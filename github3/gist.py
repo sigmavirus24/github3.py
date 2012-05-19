@@ -6,6 +6,8 @@ Module which contains all the gist related material.
 """
 
 from datetime import datetime
+from json import dumps
+from .compat import loads
 from .models import GitHubCore
 from .user import User
 
@@ -51,43 +53,75 @@ class Gist(GitHubCore):
     def __init__(self, data):
         super(Gist, self).__init__()
 
+        self._update_(data)
+
+    def __repr__(self):
+        return '<Gist [%s]>' % self._id
+
+    def _update_(self, data):
         # The gist identifier
-        self._id = data['id']
-        self._desc = data['description']
+        self._id = data.get('id')
+        self._desc = data.get('description')
 
         # e.g. https://api.github.com/gists/1
-        self._api_url = data['url']
+        self._api_url = data.get('url')
         # e.g. https://gist.github.com/1
-        self._url = data['html_url']
-        self._public = data['public']
+        self._url = data.get('html_url')
+        self._public = data.get('public')
         # a list of all the forks of that gist
         self._forks = data.get('forks', [])
         # e.g. git://gist.github.com/1.git
-        self._pull = data['git_pull_url']
+        self._pull = data.get('git_pull_url')
         # e.g. git@gist.github.com/1.git
-        self._push = data['git_push_url']
+        self._push = data.get('git_push_url')
         # date the gist was created
-        self._created = datetime.strptime(data['created_at'], 
+        self._created = datetime.strptime(data.get('created_at'),
                 self._time_format)
-        self._updated = datetime.strptime(data['updated_at'],
+        self._updated = datetime.strptime(data.get('updated_at'),
                 self._time_format)
-        self._user = User(data['user'])
+        self._user = User(data.get('user'))
 
         # Create a list of files in the gist
         self._files = []
         for file in data['files']:
             self._files.append(GistFile(data['files'][file]))
 
-    def __repr__(self):
-        return '<Gist [%s]>' % self._id
-
     @property
     def created(self):
         return self._created
 
+    def delete(self):
+        """Delete this gist."""
+        resp = self._session.delete(self._api_url)
+        if resp.status_code == 204:
+            return True
+        return False
+
     @property
     def description(self):
         return self._desc
+
+    def edit(self, **kwargs):
+        """Edit this gist. 
+
+        :param kwargs: Should be either (or both) description or files.
+        """
+        resp = self._session.patch(self._api_url, dumps(kwargs))
+        if resp.status_code == 200:
+            self._update_(loads(resp.content))
+            return True
+        return False
+
+    @property
+    def files(self):
+        return self._files
+
+    def fork(self):
+        url = '/'.join([self._api_url, 'fork'])
+        resp = self._session.post(url)
+        if resp.status_code == 201:
+            return Gist(loads(resp.content))
+        return False
 
     @property
     def forks(self):
@@ -95,7 +129,11 @@ class Gist(GitHubCore):
 
     def get(self):
         """GET /gists/:id"""
-        req = self._session.get(self._api_url)
+        resp = self._session.get(self._api_url)
+        if resp.status_code == 200:
+            self._update_(loads(resp.content))
+            return True
+        return False
 
     @property
     def git_pull(self):
@@ -112,6 +150,29 @@ class Gist(GitHubCore):
     def is_public(self):
         return self._public
 
+    def is_starred(self):
+        url = '/'.join([self._api_url, 'star'])
+        resp = self._session.get(url)
+        if resp.status_code == 204:
+            return True
+        return False
+
+    def star(self):
+        """Star this gist."""
+        url = '/'.join([self._api_url, 'star'])
+        resp = self._session.put(url)
+        if resp.status_code == 204:
+            return True
+        return False
+
+    def unstar(self):
+        """Un-star this gist."""
+        url = '/'.join([self._api_url, 'star'])
+        resp = self._session.delete(url)
+        if resp.status_code == 204:
+            return True
+        return False
+
     @property
     def updated(self):
         return self._updated
@@ -119,7 +180,3 @@ class Gist(GitHubCore):
     @property
     def user(self):
         return self._user
-
-    @property
-    def files(self):
-        return self._files
