@@ -21,16 +21,31 @@ and the submodule at the same time. Otherwise you have to do:
 Dependencies
 ------------
 
-- requests_ 
+- requests_  by Kenneth Reitz
   
 .. _requests: https://github.com/kennethreitz/requests
 
 License
 =======
 
-Modified BSD license
+Modified BSD license_
+
+.. _license:
 
 Examples
 ========
 
-*None yet*
+::
+
+  >>> from github3 import login
+  >>> gh = login(username, password)
+  >>> gists = gh.gists()
+  >>> files = {'spam.txt' : {'content': 'What... is the air-speed velocity of an
+  unladen swallow?'}}
+  >>> gh.create_gist('Answer this to cross the bridge', files, public=False)
+  <Gist [gist-id]>
+
+Author
+======
+
+Sigmavirus24

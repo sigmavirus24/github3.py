@@ -7,7 +7,8 @@ This module contains the main GitHub session object.
 """
 
 from requests import session
-from json import loads, dumps
+from json import dumps
+from .compat import loads
 from .models import GitHubCore
 from .gist import Gist
 
@@ -16,7 +17,10 @@ class GitHub(GitHubCore):
     def __init__(self):
         super(GitHub, self).__init__()
         self._session = session()
+        # Only accept JSON responses
         self._session.headers.update({'Accept': 'application/json'})
+        # Only accept UTF-8 encoded data
+        self._session.headers.update({'Accept-Charset': 'utf-8'})
 
     def __repr__(self):
         return '<github3-session at 0x%x>' % id(self)
