@@ -26,14 +26,14 @@ Dependencies
 .. _requests: https://github.com/kennethreitz/requests
 
 License
-=======
+-------
 
 Modified BSD license_
 
 .. _license:
 
 Examples
-========
+--------
 
 ::
 
@@ -46,6 +46,6 @@ Examples
   <Gist [gist-id]>
 
 Author
-======
+------
 
 Sigmavirus24
