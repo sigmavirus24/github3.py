@@ -8,8 +8,7 @@ Module which contains all the gist related material.
 from datetime import datetime
 from json import dumps
 from .compat import loads
-from .models import GitHubCore
-from .user import User
+from .models import GitHubCore, User, BaseComment
 
 class GistFile(object):
     def __init__(self, attributes):
@@ -49,6 +48,30 @@ class GistFile(object):
         return self._size
 
 
+class GistComment(BaseComment):
+    def __init__(self, comment):
+        super(GistComment, self).__init__(comment)
+
+    def __repr__(self):
+        return '<Gist Comment [%s]>' % self._user.login
+
+    def edit(self, body):
+        """Edit this comment. Replace existing comment with body."""
+        resp = self._session.patch(self._api_url, dumps({'body': body}))
+        if resp.status_code == 200:
+            d = loads(resp.content)
+            self._body = d.get('body')
+            return True
+        return False
+
+    def delete(self):
+        """Delete this comment."""
+        resp = self._session.delete(self._api_url)
+        if resp.status_code == 204:
+            return True
+        return False
+
+
 class Gist(GitHubCore):
     def __init__(self, data):
         super(Gist, self).__init__()
@@ -85,6 +108,16 @@ class Gist(GitHubCore):
         self._files = []
         for file in data['files']:
             self._files.append(GistFile(data['files'][file]))
+
+    def create_comment(self, body):
+        """Create a comment on this gist."""
+        url = '/'.join([self._api_url, 'comments'])
+        resp = self._session.post(url, dumps({'body': body}))
+        if resp.status_code == 201:
+            comment = GistComment(loads(resp.content))
+            comment._session = self._session
+            return comment
+        return None
 
     @property
     def created(self):
@@ -156,6 +189,17 @@ class Gist(GitHubCore):
         if resp.status_code == 204:
             return True
         return False
+
+    def list_comments(self):
+        url = '/'.join([self._api_url, 'comments'])
+        resp = self._session.get(url)
+        _comments = []
+        if resp.status_code == 200:
+            comments = loads(resp.content)
+            for comment in comments:
+                _comments.append(GistComment(comment))
+                _comments[-1]._session = self._session
+        return _comments
 
     def star(self):
         """Star this gist."""
