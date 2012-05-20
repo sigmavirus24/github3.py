@@ -10,6 +10,7 @@ from json import dumps
 from .compat import loads
 from .models import GitHubCore, User, BaseComment
 
+
 class GistFile(object):
     def __init__(self, attributes):
         super(GistFile, self).__init__()
@@ -135,7 +136,7 @@ class Gist(GitHubCore):
         return self._desc
 
     def edit(self, **kwargs):
-        """Edit this gist. 
+        """Edit this gist.
 
         :param kwargs: Should be either (or both) description or files.
         """

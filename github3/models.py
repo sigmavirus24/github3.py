@@ -8,6 +8,7 @@ This module provides the basic models used in github3.py
 
 from datetime import datetime
 
+
 class GitHubCore(object):
     """A basic class for the other classes."""
     def __init__(self):
@@ -204,9 +205,9 @@ class BaseComment(GitHubCore):
         self._id = comment.get('id')
         self._body = comment.get('body')
         self._user = User(comment.get('user'))
-        self._created = datetime.strptime(comment.get('created_at'), 
+        self._created = datetime.strptime(comment.get('created_at'),
                 self._time_format)
-        self._updated = datetime.strptime(comment.get('updated_at'), 
+        self._updated = datetime.strptime(comment.get('updated_at'),
                 self._time_format)
 
         self._api_url = comment.get('url')

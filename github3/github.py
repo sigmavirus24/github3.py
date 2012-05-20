@@ -12,6 +12,7 @@ from .compat import loads
 from .models import GitHubCore
 from .gist import Gist
 
+
 class GitHub(GitHubCore):
     """Stores all the session information."""
     def __init__(self):
@@ -39,7 +40,7 @@ class GitHub(GitHubCore):
         return _gist
 
     def gists(self, username=None):
-        """If no username is specified, GET /gists, otherwise GET 
+        """If no username is specified, GET /gists, otherwise GET
         /users/:username/gists"""
         if username:
             url = '/'.join([self._github_url, 'users', username,
@@ -72,5 +73,5 @@ class GitHub(GitHubCore):
         gist = None
         if response.status_code == 201:
             gist = Gist(loads(response.content))
-        
+
         return gist
