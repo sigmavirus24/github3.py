@@ -25,6 +25,71 @@ Dependencies
   
 .. _requests: https://github.com/kennethreitz/requests
 
+Progress
+--------
+
+- Gists_: **done**
+  - `Comments <http://developer.github.com/v3/gists/comments/>`_: **done**
+- `Git Data`_
+  - Blobs_
+  - Commits_
+  - References_
+  - Tags_
+  - Trees_
+- Issues_: **in progress**
+  - `Comments <http://developer.github.com/v3/issues/comments/>`_
+  - `Events <http://developer.github.com/v3/issues/events/>`_
+  - Labels_
+  - Milestones_
+- Organizations_
+  - Members_
+  - Teams_
+- `Pull Requests`_
+  - `Review Comments`_
+- Repositories_
+  - Collaborators_
+  - `Commits <http://developer.github.com/v3/repos/commits/>`_
+  - Downloads_
+  - Forks_
+  - Keys_
+  - Watching_
+  - Hooks_
+- Users_
+  - Emails_
+  - Followers_
+  - `Keys <http://developer.github.com/v3/users/keys/>`_
+- Events_
+  - Types_
+
+.. Links
+.. _Gists: http://developer.github.com/v3/gists/
+.. _Git Data: http://developer.github.com/v3/git/
+.. _Blobs: http://developer.github.com/v3/git/blobs/
+.. _Commits: http://developer.github.com/v3/git/commits/
+.. _References: http://developer.github.com/v3/git/refs/
+.. _Tags: http://developer.github.com/v3/git/tags/
+.. _Trees: http://developer.github.com/v3/git/trees/
+.. _Issues: http://developer.github.com/v3/issues/
+.. _Labels: http://developer.github.com/v3/issues/labels/
+.. _Milestones: http://developer.github.com/v3/issues/milestones/
+.. _Organizations: http://developer.github.com/v3/orgs/
+.. _Members: http://developer.github.com/v3/orgs/members/
+.. _Teams: http://developer.github.com/v3/orgs/teams/
+.. _Pull Requests: http://developer.github.com/v3/pulls/
+.. _Review Comments: http://developer.github.com/v3/pulls/comments/
+.. _Repositories: http://developer.github.com/v3/repos/
+.. _Collaborators: http://developer.github.com/v3/repos/collaborators/
+.. _Downloads: http://developer.github.com/v3/repos/downloads/
+.. _Forks: http://developer.github.com/v3/repos/forks/
+.. _Keys: http://developer.github.com/v3/repos/keys/
+.. _Watching: http://developer.github.com/v3/repos/watching/
+.. _Hooks: http://developer.github.com/v3/repos/hooks/
+.. _Users: http://developer.github.com/v3/users/
+.. _Emails: http://developer.github.com/v3/users/emails/
+.. _Followers: http://developer.github.com/v3/users/followers/
+.. _Events: http://developer.github.com/v3/events/
+.. _Types: http://developer.github.com/v3/events/types/
+
 License
 -------
 
@@ -53,7 +118,7 @@ Examples
   >>> gist = create_gist('Answer this to cross the bridge', files, public=False)
   >>> gist.list_comments()
   []
-  >>> gist.comment('Bogus. This will not work.')
+  >>> gist.create_comment('Bogus. This will not work.')
   # Which of course it didn't, because you're not logged in
 
 Author
