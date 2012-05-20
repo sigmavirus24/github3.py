@@ -29,36 +29,67 @@ Progress
 --------
 
 - Gists_: **done**
+
   - `Comments <http://developer.github.com/v3/gists/comments/>`_: **done**
+
 - `Git Data`_
+
   - Blobs_
+
   - Commits_
+
   - References_
+
   - Tags_
+
   - Trees_
+
 - Issues_: **in progress**
+
   - `Comments <http://developer.github.com/v3/issues/comments/>`_
+
   - `Events <http://developer.github.com/v3/issues/events/>`_
+
   - Labels_
+
   - Milestones_
+
 - Organizations_
+
   - Members_
+
   - Teams_
+
 - `Pull Requests`_
+
   - `Review Comments`_
+
 - Repositories_
+
   - Collaborators_
+
   - `Commits <http://developer.github.com/v3/repos/commits/>`_
+
   - Downloads_
+
   - Forks_
+
   - Keys_
+
   - Watching_
+
   - Hooks_
+
 - Users_
+
   - Emails_
+
   - Followers_
+
   - `Keys <http://developer.github.com/v3/users/keys/>`_
+
 - Events_
+
   - Types_
 
 .. Links
