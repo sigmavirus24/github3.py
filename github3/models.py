@@ -11,8 +11,8 @@ from datetime import datetime
 
 class GitHubCore(object):
     """A basic class for the other classes."""
-    def __init__(self):
-        self._session = None
+    def __init__(self, session=None):
+        self._session = session
         self._github_url = 'https://api.github.com'
         self._time_format = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -60,8 +60,8 @@ plans = {'large': _large, 'medium': _medium, 'small': _small,
 
 
 class User(GitHubCore):
-    def __init__(self, data):
-        super(User, self).__init__()
+    def __init__(self, data, session):
+        super(User, self).__init__(session)
 
         # Public information
         ## e.g. https://api.github.com/users/self._login
@@ -200,11 +200,11 @@ class User(GitHubCore):
 
 class BaseComment(GitHubCore):
     """A basic class for Gist, Issue and Pull Request Comments."""
-    def __init__(self, comment):
-        super(BaseComment, self).__init__()
+    def __init__(self, comment, session):
+        super(BaseComment, self).__init__(session)
         self._id = comment.get('id')
         self._body = comment.get('body')
-        self._user = User(comment.get('user'))
+        self._user = User(comment.get('user'), session)
         self._created = datetime.strptime(comment.get('created_at'),
                 self._time_format)
         self._updated = datetime.strptime(comment.get('updated_at'),
@@ -218,6 +218,8 @@ class BaseComment(GitHubCore):
         self._path = comment.get('path')
         self._pos = comment.get('position')
         self._cid = comment.get('comment_id')
+
+        self._session = session
 
     def __repr__(self):
         return '<github3-comment at 0x%x>' % id(self)

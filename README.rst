@@ -36,7 +36,7 @@ Progress
 
   - Blobs_
 
-  - Commits_
+  - `Commits <http://developer.github.com/v3/events/>`_
 
   - References_
 
@@ -96,7 +96,6 @@ Progress
 .. _Gists: http://developer.github.com/v3/gists/
 .. _Git Data: http://developer.github.com/v3/git/
 .. _Blobs: http://developer.github.com/v3/git/blobs/
-.. _Commits: http://developer.github.com/v3/git/commits/
 .. _References: http://developer.github.com/v3/git/refs/
 .. _Tags: http://developer.github.com/v3/git/tags/
 .. _Trees: http://developer.github.com/v3/git/trees/

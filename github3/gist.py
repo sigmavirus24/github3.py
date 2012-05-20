@@ -50,8 +50,8 @@ class GistFile(object):
 
 
 class GistComment(BaseComment):
-    def __init__(self, comment):
-        super(GistComment, self).__init__(comment)
+    def __init__(self, comment, session):
+        super(GistComment, self).__init__(comment, session)
 
     def __repr__(self):
         return '<Gist Comment [%s]>' % self._user.login
@@ -74,8 +74,8 @@ class GistComment(BaseComment):
 
 
 class Gist(GitHubCore):
-    def __init__(self, data):
-        super(Gist, self).__init__()
+    def __init__(self, data, session):
+        super(Gist, self).__init__(session)
 
         self._update_(data)
 
@@ -103,7 +103,7 @@ class Gist(GitHubCore):
                 self._time_format)
         self._updated = datetime.strptime(data.get('updated_at'),
                 self._time_format)
-        self._user = User(data.get('user'))
+        self._user = User(data.get('user'), self._session)
 
         # Create a list of files in the gist
         self._files = []
