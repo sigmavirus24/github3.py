@@ -45,6 +45,17 @@ Examples
   >>> gh.create_gist('Answer this to cross the bridge', files, public=False)
   <Gist [gist-id]>
 
+::
+
+  >>> from github3 import create_gist
+  >>> files = {'spam.txt' : {'content': 'What... is the air-speed velocity of an
+  unladen swallow?'}}
+  >>> gist = create_gist('Answer this to cross the bridge', files, public=False)
+  >>> gist.list_comments()
+  []
+  >>> gist.comment('Bogus. This will not work.')
+  # Which of course it didn't, because you're not logged in
+
 Author
 ------
 
