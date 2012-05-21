@@ -29,6 +29,12 @@ class Label(GitHubCore):
     def color(self):
         return self._color
 
+    def delete(self):
+        resp = self._session.delete(self._api_url)
+        if resp.status_code == 204:
+            return True
+        return False
+
     @property
     def name(self):
         return self._name
@@ -256,6 +262,17 @@ class Repository(GitHubCore):
     def updated_at(self):
         return self._updated
 
+    def update_label(self, name, color, new_name=None):
+        label = self.get_label(name)
+
+        if label:
+            if not new_name:
+                return label.edit(name, color)
+            return label.edit(new_name, color)
+
+        # label == None
+        return False
+
     @property
     def watchers(self):
         return self._watchers
@@ -308,19 +325,11 @@ class Issue(GitHubCore):
         self._api_url = issue.get('url')
         self._user = User(issue.get('user'), self._session)
 
-    def close(self):
-        return self.edit(self._title, self._body, self._assign.login, 
-                'closed', self._mile, self._labels)
-
-    def edit(self, title=None, body=None, assignee=None, state=None,
-            milestone=None, labels=[]):
-        data = {'title': title, 'body': body, 'assignee': assignee,
-                'state': state, 'milestone': milestone, 'labels': labels}
-        resp = self._session.patch(self._api_url, dumps(data))
+    def add_labels(self, *args):
+        url = '/'.join([self._api_url, 'labels'])
+        resp = self._session.post(url, dumps(args))
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
             return True
-
         return False
 
     @property
@@ -331,10 +340,9 @@ class Issue(GitHubCore):
     def body(self):
         return self._body
 
-    def is_closed(self):
-        if self._closed or (self._state == 'closed'):
-            return True
-        return False
+    def close(self):
+        return self.edit(self._title, self._body, self._assign.login, 
+                'closed', self._mile, self._labels)
 
     @property
     def closed_at(self):
@@ -348,6 +356,17 @@ class Issue(GitHubCore):
     def created_at(self):
         return self._created
 
+    def edit(self, title=None, body=None, assignee=None, state=None,
+            milestone=None, labels=[]):
+        data = {'title': title, 'body': body, 'assignee': assignee,
+                'state': state, 'milestone': milestone, 'labels': labels}
+        resp = self._session.patch(self._api_url, dumps(data))
+        if resp.status_code == 200:
+            self._update_(loads(resp.content))
+            return True
+
+        return False
+
     @property
     def html_url(self):
         return self._url
@@ -355,6 +374,11 @@ class Issue(GitHubCore):
     @property
     def id(self):
         return self._id
+
+    def is_closed(self):
+        if self._closed or (self._state == 'closed'):
+            return True
+        return False
 
     @property
     def labels(self):
@@ -371,6 +395,24 @@ class Issue(GitHubCore):
     @property
     def pull_request(self):
         return self._pull_req
+
+    def remove_label(self, name):
+        url = '/'.join([self._api_url, 'labels', name])
+        resp = self._session.delete(url)
+        if resp.status_code == 200:
+            return True
+        return False
+
+    def remove_all_labels(self):
+        # Can either send DELETE or [] to remove all labels
+        return self.replace_labels([])
+
+    def replace_labels(self, labels):
+        url = '/'.join([self._api_url, 'labels'])
+        resp = self._session.put(url, dumps(labels))
+        if resp.status_code == 200:
+            return True
+        return False
 
     def reopen(self):
         return self.edit(self._title, self._body, self._assign.login, 
