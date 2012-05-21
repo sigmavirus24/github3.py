@@ -109,6 +109,23 @@ class Repository(GitHubCore):
     def clone_url(self):
         return self._https_clone
 
+    def create_issue(self,
+        title,
+        body=None,
+        assignee=None,
+        milestone=None,
+        labels=[]):
+        """Creates an issue on this repository."""
+        issue = dumps({'title': title, 'body': body,
+            'assignee': assignee, 'milestone': milestone, 
+            'labels': labels})
+        url = '/'.join([self._api_url, 'issues'])
+
+        resp = self._session.post(url, issue)
+        if resp.status_code == 201:
+            return True
+        return False
+
     def create_label(self, name, color):
         if color[0] == '#':
             color = color[1:]
@@ -128,7 +145,7 @@ class Repository(GitHubCore):
         return self._desc
 
     def fork(self, organization=None):
-        """Create a fork of this repository
+        """Create a fork of this repository.
         
         :param organization: login for organization to create the fork under"""
         url = '/'.join([self._api_url, 'forks'])
@@ -254,7 +271,8 @@ class Issue(GitHubCore):
                 self._num)
 
     def _update_(self, issue):
-        self._assign = User(issue.get('assignee'), self._session)
+        if issue.get('assignee'):
+            self._assign = User(issue.get('assignee'), self._session)
         self._body = issue.get('body')
 
         # If an issue is still open, this field will be None
@@ -289,6 +307,10 @@ class Issue(GitHubCore):
                 self._time_format)
         self._api_url = issue.get('url')
         self._user = User(issue.get('user'), self._session)
+
+    def close(self):
+        return self.edit(self._title, self._body, self._assign.login, 
+                'closed', self._mile, self._labels)
 
     def edit(self, title=None, body=None, assignee=None, state=None,
             milestone=None, labels=[]):
@@ -349,6 +371,10 @@ class Issue(GitHubCore):
     @property
     def pull_request(self):
         return self._pull_req
+
+    def reopen(self):
+        return self.edit(self._title, self._body, self._assign.login, 
+                'open', self._mile, self._labels)
 
     @property
     def repository(self):

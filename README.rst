@@ -151,6 +151,22 @@ Examples
   >>> gist.create_comment('Bogus. This will not work.')
   # Which of course it didn't, because you're not logged in
 
+::
+
+  >>> from github3 import login
+  >>> gh = login(username, password)
+  >>> issue = gh.issue('sigmavirus24', 'issues.py', 2)
+  >>> issue.html_url
+  u'https://github.com/sigmavirus24/issues.py/issues/2'
+  >>> issue.state
+  u'open'
+  >>> issue.close()
+  True
+  >>> issue.reopen()
+  True
+  >>> issue.edit('Testing Github3.py', 'Testing re-opening', 'sigmavirus24')
+  True
+
 Author
 ------
 

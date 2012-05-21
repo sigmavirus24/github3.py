@@ -11,7 +11,7 @@ from json import dumps
 from .compat import loads
 from .models import GitHubCore
 from .gist import Gist
-from .issue import Issue
+from .issue import Issue, Repository
 
 
 class GitHub(GitHubCore):
@@ -44,6 +44,40 @@ class GitHub(GitHubCore):
 
         return gist
 
+    def create_issue(self,
+        owner,
+        repository,
+        title,
+        body=None,
+        assignee=None,
+        milestone=None,
+        labels=[]):
+        """Create an issue on the project 'repository' owned by 'owner' 
+        with title 'title'.
+
+        body, assignee, milestone, labels are all optional.
+
+        :param owner:
+        :param repository:
+        :param title: Title of issue to be created
+        :param body: The text of the issue, markdown formatted
+        :param assignee: Login of person to assign the issue to
+        :param milestone: Which milestone to assign the issue to
+        :param labels: List of label names.
+        """
+        
+        repo = None
+        if owner and repository and title:
+            repo = self.repository(owner, repository)
+
+        if repo:
+            return repo.create_issue(title, body, assignee, milestone, 
+                    labels)
+
+        # Regardless, something went wrong. We were unable to create the 
+        # issue
+        return False
+
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
         url = '/'.join([self._github_url, 'gists', str(id_num)])
@@ -74,6 +108,8 @@ class GitHub(GitHubCore):
         return gists
 
     def issue(self, owner, repository, number):
+        """Fetch issue #:number: from 
+        https://github.com/:owner:/:repository:"""
         url = '/'.join([self._github_url, 'repos', owner, repository, 'issues',
             str(number)])
         req = self._session.get(url)
@@ -83,13 +119,39 @@ class GitHub(GitHubCore):
 
         return issue
 
-    def issues(self, owner=None, repository=None):
-        _url = [self._github_url]
+    def issues(self,
+        owner=None,
+        repository=None,
+        filter=None,
+        state=None,
+        labels=None,
+        sort=None,
+        direction=None,
+        since=None):
+        """If no parameters are provided, this gets the issues for the 
+        authenticated user. All parameters are optional with the 
+        exception that owner and repository must be supplied together.
+
+        :param filter: accepted values:
+            ('assigned', 'created', 'mentioned', 'subscribed')
+            api-default: assigned
+        :param state: accepted values: ('open', 'closed')
+            api-default: open
+        :param labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param since: ISO 8601 formatted timestamp, e.g.,
+            2012-05-20T23:10:27Z
+        """
+        url = [self._github_url]
         if owner and repository:
-            _url.extend(['repos', owner, repository, 'issues'])
+            url.extend(['repos', owner, repository, 'issues'])
         else:
-            _url.append('issues')
-        url = '/'.join(_url)
+            url.append('issues')
+        url = '/'.join(url)
 
         issues = []
         req = self._session.get(url)
@@ -103,3 +165,12 @@ class GitHub(GitHubCore):
     def login(self, username, password):
         """Logs the user into GitHub for protected API calls."""
         self._session.auth = (username, password)
+
+    def repository(self, owner, repository):
+        """Returns a Repository object for the specified combination of 
+        owner and repository"""
+        url = '/'.join([self._github_url, 'repos', owner, repository])
+        req = self._session.get(url)
+        if req.status_code == 200:
+            return Repository(loads(req.content), self._session)
+        return None
