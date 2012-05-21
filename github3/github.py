@@ -10,8 +10,9 @@ from requests import session
 from json import dumps
 from .compat import loads
 from .models import GitHubCore
+from .issue import Issue
+from .repo import Repository
 from .gist import Gist
-from .issue import Issue, Repository
 
 
 class GitHub(GitHubCore):
