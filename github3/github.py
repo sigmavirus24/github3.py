@@ -10,7 +10,7 @@ from requests import session
 from json import dumps
 from .compat import loads
 from .models import GitHubCore
-from .issue import Issue
+from .issue import Issue, issue_params
 from .repo import Repository
 from .gist import Gist
 
@@ -153,6 +153,9 @@ class GitHub(GitHubCore):
         else:
             url.append('issues')
         url = '/'.join(url)
+        params = issue_params(filter, state, labels, sort, direction, since)
+        if params:
+            url = '?'.join([url, params])
 
         issues = []
         req = self._session.get(url)

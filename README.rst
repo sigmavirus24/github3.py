@@ -44,15 +44,15 @@ Progress
 
   - Trees_
 
-- Issues_: **in progress**
+- Issues_: **done**
 
   - `Comments <http://developer.github.com/v3/issues/comments/>`_
 
   - `Events <http://developer.github.com/v3/issues/events/>`_
 
-  - Labels_
+  - Labels_: **almost done**
 
-  - Milestones_
+  - Milestones_: **in progress**
 
 - Organizations_
 

@@ -10,7 +10,7 @@ from datetime import datetime
 from json import dumps
 from .compat import loads
 from .models import GitHubCore, User
-from .issue import Issue, Label  #, Milestone
+from .issue import Issue, Label, issue_params  #, Milestone
 
 
 class Repository(GitHubCore):
@@ -96,8 +96,8 @@ class Repository(GitHubCore):
     def create_label(self, name, color):
         if color[0] == '#':
             color = color[1:]
-        url = '/'.join([self._github_url, 'repos', self._repo[0],
-            self._repo[1], 'labels'])
+        url = '/'.join([self._github_url, 'repos', self._owner.login,
+            self._name, 'labels'])
         resp = self._session.post(url, dumps({'name': name, 'color': color}))
         if resp.status_code == 201:
             return True
@@ -159,8 +159,7 @@ class Repository(GitHubCore):
         label = None
         
         if name:
-            url = '/'.join([self._github_url, self._repo[0], self._repo[1],
-                'labels', name])
+            url = '/'.join([self._api_url, 'labels', name])
             resp = self._session.get(url)
             if resp.status_code == 200:
                 label = Label(loads(resp.content), self._session)
@@ -171,8 +170,57 @@ class Repository(GitHubCore):
     def language(self):
         return self._lang
 
-    def list_issues(self):
+    def list_issues(self,
+        milestone=None,
+        state=None,
+        assignee=None,
+        mentioned=None,
+        labels=None,
+        sort=None,
+        direction=None,
+        since=None):
+        """List issues on this repo based upon parameters passed.
+
+        :param milestone: must be an integer, 'none', or '*'
+        :param state: accepted values: ('open', 'closed')
+        :param assignee: 'none', '*', or login name
+        :param mentioned: user's login name
+        :param labels: comma-separated list of labels, e.g. 'bug,ui,@high'
+        :param sort: accepted values: 
+            ('created', 'updated', 'comments', 'created')
+        :param direction: accepted values: ('open', 'closed')
+        :param since: ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+        """
         url = '/'.join([self._api_url, 'issues'])
+
+        params = []
+        if milestone != None and milestone in ('*', 'none') or isinstance(milestone, int):
+            params.append('milestone=%s' % str(milestone).lower())
+            # str(None) = 'None' which is invalid, so .lower() it to make it
+            # work.
+
+        if assignee:
+            params.append('assignee=%s' % assignee)
+
+        if mentioned:
+            params.append('mentioned=%s' % mentioned)
+
+        tmp = issue_params(None, state, labels, sort, direction, since)
+
+        params = '&'.join(params) if params else None
+        params = '&'.join([tmp, params]) if params else tmp
+
+        if params:
+            url = '?'.join([url, params])
+
+        resp = self._session.get(url)
+        issues = []
+        if resp.status_code == 200:
+            jissues = loads(resp.content)
+            for jissue in jissues:
+                issues.append(Issue(jissue, self._session))
+
+        return issues
 
     def list_labels(self):
         url = '/'.join([self._api_url, 'labels'])
@@ -233,8 +281,8 @@ class Repository(GitHubCore):
 
         if label:
             if not new_name:
-                return label.edit(name, color)
-            return label.edit(new_name, color)
+                return label.update(name, color)
+            return label.update(new_name, color)
 
         # label == None
         return False

@@ -53,6 +53,25 @@ class Label(GitHubCore):
         return False
 
 
+class Milestone(GitHubCore):
+    def __init__(self, mile, session):
+        super(Milestone, self).__init__(session)
+        self._api_url = mile.get('url')
+        self._num = mile.get('number')
+        self._state = mile.get('state')
+        self._title = mile.get('title')
+        self._desc = mile.get('description')
+        self._creator = User(mile.get('creator'))
+        self._open = mile.get('open_issues')
+        self._closed = mile.get('closed_issues')
+        self._created = datetime.strptime(mile.get('created_at'),
+                self._time_format)
+        self._due = datetime.strptime(mile.get('due_on'), self._time_format)
+
+    def __repr__(self):
+        return '<Milestone [%s]>' % self._title
+
+
 class Issue(GitHubCore):
     def __init__(self, issue, session):
         super(Issue, self).__init__(session)
@@ -204,3 +223,26 @@ class Issue(GitHubCore):
     @property
     def user(self):
         return self._user
+
+
+def issue_params(filter, state, labels, sort, direction, since):
+    params = []
+    if filter in ('assigned', 'created', 'mentioned', 'subscribed'):
+        params.append('filter=%s' % filter)
+
+    if state in ('open', 'closed'):
+        params.append('state=%s' % state)
+
+    if labels:
+        params.append('labels=%s' % labels)
+
+    if sort in ('created', 'updated', 'comments'):
+        params.append('sort=%s' % sort)
+
+    if direction in ('asc', 'desc'):
+        params.append('direction=%s' % direction)
+
+    if since and match('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', since):
+        params.append('since=%s' % since)
+
+    return '&'.join(params)
