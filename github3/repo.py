@@ -10,7 +10,7 @@ from datetime import datetime
 from json import dumps
 from .compat import loads
 from .models import GitHubCore, User
-from .issue import Issue, Label, issue_params  #, Milestone
+from .issue import Issue, Label, Milestone, issue_params
 
 
 class Repository(GitHubCore):
@@ -234,8 +234,31 @@ class Repository(GitHubCore):
 
         return labels
 
-    def list_milestones(self):
-        pass
+    def list_milestones(self, state=None, sort=None, direction=None):
+        url = '/'.join([self._api_url, 'milestones'])
+
+        params = []
+        if state in ('open', 'closed'):
+            params.append('state=%s' % state)
+
+        if sort in ('due_date', 'completeness'):
+            params.append('sort=%s' % sort)
+
+        if direction in ('asc', 'desc'):
+            params.append('direction=%s' % direction)
+
+        if params:
+            params = '&'.join(params)
+            url = '?'.join([url, params])
+
+        resp = self._session.get(url)
+        milestones = []
+        if resp.status_code == 200:
+            miles = loads(resp.content)
+            for mile in miles:
+                milestones.append(Milestone(mile, self._session))
+
+        return milestones
 
     @property
     def mirror(self):

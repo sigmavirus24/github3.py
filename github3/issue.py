@@ -56,20 +56,80 @@ class Label(GitHubCore):
 class Milestone(GitHubCore):
     def __init__(self, mile, session):
         super(Milestone, self).__init__(session)
+        self._update_(mile)
+
+    def __repr__(self):
+        return '<Milestone [%s]>' % self._title
+
+    def _update_(self, mile):
         self._api_url = mile.get('url')
         self._num = mile.get('number')
         self._state = mile.get('state')
         self._title = mile.get('title')
         self._desc = mile.get('description')
-        self._creator = User(mile.get('creator'))
+        self._creator = User(mile.get('creator'), self._session)
         self._open = mile.get('open_issues')
         self._closed = mile.get('closed_issues')
         self._created = datetime.strptime(mile.get('created_at'),
                 self._time_format)
-        self._due = datetime.strptime(mile.get('due_on'), self._time_format)
+        self._due = None
+        if mile.get('due_on'):
+            self._due = datetime.strptime(mile.get('due_on'), 
+                    self._time_format)
 
-    def __repr__(self):
-        return '<Milestone [%s]>' % self._title
+    @property
+    def closed_issues(self):
+        return self._closed
+
+    @property
+    def created_at(self):
+        return self._created
+
+    @property
+    def creator(self):
+        return self._creator
+
+    @property
+    def description(self):
+        return self._desc
+
+    @property
+    def due_on(self):
+        return self._due
+
+    @property
+    def number(self):
+        return self._num
+
+    @property
+    def open_issues(self):
+        return self._open
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
+    def title(self):
+        return self._title
+
+    def update(self, title, state=None, description=None, due_on=None):
+        """Update this milestone.
+
+        state, description, and due_on are optional
+
+        :param title: *required*, string
+        :param state: ('open', 'closed')
+        :param description: string
+        :param due_on: ISO 8601 time string: YYYY-MM-DDTHH:MM:SSZ
+        """
+        inp = dumps({'title': title, 'state': state,
+            'description': description, 'due_on': due_on})
+        resp = self._session.patch(self._api_url, inp)
+        if resp.status_code == 200:
+            self._update_(loads(resp.content))
+            return True
+        return False
 
 
 class Issue(GitHubCore):
@@ -99,7 +159,7 @@ class Issue(GitHubCore):
         self._url = issue.get('html_url')
         self._id = issue.get('id')
         self._labels = [Label(label, self._session) for label in issue.get('labels')]
-        self._mile = issue.get('milestone')
+        self._mile = Milestone(issue.get('milestone'), self._session)
         self._num = issue.get('number')
         self._pull_req = issue.get('pull_request')
         m = match('https://github\.com/(\S+)/(\S+)/issues/\d+', self._url)
