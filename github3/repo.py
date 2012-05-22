@@ -165,16 +165,23 @@ class Repository(GitHubCore):
     def id(self):
         return self._id
 
-    def get_label(self, name):
-        label = None
-        
+    def issue(self, number):
+        if number > 0:
+            url = '/'.join([self._api_url, 'issues', str(number)])
+            resp = self._session.get(url)
+            if resp.status_code == 200:
+                return Issue(loads(resp.content), self._session)
+
+        return None
+
+    def label(self, name):
         if name:
             url = '/'.join([self._api_url, 'labels', name])
             resp = self._session.get(url)
             if resp.status_code == 200:
-                label = Label(loads(resp.content), self._session)
+                return Label(loads(resp.content), self._session)
 
-        return label
+        return None
 
     @property
     def language(self):
@@ -269,6 +276,13 @@ class Repository(GitHubCore):
                 milestones.append(Milestone(mile, self._session))
 
         return milestones
+
+    def milestone(self, number):
+        url = '/'.join([self._api_url, 'milestones', str(number)])
+        resp = self._session.get(url)
+        if resp.status_code == 200:
+            return Milestone(loads(resp.content), self._session)
+        return None
 
     @property
     def mirror(self):

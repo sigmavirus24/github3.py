@@ -111,14 +111,11 @@ class GitHub(GitHubCore):
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from 
         https://github.com/:owner:/:repository:"""
-        url = '/'.join([self._github_url, 'repos', owner, repository, 'issues',
-            str(number)])
-        req = self._session.get(url)
-        issue = None
-        if req.status_code == 200:
-            issue = Issue(loads(req.content), self._session)
+        repo = self.repository(owner, repository)
+        if repo:
+            return repo.issue(number)
 
-        return issue
+        return None
 
     def issues(self,
         owner=None,

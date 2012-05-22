@@ -89,6 +89,13 @@ class Milestone(GitHubCore):
     def creator(self):
         return self._creator
 
+    def delete(self):
+        """Delete this milestone."""
+        resp = self._session.delete(self._api_url)
+        if resp.status_code == 204:
+            return True
+        return False
+
     @property
     def description(self):
         return self._desc
