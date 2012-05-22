@@ -159,7 +159,10 @@ class Issue(GitHubCore):
         self._url = issue.get('html_url')
         self._id = issue.get('id')
         self._labels = [Label(label, self._session) for label in issue.get('labels')]
-        self._mile = Milestone(issue.get('milestone'), self._session)
+
+        # Don't want to pass a NoneType to Milestone.__init__()
+        if issue.get('milestone'):
+            self._mile = Milestone(issue.get('milestone'), self._session)
         self._num = issue.get('number')
         self._pull_req = issue.get('pull_request')
         m = match('https://github\.com/(\S+)/(\S+)/issues/\d+', self._url)
@@ -204,6 +207,19 @@ class Issue(GitHubCore):
 
     def edit(self, title=None, body=None, assignee=None, state=None,
             milestone=None, labels=[]):
+        """Edit this issue. 
+
+        :param title: Title of the issue, string
+        :param body: markdown formatted string
+        :param assignee: login name of user the issue should be assigned to
+        :param state: ('open', 'closed')
+        :param milestone: the NUMBER (not title) of the milestone to assign this
+            to [1]_
+        :param labels: list of labels to apply this to
+
+        .. [1] Milestone numbering starts at 1, i.e. the first milestone you
+               create is 1, the second is 2, etc.
+        """
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
         resp = self._session.patch(self._api_url, dumps(data))
