@@ -46,8 +46,8 @@ Progress
 
 - Issues_: **done**
 
-  - `Comments <http://developer.github.com/v3/issues/comments/>`_ **in 
-    progress**
+  - `Comments <http://developer.github.com/v3/issues/comments/>`_ 
+    **done**
 
   - `Events <http://developer.github.com/v3/issues/events/>`_
 
@@ -89,7 +89,7 @@ Progress
 
   - `Keys <http://developer.github.com/v3/users/keys/>`_
 
-- Events_
+- Events_ **in progress**
 
   - Types_
 
