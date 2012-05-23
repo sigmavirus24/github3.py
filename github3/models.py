@@ -7,6 +7,8 @@ This module provides the basic models used in github3.py
 """
 
 from datetime import datetime
+from json import dumps
+from .compat import loads
 
 
 class GitHubCore(object):
@@ -217,9 +219,15 @@ class BaseComment(GitHubCore):
     """A basic class for Gist, Issue and Pull Request Comments."""
     def __init__(self, comment, session):
         super(BaseComment, self).__init__(session)
+        self._update_(comment)
+
+    def __repr__(self):
+        return '<github3-comment at 0x%x>' % id(self)
+
+    def _update_(self, comment):
         self._id = comment.get('id')
         self._body = comment.get('body')
-        self._user = User(comment.get('user'), session)
+        self._user = User(comment.get('user'), self._session)
         self._created = datetime.strptime(comment.get('created_at'),
                 self._time_format)
         self._updated = datetime.strptime(comment.get('updated_at'),
@@ -234,23 +242,34 @@ class BaseComment(GitHubCore):
         self._pos = comment.get('position')
         self._cid = comment.get('comment_id')
 
-        self._session = session
+    @property
+    def body(self):
+        return self._body
 
-    def __repr__(self):
-        return '<github3-comment at 0x%x>' % id(self)
+    @property
+    def created_at(self):
+        return self._created
+
+    def delete(self):
+        """Delete this comment."""
+        resp = self._delete(self._api_url)
+        if resp.status_code == 204:
+            return True
+        return False
+
+    def edit(self, body):
+        """Edit this comment."""
+        if body:
+            resp = self._patch(self._api_url, dumps({'body': body}))
+            if resp.status_code == 200:
+                self._update_(loads(resp.content))
+                return True
+        return False
 
     @property
     def id(self):
         return self._id
 
     @property
-    def body(self):
-        return self._body
-
-    @property
     def user(self):
         return self._user
-
-    @property
-    def created_at(self):
-        return self._created

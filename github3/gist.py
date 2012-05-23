@@ -56,22 +56,6 @@ class GistComment(BaseComment):
     def __repr__(self):
         return '<Gist Comment [%s]>' % self._user.login
 
-    def edit(self, body):
-        """Edit this comment. Replace existing comment with body."""
-        resp = self._patch(self._api_url, dumps({'body': body}))
-        if resp.status_code == 200:
-            d = loads(resp.content)
-            self._body = d.get('body')
-            return True
-        return False
-
-    def delete(self):
-        """Delete this comment."""
-        resp = self._delete(self._api_url)
-        if resp.status_code == 204:
-            return True
-        return False
-
 
 class Gist(GitHubCore):
     def __init__(self, data, session):

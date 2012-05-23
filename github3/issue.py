@@ -215,9 +215,35 @@ class Issue(GitHubCore):
     def closed_at(self):
         return self._closed
 
+    def comment(self, id_num):
+        """Get a single comment by its id.
+
+        The catch here is that id is NOT a simple number to obtain. If 
+        you were to look at the comments on issue #15 in 
+        sigmavirus24/Todo.txt-python, the first comment's id is 4150787.  
+        """
+        if id_num > 0:  # Might as well check that it's positive
+            url = '/'.join([self._github_url, self._repo[0], 
+                self._repo[1], 'issues', 'comments', str(id)])
+            resp = self._get(url)
+            if resp.status_code == 200:
+                return IssueComment(loads(resp.content))
+        return None
+
+
     @property
     def comments(self):
         return self._comments
+
+    def create_comment(self, body):
+        """Create a comment on this issue."""
+        if body:
+            url = '/'.join([self._api_url, 'comments'])
+            resp = self._post(url, dumps({'body': body}))
+            if resp.status_code == 201:
+                return True
+
+        return False
 
     @property
     def created_at(self):
@@ -263,6 +289,16 @@ class Issue(GitHubCore):
     @property
     def labels(self):
         return self._labels
+
+    def list_comments(self):
+        url = '/'.join([self._api_url, 'comments'])
+        resp = self._get(url)
+
+        comments = []
+        if resp.status_code == 200:
+            for comment in loads(resp.content):
+                comments.append(IssueComment(comment, self._session))
+        return comments
 
     @property
     def milestone(self):
@@ -322,6 +358,13 @@ class Issue(GitHubCore):
 class IssueComment(BaseComment):
     def __init__(self, comment, session):
         super(IssueComment, self).__init__(comment, session)
+
+    def __repr__(self):
+        return '<Issue Comment [%s]>' % self._user.login
+
+    @property
+    def updated_at(self):
+        return self._updated
 
 
 def issue_params(filter, state, labels, sort, direction, since):
