@@ -36,6 +36,9 @@ class GitHubCore(object):
     def _put(self, url, data=None, **kwargs):
         return self._session.put(url, data, **kwargs)
 
+    def _strptime(self, time_str):
+        return datetime.strptime(time_str, self._time_format)
+
 
 class Plan(object):
     def __init__(self, data):
@@ -228,10 +231,8 @@ class BaseComment(GitHubCore):
         self._id = comment.get('id')
         self._body = comment.get('body')
         self._user = User(comment.get('user'), self._session)
-        self._created = datetime.strptime(comment.get('created_at'),
-                self._time_format)
-        self._updated = datetime.strptime(comment.get('updated_at'),
-                self._time_format)
+        self._created = self._strptime(comment.get('created_at'))
+        self._updated = self._strptime(comment.get('updated_at'))
 
         self._api_url = comment.get('url')
         if comment.get('_links'):

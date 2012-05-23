@@ -19,8 +19,7 @@ class Repository(GitHubCore):
         super(Repository, self).__init__(session)
         # Clone url using Smart HTTP(s)
         self._https_clone = repo.get('clone_url')
-        self._created = datetime.strptime(repo.get('created_at'),
-                self._time_format)
+        self._created = self._strptime(repo.get('created_at'))
         self._desc = repo.get('description')
 
         # The number of forks
@@ -55,15 +54,13 @@ class Repository(GitHubCore):
 
         # Is this repository private?
         self._priv = repo.get('private')
-        self._pushed = datetime.strptime(repo.get('pushed_at'),
-                self._time_format)
+        self._pushed = self._strptime(repo.get('pushed_at'))
         self._size = repo.get('size')
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         self._ssh = repo.get('ssh_url')
         self._svn = repo.get('svn_url')
-        self._updated = datetime.strptime(repo.get('updated_at'),
-                self._time_format)
+        self._updated = self._strptime(repo.get('updated_at'))
         self._api_url = repo.get('url')
 
         # The number of watchers

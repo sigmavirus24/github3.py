@@ -6,7 +6,6 @@ This module contains the classes related to issues.
 
 """
 
-from datetime import datetime
 from json import dumps
 from re import match
 from .models import GitHubCore, BaseComment, User
@@ -70,12 +69,10 @@ class Milestone(GitHubCore):
         self._creator = User(mile.get('creator'), self._session)
         self._open = mile.get('open_issues')
         self._closed = mile.get('closed_issues')
-        self._created = datetime.strptime(mile.get('created_at'),
-                self._time_format)
+        self._created = self._strptime(mile.get('created_at'))
         self._due = None
         if mile.get('due_on'):
-            self._due = datetime.strptime(mile.get('due_on'),
-                    self._time_format)
+            self._due = self._strptime(mile.get('due_on'))
 
     @property
     def closed_issues(self):
@@ -167,13 +164,11 @@ class Issue(GitHubCore):
         # If an issue is still open, this field will be None
         self._closed = None
         if issue.get('closed_at'):
-            self._closed = datetime.strptime(issue.get('closed_at'),
-                self._time_format)
+            self._closed = self._strptime(issue.get('closed_at'))
 
         # Numer of comments
         self._comments = issue.get('comments')
-        self._created = datetime.strptime(issue.get('created_at'),
-                self._time_format)
+        self._created = self._strptime(issue.get('created_at'))
         self._url = issue.get('html_url')
         self._id = issue.get('id')
         self._labels = [Label(l, self._session) for l in issue.get('labels')]
@@ -187,8 +182,7 @@ class Issue(GitHubCore):
         self._repo = m.groups()
         self._state = issue.get('state')
         self._title = issue.get('title')
-        self._updated = datetime.strptime(issue.get('updated_at'),
-                self._time_format)
+        self._updated = self._strptime(issue.get('updated_at'))
         self._api_url = issue.get('url')
         self._user = User(issue.get('user'), self._session)
 

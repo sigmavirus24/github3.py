@@ -3,9 +3,9 @@ gist.py
 =======
 
 Module which contains all the gist related material.
+
 """
 
-from datetime import datetime
 from json import dumps
 from .compat import loads
 from .models import GitHubCore, User, BaseComment
@@ -83,10 +83,8 @@ class Gist(GitHubCore):
         # e.g. git@gist.github.com/1.git
         self._push = data.get('git_push_url')
         # date the gist was created
-        self._created = datetime.strptime(data.get('created_at'),
-                self._time_format)
-        self._updated = datetime.strptime(data.get('updated_at'),
-                self._time_format)
+        self._created = self._strptime(data.get('created_at'))
+        self._updated = self._strptime(data.get('updated_at'))
         self._user = User(data.get('user'), self._session)
 
         # Create a list of files in the gist
