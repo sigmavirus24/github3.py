@@ -84,7 +84,7 @@ class Repository(GitHubCore):
         labels=[]):
         """Creates an issue on this repository."""
         issue = dumps({'title': title, 'body': body,
-            'assignee': assignee, 'milestone': milestone, 
+            'assignee': assignee, 'milestone': milestone,
             'labels': labels})
         url = '/'.join([self._api_url, 'issues'])
 
@@ -105,7 +105,7 @@ class Repository(GitHubCore):
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
         url = '/'.join([self._api_url, 'milestones'])
-        mile = dumps({'title': title, 'state': state, 
+        mile = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
 
         resp = self._post(url, mile)
@@ -123,8 +123,9 @@ class Repository(GitHubCore):
 
     def fork(self, organization=None):
         """Create a fork of this repository.
-        
-        :param organization: login for organization to create the fork under"""
+
+        :param organization: login for organization to create the fork
+            under"""
         url = '/'.join([self._api_url, 'forks'])
         if organization:
             resp = self._post(url, dumps({'org': organization}))
@@ -203,7 +204,7 @@ class Repository(GitHubCore):
         :param assignee: 'none', '*', or login name
         :param mentioned: user's login name
         :param labels: comma-separated list of labels, e.g. 'bug,ui,@high'
-        :param sort: accepted values: 
+        :param sort: accepted values:
             ('created', 'updated', 'comments', 'created')
         :param direction: accepted values: ('open', 'closed')
         :param since: ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
@@ -211,7 +212,7 @@ class Repository(GitHubCore):
         url = '/'.join([self._api_url, 'issues'])
 
         params = []
-        if milestone != None and milestone in ('*', 'none') or isinstance(milestone, int):
+        if milestone in ('*', 'none') or isinstance(milestone, int):
             params.append('milestone=%s' % str(milestone).lower())
             # str(None) = 'None' which is invalid, so .lower() it to make it
             # work.

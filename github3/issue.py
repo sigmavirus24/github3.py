@@ -74,7 +74,7 @@ class Milestone(GitHubCore):
                 self._time_format)
         self._due = None
         if mile.get('due_on'):
-            self._due = datetime.strptime(mile.get('due_on'), 
+            self._due = datetime.strptime(mile.get('due_on'),
                     self._time_format)
 
     @property
@@ -105,7 +105,7 @@ class Milestone(GitHubCore):
         return self._due
 
     def list_labels(self):
-        """List the labels for every issue associated with this 
+        """List the labels for every issue associated with this
         milestone."""
         url = '/'.join([self._api_url, 'labels'])
         resp = self._get(url)
@@ -176,7 +176,7 @@ class Issue(GitHubCore):
                 self._time_format)
         self._url = issue.get('html_url')
         self._id = issue.get('id')
-        self._labels = [Label(label, self._session) for label in issue.get('labels')]
+        self._labels = [Label(l, self._session) for l in issue.get('labels')]
 
         # Don't want to pass a NoneType to Milestone.__init__()
         if issue.get('milestone'):
@@ -208,7 +208,7 @@ class Issue(GitHubCore):
         return self._body
 
     def close(self):
-        return self.edit(self._title, self._body, self._assign.login, 
+        return self.edit(self._title, self._body, self._assign.login,
                 'closed', self._mile, self._labels)
 
     @property
@@ -218,18 +218,17 @@ class Issue(GitHubCore):
     def comment(self, id_num):
         """Get a single comment by its id.
 
-        The catch here is that id is NOT a simple number to obtain. If 
-        you were to look at the comments on issue #15 in 
-        sigmavirus24/Todo.txt-python, the first comment's id is 4150787.  
+        The catch here is that id is NOT a simple number to obtain. If
+        you were to look at the comments on issue #15 in
+        sigmavirus24/Todo.txt-python, the first comment's id is 4150787.
         """
         if id_num > 0:  # Might as well check that it's positive
-            url = '/'.join([self._github_url, self._repo[0], 
+            url = '/'.join([self._github_url, self._repo[0],
                 self._repo[1], 'issues', 'comments', str(id)])
             resp = self._get(url)
             if resp.status_code == 200:
                 return IssueComment(loads(resp.content))
         return None
-
 
     @property
     def comments(self):
@@ -251,14 +250,14 @@ class Issue(GitHubCore):
 
     def edit(self, title=None, body=None, assignee=None, state=None,
             milestone=None, labels=[]):
-        """Edit this issue. 
+        """Edit this issue.
 
         :param title: Title of the issue, string
         :param body: markdown formatted string
         :param assignee: login name of user the issue should be assigned to
         :param state: ('open', 'closed')
-        :param milestone: the NUMBER (not title) of the milestone to assign this
-            to [1]_
+        :param milestone: the NUMBER (not title) of the milestone to assign
+            this to [1]_
         :param labels: list of labels to apply this to
 
         .. [1] Milestone numbering starts at 1, i.e. the first milestone you
@@ -331,7 +330,7 @@ class Issue(GitHubCore):
         return False
 
     def reopen(self):
-        return self.edit(self._title, self._body, self._assign.login, 
+        return self.edit(self._title, self._body, self._assign.login,
                 'open', self._mile, self._labels)
 
     @property

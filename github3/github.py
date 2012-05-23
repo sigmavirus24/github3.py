@@ -53,7 +53,7 @@ class GitHub(GitHubCore):
         assignee=None,
         milestone=None,
         labels=[]):
-        """Create an issue on the project 'repository' owned by 'owner' 
+        """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
         body, assignee, milestone, labels are all optional.
@@ -66,16 +66,15 @@ class GitHub(GitHubCore):
         :param milestone: Which milestone to assign the issue to
         :param labels: List of label names.
         """
-        
         repo = None
         if owner and repository and title:
             repo = self.repository(owner, repository)
 
         if repo:
-            return repo.create_issue(title, body, assignee, milestone, 
+            return repo.create_issue(title, body, assignee, milestone,
                     labels)
 
-        # Regardless, something went wrong. We were unable to create the 
+        # Regardless, something went wrong. We were unable to create the
         # issue
         return False
 
@@ -108,7 +107,7 @@ class GitHub(GitHubCore):
         return gists
 
     def issue(self, owner, repository, number):
-        """Fetch issue #:number: from 
+        """Fetch issue #:number: from
         https://github.com/:owner:/:repository:"""
         repo = self.repository(owner, repository)
         if repo:
@@ -125,8 +124,8 @@ class GitHub(GitHubCore):
         sort=None,
         direction=None,
         since=None):
-        """If no parameters are provided, this gets the issues for the 
-        authenticated user. All parameters are optional with the 
+        """If no parameters are provided, this gets the issues for the
+        authenticated user. All parameters are optional with the
         exception that owner and repository must be supplied together.
 
         :param filter: accepted values:
@@ -150,7 +149,8 @@ class GitHub(GitHubCore):
         else:
             url.append('issues')
             url = '/'.join(url)
-            params = issue_params(filter, state, labels, sort, direction, since)
+            params = issue_params(filter, state, labels, sort, direction,
+                    since)
             if params:
                 url = '?'.join([url, params])
 
@@ -167,7 +167,7 @@ class GitHub(GitHubCore):
         self._session.auth = (username, password)
 
     def repository(self, owner, repository):
-        """Returns a Repository object for the specified combination of 
+        """Returns a Repository object for the specified combination of
         owner and repository"""
         url = '/'.join([self._github_url, 'repos', owner, repository])
         req = self._get(url)
