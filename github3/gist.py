@@ -58,7 +58,7 @@ class GistComment(BaseComment):
 
     def edit(self, body):
         """Edit this comment. Replace existing comment with body."""
-        resp = self._session.patch(self._api_url, dumps({'body': body}))
+        resp = self._patch(self._api_url, dumps({'body': body}))
         if resp.status_code == 200:
             d = loads(resp.content)
             self._body = d.get('body')
@@ -67,7 +67,7 @@ class GistComment(BaseComment):
 
     def delete(self):
         """Delete this comment."""
-        resp = self._session.delete(self._api_url)
+        resp = self._delete(self._api_url)
         if resp.status_code == 204:
             return True
         return False
@@ -113,10 +113,9 @@ class Gist(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this gist."""
         url = '/'.join([self._api_url, 'comments'])
-        resp = self._session.post(url, dumps({'body': body}))
+        resp = self._post(url, dumps({'body': body}))
         if resp.status_code == 201:
-            comment = GistComment(loads(resp.content))
-            comment._session = self._session
+            comment = GistComment(loads(resp.content), self._session)
             return comment
         return None
 
@@ -126,7 +125,7 @@ class Gist(GitHubCore):
 
     def delete(self):
         """Delete this gist."""
-        resp = self._session.delete(self._api_url)
+        resp = self._delete(self._api_url)
         if resp.status_code == 204:
             return True
         return False
@@ -140,7 +139,7 @@ class Gist(GitHubCore):
 
         :param kwargs: Should be either (or both) description or files.
         """
-        resp = self._session.patch(self._api_url, dumps(kwargs))
+        resp = self._patch(self._api_url, dumps(kwargs))
         if resp.status_code == 200:
             self._update_(loads(resp.content))
             return True
@@ -152,7 +151,7 @@ class Gist(GitHubCore):
 
     def fork(self):
         url = '/'.join([self._api_url, 'fork'])
-        resp = self._session.post(url)
+        resp = self._post(url)
         if resp.status_code == 201:
             return Gist(loads(resp.content))
         return False
@@ -163,7 +162,7 @@ class Gist(GitHubCore):
 
     def get(self):
         """GET /gists/:id"""
-        resp = self._session.get(self._api_url)
+        resp = self._get(self._api_url)
         if resp.status_code == 200:
             self._update_(loads(resp.content))
             return True
@@ -186,26 +185,24 @@ class Gist(GitHubCore):
 
     def is_starred(self):
         url = '/'.join([self._api_url, 'star'])
-        resp = self._session.get(url)
+        resp = self._get(url)
         if resp.status_code == 204:
             return True
         return False
 
     def list_comments(self):
         url = '/'.join([self._api_url, 'comments'])
-        resp = self._session.get(url)
-        _comments = []
+        resp = self._get(url)
+        comments = []
         if resp.status_code == 200:
-            comments = loads(resp.content)
-            for comment in comments:
-                _comments.append(GistComment(comment))
-                _comments[-1]._session = self._session
-        return _comments
+            for comment in loads(resp.content):
+                comments.append(GistComment(comment, self._session))
+        return comments
 
     def star(self):
         """Star this gist."""
         url = '/'.join([self._api_url, 'star'])
-        resp = self._session.put(url)
+        resp = self._put(url)
         if resp.status_code == 204:
             return True
         return False
@@ -213,7 +210,7 @@ class Gist(GitHubCore):
     def unstar(self):
         """Un-star this gist."""
         url = '/'.join([self._api_url, 'star'])
-        resp = self._session.delete(url)
+        resp = self._delete(url)
         if resp.status_code == 204:
             return True
         return False

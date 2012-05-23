@@ -46,13 +46,14 @@ Progress
 
 - Issues_: **done**
 
-  - `Comments <http://developer.github.com/v3/issues/comments/>`_
+  - `Comments <http://developer.github.com/v3/issues/comments/>`_ **in 
+    progress**
 
   - `Events <http://developer.github.com/v3/issues/events/>`_
 
-  - Labels_: **almost done**
+  - Labels_: **done**
 
-  - Milestones_: **in progress**
+  - Milestones_: **done**
 
 - Organizations_
 

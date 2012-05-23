@@ -19,6 +19,21 @@ class GitHubCore(object):
     def __repr__(self):
         return '<github3-core at 0x%x>' % id(self)
 
+    def _delete(self, url, **kwargs):
+        return self._session.delete(url, **kwargs)
+
+    def _get(self, url, **kwargs):
+        return self._session.get(url, **kwargs)
+
+    def _patch(self, url, data=None, **kwargs):
+        return self._session.patch(url, data, **kwargs)
+
+    def _post(self, url, data=None, **kwargs):
+        return self._session.post(url, data, **kwargs)
+
+    def _put(self, url, data=None, **kwargs):
+        return self._session.put(url, data, **kwargs)
+
 
 class Plan(object):
     def __init__(self, data):

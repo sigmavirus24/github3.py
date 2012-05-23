@@ -36,8 +36,8 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                 'files': files}
 
-        _url = '/'.join([self._github_url, 'gists'])
-        response = self._session.post(_url, dumps(new_gist))
+        url = '/'.join([self._github_url, 'gists'])
+        response = self._post(url, dumps(new_gist))
 
         gist = None
         if response.status_code == 201:
@@ -82,7 +82,7 @@ class GitHub(GitHubCore):
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
         url = '/'.join([self._github_url, 'gists', str(id_num)])
-        req = self._session.get(url)
+        req = self._get(url)
         gist = None
         if req.status_code == 200:
             gist = Gist(loads(req.content), self._session)
@@ -99,11 +99,10 @@ class GitHub(GitHubCore):
             _url.append('gists')
         url = '/'.join(_url)
 
-        req = self._session.get(url)
-        data = loads(req.content)
+        req = self._get(url)
 
         gists = []
-        for d in data:
+        for d in loads(req.content):
             gists.append(Gist(d, self._session))
 
         return gists
@@ -146,20 +145,20 @@ class GitHub(GitHubCore):
         """
         url = [self._github_url]
         if owner and repository:
-            url.extend(['repos', owner, repository, 'issues'])
+            repo = self.repository(owner, repository)
+            issues = repo.list_issues()
         else:
             url.append('issues')
-        url = '/'.join(url)
-        params = issue_params(filter, state, labels, sort, direction, since)
-        if params:
-            url = '?'.join([url, params])
+            url = '/'.join(url)
+            params = issue_params(filter, state, labels, sort, direction, since)
+            if params:
+                url = '?'.join([url, params])
 
-        issues = []
-        req = self._session.get(url)
-        if req.status_code == 200:
-            jissues = loads(req.content)
-            for jissue in jissues:
-                issues.append(Issue(jissue, self._session))
+            issues = []
+            req = self._get(url)
+            if req.status_code == 200:
+                for issue in loads(req.content):
+                    issues.append(Issue(issue, self._session))
 
         return issues
 
@@ -171,7 +170,7 @@ class GitHub(GitHubCore):
         """Returns a Repository object for the specified combination of 
         owner and repository"""
         url = '/'.join([self._github_url, 'repos', owner, repository])
-        req = self._session.get(url)
+        req = self._get(url)
         if req.status_code == 200:
             return Repository(loads(req.content), self._session)
         return None

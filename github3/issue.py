@@ -31,7 +31,7 @@ class Label(GitHubCore):
         return self._color
 
     def delete(self):
-        resp = self._session.delete(self._api_url)
+        resp = self._delete(self._api_url)
         if resp.status_code == 204:
             return True
         return False
@@ -44,7 +44,7 @@ class Label(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        resp = self._session.patch(self._api_url, dumps({'name': name,
+        resp = self._patch(self._api_url, dumps({'name': name,
             'color': color}))
         if resp.status_code == 200:
             self._update_(loads(resp.content))
@@ -91,7 +91,7 @@ class Milestone(GitHubCore):
 
     def delete(self):
         """Delete this milestone."""
-        resp = self._session.delete(self._api_url)
+        resp = self._delete(self._api_url)
         if resp.status_code == 204:
             return True
         return False
@@ -103,6 +103,17 @@ class Milestone(GitHubCore):
     @property
     def due_on(self):
         return self._due
+
+    def list_labels(self):
+        """List the labels for every issue associated with this 
+        milestone."""
+        url = '/'.join([self._api_url, 'labels'])
+        resp = self._get(url)
+        labels = []
+        if resp.status_code == 200:
+            for label in loads(resp.content):
+                labels.append(Label(label, self._session))
+        return labels
 
     @property
     def number(self):
@@ -132,7 +143,7 @@ class Milestone(GitHubCore):
         """
         inp = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        resp = self._session.patch(self._api_url, inp)
+        resp = self._patch(self._api_url, inp)
         if resp.status_code == 200:
             self._update_(loads(resp.content))
             return True
@@ -183,7 +194,7 @@ class Issue(GitHubCore):
 
     def add_labels(self, *args):
         url = '/'.join([self._api_url, 'labels'])
-        resp = self._session.post(url, dumps(args))
+        resp = self._post(url, dumps(args))
         if resp.status_code == 200:
             return True
         return False
@@ -229,7 +240,7 @@ class Issue(GitHubCore):
         """
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        resp = self._session.patch(self._api_url, dumps(data))
+        resp = self._patch(self._api_url, dumps(data))
         if resp.status_code == 200:
             self._update_(loads(resp.content))
             return True
@@ -267,7 +278,7 @@ class Issue(GitHubCore):
 
     def remove_label(self, name):
         url = '/'.join([self._api_url, 'labels', name])
-        resp = self._session.delete(url)
+        resp = self._delete(url)
         if resp.status_code == 200:
             return True
         return False
@@ -278,7 +289,7 @@ class Issue(GitHubCore):
 
     def replace_labels(self, labels):
         url = '/'.join([self._api_url, 'labels'])
-        resp = self._session.put(url, dumps(labels))
+        resp = self._put(url, dumps(labels))
         if resp.status_code == 200:
             return True
         return False
@@ -306,6 +317,11 @@ class Issue(GitHubCore):
     @property
     def user(self):
         return self._user
+
+
+class IssueComment(BaseComment):
+    def __init__(self, comment, session):
+        super(IssueComment, self).__init__(comment, session)
 
 
 def issue_params(filter, state, labels, sort, direction, since):

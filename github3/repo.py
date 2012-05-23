@@ -88,7 +88,7 @@ class Repository(GitHubCore):
             'labels': labels})
         url = '/'.join([self._api_url, 'issues'])
 
-        resp = self._session.post(url, issue)
+        resp = self._post(url, issue)
         if resp.status_code == 201:
             return True
         return False
@@ -97,7 +97,7 @@ class Repository(GitHubCore):
         if color[0] == '#':
             color = color[1:]
         url = '/'.join([self._api_url, 'labels'])
-        resp = self._session.post(url, dumps({'name': name, 'color': color}))
+        resp = self._post(url, dumps({'name': name, 'color': color}))
         if resp.status_code == 201:
             return True
         return False
@@ -108,7 +108,7 @@ class Repository(GitHubCore):
         mile = dumps({'title': title, 'state': state, 
             'description': description, 'due_on': due_on})
 
-        resp = self._session.post(url, mile)
+        resp = self._post(url, mile)
         if resp.status_code == 201:
             return True
         return False
@@ -127,9 +127,9 @@ class Repository(GitHubCore):
         :param organization: login for organization to create the fork under"""
         url = '/'.join([self._api_url, 'forks'])
         if organization:
-            resp = self._session.post(url, dumps({'org': organization}))
+            resp = self._post(url, dumps({'org': organization}))
         else:
-            resp = self._session.post(url)
+            resp = self._post(url)
 
         if resp.status_code == 202:
             return Repository(loads(resp.content), self._session)
@@ -168,7 +168,7 @@ class Repository(GitHubCore):
     def issue(self, number):
         if number > 0:
             url = '/'.join([self._api_url, 'issues', str(number)])
-            resp = self._session.get(url)
+            resp = self._get(url)
             if resp.status_code == 200:
                 return Issue(loads(resp.content), self._session)
 
@@ -177,7 +177,7 @@ class Repository(GitHubCore):
     def label(self, name):
         if name:
             url = '/'.join([self._api_url, 'labels', name])
-            resp = self._session.get(url)
+            resp = self._get(url)
             if resp.status_code == 200:
                 return Label(loads(resp.content), self._session)
 
@@ -230,24 +230,22 @@ class Repository(GitHubCore):
         if params:
             url = '?'.join([url, params])
 
-        resp = self._session.get(url)
+        resp = self._get(url)
         issues = []
         if resp.status_code == 200:
-            jissues = loads(resp.content)
-            for jissue in jissues:
-                issues.append(Issue(jissue, self._session))
+            for issue in loads(resp.content):
+                issues.append(Issue(issue, self._session))
 
         return issues
 
     def list_labels(self):
         url = '/'.join([self._api_url, 'labels'])
-        resp = self._session.get(url)
+        resp = self._get(url)
 
         labels = []
         if resp.status_code == 200:
-            jlabels = loads(resp.content)
-            for jlabel in jlabels:
-                labels.append(Label(jlabel, self._session))
+            for label in loads(resp.content):
+                labels.append(Label(label, self._session))
 
         return labels
 
@@ -268,11 +266,10 @@ class Repository(GitHubCore):
             params = '&'.join(params)
             url = '?'.join([url, params])
 
-        resp = self._session.get(url)
+        resp = self._get(url)
         milestones = []
         if resp.status_code == 200:
-            miles = loads(resp.content)
-            for mile in miles:
+            for mile in loads(resp.content):
                 milestones.append(Milestone(mile, self._session))
 
         return milestones
