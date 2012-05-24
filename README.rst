@@ -30,10 +30,10 @@ Progress
 
 - Gists_: **done**
 
-  - Comments_: **done**
+  - `Gist Comments`_: **done**
 
 .. _Gists: http://developer.github.com/v3/gists/
-.. _Comments: http://developer.github.com/v3/gists/comments/
+.. _Gist Comments: http://developer.github.com/v3/gists/comments/
 
 - `Git Data`_
 
@@ -56,17 +56,17 @@ Progress
 
 - Issues_: **done**
 
-  - Comments_: **done**
+  - `Issue Comments`_: **done**
 
-  - Events_: **in progress**
+  - `Issue Events`_: **in progress**
 
   - Labels_: **done**
 
   - Milestones_: **done**
 
 .. _Issues: http://developer.github.com/v3/issues/
-.. _Comments: http://developer.github.com/v3/issues/comments/>
-.. _Events: http://developer.github.com/v3/issues/events/
+.. _Issue Comments: http://developer.github.com/v3/issues/comments/>
+.. _Issue Events: http://developer.github.com/v3/issues/events/
 .. _Labels: http://developer.github.com/v3/issues/labels/
 .. _Milestones: http://developer.github.com/v3/issues/milestones/
 
@@ -91,13 +91,13 @@ Progress
 
   - Collaborators_
 
-  - Commits_
+  - `Repo Commits`_
 
   - Downloads_
 
   - Forks_
 
-  - Keys_
+  - `Repo Keys`_
 
   - Watching_
 
@@ -105,10 +105,10 @@ Progress
 
 .. _Repositories: http://developer.github.com/v3/repos/
 .. _Collaborators: http://developer.github.com/v3/repos/collaborators/
-.. _Commits: http://developer.github.com/v3/repos/commits/
+.. _Repo Commits: http://developer.github.com/v3/repos/commits/
 .. _Downloads: http://developer.github.com/v3/repos/downloads/
 .. _Forks: http://developer.github.com/v3/repos/forks/
-.. _Keys: http://developer.github.com/v3/repos/keys/
+.. _Repo Keys: http://developer.github.com/v3/repos/keys/
 .. _Watching: http://developer.github.com/v3/repos/watching/
 .. _Hooks: http://developer.github.com/v3/repos/hooks/
 
@@ -118,12 +118,12 @@ Progress
 
   - Followers_
 
-  - Keys_
+  - `User Keys`_
 
 .. _Users: http://developer.github.com/v3/users/
 .. _Emails: http://developer.github.com/v3/users/emails/
 .. _Followers: http://developer.github.com/v3/users/followers/
-.. _Keys: http://developer.github.com/v3/users/keys/
+.. _User Keys: http://developer.github.com/v3/users/keys/
 
 - Events_ **in progress**
 
