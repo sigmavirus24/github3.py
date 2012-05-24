@@ -30,13 +30,16 @@ Progress
 
 - Gists_: **done**
 
-  - `Comments <http://developer.github.com/v3/gists/comments/>`_: **done**
+  - Comments_: **done**
+
+.. _Gists: http://developer.github.com/v3/gists/
+.. _Comments: http://developer.github.com/v3/gists/comments/
 
 - `Git Data`_
 
   - Blobs_
 
-  - `Commits <http://developer.github.com/v3/events/>`_
+  - Commits_
 
   - References_
 
@@ -44,16 +47,28 @@ Progress
 
   - Trees_
 
+.. _Git Data: http://developer.github.com/v3/git/
+.. _Commits: http://developer.github.com/v3/events/
+.. _Blobs: http://developer.github.com/v3/git/blobs/
+.. _References: http://developer.github.com/v3/git/refs/
+.. _Tags: http://developer.github.com/v3/git/tags/
+.. _Trees: http://developer.github.com/v3/git/trees/
+
 - Issues_: **done**
 
-  - `Comments <http://developer.github.com/v3/issues/comments/>`_ 
-    **done**
+  - Comments_: **done**
 
-  - `Events <http://developer.github.com/v3/issues/events/>`_
+  - Events_: **in progress**
 
   - Labels_: **done**
 
   - Milestones_: **done**
+
+.. _Issues: http://developer.github.com/v3/issues/
+.. _Comments: http://developer.github.com/v3/issues/comments/>
+.. _Events: http://developer.github.com/v3/issues/events/
+.. _Labels: http://developer.github.com/v3/issues/labels/
+.. _Milestones: http://developer.github.com/v3/issues/milestones/
 
 - Organizations_
 
@@ -61,15 +76,22 @@ Progress
 
   - Teams_
 
+.. _Organizations: http://developer.github.com/v3/orgs/
+.. _Members: http://developer.github.com/v3/orgs/members/
+.. _Teams: http://developer.github.com/v3/orgs/teams/
+
 - `Pull Requests`_
 
   - `Review Comments`_
+
+.. _Pull Requests: http://developer.github.com/v3/pulls/
+.. _Review Comments: http://developer.github.com/v3/pulls/comments/
 
 - Repositories_
 
   - Collaborators_
 
-  - `Commits <http://developer.github.com/v3/repos/commits/>`_
+  - Commits_
 
   - Downloads_
 
@@ -81,43 +103,32 @@ Progress
 
   - Hooks_
 
+.. _Repositories: http://developer.github.com/v3/repos/
+.. _Collaborators: http://developer.github.com/v3/repos/collaborators/
+.. _Commits: http://developer.github.com/v3/repos/commits/
+.. _Downloads: http://developer.github.com/v3/repos/downloads/
+.. _Forks: http://developer.github.com/v3/repos/forks/
+.. _Keys: http://developer.github.com/v3/repos/keys/
+.. _Watching: http://developer.github.com/v3/repos/watching/
+.. _Hooks: http://developer.github.com/v3/repos/hooks/
+
 - Users_
 
   - Emails_
 
   - Followers_
 
-  - `Keys <http://developer.github.com/v3/users/keys/>`_
+  - Keys_
+
+.. _Users: http://developer.github.com/v3/users/
+.. _Emails: http://developer.github.com/v3/users/emails/
+.. _Followers: http://developer.github.com/v3/users/followers/
+.. _Keys: http://developer.github.com/v3/users/keys/
 
 - Events_ **in progress**
 
   - Types_
 
-.. Links
-.. _Gists: http://developer.github.com/v3/gists/
-.. _Git Data: http://developer.github.com/v3/git/
-.. _Blobs: http://developer.github.com/v3/git/blobs/
-.. _References: http://developer.github.com/v3/git/refs/
-.. _Tags: http://developer.github.com/v3/git/tags/
-.. _Trees: http://developer.github.com/v3/git/trees/
-.. _Issues: http://developer.github.com/v3/issues/
-.. _Labels: http://developer.github.com/v3/issues/labels/
-.. _Milestones: http://developer.github.com/v3/issues/milestones/
-.. _Organizations: http://developer.github.com/v3/orgs/
-.. _Members: http://developer.github.com/v3/orgs/members/
-.. _Teams: http://developer.github.com/v3/orgs/teams/
-.. _Pull Requests: http://developer.github.com/v3/pulls/
-.. _Review Comments: http://developer.github.com/v3/pulls/comments/
-.. _Repositories: http://developer.github.com/v3/repos/
-.. _Collaborators: http://developer.github.com/v3/repos/collaborators/
-.. _Downloads: http://developer.github.com/v3/repos/downloads/
-.. _Forks: http://developer.github.com/v3/repos/forks/
-.. _Keys: http://developer.github.com/v3/repos/keys/
-.. _Watching: http://developer.github.com/v3/repos/watching/
-.. _Hooks: http://developer.github.com/v3/repos/hooks/
-.. _Users: http://developer.github.com/v3/users/
-.. _Emails: http://developer.github.com/v3/users/emails/
-.. _Followers: http://developer.github.com/v3/users/followers/
 .. _Events: http://developer.github.com/v3/events/
 .. _Types: http://developer.github.com/v3/events/types/
 
