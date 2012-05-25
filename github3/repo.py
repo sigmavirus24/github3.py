@@ -102,7 +102,7 @@ class Repository(GitHubCore):
         resp = self._post(url, dumps({'name': name, 'color': color}))
 
         if resp.status_code == 201:
-            label = Label(loads(resp.content), self._session)`
+            label = Label(loads(resp.content), self._session)
         return label
 
     def create_milestone(self, title, state=None, description=None,
