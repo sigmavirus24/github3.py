@@ -58,7 +58,7 @@ Progress
 
   - `Issue Comments`_: **done**
 
-  - `Issue Events`_: **in progress**
+  - `Issue Events`_: **done**
 
   - Labels_: **done**
 
@@ -178,6 +178,27 @@ Examples
   True
   >>> issue.edit('Testing Github3.py', 'Testing re-opening', 'sigmavirus24')
   True
+
+::
+
+  >>> from github3 import login
+  >>> gh = login(username, password)
+  >>> issue = gh.issue('sigmavirus24', 'Todo.txt-python', 17)
+  >>> issue.html_url
+  u'https://github.com/sigmavirus24/Todo.txt-python/issues/17'
+  >>> issue.state
+  u'open'
+  >>> events = issue.list_events()
+  >>> events
+  [<Issue Event [#17 - subscribed - sigmavirus24]>, <Issue Event [#17 - assigned - sigmavirus24]>,
+   <Issue Event [#17 - referenced - sigmavirus24]>]
+  >>> events[0].actor
+  <User [sigmavirus24:None]>
+  >>> events[0].issue
+  <Issue [sigmavirus24/Todo.txt-python #17]>
+  >>> events[0].closed_at
+  >>> events[0].event
+  u'subscribed'
 
 Author
 ------

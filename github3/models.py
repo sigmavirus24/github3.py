@@ -274,3 +274,22 @@ class BaseComment(GitHubCore):
     @property
     def user(self):
         return self._user
+
+
+class BaseEvent(GitHubCore):
+    def __init__(self, event):
+        super(BaseEvent, self).__init__(None)
+        # Guaranteed to exist
+        self._actor = User(event.get('actor'), self._session)
+        self._created = self._strptime(event.get('created_at'))
+
+    def __repr__(self):
+        return '<github3-event at 0x%x>' % id(self)
+
+    @property
+    def actor(self):
+        return self._actor
+
+    @property
+    def created_at(self):
+        return self._created

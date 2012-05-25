@@ -86,29 +86,37 @@ class Repository(GitHubCore):
         url = '/'.join([self._api_url, 'issues'])
 
         resp = self._post(url, issue)
+        issue = None
         if resp.status_code == 201:
-            return True
-        return False
+            issue = Issue(loads(resp.content), self._session)
+
+        return issue
 
     def create_label(self, name, color):
+        label = None
+
         if color[0] == '#':
             color = color[1:]
+
         url = '/'.join([self._api_url, 'labels'])
         resp = self._post(url, dumps({'name': name, 'color': color}))
+
         if resp.status_code == 201:
-            return True
-        return False
+            label = Label(loads(resp.content), self._session)`
+        return label
 
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
         url = '/'.join([self._api_url, 'milestones'])
         mile = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
+        milestone = None
 
         resp = self._post(url, mile)
         if resp.status_code == 201:
-            return True
-        return False
+            milestone = Milestone(loads(resp.content), self._session)
+
+        return milestone
 
     @property
     def created_at(self):

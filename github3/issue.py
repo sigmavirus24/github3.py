@@ -8,7 +8,7 @@ This module contains the classes related to issues.
 
 from json import dumps
 from re import match
-from .models import GitHubCore, BaseComment, User
+from .models import GitHubCore, BaseComment, BaseEvent, User
 from .compat import loads
 
 
@@ -293,6 +293,15 @@ class Issue(GitHubCore):
                 comments.append(IssueComment(comment, self._session))
         return comments
 
+    def list_events(self):
+        url = '/'.join([self._api_url, 'events'])
+        resp = self._get(url)
+        events = []
+        if resp.status_code == 200:
+            for event in loads(resp.content):
+                events.append(IssueEvent(event, self))
+        return events
+
     @property
     def milestone(self):
         return self._mile
@@ -354,6 +363,77 @@ class IssueComment(BaseComment):
 
     def __repr__(self):
         return '<Issue Comment [%s]>' % self._user.login
+
+    @property
+    def updated_at(self):
+        return self._updated
+
+
+class IssueEvent(BaseEvent):
+    def __init__(self, event, issue):
+        super(IssueEvent, self).__init__(event)
+        # The type of event:
+        #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
+        #    'mentioned', 'assigned')
+        self._event = event.get('event')
+        self._commit_id = event.get('commit_id')
+        self._api_url = event.get('url')
+
+        # The actual issue in question
+        if event.get('issue'):
+            self._issue = Issue(event.get('issue'), self._session)
+        else:
+            self._issue = issue
+
+        # The number of comments
+        self._comments = event.get('comments')
+
+        self._closed = None
+        if event.get('closed_at'):
+            self._closed = self._strptime(event.get('closed_at'))
+
+        self._created = self._strptime(event.get('created_at'))
+
+        self._updated = None
+        if event.get('updated_at'):
+            self._updated = self._strptime(event.get('updated_at'))
+
+        self._pull_html = None
+        self._pull_diff = None
+        self._pull_patch = None
+        if event.get('pull_request'):
+            pull_req = event.get('pull_request')
+            self._pull_html = pull_req.get('html_url')
+            self._pull_diff = pull_req.get('diff_url')
+            self._pull_patch = pull_req.get('patch_url')
+
+    def __repr__(self):
+        return '<Issue Event [#%s - %s - %s]>' % (str(self._issue.number),
+                self._event, self._actor.login)
+
+    @property
+    def event(self):
+        return self._event
+
+    @property
+    def commit_id(self):
+        return self._commit_id
+
+    @property
+    def issue(self):
+        return self._issue
+
+    @property
+    def comments(self):
+        return self._comments
+
+    @property
+    def closed_at(self):
+        return self._closed
+
+    @property
+    def created_at(self):
+        return self._created
 
     @property
     def updated_at(self):

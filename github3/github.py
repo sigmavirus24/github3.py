@@ -76,7 +76,7 @@ class GitHub(GitHubCore):
 
         # Regardless, something went wrong. We were unable to create the
         # issue
-        return False
+        return None
 
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
