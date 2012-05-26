@@ -8,8 +8,9 @@ This module contains the classes related to issues.
 
 from json import dumps
 from re import match
-from .models import GitHubCore, BaseComment, BaseEvent, User
+from .models import GitHubCore, BaseComment, BaseEvent
 from .compat import loads
+from .user import User
 
 
 class Label(GitHubCore):
@@ -371,7 +372,7 @@ class IssueComment(BaseComment):
 
 class IssueEvent(BaseEvent):
     def __init__(self, event, issue):
-        super(IssueEvent, self).__init__(event)
+        super(IssueEvent, self).__init__(event, None)
         # The type of event:
         #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
         #    'mentioned', 'assigned')

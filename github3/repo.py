@@ -9,8 +9,9 @@ This module contains the class relating to repositories.
 from datetime import datetime
 from json import dumps
 from .compat import loads
-from .models import GitHubCore, User
 from .issue import Issue, Label, Milestone, issue_params
+from .models import GitHubCore
+from .user import User
 
 
 class Repository(GitHubCore):
