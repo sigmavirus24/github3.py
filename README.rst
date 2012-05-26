@@ -112,13 +112,13 @@ Progress
 .. _Watching: http://developer.github.com/v3/repos/watching/
 .. _Hooks: http://developer.github.com/v3/repos/hooks/
 
-- Users_: **in progress**
+- Users_: **done**
 
-  - Emails_
+  - Emails_: **done**
 
-  - Followers_
+  - Followers_: **done**
 
-  - `User Keys`_
+  - `User Keys`_: **done**
 
 .. _Users: http://developer.github.com/v3/users/
 .. _Emails: http://developer.github.com/v3/users/emails/

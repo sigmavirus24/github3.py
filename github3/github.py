@@ -9,10 +9,11 @@ This module contains the main GitHub session object.
 from requests import session
 from json import dumps
 from .compat import loads
-from .models import GitHubCore
-from .issue import Issue, issue_params
-from .repo import Repository
 from .gist import Gist
+from .issue import Issue, issue_params
+from .models import GitHubCore
+from .repo import Repository
+from .user import User, Key
 
 
 class GitHub(GitHubCore):
@@ -27,6 +28,21 @@ class GitHub(GitHubCore):
 
     def __repr__(self):
         return '<github3-session at 0x%x>' % id(self)
+
+    def _list_follow(self, login, which):
+        url = [self._github_url]
+        if login:
+            url.extend(['users', login, which])
+        else:
+            url.extend(['user', which])
+        url = '/'.join(url)
+
+        follow = []
+        req = self._get(url)
+        if req.status_code == 200:
+            for follower in loads(req.content):
+                follow.append(User(follower, self._session))
+        return follow
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -44,6 +60,17 @@ class GitHub(GitHubCore):
             gist = Gist(loads(response.content), self._session)
 
         return gist
+
+    def create_key(self, title, key):
+        """Create a new key for the authenticated user."""
+        created = None
+
+        if title and key:
+            url = '/'.join([self._github_url, 'user', 'keys'])
+            resp = self._post(url, dumps({'title': title, 'key': key}))
+            if resp.status_code == 201:
+                created = Key(loads(resp.content), self._session)
+        return created
 
     def create_issue(self,
         owner,
@@ -78,6 +105,33 @@ class GitHub(GitHubCore):
         # issue
         return None
 
+    def delete_key(self, key_id):
+        key = self.get_key(key_id)
+        if key:
+            return key.delete()
+        return False
+
+    def follow(self, login):
+        """Make the authenticated user follow login."""
+        if login:
+            print(login)
+            url = '/'.join([self._github_url, 'user', 'following', 
+                login])
+            resp = self._put(url)
+            if resp.status_code == 204:
+                return True
+        return False
+
+    def get_key(self, id_num):
+        """Gets the authenticated user's key specified by id_num."""
+        if int(id_num) > 0:
+            url = '/'.join([self._github_url, 'user', 'keys', 
+                str(id_num)])
+            resp = self._get(url)
+            if resp.status_code == 200:
+                return Key(loads(resp.content), self._session)
+        return None
+
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
         url = '/'.join([self._github_url, 'gists', str(id_num)])
@@ -91,12 +145,12 @@ class GitHub(GitHubCore):
     def gists(self, username=None):
         """If no username is specified, GET /gists, otherwise GET
         /users/:username/gists"""
-        _url = [self._github_url]
+        url = [self._github_url]
         if username:
-            _url.extend(['users', username, 'gists'])
+            url.extend(['users', username, 'gists'])
         else:
-            _url.append('gists')
-        url = '/'.join(_url)
+            url.append('gists')
+        url = '/'.join(url)
 
         req = self._get(url)
 
@@ -105,6 +159,16 @@ class GitHub(GitHubCore):
             gists.append(Gist(d, self._session))
 
         return gists
+
+    def is_following(self, login):
+        """Check if the authenticated user is following login."""
+        if login:
+            url = '/'.join([self._github_url, 'user', 'following', 
+                login])
+            resp = self._get(url)
+            if resp.status_code == 204:
+                return True
+        return False
 
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from
@@ -162,6 +226,28 @@ class GitHub(GitHubCore):
 
         return issues
 
+    def list_followers(self, login=None):
+        """If login is provided, return a list of followers of that 
+        login name; otherwise return a list of followers of the 
+        authenticated user."""
+        return self._list_follow(login, 'followers')
+
+    def list_following(self, login=None):
+        """If login is provided, return a list of users being followed 
+        by login; otherwise return a list of people followed by the 
+        authenticated user."""
+        return self._list_follow(login, 'following')
+
+    def list_keys(self):
+        """List public keys for the authenticated user."""
+        url = '/'.join([self._github_url, 'user', 'keys'])
+        resp = self._get(url)
+        keys = []
+        if resp.status_code == 200:
+            for key in loads(resp.content):
+                keys.append(Key(key, self._session))
+        return keys
+
     def login(self, username, password):
         """Logs the user into GitHub for protected API calls."""
         self._session.auth = (username, password)
@@ -173,4 +259,49 @@ class GitHub(GitHubCore):
         req = self._get(url)
         if req.status_code == 200:
             return Repository(loads(req.content), self._session)
+        return None
+
+    def unfollow(self, login):
+        """Make the authenticated user stop following login"""
+        if login:
+            url = '/'.join([self._github_url, 'user', 'following', 
+                login])
+            resp = self._delete(url)
+            if resp.status_code == 204:
+                return True
+        return False
+
+    def update_user(self, name=None, email=None, blog=None, 
+            company=None, location=None, hireable=False, bio=None):
+        """If authenticated as this user, update the information with 
+        the information provided in the parameters.
+
+        :param name: string, e.g., 'John Smith', not login name
+        :param email: string, e.g., 'john.smith@example.com'
+        :param blog: string, e.g., 'http://www.example.com/jsmith/blog'
+        :param company: string
+        :param location: string
+        :param hireable: boolean, defaults to False
+        :param bio: string, GitHub flavored markdown
+        """
+        user = self.user()
+        if user:
+            return user.update(name, email, blog, company, location, 
+                    hireable, bio)
+        return False
+    
+    def user(self, login=None):
+        """Returns a User object for the specified login name if 
+        provided. If no login name is provided, this will return a User 
+        object for the authenticated user."""
+        url = [self._github_url]
+        if login:
+            url.extend(['users', login])
+        else:
+            url.append('user')
+        url = '/'.join(url)
+
+        req = self._get(url)
+        if req.status_code == 200:
+            return User(loads(req.content), self._session)
         return None

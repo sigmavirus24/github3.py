@@ -34,6 +34,7 @@ class GitHubCore(object):
         return self._session.post(url, data, **kwargs)
 
     def _put(self, url, data=None, **kwargs):
+        kwargs.update(headers={'Content-Length': '0'})
         return self._session.put(url, data, **kwargs)
 
     def _strptime(self, time_str):

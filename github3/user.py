@@ -6,16 +6,64 @@ This module contains everything relating to Users.
 
 """
 
+from json import dumps
+from .compat import loads
 from .models import GitHubCore
 
 
+class Key(GitHubCore):
+    def __init__(self, key, session):
+        super(Key, self).__init__(session)
+        self._update_(key)
+
+    def __repr__(self):
+        return '<User Key [%s]>' % self._title
+
+    def _update_(self, key):
+        self._api_url = key.get('url')
+        self._id = key.get('id')
+        self._title = key.get('title')
+        self._key = key.get('key')
+
+    def delete(self):
+        resp = self._delete(self._api_url)
+        if resp.status_code == 204:
+            return True
+        return False
+
+    @property
+    def key(self):
+        return self._key
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def title(self):
+        return self._title
+
+    def update(self, title, key):
+        if not title:
+            title = self._title
+        if not key:
+            key = self._key
+
+        resp = self._patch(self._api_url, dumps({'title': title,
+            'key': key}))
+        if resp.status_code == 200:
+            self._update_(loads(resp.content))
+            return True
+        return False
+
+
 class Plan(object):
-    def __init__(self, data):
+    def __init__(self, plan):
         super(Plan, self).__init__()
-        self._collab = data.get('collaborators')
-        self._name = data.get('name')
-        self._private = data.get('private_repos')
-        self._space = data.get('space')
+        self._collab = plan.get('collaborators')
+        self._name = plan.get('name')
+        self._private = plan.get('private_repos')
+        self._space = plan.get('space')
 
     def collaborators(self):
         return self._collab
@@ -49,62 +97,78 @@ plans = {'large': _large, 'medium': _medium, 'small': _small,
 
 
 class User(GitHubCore):
-    def __init__(self, data, session):
+    def __init__(self, user, session):
         super(User, self).__init__(session)
+        self._update_(user)
 
+    def __repr__(self):
+        return '<User [%s:%s]>' % (self._login, self._name)
+
+    def _update_(self, user):
         # Public information
         ## e.g. https://api.github.com/users/self._login
-        self._api_url = data.get('url')
+        self._api_url = user.get('url')
 
-        self._avatar = data.get('avatar_url')
-        self._bio = data.get('bio')
-        self._blog = data.get('blog')
-        self._company = data.get('company')
-        self._email = data.get('email')
+        self._avatar = user.get('avatar_url')
+        self._bio = user.get('bio')
+        self._blog = user.get('blog')
+        self._company = user.get('company')
+
+        self._created = None
+        if user.get('created_at'):
+            self._created = self._strptime(user.get('created_at'))
+        self._email = user.get('email')
 
         ## The number of people following this user
-        self._followers = data.get('followers')
+        self._followers = user.get('followers')
 
         ## The number of people this user follows
-        self._following = data.get('following')
+        self._following = user.get('following')
 
         ## The number of people this user folows
-        self._grav_id = data.get('gravatar_id')
+        self._grav_id = user.get('gravatar_id')
 
-        self._hire = data.get('hireable')
-        self._id = data.get('id')
-        self._location = data.get('location')
-        self._login = data.get('login')
+        self._hire = user.get('hireable')
+        self._id = user.get('id')
+        self._location = user.get('location')
+        self._login = user.get('login')
 
         ## e.g. first_name last_name
-        self._name = data.get('name')
+        self._name = user.get('name')
 
         ## The number of public_gists
-        self._public_gists = data.get('public_gists')
+        self._public_gists = user.get('public_gists')
 
         ## The number of public_repos
-        self._public_repos = data.get('public_repos')
+        self._public_repos = user.get('public_repos')
 
         ## e.g. https://github.com/self._login
-        self._url = data.get('html_url')
+        self._url = user.get('html_url')
 
         # Private information
-        self._disk = data.get('disk_usage')
-        if data.get('plan'):
-            _plan = data.get('plan')
+        self._disk = user.get('disk_usage')
+        if user.get('plan'):
+            _plan = user.get('plan')
             self._plan = plans[_plan['name'].lower()]
             self._plan._space = _plan['space']
         else:
             self._plan = None
 
         ## The number of private repos
-        self._private_repos = data.get('total_private_repos')
-        self._private_gists = data.get('total_private_gists')
+        self._private_repos = user.get('total_private_repos')
+        self._private_gists = user.get('total_private_gists')
 
-        self._owned_private_repos = data.get('owned_private_repos')
+        self._owned_private_repos = user.get('owned_private_repos')
 
-    def __repr__(self):
-        return '<User [%s:%s]>' % (self._login, self._name)
+    def add_email_addresses(self, addresses=[]):
+        """Add the email addresses in ``addresses`` to the authenticated 
+        user's account."""
+        if addresses:
+            url = '/'.join([self._github_url, 'user', 'emails'])
+            resp = self._post(url, dumps(addresses))
+            if resp.status_code == 201:
+                return loads(resp.content)
+        return []
 
     @property
     def avatar(self):
@@ -121,6 +185,19 @@ class User(GitHubCore):
     @property
     def company(self):
         return self._company
+
+    @property
+    def created_at(self):
+        return self._created
+
+    def delete_email_addresses(self, addresses=[]):
+        """Delete the email addresses in ``addresses`` from the 
+        authenticated user's account."""
+        url = '/'.join([self._github_url, 'user', 'emails'])
+        resp = self._delete(url, data=dumps(addresses))
+        if resp.status_code == 204:
+            return True
+        return False
 
     @property
     def disk_usage(self):
@@ -149,6 +226,18 @@ class User(GitHubCore):
     @property
     def id(self):
         return self._id
+
+    def list_emails(self):
+        """List email addresses for a user.
+        
+        Predicated on the assumption that you're authenticated for this  
+        user.
+        """
+        url = '/'.join([self._github_url, 'user', 'emails'])
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return loads(resp.content)
+        return []
 
     @property
     def location(self):
@@ -185,3 +274,26 @@ class User(GitHubCore):
     @property
     def total_private_repos(self):
         return self._private_repos
+
+    def update(self, name=None, email=None, blog=None, company=None, 
+            location=None, hireable=False, bio=None):
+        """If authenticated as this user, update the information with 
+        the information provided in the parameters.
+
+        :param name: string, e.g., 'John Smith', not login name
+        :param email: string, e.g., 'john.smith@example.com'
+        :param blog: string, e.g., 'http://www.example.com/jsmith/blog'
+        :param company: string
+        :param location: string
+        :param hireable: boolean, defaults to False
+        :param bio: string, GitHub flavored markdown
+        """
+        user = dumps({'name': name, 'email': email, 'blog': blog, 
+            'company': company, 'location': location,
+            'hireable': hireable, 'bio': bio})
+        url = '/'.join([self._github_url, 'user'])
+        resp = self._patch(url, user)
+        if resp.status_code == 200:
+            self._update_(loads(resp.content))
+            return True
+        return False

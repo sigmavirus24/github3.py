@@ -13,3 +13,4 @@ __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012 Sigmavirus24'
 
 from .api import login, gist, gists, create_gist
+from .github import GitHub
