@@ -141,24 +141,6 @@ class GitHub(GitHubCore):
 
         return gist
 
-    def gists(self, username=None):
-        """If no username is specified, GET /gists, otherwise GET
-        /users/:username/gists"""
-        url = [self._github_url]
-        if username:
-            url.extend(['users', username, 'gists'])
-        else:
-            url.append('gists')
-        url = '/'.join(url)
-
-        req = self._get(url)
-
-        gists = []
-        for d in req.json:
-            gists.append(Gist(d, self._session))
-
-        return gists
-
     def is_following(self, login):
         """Check if the authenticated user is following login."""
         if login:
@@ -178,7 +160,37 @@ class GitHub(GitHubCore):
 
         return None
 
-    def issues(self,
+    def list_followers(self, login=None):
+        """If login is provided, return a list of followers of that 
+        login name; otherwise return a list of followers of the 
+        authenticated user."""
+        return self._list_follow(login, 'followers')
+
+    def list_following(self, login=None):
+        """If login is provided, return a list of users being followed 
+        by login; otherwise return a list of people followed by the 
+        authenticated user."""
+        return self._list_follow(login, 'following')
+
+    def list_gists(self, username=None):
+        """If no username is specified, GET /gists, otherwise GET
+        /users/:username/gists"""
+        url = [self._github_url]
+        if username:
+            url.extend(['users', username, 'gists'])
+        else:
+            url.append('gists')
+        url = '/'.join(url)
+
+        req = self._get(url)
+
+        gists = []
+        for d in req.json:
+            gists.append(Gist(d, self._session))
+
+        return gists
+
+    def list_issues(self,
         owner=None,
         repository=None,
         filter=None,
@@ -224,18 +236,6 @@ class GitHub(GitHubCore):
                     issues.append(Issue(issue, self._session))
 
         return issues
-
-    def list_followers(self, login=None):
-        """If login is provided, return a list of followers of that 
-        login name; otherwise return a list of followers of the 
-        authenticated user."""
-        return self._list_follow(login, 'followers')
-
-    def list_following(self, login=None):
-        """If login is provided, return a list of users being followed 
-        by login; otherwise return a list of people followed by the 
-        authenticated user."""
-        return self._list_follow(login, 'following')
 
     def list_keys(self):
         """List public keys for the authenticated user."""
