@@ -70,9 +70,9 @@ Progress
 .. _Labels: http://developer.github.com/v3/issues/labels/
 .. _Milestones: http://developer.github.com/v3/issues/milestones/
 
-- Organizations_
+- Organizations_: **done**
 
-  - Members_
+  - Members_: **in progress**
 
   - Teams_
 
@@ -146,7 +146,7 @@ Examples
 
   >>> from github3 import login
   >>> gh = login(username, password)
-  >>> gists = gh.gists()
+  >>> gists = gh.list_gists()
   >>> files = {'spam.txt' : {'content': 'What... is the air-speed velocity of an
   unladen swallow?'}}
   >>> gh.create_gist('Answer this to cross the bridge', files, public=False)

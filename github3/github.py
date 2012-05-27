@@ -11,6 +11,7 @@ from json import dumps
 from .gist import Gist
 from .issue import Issue, issue_params
 from .models import GitHubCore
+from .org import Organization
 from .repo import Repository
 from .user import User, Key
 
@@ -246,6 +247,24 @@ class GitHub(GitHubCore):
             for key in resp.json:
                 keys.append(Key(key, self._session))
         return keys
+
+    def list_orgs(self, login=None):
+        """List public organizations for login if provided; otherwise 
+        list public and private organizations for the authenticated 
+        user."""
+        url = [self._github_url]
+        if login:
+            url.extend(['users', login, 'orgs'])
+        else:
+            url.extend(['user', 'orgs'])
+        url = '/'.join(url)
+
+        orgs = []
+        resp = self._get(url)
+        if resp.status_code == 200:
+            for org in resp.json:
+                orgs.append(Organization(org, self._session))
+        return orgs
 
     def login(self, username, password):
         """Logs the user into GitHub for protected API calls."""

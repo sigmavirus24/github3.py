@@ -115,3 +115,122 @@ class BaseEvent(GitHubCore):
     @property
     def created_at(self):
         return self._created
+
+class BaseAccount(GitHubCore):
+    def __init__(self, acct, session):
+        super(BaseAccount, self).__init__(session)
+        self._update_(acct)
+
+    def __repr__(self):
+        return '<%s [%s:%s]>' % (self._type, self._login, self._name)
+
+    def _update_(self, acct):
+        # Public information
+        ## e.g. https://api.github.com/users/self._login
+        self._type = acct.get('type')
+        self._api_url = acct.get('url')
+
+        self._avatar = acct.get('avatar_url')
+        self._blog = acct.get('blog')
+        self._company = acct.get('company')
+
+        self._created = None
+        if acct.get('created_at'):
+            self._created = self._strptime(acct.get('created_at'))
+        self._email = acct.get('email')
+
+        ## The number of people following this acct
+        self._followers = acct.get('followers')
+
+        ## The number of people this acct follows
+        self._following = acct.get('following')
+
+        self._id = acct.get('id')
+        self._location = acct.get('location')
+        self._login = acct.get('login')
+
+        ## e.g. first_name last_name
+        self._name = acct.get('name')
+
+        ## The number of public_repos
+        self._public_repos = acct.get('public_repos')
+
+        ## e.g. https://github.com/self._login
+        self._url = acct.get('html_url')
+
+        ## The number of private repos
+        if self._type == 'Organization':
+            self._private_repos = acct.get('private_repos')
+
+        if self._type == 'User':
+            self._bio = acct.get('bio')
+
+            ## The number of people this acct folows
+            self._grav_id = acct.get('gravatar_id')
+            self._hire = acct.get('hireable')
+
+            ## The number of public_gists
+            self._public_gists = acct.get('public_gists')
+
+            # Private information
+            self._disk = acct.get('disk_usage')
+
+            self._owned_private_repos = acct.get('owned_private_repos')
+            self._private_gists = acct.get('total_private_gists')
+            self._private_repos = acct.get('total_private_repos')
+
+    @property
+    def avatar(self):
+        return self._avatar
+
+    @property
+    def bio(self):
+        return self._bio
+
+    @property
+    def blog(self):
+        return self._blog
+
+    @property
+    def company(self):
+        return self._company
+
+    @property
+    def created_at(self):
+        return self._created
+
+    @property
+    def email(self):
+        return self._email
+
+    @property
+    def followers(self):
+        return self._followers
+
+    @property
+    def following(self):
+        return self._following
+
+    @property
+    def html_url(self):
+        return self._url
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def location(self):
+        return self._location
+
+    @property
+    def login(self):
+        return self._login
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def public_repos(self):
+        return self._public_repos
