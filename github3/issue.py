@@ -9,7 +9,6 @@ This module contains the classes related to issues.
 from json import dumps
 from re import match
 from .models import GitHubCore, BaseComment, BaseEvent
-from .compat import loads
 from .user import User
 
 
@@ -47,7 +46,7 @@ class Label(GitHubCore):
         resp = self._patch(self._api_url, dumps({'name': name,
             'color': color}))
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
 
         return False
@@ -109,7 +108,7 @@ class Milestone(GitHubCore):
         resp = self._get(url)
         labels = []
         if resp.status_code == 200:
-            for label in loads(resp.content):
+            for label in resp.json:
                 labels.append(Label(label, self._session))
         return labels
 
@@ -143,7 +142,7 @@ class Milestone(GitHubCore):
             'description': description, 'due_on': due_on})
         resp = self._patch(self._api_url, inp)
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
         return False
 
@@ -222,7 +221,7 @@ class Issue(GitHubCore):
                 self._repo[1], 'issues', 'comments', str(id)])
             resp = self._get(url)
             if resp.status_code == 200:
-                return IssueComment(loads(resp.content))
+                return IssueComment(resp.json)
         return None
 
     @property
@@ -262,7 +261,7 @@ class Issue(GitHubCore):
                 'state': state, 'milestone': milestone, 'labels': labels}
         resp = self._patch(self._api_url, dumps(data))
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
 
         return False
@@ -290,7 +289,7 @@ class Issue(GitHubCore):
 
         comments = []
         if resp.status_code == 200:
-            for comment in loads(resp.content):
+            for comment in resp.json:
                 comments.append(IssueComment(comment, self._session))
         return comments
 
@@ -299,7 +298,7 @@ class Issue(GitHubCore):
         resp = self._get(url)
         events = []
         if resp.status_code == 200:
-            for event in loads(resp.content):
+            for event in resp.json:
                 events.append(IssueEvent(event, self))
         return events
 

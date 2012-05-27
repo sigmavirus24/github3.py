@@ -8,7 +8,6 @@ This module contains the class relating to repositories.
 
 from datetime import datetime
 from json import dumps
-from .compat import loads
 from .issue import Issue, Label, Milestone, issue_params
 from .models import GitHubCore
 from .user import User
@@ -89,7 +88,7 @@ class Repository(GitHubCore):
         resp = self._post(url, issue)
         issue = None
         if resp.status_code == 201:
-            issue = Issue(loads(resp.content), self._session)
+            issue = Issue(resp.json, self._session)
 
         return issue
 
@@ -103,7 +102,7 @@ class Repository(GitHubCore):
         resp = self._post(url, dumps({'name': name, 'color': color}))
 
         if resp.status_code == 201:
-            label = Label(loads(resp.content), self._session)
+            label = Label(resp.json, self._session)
         return label
 
     def create_milestone(self, title, state=None, description=None,
@@ -115,7 +114,7 @@ class Repository(GitHubCore):
 
         resp = self._post(url, mile)
         if resp.status_code == 201:
-            milestone = Milestone(loads(resp.content), self._session)
+            milestone = Milestone(resp.json, self._session)
 
         return milestone
 
@@ -139,7 +138,7 @@ class Repository(GitHubCore):
             resp = self._post(url)
 
         if resp.status_code == 202:
-            return Repository(loads(resp.content), self._session)
+            return Repository(resp.json, self._session)
 
         return None
 
@@ -177,7 +176,7 @@ class Repository(GitHubCore):
             url = '/'.join([self._api_url, 'issues', str(number)])
             resp = self._get(url)
             if resp.status_code == 200:
-                return Issue(loads(resp.content), self._session)
+                return Issue(resp.json, self._session)
 
         return None
 
@@ -186,7 +185,7 @@ class Repository(GitHubCore):
             url = '/'.join([self._api_url, 'labels', name])
             resp = self._get(url)
             if resp.status_code == 200:
-                return Label(loads(resp.content), self._session)
+                return Label(resp.json, self._session)
 
         return None
 
@@ -240,7 +239,7 @@ class Repository(GitHubCore):
         resp = self._get(url)
         issues = []
         if resp.status_code == 200:
-            for issue in loads(resp.content):
+            for issue in resp.json:
                 issues.append(Issue(issue, self._session))
 
         return issues
@@ -251,7 +250,7 @@ class Repository(GitHubCore):
 
         labels = []
         if resp.status_code == 200:
-            for label in loads(resp.content):
+            for label in resp.json:
                 labels.append(Label(label, self._session))
 
         return labels
@@ -276,7 +275,7 @@ class Repository(GitHubCore):
         resp = self._get(url)
         milestones = []
         if resp.status_code == 200:
-            for mile in loads(resp.content):
+            for mile in resp.json:
                 milestones.append(Milestone(mile, self._session))
 
         return milestones
@@ -285,7 +284,7 @@ class Repository(GitHubCore):
         url = '/'.join([self._api_url, 'milestones', str(number)])
         resp = self._session.get(url)
         if resp.status_code == 200:
-            return Milestone(loads(resp.content), self._session)
+            return Milestone(resp.json, self._session)
         return None
 
     @property

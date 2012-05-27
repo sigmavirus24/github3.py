@@ -8,7 +8,6 @@ This module provides the basic models used in github3.py
 
 from datetime import datetime
 from json import dumps
-from .compat import loads
 
 
 class GitHubCore(object):
@@ -86,7 +85,7 @@ class BaseComment(GitHubCore):
         if body:
             resp = self._patch(self._api_url, dumps({'body': body}))
             if resp.status_code == 200:
-                self._update_(loads(resp.content))
+                self._update_(resp.json)
                 return True
         return False
 

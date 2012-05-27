@@ -7,7 +7,6 @@ This module contains everything relating to Users.
 """
 
 from json import dumps
-from .compat import loads
 from .models import GitHubCore
 
 
@@ -52,7 +51,7 @@ class Key(GitHubCore):
         resp = self._patch(self._api_url, dumps({'title': title,
             'key': key}))
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
         return False
 
@@ -167,7 +166,7 @@ class User(GitHubCore):
             url = '/'.join([self._github_url, 'user', 'emails'])
             resp = self._post(url, dumps(addresses))
             if resp.status_code == 201:
-                return loads(resp.content)
+                return resp.json
         return []
 
     @property
@@ -236,7 +235,7 @@ class User(GitHubCore):
         url = '/'.join([self._github_url, 'user', 'emails'])
         resp = self._get(url)
         if resp.status_code == 200:
-            return loads(resp.content)
+            return resp.json
         return []
 
     @property
@@ -294,6 +293,6 @@ class User(GitHubCore):
         url = '/'.join([self._github_url, 'user'])
         resp = self._patch(url, user)
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
         return False

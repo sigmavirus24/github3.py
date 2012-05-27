@@ -7,7 +7,6 @@ Module which contains all the gist related material.
 """
 
 from json import dumps
-from .compat import loads
 from .models import GitHubCore, BaseComment
 from .user import User
 
@@ -98,7 +97,7 @@ class Gist(GitHubCore):
         url = '/'.join([self._api_url, 'comments'])
         resp = self._post(url, dumps({'body': body}))
         if resp.status_code == 201:
-            comment = GistComment(loads(resp.content), self._session)
+            comment = GistComment(resp.json, self._session)
             return comment
         return None
 
@@ -124,7 +123,7 @@ class Gist(GitHubCore):
         """
         resp = self._patch(self._api_url, dumps(kwargs))
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
         return False
 
@@ -136,7 +135,7 @@ class Gist(GitHubCore):
         url = '/'.join([self._api_url, 'fork'])
         resp = self._post(url)
         if resp.status_code == 201:
-            return Gist(loads(resp.content))
+            return Gist(resp.json)
         return False
 
     @property
@@ -147,7 +146,7 @@ class Gist(GitHubCore):
         """GET /gists/:id"""
         resp = self._get(self._api_url)
         if resp.status_code == 200:
-            self._update_(loads(resp.content))
+            self._update_(resp.json)
             return True
         return False
 
@@ -178,7 +177,7 @@ class Gist(GitHubCore):
         resp = self._get(url)
         comments = []
         if resp.status_code == 200:
-            for comment in loads(resp.content):
+            for comment in resp.json:
                 comments.append(GistComment(comment, self._session))
         return comments
 

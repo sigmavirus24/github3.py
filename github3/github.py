@@ -8,7 +8,6 @@ This module contains the main GitHub session object.
 
 from requests import session
 from json import dumps
-from .compat import loads
 from .gist import Gist
 from .issue import Issue, issue_params
 from .models import GitHubCore
@@ -40,7 +39,7 @@ class GitHub(GitHubCore):
         follow = []
         req = self._get(url)
         if req.status_code == 200:
-            for follower in loads(req.content):
+            for follower in req.json:
                 follow.append(User(follower, self._session))
         return follow
 
@@ -57,7 +56,7 @@ class GitHub(GitHubCore):
 
         gist = None
         if response.status_code == 201:
-            gist = Gist(loads(response.content), self._session)
+            gist = Gist(response.json, self._session)
 
         return gist
 
@@ -69,7 +68,7 @@ class GitHub(GitHubCore):
             url = '/'.join([self._github_url, 'user', 'keys'])
             resp = self._post(url, dumps({'title': title, 'key': key}))
             if resp.status_code == 201:
-                created = Key(loads(resp.content), self._session)
+                created = Key(resp.json, self._session)
         return created
 
     def create_issue(self,
@@ -129,7 +128,7 @@ class GitHub(GitHubCore):
                 str(id_num)])
             resp = self._get(url)
             if resp.status_code == 200:
-                return Key(loads(resp.content), self._session)
+                return Key(resp.json, self._session)
         return None
 
     def gist(self, id_num):
@@ -138,7 +137,7 @@ class GitHub(GitHubCore):
         req = self._get(url)
         gist = None
         if req.status_code == 200:
-            gist = Gist(loads(req.content), self._session)
+            gist = Gist(req.json, self._session)
 
         return gist
 
@@ -155,7 +154,7 @@ class GitHub(GitHubCore):
         req = self._get(url)
 
         gists = []
-        for d in loads(req.content):
+        for d in req.json:
             gists.append(Gist(d, self._session))
 
         return gists
@@ -221,7 +220,7 @@ class GitHub(GitHubCore):
             issues = []
             req = self._get(url)
             if req.status_code == 200:
-                for issue in loads(req.content):
+                for issue in req.json:
                     issues.append(Issue(issue, self._session))
 
         return issues
@@ -244,7 +243,7 @@ class GitHub(GitHubCore):
         resp = self._get(url)
         keys = []
         if resp.status_code == 200:
-            for key in loads(resp.content):
+            for key in resp.json:
                 keys.append(Key(key, self._session))
         return keys
 
@@ -258,7 +257,7 @@ class GitHub(GitHubCore):
         url = '/'.join([self._github_url, 'repos', owner, repository])
         req = self._get(url)
         if req.status_code == 200:
-            return Repository(loads(req.content), self._session)
+            return Repository(req.json, self._session)
         return None
 
     def unfollow(self, login):
@@ -303,5 +302,5 @@ class GitHub(GitHubCore):
 
         req = self._get(url)
         if req.status_code == 200:
-            return User(loads(req.content), self._session)
+            return User(req.json, self._session)
         return None
