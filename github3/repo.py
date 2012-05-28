@@ -114,6 +114,8 @@ class Repository(GitHubCore):
 
         if resp.status_code == 201:
             label = Label(resp.json, self._session)
+        elif resp.status_code >= 400:
+            label = Error(resp.status_code, resp.json)
         return label
 
     def create_milestone(self, title, state=None, description=None,

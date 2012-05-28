@@ -102,7 +102,7 @@ class PullRequest(GitHubCore):
         if pull.get('merged_at'):
             self._merged = self._strptime(pull.get('merged_at'))
         self._num = pull.get('number')
-        self._patch = pull.get('patch_url')
+        self._patch_url = pull.get('patch_url')
         self._state = pull.get('state')
         self._title = pull.get('title')
         self._updated = self._strptime(pull.get('updated_at'))
@@ -160,7 +160,7 @@ class PullRequest(GitHubCore):
 
     @property
     def patch_url(self):
-        return self._patch
+        return self._patch_url
 
     @property
     def state(self):
@@ -169,6 +169,20 @@ class PullRequest(GitHubCore):
     @property
     def title(self):
         return self._title
+
+    def update(self, title='', body='', state=''):
+        """Update this pull request.
+
+        :param title: (optional), string
+        :param body: (optional), string
+        :param state: (optional), string, ('open', 'closed')
+        """
+        data = dumps({'title': title, 'body': body, 'state': state})
+        resp = self._patch(self._api_url, data)
+        if resp.status_code == 200:
+            self._update_(resp.json)
+            return True
+        return False
 
     @property
     def user(self):
