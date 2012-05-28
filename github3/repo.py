@@ -10,6 +10,7 @@ from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
 from .models import GitHubCore
+from .pulls import PullRequest
 from .user import User
 
 
@@ -69,6 +70,14 @@ class Repository(GitHubCore):
     def __repr__(self):
         return '<Repository [%s/%s]>' % (self._owner.login, self._name)
 
+    def _create_pull(self, data):
+        if data:
+            url = '/'.join([self._api_url, 'pulls'])
+            resp = self._post(url, data)
+            if resp.status_code == 201:
+                return PullRequest(resp.json, self._session)
+        return None
+
     @property
     def clone_url(self):
         return self._https_clone
@@ -118,6 +127,29 @@ class Repository(GitHubCore):
 
         return milestone
 
+    def create_pull(self, title, base, head, body=''):
+        """Create a pull request using commits from ``head`` and comparing
+        against ``base``.
+
+        :param title: (required), string
+        :param base: (required), string, e.g., 'username:branch', or a sha
+        :param head: (required), string, e.g., 'master', or a sha
+        :param body: (optional), string, markdown formatted description
+        """
+        data = dumps({'title': title, 'body': body, 'base': base,
+            'head': head})
+        return self._create_pull(data)
+
+    def create_pull_from_issue(self, issue, base, head):
+        """Create a pull request from issue #``issue``.
+
+        :param issue: (required), int, issue number
+        :param base: (required), string, e.g., 'username:branch', or a sha
+        :param head: (required), string, e.g., 'master', or a sha
+        """
+        data = dumps({'issue': issue, 'base': base, 'head': head})
+        return self._create_pull(data)
+
     @property
     def created_at(self):
         return self._created
@@ -148,6 +180,9 @@ class Repository(GitHubCore):
 
     def is_fork(self):
         return self._is_fork
+
+    def is_private(self):
+        return self._priv
 
     @property
     def git_clone(self):
@@ -280,6 +315,25 @@ class Repository(GitHubCore):
 
         return milestones
 
+    def list_pulls(self, state=None):
+        url = '/'.join([self._api_url, 'pulls'])
+
+        params = []
+        if state in ('open', 'closed'):
+            params.append('state=%s' % state)
+
+        if params:
+            params = '&'.join(params)
+            url = '?'.join([url, params])
+
+        resp = self._get(url)
+        pulls = []
+        if resp.status_code == 200:
+            for pull in resp.json:
+                pulls.append(PullRequest(pull, self._session))
+
+        return pulls
+
     def milestone(self, number):
         url = '/'.join([self._api_url, 'milestones', str(number)])
         resp = self._session.get(url)
@@ -303,8 +357,13 @@ class Repository(GitHubCore):
     def owner(self):
         return self._owner
 
-    def is_private(self):
-        return self._priv
+    def pull_request(self, number):
+        if int(number) > 0:
+            url = '/'.join([self._api_url, 'pulls', str(number)])
+            resp = self._get(url)
+            if resp.status_code == 200:
+                return PullRequest(resp.json, self._session)
+        return None
 
     @property
     def pushed_at(self):
