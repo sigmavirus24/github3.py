@@ -237,3 +237,24 @@ class BaseAccount(GitHubCore):
     @property
     def public_repos(self):
         return self._public_repos
+
+class Error(object):
+    def __init__(self, code, error):
+        super(Error, self).__init__()
+        self._code = code
+        self._message = error.get('message')
+        if code == 422:
+            self._errors = []
+            for e in error.get('errors'):
+                self._errors.append(type(e.get('code'), (Error, ), e))
+
+    def __repr__(self):
+        return '<Error [%s]>' % (self._message or self._code)
+
+    @property
+    def code(self):
+        return self._code
+
+    @property
+    def errors(self):
+        return self._errors

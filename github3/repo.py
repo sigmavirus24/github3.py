@@ -9,7 +9,7 @@ This module contains the class relating to repositories.
 from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
-from .models import GitHubCore
+from .models import GitHubCore, Error
 from .pulls import PullRequest
 from .user import User
 
@@ -76,6 +76,8 @@ class Repository(GitHubCore):
             resp = self._post(url, data)
             if resp.status_code == 201:
                 return PullRequest(resp.json, self._session)
+            if resp.status_code >= 400:
+                return Error(resp.status_code, resp.json)
         return None
 
     @property
