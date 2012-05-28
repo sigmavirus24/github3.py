@@ -48,8 +48,7 @@ class Team(GitHubCore):
         return False
 
     def edit(self, name, permission=''):
-        """Edit this team. **Seems to return false regardless, could be
-        an API problem, waiting to hear back from github support.**
+        """Edit this team.
 
         :param name: (required), string
         :param permission: (optional), ('pull', 'push', 'admin')
@@ -57,7 +56,7 @@ class Team(GitHubCore):
         if name:
             data = dumps({'name': name, 'permission': permission})
             resp = self._patch(self._api_url, data)
-            if resp.status_code == 201:
+            if resp.status_code == 200:
                 self._update_(resp.json)
                 return True
         return False

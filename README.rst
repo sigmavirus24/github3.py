@@ -74,7 +74,7 @@ Progress
 
   - Members_: **done**
 
-  - Teams_: **done** [1]_
+  - Teams_: **done**
 
 .. _Organizations: http://developer.github.com/v3/orgs/
 .. _Members: http://developer.github.com/v3/orgs/members/
@@ -131,13 +131,6 @@ Progress
 
 .. _Events: http://developer.github.com/v3/events/
 .. _Types: http://developer.github.com/v3/events/types/
-
-.. [1] Editing a team seems to perpetually receive a 404 status code,
-       BUT checking the organization I used to test this via the web 
-       shows that the changes were actually applied. I have an email in 
-       to GitHub's support folks to see if this is something I have done 
-       or if this is possibly an unexpected/undocumented change on their 
-       end.
 
 License
 -------
