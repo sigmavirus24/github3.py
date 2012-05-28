@@ -25,6 +25,9 @@ class GitHub(GitHubCore):
         self._session.headers.update({'Accept': 'application/json'})
         # Only accept UTF-8 encoded data
         self._session.headers.update({'Accept-Charset': 'utf-8'})
+        # Identify who we are
+        self._session.config['base_headers'].update({'User-Agent':
+            'github3.py/pre-alpha'})
 
     def __repr__(self):
         return '<github3-session at 0x%x>' % id(self)
@@ -115,7 +118,7 @@ class GitHub(GitHubCore):
         """Make the authenticated user follow login."""
         if login:
             print(login)
-            url = '/'.join([self._github_url, 'user', 'following', 
+            url = '/'.join([self._github_url, 'user', 'following',
                 login])
             resp = self._put(url)
             if resp.status_code == 204:
@@ -125,7 +128,7 @@ class GitHub(GitHubCore):
     def get_key(self, id_num):
         """Gets the authenticated user's key specified by id_num."""
         if int(id_num) > 0:
-            url = '/'.join([self._github_url, 'user', 'keys', 
+            url = '/'.join([self._github_url, 'user', 'keys',
                 str(id_num)])
             resp = self._get(url)
             if resp.status_code == 200:
@@ -145,7 +148,7 @@ class GitHub(GitHubCore):
     def is_following(self, login):
         """Check if the authenticated user is following login."""
         if login:
-            url = '/'.join([self._github_url, 'user', 'following', 
+            url = '/'.join([self._github_url, 'user', 'following',
                 login])
             resp = self._get(url)
             if resp.status_code == 204:
@@ -162,14 +165,14 @@ class GitHub(GitHubCore):
         return None
 
     def list_followers(self, login=None):
-        """If login is provided, return a list of followers of that 
-        login name; otherwise return a list of followers of the 
+        """If login is provided, return a list of followers of that
+        login name; otherwise return a list of followers of the
         authenticated user."""
         return self._list_follow(login, 'followers')
 
     def list_following(self, login=None):
-        """If login is provided, return a list of users being followed 
-        by login; otherwise return a list of people followed by the 
+        """If login is provided, return a list of users being followed
+        by login; otherwise return a list of people followed by the
         authenticated user."""
         return self._list_follow(login, 'following')
 
@@ -249,8 +252,8 @@ class GitHub(GitHubCore):
         return keys
 
     def list_orgs(self, login=None):
-        """List public organizations for login if provided; otherwise 
-        list public and private organizations for the authenticated 
+        """List public organizations for login if provided; otherwise
+        list public and private organizations for the authenticated
         user."""
         url = [self._github_url]
         if login:
@@ -270,6 +273,14 @@ class GitHub(GitHubCore):
         """Logs the user into GitHub for protected API calls."""
         self._session.auth = (username, password)
 
+    def organization(self, login):
+        """Returns a Organization object for the login name"""
+        url = '/'.join([self._github_url, 'orgs', login])
+        req = self._get(url)
+        if req.status_code == 200:
+            return Organization(req.json, self._session)
+        return None
+
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
         owner and repository"""
@@ -282,16 +293,16 @@ class GitHub(GitHubCore):
     def unfollow(self, login):
         """Make the authenticated user stop following login"""
         if login:
-            url = '/'.join([self._github_url, 'user', 'following', 
+            url = '/'.join([self._github_url, 'user', 'following',
                 login])
             resp = self._delete(url)
             if resp.status_code == 204:
                 return True
         return False
 
-    def update_user(self, name=None, email=None, blog=None, 
+    def update_user(self, name=None, email=None, blog=None,
             company=None, location=None, hireable=False, bio=None):
-        """If authenticated as this user, update the information with 
+        """If authenticated as this user, update the information with
         the information provided in the parameters.
 
         :param name: string, e.g., 'John Smith', not login name
@@ -304,13 +315,13 @@ class GitHub(GitHubCore):
         """
         user = self.user()
         if user:
-            return user.update(name, email, blog, company, location, 
+            return user.update(name, email, blog, company, location,
                     hireable, bio)
         return False
-    
+
     def user(self, login=None):
-        """Returns a User object for the specified login name if 
-        provided. If no login name is provided, this will return a User 
+        """Returns a User object for the specified login name if
+        provided. If no login name is provided, this will return a User
         object for the authenticated user."""
         url = [self._github_url]
         if login:

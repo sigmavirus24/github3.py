@@ -110,6 +110,9 @@ class User(BaseAccount):
         if not self._type:
             self._type = 'User'
 
+    def __repr__(self):
+        return '<User [%s:%s]>' % (self._login, self._name)
+
     def _update_(self, user):
         # Private information
         super(User, self)._update_(user)
@@ -121,7 +124,7 @@ class User(BaseAccount):
             self._plan = None
 
     def add_email_addresses(self, addresses=[]):
-        """Add the email addresses in ``addresses`` to the authenticated 
+        """Add the email addresses in ``addresses`` to the authenticated
         user's account."""
         if addresses:
             url = '/'.join([self._github_url, 'user', 'emails'])
@@ -131,7 +134,7 @@ class User(BaseAccount):
         return []
 
     def delete_email_addresses(self, addresses=[]):
-        """Delete the email addresses in ``addresses`` from the 
+        """Delete the email addresses in ``addresses`` from the
         authenticated user's account."""
         url = '/'.join([self._github_url, 'user', 'emails'])
         resp = self._delete(url, data=dumps(addresses))
@@ -149,8 +152,8 @@ class User(BaseAccount):
 
     def list_emails(self):
         """List email addresses for a user.
-        
-        Predicated on the assumption that you're authenticated for this  
+
+        Predicated on the assumption that you're authenticated for this
         user.
         """
         url = '/'.join([self._github_url, 'user', 'emails'])
@@ -179,9 +182,9 @@ class User(BaseAccount):
     def total_private_repos(self):
         return self._private_repos
 
-    def update(self, name=None, email=None, blog=None, company=None, 
+    def update(self, name=None, email=None, blog=None, company=None,
             location=None, hireable=False, bio=None):
-        """If authenticated as this user, update the information with 
+        """If authenticated as this user, update the information with
         the information provided in the parameters.
 
         :param name: string, e.g., 'John Smith', not login name
@@ -192,7 +195,7 @@ class User(BaseAccount):
         :param hireable: boolean, defaults to False
         :param bio: string, GitHub flavored markdown
         """
-        user = dumps({'name': name, 'email': email, 'blog': blog, 
+        user = dumps({'name': name, 'email': email, 'blog': blog,
             'company': company, 'location': location,
             'hireable': hireable, 'bio': bio})
         url = '/'.join([self._github_url, 'user'])

@@ -326,7 +326,7 @@ class Repository(GitHubCore):
     def updated_at(self):
         return self._updated
 
-    def update_label(self, name, color, new_name=None):
+    def update_label(self, name, color, new_name=''):
         label = self.get_label(name)
 
         if label:

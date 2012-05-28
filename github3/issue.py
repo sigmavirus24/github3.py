@@ -128,15 +128,16 @@ class Milestone(GitHubCore):
     def title(self):
         return self._title
 
-    def update(self, title, state=None, description=None, due_on=None):
+    def update(self, title, state='', description='', due_on=''):
         """Update this milestone.
 
         state, description, and due_on are optional
 
         :param title: *required*, string
-        :param state: ('open', 'closed')
-        :param description: string
-        :param due_on: ISO 8601 time string: YYYY-MM-DDTHH:MM:SSZ
+        :param state: (optional), ('open', 'closed')
+        :param description: (optional), string
+        :param due_on: (optional), ISO 8601 time string:
+        YYYY-MM-DDTHH:MM:SSZ
         """
         inp = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})

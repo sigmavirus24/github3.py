@@ -116,18 +116,21 @@ class BaseEvent(GitHubCore):
     def created_at(self):
         return self._created
 
+
 class BaseAccount(GitHubCore):
     def __init__(self, acct, session):
         super(BaseAccount, self).__init__(session)
         self._update_(acct)
 
     def __repr__(self):
-        return '<%s [%s:%s]>' % (self._type, self._login, self._name)
+        return '<BaseAccount [%s:%s]>' % (self._login, self._name)
 
     def _update_(self, acct):
         # Public information
         ## e.g. https://api.github.com/users/self._login
-        self._type = acct.get('type')
+        self._type = None
+        if acct.get('type'):
+            self._type = acct.get('type')
         self._api_url = acct.get('url')
 
         self._avatar = acct.get('avatar_url')
