@@ -65,7 +65,6 @@ class Commit(GitData):
 
         self._committer = ''
         if commit.get('committer'):
-            # This is entirely optional.
             if len(commit.get('committer')) > 3:
                 self._committer = User(commit.get('committer'), None)
             else:
@@ -77,6 +76,10 @@ class Commit(GitData):
             api = parent.pop('url')
             parent['_api_url'] = api
             self._parents.append(type('Parent', (object, ), parent))
+
+        self._tree = None
+        if commit.get('tree'):
+            self._tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
         return '<Commit [%s:%s]>' % (self._author.login, self._sha)
@@ -97,13 +100,18 @@ class Commit(GitData):
     def parents(self):
         return self._parents
 
+    @property
+    def tree(self):
+        return self._tree
+
 
 class Tree(GitData):
     def __init__(self, tree, session):
         super(Tree, self).__init__(tree, session)
         self._tree = []
-        for t in tree.get('tree'):
-            self._tree.append(TreeInfo(t))
+        if tree.get('tree'):
+            for t in tree.get('tree'):
+                self._tree.append(Hash(t))
 
     def __repr__(self):
         return '<Tree [%s]>' % self._sha
@@ -122,9 +130,9 @@ class Tree(GitData):
         return self._tree
 
 
-class TreeInfo(object):
+class Hash(object):
     def __init__(self, info):
-        super(TreeInfo, self).__init__()
+        super(Hash, self).__init__()
         self._path = info.get('path')
         self._mode = info.get('mode')
         self._type = info.get('type')

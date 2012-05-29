@@ -39,13 +39,13 @@ Progress
 
   - Blobs_: **done**
 
-  - Commits_: **in progress**
+  - Commits_: **done**
 
   - References_: **in progress**
 
   - Tags_: **in progress**
 
-  - Trees_: **in progress**
+  - Trees_: **done**
 
 .. _Git Data: http://developer.github.com/v3/git/
 .. _Commits: http://developer.github.com/v3/events/

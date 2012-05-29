@@ -110,6 +110,36 @@ class Repository(GitHubCore):
                 return Error(resp.status_code, resp.json)
         return None
 
+    def create_commit(self, message, tree, parents, author={}, committer={}):
+        """Create a commit on this repository.
+
+        :param message: (required), string, commit message
+        :param tree: (required), string, SHA of the tree object this
+            commit points to
+        :param parents: (required), list/array, SHAs of the commits that
+            were parents of this commit. If empty, the commit will be
+            written as the root commit. Even if there is only one
+            parent, this should be an array.
+        :param author: (optional), dictionary, if omitted, GitHub will
+            use the authenticated user's credentials and the current
+            time. Format: {'name': 'Committer Name', 'email':
+            'name@example.com', 'date': 'YYYY-MM-DDTHH:MM:SS+HH:00'}
+        :param committer: (optional), dictionary, if ommitted, GitHub
+            will use the author parameters. Should be the same format as
+            the author parameter.
+        """
+        if message and tree and isinstance(parents, list):
+            url = self._api_url + '/git/commits'
+            data = dumps({'message': message, 'tree': tree,
+                'parents': parents, 'author': author,
+                'committer': committer})
+            resp = self._post(url, data)
+            if resp.status_code == 201:
+                return Commit(resp.json, self._session)
+            if resp.status_code >= 400:
+                return Error(resp.status_code, resp.json)
+        return None
+
     def create_issue(self,
         title,
         body=None,
@@ -179,6 +209,25 @@ class Repository(GitHubCore):
         """
         data = dumps({'issue': issue, 'base': base, 'head': head})
         return self._create_pull(data)
+
+    def create_tree(self, tree, base_tree=''):
+        """Create a tree on this repository.
+
+        :param tree: (required), array of hash objects specifying the
+            tree structure. Format: [{'path': 'path/file', 'mode':
+            'filemode', 'type': 'blob or tree', 'sha': '44bfc6d...'}]
+        :param base_tree: (optional), string, SHA1 of the tree you want
+            to update with new data
+        """
+        if tree and isinstance(tree, list):
+            data = dumps({'tree': tree, 'base_tree': base_tree})
+            url = self._api_url + '/git/trees'
+            resp = self._post(url, data)
+            if resp.status_code == 201:
+                return Tree(resp.json)
+            if resp.status_code >= 400:
+                return Error(resp.status_code, resp.json)
+        return None
 
     @property
     def created_at(self):
