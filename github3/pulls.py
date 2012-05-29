@@ -8,7 +8,7 @@ This module contains all the classes relating to pull requests.
 
 from json import dumps
 from .git import Commit
-from .models import GitHubCore
+from .models import GitHubCore, BaseComment
 from .user import User
 
 
@@ -211,6 +211,16 @@ class PullRequest(GitHubCore):
     def links(self):
         return self._links
 
+    def list_comments(self):
+        """List the comments on this pull request."""
+        url = '/'.join([self._api_url, 'comments'])
+        resp = self._get(url)
+        comments = []
+        if resp.status_code == 200:
+            for comment in resp.json:
+                comments.append(ReviewComment(comment, self._session))
+        return comments
+
     def list_commits(self):
         """List the commits on this pull request."""
         url = '/'.join([self._api_url, 'commits'])
@@ -281,3 +291,31 @@ class PullRequest(GitHubCore):
     @property
     def user(self):
         return self._user
+
+
+class ReviewComment(BaseComment):
+    def __init__(self, comment, session):
+        super(ReviewComment, self).__init__(comment, session)
+
+    def __repr__(self):
+        return '<Review Comment [%s]>' % self._user.login
+
+    @property
+    def commit_id(self):
+        return self._cid
+    
+    @property
+    def html_url(self):
+        return self._url
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def position(self):
+        return self._pos
+
+    @property
+    def updated_at(self):
+        return self._updated

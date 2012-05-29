@@ -63,7 +63,7 @@ class BaseComment(GitHubCore):
 
         self._path = comment.get('path')
         self._pos = comment.get('position')
-        self._cid = comment.get('comment_id')
+        self._cid = comment.get('commit_id')
 
     @property
     def body(self):

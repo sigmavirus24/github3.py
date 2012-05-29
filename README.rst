@@ -35,17 +35,17 @@ Progress
 .. _Gists: http://developer.github.com/v3/gists/
 .. _Gist Comments: http://developer.github.com/v3/gists/comments/
 
-- `Git Data`_
+- `Git Data`_: **in progress**
 
-  - Blobs_
+  - Blobs_: **in progress**
 
-  - Commits_: **sort of in progress**
+  - Commits_: **in progress**
 
-  - References_
+  - References_: **in progress**
 
-  - Tags_
+  - Tags_: **in progress**
 
-  - Trees_
+  - Trees_: **in progress**
 
 .. _Git Data: http://developer.github.com/v3/git/
 .. _Commits: http://developer.github.com/v3/events/
@@ -82,7 +82,7 @@ Progress
 
 - `Pull Requests`_: **done*
 
-  - `Review Comments`_: **in progress**
+  - `Review Comments`_: **done**
 
 .. _Pull Requests: http://developer.github.com/v3/pulls/
 .. _Review Comments: http://developer.github.com/v3/pulls/comments/
