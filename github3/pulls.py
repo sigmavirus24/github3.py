@@ -7,6 +7,7 @@ This module contains all the classes relating to pull requests.
 """
 
 from json import dumps
+from .git import Commit
 from .models import GitHubCore
 from .user import User
 
@@ -49,6 +50,59 @@ class PullDestination(GitHubCore):
     @property
     def user(self):
         return self._user
+
+
+class PullFile(object):
+    def __init__(self, pfile):
+        super(PullFile, self).__init__()
+        self._sha = pfile.get('sha')
+        self._name = pfile.get('filename')
+        self._status = pfile.get('status')
+        self._add = pfile.get('additions')
+        self._del = pfile.get('deletions')
+        self._changes = pfile.get('changes')
+        self._blob = pfile.get('blob_url')
+        self._raw = pfile.get('raw_url')
+        self._patch = pfile.get('patch')
+
+    def __repr__(self):
+        return '<Pull Request File [%s]>' % self._name
+
+    @property
+    def additions(self):
+        return self._add
+
+    @property
+    def blob_url(self):
+        return self._blob
+
+    @property
+    def changes(self):
+        return self._changes
+
+    @property
+    def deletions(self):
+        return self._del
+
+    @property
+    def filename(self):
+        return self._name
+
+    @property
+    def patch(self):
+        return self._patch
+
+    @property
+    def raw_url(self):
+        return self._raw
+
+    @property
+    def sha(self):
+        return self._shaw
+
+    @property
+    def status(self):
+        return self._status
 
 
 class PullRequest(GitHubCore):
@@ -142,6 +196,13 @@ class PullRequest(GitHubCore):
     def id(self):
         return self._id
 
+    def is_merged(self):
+        url = '/'.join([self._api_url, 'merge'])
+        resp = self._get(url)
+        if resp.status_code == 204:
+            return True
+        return False
+
     @property
     def issue_url(self):
         return self._issue
@@ -149,6 +210,39 @@ class PullRequest(GitHubCore):
     @property
     def links(self):
         return self._links
+
+    def list_commits(self):
+        """List the commits on this pull request."""
+        url = '/'.join([self._api_url, 'commits'])
+        resp = self._get(url)
+        commits = []
+        if resp.status_code == 200:
+            for commit in resp.json:
+                commits.append(Commit(commit))
+
+        return commits
+
+    def list_files(self):
+        """List the files associated with this pull request."""
+        url = '/'.join([self._api_url, 'files'])
+        resp = self._get(url)
+        files = []
+        if resp.status_code == 200:
+            for f in resp.json:
+                files.append(PullFile(f))
+        return files
+
+    def merge(self, commit_message=''):
+        """Merge this pull request.
+
+        :param commit_message: (optional), string
+        """
+        data = {'commit_message': commit_message} if commit_message else None
+        url = '/'.join([self._api_url, 'merge'])
+        resp = self._put(url, data)
+        if resp.status_code == 200:
+            return resp.json['merged']
+        return resp.json['merged']
 
     @property
     def merged_at(self):

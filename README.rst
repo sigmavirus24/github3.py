@@ -39,7 +39,7 @@ Progress
 
   - Blobs_
 
-  - Commits_
+  - Commits_: **sort of in progress**
 
   - References_
 
@@ -80,9 +80,9 @@ Progress
 .. _Members: http://developer.github.com/v3/orgs/members/
 .. _Teams: http://developer.github.com/v3/orgs/teams/
 
-- `Pull Requests`_
+- `Pull Requests`_: **done*
 
-  - `Review Comments`_
+  - `Review Comments`_: **in progress**
 
 .. _Pull Requests: http://developer.github.com/v3/pulls/
 .. _Review Comments: http://developer.github.com/v3/pulls/comments/
