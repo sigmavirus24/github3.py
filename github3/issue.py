@@ -104,7 +104,7 @@ class Milestone(GitHubCore):
     def list_labels(self):
         """List the labels for every issue associated with this
         milestone."""
-        url = '/'.join([self._api_url, 'labels'])
+        url = self._api_url + '/labels'
         resp = self._get(url)
         labels = []
         if resp.status_code == 200:
@@ -188,7 +188,7 @@ class Issue(GitHubCore):
         self._user = User(issue.get('user'), self._session)
 
     def add_labels(self, *args):
-        url = '/'.join([self._api_url, 'labels'])
+        url = self._api_url + '/labels'
         resp = self._post(url, dumps(args))
         if resp.status_code == 200:
             return True
@@ -232,7 +232,7 @@ class Issue(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this issue."""
         if body:
-            url = '/'.join([self._api_url, 'comments'])
+            url = self._api_url + '/comments'
             resp = self._post(url, dumps({'body': body}))
             if resp.status_code == 201:
                 return True
@@ -285,7 +285,7 @@ class Issue(GitHubCore):
         return self._labels
 
     def list_comments(self):
-        url = '/'.join([self._api_url, 'comments'])
+        url = self._api_url + '/comments'
         resp = self._get(url)
 
         comments = []
@@ -295,7 +295,7 @@ class Issue(GitHubCore):
         return comments
 
     def list_events(self):
-        url = '/'.join([self._api_url, 'events'])
+        url = self._api_url + '/events'
         resp = self._get(url)
         events = []
         if resp.status_code == 200:
@@ -316,7 +316,7 @@ class Issue(GitHubCore):
         return self._pull_req
 
     def remove_label(self, name):
-        url = '/'.join([self._api_url, 'labels', name])
+        url = '{0}/labels/{1}'.format(self._api_url, name)
         resp = self._delete(url)
         if resp.status_code == 200:
             return True
@@ -327,7 +327,7 @@ class Issue(GitHubCore):
         return self.replace_labels([])
 
     def replace_labels(self, labels):
-        url = '/'.join([self._api_url, 'labels'])
+        url = self._api_url + '/labels'
         resp = self._put(url, dumps(labels))
         if resp.status_code == 200:
             return True

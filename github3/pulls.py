@@ -148,7 +148,7 @@ class PullRequest(GitHubCore):
                     'comments']),
                 'issue': self._api_url.replace('pulls', 'issues'),
                 'html': self._url,
-                'review_comments': '/'.join([self._api_url, 'comments'])
+                'review_comments': self._api_url + '/comments'
                 }
 
         self._merged = None
@@ -197,7 +197,7 @@ class PullRequest(GitHubCore):
         return self._id
 
     def is_merged(self):
-        url = '/'.join([self._api_url, 'merge'])
+        url = self._api_url + '/merge'
         resp = self._get(url)
         if resp.status_code == 204:
             return True
@@ -213,7 +213,7 @@ class PullRequest(GitHubCore):
 
     def list_comments(self):
         """List the comments on this pull request."""
-        url = '/'.join([self._api_url, 'comments'])
+        url = self._api_url + '/comments'
         resp = self._get(url)
         comments = []
         if resp.status_code == 200:
@@ -223,18 +223,18 @@ class PullRequest(GitHubCore):
 
     def list_commits(self):
         """List the commits on this pull request."""
-        url = '/'.join([self._api_url, 'commits'])
+        url = self._api_url + '/commits'
         resp = self._get(url)
         commits = []
         if resp.status_code == 200:
             for commit in resp.json:
-                commits.append(Commit(commit))
+                commits.append(Commit(commit, self._session))
 
         return commits
 
     def list_files(self):
         """List the files associated with this pull request."""
-        url = '/'.join([self._api_url, 'files'])
+        url = self._api_url + '/files'
         resp = self._get(url)
         files = []
         if resp.status_code == 200:
@@ -248,7 +248,7 @@ class PullRequest(GitHubCore):
         :param commit_message: (optional), string
         """
         data = {'commit_message': commit_message} if commit_message else None
-        url = '/'.join([self._api_url, 'merge'])
+        url = self._api_url + '/merge'
         resp = self._put(url, data)
         if resp.status_code == 200:
             return resp.json['merged']

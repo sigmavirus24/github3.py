@@ -22,12 +22,13 @@ class GitHub(GitHubCore):
         super(GitHub, self).__init__()
         self._session = session()
         # Only accept JSON responses
-        self._session.headers.update({'Accept': 'application/json'})
+        self._session.headers.update(
+                {'Accept': 'application/vnd.github.full+json'})
         # Only accept UTF-8 encoded data
         self._session.headers.update({'Accept-Charset': 'utf-8'})
         # Identify who we are
-        self._session.config['base_headers'].update({'User-Agent':
-            'github3.py/pre-alpha'})
+        self._session.config['base_headers'].update(
+                {'User-Agent': 'github3.py/pre-alpha'})
 
     def __repr__(self):
         return '<github3-session at 0x%x>' % id(self)
@@ -55,7 +56,7 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                 'files': files}
 
-        url = '/'.join([self._github_url, 'gists'])
+        url = self._github_url + '/gists'
         response = self._post(url, dumps(new_gist))
 
         gist = None
@@ -69,7 +70,7 @@ class GitHub(GitHubCore):
         created = None
 
         if title and key:
-            url = '/'.join([self._github_url, 'user', 'keys'])
+            url = self._github_url + '/user/keys'
             resp = self._post(url, dumps({'title': title, 'key': key}))
             if resp.status_code == 201:
                 created = Key(resp.json, self._session)
@@ -118,8 +119,8 @@ class GitHub(GitHubCore):
         """Make the authenticated user follow login."""
         if login:
             print(login)
-            url = '/'.join([self._github_url, 'user', 'following',
-                login])
+            url = '{0}/user/following/{1}'.format(self._github_url,
+                    login)
             resp = self._put(url)
             if resp.status_code == 204:
                 return True
@@ -128,8 +129,8 @@ class GitHub(GitHubCore):
     def get_key(self, id_num):
         """Gets the authenticated user's key specified by id_num."""
         if int(id_num) > 0:
-            url = '/'.join([self._github_url, 'user', 'keys',
-                str(id_num)])
+            url = '{0}/user/keys/{1}'.format(self._github_url,
+                    str(id_num))
             resp = self._get(url)
             if resp.status_code == 200:
                 return Key(resp.json, self._session)
@@ -137,7 +138,7 @@ class GitHub(GitHubCore):
 
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
-        url = '/'.join([self._github_url, 'gists', str(id_num)])
+        url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
         req = self._get(url)
         gist = None
         if req.status_code == 200:
@@ -148,8 +149,8 @@ class GitHub(GitHubCore):
     def is_following(self, login):
         """Check if the authenticated user is following login."""
         if login:
-            url = '/'.join([self._github_url, 'user', 'following',
-                login])
+            url = '{0}/user/following/{1}'.format(self._github_url,
+                    login))
             resp = self._get(url)
             if resp.status_code == 204:
                 return True
@@ -231,7 +232,7 @@ class GitHub(GitHubCore):
             params = issue_params(filter, state, labels, sort, direction,
                     since)
             if params:
-                url = '?'.join([url, params])
+                url = '{0}?{1}'.format(url, params)
 
             issues = []
             req = self._get(url)
@@ -243,7 +244,7 @@ class GitHub(GitHubCore):
 
     def list_keys(self):
         """List public keys for the authenticated user."""
-        url = '/'.join([self._github_url, 'user', 'keys'])
+        url = self._github_url + '/user/keys'
         resp = self._get(url)
         keys = []
         if resp.status_code == 200:
@@ -275,7 +276,7 @@ class GitHub(GitHubCore):
 
     def organization(self, login):
         """Returns a Organization object for the login name"""
-        url = '/'.join([self._github_url, 'orgs', login])
+        url = '{0}/orgs/{1}'.format(self._github_url, login)
         req = self._get(url)
         if req.status_code == 200:
             return Organization(req.json, self._session)
@@ -293,8 +294,8 @@ class GitHub(GitHubCore):
     def unfollow(self, login):
         """Make the authenticated user stop following login"""
         if login:
-            url = '/'.join([self._github_url, 'user', 'following',
-                login])
+            url = '{0}/user/following/{1}'.format(self._github_url,
+                    login)
             resp = self._delete(url)
             if resp.status_code == 204:
                 return True

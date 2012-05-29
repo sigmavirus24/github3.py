@@ -94,7 +94,7 @@ class Gist(GitHubCore):
 
     def create_comment(self, body):
         """Create a comment on this gist."""
-        url = '/'.join([self._api_url, 'comments'])
+        url = self._api_url + '/comments'
         resp = self._post(url, dumps({'body': body}))
         if resp.status_code == 201:
             comment = GistComment(resp.json, self._session)
@@ -132,7 +132,7 @@ class Gist(GitHubCore):
         return self._files
 
     def fork(self):
-        url = '/'.join([self._api_url, 'fork'])
+        url = self._api_url + '/fork'
         resp = self._post(url)
         if resp.status_code == 201:
             return Gist(resp.json)
@@ -166,14 +166,14 @@ class Gist(GitHubCore):
         return self._public
 
     def is_starred(self):
-        url = '/'.join([self._api_url, 'star'])
+        url = self._api_url + '/star'
         resp = self._get(url)
         if resp.status_code == 204:
             return True
         return False
 
     def list_comments(self):
-        url = '/'.join([self._api_url, 'comments'])
+        url = self._api_url + '/comments'
         resp = self._get(url)
         comments = []
         if resp.status_code == 200:
@@ -183,7 +183,7 @@ class Gist(GitHubCore):
 
     def star(self):
         """Star this gist."""
-        url = '/'.join([self._api_url, 'star'])
+        url = self._api_url + '/star'
         resp = self._put(url)
         if resp.status_code == 204:
             return True
@@ -191,7 +191,7 @@ class Gist(GitHubCore):
 
     def unstar(self):
         """Un-star this gist."""
-        url = '/'.join([self._api_url, 'star'])
+        url = self._api_url + '/star'
         resp = self._delete(url)
         if resp.status_code == 204:
             return True

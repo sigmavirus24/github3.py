@@ -52,6 +52,8 @@ class BaseComment(GitHubCore):
     def _update_(self, comment):
         self._id = comment.get('id')
         self._body = comment.get('body')
+        self._bodyt = comment.get('body_text')
+        self._bodyh = comment.get('body_html')
         self._user = User(comment.get('user'), self._session)
         self._created = self._strptime(comment.get('created_at'))
         self._updated = self._strptime(comment.get('updated_at'))
@@ -68,6 +70,14 @@ class BaseComment(GitHubCore):
     @property
     def body(self):
         return self._body
+
+    @property
+    def body_html(self):
+        return self._bodyh
+
+    @property
+    def body_text(self):
+        return self._bodyt
 
     @property
     def created_at(self):
@@ -243,8 +253,8 @@ class Error(object):
         super(Error, self).__init__()
         self._code = code
         self._message = error.get('message')
+        self._errors = []
         if code == 422:
-            self._errors = []
             for e in error.get('errors'):
                 self._errors.append(type(e.get('code'), (Error, ), e))
 
@@ -258,3 +268,7 @@ class Error(object):
     @property
     def errors(self):
         return self._errors
+
+    @property
+    def message(self):
+        return self._message

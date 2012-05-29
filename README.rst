@@ -37,7 +37,7 @@ Progress
 
 - `Git Data`_: **in progress**
 
-  - Blobs_: **in progress**
+  - Blobs_: **done**
 
   - Commits_: **in progress**
 
@@ -199,6 +199,22 @@ Examples
   >>> events[0].closed_at
   >>> events[0].event
   u'subscribed'
+
+::
+
+  >>> from github3 import login
+  >>> g = login(username, password)
+  >>> repo = g.repository('sigmavirus24', 'Todo.txt-python')
+  >>> sha = repo.create_blob('Testing blob creation', 'utf-8')
+  >>> sha
+  u'57fad9a39b27e5eb4700f66673ce860b65b93ab8'
+  >>> blob = repo.blob(sha)
+  >>> blob.content
+  u'VGVzdGluZyBibG9iIGNyZWF0aW9u\n'
+  >>> blob.decoded
+  u'Testing blob creation'
+  >>> blob.encoding
+  u'base64'
 
 Author
 ------

@@ -127,7 +127,7 @@ class User(BaseAccount):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account."""
         if addresses:
-            url = '/'.join([self._github_url, 'user', 'emails'])
+            url = self._github_url + '/user/emails'
             resp = self._post(url, dumps(addresses))
             if resp.status_code == 201:
                 return resp.json
@@ -136,7 +136,7 @@ class User(BaseAccount):
     def delete_email_addresses(self, addresses=[]):
         """Delete the email addresses in ``addresses`` from the
         authenticated user's account."""
-        url = '/'.join([self._github_url, 'user', 'emails'])
+        url = self._github_url + '/user/emails'
         resp = self._delete(url, data=dumps(addresses))
         if resp.status_code == 204:
             return True
@@ -156,7 +156,7 @@ class User(BaseAccount):
         Predicated on the assumption that you're authenticated for this
         user.
         """
-        url = '/'.join([self._github_url, 'user', 'emails'])
+        url = self._github_url + '/user/emails'
         resp = self._get(url)
         if resp.status_code == 200:
             return resp.json
@@ -198,7 +198,7 @@ class User(BaseAccount):
         user = dumps({'name': name, 'email': email, 'blog': blog,
             'company': company, 'location': location,
             'hireable': hireable, 'bio': bio})
-        url = '/'.join([self._github_url, 'user'])
+        url = self._github_url + '/user'
         resp = self._patch(url, user)
         if resp.status_code == 200:
             self._update_(resp.json)
