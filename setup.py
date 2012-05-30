@@ -16,7 +16,7 @@ packages = ["github3"]
 requires = ["requests>=0.12.1"]
 
 setup(
-    name="github3",
+    name="github3.py",
     version="0.1-pre-alpha",
     description="Python wrapper for the GitHub API (http://developer.github.com/v3)",
     long_description="\n\n".join([open("README.rst").read(), 
