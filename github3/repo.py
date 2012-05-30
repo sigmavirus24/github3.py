@@ -9,7 +9,7 @@ This module contains the class relating to repositories.
 from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
-from .git import Blob
+from .git import Blob, Reference
 from .models import GitHubCore, Error
 from .pulls import PullRequest
 from .user import User
@@ -63,7 +63,7 @@ class Repository(GitHubCore):
         self._ssh = repo.get('ssh_url')
         self._svn = repo.get('svn_url')
         self._updated = self._strptime(repo.get('updated_at'))
-        self._api_url = repo.get('url')
+        self._api = repo.get('url')
 
         # The number of watchers
         self._watch = repo.get('watchers')
@@ -73,21 +73,21 @@ class Repository(GitHubCore):
 
     def _create_pull(self, data):
         if data:
-            url = self._api_url + '/pulls'
+            url = self._api + '/pulls'
             resp = self._post(url, data)
             if resp.status_code == 201:
                 return PullRequest(resp.json, self._session)
             if resp.status_code >= 400:
-                return Error(resp.status_code, resp.json)
+                return Error(resp)
         return None
 
     def blob(self, sha):
-        url = '{0}/git/blobs/{1}'.format(self._api_url, sha)
+        url = '{0}/git/blobs/{1}'.format(self._api, sha)
         resp = self._get(url)
         if resp.status_code == 200:
             return Blob(resp.json)
         if resp.status_code >= 400:
-            return Error(resp.status_code, resp.json)
+            return Error(resp)
         return None
 
     @property
@@ -101,13 +101,13 @@ class Repository(GitHubCore):
         :param encoding: (required), string, ('base64', 'utf-8')
         """
         if encoding in ('base64', 'utf-8') and content:
-            url = self._api_url + '/git/blobs'
+            url = self._api + '/git/blobs'
             data = dumps({'content': content, 'encoding': encoding})
             resp = self._post(url, data)
             if resp.status_code == 201:
                 return resp.json.get('sha')
             if resp.status_code >= 400:
-                return Error(resp.status_code, resp.json)
+                return Error(resp)
         return None
 
     def create_commit(self, message, tree, parents, author={}, committer={}):
@@ -129,7 +129,7 @@ class Repository(GitHubCore):
             the author parameter.
         """
         if message and tree and isinstance(parents, list):
-            url = self._api_url + '/git/commits'
+            url = self._api + '/git/commits'
             data = dumps({'message': message, 'tree': tree,
                 'parents': parents, 'author': author,
                 'committer': committer})
@@ -137,7 +137,7 @@ class Repository(GitHubCore):
             if resp.status_code == 201:
                 return Commit(resp.json, self._session)
             if resp.status_code >= 400:
-                return Error(resp.status_code, resp.json)
+                return Error(resp)
         return None
 
     def create_issue(self,
@@ -150,7 +150,7 @@ class Repository(GitHubCore):
         issue = dumps({'title': title, 'body': body,
             'assignee': assignee, 'milestone': milestone,
             'labels': labels})
-        url = self._api_url + '/issues'
+        url = self._api + '/issues'
 
         resp = self._post(url, issue)
         issue = None
@@ -165,18 +165,18 @@ class Repository(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        url = self._api_url + '/labels'
+        url = self._api + '/labels'
         resp = self._post(url, dumps({'name': name, 'color': color}))
 
         if resp.status_code == 201:
             label = Label(resp.json, self._session)
         elif resp.status_code >= 400:
-            label = Error(resp.status_code, resp.json)
+            label = Error(resp)
         return label
 
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
-        url = self._api_url + '/milestones'
+        url = self._api + '/milestones'
         mile = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
         milestone = None
@@ -210,6 +210,23 @@ class Repository(GitHubCore):
         data = dumps({'issue': issue, 'base': base, 'head': head})
         return self._create_pull(data)
 
+    def create_ref(self, ref, sha):
+        """Create a reference in this repository.
+
+        :param ref: (required), string, fully qualified name of the reference,
+            e.g. ``refs/heads/master``. If it doesn't start with ``refs`` and
+            contain at least two slashes, GitHub's API will reject it.
+        :param sha: (required), string, SHA1 value to set the reference to
+        """
+        data = dumps({'ref': ref, 'sha': sha})
+        url = self._api + '/git/refs'
+        resp = self._post(url, data)
+        if resp.status_code == 201:
+            return Reference(resp.json, self._session)
+        if resp.status_code >= 400:
+            return Error(resp)
+        return None
+
     def create_tree(self, tree, base_tree=''):
         """Create a tree on this repository.
 
@@ -221,12 +238,12 @@ class Repository(GitHubCore):
         """
         if tree and isinstance(tree, list):
             data = dumps({'tree': tree, 'base_tree': base_tree})
-            url = self._api_url + '/git/trees'
+            url = self._api + '/git/trees'
             resp = self._post(url, data)
             if resp.status_code == 201:
                 return Tree(resp.json)
             if resp.status_code >= 400:
-                return Error(resp.status_code, resp.json)
+                return Error(resp)
         return None
 
     @property
@@ -242,7 +259,7 @@ class Repository(GitHubCore):
 
         :param organization: login for organization to create the fork
             under"""
-        url = self._api_url + '/forks'
+        url = self._api + '/forks'
         if organization:
             resp = self._post(url, dumps({'org': organization}))
         else:
@@ -287,7 +304,7 @@ class Repository(GitHubCore):
 
     def issue(self, number):
         if number > 0:
-            url = '{0}/issues/{1}'.format(self._api_url, str(number))
+            url = '{0}/issues/{1}'.format(self._api, str(number))
             resp = self._get(url)
             if resp.status_code == 200:
                 return Issue(resp.json, self._session)
@@ -296,7 +313,7 @@ class Repository(GitHubCore):
 
     def label(self, name):
         if name:
-            url = '{0}/labels/{1}'.format(self._api_url, name)
+            url = '{0}/labels/{1}'.format(self._api, name)
             resp = self._get(url)
             if resp.status_code == 200:
                 return Label(resp.json, self._session)
@@ -328,7 +345,7 @@ class Repository(GitHubCore):
         :param direction: accepted values: ('open', 'closed')
         :param since: ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
         """
-        url = self._api_url + '/issues'
+        url = self._api + '/issues'
 
         params = []
         if milestone in ('*', 'none') or isinstance(milestone, int):
@@ -359,7 +376,7 @@ class Repository(GitHubCore):
         return issues
 
     def list_labels(self):
-        url = self._api_url + '/labels'
+        url = self._api + '/labels'
         resp = self._get(url)
 
         labels = []
@@ -370,7 +387,7 @@ class Repository(GitHubCore):
         return labels
 
     def list_milestones(self, state=None, sort=None, direction=None):
-        url = self._api_url + '/milestones'
+        url = self._api + '/milestones'
 
         params = []
         if state in ('open', 'closed'):
@@ -396,9 +413,9 @@ class Repository(GitHubCore):
 
     def list_pulls(self, state=None):
         if state in ('open', 'closed'):
-            url = '{0}/pulls?state={1}'.format(self._api_url, state)
+            url = '{0}/pulls?state={1}'.format(self._api, state)
         else:
-            url = self._api_url + '/pulls'
+            url = self._api + '/pulls'
 
         resp = self._get(url)
         pulls = []
@@ -408,8 +425,24 @@ class Repository(GitHubCore):
 
         return pulls
 
+    def list_refs(self, subspace=''):
+        """List references for this repository.
+
+        :param subspace: (optional), string, e.g. 'tags', 'stashes', 'notes'
+        """
+        if subspace:
+            url = self._api + '/git/refs/' + subspace
+        else:
+            url = self._api + '/git/refs'
+        resp = self._get(url)
+        refs = []
+        if resp.status_code == 200:
+            for ref in resp.json:
+                refs.append(Reference(ref, self._session))
+        return refs
+
     def milestone(self, number):
-        url = '{0}/milestones/{1}'.format(self._api_url, str(number))
+        url = '{0}/milestones/{1}'.format(self._api, str(number))
         resp = self._session.get(url)
         if resp.status_code == 200:
             return Milestone(resp.json, self._session)
@@ -433,7 +466,7 @@ class Repository(GitHubCore):
 
     def pull_request(self, number):
         if int(number) > 0:
-            url = '{0}/pulls/{1}'.format(self._api_url, str(number))
+            url = '{0}/pulls/{1}'.format(self._api, str(number))
             resp = self._get(url)
             if resp.status_code == 200:
                 return PullRequest(resp.json, self._session)
@@ -442,6 +475,24 @@ class Repository(GitHubCore):
     @property
     def pushed_at(self):
         return self._pushed
+
+    def ref(self, ref):
+        """Get a reference pointed to by ``ref``.
+
+        The most common will be branches and tags. For a branch, you must
+        specify 'heads/branchname' and for a tag, 'tags/tagname'. Note that
+        tagname is the name you provided it, not the number GitHub provides.
+        Essentially, the system should return any reference you provide it in
+        the namespace, including notes and stashes (provided they exist on the
+        server).
+        """
+        url = self._api + '/git/refs/' + ref
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return Reference(resp.json, self._session)
+        if resp.status_code >= 400:
+            return Error(resp)
+        return None
 
     @property
     def size(self):
@@ -456,7 +507,7 @@ class Repository(GitHubCore):
         return self._svn
 
     def tree(self, sha):
-        url = '{0}/git/trees/{1}'.format(self._api_url, sha)
+        url = '{0}/git/trees/{1}'.format(self._api, sha)
 
     @property
     def updated_at(self):

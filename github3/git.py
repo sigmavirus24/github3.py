@@ -40,8 +40,8 @@ class Blob(object):
 class GitData(GitHubCore):
     def __init__(self, data, session):
         super(GitData, self).__init__(session)
-        self._sha = commit.get('sha')
-        self._api_url = commit.get('url')
+        self._sha = data.get('sha')
+        self._api = data.get('url')
 
     def __repr__(self):
         return '<github3-gitdata at 0x%x>' % id(self)
@@ -74,7 +74,7 @@ class Commit(GitData):
         self._parents = []
         for parent in commit.get('parents'):
             api = parent.pop('url')
-            parent['_api_url'] = api
+            parent['_api'] = api
             self._parents.append(type('Parent', (object, ), parent))
 
         self._tree = None
@@ -105,6 +105,55 @@ class Commit(GitData):
         return self._tree
 
 
+class Reference(GitHubCore):
+    def __init__(self, ref, session):
+        super(Reference, self).__init__(session)
+        self._update_(ref)
+
+    def __repr__(self):
+        return '<Reference [%s]>' % self._ref
+
+    def _update_(self, ref):
+        self._ref = ref.get('ref')
+        self._api = ref.get('url')
+        self._obj = ReferenceObject(ref.get('object'))
+
+    def delete(self):
+        resp = self._delete(self._api)
+        if resp.status_code == 204:
+            return True
+        return False
+
+    @property
+    def object(self):
+        return self._obj
+
+    @property
+    def ref(self):
+        return self._ref
+
+    def update(self, sha, force=False):
+        data = dumps({'sha': sha, 'force': force})
+        resp = self._patch(self._api, data)
+        if resp.status_code == 200:
+            self._update_(resp.json)
+            return True
+        return False
+
+
+class ReferenceObject(GitData):
+    def __init__(self, obj):
+        super(ReferenceObject, self).__init__(obj, None)
+        self._type = obj.get('type')
+
+    def __repr__(self):
+        return '<Reference Object [%s]>' % self._sha
+
+    @property
+    def type(self):
+        return self._type
+
+
 class Tree(GitData):
     def __init__(self, tree, session):
         super(Tree, self).__init__(tree, session)
@@ -117,12 +166,12 @@ class Tree(GitData):
         return '<Tree [%s]>' % self._sha
 
     def recurse(self):
-        url = self._api_url + '?recursive=1'
+        url = self._api + '?recursive=1'
         resp = self._get(url)
         if resp.status_code == 200:
             return Tree(resp.json, self._session)
         if resp.status_code >= 400:
-            return Error(resp.status_code, resp.json)
+            return Error(resp)
         return None
 
     @property

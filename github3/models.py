@@ -58,7 +58,7 @@ class BaseComment(GitHubCore):
         self._created = self._strptime(comment.get('created_at'))
         self._updated = self._strptime(comment.get('updated_at'))
 
-        self._api_url = comment.get('url')
+        self._api = comment.get('url')
         if comment.get('_links'):
             self._url = comment['_links'].get('html')
             self._pull = comment['_links'].get('pull_request')
@@ -85,7 +85,7 @@ class BaseComment(GitHubCore):
 
     def delete(self):
         """Delete this comment."""
-        resp = self._delete(self._api_url)
+        resp = self._delete(self._api)
         if resp.status_code == 204:
             return True
         return False
@@ -93,7 +93,7 @@ class BaseComment(GitHubCore):
     def edit(self, body):
         """Edit this comment."""
         if body:
-            resp = self._patch(self._api_url, dumps({'body': body}))
+            resp = self._patch(self._api, dumps({'body': body}))
             if resp.status_code == 200:
                 self._update_(resp.json)
                 return True
@@ -141,7 +141,7 @@ class BaseAccount(GitHubCore):
         self._type = None
         if acct.get('type'):
             self._type = acct.get('type')
-        self._api_url = acct.get('url')
+        self._api = acct.get('url')
 
         self._avatar = acct.get('avatar_url')
         self._blog = acct.get('blog')
@@ -249,12 +249,13 @@ class BaseAccount(GitHubCore):
         return self._public_repos
 
 class Error(object):
-    def __init__(self, code, error):
+    def __init__(self, resp):
         super(Error, self).__init__()
-        self._code = code
+        self._code = resp.status_code
+        error = resp.json
         self._message = error.get('message')
         self._errors = []
-        if code == 422:
+        if self._code == 422:
             for e in error.get('errors'):
                 self._errors.append(type(e.get('code'), (Error, ), e))
 

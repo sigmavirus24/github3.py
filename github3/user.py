@@ -19,13 +19,13 @@ class Key(GitHubCore):
         return '<User Key [%s]>' % self._title
 
     def _update_(self, key):
-        self._api_url = key.get('url')
+        self._api = key.get('url')
         self._id = key.get('id')
         self._title = key.get('title')
         self._key = key.get('key')
 
     def delete(self):
-        resp = self._delete(self._api_url)
+        resp = self._delete(self._api)
         if resp.status_code == 204:
             return True
         return False
@@ -48,7 +48,7 @@ class Key(GitHubCore):
         if not key:
             key = self._key
 
-        resp = self._patch(self._api_url, dumps({'title': title,
+        resp = self._patch(self._api, dumps({'title': title,
             'key': key}))
         if resp.status_code == 200:
             self._update_(resp.json)

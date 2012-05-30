@@ -149,8 +149,7 @@ class GitHub(GitHubCore):
     def is_following(self, login):
         """Check if the authenticated user is following login."""
         if login:
-            url = '{0}/user/following/{1}'.format(self._github_url,
-                    login))
+            url = '{0}/user/following/{1}'.format(self._github_url, login)
             resp = self._get(url)
             if resp.status_code == 204:
                 return True

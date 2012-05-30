@@ -114,7 +114,7 @@ class PullRequest(GitHubCore):
         return '<Pull Request [#%d]>' % self._num
 
     def _update_(self, pull):
-        self._api_url = pull.get('url')
+        self._api = pull.get('url')
         self._base = PullDestination(pull.get('base'), 'Base')
         self._body = pull.get('body')
 
@@ -143,12 +143,12 @@ class PullRequest(GitHubCore):
         #  - ``review_comments`` is just the api url for the pull, e.g.,
         #    https://api.github.com/repos/:user/:repo/pulls/:number/comments
         self._links = {
-                'self': self._api_url,
-                'comments': '/'.join([self._api_url.replace('pulls', 'issues'),
+                'self': self._api,
+                'comments': '/'.join([self._api.replace('pulls', 'issues'),
                     'comments']),
-                'issue': self._api_url.replace('pulls', 'issues'),
+                'issue': self._api.replace('pulls', 'issues'),
                 'html': self._url,
-                'review_comments': self._api_url + '/comments'
+                'review_comments': self._api + '/comments'
                 }
 
         self._merged = None
@@ -197,7 +197,7 @@ class PullRequest(GitHubCore):
         return self._id
 
     def is_merged(self):
-        url = self._api_url + '/merge'
+        url = self._api + '/merge'
         resp = self._get(url)
         if resp.status_code == 204:
             return True
@@ -213,7 +213,7 @@ class PullRequest(GitHubCore):
 
     def list_comments(self):
         """List the comments on this pull request."""
-        url = self._api_url + '/comments'
+        url = self._api + '/comments'
         resp = self._get(url)
         comments = []
         if resp.status_code == 200:
@@ -223,7 +223,7 @@ class PullRequest(GitHubCore):
 
     def list_commits(self):
         """List the commits on this pull request."""
-        url = self._api_url + '/commits'
+        url = self._api + '/commits'
         resp = self._get(url)
         commits = []
         if resp.status_code == 200:
@@ -234,7 +234,7 @@ class PullRequest(GitHubCore):
 
     def list_files(self):
         """List the files associated with this pull request."""
-        url = self._api_url + '/files'
+        url = self._api + '/files'
         resp = self._get(url)
         files = []
         if resp.status_code == 200:
@@ -248,7 +248,7 @@ class PullRequest(GitHubCore):
         :param commit_message: (optional), string
         """
         data = {'commit_message': commit_message} if commit_message else None
-        url = self._api_url + '/merge'
+        url = self._api + '/merge'
         resp = self._put(url, data)
         if resp.status_code == 200:
             return resp.json['merged']
@@ -282,7 +282,7 @@ class PullRequest(GitHubCore):
         :param state: (optional), string, ('open', 'closed')
         """
         data = dumps({'title': title, 'body': body, 'state': state})
-        resp = self._patch(self._api_url, data)
+        resp = self._patch(self._api, data)
         if resp.status_code == 200:
             self._update_(resp.json)
             return True

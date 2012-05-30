@@ -21,7 +21,7 @@ class Label(GitHubCore):
         return '<Label [%s]>' % self._name
 
     def _update_(self, label):
-        self._api_url = label.get('url')
+        self._api = label.get('url')
         self._color = label.get('color')
         self._name = label.get('name')
 
@@ -30,7 +30,7 @@ class Label(GitHubCore):
         return self._color
 
     def delete(self):
-        resp = self._delete(self._api_url)
+        resp = self._delete(self._api)
         if resp.status_code == 204:
             return True
         return False
@@ -43,7 +43,7 @@ class Label(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        resp = self._patch(self._api_url, dumps({'name': name,
+        resp = self._patch(self._api, dumps({'name': name,
             'color': color}))
         if resp.status_code == 200:
             self._update_(resp.json)
@@ -61,7 +61,7 @@ class Milestone(GitHubCore):
         return '<Milestone [%s]>' % self._title
 
     def _update_(self, mile):
-        self._api_url = mile.get('url')
+        self._api = mile.get('url')
         self._num = mile.get('number')
         self._state = mile.get('state')
         self._title = mile.get('title')
@@ -88,7 +88,7 @@ class Milestone(GitHubCore):
 
     def delete(self):
         """Delete this milestone."""
-        resp = self._delete(self._api_url)
+        resp = self._delete(self._api)
         if resp.status_code == 204:
             return True
         return False
@@ -104,7 +104,7 @@ class Milestone(GitHubCore):
     def list_labels(self):
         """List the labels for every issue associated with this
         milestone."""
-        url = self._api_url + '/labels'
+        url = self._api + '/labels'
         resp = self._get(url)
         labels = []
         if resp.status_code == 200:
@@ -141,7 +141,7 @@ class Milestone(GitHubCore):
         """
         inp = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        resp = self._patch(self._api_url, inp)
+        resp = self._patch(self._api, inp)
         if resp.status_code == 200:
             self._update_(resp.json)
             return True
@@ -184,11 +184,11 @@ class Issue(GitHubCore):
         self._state = issue.get('state')
         self._title = issue.get('title')
         self._updated = self._strptime(issue.get('updated_at'))
-        self._api_url = issue.get('url')
+        self._api = issue.get('url')
         self._user = User(issue.get('user'), self._session)
 
     def add_labels(self, *args):
-        url = self._api_url + '/labels'
+        url = self._api + '/labels'
         resp = self._post(url, dumps(args))
         if resp.status_code == 200:
             return True
@@ -232,7 +232,7 @@ class Issue(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this issue."""
         if body:
-            url = self._api_url + '/comments'
+            url = self._api + '/comments'
             resp = self._post(url, dumps({'body': body}))
             if resp.status_code == 201:
                 return True
@@ -260,7 +260,7 @@ class Issue(GitHubCore):
         """
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        resp = self._patch(self._api_url, dumps(data))
+        resp = self._patch(self._api, dumps(data))
         if resp.status_code == 200:
             self._update_(resp.json)
             return True
@@ -285,7 +285,7 @@ class Issue(GitHubCore):
         return self._labels
 
     def list_comments(self):
-        url = self._api_url + '/comments'
+        url = self._api + '/comments'
         resp = self._get(url)
 
         comments = []
@@ -295,7 +295,7 @@ class Issue(GitHubCore):
         return comments
 
     def list_events(self):
-        url = self._api_url + '/events'
+        url = self._api + '/events'
         resp = self._get(url)
         events = []
         if resp.status_code == 200:
@@ -316,7 +316,7 @@ class Issue(GitHubCore):
         return self._pull_req
 
     def remove_label(self, name):
-        url = '{0}/labels/{1}'.format(self._api_url, name)
+        url = '{0}/labels/{1}'.format(self._api, name)
         resp = self._delete(url)
         if resp.status_code == 200:
             return True
@@ -327,7 +327,7 @@ class Issue(GitHubCore):
         return self.replace_labels([])
 
     def replace_labels(self, labels):
-        url = self._api_url + '/labels'
+        url = self._api + '/labels'
         resp = self._put(url, dumps(labels))
         if resp.status_code == 200:
             return True
@@ -378,7 +378,7 @@ class IssueEvent(BaseEvent):
         #    'mentioned', 'assigned')
         self._event = event.get('event')
         self._commit_id = event.get('commit_id')
-        self._api_url = event.get('url')
+        self._api = event.get('url')
 
         # The actual issue in question
         if event.get('issue'):

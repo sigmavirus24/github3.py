@@ -21,7 +21,7 @@ class Team(GitHubCore):
         return '<Team [%s]>' % self._name
 
     def _update_(self, team):
-        self._api_url = team.get('url')
+        self._api = team.get('url')
         self._name = team.get('name')
         self._id = team.get('id')
         self._perm = team.get('permissions')
@@ -30,7 +30,7 @@ class Team(GitHubCore):
 
     def add_member(self, login):
         """Add ``login`` to this team."""
-        url = '{0}/member/{1}'.format(self._api_url, login)
+        url = '{0}/member/{1}'.format(self._api, login)
         resp = self._put(url)
         if resp.status_code == 204:
             return True
@@ -41,7 +41,7 @@ class Team(GitHubCore):
 
         :param repo: (required), string, form: 'user/repo'
         """
-        url = '{0}/repos/{1}'.format(self._api_url, repo)
+        url = '{0}/repos/{1}'.format(self._api, repo)
         resp = self._put(url)
         if resp.status_code == 204:
             return True
@@ -55,7 +55,7 @@ class Team(GitHubCore):
         """
         if name:
             data = dumps({'name': name, 'permission': permission})
-            resp = self._patch(self._api_url, data)
+            resp = self._patch(self._api, data)
             if resp.status_code == 200:
                 self._update_(resp.json)
                 return True
@@ -63,7 +63,7 @@ class Team(GitHubCore):
 
     def delete(self):
         """Delete this team."""
-        resp = self._delete(self._api_url)
+        resp = self._delete(self._api)
         if resp.status_code == 204:
             return True
         return False
@@ -73,7 +73,7 @@ class Team(GitHubCore):
 
         :param repo: (required), string, form: 'user/repo'
         """
-        url = '{0}/repos/{1}'.format(self._api_url, repo)
+        url = '{0}/repos/{1}'.format(self._api, repo)
         resp = self._get(url)
         if resp.status_code == 204:
             return True
@@ -85,7 +85,7 @@ class Team(GitHubCore):
 
     def is_member(self, login):
         """Check if ``login`` is a member of this team."""
-        url = '{0}/members/{1}'.format(self._api_url, login)
+        url = '{0}/members/{1}'.format(self._api, login)
         resp = self._get(url)
         if resp.status_code == 204:
             return True
@@ -93,7 +93,7 @@ class Team(GitHubCore):
 
     def list_members(self):
         """List the members of this team."""
-        url = self._api_url + '/members'
+        url = self._api + '/members'
         resp = self._get(url)
         members = []
         if resp.status_code == 200:
@@ -103,7 +103,7 @@ class Team(GitHubCore):
 
     def list_repos(self):
         """List the repositories this team has access to."""
-        url = self._api_url + '/repos'
+        url = self._api + '/repos'
         resp = self._get(url)
         repos = []
         if resp.status_code == 200:
@@ -121,7 +121,7 @@ class Team(GitHubCore):
 
     def remove_member(self, login):
         """Remove ``login`` from this team."""
-        url = '{0}/members/{1}'.format(self._api_url, login)
+        url = '{0}/members/{1}'.format(self._api, login)
         resp = self._delete(url)
         if resp.status_code == 204:
             return True
@@ -132,7 +132,7 @@ class Team(GitHubCore):
 
         :param repo: (required), string, form: 'user/repo'
         """
-        url = '{0}/repos/{1}'.format(self._api_url, repo)
+        url = '{0}/repos/{1}'.format(self._api, repo)
         resp = self._delete(url)
         if resp.status_code == 204:
             return True
@@ -178,7 +178,7 @@ class Organization(BaseAccount):
 
     def conceal_member(self, login):
         """Conceal ``login``'s membership in this organization."""
-        url = '{0}/public_members/{1}'.format(self._api_url, login)
+        url = '{0}/public_members/{1}'.format(self._api, login)
         resp = self._delete(url)
         if resp.status_code == 204:
             return True
@@ -201,7 +201,7 @@ class Organization(BaseAccount):
         """
         data = dumps({'name': name, 'repo_names': repo_names,
             'permissions': permissions})
-        url = self._api_url + '/teams'
+        url = self._api + '/teams'
         resp = self._post(url, data)
         if resp.status_code == 201:
             return Team(resp.json, self._session)
@@ -221,7 +221,7 @@ class Organization(BaseAccount):
         :param location: (optional)
         :param name: (optional)
         """
-        resp = self._patch(self._api_url,
+        resp = self._patch(self._api,
                 dumps({'billing_email': billing_email,
                     'company': company, 'email': email,
                     'location': location,  'name': name}))
@@ -232,7 +232,7 @@ class Organization(BaseAccount):
 
     def is_member(self, login):
         """Check if the user with login ``login`` is a member."""
-        url = '{0}/members/{1}'.format(self._api_url, login)
+        url = '{0}/members/{1}'.format(self._api, login)
         resp = self._get(url)
         if resp.status_code == 204:
             return True
@@ -240,7 +240,7 @@ class Organization(BaseAccount):
 
     def is_public_member(self, login):
         """Check if the user with login ``login`` is a public member."""
-        url = '{0}/public_members/{1}'.format(self._api_url, login)
+        url = '{0}/public_members/{1}'.format(self._api, login)
         resp = self._get(url)
         if resp.status_code == 204:
             return True
@@ -248,7 +248,7 @@ class Organization(BaseAccount):
 
     def list_members(self):
         """List members of this organization."""
-        url = self._api_url + '/members'
+        url = self._api + '/members'
         members = []
         resp = self._get(url)
         if resp.status_code == 200:
@@ -258,7 +258,7 @@ class Organization(BaseAccount):
 
     def list_public_members(self):
         """List public members of this organization."""
-        url = self._api_url + '/public_members'
+        url = self._api + '/public_members'
         members = []
         resp = self._get(url)
         if resp.status_code == 200:
@@ -268,7 +268,7 @@ class Organization(BaseAccount):
 
     def list_teams(self):
         """List teams that are part of this organization."""
-        url = self._api_url + '/teams'
+        url = self._api + '/teams'
         teams = []
         resp = self._get(url)
         if resp.status_code == 200:
@@ -282,7 +282,7 @@ class Organization(BaseAccount):
 
     def publicize_member(self, login):
         """Make ``login``'s membership in this organization public."""
-        url = '{0}/public_members/{1}'.format(self._api_url, login)
+        url = '{0}/public_members/{1}'.format(self._api, login)
         resp = self._put(url)
         if resp.status_code == 204:
             return True
@@ -291,7 +291,7 @@ class Organization(BaseAccount):
     def remove_member(self, login):
         """Remove the user with login ``login`` from this
         organization."""
-        url = '{0}/members/{1}'.format(self._api_url, login)
+        url = '{0}/members/{1}'.format(self._api, login)
         resp = self._delete(url)
         if resp.status_code == 204:
             return True

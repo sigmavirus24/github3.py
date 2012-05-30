@@ -72,7 +72,7 @@ class Gist(GitHubCore):
         self._desc = data.get('description')
 
         # e.g. https://api.github.com/gists/1
-        self._api_url = data.get('url')
+        self._api = data.get('url')
         # e.g. https://gist.github.com/1
         self._url = data.get('html_url')
         self._public = data.get('public')
@@ -94,7 +94,7 @@ class Gist(GitHubCore):
 
     def create_comment(self, body):
         """Create a comment on this gist."""
-        url = self._api_url + '/comments'
+        url = self._api + '/comments'
         resp = self._post(url, dumps({'body': body}))
         if resp.status_code == 201:
             comment = GistComment(resp.json, self._session)
@@ -107,7 +107,7 @@ class Gist(GitHubCore):
 
     def delete(self):
         """Delete this gist."""
-        resp = self._delete(self._api_url)
+        resp = self._delete(self._api)
         if resp.status_code == 204:
             return True
         return False
@@ -121,7 +121,7 @@ class Gist(GitHubCore):
 
         :param kwargs: Should be either (or both) description or files.
         """
-        resp = self._patch(self._api_url, dumps(kwargs))
+        resp = self._patch(self._api, dumps(kwargs))
         if resp.status_code == 200:
             self._update_(resp.json)
             return True
@@ -132,7 +132,7 @@ class Gist(GitHubCore):
         return self._files
 
     def fork(self):
-        url = self._api_url + '/fork'
+        url = self._api + '/fork'
         resp = self._post(url)
         if resp.status_code == 201:
             return Gist(resp.json)
@@ -144,7 +144,7 @@ class Gist(GitHubCore):
 
     def get(self):
         """GET /gists/:id"""
-        resp = self._get(self._api_url)
+        resp = self._get(self._api)
         if resp.status_code == 200:
             self._update_(resp.json)
             return True
@@ -166,14 +166,14 @@ class Gist(GitHubCore):
         return self._public
 
     def is_starred(self):
-        url = self._api_url + '/star'
+        url = self._api + '/star'
         resp = self._get(url)
         if resp.status_code == 204:
             return True
         return False
 
     def list_comments(self):
-        url = self._api_url + '/comments'
+        url = self._api + '/comments'
         resp = self._get(url)
         comments = []
         if resp.status_code == 200:
@@ -183,7 +183,7 @@ class Gist(GitHubCore):
 
     def star(self):
         """Star this gist."""
-        url = self._api_url + '/star'
+        url = self._api + '/star'
         resp = self._put(url)
         if resp.status_code == 204:
             return True
@@ -191,7 +191,7 @@ class Gist(GitHubCore):
 
     def unstar(self):
         """Un-star this gist."""
-        url = self._api_url + '/star'
+        url = self._api + '/star'
         resp = self._delete(url)
         if resp.status_code == 204:
             return True
