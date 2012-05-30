@@ -35,15 +35,15 @@ Progress
 .. _Gists: http://developer.github.com/v3/gists/
 .. _Gist Comments: http://developer.github.com/v3/gists/comments/
 
-- `Git Data`_: **in progress**
+- `Git Data`_: **done**
 
   - Blobs_: **done**
 
   - Commits_: **done**
 
-  - References_: **in progress**
+  - References_: **done**
 
-  - Tags_: **in progress**
+  - Tags_: **done**
 
   - Trees_: **done**
 
@@ -215,6 +215,19 @@ Examples
   u'Testing blob creation'
   >>> blob.encoding
   u'base64'
+
+::
+
+  >>> from github3 import login
+  >>> g = login(username, password)
+  >>> repo = g.repository('sigmavirus24', 'github3.py')
+  >>> tag = repo.tag('cdba84b4fede2c69cb1ee246b33f49f19475abfa')
+  >>> tag
+  <Tag [cdba84b4fede2c69cb1ee246b33f49f19475abfa]>
+  >>> tag.object.sha
+  u'24ea44d302c6394a0372dcde8fd8aed899c0034b'
+  >>> tag.object.type
+  u'commit'
 
 Author
 ------

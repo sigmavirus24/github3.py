@@ -10,11 +10,11 @@ github3.api
 from .github import GitHub
 
 
-def login(username, password):
+def login(username, password, token=None):
     """Constructs and returns a GitHub session with the username and
-    password"""
+    password, or token"""
     gh = GitHub()
-    gh.login(username, password)
+    gh.login(username, password, token)
     return gh
 
 

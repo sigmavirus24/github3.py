@@ -9,7 +9,7 @@ This module contains the class relating to repositories.
 from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
-from .git import Blob, Reference
+from .git import Blob, Reference, Tag
 from .models import GitHubCore, Error
 from .pulls import PullRequest
 from .user import User
@@ -226,6 +226,36 @@ class Repository(GitHubCore):
         if resp.status_code >= 400:
             return Error(resp)
         return None
+
+    def create_tag(self, tag, message, sha, obj_type, tagger,
+            lightweight=False):
+        """Create a tag in this repository.
+
+        :param tag: (required), string, name of the tag
+        :param message: (required), string, tag message
+        :param sha: (required), string, SHA of the git object this is tagging
+        :param obj_type: (required), string, type of object being tagged, e.g.,
+            'commit', 'tree', 'blob'
+        :param tagger: (required), dict, containing the name, email of the
+            tagger and the date it was tagged
+        :param lightweight: (optional), boolean, if False, create an annotated
+            tag, otherwise create a lightweight tag (a Reference).
+        """
+        if lightweight and tag and sha:
+            return self.create_ref('refs/tags/' + tag, sha)
+
+        t = None
+        if tag and message and sha and obj_type and len(tagger) == 3:
+            data = dumps({'tag': tag, 'message': message, 'object': sha,
+                'type': obj_type, 'tagger': tagger})
+            url = self._api + '/git/tags'
+            resp = self._post(url, data)
+            if resp.status_code == 201:
+                t = Tag(resp.json)
+                self.create_ref('refs/tags/' + tag, sha)
+            elif resp.status_code >= 400:
+                t = Error(resp)
+        return t
 
     def create_tree(self, tree, base_tree=''):
         """Create a tree on this repository.
@@ -480,11 +510,9 @@ class Repository(GitHubCore):
         """Get a reference pointed to by ``ref``.
 
         The most common will be branches and tags. For a branch, you must
-        specify 'heads/branchname' and for a tag, 'tags/tagname'. Note that
-        tagname is the name you provided it, not the number GitHub provides.
-        Essentially, the system should return any reference you provide it in
-        the namespace, including notes and stashes (provided they exist on the
-        server).
+        specify 'heads/branchname' and for a tag, 'tags/tagname'. Essentially,
+        the system should return any reference you provide it in the namespace,
+        including notes and stashes (provided they exist on the server).
         """
         url = self._api + '/git/refs/' + ref
         resp = self._get(url)
@@ -506,8 +534,27 @@ class Repository(GitHubCore):
     def svn_url(self):
         return self._svn
 
+    def tag(self, sha):
+        """Get an annotated tag.
+
+        http://learn.github.com/p/tagging.html
+        """
+        url = self._api + '/git/tags/' + sha
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return Tag(resp.json)
+        if resp.status_code >= 400:
+            return Error(resp)
+        return None
+
     def tree(self, sha):
         url = '{0}/git/trees/{1}'.format(self._api, sha)
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return Tree(resp.json, self._session)
+        if resp.status_code >= 400:
+            return Error(resp)
+        return None
 
     @property
     def updated_at(self):

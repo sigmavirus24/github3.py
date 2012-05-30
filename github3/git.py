@@ -116,7 +116,7 @@ class Reference(GitHubCore):
     def _update_(self, ref):
         self._ref = ref.get('ref')
         self._api = ref.get('url')
-        self._obj = ReferenceObject(ref.get('object'))
+        self._obj = GitObject(ref.get('object'))
 
     def delete(self):
         resp = self._delete(self._api)
@@ -141,17 +141,45 @@ class Reference(GitHubCore):
         return False
 
 
-class ReferenceObject(GitData):
+class GitObject(GitData):
     def __init__(self, obj):
-        super(ReferenceObject, self).__init__(obj, None)
+        super(GitObject, self).__init__(obj, None)
         self._type = obj.get('type')
 
     def __repr__(self):
-        return '<Reference Object [%s]>' % self._sha
+        return '<Git Object [%s]>' % self._sha
 
     @property
     def type(self):
         return self._type
+
+
+class Tag(GitData):
+    def __init__(self, tag):
+        super(Tag, self).__init__(tag, None)
+        self._tag = tag.get('tag')
+        self._msg = tag.get('message')
+        self._tagger = type('Tagger', (object, ), tag.get('tagger'))
+        self._obj = GitObject(tag.get('object'))
+
+    def __repr__(self):
+        return '<Tag [%s]>' % self._tag
+
+    @property
+    def message(self):
+        return self._msg
+
+    @property
+    def object(self):
+        return self._obj
+
+    @property
+    def tag(self):
+        return self._tag
+
+    @property
+    def tagger(self):
+        return self._tagger
 
 
 class Tree(GitData):

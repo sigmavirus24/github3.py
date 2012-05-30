@@ -16,28 +16,53 @@ class GitHubCore(object):
         self._session = session
         self._github_url = 'https://api.github.com'
         self._time_format = '%Y-%m-%dT%H:%M:%SZ'
+        self._remaining = 5000
 
     def __repr__(self):
         return '<github3-core at 0x%x>' % id(self)
 
     def _delete(self, url, **kwargs):
-        return self._session.delete(url, **kwargs)
+        req = None
+        if self._remaining > 0:
+            req = self._session.delete(url, **kwargs)
+            self._remaining = int(req.headers['x-ratelimit-remaining'])
+        return req
 
     def _get(self, url, **kwargs):
-        return self._session.get(url, **kwargs)
+        req = None
+        if self._remaining > 0:
+            req = self._session.get(url, **kwargs)
+            self._remaining = int(req.headers['x-ratelimit-remaining'])
+        return req
 
     def _patch(self, url, data=None, **kwargs):
-        return self._session.patch(url, data, **kwargs)
+        req = None
+        if self._remaining > 0:
+            req = self._session.patch(url, data, **kwargs)
+            self._remaining = int(req.headers['x-ratelimit-remaining'])
+        return req
 
     def _post(self, url, data=None, **kwargs):
-        return self._session.post(url, data, **kwargs)
+        req = None
+        if self._remaining > 0:
+            req = self._session.post(url, data, **kwargs)
+            self._remaining = int(req.headers['x-ratelimit-remaining'])
+        return req
 
     def _put(self, url, data=None, **kwargs):
-        kwargs.update(headers={'Content-Length': '0'})
-        return self._session.put(url, data, **kwargs)
+        req = None
+        if self._remaining > 0:
+            kwargs.update(headers={'Content-Length': '0'})
+            req = self._session.put(url, data, **kwargs)
+            self._remaining = int(req.headers['x-ratelimit-remaining'])
+        return req
 
     def _strptime(self, time_str):
         return datetime.strptime(time_str, self._time_format)
+
+    @property
+    def ratelimit_remaining(self):
+        return self._remaining
 
 
 class BaseComment(GitHubCore):

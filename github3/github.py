@@ -269,9 +269,12 @@ class GitHub(GitHubCore):
                 orgs.append(Organization(org, self._session))
         return orgs
 
-    def login(self, username, password):
+    def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls."""
-        self._session.auth = (username, password)
+        if username and password:
+            self._session.auth = (username, password)
+        elif token:
+            self._session.update({'access_token': token})
 
     def organization(self, login):
         """Returns a Organization object for the login name"""
