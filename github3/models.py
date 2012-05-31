@@ -58,7 +58,10 @@ class GitHubCore(object):
         return req
 
     def _strptime(self, time_str):
-        return datetime.strptime(time_str, self._time_format)
+        if time_str:
+            return datetime.strptime(time_str, self._time_format)
+        else:
+            return None
 
     @property
     def ratelimit_remaining(self):
@@ -281,8 +284,8 @@ class Error(object):
         self._message = error.get('message')
         self._errors = []
         if self._code == 422:
-            for e in error.get('errors'):
-                self._errors.append(type(e.get('code'), (Error, ), e))
+            errs = error.get('errors')
+            self._errors = [type(e.get('code'), (Error, ), e) for e in errs]
 
     def __repr__(self):
         return '<Error [%s]>' % (self._message or self._code)

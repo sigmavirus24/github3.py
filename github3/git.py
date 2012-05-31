@@ -159,7 +159,9 @@ class Tag(GitData):
         super(Tag, self).__init__(tag, None)
         self._tag = tag.get('tag')
         self._msg = tag.get('message')
-        self._tagger = type('Tagger', (object, ), tag.get('tagger'))
+        self._tagger = None
+        if tag.get('tagger'):
+            self._tagger = type('Tagger', (object, ), tag.get('tagger'))
         self._obj = GitObject(tag.get('object'))
 
     def __repr__(self):

@@ -80,16 +80,16 @@ Progress
 .. _Members: http://developer.github.com/v3/orgs/members/
 .. _Teams: http://developer.github.com/v3/orgs/teams/
 
-- `Pull Requests`_: **done*
+- `Pull Requests`_: **done**
 
   - `Review Comments`_: **done**
 
 .. _Pull Requests: http://developer.github.com/v3/pulls/
 .. _Review Comments: http://developer.github.com/v3/pulls/comments/
 
-- Repositories_
+- Repositories_: **done**
 
-  - Collaborators_
+  - Collaborators_: **in progress**
 
   - `Repo Commits`_
 

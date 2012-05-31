@@ -47,6 +47,53 @@ class Team(GitHubCore):
             return True
         return False
 
+    def create_repo(self,
+        name,
+        description='',
+        homepage='',
+        private=False,
+        has_issues=True,
+        has_wiki=True,
+        has_downloads=True,
+        team_id=0):
+        """Create a repository for this organization if the authenticated user
+        is a member.
+
+        :param name: (required), string, name of the repository
+        :param description: (optional), string
+        :param homepage: (optional), string
+        :param private: (optional), boolean, If ``True``, create a
+            private repository. API default: ``False``
+        :param has_issues: (optional), boolean, If ``True``, enable
+            issues for this repository. API default: ``True``
+        :param has_wiki: (optional), boolean, If ``True``, enable the
+            wiki for this repository. API default: ``True``
+        :param has_downloads: (optional), boolean, If ``True``, enable
+            downloads for this repository. API default: ``True``
+        :param team_id: (optional), int, id of the team that will be granted
+            access to this repository
+        """
+        url = self._github_url + '/user/repos'
+        data = dumps({'name': name, 'description': description,
+            'homepage': homepage, 'private': private,
+            'has_issues': has_issues, 'has_wiki': has_wiki,
+            'has_downloads': has_downloads})
+        if team_id > 0:
+            data.update({'team_id': team_id})
+        resp = self._post(url, data)
+        if resp.status_code == 201:
+            return Repository(resp.json, self._session)
+        if resp.status_code >= 400:
+            return Error(resp)
+        return None
+
+    def delete(self):
+        """Delete this team."""
+        resp = self._delete(self._api)
+        if resp.status_code == 204:
+            return True
+        return False
+
     def edit(self, name, permission=''):
         """Edit this team.
 
@@ -59,13 +106,6 @@ class Team(GitHubCore):
             if resp.status_code == 200:
                 self._update_(resp.json)
                 return True
-        return False
-
-    def delete(self):
-        """Delete this team."""
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
         return False
 
     def has_repo(self, repo):
@@ -97,8 +137,8 @@ class Team(GitHubCore):
         resp = self._get(url)
         members = []
         if resp.status_code == 200:
-            for member in resp.json:
-                members.append(User(member, self._session))
+            ses = self._session
+            members = [User(m, ses) for m in resp.json]
         return members
 
     def list_repos(self):
@@ -107,8 +147,8 @@ class Team(GitHubCore):
         resp = self._get(url)
         repos = []
         if resp.status_code == 200:
-            for repo in resp.json:
-                repos.append(Repository(repo, self._session))
+            ses = self._session
+            repos = [Repository(r, ses) for r in resp.json]
         return repos
 
     @property
@@ -252,8 +292,8 @@ class Organization(BaseAccount):
         members = []
         resp = self._get(url)
         if resp.status_code == 200:
-            for member in resp.json:
-                members.append(User(member, self._session))
+            ses = self._session
+            members = [User(m, ses) for m in resp.json]
         return members
 
     def list_public_members(self):
@@ -262,9 +302,25 @@ class Organization(BaseAccount):
         members = []
         resp = self._get(url)
         if resp.status_code == 200:
-            for member in resp.json:
-                members.append(User(member, self._session))
+            ses = self._session
+            members = [User(m, ses) for m in resp.json]
         return members
+
+    def list_repos(self, type=''):
+        """List repos for this organization.
+
+        :param type: (optional), string, accepted values:
+            ('all', 'public', 'member', 'private'), API default: 'all'
+        """
+        url = self._api + '/repos'
+        if type in ('all', 'public', 'member', 'private'):
+            url = '?'.join([url, 'type=' + type])
+        repos = []
+        resp = self._get(url)
+        if resp.status_code == 200:
+            ses = self._session
+            repos = [Repository(r, ses) for r in resp.json]
+        return repos
 
     def list_teams(self):
         """List teams that are part of this organization."""

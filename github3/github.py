@@ -31,7 +31,7 @@ class GitHub(GitHubCore):
                 {'User-Agent': 'github3.py/pre-alpha'})
 
     def __repr__(self):
-        return '<github3-session at 0x%x>' % id(self)
+        return '<GitHub at 0x%x>' % id(self)
 
     def _list_follow(self, login, which):
         url = [self._github_url]
@@ -42,10 +42,10 @@ class GitHub(GitHubCore):
         url = '/'.join(url)
 
         follow = []
-        req = self._get(url)
-        if req.status_code == 200:
-            for follower in req.json:
-                follow.append(User(follower, self._session))
+        resp = self._get(url)
+        if resp.status_code == 200:
+            ses = self._session
+            follow = [User(follower, ses) for follower in resp.json]
         return follow
 
     def create_gist(self, description, files, public=True):
@@ -57,11 +57,11 @@ class GitHub(GitHubCore):
                 'files': files}
 
         url = self._github_url + '/gists'
-        response = self._post(url, dumps(new_gist))
+        resp = self._post(url, dumps(new_gist))
 
         gist = None
-        if response.status_code == 201:
-            gist = Gist(response.json, self._session)
+        if resp.status_code == 201:
+            gist = Gist(resp.json, self._session)
 
         return gist
 
@@ -89,13 +89,16 @@ class GitHub(GitHubCore):
 
         body, assignee, milestone, labels are all optional.
 
-        :param owner:
-        :param repository:
-        :param title: Title of issue to be created
-        :param body: The text of the issue, markdown formatted
-        :param assignee: Login of person to assign the issue to
-        :param milestone: Which milestone to assign the issue to
-        :param labels: List of label names.
+        :param owner: (required), string, login of the owner
+        :param repository: (required), string, repository name
+        :param title: (required), string, Title of issue to be created
+        :param body: (optional), string, The text of the issue, markdown
+            formatted
+        :param assignee: (optional), string, Login of person to assign
+            the issue to
+        :param milestone: (optional), string, Which milestone to assign
+            the issue to
+        :param labels: (optional), list, List of label names.
         """
         repo = None
         if owner and repository and title:
@@ -107,6 +110,40 @@ class GitHub(GitHubCore):
 
         # Regardless, something went wrong. We were unable to create the
         # issue
+        return None
+
+    def create_repo(self,
+        name,
+        description='',
+        homepage='',
+        private=False,
+        has_issues=True,
+        has_wiki=True,
+        has_downloads=True):
+        """Create a repository for the authenticated user.
+
+        :param name: (required), string, name of the repository
+        :param description: (optional), string
+        :param homepage: (optional), string
+        :param private: (optional), boolean, If ``True``, create a
+            private repository. API default: ``False``
+        :param has_issues: (optional), boolean, If ``True``, enable
+            issues for this repository. API default: ``True``
+        :param has_wiki: (optional), boolean, If ``True``, enable the
+            wiki for this repository. API default: ``True``
+        :param has_downloads: (optional), boolean, If ``True``, enable
+            downloads for this repository. API default: ``True``
+        """
+        url = self._github_url + '/user/repos'
+        data = dumps({'name': name, 'description': description,
+            'homepage': homepage, 'private': private,
+            'has_issues': has_issues, 'has_wiki': has_wiki,
+            'has_downloads': has_downloads})
+        resp = self._post(url, data)
+        if resp.status_code == 201:
+            return Repository(resp.json, self._session)
+        if resp.status_code >= 400:
+            return Error(resp)
         return None
 
     def delete_key(self, key_id):
@@ -139,11 +176,10 @@ class GitHub(GitHubCore):
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
         url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
-        req = self._get(url)
+        resp = self._get(url)
         gist = None
-        if req.status_code == 200:
-            gist = Gist(req.json, self._session)
-
+        if resp.status_code == 200:
+            gist = Gist(resp.json, self._session)
         return gist
 
     def is_following(self, login):
@@ -161,7 +197,6 @@ class GitHub(GitHubCore):
         repo = self.repository(owner, repository)
         if repo:
             return repo.issue(number)
-
         return None
 
     def list_followers(self, login=None):
@@ -186,12 +221,11 @@ class GitHub(GitHubCore):
             url.append('gists')
         url = '/'.join(url)
 
-        req = self._get(url)
-
+        resp = self._get(url)
         gists = []
-        for d in req.json:
-            gists.append(Gist(d, self._session))
-
+        if resp.status_code == 200:
+            ses = self._session
+            gists = [Gist(gist, ses) for gist in resp.json]
         return gists
 
     def list_issues(self,
@@ -234,10 +268,10 @@ class GitHub(GitHubCore):
                 url = '{0}?{1}'.format(url, params)
 
             issues = []
-            req = self._get(url)
-            if req.status_code == 200:
-                for issue in req.json:
-                    issues.append(Issue(issue, self._session))
+            resp = self._get(url)
+            if resp.status_code == 200:
+                ses = self._session
+                issues = [Issue(issue, ses) for issue in resp.json]
 
         return issues
 
@@ -247,8 +281,8 @@ class GitHub(GitHubCore):
         resp = self._get(url)
         keys = []
         if resp.status_code == 200:
-            for key in resp.json:
-                keys.append(Key(key, self._session))
+            ses = self._session
+            keys = [Key(key, ses) for key in resp.json]
         return keys
 
     def list_orgs(self, login=None):
@@ -265,9 +299,50 @@ class GitHub(GitHubCore):
         orgs = []
         resp = self._get(url)
         if resp.status_code == 200:
-            for org in resp.json:
-                orgs.append(Organization(org, self._session))
+            ses = self._session
+            orgs = [Organization(org, ses) for org in resp.json]
         return orgs
+
+    def list_repos(self, login=None, type='', sort='', direction=''):
+        """List public repositories for the specified ``login`` or all 
+        repositories for the authenticated user if ``login`` is not 
+        provided.
+
+        :param type: (optional), string, accepted values:
+            ('all', 'owner', 'public', 'private', 'member')
+            API default: 'all'
+        :param sort: (optional), string, accepted values:
+            ('created', 'updated', 'pushed', 'full_name')
+            API default: 'created'
+        :param direction: (optional), string, accepted values:
+            ('asc', 'desc'), API default: 'asc' when using 'full_name',
+            'desc' otherwise
+        """
+        url = [self._github_url]
+        if login:
+            url.extend(['users', login, 'repos'])
+        else:
+            url.extend(['user', 'repos'])
+        url = '/'.join(url)
+        
+        params = []
+        if type in ('all', 'owner', 'public', 'private', 'member'):
+            params.append('type={0}'.format(type))
+        if not login:
+            if sort in ('created', 'updated', 'pushed', 'full_name'):
+                params.append('sort={0}'.format(sort))
+            if direction in ('asc', 'desc'):
+                params.append('direction={0}'.format(sort))
+        if params:
+            params = '&'.join(params)
+            url = '?'.join([url, params])
+
+        resp = self._get(url)
+        repos = []
+        if resp.status_code == 200:
+            ses = self._session
+            repos = [Repository(repo, ses) for repo in resp.json]
+        return repos
 
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls."""
@@ -279,18 +354,18 @@ class GitHub(GitHubCore):
     def organization(self, login):
         """Returns a Organization object for the login name"""
         url = '{0}/orgs/{1}'.format(self._github_url, login)
-        req = self._get(url)
-        if req.status_code == 200:
-            return Organization(req.json, self._session)
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return Organization(resp.json, self._session)
         return None
 
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
         owner and repository"""
         url = '/'.join([self._github_url, 'repos', owner, repository])
-        req = self._get(url)
-        if req.status_code == 200:
-            return Repository(req.json, self._session)
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return Repository(resp.json, self._session)
         return None
 
     def unfollow(self, login):
@@ -333,7 +408,7 @@ class GitHub(GitHubCore):
             url.append('user')
         url = '/'.join(url)
 
-        req = self._get(url)
-        if req.status_code == 200:
-            return User(req.json, self._session)
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return User(resp.json, self._session)
         return None

@@ -19,6 +19,12 @@ class Repository(GitHubCore):
     """A class to represent how GitHub sends information about repositories."""
     def __init__(self, repo, session):
         super(Repository, self).__init__(session)
+        self._update_(repo)
+
+    def __repr__(self):
+        return '<Repository [%s/%s]>' % (self._owner.login, self._name)
+
+    def _update_(self, repo):
         # Clone url using Smart HTTP(s)
         self._https_clone = repo.get('clone_url')
         self._created = self._strptime(repo.get('created_at'))
@@ -67,9 +73,6 @@ class Repository(GitHubCore):
 
         # The number of watchers
         self._watch = repo.get('watchers')
-
-    def __repr__(self):
-        return '<Repository [%s/%s]>' % (self._owner.login, self._name)
 
     def _create_pull(self, data):
         if data:
@@ -284,6 +287,38 @@ class Repository(GitHubCore):
     def description(self):
         return self._desc
 
+    def edit(self,
+        name,
+        description='',
+        homepage='',
+        private=False,
+        has_issues=True,
+        has_wiki=True,
+        has_downloads=True):
+        """Edit this repository.
+
+        :param name: (required), string, name of the repository
+        :param description: (optional), string
+        :param homepage: (optional), string
+        :param private: (optional), boolean, If ``True``, create a
+            private repository. API default: ``False``
+        :param has_issues: (optional), boolean, If ``True``, enable
+            issues for this repository. API default: ``True``
+        :param has_wiki: (optional), boolean, If ``True``, enable the
+            wiki for this repository. API default: ``True``
+        :param has_downloads: (optional), boolean, If ``True``, enable
+            downloads for this repository. API default: ``True``
+        """
+        data = dumps({'name': name, 'description': description,
+            'homepage': homepage, 'private': private,
+            'has_issues': has_issues, 'has_wiki': has_wiki,
+            'has_downloads': has_downloads})
+        resp = self._patch(self._api, data)
+        if resp.status_code == 200:
+            self._update_(resp.json)
+            return True
+        return False
+
     def fork(self, organization=None):
         """Create a fork of this repository.
 
@@ -303,6 +338,15 @@ class Repository(GitHubCore):
     @property
     def forks(self):
         return self._forks
+
+    def is_collaborator(self, login):
+        """Check to see if ``login`` is a collaborator on this repository."""
+        if login:
+            url = self._api + '/collaborators/' + login
+            resp = self._get(url)
+            if resp.status_code == 204:
+                return True
+        return False
 
     def is_fork(self):
         return self._is_fork
@@ -354,6 +398,31 @@ class Repository(GitHubCore):
     def language(self):
         return self._lang
 
+    def list_branches(self):
+        """List the branches in this repository."""
+        url = self._api + '/branches'
+        resp = self._get(url)
+        branches = []
+        if resp.status_code == 200:
+            branches = [Branch(b) for b in resp.json]
+        return branches
+
+    def list_contributors(self, anon=False):
+        """List the contributors to this repository.
+
+        :param anon: (optional), boolean, True lists anonymous
+            contributors as well
+        """
+        url = self._api + '/contributors'
+        if anon:
+            url = '?'.join([url, 'anon=true'])
+        resp = self._get(url)
+        contrib = []
+        if resp.status_code == 200:
+            ses = self._session
+            contrib = [User(c, ses) for c in resp.json]
+        return contrib
+
     def list_issues(self,
         milestone=None,
         state=None,
@@ -400,9 +469,8 @@ class Repository(GitHubCore):
         resp = self._get(url)
         issues = []
         if resp.status_code == 200:
-            for issue in resp.json:
-                issues.append(Issue(issue, self._session))
-
+            ses = self._session
+            issues = [Issue(i, ses) for i in resp.json]
         return issues
 
     def list_labels(self):
@@ -411,10 +479,18 @@ class Repository(GitHubCore):
 
         labels = []
         if resp.status_code == 200:
-            for label in resp.json:
-                labels.append(Label(label, self._session))
-
+            ses = self._session
+            labels = [Label(label, ses) for label in resp.json]
         return labels
+
+    def list_languages(self):
+        """List the programming languages used in the repository."""
+        url = self._api + '/languages'
+        resp = self._get(url)
+        langs = []
+        if resp.status_code == 200:
+            langs = [(k, v) for k, v in resp.json.items()]
+        return langs
 
     def list_milestones(self, state=None, sort=None, direction=None):
         url = self._api + '/milestones'
@@ -450,9 +526,8 @@ class Repository(GitHubCore):
         resp = self._get(url)
         pulls = []
         if resp.status_code == 200:
-            for pull in resp.json:
-                pulls.append(PullRequest(pull, self._session))
-
+            ses = self._session
+            pulls = [PullRequest(pull, ses) for pull in resp.json]
         return pulls
 
     def list_refs(self, subspace=''):
@@ -467,9 +542,27 @@ class Repository(GitHubCore):
         resp = self._get(url)
         refs = []
         if resp.status_code == 200:
-            for ref in resp.json:
-                refs.append(Reference(ref, self._session))
+            ses = self._session
+            refs = [Reference(r, ses) for r in resp.json]
         return refs
+
+    def list_tags(self):
+        """List tags on this repository."""
+        url = self._api + '/tags'
+        resp = self._get(url)
+        tags = []
+        if resp.status_code == 200:
+            tags = [Tag(tag) for tag in resp.json]
+        return tags
+
+    def list_teams(self):
+        """List teams with access to this repository."""
+        url = self._api + '/teams'
+        resp = self._get(url)
+        tms = []
+        if resp.status_code == 200:
+            tms = [type('Repository Team', (object, ), t) for t in resp.json]
+        return tms
 
     def milestone(self, number):
         url = '{0}/milestones/{1}'.format(self._api, str(number))
@@ -574,3 +667,55 @@ class Repository(GitHubCore):
     @property
     def watchers(self):
         return self._watchers
+
+
+class Branch(object):
+    def __init__(self, branch):
+        super(Branch, self).__init__()
+        self._name = branch.get('name')
+        self._commit = None
+        if branch.get('commit'):
+            self._commit = type('Branch Commit', (object, ),
+                    branch.get('commit'))
+
+    def __repr__(self):
+        return '<Repository Branch [%s]>' % self._name
+
+    @property
+    def commit(self):
+        return self._commit
+
+    @property
+    def name(self):
+        return self._name
+
+
+class RepositoryTag(object):
+    def __init__(self, tag):
+        super(RepositoryTag, self).__init__()
+        self._name = tag.get('name')
+        self._zip = tag.get('zipball_url')
+        self._tar = tag.get('tarball_url')
+        self._commit = None
+        if tag.get('commit'):
+            self._commit = type('Tag Commit', (object, ),
+                    tag.get('commit'))
+
+    def __repr__(self):
+        return '<Repository Tag [%s]>' % self._name
+
+    @property
+    def commit(self):
+        return self._commit
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def tarball_url(self):
+        return self._tar
+
+    @property
+    def zipball_url(self):
+        return self._zip
