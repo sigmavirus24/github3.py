@@ -89,9 +89,9 @@ Progress
 
 - Repositories_: **done**
 
-  - Collaborators_: **in progress**
+  - Collaborators_: **done**
 
-  - `Repo Commits`_
+  - `Repo Commits`_: **in progress**
 
   - Downloads_
 

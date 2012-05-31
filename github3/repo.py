@@ -84,6 +84,15 @@ class Repository(GitHubCore):
                 return Error(resp)
         return None
 
+    def add_collaborator(self, login):
+        """Add ``login`` as a collaborator to a repository."""
+        if login:
+            url = self._api + '/collaborators/' + login
+            resp = self._put(url)
+            if resp.status_code == 204:
+                return True
+        return False
+
     def blob(self, sha):
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
         resp = self._get(url)
@@ -614,6 +623,15 @@ class Repository(GitHubCore):
         if resp.status_code >= 400:
             return Error(resp)
         return None
+
+    def remove_collaborator(self, login):
+        """Remove collaborator ``login`` from the repository."""
+        if login:
+            url = self._api + '/collaborators/' + login
+            resp = self._delete(url)
+            if resp.status_code == 204:
+                return True
+        return False
 
     @property
     def size(self):
