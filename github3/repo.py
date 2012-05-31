@@ -10,7 +10,7 @@ from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Reference, Tag
-from .models import GitHubCore, Error
+from .models import GitHubCore, Error, BaseComment
 from .pulls import PullRequest
 from .user import User
 
@@ -75,23 +75,21 @@ class Repository(GitHubCore):
         self._watch = repo.get('watchers')
 
     def _create_pull(self, data):
+        pull = None
         if data:
             url = self._api + '/pulls'
-            resp = self._post(url, data)
+            json = self._post(url, data)
             if resp.status_code == 201:
-                return PullRequest(resp.json, self._session)
-            if resp.status_code >= 400:
-                return Error(resp)
+                pull = PullRequest(json, self._session)
         return None
 
     def add_collaborator(self, login):
         """Add ``login`` as a collaborator to a repository."""
+        resp = False
         if login:
             url = self._api + '/collaborators/' + login
             resp = self._put(url)
-            if resp.status_code == 204:
-                return True
-        return False
+        return resp
 
     def blob(self, sha):
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
@@ -112,15 +110,14 @@ class Repository(GitHubCore):
         :param content: (required), string, content of the blob
         :param encoding: (required), string, ('base64', 'utf-8')
         """
+        sha = ''
         if encoding in ('base64', 'utf-8') and content:
             url = self._api + '/git/blobs'
             data = dumps({'content': content, 'encoding': encoding})
-            resp = self._post(url, data)
-            if resp.status_code == 201:
-                return resp.json.get('sha')
-            if resp.status_code >= 400:
-                return Error(resp)
-        return None
+            json = self._post(url, data)
+            if json:
+                sha = json.get('sha')
+        return sha
 
     def create_commit(self, message, tree, parents, author={}, committer={}):
         """Create a commit on this repository.
@@ -140,17 +137,16 @@ class Repository(GitHubCore):
             will use the author parameters. Should be the same format as
             the author parameter.
         """
+        commit = None
         if message and tree and isinstance(parents, list):
             url = self._api + '/git/commits'
             data = dumps({'message': message, 'tree': tree,
                 'parents': parents, 'author': author,
                 'committer': committer})
-            resp = self._post(url, data)
-            if resp.status_code == 201:
-                return Commit(resp.json, self._session)
-            if resp.status_code >= 400:
-                return Error(resp)
-        return None
+            json = self._post(url, data)
+            if json:
+                commit = Commit(json, self._session)
+        return commit
 
     def create_issue(self,
         title,
@@ -164,40 +160,25 @@ class Repository(GitHubCore):
             'labels': labels})
         url = self._api + '/issues'
 
-        resp = self._post(url, issue)
-        issue = None
-        if resp.status_code == 201:
-            issue = Issue(resp.json, self._session)
-
-        return issue
+        json = self._post(url, issue)
+        return Issue(json, self._session) if json else None
 
     def create_label(self, name, color):
-        label = None
-
         if color[0] == '#':
             color = color[1:]
 
         url = self._api + '/labels'
-        resp = self._post(url, dumps({'name': name, 'color': color}))
+        json = self._post(url, dumps({'name': name, 'color': color}))
 
-        if resp.status_code == 201:
-            label = Label(resp.json, self._session)
-        elif resp.status_code >= 400:
-            label = Error(resp)
-        return label
+        return Label(json, self._session) if json else None
 
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
         url = self._api + '/milestones'
         mile = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        milestone = None
-
-        resp = self._post(url, mile)
-        if resp.status_code == 201:
-            milestone = Milestone(resp.json, self._session)
-
-        return milestone
+        json = self._post(url, mile)
+        return Milestone(json, self._session) if json else None
 
     def create_pull(self, title, base, head, body=''):
         """Create a pull request using commits from ``head`` and comparing
@@ -232,12 +213,8 @@ class Repository(GitHubCore):
         """
         data = dumps({'ref': ref, 'sha': sha})
         url = self._api + '/git/refs'
-        resp = self._post(url, data)
-        if resp.status_code == 201:
-            return Reference(resp.json, self._session)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._post(url, data)
+        return Reference(json, self._session) if json else None
 
     def create_tag(self, tag, message, sha, obj_type, tagger,
             lightweight=False):
@@ -261,12 +238,10 @@ class Repository(GitHubCore):
             data = dumps({'tag': tag, 'message': message, 'object': sha,
                 'type': obj_type, 'tagger': tagger})
             url = self._api + '/git/tags'
-            resp = self._post(url, data)
-            if resp.status_code == 201:
-                t = Tag(resp.json)
+            json = self._post(url, data)
+            if json:
+                t = Tag(json)
                 self.create_ref('refs/tags/' + tag, sha)
-            elif resp.status_code >= 400:
-                t = Error(resp)
         return t
 
     def create_tree(self, tree, base_tree=''):
@@ -278,15 +253,14 @@ class Repository(GitHubCore):
         :param base_tree: (optional), string, SHA1 of the tree you want
             to update with new data
         """
+        tree = None
         if tree and isinstance(tree, list):
             data = dumps({'tree': tree, 'base_tree': base_tree})
             url = self._api + '/git/trees'
-            resp = self._post(url, data)
-            if resp.status_code == 201:
-                return Tree(resp.json)
-            if resp.status_code >= 400:
-                return Error(resp)
-        return None
+            json = self._post(url, data)
+            if json:
+                tree = Tree(json)
+        return tree
 
     @property
     def created_at(self):
@@ -335,14 +309,12 @@ class Repository(GitHubCore):
             under"""
         url = self._api + '/forks'
         if organization:
-            resp = self._post(url, dumps({'org': organization}))
+            json = self._post(url, dumps({'org': organization}),
+                    status_code=202)
         else:
-            resp = self._post(url)
+            json = self._post(url, status_code=202)
 
-        if resp.status_code == 202:
-            return Repository(resp.json, self._session)
-
-        return None
+        return Repository(json, self._session) if json else None
 
     @property
     def forks(self):
@@ -626,12 +598,11 @@ class Repository(GitHubCore):
 
     def remove_collaborator(self, login):
         """Remove collaborator ``login`` from the repository."""
+        resp = False
         if login:
             url = self._api + '/collaborators/' + login
             resp = self._delete(url)
-            if resp.status_code == 204:
-                return True
-        return False
+        return resp
 
     @property
     def size(self):

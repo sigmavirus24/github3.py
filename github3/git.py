@@ -119,10 +119,7 @@ class Reference(GitHubCore):
         self._obj = GitObject(ref.get('object'))
 
     def delete(self):
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     @property
     def object(self):

@@ -57,13 +57,8 @@ class GitHub(GitHubCore):
                 'files': files}
 
         url = self._github_url + '/gists'
-        resp = self._post(url, dumps(new_gist))
-
-        gist = None
-        if resp.status_code == 201:
-            gist = Gist(resp.json, self._session)
-
-        return gist
+        json = self._post(url, dumps(new_gist))
+        return Gist(json, self._session) if json else None
 
     def create_key(self, title, key):
         """Create a new key for the authenticated user."""
@@ -71,8 +66,8 @@ class GitHub(GitHubCore):
 
         if title and key:
             url = self._github_url + '/user/keys'
-            resp = self._post(url, dumps({'title': title, 'key': key}))
-            if resp.status_code == 201:
+            json = self._post(url, dumps({'title': title, 'key': key}))
+            if json:
                 created = Key(resp.json, self._session)
         return created
 
@@ -139,12 +134,8 @@ class GitHub(GitHubCore):
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads})
-        resp = self._post(url, data)
-        if resp.status_code == 201:
-            return Repository(resp.json, self._session)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._post(url, data)
+        return Repository(json, self._session) if json else None
 
     def delete_key(self, key_id):
         key = self.get_key(key_id)
@@ -154,13 +145,11 @@ class GitHub(GitHubCore):
 
     def follow(self, login):
         """Make the authenticated user follow login."""
+        resp = False
         if login:
-            print(login)
             url = '{0}/user/following/{1}'.format(self._github_url,
                     login)
             resp = self._put(url)
-            if resp.status_code == 204:
-                return True
         return False
 
     def get_key(self, id_num):
@@ -370,13 +359,12 @@ class GitHub(GitHubCore):
 
     def unfollow(self, login):
         """Make the authenticated user stop following login"""
+        resp = False
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url,
                     login)
             resp = self._delete(url)
-            if resp.status_code == 204:
-                return True
-        return False
+        return resp
 
     def update_user(self, name=None, email=None, blog=None,
             company=None, location=None, hireable=False, bio=None):

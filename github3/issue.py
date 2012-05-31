@@ -30,10 +30,7 @@ class Label(GitHubCore):
         return self._color
 
     def delete(self):
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     @property
     def name(self):
@@ -88,10 +85,7 @@ class Milestone(GitHubCore):
 
     def delete(self):
         """Delete this milestone."""
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     @property
     def description(self):
@@ -189,10 +183,8 @@ class Issue(GitHubCore):
 
     def add_labels(self, *args):
         url = self._api + '/labels'
-        resp = self._post(url, dumps(args))
-        if resp.status_code == 200:
-            return True
-        return False
+        json = self._post(url, dumps(args), status_code=200)
+        return True if json else False
 
     @property
     def assignee(self):
@@ -231,13 +223,11 @@ class Issue(GitHubCore):
 
     def create_comment(self, body):
         """Create a comment on this issue."""
+        json = None
         if body:
             url = self._api + '/comments'
-            resp = self._post(url, dumps({'body': body}))
-            if resp.status_code == 201:
-                return True
-
-        return False
+            json = self._post(url, dumps({'body': body}))
+        return IssueComment(json, self._session) if json else None
 
     @property
     def created_at(self):
@@ -317,10 +307,7 @@ class Issue(GitHubCore):
 
     def remove_label(self, name):
         url = '{0}/labels/{1}'.format(self._api, name)
-        resp = self._delete(url)
-        if resp.status_code == 200:
-            return True
-        return False
+        return self._delete(url, status_code=200)
 
     def remove_all_labels(self):
         # Can either send DELETE or [] to remove all labels
@@ -328,10 +315,7 @@ class Issue(GitHubCore):
 
     def replace_labels(self, labels):
         url = self._api + '/labels'
-        resp = self._put(url, dumps(labels))
-        if resp.status_code == 200:
-            return True
-        return False
+        return self._put(url, dumps(labels), status_code=200)
 
     def reopen(self):
         return self.edit(self._title, self._body, self._assign.login,

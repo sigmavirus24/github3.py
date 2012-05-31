@@ -91,6 +91,8 @@ Progress
 
   - Collaborators_: **done**
 
+  - `Repo Comments`_: **in progress**
+
   - `Repo Commits`_: **in progress**
 
   - Downloads_
@@ -105,6 +107,7 @@ Progress
 
 .. _Repositories: http://developer.github.com/v3/repos/
 .. _Collaborators: http://developer.github.com/v3/repos/collaborators/
+.. _Repo Comments: http://developer.github.com/v3/repos/comments/
 .. _Repo Commits: http://developer.github.com/v3/repos/commits/
 .. _Downloads: http://developer.github.com/v3/repos/downloads/
 .. _Forks: http://developer.github.com/v3/repos/forks/

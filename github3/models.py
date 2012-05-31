@@ -21,12 +21,16 @@ class GitHubCore(object):
     def __repr__(self):
         return '<github3-core at 0x%x>' % id(self)
 
-    def _delete(self, url, **kwargs):
-        req = None
+    def _delete(self, url, status_code=204 **kwargs):
+        req = False
         if self._remaining > 0:
             req = self._session.delete(url, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
-        return req
+            if req.status_code == status_code:
+                req = True
+            if req.status_code >= 400:
+                raise Error(req)
+        return False
 
     def _get(self, url, **kwargs):
         req = None
@@ -42,20 +46,27 @@ class GitHubCore(object):
             self._remaining = int(req.headers['x-ratelimit-remaining'])
         return req
 
-    def _post(self, url, data=None, **kwargs):
+    def _post(self, url, data=None, status_code=201 **kwargs):
         req = None
         if self._remaining > 0:
             req = self._session.post(url, data, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.status_code == status_code:
+                req = resp.json
+            elif req.status_code >= 400:
+                raise Error(req)
         return req
 
-    def _put(self, url, data=None, **kwargs):
-        req = None
+    def _put(self, url, data=None, status_code=204 **kwargs):
         if self._remaining > 0:
             kwargs.update(headers={'Content-Length': '0'})
             req = self._session.put(url, data, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
-        return req
+            if req.status_code == status_code:
+                return True
+            if req.status_code >= 400:
+                raise Error(req)
+        return False
 
     def _strptime(self, time_str):
         if time_str:
@@ -113,10 +124,7 @@ class BaseComment(GitHubCore):
 
     def delete(self):
         """Delete this comment."""
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     def edit(self, body):
         """Edit this comment."""

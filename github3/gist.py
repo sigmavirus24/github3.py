@@ -95,11 +95,8 @@ class Gist(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this gist."""
         url = self._api + '/comments'
-        resp = self._post(url, dumps({'body': body}))
-        if resp.status_code == 201:
-            comment = GistComment(resp.json, self._session)
-            return comment
-        return None
+        json = self._post(url, dumps({'body': body}))
+        return GistComment(json, self._session) if json else None
 
     @property
     def created(self):
@@ -107,10 +104,7 @@ class Gist(GitHubCore):
 
     def delete(self):
         """Delete this gist."""
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     @property
     def description(self):
@@ -133,10 +127,8 @@ class Gist(GitHubCore):
 
     def fork(self):
         url = self._api + '/fork'
-        resp = self._post(url)
-        if resp.status_code == 201:
-            return Gist(resp.json)
-        return False
+        json = self._post(url)
+        return Gist(json) if json else None
 
     @property
     def forks(self):
@@ -184,18 +176,12 @@ class Gist(GitHubCore):
     def star(self):
         """Star this gist."""
         url = self._api + '/star'
-        resp = self._put(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._put(url)
 
     def unstar(self):
         """Un-star this gist."""
         url = self._api + '/star'
-        resp = self._delete(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(url)
 
     @property
     def updated(self):

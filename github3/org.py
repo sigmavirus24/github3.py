@@ -31,10 +31,7 @@ class Team(GitHubCore):
     def add_member(self, login):
         """Add ``login`` to this team."""
         url = '{0}/member/{1}'.format(self._api, login)
-        resp = self._put(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._put(url)
 
     def add_repo(self, repo):
         """Add ``repo`` to this team.
@@ -42,10 +39,7 @@ class Team(GitHubCore):
         :param repo: (required), string, form: 'user/repo'
         """
         url = '{0}/repos/{1}'.format(self._api, repo)
-        resp = self._put(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._put(url)
 
     def create_repo(self,
         name,
@@ -80,19 +74,12 @@ class Team(GitHubCore):
             'has_downloads': has_downloads})
         if team_id > 0:
             data.update({'team_id': team_id})
-        resp = self._post(url, data)
-        if resp.status_code == 201:
-            return Repository(resp.json, self._session)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._post(url, data)
+        return Repository(json, self._session) if json else None
 
     def delete(self):
         """Delete this team."""
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     def edit(self, name, permission=''):
         """Edit this team.
@@ -162,10 +149,7 @@ class Team(GitHubCore):
     def remove_member(self, login):
         """Remove ``login`` from this team."""
         url = '{0}/members/{1}'.format(self._api, login)
-        resp = self._delete(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(url)
 
     def remove_repo(self, repo):
         """Remove ``repo`` from this team.
@@ -173,10 +157,7 @@ class Team(GitHubCore):
         :param repo: (required), string, form: 'user/repo'
         """
         url = '{0}/repos/{1}'.format(self._api, repo)
-        resp = self._delete(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(url)
 
     @property
     def repos_count(self):
@@ -219,10 +200,7 @@ class Organization(BaseAccount):
     def conceal_member(self, login):
         """Conceal ``login``'s membership in this organization."""
         url = '{0}/public_members/{1}'.format(self._api, login)
-        resp = self._delete(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(url)
 
     def create_team(self, name, repo_names=[], permissions=''):
         """Assuming the authenticated user owns this organization,
@@ -242,10 +220,8 @@ class Organization(BaseAccount):
         data = dumps({'name': name, 'repo_names': repo_names,
             'permissions': permissions})
         url = self._api + '/teams'
-        resp = self._post(url, data)
-        if resp.status_code == 201:
-            return Team(resp.json, self._session)
-        return None
+        json = self._post(url, data)
+        return Team(json, self._session) if json else None
 
     def edit(self,
         billing_email=None,
@@ -339,19 +315,13 @@ class Organization(BaseAccount):
     def publicize_member(self, login):
         """Make ``login``'s membership in this organization public."""
         url = '{0}/public_members/{1}'.format(self._api, login)
-        resp = self._put(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._put(url)
 
     def remove_member(self, login):
         """Remove the user with login ``login`` from this
         organization."""
         url = '{0}/members/{1}'.format(self._api, login)
-        resp = self._delete(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(url)
 
     def remove_repo(self, repo, team):
         """Remove ``repo`` from ``team``.

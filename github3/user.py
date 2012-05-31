@@ -25,10 +25,7 @@ class Key(GitHubCore):
         self._key = key.get('key')
 
     def delete(self):
-        resp = self._delete(self._api)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(self._api)
 
     @property
     def key(self):
@@ -126,21 +123,17 @@ class User(BaseAccount):
     def add_email_addresses(self, addresses=[]):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account."""
+        json = []
         if addresses:
             url = self._github_url + '/user/emails'
-            resp = self._post(url, dumps(addresses))
-            if resp.status_code == 201:
-                return resp.json
-        return []
+            json = self._post(url, dumps(addresses))
+        return json
 
     def delete_email_addresses(self, addresses=[]):
         """Delete the email addresses in ``addresses`` from the
         authenticated user's account."""
         url = self._github_url + '/user/emails'
-        resp = self._delete(url, data=dumps(addresses))
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._delete(url, data=dumps(addresses))
 
     @property
     def disk_usage(self):
