@@ -43,10 +43,8 @@ class GitHub(GitHubCore):
 
         follow = []
         resp = self._get(url)
-        if resp.status_code == 200:
-            ses = self._session
-            follow = [User(follower, ses) for follower in resp.json]
-        return follow
+        ses = self._session
+        return [User(follower, ses) for follower in json]
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -154,31 +152,26 @@ class GitHub(GitHubCore):
 
     def get_key(self, id_num):
         """Gets the authenticated user's key specified by id_num."""
+        json = None
         if int(id_num) > 0:
             url = '{0}/user/keys/{1}'.format(self._github_url,
                     str(id_num))
-            resp = self._get(url)
-            if resp.status_code == 200:
-                return Key(resp.json, self._session)
-        return None
+            json = self._get(url)
+        return Key(json, self._session) if json else None
 
     def gist(self, id_num):
         """Gets the gist using the specified id number."""
         url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
-        resp = self._get(url)
-        gist = None
-        if resp.status_code == 200:
-            gist = Gist(resp.json, self._session)
-        return gist
+        json = self._get(url)
+        return Gist(json, self._session) if json else None
 
     def is_following(self, login):
         """Check if the authenticated user is following login."""
+        json = None
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url, login)
-            resp = self._get(url)
-            if resp.status_code == 204:
-                return True
-        return False
+            json = self._get(url, status_code=204)
+        return True if json else False
 
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from
@@ -210,12 +203,9 @@ class GitHub(GitHubCore):
             url.append('gists')
         url = '/'.join(url)
 
-        resp = self._get(url)
-        gists = []
-        if resp.status_code == 200:
-            ses = self._session
-            gists = [Gist(gist, ses) for gist in resp.json]
-        return gists
+        json = self._get(url)
+        ses = self._session
+        return [Gist(gist, ses) for gist in json]
 
     def list_issues(self,
         owner=None,
@@ -256,23 +246,17 @@ class GitHub(GitHubCore):
             if params:
                 url = '{0}?{1}'.format(url, params)
 
-            issues = []
-            resp = self._get(url)
-            if resp.status_code == 200:
-                ses = self._session
-                issues = [Issue(issue, ses) for issue in resp.json]
-
+            json = self._get(url)
+            ses = self._session
+            issues = [Issue(issue, ses) for issue in json]
         return issues
 
     def list_keys(self):
         """List public keys for the authenticated user."""
         url = self._github_url + '/user/keys'
-        resp = self._get(url)
-        keys = []
-        if resp.status_code == 200:
-            ses = self._session
-            keys = [Key(key, ses) for key in resp.json]
-        return keys
+        json = self._get(url)
+        ses = self._session
+        return [Key(key, ses) for key in json]
 
     def list_orgs(self, login=None):
         """List public organizations for login if provided; otherwise
@@ -285,12 +269,9 @@ class GitHub(GitHubCore):
             url.extend(['user', 'orgs'])
         url = '/'.join(url)
 
-        orgs = []
-        resp = self._get(url)
-        if resp.status_code == 200:
-            ses = self._session
-            orgs = [Organization(org, ses) for org in resp.json]
-        return orgs
+        json = self._get(url)
+        ses = self._session
+        return [Organization(org, ses) for org in json]
 
     def list_repos(self, login=None, type='', sort='', direction=''):
         """List public repositories for the specified ``login`` or all 
@@ -326,12 +307,9 @@ class GitHub(GitHubCore):
             params = '&'.join(params)
             url = '?'.join([url, params])
 
-        resp = self._get(url)
-        repos = []
-        if resp.status_code == 200:
-            ses = self._session
-            repos = [Repository(repo, ses) for repo in resp.json]
-        return repos
+        json = self._get(url)
+        ses = self._session
+        return [Repository(repo, ses) for repo in json]
 
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls."""
@@ -343,19 +321,15 @@ class GitHub(GitHubCore):
     def organization(self, login):
         """Returns a Organization object for the login name"""
         url = '{0}/orgs/{1}'.format(self._github_url, login)
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Organization(resp.json, self._session)
-        return None
+        json = self._get(url)
+        return Organization(json, self._session) if json else None
 
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
         owner and repository"""
         url = '/'.join([self._github_url, 'repos', owner, repository])
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Repository(resp.json, self._session)
-        return None
+        json = self._get(url)
+        return Repository(json, self._session) if json else None
 
     def unfollow(self, login):
         """Make the authenticated user stop following login"""
@@ -396,7 +370,5 @@ class GitHub(GitHubCore):
             url.append('user')
         url = '/'.join(url)
 
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return User(resp.json, self._session)
-        return None
+        json = self._get(url)
+        return User(json, self._session) if json else None

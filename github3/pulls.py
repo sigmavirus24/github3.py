@@ -98,7 +98,7 @@ class PullFile(object):
 
     @property
     def sha(self):
-        return self._shaw
+        return self._sha
 
     @property
     def status(self):
@@ -198,10 +198,7 @@ class PullRequest(GitHubCore):
 
     def is_merged(self):
         url = self._api + '/merge'
-        resp = self._get(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._get(url, status_code=204)
 
     @property
     def issue_url(self):
@@ -215,32 +212,21 @@ class PullRequest(GitHubCore):
         """List the comments on this pull request."""
         url = self._api + '/comments'
         resp = self._get(url)
-        comments = []
-        if resp.status_code == 200:
-            for comment in resp.json:
-                comments.append(ReviewComment(comment, self._session))
-        return comments
+        ses = self._session
+        return [ReviewComment(comment, ses) for comment in json]
 
     def list_commits(self):
         """List the commits on this pull request."""
         url = self._api + '/commits'
-        resp = self._get(url)
-        commits = []
-        if resp.status_code == 200:
-            for commit in resp.json:
-                commits.append(Commit(commit, self._session))
-
-        return commits
+        json = self._get(url)
+        ses = self._session
+        return [Commit(commit, ses) for commit in json]
 
     def list_files(self):
         """List the files associated with this pull request."""
         url = self._api + '/files'
-        resp = self._get(url)
-        files = []
-        if resp.status_code == 200:
-            for f in resp.json:
-                files.append(PullFile(f))
-        return files
+        json = self._get(url)
+        return [PullFile(f) for f in json]
 
     def merge(self, commit_message=''):
         """Merge this pull request.
@@ -282,9 +268,9 @@ class PullRequest(GitHubCore):
         :param state: (optional), string, ('open', 'closed')
         """
         data = dumps({'title': title, 'body': body, 'state': state})
-        resp = self._patch(self._api, data)
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(self._api, data)
+        if json:
+            self._update_(json)
             return True
         return False
 

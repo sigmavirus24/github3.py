@@ -40,10 +40,10 @@ class Label(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        resp = self._patch(self._api, dumps({'name': name,
+        json = self._patch(self._api, dumps({'name': name,
             'color': color}))
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        if json:
+            self._update_(json)
             return True
 
         return False
@@ -99,12 +99,9 @@ class Milestone(GitHubCore):
         """List the labels for every issue associated with this
         milestone."""
         url = self._api + '/labels'
-        resp = self._get(url)
-        labels = []
-        if resp.status_code == 200:
-            for label in resp.json:
-                labels.append(Label(label, self._session))
-        return labels
+        json = self._get(url)
+        ses = self._session
+        return [Label(label, ses) for label in json]
 
     @property
     def number(self):
@@ -135,9 +132,9 @@ class Milestone(GitHubCore):
         """
         inp = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        resp = self._patch(self._api, inp)
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(self._api, inp)
+        if json:
+            self._update_(json)
             return True
         return False
 
@@ -209,13 +206,12 @@ class Issue(GitHubCore):
         you were to look at the comments on issue #15 in
         sigmavirus24/Todo.txt-python, the first comment's id is 4150787.
         """
+        json = None
         if id_num > 0:  # Might as well check that it's positive
             url = '/'.join([self._github_url, self._repo[0],
                 self._repo[1], 'issues', 'comments', str(id)])
-            resp = self._get(url)
-            if resp.status_code == 200:
-                return IssueComment(resp.json)
-        return None
+            json = self._get(url)
+        return IssueComment(json) if json else None
 
     @property
     def comments(self):
@@ -250,9 +246,9 @@ class Issue(GitHubCore):
         """
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        resp = self._patch(self._api, dumps(data))
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(self._api, dumps(data))
+        if json:
+            self._update_(json)
             return True
 
         return False
@@ -276,22 +272,14 @@ class Issue(GitHubCore):
 
     def list_comments(self):
         url = self._api + '/comments'
-        resp = self._get(url)
-
-        comments = []
-        if resp.status_code == 200:
-            for comment in resp.json:
-                comments.append(IssueComment(comment, self._session))
-        return comments
+        json = self._get(url)
+        ses = self._session
+        return [IssueComment(comment, ses) for comment in json]
 
     def list_events(self):
         url = self._api + '/events'
-        resp = self._get(url)
-        events = []
-        if resp.status_code == 200:
-            for event in resp.json:
-                events.append(IssueEvent(event, self))
-        return events
+        json = self._get(url)
+        return [IssueEvent(event, self) for event in json]
 
     @property
     def milestone(self):
@@ -345,6 +333,7 @@ class Issue(GitHubCore):
 class IssueComment(BaseComment):
     def __init__(self, comment, session):
         super(IssueComment, self).__init__(comment, session)
+        self._user = User(comment.get('user'), self._session)
 
     def __repr__(self):
         return '<Issue Comment [%s]>' % self._user.login

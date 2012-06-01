@@ -45,10 +45,10 @@ class Key(GitHubCore):
         if not key:
             key = self._key
 
-        resp = self._patch(self._api, dumps({'title': title,
+        json = self._patch(self._api, dumps({'title': title,
             'key': key}))
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        if json:
+            self._update_(json)
             return True
         return False
 
@@ -150,10 +150,7 @@ class User(BaseAccount):
         user.
         """
         url = self._github_url + '/user/emails'
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return resp.json
-        return []
+        return self._get(url) or []
 
     @property
     def owned_private_repos(self):
@@ -192,8 +189,8 @@ class User(BaseAccount):
             'company': company, 'location': location,
             'hireable': hireable, 'bio': bio})
         url = self._github_url + '/user'
-        resp = self._patch(url, user)
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(url, user)
+        if json:
+            self._update_(json)
             return True
         return False

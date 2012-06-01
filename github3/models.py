@@ -21,52 +21,66 @@ class GitHubCore(object):
     def __repr__(self):
         return '<github3-core at 0x%x>' % id(self)
 
-    def _delete(self, url, status_code=204 **kwargs):
+    def _json(self, request, status_code):
+        if request.status_code == status_code:
+            return request.json
+        if request.status_code >= 400:
+            raise Error(request)
+        return None
+
+    def _boolean(self, request, status_code):
+        if request.status_code == status_code:
+            return True
+        if request.status_code >= 400:
+            raise Error(request)
+        return False
+
+    def _delete(self, url, status_code=204, **kwargs):
         req = False
         if self._remaining > 0:
             req = self._session.delete(url, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
-            if req.status_code == status_code:
-                req = True
-            if req.status_code >= 400:
-                raise Error(req)
-        return False
+            req = self._boolean(req, status_code)
+        return req
 
-    def _get(self, url, **kwargs):
+    def _get(self, url, status_code=200, **kwargs):
         req = None
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if status_code == 204:
+                # We're not expecting any json back
+                # If we left it as a simple _json() call there would be a
+                #  TypeError since requests doesn't handle that cleanly
+                req = self._boolean(req, status_code)
+            else:
+                req = self._json(req, status_code)
         return req
 
-    def _patch(self, url, data=None, **kwargs):
+    def _patch(self, url, data=None, status_code=200, **kwargs):
         req = None
         if self._remaining > 0:
             req = self._session.patch(url, data, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
+            req = self._json(req, status_code)
         return req
 
-    def _post(self, url, data=None, status_code=201 **kwargs):
+    def _post(self, url, data=None, status_code=201, **kwargs):
         req = None
         if self._remaining > 0:
             req = self._session.post(url, data, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
-            if req.status_code == status_code:
-                req = resp.json
-            elif req.status_code >= 400:
-                raise Error(req)
+            req = self._json(req, status_code)
         return req
 
-    def _put(self, url, data=None, status_code=204 **kwargs):
+    def _put(self, url, data=None, status_code=204, **kwargs):
+        req = False
         if self._remaining > 0:
             kwargs.update(headers={'Content-Length': '0'})
             req = self._session.put(url, data, **kwargs)
             self._remaining = int(req.headers['x-ratelimit-remaining'])
-            if req.status_code == status_code:
-                return True
-            if req.status_code >= 400:
-                raise Error(req)
-        return False
+            req = self._boolean(req, status_code)
+        return req
 
     def _strptime(self, time_str):
         if time_str:
@@ -93,7 +107,6 @@ class BaseComment(GitHubCore):
         self._body = comment.get('body')
         self._bodyt = comment.get('body_text')
         self._bodyh = comment.get('body_html')
-        self._user = User(comment.get('user'), self._session)
         self._created = self._strptime(comment.get('created_at'))
         self._updated = self._strptime(comment.get('updated_at'))
 
@@ -129,9 +142,9 @@ class BaseComment(GitHubCore):
     def edit(self, body):
         """Edit this comment."""
         if body:
-            resp = self._patch(self._api, dumps({'body': body}))
-            if resp.status_code == 200:
-                self._update_(resp.json)
+            json = self._patch(self._api, dumps({'body': body}))
+            if json:
+                self._update_(json)
                 return True
         return False
 
@@ -148,15 +161,10 @@ class BaseEvent(GitHubCore):
     def __init__(self, event, session):
         super(BaseEvent, self).__init__(session)
         # Guaranteed to exist
-        self._actor = User(event.get('actor'), self._session)
         self._created = self._strptime(event.get('created_at'))
 
     def __repr__(self):
         return '<github3-event at 0x%x>' % id(self)
-
-    @property
-    def actor(self):
-        return self._actor
 
     @property
     def created_at(self):
@@ -284,19 +292,26 @@ class BaseAccount(GitHubCore):
     def public_repos(self):
         return self._public_repos
 
-class Error(object):
+class Error(BaseException):
     def __init__(self, resp):
         super(Error, self).__init__()
         self._code = resp.status_code
         error = resp.json
         self._message = error.get('message')
         self._errors = []
-        if self._code == 422:
+        if self._code == 422 or error.get('errors'):
             errs = error.get('errors')
             self._errors = [type(e.get('code'), (Error, ), e) for e in errs]
 
     def __repr__(self):
         return '<Error [%s]>' % (self._message or self._code)
+
+    def __str__(self):
+        if not self._errors:
+            return '{0} {1}'.format(self._code, self._message)
+        else:
+            return '{0} {1}: {2}'.format(self._code, self._message,
+                ', '.join(self._errors))
 
     @property
     def code(self):

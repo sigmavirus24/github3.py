@@ -30,7 +30,7 @@ class Team(GitHubCore):
 
     def add_member(self, login):
         """Add ``login`` to this team."""
-        url = '{0}/member/{1}'.format(self._api, login)
+        url = '{0}/members/{1}'.format(self._api, login)
         return self._put(url)
 
     def add_repo(self, repo):
@@ -89,9 +89,9 @@ class Team(GitHubCore):
         """
         if name:
             data = dumps({'name': name, 'permission': permission})
-            resp = self._patch(self._api, data)
-            if resp.status_code == 200:
-                self._update_(resp.json)
+            json = self._patch(self._api, data)
+            if json:
+                self._update_(json)
                 return True
         return False
 
@@ -101,10 +101,7 @@ class Team(GitHubCore):
         :param repo: (required), string, form: 'user/repo'
         """
         url = '{0}/repos/{1}'.format(self._api, repo)
-        resp = self._get(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._get(url, status_code=204)
 
     @property
     def id(self):
@@ -113,30 +110,21 @@ class Team(GitHubCore):
     def is_member(self, login):
         """Check if ``login`` is a member of this team."""
         url = '{0}/members/{1}'.format(self._api, login)
-        resp = self._get(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._get(url, status_code=204)
 
     def list_members(self):
         """List the members of this team."""
         url = self._api + '/members'
         resp = self._get(url)
-        members = []
-        if resp.status_code == 200:
-            ses = self._session
-            members = [User(m, ses) for m in resp.json]
-        return members
+        ses = self._session
+        return [User(m, ses) for m in json]
 
     def list_repos(self):
         """List the repositories this team has access to."""
         url = self._api + '/repos'
         resp = self._get(url)
-        repos = []
-        if resp.status_code == 200:
-            ses = self._session
-            repos = [Repository(r, ses) for r in resp.json]
-        return repos
+        ses = self._session
+        return [Repository(r, ses) for r in json]
 
     @property
     def members_count(self):
@@ -173,6 +161,13 @@ class Organization(BaseAccount):
 
     def __repr__(self):
         return '<Organization [%s:%s]>' % (self._login, self._name)
+
+    def _list_members(self, tail):
+        """List members of this organization."""
+        url = self._api + tail
+        json = self._get(url)
+        ses = self._session
+        return [User(memb, ses) for memb in json]
 
     def add_member(self, login, team):
         """Add ``login`` to ``team`` and thereby to this organization.
@@ -237,50 +232,32 @@ class Organization(BaseAccount):
         :param location: (optional)
         :param name: (optional)
         """
-        resp = self._patch(self._api,
+        json = self._patch(self._api,
                 dumps({'billing_email': billing_email,
                     'company': company, 'email': email,
                     'location': location,  'name': name}))
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        if json:
+            self._update_(json)
             return True
         return False
 
     def is_member(self, login):
         """Check if the user with login ``login`` is a member."""
         url = '{0}/members/{1}'.format(self._api, login)
-        resp = self._get(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._get(url, status_code=204)
 
     def is_public_member(self, login):
         """Check if the user with login ``login`` is a public member."""
         url = '{0}/public_members/{1}'.format(self._api, login)
-        resp = self._get(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._get(url, status_code=204)
 
     def list_members(self):
         """List members of this organization."""
-        url = self._api + '/members'
-        members = []
-        resp = self._get(url)
-        if resp.status_code == 200:
-            ses = self._session
-            members = [User(m, ses) for m in resp.json]
-        return members
+        return self._list_members('/members')
 
     def list_public_members(self):
         """List public members of this organization."""
-        url = self._api + '/public_members'
-        members = []
-        resp = self._get(url)
-        if resp.status_code == 200:
-            ses = self._session
-            members = [User(m, ses) for m in resp.json]
-        return members
+        return self._list_members('/public_members')
 
     def list_repos(self, type=''):
         """List repos for this organization.
@@ -291,22 +268,16 @@ class Organization(BaseAccount):
         url = self._api + '/repos'
         if type in ('all', 'public', 'member', 'private'):
             url = '?'.join([url, 'type=' + type])
-        repos = []
-        resp = self._get(url)
-        if resp.status_code == 200:
-            ses = self._session
-            repos = [Repository(r, ses) for r in resp.json]
-        return repos
+        json = self._get(url)
+        ses = self._session
+        return [Repository(r, ses) for r in json]
 
     def list_teams(self):
         """List teams that are part of this organization."""
         url = self._api + '/teams'
-        teams = []
-        resp = self._get(url)
-        if resp.status_code == 200:
-            for team in resp.json:
-                teams.append(Team(team, self._session))
-        return teams
+        json = self._get(url)
+        ses = self._session
+        return [Team(team, ses) for team in json]
 
     @property
     def private_repos(self):
@@ -341,10 +312,8 @@ class Organization(BaseAccount):
 
         :param team_id: (required), int
         """
-        team = None
+        json = None
         if int(team_id) > 0:
             url = '{0}/teams/{1}'.format(self._github_url, str(team_id))
-            resp = self._get(url)
-            if resp.status_code == 200:
-                team = Team(resp.json, self._session)
-        return team
+            json = self._get(url)
+        return Team(json, self._session) if json else None

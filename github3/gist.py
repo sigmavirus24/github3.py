@@ -115,9 +115,9 @@ class Gist(GitHubCore):
 
         :param kwargs: Should be either (or both) description or files.
         """
-        resp = self._patch(self._api, dumps(kwargs))
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(self._api, dumps(kwargs))
+        if json:
+            self._update_(json)
             return True
         return False
 
@@ -136,9 +136,9 @@ class Gist(GitHubCore):
 
     def get(self):
         """GET /gists/:id"""
-        resp = self._get(self._api)
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._get(self._api)
+        if json:
+            self._update_(json)
             return True
         return False
 
@@ -159,19 +159,13 @@ class Gist(GitHubCore):
 
     def is_starred(self):
         url = self._api + '/star'
-        resp = self._get(url)
-        if resp.status_code == 204:
-            return True
-        return False
+        return self._get(url, status_code=204)
 
     def list_comments(self):
         url = self._api + '/comments'
-        resp = self._get(url)
-        comments = []
-        if resp.status_code == 200:
-            for comment in resp.json:
-                comments.append(GistComment(comment, self._session))
-        return comments
+        json = self._get(url)
+        ses = self._session
+        return [GistComment(comment, ses) for comment in json]
 
     def star(self):
         """Star this gist."""

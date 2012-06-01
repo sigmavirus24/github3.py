@@ -93,12 +93,8 @@ class Repository(GitHubCore):
 
     def blob(self, sha):
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Blob(resp.json)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._get(url)
+        return Blob(json) if json else None
 
     @property
     def clone_url(self):
@@ -296,9 +292,9 @@ class Repository(GitHubCore):
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads})
-        resp = self._patch(self._api, data)
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(self._api, data)
+        if json:
+            self._update_(json)
             return True
         return False
 
@@ -322,12 +318,11 @@ class Repository(GitHubCore):
 
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository."""
+        resp = False
         if login:
             url = self._api + '/collaborators/' + login
-            resp = self._get(url)
-            if resp.status_code == 204:
-                return True
-        return False
+            resp = self._get(url, status_code=204)
+        return resp
 
     def is_fork(self):
         return self._is_fork
@@ -358,22 +353,18 @@ class Repository(GitHubCore):
         return self._id
 
     def issue(self, number):
+        json = None
         if number > 0:
             url = '{0}/issues/{1}'.format(self._api, str(number))
-            resp = self._get(url)
-            if resp.status_code == 200:
-                return Issue(resp.json, self._session)
-
-        return None
+            json = self._get(url)
+        return Issue(json, self._session) if json else None
 
     def label(self, name):
+        json = None
         if name:
             url = '{0}/labels/{1}'.format(self._api, name)
-            resp = self._get(url)
-            if resp.status_code == 200:
-                return Label(resp.json, self._session)
-
-        return None
+            json = self._get(url)
+        return Label(json, self._session) if json else None
 
     @property
     def language(self):
@@ -382,11 +373,8 @@ class Repository(GitHubCore):
     def list_branches(self):
         """List the branches in this repository."""
         url = self._api + '/branches'
-        resp = self._get(url)
-        branches = []
-        if resp.status_code == 200:
-            branches = [Branch(b) for b in resp.json]
-        return branches
+        json = self._get(url)
+        return [Branch(b) for b in json]
 
     def list_contributors(self, anon=False):
         """List the contributors to this repository.
@@ -397,12 +385,9 @@ class Repository(GitHubCore):
         url = self._api + '/contributors'
         if anon:
             url = '?'.join([url, 'anon=true'])
-        resp = self._get(url)
-        contrib = []
-        if resp.status_code == 200:
-            ses = self._session
-            contrib = [User(c, ses) for c in resp.json]
-        return contrib
+        json = self._get(url)
+        ses = self._session
+        return [User(c, ses) for c in json]
 
     def list_issues(self,
         milestone=None,
@@ -447,31 +432,21 @@ class Repository(GitHubCore):
         if params:
             url = '{0}?{1}'.format(url, params)
 
-        resp = self._get(url)
-        issues = []
-        if resp.status_code == 200:
-            ses = self._session
-            issues = [Issue(i, ses) for i in resp.json]
-        return issues
+        json = self._get(url)
+        ses = self._session
+        return [Issue(i, ses) for i in json]
 
     def list_labels(self):
         url = self._api + '/labels'
-        resp = self._get(url)
-
-        labels = []
-        if resp.status_code == 200:
-            ses = self._session
-            labels = [Label(label, ses) for label in resp.json]
-        return labels
+        json = self._get(url)
+        ses = self._session
+        return [Label(label, ses) for label in json]
 
     def list_languages(self):
         """List the programming languages used in the repository."""
         url = self._api + '/languages'
-        resp = self._get(url)
-        langs = []
-        if resp.status_code == 200:
-            langs = [(k, v) for k, v in resp.json.items()]
-        return langs
+        json = self._get(url)
+        return [(k, v) for k, v in json.items()]
 
     def list_milestones(self, state=None, sort=None, direction=None):
         url = self._api + '/milestones'
@@ -490,26 +465,18 @@ class Repository(GitHubCore):
             params = '&'.join(params)
             url = '{0}?{1}'.format(url, params)
 
-        resp = self._get(url)
-        milestones = []
-        if resp.status_code == 200:
-            for mile in resp.json:
-                milestones.append(Milestone(mile, self._session))
-
-        return milestones
+        json = self._get(url)
+        ses = self._session
+        return [Milestone(mile, ses) for mile in json]
 
     def list_pulls(self, state=None):
         if state in ('open', 'closed'):
             url = '{0}/pulls?state={1}'.format(self._api, state)
         else:
             url = self._api + '/pulls'
-
-        resp = self._get(url)
-        pulls = []
-        if resp.status_code == 200:
-            ses = self._session
-            pulls = [PullRequest(pull, ses) for pull in resp.json]
-        return pulls
+        json = self._get(url)
+        ses = self._session
+        return [PullRequest(pull, ses) for pull in json]
 
     def list_refs(self, subspace=''):
         """List references for this repository.
@@ -520,37 +487,26 @@ class Repository(GitHubCore):
             url = self._api + '/git/refs/' + subspace
         else:
             url = self._api + '/git/refs'
-        resp = self._get(url)
-        refs = []
-        if resp.status_code == 200:
-            ses = self._session
-            refs = [Reference(r, ses) for r in resp.json]
-        return refs
+        json = self._get(url)
+        ses = self._session
+        return [Reference(r, ses) for r in json]
 
     def list_tags(self):
         """List tags on this repository."""
         url = self._api + '/tags'
-        resp = self._get(url)
-        tags = []
-        if resp.status_code == 200:
-            tags = [Tag(tag) for tag in resp.json]
-        return tags
+        json = self._get(url)
+        return [RepositoryTag(tag) for tag in json]
 
     def list_teams(self):
         """List teams with access to this repository."""
         url = self._api + '/teams'
-        resp = self._get(url)
-        tms = []
-        if resp.status_code == 200:
-            tms = [type('Repository Team', (object, ), t) for t in resp.json]
-        return tms
+        json = self._get(url)
+        return [type('Repository Team', (object, ), t) for t in json]
 
     def milestone(self, number):
         url = '{0}/milestones/{1}'.format(self._api, str(number))
-        resp = self._session.get(url)
-        if resp.status_code == 200:
-            return Milestone(resp.json, self._session)
-        return None
+        json = self._get(url)
+        return Milestone(json, self._session) if json else None
 
     @property
     def mirror(self):
@@ -569,12 +525,11 @@ class Repository(GitHubCore):
         return self._owner
 
     def pull_request(self, number):
+        json = None
         if int(number) > 0:
             url = '{0}/pulls/{1}'.format(self._api, str(number))
-            resp = self._get(url)
-            if resp.status_code == 200:
-                return PullRequest(resp.json, self._session)
-        return None
+            json = self._get(url)
+        return PullRequest(json, self._session) if json else None
 
     @property
     def pushed_at(self):
@@ -589,12 +544,8 @@ class Repository(GitHubCore):
         including notes and stashes (provided they exist on the server).
         """
         url = self._api + '/git/refs/' + ref
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Reference(resp.json, self._session)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._get(url)
+        return Reference(json, self._session) if json else None
 
     def remove_collaborator(self, login):
         """Remove collaborator ``login`` from the repository."""
@@ -622,21 +573,13 @@ class Repository(GitHubCore):
         http://learn.github.com/p/tagging.html
         """
         url = self._api + '/git/tags/' + sha
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Tag(resp.json)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._get(url)
+        return Tag(json) if json else None
 
     def tree(self, sha):
         url = '{0}/git/trees/{1}'.format(self._api, sha)
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Tree(resp.json, self._session)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._get(url)
+        return Tree(json, self._session) if json else None
 
     @property
     def updated_at(self):

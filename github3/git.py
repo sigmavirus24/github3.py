@@ -131,9 +131,9 @@ class Reference(GitHubCore):
 
     def update(self, sha, force=False):
         data = dumps({'sha': sha, 'force': force})
-        resp = self._patch(self._api, data)
-        if resp.status_code == 200:
-            self._update_(resp.json)
+        json = self._patch(self._api, data)
+        if json:
+            self._update_(json)
             return True
         return False
 
@@ -194,12 +194,8 @@ class Tree(GitData):
 
     def recurse(self):
         url = self._api + '?recursive=1'
-        resp = self._get(url)
-        if resp.status_code == 200:
-            return Tree(resp.json, self._session)
-        if resp.status_code >= 400:
-            return Error(resp)
-        return None
+        json = self._get(url)
+        return Tree(json, self._session) if json else None
 
     @property
     def tree(self):

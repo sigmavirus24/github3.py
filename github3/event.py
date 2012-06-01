@@ -42,7 +42,6 @@ class Event(BaseEvent):
         self._public = event.get('public')
         self._repo = Repository(event.get('repo'), self._session)
         self._actor = User(event.get('actor'), self._session)
-        self._created = self._strptime(event.get('created_at'))
 
         # Commented out for now because there is no Organization class
         # if event.get('org'):
@@ -54,10 +53,6 @@ class Event(BaseEvent):
     @property
     def actor(self):
         return self._actor
-
-    @property
-    def created_at(self):
-        return self._created
 
     @classmethod
     def list_types(cls):
