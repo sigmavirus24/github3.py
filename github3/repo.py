@@ -9,8 +9,8 @@ This module contains the class relating to repositories.
 from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
-from .git import Blob, Reference, Tag
-from .models import GitHubCore, Error, BaseComment
+from .git import Blob, Commit, Reference, Tag
+from .models import GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
 from .user import User
 
@@ -376,6 +376,18 @@ class Repository(GitHubCore):
         json = self._get(url)
         return [Branch(b) for b in json]
 
+    def list_comments(self):
+        """List comments on all commits in the repository."""
+        url = self._api + '/comments'
+        json = self._get(url)
+        return [RepoComment(comment, self._session) for comment in json]
+
+    def list_commits(self):
+        """List commits in this repository."""
+        url = self._api + '/commits'
+        json = self._get(url)
+        return [RepoCommit(commit, self._session) for commit in json]
+
     def list_contributors(self, anon=False):
         """List the contributors to this repository.
 
@@ -495,7 +507,7 @@ class Repository(GitHubCore):
         """List tags on this repository."""
         url = self._api + '/tags'
         json = self._get(url)
-        return [RepositoryTag(tag) for tag in json]
+        return [RepoTag(tag) for tag in json]
 
     def list_teams(self):
         """List teams with access to this repository."""
@@ -622,9 +634,9 @@ class Branch(object):
         return self._name
 
 
-class RepositoryTag(object):
+class RepoTag(object):
     def __init__(self, tag):
-        super(RepositoryTag, self).__init__()
+        super(RepoTag, self).__init__()
         self._name = tag.get('name')
         self._zip = tag.get('zipball_url')
         self._tar = tag.get('tarball_url')
@@ -651,3 +663,102 @@ class RepositoryTag(object):
     @property
     def zipball_url(self):
         return self._zip
+
+
+class RepoComment(BaseComment):
+    def __init__(self, comment, session):
+        super(RepoComment, self).__init__(comment, session)
+        self._update_(comment)
+
+    def __repr__(self):
+        return '<Repository Comment [%s]>' % self._user.login
+
+    def _update_(self, comment):
+        super(RepoComment, self)._update_(comment)
+        self._cid = comment.get('commit_id')
+        self._html = comment.get('html_url')
+        self._line = comment.get('line')
+        self._path = comment.get('path')
+        self._pos = comment.get('position')
+        self._updated = comment.get('updated_at')
+        self._user = User(comment.get('user'), self._session)
+
+    @property
+    def commit_id(self):
+        return self._cid
+
+    @property
+    def html_url(self):
+        return self._html
+
+    @property
+    def line(self):
+        return self._line
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def position(self):
+        return self._pos
+
+    @property
+    def updated_at(self):
+        return self._updated
+
+    @property
+    def user(self):
+        return self._user
+
+
+class RepoCommit(BaseCommit):
+    def __init__(self, commit, session):
+        super(RepoCommit, self).__init__(commit, session)
+        self._author = User(commit.get('author'), self._session)
+        self._committer = User(commit.get('committer'), self._session)
+        self._commit = Commit(commit.get('commit'), self._session)
+
+        if commit.get('stats'):
+            self._addts = commit['stats'].get('additions')
+            self._delts = commit['stats'].get('deletions')
+            self._total = commit['stats'].get('total')
+        else:
+            self._addts = self._delts = self._total = 0
+
+        self._files = []
+        if commit.get('files'):
+            append = self._files.append
+            for f in commit.get('files'):
+                append(type('RepoCommit File', (object, ), f))
+
+    def __repr__(self):
+        return '<Repository Commit [%s]>' % self._sha
+
+    @property
+    def additions(self):
+        return self._addts
+
+    @property
+    def author(self):
+        return self._author
+
+    @property
+    def commit(self):
+        return self._commit
+
+    @property
+    def committer(self):
+        return self._committer
+
+    @property
+    def deletions(self):
+        return self._delts
+
+    @property
+    def files(self):
+        return self._files
+
+    @property
+    def total(self):
+        return self._total

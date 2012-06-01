@@ -157,6 +157,31 @@ class BaseComment(GitHubCore):
         return self._user
 
 
+class BaseCommit(GitHubCore):
+    def __init__(self, commit, session):
+        super(BaseCommit, self).__init__(session)
+        self._api = commit.get('url')
+        self._sha = commit.get('sha')
+        self._msg = commit.get('message')
+        self._parents = []
+        for parent in commit.get('parents', []):
+                api = parent.pop('url')
+                parent['_api'] = api
+                self._parents.append(type('Parent', (object, ), parent))
+
+    @property
+    def message(self):
+        return self._msg
+
+    @property
+    def parents(self):
+        return self._parents
+
+    @property
+    def sha(self):
+        return self._sha
+
+
 class BaseEvent(GitHubCore):
     def __init__(self, event, session):
         super(BaseEvent, self).__init__(session)

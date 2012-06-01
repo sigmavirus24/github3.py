@@ -8,7 +8,7 @@ This module contains all the classes relating to Git Data.
 
 from base64 import b64decode
 from json import dumps
-from .models import GitHubCore
+from .models import GitHubCore, BaseCommit
 from .user import User
 
 
@@ -51,7 +51,7 @@ class GitData(GitHubCore):
         return self._sha
 
 
-class Commit(GitData):
+class Commit(BaseCommit):
     def __init__(self, commit, session):
         super(Commit, self).__init__(commit, session)
 
@@ -60,8 +60,10 @@ class Commit(GitData):
             # Typically there should be 5 keys, but more than 3 should 
             # be a sufficient test
             self._author = User(commit.get('author'), None)
+            self._author_name = self._author.login
         elif commit.get('author'):  # Not a User object
             self._author = type('Author', (object, ), commit.get('author'))
+            self._author_name = self._author.name
 
         self._committer = ''
         if commit.get('committer'):
@@ -70,19 +72,13 @@ class Commit(GitData):
             else:
                 self._committer = type('Committer', (object, ),
                         commit.get('committer'))
-        self._msg = commit.get('message')
-        self._parents = []
-        for parent in commit.get('parents'):
-            api = parent.pop('url')
-            parent['_api'] = api
-            self._parents.append(type('Parent', (object, ), parent))
 
         self._tree = None
         if commit.get('tree'):
             self._tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
-        return '<Commit [%s:%s]>' % (self._author.login, self._sha)
+        return '<Commit [%s:%s]>' % (self._author_name, self._sha)
 
     @property
     def author(self):
@@ -91,14 +87,6 @@ class Commit(GitData):
     @property
     def committer(self):
         return self._committer
-
-    @property
-    def message(self):
-        return self._msg
-
-    @property
-    def parents(self):
-        return self._parents
 
     @property
     def tree(self):
