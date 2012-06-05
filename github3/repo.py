@@ -100,6 +100,12 @@ class Repository(GitHubCore):
     def clone_url(self):
         return self._https_clone
 
+    def commit_comment(self, comment_id):
+        """Get a single commit comment."""
+        url = '{0}/comments/{1}'.format(self._api, comment_id)
+        json = self._get(url)
+        return RepoComment(json, self._session) if json else None
+
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
@@ -114,6 +120,26 @@ class Repository(GitHubCore):
             if json:
                 sha = json.get('sha')
         return sha
+
+    def create_comment(self, body, sha, line, path, position):
+        """Create a comment on a commit.
+
+        :param body: (required), string, body of the message
+        :param sha: (required), string, commit id
+        :param line: (required), int, line number of the file to comment on
+        :param path: (required), string, relative path of the file to comment
+            on
+        :param position: (required), int, line index in the diff to comment on
+        """
+        line = int(line)
+        position = int(position)
+        json = None
+        if body and sha and line > 0 and path and position > 0:
+            data = dumps({'body': body, 'commit_id': sha, 'line': line,
+                'path': path, 'position': position})
+            url = self._api + '/commits/' + sha + '/comments'
+            json = self._post(url, data)
+        return RepoComment(json, self._session) if json else None
 
     def create_commit(self, message, tree, parents, author={}, committer={}):
         """Create a commit on this repository.
@@ -381,6 +407,14 @@ class Repository(GitHubCore):
         url = self._api + '/comments'
         json = self._get(url)
         return [RepoComment(comment, self._session) for comment in json]
+
+    def list_comments_on_commit(self, sha):
+        """List comments for a single commit."""
+        json = []
+        if sha:
+            url = self._api + '/commits/' + sha + '/comments'
+            json = self._get(url)
+        return [RepoComment(comm, self._session) for comm in json]
 
     def list_commits(self):
         """List commits in this repository."""
