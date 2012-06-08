@@ -100,11 +100,22 @@ class Repository(GitHubCore):
     def clone_url(self):
         return self._https_clone
 
+    def commit(self, sha):
+        """Get a single commit."""
+        json = self._get(self._api + '/commits/' + sha)
+        return RepoCommit(json, self._session) if json else None
+
     def commit_comment(self, comment_id):
         """Get a single commit comment."""
         url = '{0}/comments/{1}'.format(self._api, comment_id)
         json = self._get(url)
         return RepoComment(json, self._session) if json else None
+
+    def compare_commits(self, base, head):
+        """Compare two commits."""
+        url = self._api + '/compare/{0}...{1}'.format(base, head)
+        json = self._get(url)
+        return Comparison(json) if json else None
 
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
@@ -668,6 +679,11 @@ class Branch(object):
         return self._name
 
 
+class Contents(object):
+    def __init__(self, content):
+        super(Contents, self).__init__()
+
+
 class RepoTag(object):
     def __init__(self, tag):
         super(RepoTag, self).__init__()
@@ -737,6 +753,26 @@ class RepoComment(BaseComment):
     def position(self):
         return self._pos
 
+    def update(self, body, sha, line, path, position):
+        """Update this comment.
+
+        :param body: (required), string
+        :param sha: (required), string, sha id of the commit to comment on
+        :param line: (required), int, line number to comment on
+        :param path: (required), string, relative path of the file you're
+            commenting on
+        :param position: (required), int, line index in the diff to comment on
+        """
+        json = None
+        if body and sha and path and line > 0 and position > 0:
+            data = dumps({'body': body, 'commit_id': sha, 'line': line,
+                'path': path, 'position': position})
+            json = self._post(self._api, data)
+        if json:
+            self._update_(json)
+            return True
+        return False
+
     @property
     def updated_at(self):
         return self._updated
@@ -796,3 +832,72 @@ class RepoCommit(BaseCommit):
     @property
     def total(self):
         return self._total
+
+
+class Comparison(object):
+    def __init__(self, compare):
+        super(Comparison, self).__init__()
+        self._api = compare.get('api')
+        self._html = compare.get('html_url')
+        self._perma = compare.get('permalink_url')
+        self._diff = compare.get('diff_url')
+        self._patch = compare.get('patch_url')
+        self._base = RepoCommit(compare.get('base_commit'), None)
+        self._stat = compare.get('status')
+        self._ahead_by = compare.get('ahead_by')
+        self._behind = compare.get('behind_by')
+        self._ttl_commits = compare.get('total_commits')
+        self._commits = [RepoCommit(com, None) for com in
+                compare.get('commits')]
+        self._files = []
+        if compare.get('files'):
+            append = self._files.append
+            for f in compare.get('files'):
+                append(type('Comparison File', (object, ), f))
+
+    def __repr__(self):
+        return '<Comparison of %d commits>' % self.total_commits
+
+    @property
+    def ahead_by(self):
+        return self._ahead_by
+
+    @property
+    def base_commit(self):
+        return self._base
+
+    @property
+    def behind_by(self):
+        return self._behind
+
+    @property
+    def commits(self):
+        return self._commits
+
+    @property
+    def diff_url(self):
+        return self._diff
+
+    @property
+    def files(self):
+        return self._files
+
+    @property
+    def html_url(self):
+        return self._html
+
+    @property
+    def patch_url(self):
+        return self._patch
+
+    @property
+    def permalink_url(self):
+        return self._perma
+
+    @property
+    def status(self):
+        return self._stat
+
+    @property
+    def total_commits(self):
+        return self._ttl_commits
