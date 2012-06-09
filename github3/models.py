@@ -28,6 +28,17 @@ class GitHubCore(object):
             raise Error(request)
         return None
 
+    def _getr(self, url, status_code=200, **kwargs):
+        """In the rare instance we care about the entire response."""
+        req = None
+        if self._remaining > 0:
+            req = self._session.get(url, **kwargs)
+            if req.headers.get('x-ratelimit-remaining'):
+                self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.status_code != status_code or req.status_code >= 400:
+                raise Error(request)
+        return req
+
     def _boolean(self, request, status_code):
         if request.status_code == status_code:
             return True

@@ -6,6 +6,7 @@ This module contains the class relating to repositories.
 
 """
 
+from base64 import b64decode
 from datetime import datetime
 from json import dumps
 from .issue import Issue, Label, Milestone, issue_params
@@ -91,6 +92,30 @@ class Repository(GitHubCore):
             resp = self._put(url)
         return resp
 
+    def archive(self, format, path='', ref='master'):
+        """Get the tarball or zipball archive for this repo at ref.
+
+        :param format: (required), string, accepted values: ('tarball',
+            'zipball')
+        :param path: (optional), string, path where the file should be saved
+            to, default is the filename provided in the headers and will be 
+            written in the current directory
+        :param ref: (optional), string
+        """
+        resp = None
+        if format in ('tarball', 'zipball'):
+            url = '/'.join([self._api, format, ref])
+            resp = self._getr(url, allow_redirects=True)
+
+        if resp and path:
+            with open(path, 'wb') as fd:
+                fd.write(resp.content)
+        elif resp:
+            header = resp.headers['content-disposition']
+            i = h.find('filename=') + len('filename=')
+            with open(header[i:], 'wb') as fd:
+                fd.write(resp.content)
+
     def blob(self, sha):
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
         json = self._get(url)
@@ -116,6 +141,16 @@ class Repository(GitHubCore):
         url = self._api + '/compare/{0}...{1}'.format(base, head)
         json = self._get(url)
         return Comparison(json) if json else None
+
+    def contents(self, path):
+        """Get the contents of the file pointed to by ``path``.
+        
+        :param path: (required), string, path to file, e.g.
+            github3/repo.py
+        """
+        url = self._api + '/contents/' + path
+        json = self._get(url)
+        return Contents(json) if json else None
 
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
@@ -592,6 +627,12 @@ class Repository(GitHubCore):
     def pushed_at(self):
         return self._pushed
 
+    def readme(self):
+        """Get the README for this repository."""
+        url = self._api + '/readme'
+        json = self._get(url)
+        return Contents(json) if json else None
+
     def ref(self, ref):
         """Get a reference pointed to by ``ref``.
 
@@ -682,6 +723,73 @@ class Branch(object):
 class Contents(object):
     def __init__(self, content):
         super(Contents, self).__init__()
+        # links
+        self._api = content['_links'].get('self')
+        self._html = content['_links'].get('html')
+        self._git = content['_links'].get('git')
+
+        # should always be 'base64'
+        self._enc = content.get('encoding')
+
+        # content, base64 encoded and decoded
+        self._content = content.get('content')
+        if self._enc == 'base64':
+            self._dec = b64decode(self._content)
+        else:
+            self._dec = self._b64
+
+        # file name, path, and size
+        self._name = content.get('name')
+        self._path = content.get('path')
+        self._sz = content.get('size')
+
+        self._sha = content.get('sha')
+
+        # should always be 'file'
+        self._type = content.get('type')
+
+    def __repr__(self):
+        return '<Content [%s]>' % self.path
+
+    @property
+    def content(self):
+        return self._content
+
+    @property
+    def decoded(self):
+        return self._dec
+
+    @property
+    def encoding(self):
+        return self._enc
+
+    @property
+    def git(self):
+        return self._git
+
+    @property
+    def html(self):
+        return self._html
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def path(self):
+        return self._path
+
+    @property
+    def sha(self):
+        return self._sha
+
+    @property
+    def size(self):
+        return self._sz
+
+    @property
+    def type(self):
+        return self._type
 
 
 class RepoTag(object):

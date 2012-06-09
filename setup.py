@@ -22,7 +22,7 @@ setup(
     description="Python wrapper for the GitHub API (http://developer.github.com/v3)",
     long_description="\n\n".join([open("README.rst").read(), 
         open("HISTORY.rst").read()]),
-    author="graffatcolmingov",
+    author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
     url="https://github.com/sigmavirus24/github3.py",
     packages=packages,

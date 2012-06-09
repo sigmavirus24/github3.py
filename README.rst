@@ -3,6 +3,9 @@ github3.py
 
 Eventually this will be a python module to access the GitHub v3 API.
 
+This is not stable yet and there is no backwards compatibility yet. There will 
+likely be some changes which change behavior in the near future.
+
 Easy Cloning
 ------------
 
@@ -95,9 +98,9 @@ Progress
 
   - `Repo Commits`_: **done**
 
-  - Contents_: **in progress**
+  - Contents_: **done**
 
-  - Downloads_
+  - Downloads_: **in progress**
 
   - Forks_
 
@@ -238,4 +241,4 @@ Examples
 Author
 ------
 
-Sigmavirus24
+Ian Cordasco (sigmavirus24)
