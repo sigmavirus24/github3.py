@@ -244,8 +244,6 @@ class Repository(GitHubCore):
             json = self._post(url, data)
 
         if json:
-            headers = {'Content-Type':
-                'multipart/form-data; boundary=github'}
             key = 'downloads/{0}/{1}/{2}'.format(self.owner.login, self.name,
                     name)
             success = 201
@@ -286,10 +284,17 @@ Content-Disposition: form-data; name="file", filename="{File}"
 Content-Type: application/octet-stream
 
 {file}
+--github
+Content-Disposition: form-data; name="submit"
+
+Upload to Amazon S3
 --github--""".format(key=key, acl=json.get('acl'), sas=success,
                     File=name, aws=json.get('accesskeyid'),
                     pol=json.get('policy'), sig=json.get('signature'),
                     con=json.get('mime_type'), file=open(path, 'rb').read())
+            headers = {'Content-Type':
+                'multipart/form-data; boundary=github',
+                'Content-Length': len(data)}
             resp = requests.post(json.get('s3_url'), data, headers=headers)
             print(resp)
 
@@ -725,6 +730,12 @@ Content-Type: application/octet-stream
         url = self._api + '/teams'
         json = self._get(url)
         return [type('Repository Team', (object, ), t) for t in json]
+
+    def list_watchers(self):
+        """List watchers of this repository."""
+        url = self._api + '/watchers'
+        json = self._get(url)
+        return [User(u, self._session) for u in json]
 
     def milestone(self, number):
         url = '{0}/milestones/{1}'.format(self._api, str(number))

@@ -311,6 +311,19 @@ class GitHub(GitHubCore):
         ses = self._session
         return [Repository(repo, ses) for repo in json]
 
+    def list_watching(self, login=None):
+        """List the repositories being watched by ``login`` if provided or the
+        repositories being watched by the authenticated user.
+
+        :param login: (optional), string
+        """
+        if login:
+            url = self._github_url + '/users/' + login + '/watched'
+        else:
+            url = self._github_url + '/user/watched'
+        json = self._get(url)
+        return [Repository(repo, self._session) for repo in json]
+
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls."""
         if username and password:
