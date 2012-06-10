@@ -100,13 +100,13 @@ Progress
 
   - Contents_: **done**
 
-  - Downloads_: **in progress**
+  - Downloads_: **stalled** [#]_
 
-  - Forks_
+  - Forks_: **done**
 
-  - `Repo Keys`_
+  - `Repo Keys`_: **done**
 
-  - Watching_
+  - Watching_: **in progress**
 
   - Hooks_
 
@@ -140,6 +140,9 @@ Progress
 
 .. _Events: http://developer.github.com/v3/events/
 .. _Types: http://developer.github.com/v3/events/types/
+
+.. [#] Creating a download via Amazon S3 seems to always return an invalid
+       multipart/form-data POST request.
 
 License
 -------

@@ -14,7 +14,7 @@ from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag
 from .models import GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
-from .user import User
+from .user import User, Key
 
 
 class Repository(GitHubCore):
@@ -245,61 +245,67 @@ class Repository(GitHubCore):
 
         if json:
             headers = {'Content-Type':
-                'multipart/form-data; boundary="github"'}
+                'multipart/form-data; boundary=github'}
             key = 'downloads/{0}/{1}/{2}'.format(self.owner.login, self.name,
                     name)
             success = 201
             data = """--github
-            Content-Disposition: form-data; name="key"
+Content-Disposition: form-data; name="key"
 
-            {key}
+{key}
+--github
+Content-Disposition: form-data; name="acl"
 
-            --github
-            Content-Disposition: form-data; name="acl"
+{acl}
+--github
+Content-Disposition: form-data; name="success_action_status"
 
-            {acl}
+{sas}
+--github
+Content-Disposition: form-data; name="Filename"
 
-            --github
-            Content-Disposition: form-data; name="success_action_status"
+{File}
+--github
+Content-Disposition: form-data; name="AWSAccessKeyID"
 
-            {sas}
+{aws}
+--github
+Content-Disposition: form-data; name="Policy'
 
-            --github
-            Content-Disposition: form-data; name="Filename"
+{pol}
+--github
+Content-Disposition: form-data; name="Signature"
 
-            {File}
+{sig}
+--github
+Content-Disposition: form-data; name="Content-Type"
 
-            --github
-            Content-Disposition: form-data; name="AWSAccessKeyID"
+{con}
+--github
+Content-Disposition: form-data; name="file", filename="{File}"
+Content-Type: application/octet-stream
 
-            {aws}
-
-            --github
-            Content-Disposition: form-data; name="Policy'
-
-            {pol}
-
-            --github
-            Content-Disposition: form-data; name="Signature"
-
-            {sig}
-
-            --github
-            Content-Disposition: form-data; name="Content-Type"
-
-            {con}
-
-            --github
-            Content-Disposition: form-data; name="file", filename="{File}"
-
-            {file}
-
-            --github--""".format(key=key, acl=json.get('acl'), sas=success,
+{file}
+--github--""".format(key=key, acl=json.get('acl'), sas=success,
                     File=name, aws=json.get('accesskeyid'),
                     pol=json.get('policy'), sig=json.get('signature'),
                     con=json.get('mime_type'), file=open(path, 'rb').read())
             resp = requests.post(json.get('s3_url'), data, headers=headers)
             print(resp)
+
+    def create_fork(self, organization=None):
+        """Create a fork of this repository.
+
+        :param organization: login for organization to create the fork
+            under"""
+        url = self._api + '/forks'
+        if organization:
+            json = self._post(url, dumps({'org': organization}),
+                    status_code=202)
+        else:
+            json = self._post(url, status_code=202)
+
+        return Repository(json, self._session) if json else None
 
     def create_issue(self,
         title,
@@ -315,6 +321,17 @@ class Repository(GitHubCore):
 
         json = self._post(url, issue)
         return Issue(json, self._session) if json else None
+
+    def create_key(self, title, key):
+        """Create a deploy key.
+
+        :param title: (required), string, title of key
+        :param key: (required), string, key text
+        """
+        data = dumps({'title': title, 'key': key})
+        url = self._api + '/keys'
+        json = self._post(url, data)
+        return Key(json, self._session) if json else None
 
     def create_label(self, name, color):
         if color[0] == '#':
@@ -466,20 +483,6 @@ class Repository(GitHubCore):
             return True
         return False
 
-    def fork(self, organization=None):
-        """Create a fork of this repository.
-
-        :param organization: login for organization to create the fork
-            under"""
-        url = self._api + '/forks'
-        if organization:
-            json = self._post(url, dumps({'org': organization}),
-                    status_code=202)
-        else:
-            json = self._post(url, status_code=202)
-
-        return Repository(json, self._session) if json else None
-
     @property
     def forks(self):
         return self._forks
@@ -526,6 +529,14 @@ class Repository(GitHubCore):
             url = '{0}/issues/{1}'.format(self._api, str(number))
             json = self._get(url)
         return Issue(json, self._session) if json else None
+
+    def key(self, id_num):
+        """Get the specified deploy key."""
+        json = None
+        if int(id_num) > 0:
+            url = self._api + '/keys/' + str(id_num)
+            json = self._get(url)
+        return Key(json, self._session) if json else None
 
     def label(self, name):
         json = None
@@ -583,6 +594,18 @@ class Repository(GitHubCore):
         json = self._get(url)
         return [Download(dl, self._session) for dl in json]
 
+    def list_forks(self, sort=''):
+        """List forks of this repository.
+
+        :param sort: (optional), string, accepted values:
+            ('newest', 'oldest', 'watchers'), API default: 'newest'
+        """
+        url = self._api + '/forks'
+        if sort in ('newest', 'oldest', 'watchers'):
+            url = ''.join([url, '?sort=', sort])
+        json = self._get(url)
+        return [Repository(r, self._session) for r in json]
+
     def list_issues(self,
         milestone=None,
         state=None,
@@ -629,6 +652,12 @@ class Repository(GitHubCore):
         json = self._get(url)
         ses = self._session
         return [Issue(i, ses) for i in json]
+
+    def list_keys(self):
+        """List deploy keys on this repository."""
+        url = self._api + '/keys'
+        json = self._get(url)
+        return [Key(k, self._session) for k in json]
 
     def list_labels(self):
         url = self._api + '/labels'
