@@ -9,6 +9,7 @@ This module contains the class relating to repositories.
 from base64 import b64decode
 from datetime import datetime
 from json import dumps
+import requests
 from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag
 from .models import GitHubCore, BaseComment, BaseCommit
@@ -103,6 +104,7 @@ class Repository(GitHubCore):
         :param ref: (optional), string
         """
         resp = None
+        written = False
         if format in ('tarball', 'zipball'):
             url = '/'.join([self._api, format, ref])
             resp = self._getr(url, allow_redirects=True)
@@ -110,11 +112,14 @@ class Repository(GitHubCore):
         if resp and path:
             with open(path, 'wb') as fd:
                 fd.write(resp.content)
+                written = True
         elif resp:
             header = resp.headers['content-disposition']
             i = h.find('filename=') + len('filename=')
             with open(header[i:], 'wb') as fd:
                 fd.write(resp.content)
+                written = True
+        return written
 
     def blob(self, sha):
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
@@ -215,6 +220,86 @@ class Repository(GitHubCore):
             if json:
                 commit = Commit(json, self._session)
         return commit
+
+    def create_download(self, name, path, description='', content_type=''):
+        """ THIS DOES NOT WORK.
+
+        Create a new download on this repository.
+
+        I do not require you provide the size in bytes because it can be 
+        determined by the operating system.
+
+        :param name: (required), string, name of the file as it will appear
+        :param path: (required), string, path to the file
+        :param description: (optional), string, description of the file
+        :param content_type: (optional), string, e.g. 'text/plain'
+        """
+        json = None
+        if name and path:
+            url = self._api + '/downloads'
+            from os import stat
+            info = stat(path)
+            data = dumps({'name': name, 'size': info.st_size,
+                'description': description, 'content_type': content_type})
+            json = self._post(url, data)
+
+        if json:
+            headers = {'Content-Type':
+                'multipart/form-data; boundary="github"'}
+            key = 'downloads/{0}/{1}/{2}'.format(self.owner.login, self.name,
+                    name)
+            success = 201
+            data = """--github
+            Content-Disposition: form-data; name="key"
+
+            {key}
+
+            --github
+            Content-Disposition: form-data; name="acl"
+
+            {acl}
+
+            --github
+            Content-Disposition: form-data; name="success_action_status"
+
+            {sas}
+
+            --github
+            Content-Disposition: form-data; name="Filename"
+
+            {File}
+
+            --github
+            Content-Disposition: form-data; name="AWSAccessKeyID"
+
+            {aws}
+
+            --github
+            Content-Disposition: form-data; name="Policy'
+
+            {pol}
+
+            --github
+            Content-Disposition: form-data; name="Signature"
+
+            {sig}
+
+            --github
+            Content-Disposition: form-data; name="Content-Type"
+
+            {con}
+
+            --github
+            Content-Disposition: form-data; name="file", filename="{File}"
+
+            {file}
+
+            --github--""".format(key=key, acl=json.get('acl'), sas=success,
+                    File=name, aws=json.get('accesskeyid'),
+                    pol=json.get('policy'), sig=json.get('signature'),
+                    con=json.get('mime_type'), file=open(path, 'rb').read())
+            resp = requests.post(json.get('s3_url'), data, headers=headers)
+            print(resp)
 
     def create_issue(self,
         title,
@@ -337,6 +422,17 @@ class Repository(GitHubCore):
     @property
     def description(self):
         return self._desc
+
+    def download(self, id_num):
+        """Get a single download object by its id.
+
+        :param id_num: (required), string or int, id of the download
+        """
+        json = None
+        if int(id_num) > 0:
+            url = self._api + '/downloads/' + str(id_num)
+            json = self._get(url)
+        return Download(json, self._session) if json else None
 
     def edit(self,
         name,
@@ -480,6 +576,12 @@ class Repository(GitHubCore):
         json = self._get(url)
         ses = self._session
         return [User(c, ses) for c in json]
+
+    def list_downloads(self):
+        """List available downloads for this repository."""
+        url = self._api + '/downloads'
+        json = self._get(url)
+        return [Download(dl, self._session) for dl in json]
 
     def list_issues(self,
         milestone=None,
@@ -790,6 +892,66 @@ class Contents(object):
     @property
     def type(self):
         return self._type
+
+
+class Download(GitHubCore):
+    def __init__(self, download, session):
+        super(Download, self).__init__(session)
+        self._api = download.get('url')
+        self._html = download.get('html_url')
+        self._id = download.get('id')
+        self._name = download.get('name')
+        self._desc = download.get('description')
+        self._sz = download.get('size')
+        self._dlct = download.get('download_count')
+        self._type = download.get('content_type')
+
+    def __repr__(self):
+        return '<Download [%s]>' % self.name
+
+    @property
+    def content_type(self):
+        return self._type
+
+    @property
+    def description(self):
+        return self._desc
+
+    @property
+    def download_count(self):
+        return self._dlct
+
+    @property
+    def html_url(self):
+        return self._html
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def name(self):
+        return self._name
+
+    def saveas(self, path=''):
+        """Save this download to the path specified.
+        
+        :param path: (optional), string, if no path is specified, it will be
+            saved in the current directory with the name specified by GitHub.
+        """
+        if not path:
+            path = self.name
+
+        resp = self._getr(self.html_url, allow_redirects=True)
+        if resp:
+            with open(path, 'wb') as fd:
+                fd.write(resp.content)
+                return True
+        return False
+
+    @property
+    def size(self):
+        return self._sz
 
 
 class RepoTag(object):

@@ -50,7 +50,8 @@ class GitHubCore(object):
         req = False
         if self._remaining > 0:
             req = self._session.delete(url, **kwargs)
-            self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.headers.get('x-ratelimit-remaining'):
+                self._remaining = int(req.headers['x-ratelimit-remaining'])
             req = self._boolean(req, status_code)
         return req
 
@@ -58,7 +59,8 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
-            self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.headers.get('x-ratelimit-remaining'):
+                self._remaining = int(req.headers['x-ratelimit-remaining'])
             if status_code == 204:
                 # We're not expecting any json back
                 # If we left it as a simple _json() call there would be a
@@ -72,7 +74,8 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.patch(url, data, **kwargs)
-            self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.headers.get('x-ratelimit-remaining'):
+                self._remaining = int(req.headers['x-ratelimit-remaining'])
             req = self._json(req, status_code)
         return req
 
@@ -80,7 +83,8 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.post(url, data, **kwargs)
-            self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.headers.get('x-ratelimit-remaining'):
+                self._remaining = int(req.headers['x-ratelimit-remaining'])
             req = self._json(req, status_code)
         return req
 
@@ -89,7 +93,8 @@ class GitHubCore(object):
         if self._remaining > 0:
             kwargs.update(headers={'Content-Length': '0'})
             req = self._session.put(url, data, **kwargs)
-            self._remaining = int(req.headers['x-ratelimit-remaining'])
+            if req.headers.get('x-ratelimit-remaining'):
+                self._remaining = int(req.headers['x-ratelimit-remaining'])
             req = self._boolean(req, status_code)
         return req
 
@@ -337,7 +342,7 @@ class Error(BaseException):
         self._errors = []
         if self._code == 422 or error.get('errors'):
             errs = error.get('errors')
-            self._errors = [type(e.get('code'), (Error, ), e) for e in errs]
+            self._errors = errs
 
     def __repr__(self):
         return '<Error [%s]>' % (self._message or self._code)
