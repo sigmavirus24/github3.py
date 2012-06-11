@@ -101,7 +101,7 @@ class Team(GitHubCore):
         :param repo: (required), string, form: 'user/repo'
         """
         url = '{0}/repos/{1}'.format(self._api, repo)
-        return self._get(url, status_code=204)
+        return self._session.get(url).status_code == 204
 
     @property
     def id(self):
@@ -110,7 +110,7 @@ class Team(GitHubCore):
     def is_member(self, login):
         """Check if ``login`` is a member of this team."""
         url = '{0}/members/{1}'.format(self._api, login)
-        return self._get(url, status_code=204)
+        return self._session.get(url).status_code == 204
 
     def list_members(self):
         """List the members of this team."""
@@ -244,12 +244,12 @@ class Organization(BaseAccount):
     def is_member(self, login):
         """Check if the user with login ``login`` is a member."""
         url = '{0}/members/{1}'.format(self._api, login)
-        return self._get(url, status_code=204)
+        return self._session.get(url).status_code == 204
 
     def is_public_member(self, login):
         """Check if the user with login ``login`` is a public member."""
         url = '{0}/public_members/{1}'.format(self._api, login)
-        return self._get(url, status_code=204)
+        return self._session.get(url).status_code == 204
 
     def list_members(self):
         """List members of this organization."""

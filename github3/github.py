@@ -148,7 +148,7 @@ class GitHub(GitHubCore):
             url = '{0}/user/following/{1}'.format(self._github_url,
                     login)
             resp = self._put(url)
-        return False
+        return resp
 
     def get_key(self, id_num):
         """Gets the authenticated user's key specified by id_num."""
@@ -170,7 +170,19 @@ class GitHub(GitHubCore):
         json = None
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url, login)
-            json = self._get(url, status_code=204)
+            json = self._session.get(url).status_code == 204
+        return True if json else False
+
+    def is_watching(self, login, repo):
+        """Check if the authenticated user is following login/repo.
+        
+        :param login: (required), string, owner of repository
+        :param repo: (required), string, name of repository
+        """
+        json = None
+        if login and repo:
+            url = '/'.join([self._github_url, 'user/watched', login, repo])
+            json = self._session.get(url).status_code == 204
         return True if json else False
 
     def issue(self, owner, repository, number):
@@ -385,3 +397,27 @@ class GitHub(GitHubCore):
 
         json = self._get(url)
         return User(json, self._session) if json else None
+
+    def watch(self, login, repo):
+        """Make user start watching login/repo.
+        
+        :param login: (required), string, owner of repository
+        :param repo: (required), string, name of repository
+        """
+        resp = False
+        if login and repo:
+            url = self._github_url + '/user/watched/' + login + '/' + repo
+            resp = self._put(url)
+        return resp
+
+    def unwatch(self, login, repo):
+        """Make user stop watching login/repo.
+
+        :param login: (required), string, owner of repository
+        :param repo: (required), string, name of repository
+        """
+        resp = False
+        if login and repo:
+            url = self._github_url + '/user/watched/' + login + '/' + repo
+            resp = self._delete(url)
+        return resp

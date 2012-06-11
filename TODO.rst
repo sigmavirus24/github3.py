@@ -4,32 +4,17 @@ TODO
 github3.api
 -----------
 
-- Add issues related anonymous functions
-- Add repository related anonymous functions
+- Add anonymous functionality for certain areas of the API
 
-github3.events
---------------
+unittests
+---------
 
-Events
-``````
+- We need to test everything right now. **EVERYTHING**
 
-- Handle all response types
-- Add relevant commands to ``GitHub``, ``Repository``, and ``User`` 
-  classes.
-- Remember to add to ``Organization`` class.
+Plan
+====
 
-github3.repo
-------------
-
-Repository
-``````````
-
-- Add almost everything
-
-github3.user
-------------
-
-User
-````
-
-- Add pretty much everything here as well
+- Finish everything that's left (currently Repository Downloads, Hooks and all 
+  Events)
+- Write unittests for everything possible, try to find as many corner cases as 
+  possible

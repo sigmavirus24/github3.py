@@ -497,7 +497,7 @@ Upload to Amazon S3
         resp = False
         if login:
             url = self._api + '/collaborators/' + login
-            resp = self._get(url, status_code=204)
+            resp = self._session.get(url).status_code == 204
         return resp
 
     def is_fork(self):

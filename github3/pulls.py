@@ -198,7 +198,7 @@ class PullRequest(GitHubCore):
 
     def is_merged(self):
         url = self._api + '/merge'
-        return self._get(url, status_code=204)
+        return self._session.get(url).status_code == 204
 
     @property
     def issue_url(self):

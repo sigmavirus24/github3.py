@@ -106,9 +106,9 @@ Progress
 
   - `Repo Keys`_: **done**
 
-  - Watching_: **in progress**
+  - Watching_: **done**
 
-  - Hooks_
+  - Hooks_: **in progress**
 
 .. _Repositories: http://developer.github.com/v3/repos/
 .. _Collaborators: http://developer.github.com/v3/repos/collaborators/
