@@ -246,50 +246,18 @@ class Repository(GitHubCore):
         if json:
             key = 'downloads/{0}/{1}/{2}'.format(self.owner.login, self.name,
                     name)
-            success = 201
-            data = """--github
-Content-Disposition: form-data; name="key"
-
-{key}
---github
-Content-Disposition: form-data; name="acl"
-
-{acl}
---github
-Content-Disposition: form-data; name="success_action_status"
-
-{sas}
---github
-Content-Disposition: form-data; name="Filename"
-
-{File}
---github
-Content-Disposition: form-data; name="AWSAccessKeyID"
-
-{aws}
---github
-Content-Disposition: form-data; name="Policy"
-
-{pol}
---github
-Content-Disposition: form-data; name="Signature"
-
-{sig}
---github
-Content-Disposition: form-data; name="Content-Type"
-
-{con}
---github
-Content-Disposition: form-data; name="file", filename="{File}"
-
-{file}
---github--""".format(key=key, acl=json.get('acl'), sas=success,
-                    File=name, aws=json.get('accesskeyid'),
-                    pol=json.get('policy'), sig=json.get('signature'),
-                    con=json.get('mime_type'), file=open(path, 'rb').read())
-            headers = {'Content-Type':
-                'multipart/form-data; boundary=github'}
-            resp = requests.post(json.get('s3_url'), data, headers=headers)
+            form = {'key': key, 'acl': json.get('acl'),
+                    'success_action_status': '201',  # 'Filename': name,
+                    'AWSAccessKeyID': json.get('accesskeyid'),
+                    'Policy': json.get('policy'),
+                    'Signature': json.get('signature'),
+                    'Content-Type': json.get('mime_type')}
+            files = {name: open(path, 'rb')}
+            #headers = {'Content-Type': 'multipart/form-data'}
+            resp = requests.post(json.get('s3_url'),  # headers=headers,
+                    data=form, files=files)
+            #resp = requests.post('http://httpbin.org/post', headers=headers,
+            #        files=form)
             print(resp)
 
     def create_fork(self, organization=None):
