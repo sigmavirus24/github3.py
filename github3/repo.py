@@ -7,7 +7,7 @@ This module contains the class relating to repositories.
 """
 
 from base64 import b64decode
-from datetime import datetime
+from time import time
 from json import dumps
 import requests
 from .issue import Issue, Label, Milestone, issue_params
@@ -245,18 +245,21 @@ class Repository(GitHubCore):
             json = self._post(url, data)
 
         if json:
+            date = strptime(json.get('expirationdate'),
+                    '%Y-%m-%dT%H:%M:%S.000Z')
             form = [('key', json.get('path')), ('acl', json.get('acl')),
                 ('success_action_status', '201'),
                 ('Filename', json.get('name')),
+                ('Expires', int(time()) + 100),
                 ('AWSAccessKeyId', json.get('accesskeyid')),
                 ('Policy', json.get('policy')),
                 ('Signature', json.get('signature')),
                 ('Content-Type', json.get('mime_type')),
-                ('file', {json.get('name'): open(path, 'rb')})]
+                ('file', {json.get('name'): open(path, 'rb').read()})]
             #files = {json.get('name'): open(path, 'rb')}
-            #headers = {'Content-Type': 'multipart/form-data'}
-            # resp = requests.post(json.get('s3_url'),  # headers=headers,
+            #resp = requests.post(json.get('s3_url'),  # headers=headers,
             #         data=form, files=files)
+            headers = {'Accept': 'utf-8'}
             resp = requests.post(json.get('s3_url'), data=OrderedDict(form))
             #resp = requests.post('http://httpbin.org/post', headers=headers,
             #        files=form)

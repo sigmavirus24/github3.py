@@ -17,5 +17,9 @@ except ImportError:
         def __repr__(self):
             return 'OrderedDict({0})'.format(str(self.__items__))
 
+        def __setitem__(self, x, y):
+            super(OrderedDict, self).__setitem__(x, y)
+            self.__items__.append((x, y))
+
         def items(self):
             return self.__items__
