@@ -1,6 +1,17 @@
 TODO
 ====
 
+everywhere
+----------
+
+- use requests ``params`` parameter to send parameters from the URl
+
+
+github3.repo
+------------
+
+- discern how to do ``multipart/form-data`` encoding with requests
+
 github3.api
 -----------
 

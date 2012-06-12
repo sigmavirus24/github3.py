@@ -290,6 +290,7 @@ class GitHub(GitHubCore):
         repositories for the authenticated user if ``login`` is not 
         provided.
 
+        :param login: (optional), string
         :param type: (optional), string, accepted values:
             ('all', 'owner', 'public', 'private', 'member')
             API default: 'all'
@@ -307,19 +308,16 @@ class GitHub(GitHubCore):
             url.extend(['user', 'repos'])
         url = '/'.join(url)
         
-        params = []
+        params = {}
         if type in ('all', 'owner', 'public', 'private', 'member'):
-            params.append('type={0}'.format(type))
+            params.update(type=type)
         if not login:
             if sort in ('created', 'updated', 'pushed', 'full_name'):
-                params.append('sort={0}'.format(sort))
+                params.update(sort=sort)
             if direction in ('asc', 'desc'):
-                params.append('direction={0}'.format(sort))
-        if params:
-            params = '&'.join(params)
-            url = '?'.join([url, params])
+                params.update(direction=direction)
 
-        json = self._get(url)
+        json = self._get(url, params=params)
         ses = self._session
         return [Repository(repo, ses) for repo in json]
 

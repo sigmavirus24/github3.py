@@ -268,7 +268,7 @@ Content-Disposition: form-data; name="AWSAccessKeyID"
 
 {aws}
 --github
-Content-Disposition: form-data; name="Policy'
+Content-Disposition: form-data; name="Policy"
 
 {pol}
 --github
@@ -281,20 +281,14 @@ Content-Disposition: form-data; name="Content-Type"
 {con}
 --github
 Content-Disposition: form-data; name="file", filename="{File}"
-Content-Type: application/octet-stream
 
 {file}
---github
-Content-Disposition: form-data; name="submit"
-
-Upload to Amazon S3
 --github--""".format(key=key, acl=json.get('acl'), sas=success,
                     File=name, aws=json.get('accesskeyid'),
                     pol=json.get('policy'), sig=json.get('signature'),
                     con=json.get('mime_type'), file=open(path, 'rb').read())
             headers = {'Content-Type':
-                'multipart/form-data; boundary=github',
-                'Content-Length': len(data)}
+                'multipart/form-data; boundary=github'}
             resp = requests.post(json.get('s3_url'), data, headers=headers)
             print(resp)
 
