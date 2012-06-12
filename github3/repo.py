@@ -14,6 +14,7 @@ from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag
 from .models import GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
+from .structs import OrderedDict
 from .user import User, Key
 
 
@@ -244,18 +245,19 @@ class Repository(GitHubCore):
             json = self._post(url, data)
 
         if json:
-            key = 'downloads/{0}/{1}/{2}'.format(self.owner.login, self.name,
-                    name)
-            form = {'key': key, 'acl': json.get('acl'),
-                    'success_action_status': '201',  # 'Filename': name,
-                    'AWSAccessKeyID': json.get('accesskeyid'),
-                    'Policy': json.get('policy'),
-                    'Signature': json.get('signature'),
-                    'Content-Type': json.get('mime_type')}
-            files = {name: open(path, 'rb')}
+            form = [('key', json.get('path')), ('acl', json.get('acl')),
+                ('success_action_status', '201'),
+                ('Filename', json.get('name')),
+                ('AWSAccessKeyId', json.get('accesskeyid')),
+                ('Policy', json.get('policy')),
+                ('Signature', json.get('signature')),
+                ('Content-Type', json.get('mime_type')),
+                ('file', {json.get('name'): open(path, 'rb')})]
+            #files = {json.get('name'): open(path, 'rb')}
             #headers = {'Content-Type': 'multipart/form-data'}
-            resp = requests.post(json.get('s3_url'),  # headers=headers,
-                    data=form, files=files)
+            # resp = requests.post(json.get('s3_url'),  # headers=headers,
+            #         data=form, files=files)
+            resp = requests.post(json.get('s3_url'), data=OrderedDict(form))
             #resp = requests.post('http://httpbin.org/post', headers=headers,
             #        files=form)
             print(resp)
