@@ -765,6 +765,25 @@ class Repository(GitHubCore):
     def owner(self):
         return self._owner
 
+    def pubsubhubbub(self, mode, topic, callback, secret=''):
+        """Create/update a pubsubhubbub hook.
+
+        :param mode: (required), string, accepted values:
+            ('subscribe', 'unsubscribe')
+        :param topic: (required), string, form:
+            https://github.com/:user/:repo/events/:event
+        :param callback: (required), string, the URI that receives the updates
+        :param secret: (optional), string, shared secret key that generates a
+            SHA1 HMAC of the payload content.
+        """
+        from re import match
+        m = match('https://github\.com/\w+/\w+/events/\w+', topic)
+        if mode and topic and callback and m:
+            data = {'hub.mode': mode, 'hub.topic': topic,
+                    'hub.callback': callback, 'hub.secret': secret}
+            return self._post('https://api.github.com/hub', data)
+        return False
+
     def pull_request(self, number):
         json = None
         if int(number) > 0:

@@ -108,7 +108,7 @@ Progress
 
   - Watching_: **done**
 
-  - Hooks_: **in progress**
+  - Hooks_: **done**
 
 .. _Repositories: http://developer.github.com/v3/repos/
 .. _Collaborators: http://developer.github.com/v3/repos/collaborators/
@@ -134,9 +134,9 @@ Progress
 .. _Followers: http://developer.github.com/v3/users/followers/
 .. _User Keys: http://developer.github.com/v3/users/keys/
 
-- Events_: **started/postponed**
+- Events_: **in progress**
 
-  - Types_: **started/postponed**
+  - Types_: **in progress**
 
 .. _Events: http://developer.github.com/v3/events/
 .. _Types: http://developer.github.com/v3/events/types/
