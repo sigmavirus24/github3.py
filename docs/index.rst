@@ -12,8 +12,6 @@ First, let's get information about a user.
 
 .. code-block:: python
 
-::
-
     from github3 import login
 
     gh = login('sigmavirus24', password='<password>')
@@ -39,5 +37,7 @@ First, let's get information about a user.
 
     gh.list_followers('kennethreitz')
 
+
+.. _GitHub API: http://developer.github.com
 
 .. toctree::
