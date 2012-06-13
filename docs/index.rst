@@ -10,7 +10,7 @@ examples.
 
 First, let's get information about a user.
 
-.. code-block:: python
+::
 
     from github3 import login
 
@@ -38,6 +38,11 @@ First, let's get information about a user.
     gh.list_followers('kennethreitz')
 
 
+.. links
+
 .. _GitHub API: http://developer.github.com
 
 .. toctree::
+    :maxdepth: 1
+
+    api

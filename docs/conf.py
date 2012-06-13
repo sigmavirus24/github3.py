@@ -17,6 +17,10 @@ release = version
 
 exclude_patterns = ['_build']
 
+highlight_lang = 'python'
+
 html_theme = 'default'
 
-htmlhelp_basename = 'Github3.pydoc'
+html_short_title = '<project> documentation'
+
+htmlhelp_basename = 'github3.pydoc'
