@@ -42,7 +42,7 @@ class GitHub(GitHubCore):
         url = '/'.join(url)
 
         follow = []
-        resp = self._get(url)
+        json = self._get(url)
         ses = self._session
         return [User(follower, ses) for follower in json]
 
