@@ -428,6 +428,9 @@ class Repository(GitHubCore):
     def created_at(self):
         return self._created
 
+    def delete(self):
+        return self._delete(self._api)
+
     @property
     def description(self):
         return self._desc

@@ -42,7 +42,7 @@ class GitHubCore(object):
     def _boolean(self, request, status_code):
         if request.status_code == status_code:
             return True
-        if request.status_code >= 400:
+        if request.status_code != 404 and request.status_code >= 400:
             raise Error(request)
         return False
 
