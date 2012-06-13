@@ -12,7 +12,6 @@ from json import dumps
 
 class GitHubCore(object):
     """A basic class for the other classes."""
-    rate = 'x-ratelimit-remaining'
     def __init__(self, session=None):
         self._session = session
         if self._session:
@@ -26,7 +25,7 @@ class GitHubCore(object):
 
     def _json(self, request, status_code):
         if request.status_code == status_code:
-            return request.json
+            return request.json if request.content else True
         if request.status_code >= 400:
             raise Error(request)
         return None
@@ -36,8 +35,6 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
-            if req.headers.get(self.rate):
-                self._session_remain = int(req.headers[self.rate])
             if req.status_code != status_code or req.status_code >= 400:
                 raise Error(request)
         return req
@@ -53,8 +50,6 @@ class GitHubCore(object):
         req = False
         if self._remaining > 0:
             req = self._session.delete(url, **kwargs)
-            if req.headers.get(self.rate):
-                self._session._remain = int(req.headers[self.rate])
             req = self._boolean(req, status_code)
         return req
 
@@ -62,8 +57,6 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
-            if req.headers.get(self.rate):
-                self._session._remain = int(req.headers[self.rate])
             if status_code == 204:
                 # We're not expecting any json back
                 # If we left it as a simple _json() call there would be a
@@ -77,8 +70,6 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.patch(url, data, **kwargs)
-            if req.headers.get(self.rate):
-                self._session._remain = int(req.headers[self.rate])
             req = self._json(req, status_code)
         return req
 
@@ -86,8 +77,6 @@ class GitHubCore(object):
         req = None
         if self._remaining > 0:
             req = self._session.post(url, data, **kwargs)
-            if req.headers.get(self.rate):
-                self._session._remain = int(req.headers[self.rate])
             req = self._json(req, status_code)
         return req
 
@@ -96,8 +85,6 @@ class GitHubCore(object):
         if self._remaining > 0:
             kwargs.update(headers={'Content-Length': '0'})
             req = self._session.put(url, data, **kwargs)
-            if req.headers.get(self.rate):
-                self._session._remain = int(req.headers[self.rate])
             req = self._boolean(req, status_code)
         return req
 
@@ -109,7 +96,8 @@ class GitHubCore(object):
 
     @property
     def ratelimit_remaining(self):
-        return self._session._remain
+        json = self._get(self._github_url + '/rate_limit')
+        return json.get('remaining', 5000)
 
 
 class BaseComment(GitHubCore):

@@ -222,7 +222,8 @@ class Repository(GitHubCore):
                 commit = Commit(json, self._session)
         return commit
 
-    def create_download(self, name, path, description='', content_type=''):
+    def create_download(self, name, path, description='',
+            content_type='text/plain'):
         """ THIS DOES NOT WORK.
 
         Create a new download on this repository.
@@ -245,8 +246,6 @@ class Repository(GitHubCore):
             json = self._post(url, data)
 
         if json:
-            date = strptime(json.get('expirationdate'),
-                    '%Y-%m-%dT%H:%M:%S.000Z')
             form = [('key', json.get('path')), ('acl', json.get('acl')),
                 ('success_action_status', '201'),
                 ('Filename', json.get('name')),
@@ -259,11 +258,14 @@ class Repository(GitHubCore):
             #files = {json.get('name'): open(path, 'rb')}
             #resp = requests.post(json.get('s3_url'),  # headers=headers,
             #         data=form, files=files)
-            headers = {'Accept': 'utf-8'}
-            resp = requests.post(json.get('s3_url'), data=OrderedDict(form))
+            #headers = {'Authorization': 'AWS {0}:{1}'.format(
+            #    json.get('accesskeyid'), json.get('signature'))}
+            resp = requests.post(json.get('s3_url'), data=OrderedDict(form),
+                    headers=headers)
             #resp = requests.post('http://httpbin.org/post', headers=headers,
             #        files=form)
             print(resp)
+            print(resp.content)
 
     def create_fork(self, organization=None):
         """Create a fork of this repository.
@@ -278,6 +280,24 @@ class Repository(GitHubCore):
             json = self._post(url, status_code=202)
 
         return Repository(json, self._session) if json else None
+
+    def create_hook(self, name, config, events=['push'], active=True):
+        """Create a hook on this repository.
+
+        :param name: (required), string, name of the hook
+        :param config: (required), dict, key-value pairs which act as settings
+            for this hook
+        :param events: (optional), list, events the hook is triggered for
+        :param active: (optional), boolean, whether the hook is actually
+            triggered
+        """
+        json = None
+        if name and config and isinstance(config, dict):
+            url = self._api + '/hooks'
+            data = {'name': name, 'config': config, 'events': events, 'active':
+                    active}
+            json = self._post(url, data)
+        return Hoook(json, self._session) if json else None
 
     def create_issue(self,
         title,
@@ -487,6 +507,17 @@ class Repository(GitHubCore):
     def homepage(self):
         return self._homepg
 
+    def hook(self, id_num):
+        """Get a single hook.
+
+        :param id_num: (required), int, id of the hook
+        """
+        json = None
+        if int(id_num) > 0:
+            url = self._api + '/hooks/{0}'.format(id_num)
+            json = self._get(url)
+        return Hook(json, self._session) if json else None
+
     @property
     def html_url(self):
         return self._url
@@ -577,6 +608,12 @@ class Repository(GitHubCore):
             url = ''.join([url, '?sort=', sort])
         json = self._get(url)
         return [Repository(r, self._session) for r in json]
+
+    def list_hooks(self):
+        """List hooks registered on this repository."""
+        url = self._api + '/hooks'
+        json = self._get(url)
+        return [Hook(h, self._session) for h in json]
 
     def list_issues(self,
         milestone=None,
@@ -959,6 +996,91 @@ class Download(GitHubCore):
     @property
     def size(self):
         return self._sz
+
+
+class Hook(GitHubCore):
+    def __init__(self, hook, session):
+        super(Hook, self).__init__(session)
+        self._update_(hook)
+
+    def __repr__(self):
+        return '<Hook [%s]>' % self._name
+
+    def _update_(self, hook):
+        self._api = hook.get('url')
+        self._updated = None
+        if hook.get('updated_at'):
+            self._updated = self._strptime(hook.get('updated_at'))
+        self._created = self._strptime(hook.get('created_at'))
+        self._name = hook.get('name')
+        self._events = hook.get('events')
+        self._active = hook.get('active')
+        self._config = hook.get('config')
+        self._id = hook.get('id')
+
+    @property
+    def config(self):
+        return self._config
+
+    @property
+    def created_at(self):
+        return self._created
+
+    def delete(self):
+        """Delete this hook."""
+        return self._delete(self._api)
+
+    def edit(self, name, config, events=[], add_events=[], rm_events=[],
+            active=True):
+        """Edit this hook.
+
+        :param name: (required), string, name of the service being called
+        :param config: (required), dict, key-value pairs of settings for this
+            hook
+        :param events: (optional), list, which events should this be triggered
+            for
+        :param add_events: (optional), list, events to be added to the list of
+            events that this hook triggers for
+        :param rm_events: (optional), list, events to be remvoed from the list
+            of events that this hook triggers for
+        :param active: (optional), boolean, should this event be active
+        """
+        if name and config and isinstance(config, dict):
+            data = {'name': name, 'config': config, 'active': active}
+            if events:
+                data['events'] = events
+
+            if add_events:
+                data['add_events'] = add_events
+
+            if rm_events:
+                data['remove_events'] = rm_events
+
+            json = self._patch(self._api, dumps(data))
+            self._update_(json)
+
+    @property
+    def events(self):
+        return self._events
+    
+    @property
+    def id(self):
+        return self._id
+
+    def is_active(self):
+        return self._active
+
+    @property
+    def name(self):
+        return self._name
+
+    def test(self):
+        """Test this hook"""
+        return self._post(self._api + '/test')
+
+    @property
+    def updated_at(self):
+        return self._updated
 
 
 class RepoTag(object):
