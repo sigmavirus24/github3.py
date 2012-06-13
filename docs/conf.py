@@ -21,6 +21,4 @@ highlight_lang = 'python'
 
 html_theme = 'default'
 
-html_short_title = '<project> documentation'
-
 htmlhelp_basename = 'github3.pydoc'

@@ -42,6 +42,10 @@ First, let's get information about a user.
 
 .. _GitHub API: http://developer.github.com
 
+
+Table of Contents
+=================
+
 .. toctree::
     :maxdepth: 1
 
