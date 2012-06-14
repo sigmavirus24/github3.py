@@ -7,6 +7,7 @@ This module contains the class(es) related to Events
 """
 
 from .compat import loads
+from .git import Commit
 from .models import GitHubCore, BaseEvent
 from .repo import Repository
 from .user import User
@@ -16,9 +17,9 @@ class Event(BaseEvent):
     # Based upon self._type, choose a function to determine
     # self._payload
     _payload_handlers = {
-            'CommitCommentEvent': None,
-            'CreateEvent': None,
-            'DeleteEvent': None,
+            'CommitCommentEvent': self._commitcomment,
+            'CreateEvent': self._create,
+            'DeleteEvent': self._delete,
             'DownloadEvent': None,
             'FollowEvent': None,
             'ForkEvent': None,
@@ -42,10 +43,13 @@ class Event(BaseEvent):
         self._public = event.get('public')
         self._repo = Repository(event.get('repo'), self._session)
         self._actor = User(event.get('actor'), self._session)
+        self._id = event.get('id')
+        self._payload = event.get('payload')
 
         # Commented out for now because there is no Organization class
-        # if event.get('org'):
-        #     self._org = Organization(event.get('org'), self._session)
+        self._org = None
+        if event.get('org'):
+            self._org = Organization(event.get('org'), self._session)
 
     def __repr__(self):
         return '<Event [%s]>' % self._type[:-5]
@@ -58,9 +62,9 @@ class Event(BaseEvent):
     def list_types(cls):
         return sorted(cls._payload_handlers.keys())
 
-    # @property
-    # def org(self):
-    #     return self._org
+    @property
+    def org(self):
+        return self._org
 
     # @property
     # def payload(self):
@@ -76,3 +80,13 @@ class Event(BaseEvent):
     @property
     def type(self):
         return self._type
+
+    def _commitcomment(self, comment):
+        from .repo import RepoComment
+        return RepoComment(comment, self._session) if comment else None
+
+    def _create(self, create):
+        pass
+
+    def _delete(self, delete):
+        pass
