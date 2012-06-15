@@ -245,15 +245,14 @@ class Repository(GitHubCore):
             json = self._post(url, data)
 
         if json:
-            form_vals = [('key', json.get('path')),
+            form = [('key', json.get('path')),
                 ('acl', json.get('acl')),
                 ('success_action_status', '201'),
                 ('Filename', json.get('name')),
                 ('AWSAccessKeyId', json.get('accesskeyid')),
                 ('Policy', json.get('policy')),
                 ('Signature', json.get('signature')),
-                ('Content-Type', json.get('mime_type')),
-                ('file', b64encode(open(path, 'rb').read()))]
+                ('Content-Type', json.get('mime_type'))]
 #            form = """--github
 #Content-Disposition: form-data; name="{key}"
 #
@@ -265,7 +264,25 @@ class Repository(GitHubCore):
 #            data = ''.join([data, '--github--'])
 #            headers = {'Content-Type': 'multipart/form-data; boundary=github',
 #                    'Content-Length': str(len(data))}
-            resp = requests.post(json.get('s3_url'), data=form_vals)
+            #resp = requests.post(json.get('s3_url'), data=form_vals)
+            boundary = '--GitHubBoundary'
+            form_data = []
+            for (k, v) in form:
+                tmp = [boundary,
+                        'Content-Disposition: form-data; name="{0}"'.format(k),
+                        '', v]
+                form_data.extend(tmp)
+            form_data.append(boundary)
+            form_data.append('Content-Disposition: form-data; ' +\
+                    'name="{0}"; filename="{1}"'.format(k, json.get('name')))
+            form_data.extend(['', open(path, 'rb').read()])
+            form_data.append(boundary + '--')
+            form_data.append('')
+            form_data = '\r\n'.join(form_data)
+            headers = {'Content-Type':
+                    'multipart/form-data; boundary={0}'.format(boundary[2:]),
+                    'Content-Length': str(len(form_data))}
+            resp = requests.post(json.get('s3_url'), data, headers=headers)
             print(resp)
             print(resp.content)
 
