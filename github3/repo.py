@@ -6,7 +6,7 @@ This module contains the class relating to repositories.
 
 """
 
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from time import time
 from json import dumps
 import requests
@@ -14,7 +14,6 @@ from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag
 from .models import GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
-from .structs import OrderedDict
 from .user import User, Key
 
 
@@ -246,24 +245,27 @@ class Repository(GitHubCore):
             json = self._post(url, data)
 
         if json:
-            form = [('key', json.get('path')), ('acl', json.get('acl')),
+            form_vals = [('key', json.get('path')),
+                ('acl', json.get('acl')),
                 ('success_action_status', '201'),
                 ('Filename', json.get('name')),
-                ('Expires', int(time()) + 100),
                 ('AWSAccessKeyId', json.get('accesskeyid')),
                 ('Policy', json.get('policy')),
                 ('Signature', json.get('signature')),
                 ('Content-Type', json.get('mime_type')),
-                ('file', {json.get('name'): open(path, 'rb').read()})]
-            #files = {json.get('name'): open(path, 'rb')}
-            #resp = requests.post(json.get('s3_url'),  # headers=headers,
-            #         data=form, files=files)
-            #headers = {'Authorization': 'AWS {0}:{1}'.format(
-            #    json.get('accesskeyid'), json.get('signature'))}
-            resp = requests.post(json.get('s3_url'), data=OrderedDict(form),
-                    headers=headers)
-            #resp = requests.post('http://httpbin.org/post', headers=headers,
-            #        files=form)
+                ('file', b64encode(open(path, 'rb').read()))]
+#            form = """--github
+#Content-Disposition: form-data; name="{key}"
+#
+#{value}
+#"""
+#            data = ''
+#            for (k, v) in form_vals:
+#                data = ''.join([data, form.format(key=k, value=v)])
+#            data = ''.join([data, '--github--'])
+#            headers = {'Content-Type': 'multipart/form-data; boundary=github',
+#                    'Content-Length': str(len(data))}
+            resp = requests.post(json.get('s3_url'), data=form_vals)
             print(resp)
             print(resp.content)
 
