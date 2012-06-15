@@ -143,14 +143,17 @@ class User(BaseAccount):
     def for_hire(self):
         return self._hire
 
-    def list_emails(self):
-        """List email addresses for a user.
+    def list_followers(self):
+        """List followers of this user."""
+        url = self._api + '/followers'
+        json = self._get(url)
+        return [User(u, self._session) for u in json]
 
-        Predicated on the assumption that you're authenticated for this
-        user.
-        """
-        url = self._github_url + '/user/emails'
-        return self._get(url) or []
+    def list_following(self):
+        """List users being followed by this user."""
+        url = self._api + '/following'
+        json = self._get(url)
+        return [User(u, self._session) for u in json]
 
     @property
     def owned_private_repos(self):

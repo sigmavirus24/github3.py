@@ -34,17 +34,9 @@ class GitHub(GitHubCore):
         return '<GitHub at 0x%x>' % id(self)
 
     def _list_follow(self, login, which):
-        url = [self._github_url]
-        if login:
-            url.extend(['users', login, which])
-        else:
-            url.extend(['user', which])
-        url = '/'.join(url)
-
-        follow = []
+        url = self._github_url + '/user/' + which
         json = self._get(url)
-        ses = self._session
-        return [User(follower, ses) for follower in json]
+        return [User(f, self._session) for f in json]
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -193,17 +185,26 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
+    def list_emails(self):
+        """List email addresses for the authenticated user."""
+        url = self._github_url + '/user/emails'
+        return self._get(url) or []
+
     def list_followers(self, login=None):
         """If login is provided, return a list of followers of that
         login name; otherwise return a list of followers of the
         authenticated user."""
-        return self._list_follow(login, 'followers')
+        if login:
+            return self.user(login).list_followers()
+        return self._list_follow('followers')
 
     def list_following(self, login=None):
         """If login is provided, return a list of users being followed
         by login; otherwise return a list of people followed by the
         authenticated user."""
-        return self._list_follow(login, 'following')
+        if login:
+            return self.user(login).list_following()
+        return self._list_follow('following')
 
     def list_gists(self, username=None):
         """If no username is specified, GET /gists, otherwise GET

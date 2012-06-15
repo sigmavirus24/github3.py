@@ -253,18 +253,6 @@ class Repository(GitHubCore):
                 ('Policy', json.get('policy')),
                 ('Signature', json.get('signature')),
                 ('Content-Type', json.get('mime_type'))]
-#            form = """--github
-#Content-Disposition: form-data; name="{key}"
-#
-#{value}
-#"""
-#            data = ''
-#            for (k, v) in form_vals:
-#                data = ''.join([data, form.format(key=k, value=v)])
-#            data = ''.join([data, '--github--'])
-#            headers = {'Content-Type': 'multipart/form-data; boundary=github',
-#                    'Content-Length': str(len(data))}
-            #resp = requests.post(json.get('s3_url'), data=form_vals)
             boundary = '--GitHubBoundary'
             form_data = []
             for (k, v) in form:
@@ -275,6 +263,7 @@ class Repository(GitHubCore):
             form_data.append(boundary)
             form_data.append('Content-Disposition: form-data; ' +\
                     'name="{0}"; filename="{1}"'.format(k, json.get('name')))
+            #form_data.append('Content-Type: ' + json.get('mime_type'))
             form_data.extend(['', open(path, 'rb').read()])
             form_data.append(boundary + '--')
             form_data.append('')
