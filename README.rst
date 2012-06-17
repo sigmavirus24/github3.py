@@ -141,6 +141,10 @@ Progress
 .. _Events: http://developer.github.com/v3/events/
 .. _Types: http://developer.github.com/v3/events/types/
 
+- Search_
+
+.. _Search: http://developer.github.com/v3/search
+
 .. [#] Creating a download via Amazon S3 seems to always return an invalid
        multipart/form-data POST request.
 
