@@ -154,6 +154,10 @@ class Gist(GitHubCore):
     def html_url(self):
         return self._url
 
+    @property
+    def id(self):
+        return self._id
+
     def is_public(self):
         return self._public
 

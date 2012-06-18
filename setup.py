@@ -24,15 +24,16 @@ setup(
         open("HISTORY.rst").read()]),
     author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
-    url="https://github.com/sigmavirus24/github3.py",
+    #url="https://github.com/sigmavirus24/github3.py",
+    url="https://github3py.readthedocs.org",
     packages=packages,
     package_data={'': ['LICENSE']},
     install_requires=requires,
-    classifiers=(
+    classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: Implementation :: CPython',
-        ),
+        ],
     )
