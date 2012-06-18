@@ -355,3 +355,41 @@ class PullRequestEvent(object):
     @property
     def pull_request(self):
         return self._pull
+
+
+class PullRequestCommentReviewEvent(object):
+    def __init__(self, event):
+        super(PullRequestCommentReviewEvent, self).__init__()
+        from .pulls import ReviewComment
+        self._com = ReviewComment(event.get('comment', {}), None)
+
+    def __repr__(self):
+        return '<PullRequestCommentReviewEvent [%s]>' % str(self._com.id)
+
+    @property
+    def comment(self):
+        return self._com
+
+
+class PushEvent(object):
+    def __init__(self, event):
+        super(PushEvent, self).__init__()
+        self._head = event.get('head', '')
+        self._ref = event.get('ref', '')
+        self._sz = event.get('size', -1)
+        commits = event.get('commits', {})
+        self._sha = commits.get('sha', '')
+        self._msg = commits.get('message', '')
+        self._url = commits.get('url', '')
+        self._commits = commits
+        author = event.get('author', {})
+        self._authname = author.get('name', '')
+        self._authmail = author.get('email', '')
+        self._author = author
+
+    def __repr__(self):
+        return '<PushEvent [%s by %s]>' % (self._head, self._authname)
+
+    @property
+    def head(self):
+        return self._head
