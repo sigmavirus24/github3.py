@@ -89,7 +89,10 @@ class Repository(GitHubCore):
         return None
 
     def add_collaborator(self, login):
-        """Add ``login`` as a collaborator to a repository."""
+        """Add ``login`` as a collaborator to a repository.
+        
+        :param login: (required), string, login of the user
+        """
         resp = False
         if login:
             url = self._api + '/collaborators/' + login
@@ -125,6 +128,10 @@ class Repository(GitHubCore):
         return written
 
     def blob(self, sha):
+        """Get the blob indicated by ``sha``.
+
+        :param sha: (required), string, sha of the blob
+        """
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
         json = self._get(url)
         return Blob(json) if json else None
@@ -135,12 +142,18 @@ class Repository(GitHubCore):
         return self._https_clone
 
     def commit(self, sha):
-        """Get a single commit."""
+        """Get a single commit.
+        
+        :param sha: (required), string, sha of the commit
+        """
         json = self._get(self._api + '/commits/' + sha)
         return RepoCommit(json, self._session) if json else None
 
     def commit_comment(self, comment_id):
-        """Get a single commit comment."""
+        """Get a single commit comment.
+        
+        :param comment_id: (required), int, id of the comment used by GitHub
+        """
         url = '{0}/comments/{1}'.format(self._api, comment_id)
         json = self._get(url)
         return RepoComment(json, self._session) if json else None
@@ -317,7 +330,17 @@ class Repository(GitHubCore):
         assignee=None,
         milestone=None,
         labels=[]):
-        """Creates an issue on this repository."""
+        """Creates an issue on this repository.
+        
+        :param title: (required), string, title of the issue
+        :param body: (optional), string, body of the issue
+        :param assignee: (optional), string, login of the user to assign the
+            issue to
+        :param milestone: (optional), string, milestone to attribute this issue
+            to
+        :param labels: (optional), list of strings, labels to apply to this
+            issue
+        """
         issue = dumps({'title': title, 'body': body,
             'assignee': assignee, 'milestone': milestone,
             'labels': labels})
@@ -338,6 +361,12 @@ class Repository(GitHubCore):
         return Key(json, self._session) if json else None
 
     def create_label(self, name, color):
+        """Create a label for this repository.
+
+        :param name: (required), string, name to give to the label
+        :param color: (required), string, value of the color to assign to the
+            label
+        """
         if color[0] == '#':
             color = color[1:]
 
@@ -348,7 +377,17 @@ class Repository(GitHubCore):
 
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
+        """Create a milestone for this repository.
+
+        :param title: (required), string, title of the milestone
+        :param state: (optional), string, state of the milestone, accepted
+            values: ('open', 'closed'), default: 'open'
+        :param description: (optional), string, description of the milestone
+        :param due_on: (optional), string, ISO 8601 formatted due date
+        """
         url = self._api + '/milestones'
+        if state not in ('open', 'closed'):
+            state = 'open'
         mile = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
         json = self._post(url, mile)
@@ -498,7 +537,10 @@ class Repository(GitHubCore):
         return self._forks
 
     def is_collaborator(self, login):
-        """Check to see if ``login`` is a collaborator on this repository."""
+        """Check to see if ``login`` is a collaborator on this repository.
+        
+        :param login: (required), string, login for the user
+        """
         resp = False
         if login:
             url = self._api + '/collaborators/' + login
@@ -506,9 +548,11 @@ class Repository(GitHubCore):
         return resp
 
     def is_fork(self):
+        """Checks if this repository is a fork."""
         return self._is_fork
 
     def is_private(self):
+        """Checks if this repository is private."""
         return self._priv
 
     @property
@@ -517,9 +561,11 @@ class Repository(GitHubCore):
         return self._git_clone
 
     def has_downloads(self):
+        """Checks if this repository has downloads."""
         return self._has_dl
 
     def has_wiki(self):
+        """Checks if this repository has a wiki."""
         return self._has_wiki
 
     @property
@@ -549,14 +595,21 @@ class Repository(GitHubCore):
         return self._id
 
     def issue(self, number):
+        """Get the issue specified by ``number``.
+
+        :param number: (required), int, number of the issue on this repository
+        """
         json = None
-        if number > 0:
+        if int(number) > 0:
             url = '{0}/issues/{1}'.format(self._api, str(number))
             json = self._get(url)
         return Issue(json, self._session) if json else None
 
     def key(self, id_num):
-        """Get the specified deploy key."""
+        """Get the specified deploy key.
+        
+        :param id_num: (required), int, id of the key
+        """
         json = None
         if int(id_num) > 0:
             url = self._api + '/keys/' + str(id_num)
@@ -564,6 +617,10 @@ class Repository(GitHubCore):
         return Key(json, self._session) if json else None
 
     def label(self, name):
+        """Get the label specified by ``name``
+
+        :param name: (required), string, name of the label
+        """
         json = None
         if name:
             url = '{0}/labels/{1}'.format(self._api, name)
@@ -588,7 +645,10 @@ class Repository(GitHubCore):
         return [RepoComment(comment, self._session) for comment in json]
 
     def list_comments_on_commit(self, sha):
-        """List comments for a single commit."""
+        """List comments for a single commit.
+        
+        :param sha: (required), string, sha of the commit to list comments on
+        """
         json = []
         if sha:
             url = self._api + '/commits/' + sha + '/comments'
@@ -692,6 +752,7 @@ class Repository(GitHubCore):
         return [Key(k, self._session) for k in json]
 
     def list_labels(self):
+        """List labels on this repository."""
         url = self._api + '/labels'
         json = self._get(url)
         ses = self._session
@@ -704,17 +765,26 @@ class Repository(GitHubCore):
         return [(k, v) for k, v in json.items()]
 
     def list_milestones(self, state=None, sort=None, direction=None):
+        """List the milestones on this repository.
+
+        :param state: (optional), string, state of the milestones, accepted
+            values: ('open', 'closed')
+        :param sort: (optional), string, how to sort the milestones, accepted
+            values: ('due_date', 'completeness')
+        :param direction: (optional), string, direction to sort the milestones,
+            accepted values: ('asc', 'desc')
+        """
         url = self._api + '/milestones'
 
         params = []
         if state in ('open', 'closed'):
-            params.append('state=%s' % state)
+            params.append('state=' + state)
 
         if sort in ('due_date', 'completeness'):
-            params.append('sort=%s' % sort)
+            params.append('sort=' + sort)
 
         if direction in ('asc', 'desc'):
-            params.append('direction=%s' % direction)
+            params.append('direction=' + direction)
 
         if params:
             params = '&'.join(params)
@@ -725,6 +795,10 @@ class Repository(GitHubCore):
         return [Milestone(mile, ses) for mile in json]
 
     def list_pulls(self, state=None):
+        """List pull requests on repository.
+
+        :param state: (optional), string, accepted values: ('open', 'closed')
+        """
         if state in ('open', 'closed'):
             url = '{0}/pulls?state={1}'.format(self._api, state)
         else:
@@ -765,6 +839,10 @@ class Repository(GitHubCore):
         return [User(u, self._session) for u in json]
 
     def milestone(self, number):
+        """Get the milestone indicated by ``number``.
+
+        :param number: (required), int, unique id number of the milestone
+        """
         url = '{0}/milestones/{1}'.format(self._api, str(number))
         json = self._get(url)
         return Milestone(json, self._session) if json else None
@@ -809,6 +887,10 @@ class Repository(GitHubCore):
         return False
 
     def pull_request(self, number):
+        """Get the pull request indicated by ``number``.
+
+        :param number: (required), int, number of the pull request.
+        """
         json = None
         if int(number) > 0:
             url = '{0}/pulls/{1}'.format(self._api, str(number))
@@ -866,12 +948,18 @@ class Repository(GitHubCore):
         """Get an annotated tag.
 
         http://learn.github.com/p/tagging.html
+
+        :param sha: (required), string, sha of the object for this tag
         """
         url = self._api + '/git/tags/' + sha
         json = self._get(url)
         return Tag(json) if json else None
 
     def tree(self, sha):
+        """Get a tree.
+
+        :param sha: (required), string, sha of the object for this tree
+        """
         url = '{0}/git/trees/{1}'.format(self._api, sha)
         json = self._get(url)
         return Tree(json, self._session) if json else None
@@ -883,6 +971,12 @@ class Repository(GitHubCore):
         return self._updated
 
     def update_label(self, name, color, new_name=''):
+        """Update the label ``name``.
+
+        :param name: (required), string, name of the label
+        :param color: (required), string, color code
+        :param new_name: (optional), string, new name of the label
+        """
         label = self.get_label(name)
 
         if label:
@@ -900,6 +994,10 @@ class Repository(GitHubCore):
 
 
 class Branch(object):
+    """The :class:`Branch <Branch>` object. It holds the information GitHub
+    returns about a branch on a :class:`Repository <Repository>`.
+    """
+
     def __init__(self, branch):
         super(Branch, self).__init__()
         self._name = branch.get('name')
@@ -913,14 +1011,20 @@ class Branch(object):
 
     @property
     def commit(self):
+        """Returns the branch commit."""
         return self._commit
 
     @property
     def name(self):
+        """Name of the branch."""
         return self._name
 
 
 class Contents(object):
+    """The :class:`Contents <Contents>` object. It holds the information
+    concerning any content in a repository requested via the API.
+    """
+
     def __init__(self, content):
         super(Contents, self).__init__()
         # links
@@ -953,46 +1057,60 @@ class Contents(object):
 
     @property
     def content(self):
+        """Base64-encoded content of the file."""
         return self._content
 
     @property
     def decoded(self):
+        """Decoded content of the file."""
         return self._dec
 
     @property
     def encoding(self):
+        """Returns encoding used on the content."""
         return self._enc
 
     @property
     def git(self):
+        """Git URL for cloning."""
         return self._git
 
     @property
     def html(self):
+        """URL pointing to the content on GitHub."""
         return self._html
 
     @property
     def name(self):
+        """Name of the content."""
         return self._name
 
     @property
     def path(self):
+        """Path to the content."""
         return self._path
 
     @property
     def sha(self):
+        """SHA string."""
         return self._sha
 
     @property
     def size(self):
+        """Size of the content"""
         return self._sz
 
     @property
     def type(self):
+        """Type of content."""
         return self._type
 
 
 class Download(GitHubCore):
+    """The :class:`Download <Download>` object. It represents how GitHub sends
+    information about files uploaded to the downloads section of a repository.
+    """
+
     def __init__(self, download, session):
         super(Download, self).__init__(session)
         self._api = download.get('url')
@@ -1009,26 +1127,32 @@ class Download(GitHubCore):
 
     @property
     def content_type(self):
+        """Content type of the download."""
         return self._type
 
     @property
     def description(self):
+        """Description of the download."""
         return self._desc
 
     @property
     def download_count(self):
+        """How many times this particular file has been downloaded."""
         return self._dlct
 
     @property
     def html_url(self):
+        """URL of the download at GitHub."""
         return self._html
 
     @property
     def id(self):
+        """Unique id of the download on GitHub."""
         return self._id
 
     @property
     def name(self):
+        """Name of the download."""
         return self._name
 
     def saveas(self, path=''):
@@ -1049,10 +1173,15 @@ class Download(GitHubCore):
 
     @property
     def size(self):
+        """Size of the download."""
         return self._sz
 
 
 class Hook(GitHubCore):
+    """The :class:`Hook <Hook>` object. This handles the information returned by
+    GitHub about hooks set on a repository.
+    """
+
     def __init__(self, hook, session):
         super(Hook, self).__init__(session)
         self._update_(hook)
@@ -1074,10 +1203,12 @@ class Hook(GitHubCore):
 
     @property
     def config(self):
+        """Dictionary containing the configuration for the Hook."""
         return self._config
 
     @property
     def created_at(self):
+        """datetime object representing the date the hook was created."""
         return self._created
 
     def delete(self):
@@ -1115,17 +1246,21 @@ class Hook(GitHubCore):
 
     @property
     def events(self):
+        """Events which trigger the hook."""
         return self._events
     
     @property
     def id(self):
+        """Unique id of the hook."""
         return self._id
 
     def is_active(self):
+        """Checks whether the hook is marked as active on GitHub or not."""
         return self._active
 
     @property
     def name(self):
+        """The name of the hook."""
         return self._name
 
     def test(self):
@@ -1134,41 +1269,51 @@ class Hook(GitHubCore):
 
     @property
     def updated_at(self):
+        """datetime object representing when this hook was last updated."""
         return self._updated
 
 
 class RepoTag(object):
+    """The :class:`RepoTag <RepoTag>` object. This stores the information
+    representing a tag that was created on a repository.
+    """
+
     def __init__(self, tag):
         super(RepoTag, self).__init__()
         self._name = tag.get('name')
         self._zip = tag.get('zipball_url')
         self._tar = tag.get('tarball_url')
-        self._commit = None
-        if tag.get('commit'):
-            self._commit = type('Tag Commit', (object, ),
-                    tag.get('commit'))
+        self._commit = tag.get('commit', {})
 
     def __repr__(self):
         return '<Repository Tag [%s]>' % self._name
 
     @property
     def commit(self):
+        """Dictionary containing the SHA and URL of the commit."""
         return self._commit
 
     @property
     def name(self):
+        """Name of the tag."""
         return self._name
 
     @property
     def tarball_url(self):
+        """URL for the GitHub generated tarball associated with the tag."""
         return self._tar
 
     @property
     def zipball_url(self):
+        """URL for the GitHub generated zipball associated with the tag."""
         return self._zip
 
 
 class RepoComment(BaseComment):
+    """The :class:`RepoComment <RepoComment>` object. This stores the
+    information about a comment on a file in a repository.
+    """
+
     def __init__(self, comment, session):
         super(RepoComment, self).__init__(comment, session)
         self._update_(comment)
@@ -1188,22 +1333,27 @@ class RepoComment(BaseComment):
 
     @property
     def commit_id(self):
+        """Commit id on which the comment was made."""
         return self._cid
 
     @property
     def html_url(self):
+        """URL of the comment on GitHub."""
         return self._html
 
     @property
     def line(self):
+        """The line number where the comment is located."""
         return self._line
 
     @property
     def path(self):
+        """The path to the file where the comment was made."""
         return self._path
 
     @property
     def position(self):
+        """The position in the diff where the comment was made."""
         return self._pos
 
     def update(self, body, sha, line, path, position):
@@ -1228,14 +1378,21 @@ class RepoComment(BaseComment):
 
     @property
     def updated_at(self):
+        """datetime object representing when the comment was updated."""
         return self._updated
 
     @property
     def user(self):
+        """Login of the user who left the comment."""
         return self._user
 
 
 class RepoCommit(BaseCommit):
+    """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
+    viewed by a :class:`Repository`. This is different from a Commit object
+    returned from the git data section.
+    """
+
     def __init__(self, commit, session):
         super(RepoCommit, self).__init__(commit, session)
         self._author = User(commit.get('author'), self._session)
@@ -1260,34 +1417,45 @@ class RepoCommit(BaseCommit):
 
     @property
     def additions(self):
+        """The number of additions made in the commit."""
         return self._addts
 
     @property
     def author(self):
+        """:class:`User <User>` who authored the commit."""
         return self._author
 
     @property
     def commit(self):
+        """:class:`Commit <Commit>`."""
         return self._commit
 
     @property
     def committer(self):
+        """:class:`User <User>` who committed the commit."""
         return self._committer
 
     @property
     def deletions(self):
+        """The number of deletions made in the commit."""
         return self._delts
 
     @property
     def files(self):
+        """The files that were modified by this commit."""
         return self._files
 
     @property
     def total(self):
+        """Total number of changes in the files."""
         return self._total
 
 
 class Comparison(object):
+    """The :class:`Comparison <Comparison>` object. This encapsulates the
+    information returned by GitHub comparing two commit objects in a repository.
+    """
+
     def __init__(self, compare):
         super(Comparison, self).__init__()
         self._api = compare.get('api')
@@ -1302,55 +1470,64 @@ class Comparison(object):
         self._ttl_commits = compare.get('total_commits')
         self._commits = [RepoCommit(com, None) for com in
                 compare.get('commits')]
-        self._files = []
-        if compare.get('files'):
-            append = self._files.append
-            for f in compare.get('files'):
-                append(type('Comparison File', (object, ), f))
+        self._files = compare.get('files')
 
     def __repr__(self):
         return '<Comparison of %d commits>' % self.total_commits
 
     @property
     def ahead_by(self):
+        """Number of commits ahead by."""
         return self._ahead_by
 
     @property
     def base_commit(self):
+        """:class:`RepoCommit <RepoCommit>` object representing the base of
+        comparison.
+        """
         return self._base
 
     @property
     def behind_by(self):
+        """Number of commits behind by."""
         return self._behind
 
     @property
     def commits(self):
+        """List of :class:`RepoCommit <RepoCommit>` objects."""
         return self._commits
 
     @property
     def diff_url(self):
+        """URL to see the diff between the two commits."""
         return self._diff
 
     @property
     def files(self):
+        """List of dictionaries describing the files modified."""
         return self._files
 
     @property
     def html_url(self):
+        """URL to view the comparison at GitHub."""
         return self._html
 
     @property
     def patch_url(self):
+        """Patch URL at GitHub for the comparison."""
         return self._patch
 
     @property
     def permalink_url(self):
+        """Permanent link to this comparison."""
         return self._perma
 
     @property
     def status(self):
+        """Behind or ahead."""
         return self._stat
 
     @property
     def total_commits(self):
+        """Number of commits difference in the comparison."""
         return self._ttl_commits
