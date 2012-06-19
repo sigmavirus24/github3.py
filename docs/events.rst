@@ -1,12 +1,16 @@
+.. _events:
+
 ======
 Events
 ======
 
 .. module:: github3
+.. module:: github3.event
 
 This part of the documentation covers the :class:`Event <Event>` object.
 
 .. autoclass:: Event
+    :inherited-members:
 
 When accessing the payload of the event, you should notice that you receive a
 dictionary where the keys depend on the event type_. Note:

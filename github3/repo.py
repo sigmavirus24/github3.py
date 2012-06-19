@@ -18,7 +18,10 @@ from .user import User, Key
 
 
 class Repository(GitHubCore):
-    """A class to represent how GitHub sends information about repositories."""
+    """The :class:`Repository <Repository>` object. It represents how GitHub
+    sends information about repositories.
+    """
+
     def __init__(self, repo, session):
         super(Repository, self).__init__(session)
         self._update_(repo)
@@ -128,6 +131,7 @@ class Repository(GitHubCore):
 
     @property
     def clone_url(self):
+        """URL used to clone via HTTPS."""
         return self._https_clone
 
     def commit(self, sha):
@@ -434,6 +438,7 @@ class Repository(GitHubCore):
 
     @property
     def created_at(self):
+        """``datetime`` object representing when the Repository was created."""
         return self._created
 
     def delete(self):
@@ -441,6 +446,7 @@ class Repository(GitHubCore):
 
     @property
     def description(self):
+        """Description of the repository."""
         return self._desc
 
     def download(self, id_num):
@@ -488,6 +494,7 @@ class Repository(GitHubCore):
 
     @property
     def forks(self):
+        """The number of forks made of this repository."""
         return self._forks
 
     def is_collaborator(self, login):
@@ -506,6 +513,7 @@ class Repository(GitHubCore):
 
     @property
     def git_clone(self):
+        """Plain git url for an anonymous clone."""
         return self._git_clone
 
     def has_downloads(self):
@@ -516,6 +524,7 @@ class Repository(GitHubCore):
 
     @property
     def homepage(self):
+        """URL of the home page for the project."""
         return self._homepg
 
     def hook(self, id_num):
@@ -531,10 +540,12 @@ class Repository(GitHubCore):
 
     @property
     def html_url(self):
+        """URL of the project at GitHub."""
         return self._url
 
     @property
     def id(self):
+        """Unique id of the repository."""
         return self._id
 
     def issue(self, number):
@@ -561,6 +572,7 @@ class Repository(GitHubCore):
 
     @property
     def language(self):
+        """Language property."""
         return self._lang
 
     def list_branches(self):
@@ -759,18 +771,22 @@ class Repository(GitHubCore):
 
     @property
     def mirror(self):
+        """Mirror property."""
         return self._mirror
 
     @property
     def name(self):
+        """Name of the repository."""
         return self._name
 
     @property
     def open_issues(self):
+        """Number of open issues on the repository."""
         return self._open_issues
 
     @property
     def owner(self):
+        """:class:`User <User>` object representing the repository owner."""
         return self._owner
 
     def pubsubhubbub(self, mode, topic, callback, secret=''):
@@ -801,6 +817,8 @@ class Repository(GitHubCore):
 
     @property
     def pushed_at(self):
+        """``datetime`` object representing the last time commits were pushed to
+        the repository."""
         return self._pushed
 
     def readme(self):
@@ -831,14 +849,17 @@ class Repository(GitHubCore):
 
     @property
     def size(self):
+        """Size of the repository."""
         return self._size
 
     @property
     def ssh_url(self):
+        """URL to clone the repository via SSH."""
         return self._ssh
 
     @property
     def svn_url(self):
+        """If it exists, url to clone the repository via SVN."""
         return self._svn
 
     def tag(self, sha):
@@ -857,6 +878,8 @@ class Repository(GitHubCore):
 
     @property
     def updated_at(self):
+        """``datetime`` object representing the last time the repository was
+        updated."""
         return self._updated
 
     def update_label(self, name, color, new_name=''):
@@ -872,6 +895,7 @@ class Repository(GitHubCore):
 
     @property
     def watchers(self):
+        """Number of users watching the repository."""
         return self._watchers
 
 

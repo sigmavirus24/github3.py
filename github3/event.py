@@ -10,6 +10,11 @@ from .models import GitHubCore, BaseEvent
 
 
 class Event(BaseEvent):
+    """The :class:`Event <Event>` object. It structures and handles the data
+    returned by via the `Events <http://developer.github.com/v3/events>`-
+    section of the GitHub API.
+    """
+
     def __init__(self, event, session):
         super(Event, self).__init__(event, session)
         from .user import User
@@ -33,6 +38,7 @@ class Event(BaseEvent):
 
     @property
     def actor(self):
+        """:class:`User <User>` object representing the actor."""
         return self._actor
 
     @classmethod
@@ -41,13 +47,19 @@ class Event(BaseEvent):
 
     @property
     def org(self):
+        """:class:`Organization <Organization>` object if actor was an org."""
         return self._org
 
     @property
     def payload(self):
+        """Dictionary with the payload. Payload structure is defined by type_.
+
+        .. _type: http://developer.github.com/v3/events/types
+        """
         return self._payload
 
     def is_public(self):
+        """Indicates whether the Event is public or not."""
         return self._public
 
     @property
@@ -56,6 +68,7 @@ class Event(BaseEvent):
 
     @property
     def type(self):
+
         return self._type
 
 

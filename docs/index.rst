@@ -50,3 +50,5 @@ Table of Contents
     :maxdepth: 1
 
     api
+    repos
+    events
