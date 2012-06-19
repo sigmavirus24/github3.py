@@ -8,6 +8,7 @@ This module contains the main GitHub session object.
 
 from requests import session
 from json import dumps
+from .event import Event
 from .gist import Gist
 from .issue import Issue, issue_params
 from .models import GitHubCore
@@ -189,6 +190,11 @@ class GitHub(GitHubCore):
         """List email addresses for the authenticated user."""
         url = self._github_url + '/user/emails'
         return self._get(url) or []
+
+    def list_events(self):
+        """List public events."""
+        json = self._get(self._github_url + '/events')
+        return [Event(ev, self._session) for ev in json]
 
     def list_followers(self, login=None):
         """If login is provided, return a list of followers of that

@@ -6,50 +6,23 @@ This module contains the class(es) related to Events
 
 """
 
-from .compat import loads
 from .git import Commit
 from .models import GitHubCore, BaseEvent
 from .repo import Repository
 from .user import User
+from .org import Organization
 
 
 class Event(BaseEvent):
-    # Based upon self._type, choose a function to determine
-    # self._payload
-    _payload_handlers = {
-            'CommitCommentEvent': self._commitcomment,
-            'CreateEvent': self._create,
-            'DeleteEvent': self._delete,
-            'DownloadEvent': None,
-            'FollowEvent': None,
-            'ForkEvent': None,
-            'ForkApplyEvent': None,
-            'GistEvent': None,
-            'GollumEvent': None,
-            'IssueCommentEvent': None,
-            'IssueEvent': None,
-            'MemberEvent': None,
-            'PublicEvent': lambda x: '',
-            'PullRequestEvent': None,
-            'PullRequestCommentReviewEvent': None,
-            'PushEvent': None,
-            'TeamAddEvent': None,
-            'WatchEvent': None,
-            }
-
     def __init__(self, event, session):
         super(Event, self).__init__(event, session)
         self._type = event.get('type')
         self._public = event.get('public')
-        self._repo = Repository(event.get('repo'), self._session)
-        self._actor = User(event.get('actor'), self._session)
+        self._repo = event.get('repo', {})
+        self._actor = event.get('actor', {})
         self._id = event.get('id')
         self._payload = event.get('payload')
-
-        # Commented out for now because there is no Organization class
-        self._org = None
-        if event.get('org'):
-            self._org = Organization(event.get('org'), self._session)
+        self._org = event.get('org', {})
 
     def __repr__(self):
         return '<Event [%s]>' % self._type[:-5]
@@ -66,9 +39,9 @@ class Event(BaseEvent):
     def org(self):
         return self._org
 
-    # @property
-    # def payload(self):
-    #     return self._payload
+    @property
+    def payload(self):
+        return self._payload
 
     def is_public(self):
         return self._public
@@ -81,18 +54,82 @@ class Event(BaseEvent):
     def type(self):
         return self._type
 
-    def _commitcomment(self, comment):
-        from .repo import RepoComment
-        return RepoComment(comment, self._session) if comment else None
 
-    def _create(self, create):
-        return CreateEvent(create) if create else None
+def _commitcomment(comment):
+    from .repo import RepoComment
+    return RepoComment(comment, None) if comment else None
 
-    def _delete(self, delete):
-        return DeleteEvent(delete) if delete else None
 
-    def _download(self, download):
-        return DownloadEvent(download) if download else None
+def _create(create):
+    return CreateEvent(create) if create else None
+
+
+def _delete(delete):
+    return DeleteEvent(delete) if delete else None
+
+
+def _download(download):
+    return DownloadEvent(download) if download else None
+
+
+def _follow(follow):
+    return FollowEvent(follow) if follow else None
+
+
+def _forkev(fork):
+    return ForkEvent(fork) if fork else None
+
+
+def _forkapply(fork):
+    return ForkApplyEvent(fork) if fork else None
+
+
+def _gist(gist):
+    return GistEvent(gist) if gist else None
+
+
+def _gollum(event):
+    return GollumEvent(event) if event else None
+
+
+def _issuecomm(event):
+    return IssueCommentEvent(event) if event else None
+
+
+def _issueevent(event):
+    return IssueEvent(event) if event else None
+
+
+def _member(event):
+    return MemberEvent(event) if event else None
+
+
+def _pullreqev(event):
+    return PullRequestEvent(event) if event else None
+
+
+# Based upon self._type, choose a function to determine
+# self._payload
+_payload_handlers = {
+        'CommitCommentEvent': _commitcomment,
+        'CreateEvent': _create,
+        'DeleteEvent': _delete,
+        'DownloadEvent': None,
+        'FollowEvent': None,
+        'ForkEvent': None,
+        'ForkApplyEvent': None,
+        'GistEvent': None,
+        'GollumEvent': None,
+        'IssueCommentEvent': None,
+        'IssueEvent': None,
+        'MemberEvent': None,
+        'PublicEvent': lambda x: '',
+        'PullRequestEvent': None,
+        'PullRequestCommentReviewEvent': None,
+        'PushEvent': None,
+        'TeamAddEvent': None,
+        'WatchEvent': None,
+        }
 
 
 class CreateEvent(object):
@@ -377,19 +414,67 @@ class PushEvent(object):
         self._head = event.get('head', '')
         self._ref = event.get('ref', '')
         self._sz = event.get('size', -1)
-        commits = event.get('commits', {})
-        self._sha = commits.get('sha', '')
-        self._msg = commits.get('message', '')
-        self._url = commits.get('url', '')
-        self._commits = commits
-        author = event.get('author', {})
-        self._authname = author.get('name', '')
-        self._authmail = author.get('email', '')
-        self._author = author
+        self._commits = event.get('commits', {})
+        self._author = event.get('author', {})
 
     def __repr__(self):
         return '<PushEvent [%s by %s]>' % (self._head, self._authname)
 
     @property
+    def author(self):
+        return self._author
+
+    @property
+    def commits(self):
+        return self._commits
+
+    @property
     def head(self):
         return self._head
+
+    @property
+    def ref(self):
+        return self._ref
+
+    @property
+    def size(self):
+        return self._sz
+
+
+class TeamAddEvent(object):
+    def __init__(self, event):
+        super(TeamAddEvent, self).__init__()
+        from .org import Team
+        from .user import User
+        from .repo import Repository
+        self._team = Team(event.get('team', {}), None)
+        self._user = User(event.get('user', {}), None)
+        self._repo = Repository(event.get('repo', {}), None)
+
+    def __repr__(self):
+        return '<TeamAddEvent [%s]>' % self._team.name
+
+    @property
+    def repo(self):
+        return self._repo
+
+    @property
+    def team(self):
+        return self._team
+
+    @property
+    def user(self):
+        return self._user
+
+
+def WatchEvent(object):
+    def __init__(self, event):
+        super(WatchEvent, self).__init__()
+        self._act = event.get('action', '')
+
+    def __repr__(self):
+        return '<WatchEvent [%s]>' % self._act
+
+    @property
+    def action(self):
+        return self._act
