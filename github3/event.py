@@ -12,14 +12,21 @@ from .models import GitHubCore, BaseEvent
 class Event(BaseEvent):
     def __init__(self, event, session):
         super(Event, self).__init__(event, session)
+        from .user import User
+        from .repo import Repository
+        from .org import Organization
         self._type = event.get('type')
         self._public = event.get('public')
         self._repo = event.get('repo', {})
         self._actor = event.get('actor', {})
+        if self._actor:
+            self._actor = User(self._actor, self._session)
         self._id = event.get('id')
         handler = _payload_handlers[self._type]
         self._payload = handler(event.get('payload'))
         self._org = event.get('org', {})
+        if self._org:
+            Organization(self._org, self._session)
 
     def __repr__(self):
         return '<Event [%s]>' % self._type[:-5]
@@ -152,7 +159,7 @@ _payload_handlers = {
         'MemberEvent': _member,
         'PublicEvent': lambda x: '',
         'PullRequestEvent': _pullreqev,
-        'PullRequestCommentReviewEvent': _pullreqcomm,
+        'PullRequestReviewCommentEvent': _pullreqcomm,
         'PushEvent': lambda x: x,
         'TeamAddEvent': _team,
         'WatchEvent': lambda x: x,

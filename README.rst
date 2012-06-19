@@ -134,14 +134,14 @@ Progress
 .. _Followers: http://developer.github.com/v3/users/followers/
 .. _User Keys: http://developer.github.com/v3/users/keys/
 
-- Events_: **in progress**
+- Events_: **done**
 
-  - Types_: **in progress**
+  - Types_: **done**
 
 .. _Events: http://developer.github.com/v3/events/
 .. _Types: http://developer.github.com/v3/events/types/
 
-- Search_
+- Search_: **in progress**
 
 .. _Search: http://developer.github.com/v3/search
 
