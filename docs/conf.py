@@ -19,6 +19,6 @@ exclude_patterns = ['_build']
 
 highlight_lang = 'python'
 
-html_theme = 'default'
+html_theme = 'nature'
 
 htmlhelp_basename = 'github3.pydoc'
