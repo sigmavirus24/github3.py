@@ -91,7 +91,9 @@ class Repository(GitHubCore):
     def add_collaborator(self, login):
         """Add ``login`` as a collaborator to a repository.
         
-        :param login: (required), string, login of the user
+        :param login: (required), login of the user
+        :type login: str
+        :returns: bool -- True if successful, False otherwise
         """
         resp = False
         if login:
@@ -102,12 +104,16 @@ class Repository(GitHubCore):
     def archive(self, format, path='', ref='master'):
         """Get the tarball or zipball archive for this repo at ref.
 
-        :param format: (required), string, accepted values: ('tarball',
+        :param format: (required), accepted values: ('tarball',
             'zipball')
-        :param path: (optional), string, path where the file should be saved
+        :type format: str
+        :param path: (optional), path where the file should be saved
             to, default is the filename provided in the headers and will be 
             written in the current directory
-        :param ref: (optional), string
+        :type path: str
+        :param ref: (optional)
+        :type ref: str
+        :returns: bool -- True if successful, False otherwise
         """
         resp = None
         written = False
@@ -130,7 +136,9 @@ class Repository(GitHubCore):
     def blob(self, sha):
         """Get the blob indicated by ``sha``.
 
-        :param sha: (required), string, sha of the blob
+        :param sha: (required), sha of the blob
+        :type sha: str
+        :returns: :class:`Blob` if successful, otherwise None
         """
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
         json = self._get(url)
@@ -144,7 +152,9 @@ class Repository(GitHubCore):
     def commit(self, sha):
         """Get a single commit.
         
-        :param sha: (required), string, sha of the commit
+        :param sha: (required), sha of the commit
+        :type sha: str
+        :returns: :class:`RepoCommit <RepoCommit>` if successful, otherwise None
         """
         json = self._get(self._api + '/commits/' + sha)
         return RepoCommit(json, self._session) if json else None
@@ -152,14 +162,24 @@ class Repository(GitHubCore):
     def commit_comment(self, comment_id):
         """Get a single commit comment.
         
-        :param comment_id: (required), int, id of the comment used by GitHub
+        :param comment_id: (required), id of the comment used by GitHub
+        :type comment_id: int
+        :returns: :class:`RepoComment <RepoComment>` if successful, otherwise
+            None
         """
         url = '{0}/comments/{1}'.format(self._api, comment_id)
         json = self._get(url)
         return RepoComment(json, self._session) if json else None
 
     def compare_commits(self, base, head):
-        """Compare two commits."""
+        """Compare two commits.
+        
+        :param base: (required), base for the comparison
+        :type base: str
+        :param head: (required), compare this against base
+        :type head: str
+        :returns: :class:`Comparison <Comparison>` if successful, else None
+        """
         url = self._api + '/compare/{0}...{1}'.format(base, head)
         json = self._get(url)
         return Comparison(json) if json else None
@@ -167,8 +187,10 @@ class Repository(GitHubCore):
     def contents(self, path):
         """Get the contents of the file pointed to by ``path``.
         
-        :param path: (required), string, path to file, e.g.
+        :param path: (required), path to file, e.g.
             github3/repo.py
+        :type path: str
+        :returns: :class:`Contents <Contents>` if successful, else None
         """
         url = self._api + '/contents/' + path
         json = self._get(url)
@@ -177,8 +199,11 @@ class Repository(GitHubCore):
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
-        :param content: (required), string, content of the blob
-        :param encoding: (required), string, ('base64', 'utf-8')
+        :param content: (required), content of the blob
+        :type content: str
+        :param encoding: (required), ('base64', 'utf-8')
+        :type encoding: str
+        :returns: string of the SHA returned
         """
         sha = ''
         if encoding in ('base64', 'utf-8') and content:
@@ -192,12 +217,18 @@ class Repository(GitHubCore):
     def create_comment(self, body, sha, line, path, position):
         """Create a comment on a commit.
 
-        :param body: (required), string, body of the message
-        :param sha: (required), string, commit id
-        :param line: (required), int, line number of the file to comment on
-        :param path: (required), string, relative path of the file to comment
+        :param body: (required), body of the message
+        :type body: str
+        :param sha: (required), commit id
+        :type sha: str
+        :param line: (required), line number of the file to comment on
+        :type line: int
+        :param path: (required), relative path of the file to comment
             on
-        :param position: (required), int, line index in the diff to comment on
+        :type path: str
+        :param position: (required), line index in the diff to comment on
+        :type position: int
+        :returns: :class:`RepoComment <RepoComment>` if successful else None
         """
         line = int(line)
         position = int(position)
@@ -212,20 +243,25 @@ class Repository(GitHubCore):
     def create_commit(self, message, tree, parents, author={}, committer={}):
         """Create a commit on this repository.
 
-        :param message: (required), string, commit message
-        :param tree: (required), string, SHA of the tree object this
+        :param message: (required), commit message
+        :type message: str
+        :param tree: (required), SHA of the tree object this
             commit points to
-        :param parents: (required), list/array, SHAs of the commits that
-            were parents of this commit. If empty, the commit will be
-            written as the root commit. Even if there is only one
-            parent, this should be an array.
-        :param author: (optional), dictionary, if omitted, GitHub will
+        :type tree: str
+        :param parents: (required), SHAs of the commits that were parents of
+            this commit. If empty, the commit will be written as the root
+            commit.  Even if there is only one parent, this should be an
+            array.
+        :type parents: list
+        :param author: (optional), if omitted, GitHub will
             use the authenticated user's credentials and the current
             time. Format: {'name': 'Committer Name', 'email':
             'name@example.com', 'date': 'YYYY-MM-DDTHH:MM:SS+HH:00'}
-        :param committer: (optional), dictionary, if ommitted, GitHub
-            will use the author parameters. Should be the same format as
-            the author parameter.
+        :type author: dict
+        :param committer: (optional), if ommitted, GitHub will use the author
+            parameters. Should be the same format as the author parameter.
+        :type commiter: dict
+        :returns: :class:`Commit <Commit>` if successful, else None
         """
         commit = None
         if message and tree and isinstance(parents, list):
@@ -247,10 +283,15 @@ class Repository(GitHubCore):
         I do not require you provide the size in bytes because it can be 
         determined by the operating system.
 
-        :param name: (required), string, name of the file as it will appear
-        :param path: (required), string, path to the file
-        :param description: (optional), string, description of the file
-        :param content_type: (optional), string, e.g. 'text/plain'
+        :param name: (required), name of the file as it will appear
+        :type name: str
+        :param path: (required), path to the file
+        :type path: str
+        :param description: (optional), description of the file
+        :type description: str
+        :param content_type: (optional), e.g. 'text/plain'
+        :type content_type: str
+        :returns: :class:`Download <Download>` if successful, else None
         """
         json = None
         if name and path:
@@ -295,8 +336,11 @@ class Repository(GitHubCore):
     def create_fork(self, organization=None):
         """Create a fork of this repository.
 
-        :param organization: login for organization to create the fork
-            under"""
+        :param organization: (required), login for organization to create the
+            fork under
+        :type organization: str
+        :returns: :class:`Repository <Repository>` if successful, else None
+        """
         url = self._api + '/forks'
         if organization:
             json = self._post(url, dumps({'org': organization}),
@@ -309,12 +353,17 @@ class Repository(GitHubCore):
     def create_hook(self, name, config, events=['push'], active=True):
         """Create a hook on this repository.
 
-        :param name: (required), string, name of the hook
-        :param config: (required), dict, key-value pairs which act as settings
+        :param name: (required), name of the hook
+        :type name: str
+        :param config: (required), key-value pairs which act as settings
             for this hook
-        :param events: (optional), list, events the hook is triggered for
-        :param active: (optional), boolean, whether the hook is actually
+        :type config: dict
+        :param events: (optional), events the hook is triggered for
+        :type events: list
+        :param active: (optional), whether the hook is actually
             triggered
+        :type active: bool
+        :returns: :class:`Hook <Hook>` if successful, else None
         """
         json = None
         if name and config and isinstance(config, dict):
@@ -322,7 +371,7 @@ class Repository(GitHubCore):
             data = {'name': name, 'config': config, 'events': events, 'active':
                     active}
             json = self._post(url, data)
-        return Hoook(json, self._session) if json else None
+        return Hook(json, self._session) if json else None
 
     def create_issue(self,
         title,
@@ -332,14 +381,20 @@ class Repository(GitHubCore):
         labels=[]):
         """Creates an issue on this repository.
         
-        :param title: (required), string, title of the issue
-        :param body: (optional), string, body of the issue
-        :param assignee: (optional), string, login of the user to assign the
+        :param title: (required), title of the issue
+        :type title: str
+        :param body: (optional), body of the issue
+        :type body: str
+        :param assignee: (optional), login of the user to assign the
             issue to
-        :param milestone: (optional), string, milestone to attribute this issue
+        :type assignee: str
+        :param milestone: (optional), milestone to attribute this issue
             to
-        :param labels: (optional), list of strings, labels to apply to this
+        :type milestone: str
+        :param labels: (optional), labels to apply to this
             issue
+        :type labels: list of strings
+        :returns: :class:`Issue <Issue>` if successful, else None
         """
         issue = dumps({'title': title, 'body': body,
             'assignee': assignee, 'milestone': milestone,
@@ -352,8 +407,11 @@ class Repository(GitHubCore):
     def create_key(self, title, key):
         """Create a deploy key.
 
-        :param title: (required), string, title of key
-        :param key: (required), string, key text
+        :param title: (required), title of key
+        :type title: str
+        :param key: (required), key text
+        :type key: str
+        :returns: :class:`Key <Key>` if successful, else None
         """
         data = dumps({'title': title, 'key': key})
         url = self._api + '/keys'
@@ -363,9 +421,12 @@ class Repository(GitHubCore):
     def create_label(self, name, color):
         """Create a label for this repository.
 
-        :param name: (required), string, name to give to the label
-        :param color: (required), string, value of the color to assign to the
+        :param name: (required), name to give to the label
+        :type name: str
+        :param color: (required), value of the color to assign to the
             label
+        :type color: str
+        :returns: :class:`Label <Label>` if successful, else None
         """
         if color[0] == '#':
             color = color[1:]
@@ -379,11 +440,16 @@ class Repository(GitHubCore):
             due_on=None):
         """Create a milestone for this repository.
 
-        :param title: (required), string, title of the milestone
-        :param state: (optional), string, state of the milestone, accepted
+        :param title: (required), title of the milestone
+        :type title: str
+        :param state: (optional), state of the milestone, accepted
             values: ('open', 'closed'), default: 'open'
-        :param description: (optional), string, description of the milestone
-        :param due_on: (optional), string, ISO 8601 formatted due date
+        :type state: str
+        :param description: (optional), description of the milestone
+        :type description: str
+        :param due_on: (optional), ISO 8601 formatted due date
+        :type due_on: str
+        :returns: :class:`Milestone <Milestone>` if successful, else None
         """
         url = self._api + '/milestones'
         if state not in ('open', 'closed'):
@@ -397,10 +463,15 @@ class Repository(GitHubCore):
         """Create a pull request using commits from ``head`` and comparing
         against ``base``.
 
-        :param title: (required), string
-        :param base: (required), string, e.g., 'username:branch', or a sha
-        :param head: (required), string, e.g., 'master', or a sha
-        :param body: (optional), string, markdown formatted description
+        :param title: (required)
+        :type title: str
+        :param base: (required), e.g., 'username:branch', or a sha
+        :type base: str
+        :param head: (required), e.g., 'master', or a sha
+        :type head: str
+        :param body: (optional), markdown formatted description
+        :type body: str
+        :returns: :class:`PullRequest <PullRequest>` if successful, else None
         """
         data = dumps({'title': title, 'body': body, 'base': base,
             'head': head})
@@ -409,9 +480,13 @@ class Repository(GitHubCore):
     def create_pull_from_issue(self, issue, base, head):
         """Create a pull request from issue #``issue``.
 
-        :param issue: (required), int, issue number
-        :param base: (required), string, e.g., 'username:branch', or a sha
-        :param head: (required), string, e.g., 'master', or a sha
+        :param issue: (required), issue number
+        :type issue: int
+        :param base: (required), e.g., 'username:branch', or a sha
+        :type base: str
+        :param head: (required), e.g., 'master', or a sha
+        :type head: str
+        :returns: :class:`PullRequest <PullRequest>` if successful, else None
         """
         data = dumps({'issue': issue, 'base': base, 'head': head})
         return self._create_pull(data)
@@ -419,10 +494,13 @@ class Repository(GitHubCore):
     def create_ref(self, ref, sha):
         """Create a reference in this repository.
 
-        :param ref: (required), string, fully qualified name of the reference,
+        :param ref: (required), fully qualified name of the reference,
             e.g. ``refs/heads/master``. If it doesn't start with ``refs`` and
             contain at least two slashes, GitHub's API will reject it.
-        :param sha: (required), string, SHA1 value to set the reference to
+        :type ref: str
+        :param sha: (required), SHA1 value to set the reference to
+        :type sha: str
+        :returns: :class:`Reference <Reference>` if successful else None
         """
         data = dumps({'ref': ref, 'sha': sha})
         url = self._api + '/git/refs'
@@ -433,15 +511,23 @@ class Repository(GitHubCore):
             lightweight=False):
         """Create a tag in this repository.
 
-        :param tag: (required), string, name of the tag
-        :param message: (required), string, tag message
-        :param sha: (required), string, SHA of the git object this is tagging
-        :param obj_type: (required), string, type of object being tagged, e.g.,
+        :param tag: (required), name of the tag
+        :type tag: str
+        :param message: (required), tag message
+        :type message: str
+        :param sha: (required), SHA of the git object this is tagging
+        :type sha: str
+        :param obj_type: (required), type of object being tagged, e.g.,
             'commit', 'tree', 'blob'
-        :param tagger: (required), dict, containing the name, email of the
+        :type obj_type: str
+        :param tagger: (required), containing the name, email of the
             tagger and the date it was tagged
-        :param lightweight: (optional), boolean, if False, create an annotated
+        :type tagger: dict
+        :param lightweight: (optional), if False, create an annotated
             tag, otherwise create a lightweight tag (a Reference).
+        :type lightweight: bool
+        :returns: If lightweight == False: :class:`Tag <Tag>` if successful,
+            else None. If lightweight == True: :class:`Reference <Reference>` 
         """
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
@@ -460,11 +546,14 @@ class Repository(GitHubCore):
     def create_tree(self, tree, base_tree=''):
         """Create a tree on this repository.
 
-        :param tree: (required), array of hash objects specifying the
-            tree structure. Format: [{'path': 'path/file', 'mode':
+        :param tree: (required), specifies the tree structure.
+            Format: [{'path': 'path/file', 'mode':
             'filemode', 'type': 'blob or tree', 'sha': '44bfc6d...'}]
-        :param base_tree: (optional), string, SHA1 of the tree you want
+        :type tree: list of dicts
+        :param base_tree: (optional), SHA1 of the tree you want
             to update with new data
+        :type base_tree: str
+        :returns: :class:`Tree <Tree>` if successful, else None
         """
         tree = None
         if tree and isinstance(tree, list):
@@ -481,6 +570,10 @@ class Repository(GitHubCore):
         return self._created
 
     def delete(self):
+        """Delete this repository.
+
+        :returns: bool -- True if successful, False otherwise
+        """
         return self._delete(self._api)
 
     @property
@@ -491,7 +584,9 @@ class Repository(GitHubCore):
     def download(self, id_num):
         """Get a single download object by its id.
 
-        :param id_num: (required), string or int, id of the download
+        :param id_num: (required), id of the download
+        :type id_num: int
+        :returns: :class:`Download <Download>` if successful, else None
         """
         json = None
         if int(id_num) > 0:
@@ -509,17 +604,25 @@ class Repository(GitHubCore):
         has_downloads=True):
         """Edit this repository.
 
-        :param name: (required), string, name of the repository
-        :param description: (optional), string
-        :param homepage: (optional), string
-        :param private: (optional), boolean, If ``True``, create a
+        :param name: (required), name of the repository
+        :type name: str
+        :param description: (optional)
+        :type description: str
+        :param homepage: (optional)
+        :type homepage: str
+        :param private: (optional), If ``True``, create a
             private repository. API default: ``False``
-        :param has_issues: (optional), boolean, If ``True``, enable
+        :type private: bool
+        :param has_issues: (optional), If ``True``, enable
             issues for this repository. API default: ``True``
-        :param has_wiki: (optional), boolean, If ``True``, enable the
+        :type has_issues: bool
+        :param has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :param has_downloads: (optional), boolean, If ``True``, enable
+        :type has_wiki: bool
+        :param has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
+        :type has_downloads: bool
+        :returns: bool -- True if successful, False otherwise
         """
         data = dumps({'name': name, 'description': description,
             'homepage': homepage, 'private': private,
@@ -539,7 +642,9 @@ class Repository(GitHubCore):
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository.
         
-        :param login: (required), string, login for the user
+        :param login: (required), login for the user
+        :type login: str
+        :returns: bool -- True if successful, False otherwise
         """
         resp = False
         if login:
@@ -548,11 +653,17 @@ class Repository(GitHubCore):
         return resp
 
     def is_fork(self):
-        """Checks if this repository is a fork."""
+        """Checks if this repository is a fork.
+        
+        :returns: bool
+        """
         return self._is_fork
 
     def is_private(self):
-        """Checks if this repository is private."""
+        """Checks if this repository is private.
+        
+        :returns: bool
+        """
         return self._priv
 
     @property
@@ -561,11 +672,17 @@ class Repository(GitHubCore):
         return self._git_clone
 
     def has_downloads(self):
-        """Checks if this repository has downloads."""
+        """Checks if this repository has downloads.
+        
+        :returns: bool
+        """
         return self._has_dl
 
     def has_wiki(self):
-        """Checks if this repository has a wiki."""
+        """Checks if this repository has a wiki.
+        
+        :returns: bool
+        """
         return self._has_wiki
 
     @property
@@ -576,7 +693,9 @@ class Repository(GitHubCore):
     def hook(self, id_num):
         """Get a single hook.
 
-        :param id_num: (required), int, id of the hook
+        :param id_num: (required), id of the hook
+        :type id_num: int
+        :returns: :class:`Hook <Hook>` if successful, else None
         """
         json = None
         if int(id_num) > 0:
@@ -597,7 +716,9 @@ class Repository(GitHubCore):
     def issue(self, number):
         """Get the issue specified by ``number``.
 
-        :param number: (required), int, number of the issue on this repository
+        :param number: (required), number of the issue on this repository
+        :type number: int
+        :returns: :class:`Issue <Issue>` if successful, else None
         """
         json = None
         if int(number) > 0:
@@ -608,7 +729,9 @@ class Repository(GitHubCore):
     def key(self, id_num):
         """Get the specified deploy key.
         
-        :param id_num: (required), int, id of the key
+        :param id_num: (required), id of the key
+        :type id_num: int
+        :returns: :class:`Key <Key>` if successful, else None
         """
         json = None
         if int(id_num) > 0:
@@ -619,7 +742,9 @@ class Repository(GitHubCore):
     def label(self, name):
         """Get the label specified by ``name``
 
-        :param name: (required), string, name of the label
+        :param name: (required), name of the label
+        :type name: str
+        :returns: :class:`Label <Label>` if successful, else None
         """
         json = None
         if name:
@@ -633,13 +758,19 @@ class Repository(GitHubCore):
         return self._lang
 
     def list_branches(self):
-        """List the branches in this repository."""
+        """List the branches in this repository.
+        
+        :returns: list of :class:`Branch <Branch>`\ es
+        """
         url = self._api + '/branches'
         json = self._get(url)
         return [Branch(b) for b in json]
 
     def list_comments(self):
-        """List comments on all commits in the repository."""
+        """List comments on all commits in the repository.
+        
+        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        """
         url = self._api + '/comments'
         json = self._get(url)
         return [RepoComment(comment, self._session) for comment in json]
@@ -647,7 +778,9 @@ class Repository(GitHubCore):
     def list_comments_on_commit(self, sha):
         """List comments for a single commit.
         
-        :param sha: (required), string, sha of the commit to list comments on
+        :param sha: (required), sha of the commit to list comments on
+        :type sha: str
+        :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
         json = []
         if sha:
@@ -656,7 +789,10 @@ class Repository(GitHubCore):
         return [RepoComment(comm, self._session) for comm in json]
 
     def list_commits(self):
-        """List commits in this repository."""
+        """List commits in this repository.
+        
+        :returns: list of :class:`RepoCommit <RepoCommit>`\ s
+        """
         url = self._api + '/commits'
         json = self._get(url)
         return [RepoCommit(commit, self._session) for commit in json]
@@ -664,8 +800,9 @@ class Repository(GitHubCore):
     def list_contributors(self, anon=False):
         """List the contributors to this repository.
 
-        :param anon: (optional), boolean, True lists anonymous
-            contributors as well
+        :param anon: (optional), True lists anonymous contributors as well
+        :type anon: bool
+        :returns: list of :class:`User <User>`\ s
         """
         url = self._api + '/contributors'
         if anon:
@@ -675,7 +812,10 @@ class Repository(GitHubCore):
         return [User(c, ses) for c in json]
 
     def list_downloads(self):
-        """List available downloads for this repository."""
+        """List available downloads for this repository.
+        
+        :returns: list of :class:`Download <Download>`\ s
+        """
         url = self._api + '/downloads'
         json = self._get(url)
         return [Download(dl, self._session) for dl in json]
@@ -683,8 +823,10 @@ class Repository(GitHubCore):
     def list_forks(self, sort=''):
         """List forks of this repository.
 
-        :param sort: (optional), string, accepted values:
+        :param sort: (optional), accepted values:
             ('newest', 'oldest', 'watchers'), API default: 'newest'
+        :type sort: str
+        :returns: list of :class:`Repository <Repository>`
         """
         url = self._api + '/forks'
         if sort in ('newest', 'oldest', 'watchers'):
@@ -693,7 +835,10 @@ class Repository(GitHubCore):
         return [Repository(r, self._session) for r in json]
 
     def list_hooks(self):
-        """List hooks registered on this repository."""
+        """List hooks registered on this repository.
+        
+        :returns: list of :class:`Hook <Hook>`\ s
+        """
         url = self._api + '/hooks'
         json = self._get(url)
         return [Hook(h, self._session) for h in json]
@@ -709,15 +854,23 @@ class Repository(GitHubCore):
         since=None):
         """List issues on this repo based upon parameters passed.
 
-        :param milestone: must be an integer, 'none', or '*'
-        :param state: accepted values: ('open', 'closed')
-        :param assignee: 'none', '*', or login name
-        :param mentioned: user's login name
-        :param labels: comma-separated list of labels, e.g. 'bug,ui,@high'
-        :param sort: accepted values:
+        :param milestone: (optional), 'none', or '*'
+        :type milestone: int
+        :param state: (optional), accepted values: ('open', 'closed')
+        :type state: str
+        :param assignee: (optional), 'none', '*', or login name
+        :type assignee: str
+        :param mentioned: (optional), user's login name
+        :type mentioned: str
+        :param labels: (optional), comma-separated list of labels, e.g.
+            'bug,ui,@high' :param sort: accepted values:
             ('created', 'updated', 'comments', 'created')
-        :param direction: accepted values: ('open', 'closed')
-        :param since: ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+        :type labels: str
+        :param direction: (optional), accepted values: ('open', 'closed')
+        :type direction: str
+        :param since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+        :type since: str
+        :returns: list of :class:`Issue <Issue>`\ s
         """
         url = self._api + '/issues'
 
@@ -746,20 +899,29 @@ class Repository(GitHubCore):
         return [Issue(i, ses) for i in json]
 
     def list_keys(self):
-        """List deploy keys on this repository."""
+        """List deploy keys on this repository.
+        
+        :returns: list of :class:`Key <Key>`\ s
+        """
         url = self._api + '/keys'
         json = self._get(url)
         return [Key(k, self._session) for k in json]
 
     def list_labels(self):
-        """List labels on this repository."""
+        """List labels on this repository.
+        
+        :returns: list of :class:`Label <Label>`\ s
+        """
         url = self._api + '/labels'
         json = self._get(url)
         ses = self._session
         return [Label(label, ses) for label in json]
 
     def list_languages(self):
-        """List the programming languages used in the repository."""
+        """List the programming languages used in the repository.
+        
+        :returns: list of tuples
+        """
         url = self._api + '/languages'
         json = self._get(url)
         return [(k, v) for k, v in json.items()]
@@ -767,12 +929,16 @@ class Repository(GitHubCore):
     def list_milestones(self, state=None, sort=None, direction=None):
         """List the milestones on this repository.
 
-        :param state: (optional), string, state of the milestones, accepted
+        :param state: (optional), state of the milestones, accepted
             values: ('open', 'closed')
-        :param sort: (optional), string, how to sort the milestones, accepted
+        :type state: str
+        :param sort: (optional), how to sort the milestones, accepted
             values: ('due_date', 'completeness')
-        :param direction: (optional), string, direction to sort the milestones,
+        :type sort: str
+        :param direction: (optional), direction to sort the milestones,
             accepted values: ('asc', 'desc')
+        :type direction: str
+        :returns: list of :class:`Milestone <Milestone>`\ s
         """
         url = self._api + '/milestones'
 
@@ -797,7 +963,9 @@ class Repository(GitHubCore):
     def list_pulls(self, state=None):
         """List pull requests on repository.
 
-        :param state: (optional), string, accepted values: ('open', 'closed')
+        :param state: (optional), accepted values: ('open', 'closed')
+        :type state: str
+        :returns: list of :class:`PullRequest <PullRequest>`\ s
         """
         if state in ('open', 'closed'):
             url = '{0}/pulls?state={1}'.format(self._api, state)
@@ -810,7 +978,9 @@ class Repository(GitHubCore):
     def list_refs(self, subspace=''):
         """List references for this repository.
 
-        :param subspace: (optional), string, e.g. 'tags', 'stashes', 'notes'
+        :param subspace: (optional), e.g. 'tags', 'stashes', 'notes'
+        :type subspace: str
+        :returns: list of :class:`Reference <Reference>`\ s
         """
         if subspace:
             url = self._api + '/git/refs/' + subspace
@@ -821,19 +991,27 @@ class Repository(GitHubCore):
         return [Reference(r, ses) for r in json]
 
     def list_tags(self):
-        """List tags on this repository."""
+        """List tags on this repository.
+        
+        :returns: list of :class:`RepoTag <RepoTag>`\ s
+        """
         url = self._api + '/tags'
         json = self._get(url)
         return [RepoTag(tag) for tag in json]
 
     def list_teams(self):
-        """List teams with access to this repository."""
+        """List teams with access to this repository.
+        
+        :returns: list of dicts
+        """
         url = self._api + '/teams'
-        json = self._get(url)
-        return [type('Repository Team', (object, ), t) for t in json]
+        return self._get(url)
 
     def list_watchers(self):
-        """List watchers of this repository."""
+        """List watchers of this repository.
+        
+        :returns: list of :class:`User <User>`\ s
+        """
         url = self._api + '/watchers'
         json = self._get(url)
         return [User(u, self._session) for u in json]
@@ -841,7 +1019,9 @@ class Repository(GitHubCore):
     def milestone(self, number):
         """Get the milestone indicated by ``number``.
 
-        :param number: (required), int, unique id number of the milestone
+        :param number: (required), unique id number of the milestone
+        :type number: int
+        :returns: :class:`Milestone <Milestone>`
         """
         url = '{0}/milestones/{1}'.format(self._api, str(number))
         json = self._get(url)
@@ -870,13 +1050,17 @@ class Repository(GitHubCore):
     def pubsubhubbub(self, mode, topic, callback, secret=''):
         """Create/update a pubsubhubbub hook.
 
-        :param mode: (required), string, accepted values:
-            ('subscribe', 'unsubscribe')
-        :param topic: (required), string, form:
+        :param mode: (required), accepted values: ('subscribe', 'unsubscribe')
+        :type mode: str
+        :param topic: (required), form:
             https://github.com/:user/:repo/events/:event
-        :param callback: (required), string, the URI that receives the updates
-        :param secret: (optional), string, shared secret key that generates a
+        :type topic: str
+        :param callback: (required), the URI that receives the updates
+        :type callback: str
+        :param secret: (optional), shared secret key that generates a
             SHA1 HMAC of the payload content.
+        :type secret: str
+        :returns: bool
         """
         from re import match
         m = match('https://github\.com/\w+/\w+/events/\w+', topic)
@@ -889,7 +1073,9 @@ class Repository(GitHubCore):
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
 
-        :param number: (required), int, number of the pull request.
+        :param number: (required), number of the pull request.
+        :type number: int
+        :returns: :class:`PullRequest <PullRequest>`
         """
         json = None
         if int(number) > 0:
@@ -904,7 +1090,10 @@ class Repository(GitHubCore):
         return self._pushed
 
     def readme(self):
-        """Get the README for this repository."""
+        """Get the README for this repository.
+        
+        :returns: :class:`Contents <Contents>`
+        """
         url = self._api + '/readme'
         json = self._get(url)
         return Contents(json) if json else None
@@ -916,13 +1105,22 @@ class Repository(GitHubCore):
         specify 'heads/branchname' and for a tag, 'tags/tagname'. Essentially,
         the system should return any reference you provide it in the namespace,
         including notes and stashes (provided they exist on the server).
+
+        :param ref: (required)
+        :type ref: str
+        :returns: :class:`Reference <Reference>`
         """
         url = self._api + '/git/refs/' + ref
         json = self._get(url)
         return Reference(json, self._session) if json else None
 
     def remove_collaborator(self, login):
-        """Remove collaborator ``login`` from the repository."""
+        """Remove collaborator ``login`` from the repository.
+        
+        :param login: (required), login name of the collaborator
+        :type login: str
+        :returns: bool
+        """
         resp = False
         if login:
             url = self._api + '/collaborators/' + login
@@ -949,7 +1147,9 @@ class Repository(GitHubCore):
 
         http://learn.github.com/p/tagging.html
 
-        :param sha: (required), string, sha of the object for this tag
+        :param sha: (required), sha of the object for this tag
+        :type sha: str
+        :returns: :class:`Tag <Tag>`
         """
         url = self._api + '/git/tags/' + sha
         json = self._get(url)
@@ -958,7 +1158,9 @@ class Repository(GitHubCore):
     def tree(self, sha):
         """Get a tree.
 
-        :param sha: (required), string, sha of the object for this tree
+        :param sha: (required), sha of the object for this tree
+        :type sha: str
+        :returns: :class:`Tree <Tree>`
         """
         url = '{0}/git/trees/{1}'.format(self._api, sha)
         json = self._get(url)
@@ -973,9 +1175,13 @@ class Repository(GitHubCore):
     def update_label(self, name, color, new_name=''):
         """Update the label ``name``.
 
-        :param name: (required), string, name of the label
-        :param color: (required), string, color code
-        :param new_name: (optional), string, new name of the label
+        :param name: (required), name of the label
+        :type name: str
+        :param color: (required), color code
+        :type color: str
+        :param new_name: (optional), new name of the label
+        :type new_name: str
+        :returns: bool
         """
         label = self.get_label(name)
 
@@ -1158,8 +1364,10 @@ class Download(GitHubCore):
     def saveas(self, path=''):
         """Save this download to the path specified.
         
-        :param path: (optional), string, if no path is specified, it will be
+        :param path: (optional), if no path is specified, it will be
             saved in the current directory with the name specified by GitHub.
+        :type path: str
+        :returns: bool
         """
         if not path:
             path = self.name
@@ -1212,23 +1420,33 @@ class Hook(GitHubCore):
         return self._created
 
     def delete(self):
-        """Delete this hook."""
+        """Delete this hook.
+        
+        :returns: bool
+        """
         return self._delete(self._api)
 
     def edit(self, name, config, events=[], add_events=[], rm_events=[],
             active=True):
         """Edit this hook.
 
-        :param name: (required), string, name of the service being called
-        :param config: (required), dict, key-value pairs of settings for this
+        :param name: (required), name of the service being called
+        :type name: str
+        :param config: (required), key-value pairs of settings for this
             hook
-        :param events: (optional), list, which events should this be triggered
+        :type config: dict
+        :param events: (optional), which events should this be triggered
             for
-        :param add_events: (optional), list, events to be added to the list of
+        :type events: list
+        :param add_events: (optional), events to be added to the list of
             events that this hook triggers for
-        :param rm_events: (optional), list, events to be remvoed from the list
+        :type add_events: list
+        :param rm_events: (optional), events to be remvoed from the list
             of events that this hook triggers for
-        :param active: (optional), boolean, should this event be active
+        :type rm_events: list
+        :param active: (optional), should this event be active
+        :type active: bool
+        :returns: bool
         """
         if name and config and isinstance(config, dict):
             data = {'name': name, 'config': config, 'active': active}
@@ -1243,6 +1461,8 @@ class Hook(GitHubCore):
 
             json = self._patch(self._api, dumps(data))
             self._update_(json)
+            return True
+        return False
 
     @property
     def events(self):
@@ -1255,7 +1475,10 @@ class Hook(GitHubCore):
         return self._id
 
     def is_active(self):
-        """Checks whether the hook is marked as active on GitHub or not."""
+        """Checks whether the hook is marked as active on GitHub or not.
+        
+        :returns: bool
+        """
         return self._active
 
     @property
@@ -1264,7 +1487,10 @@ class Hook(GitHubCore):
         return self._name
 
     def test(self):
-        """Test this hook"""
+        """Test this hook
+        
+        :returns: bool
+        """
         return self._post(self._api + '/test')
 
     @property
@@ -1359,12 +1585,18 @@ class RepoComment(BaseComment):
     def update(self, body, sha, line, path, position):
         """Update this comment.
 
-        :param body: (required), string
-        :param sha: (required), string, sha id of the commit to comment on
-        :param line: (required), int, line number to comment on
-        :param path: (required), string, relative path of the file you're
+        :param body: (required)
+        :type body: str
+        :param sha: (required), sha id of the commit to comment on
+        :type sha: str
+        :param line: (required), line number to comment on
+        :type line: int
+        :param path: (required), relative path of the file you're
             commenting on
-        :param position: (required), int, line index in the diff to comment on
+        :type path: str
+        :param position: (required), line index in the diff to comment on
+        :type position: int
+        :returns: bool
         """
         json = None
         if body and sha and path and line > 0 and position > 0:

@@ -50,5 +50,6 @@ Table of Contents
     :maxdepth: 1
 
     api
+    gists
     repos
     events

@@ -13,5 +13,5 @@ __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012 Ian Cordasco'
 __version__ = '0.1a'
 
-from .api import login, gist, gists, create_gist
+from .api import login, gist, list_gists, create_gist
 from .github import GitHub

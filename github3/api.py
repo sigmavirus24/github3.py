@@ -12,29 +12,54 @@ from .github import GitHub
 
 def login(username, password, token=None):
     """Constructs and returns a GitHub session with the username and
-    password, or token"""
+    password, or token
+    
+    :param username: login name
+    :type username: str
+    :param password: password for the login
+    :type password: str
+    :param token: (optional), OAuth token
+    :type token: str
+    :returns: :class:`GitHub <GitHub>`
+    """
     gh = GitHub()
     gh.login(username, password, token)
     return gh
 
 
 def gist(id_num):
+    """Get the gist identified by ``id_num``.
+
+    :param id_num: (required), unique id of the gist
+    :type id_num: int
+    :returns: :class:`Gist <Gist>`
+    """
     gh = GitHub()
     return gh.gist(id_num)
 
 
-def gists(username=None):
+def list_gists(username=None):
+    """Get public gists or gists for the provided username.
+
+    :param username: (optional), if provided, get the gists for this user
+        instead of the authenticated user.
+    :type username: str
+    :returns: list of :class:`Gist <Gist>`\ s
+    """
     gh = GitHub()
-    return gh.gists(username)
+    return gh.list_gists(username)
 
 
 def create_gist(description, files):
     """Creates an anonymous public gist.
 
-    :param description: short description of the gist
-    :param files: dictionary containing file names with associated
-    dictionaries for content, e.g.
-      {'spam.txt': {'content': 'File contents ...'}}
+    :param description: (required), short description of the gist
+    :type description: str
+    :param files: (required), file names with associated
+        dictionaries for content, e.g.
+        {'spam.txt': {'content': 'File contents ...'}}
+    :type files: dict
+    :returns: :class:`Gist <Gist>`
     """
     gh = GitHub()
     return gh.create_gist(description, files)

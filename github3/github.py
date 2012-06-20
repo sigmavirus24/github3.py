@@ -51,17 +51,6 @@ class GitHub(GitHubCore):
         json = self._post(url, dumps(new_gist))
         return Gist(json, self._session) if json else None
 
-    def create_key(self, title, key):
-        """Create a new key for the authenticated user."""
-        created = None
-
-        if title and key:
-            url = self._github_url + '/user/keys'
-            json = self._post(url, dumps({'title': title, 'key': key}))
-            if json:
-                created = Key(resp.json, self._session)
-        return created
-
     def create_issue(self,
         owner,
         repository,
@@ -97,6 +86,17 @@ class GitHub(GitHubCore):
         # Regardless, something went wrong. We were unable to create the
         # issue
         return None
+
+    def create_key(self, title, key):
+        """Create a new key for the authenticated user."""
+        created = None
+
+        if title and key:
+            url = self._github_url + '/user/keys'
+            json = self._post(url, dumps({'title': title, 'key': key}))
+            if json:
+                created = Key(resp.json, self._session)
+        return created
 
     def create_repo(self,
         name,

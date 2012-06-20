@@ -50,8 +50,8 @@ sections of the GitHub documentation.
 
 ---------
 
-More information about this class can be found in the official `documentation
-<http://developer.github.com/v3/repos/comments/>`_.
+More information about this class can be found in the official documentation
+about `comments <http://developer.github.com/v3/repos/comments/>`_.
 
 .. autoclass:: RepoComment
     :inherited-members:
