@@ -63,3 +63,17 @@ def create_gist(description, files):
     """
     gh = GitHub()
     return gh.create_gist(description, files)
+
+def issue(owner, repository, number):
+    """Anonymously gets issue :number on :owner/:repository.
+
+    :param owner: (required), repository owner
+    :type owner: str
+    :param repository: (required), repository name
+    :type repository: str
+    :param number: (required), issue number
+    :type number: int
+    :returns: :class:`Issue <Issue>`
+    """
+    gh = GitHub()
+    return gh.issue(owner, repository, number)

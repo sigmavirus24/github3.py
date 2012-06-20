@@ -43,6 +43,14 @@ class GitHub(GitHubCore):
         """Create a new gist.
 
         If no login was provided, it will be anonymous.
+        :param description: (required), description of gist
+        :type description: str
+        :param files: (required), file names with associated dictionaries for
+            content, e.g.  {'spam.txt': {'content': 'File contents ...'}}
+        :type files: dict
+        :param public: (optional), make the gist public if True
+        :type public: bool
+        :returns: :class:`Gist <Gist>`
         """
         new_gist = {'description': description, 'public': public,
                 'files': files}
@@ -64,16 +72,24 @@ class GitHub(GitHubCore):
 
         body, assignee, milestone, labels are all optional.
 
-        :param owner: (required), string, login of the owner
-        :param repository: (required), string, repository name
-        :param title: (required), string, Title of issue to be created
-        :param body: (optional), string, The text of the issue, markdown
+        :param owner: (required), login of the owner
+        :type owner: str
+        :param repository: (required), repository name
+        :type repository: str
+        :param title: (required), Title of issue to be created
+        :type title: str
+        :param body: (optional), The text of the issue, markdown
             formatted
-        :param assignee: (optional), string, Login of person to assign
+        :type body: str
+        :param assignee: (optional), Login of person to assign
             the issue to
-        :param milestone: (optional), string, Which milestone to assign
+        :type assignee: str
+        :param milestone: (optional), Which milestone to assign
             the issue to
-        :param labels: (optional), list, List of label names.
+        :type milestone: str
+        :param labels: (optional), List of label names.
+        :type labels: list
+        :returns: :class:`Issue <Issue>`
         """
         repo = None
         if owner and repository and title:
@@ -88,7 +104,14 @@ class GitHub(GitHubCore):
         return None
 
     def create_key(self, title, key):
-        """Create a new key for the authenticated user."""
+        """Create a new key for the authenticated user.
+        
+        :param title: (required), key title
+        :type title: str
+        :param key: (required), actual key contents
+        :type key: str
+        :returns: :class:`Key <Key>`
+        """
         created = None
 
         if title and key:
@@ -108,17 +131,25 @@ class GitHub(GitHubCore):
         has_downloads=True):
         """Create a repository for the authenticated user.
 
-        :param name: (required), string, name of the repository
-        :param description: (optional), string
-        :param homepage: (optional), string
-        :param private: (optional), boolean, If ``True``, create a
+        :param name: (required), name of the repository
+        :type name: str
+        :param description: (optional)
+        :type description: str
+        :param homepage: (optional)
+        :type homepage: str
+        :param private: (optional), If ``True``, create a
             private repository. API default: ``False``
-        :param has_issues: (optional), boolean, If ``True``, enable
+        :type private: bool
+        :param has_issues: (optional), If ``True``, enable
             issues for this repository. API default: ``True``
-        :param has_wiki: (optional), boolean, If ``True``, enable the
+        :type has_issues: bool
+        :param has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :param has_downloads: (optional), boolean, If ``True``, enable
+        :type has_wiki: bool
+        :param has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
+        :type has_downloads: bool
+        :returns: :class:`Repository <Repository>`
         """
         url = self._github_url + '/user/repos'
         data = dumps({'name': name, 'description': description,
@@ -129,13 +160,24 @@ class GitHub(GitHubCore):
         return Repository(json, self._session) if json else None
 
     def delete_key(self, key_id):
+        """Delete user key pointed to by ``key_id``.
+
+        :param key_id: (required), unique id used by Github
+        :type: int
+        :returns: bool
+        """
         key = self.get_key(key_id)
         if key:
             return key.delete()
         return False
 
     def follow(self, login):
-        """Make the authenticated user follow login."""
+        """Make the authenticated user follow login.
+        
+        :param login: (required), user to follow
+        :type login: str
+        :returns: bool
+        """
         resp = False
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url,
@@ -144,7 +186,12 @@ class GitHub(GitHubCore):
         return resp
 
     def get_key(self, id_num):
-        """Gets the authenticated user's key specified by id_num."""
+        """Gets the authenticated user's key specified by id_num.
+        
+        :param id_num: (required), unique id of the key
+        :type id_num: int
+        :returns: :class:`Key <Key>`
+        """
         json = None
         if int(id_num) > 0:
             url = '{0}/user/keys/{1}'.format(self._github_url,
@@ -153,13 +200,24 @@ class GitHub(GitHubCore):
         return Key(json, self._session) if json else None
 
     def gist(self, id_num):
-        """Gets the gist using the specified id number."""
+        """Gets the gist using the specified id number.
+        
+        :param id_num: (required), unique id of the gist
+        :type id_num: int
+        :returns: :class:`Gist <Gist>`
+        """
         url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
         json = self._get(url)
         return Gist(json, self._session) if json else None
 
     def is_following(self, login):
-        """Check if the authenticated user is following login."""
+        """Check if the authenticated user is following login.
+        
+        :param login: (required), login of the user to check if the
+            authenticated user is checking
+        :type login: str
+        :returns: bool
+        """
         json = None
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url, login)
