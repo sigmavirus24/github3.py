@@ -44,7 +44,8 @@ Further Examples
 .. toctree::
     :maxdepth: 2
 
-    examples/gists
+    examples/gistex
+    examples/githubex
 
 
 .. links
@@ -60,6 +61,7 @@ Modules
 
     api
     gists
+    github
     repos
     events
 

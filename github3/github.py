@@ -43,10 +43,11 @@ class GitHub(GitHubCore):
         """Create a new gist.
 
         If no login was provided, it will be anonymous.
+
         :param description: (required), description of gist
         :type description: str
         :param files: (required), file names with associated dictionaries for
-            content, e.g.  {'spam.txt': {'content': 'File contents ...'}}
+            content, e.g. ``{'spam.txt': {'content': 'File contents ...'}}``
         :type files: dict
         :param public: (optional), make the gist public if True
         :type public: bool
@@ -109,14 +110,14 @@ class GitHub(GitHubCore):
         :param title: (required), key title
         :type title: str
         :param key: (required), actual key contents
-        :type key: str
+        :type key: str or file
         :returns: :class:`Key <Key>`
         """
         created = None
 
         if title and key:
             url = self._github_url + '/user/keys'
-            json = self._post(url, dumps({'title': title, 'key': key}))
+            json = self._post(url, {'title': title, 'key': key})
             if json:
                 created = Key(resp.json, self._session)
         return created
@@ -227,8 +228,11 @@ class GitHub(GitHubCore):
     def is_watching(self, login, repo):
         """Check if the authenticated user is following login/repo.
         
-        :param login: (required), string, owner of repository
-        :param repo: (required), string, name of repository
+        :param login: (required), owner of repository
+        :type login: str
+        :param repo: (required), name of repository
+        :type repo: str
+        :returns: bool
         """
         json = None
         if login and repo:
@@ -237,27 +241,46 @@ class GitHub(GitHubCore):
         return True if json else False
 
     def issue(self, owner, repository, number):
-        """Fetch issue #:number: from
-        https://github.com/:owner:/:repository:"""
+        """Fetch issue #:number: from https://github.com/:owner:/:repository:
+            
+        :param owner: (required), owner of the repository
+        :type owner: str
+        :param repository: (required), name of the repository
+        :type repository: str
+        :param number: (required), issue number
+        :type number: int
+        :return: :class:`Issue <Issue>`
+        """
         repo = self.repository(owner, repository)
         if repo:
             return repo.issue(number)
         return None
 
     def list_emails(self):
-        """List email addresses for the authenticated user."""
+        """List email addresses for the authenticated user.
+        
+        :returns: list of dicts
+        """
         url = self._github_url + '/user/emails'
         return self._get(url) or []
 
     def list_events(self):
-        """List public events."""
+        """List public events.
+        
+        :returns: list of :class:`Event <Event>`\ s
+        """
         json = self._get(self._github_url + '/events')
         return [Event(ev, self._session) for ev in json]
 
     def list_followers(self, login=None):
         """If login is provided, return a list of followers of that
         login name; otherwise return a list of followers of the
-        authenticated user."""
+        authenticated user.
+        
+        :param login: (optional), login of the user to check
+        :type login: str
+        :returns: list of :class:`User <User>`\ s
+        """
         if login:
             return self.user(login).list_followers()
         return self._list_follow('followers')
@@ -265,14 +288,24 @@ class GitHub(GitHubCore):
     def list_following(self, login=None):
         """If login is provided, return a list of users being followed
         by login; otherwise return a list of people followed by the
-        authenticated user."""
+        authenticated user.
+        
+        :param login: (optional), login of the user to check
+        :type login: str
+        :returns: list of :class:`User <User>`\ s
+        """
         if login:
             return self.user(login).list_following()
         return self._list_follow('following')
 
     def list_gists(self, username=None):
         """If no username is specified, GET /gists, otherwise GET
-        /users/:username/gists"""
+        /users/:username/gists
+        
+        :param login: (optional), login of the user to check
+        :type login: str
+        :returns: list of :class:`Gist <Gist>`\ s
+        """
         url = [self._github_url]
         if username:
             url.extend(['users', username, 'gists'])
@@ -299,17 +332,24 @@ class GitHub(GitHubCore):
 
         :param filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
-            api-default: assigned
+            api-default: 'assigned'
+        :type filter: str
         :param state: accepted values: ('open', 'closed')
-            api-default: open
+            api-default: 'open'
+        :type state: str
         :param labels: comma-separated list of label names, e.g.,
             'bug,ui,@high'
+        :type labels: str
         :param sort: accepted values: ('created', 'updated', 'comments')
             api-default: created
+        :type sort: str
         :param direction: accepted values: ('asc', 'desc')
             api-default: desc
+        :type direction: str
         :param since: ISO 8601 formatted timestamp, e.g.,
             2012-05-20T23:10:27Z
+        :type since: str
+        :returns: list of :class:`Issue <Issue>`\ s
         """
         url = [self._github_url]
         if owner and repository:
@@ -329,7 +369,10 @@ class GitHub(GitHubCore):
         return issues
 
     def list_keys(self):
-        """List public keys for the authenticated user."""
+        """List public keys for the authenticated user.
+        
+        :returns: list of :class:`Key <Key>`\ s
+        """
         url = self._github_url + '/user/keys'
         json = self._get(url)
         ses = self._session
@@ -338,7 +381,12 @@ class GitHub(GitHubCore):
     def list_orgs(self, login=None):
         """List public organizations for login if provided; otherwise
         list public and private organizations for the authenticated
-        user."""
+        user.
+        
+        :param login: (optional), user whose orgs you wish to list
+        :type login: str
+        :returns: list of :class:`Organization <Organization>`\ s
+        """
         url = [self._github_url]
         if login:
             url.extend(['users', login, 'orgs'])
@@ -355,16 +403,21 @@ class GitHub(GitHubCore):
         repositories for the authenticated user if ``login`` is not 
         provided.
 
-        :param login: (optional), string
-        :param type: (optional), string, accepted values:
+        :param login: (optional)
+        :type login: str
+        :param type: (optional), accepted values:
             ('all', 'owner', 'public', 'private', 'member')
             API default: 'all'
-        :param sort: (optional), string, accepted values:
+        :type type: str
+        :param sort: (optional), accepted values:
             ('created', 'updated', 'pushed', 'full_name')
             API default: 'created'
-        :param direction: (optional), string, accepted values:
+        :type sort: str
+        :param direction: (optional), accepted values:
             ('asc', 'desc'), API default: 'asc' when using 'full_name',
             'desc' otherwise
+        :type direction: str
+        :returns: list of :class:`Repository <Repository>` objects
         """
         url = [self._github_url]
         if login:
@@ -390,7 +443,9 @@ class GitHub(GitHubCore):
         """List the repositories being watched by ``login`` if provided or the
         repositories being watched by the authenticated user.
 
-        :param login: (optional), string
+        :param login: (optional)
+        :type login: str
+        :returns: list of :class:`Repository <Repository>` objects
         """
         if login:
             url = self._github_url + '/users/' + login + '/watched'
@@ -400,27 +455,52 @@ class GitHub(GitHubCore):
         return [Repository(repo, self._session) for repo in json]
 
     def login(self, username=None, password=None, token=None):
-        """Logs the user into GitHub for protected API calls."""
+        """Logs the user into GitHub for protected API calls.
+        
+        :param username: (optional)
+        :type username: str
+        :param password: (optional)
+        :type password: str
+        :param token: (optional)
+        :type token: str
+        """
         if username and password:
             self._session.auth = (username, password)
         elif token:
-            self._session.update({'access_token': token})
+            self._session.headers.update({'access_token': token})
 
     def organization(self, login):
-        """Returns a Organization object for the login name"""
+        """Returns a Organization object for the login name
+        
+        :param login: (required), login name of the org
+        :type login: str
+        :returns: :class:`Organization <Organization>`
+        """
         url = '{0}/orgs/{1}'.format(self._github_url, login)
         json = self._get(url)
         return Organization(json, self._session) if json else None
 
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
-        owner and repository"""
+        owner and repository
+        
+        :param owner: (required)
+        :type owner: str
+        :param repository: (required)
+        :type repository: str
+        :returns: :class:`Repository <Repository>`
+        """
         url = '/'.join([self._github_url, 'repos', owner, repository])
         json = self._get(url)
         return Repository(json, self._session) if json else None
 
     def unfollow(self, login):
-        """Make the authenticated user stop following login"""
+        """Make the authenticated user stop following login
+        
+        :param login: (required)
+        :type login: str
+        :returns: bool
+        """
         resp = False
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url,
@@ -431,15 +511,24 @@ class GitHub(GitHubCore):
     def update_user(self, name=None, email=None, blog=None,
             company=None, location=None, hireable=False, bio=None):
         """If authenticated as this user, update the information with
-        the information provided in the parameters.
+        the information provided in the parameters. All parameters are
+        optional.
 
-        :param name: string, e.g., 'John Smith', not login name
-        :param email: string, e.g., 'john.smith@example.com'
-        :param blog: string, e.g., 'http://www.example.com/jsmith/blog'
-        :param company: string
-        :param location: string
-        :param hireable: boolean, defaults to False
-        :param bio: string, GitHub flavored markdown
+        :param name: e.g., 'John Smith', not login name
+        :type name: str
+        :param email: e.g., 'john.smith@example.com'
+        :type email: str
+        :param blog: e.g., 'http://www.example.com/jsmith/blog'
+        :type blog: str
+        :param company: company name
+        :type company: str
+        :param location: where you are located
+        :type location: str
+        :param hireable: defaults to False
+        :type hireable: bool
+        :param bio: GitHub flavored markdown
+        :type bio: str
+        :returns: bool
         """
         user = self.user()
         if user:
@@ -450,7 +539,12 @@ class GitHub(GitHubCore):
     def user(self, login=None):
         """Returns a User object for the specified login name if
         provided. If no login name is provided, this will return a User
-        object for the authenticated user."""
+        object for the authenticated user.
+        
+        :param login: (optional)
+        :type login: str
+        :returns: :class:`User <User>`
+        """
         url = [self._github_url]
         if login:
             url.extend(['users', login])
@@ -464,8 +558,11 @@ class GitHub(GitHubCore):
     def watch(self, login, repo):
         """Make user start watching login/repo.
         
-        :param login: (required), string, owner of repository
-        :param repo: (required), string, name of repository
+        :param login: (required), owner of repository
+        :type login: str
+        :param repo: (required), name of repository
+        :type repo: str
+        :returns: bool
         """
         resp = False
         if login and repo:
@@ -476,8 +573,11 @@ class GitHub(GitHubCore):
     def unwatch(self, login, repo):
         """Make user stop watching login/repo.
 
-        :param login: (required), string, owner of repository
-        :param repo: (required), string, name of repository
+        :param login: (required), owner of repository
+        :type login: str
+        :param repo: (required), name of repository
+        :type repo: str
+        :returns: bool
         """
         resp = False
         if login and repo:
