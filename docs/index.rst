@@ -5,12 +5,12 @@ Release v\ |version|.
 
 github3.py is wrapper for the `GitHub API`_ written in python. The design of
 github3.py is centered around having a logical organization of the methods
-needed to interact with the API. Let me demonstrate this with some code
-examples.
+needed to interact with the API. Let me demonstrate this with a code example.
 
-First, let's get information about a user.
+Example
+-------
 
-::
+Let's get information about a user::
 
     from github3 import login
 
@@ -38,13 +38,22 @@ First, let's get information about a user.
     gh.list_followers('kennethreitz')
 
 
+Further Examples
+~~~~~~~~~~~~~~~~
+
+.. toctree::
+    :maxdepth: 2
+
+    examples/gists
+
+
 .. links
 
 .. _GitHub API: http://developer.github.com
 
 
-Table of Contents
-=================
+Modules
+-------
 
 .. toctree::
     :maxdepth: 1
@@ -53,3 +62,65 @@ Table of Contents
     gists
     repos
     events
+
+
+Dependencies
+------------
+
+- requests_ by Kenneth Reitz
+
+.. _requests: https://github.com/kennethreitz/requests
+
+
+API Coverage
+------------
+
+- Gists
+
+  - Comments
+
+- Git Data
+
+  - Blobs
+  - Commits
+  - References
+  - Tags
+  - Trees
+
+- Issues
+
+  - Comments
+  - Events
+  - Labels
+  - Milestones
+
+- Orgs
+
+  - Members
+  - Teams
+
+- Pull Requests
+
+  - Review Comments
+
+- Repos
+
+  - Collaborators
+  - Comments
+  - Commits
+  - Contents
+  - Downloads
+  - Forks
+  - Keys
+  - Watching
+  - Hooks
+
+- Users
+
+  - Emails
+  - Followers
+  - Keys
+
+- Events
+
+  - Types
