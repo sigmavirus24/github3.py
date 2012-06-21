@@ -43,7 +43,16 @@ to demonstrate the differences between the two, I will use ``anon``. ``anon``
 could be instantiated like so::
 
     anon = GitHub()
-    
+
+Also let's define the following constants::
+
+    sigma = 'sigmavirus24'
+    github3 = 'github3.py'
+    todopy = 'Todo.txt-python'
+    kr = 'kennethreitz'
+    requests = 'requests'
+
+We may not need all of them, but they'll be useful
 
 Adding a new key to your account
 --------------------------------
@@ -65,7 +74,7 @@ Adding a new key to your account
         sys.exit(1)
 
     with open(path, 'r') as key_file:
-        key = g.create_key(name, key_file):
+        key = g.create_key(name, key_file)
         if key:
             print('Key {0} created.'.format(key.title))
         else:
@@ -111,3 +120,49 @@ Creating a new repository
 
     if r:
         print("Created {0} successfully.".format(r.name))
+
+Follow another user on GitHub
+-----------------------------
+
+I'm cheating here and using most of the follow functions in one example
+
+::
+
+    if not g.is_following(sigma):
+        g.follow(sigma):
+
+    if not g.is_watching(sigma, github3py):
+        g.watch(sigma, , github3py)
+
+    for follower in g.list_followers():
+        print("{0} is following me.".format(follower.login))
+
+    for followee in g.list_following():
+        print("I am following {0}.".format(followee.login))
+
+    if g.is_following(sigma):
+        g.unfollow(sigma)
+
+Changing your user information
+------------------------------
+
+Note that you **can not** change your login name via the API.
+
+::
+
+    new_name = 'J. Smith'
+    blog = 'http://www.example.com/'
+    company = 'Vandelay Industries'
+    bio = """# J. Smith
+
+    A simple man working at a latex factory
+    """
+
+    if g.update_user(new_name, blog, company, bio=bio):
+        print('Profile updated.')
+
+This is the same as::
+
+    me = g.user()
+    if me.update(new_name, blog, company, bio=bio):
+        print('Profile updated.')
