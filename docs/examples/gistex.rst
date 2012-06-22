@@ -1,4 +1,4 @@
-.. _gists:
+.. _gistex:
 
 Gist Code Examples
 ==================

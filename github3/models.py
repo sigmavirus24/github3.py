@@ -101,7 +101,8 @@ class GitHubCore(object):
 
 
 class BaseComment(GitHubCore):
-    """A basic class for Gist, Issue and Pull Request Comments."""
+    """The :class:`BaseComment <BaseComment>` object. A basic class for Gist,
+    Issue and Pull Request Comments."""
     def __init__(self, comment, session):
         super(BaseComment, self).__init__(session)
         self._update_(comment)
@@ -128,26 +129,39 @@ class BaseComment(GitHubCore):
 
     @property
     def body(self):
+        """Body of the comment. (As written by the commenter)"""
         return self._body
 
     @property
     def body_html(self):
+        """Body of the comment formatted as html."""
         return self._bodyh
 
     @property
     def body_text(self):
+        """Body of the comment formatted as plain-text. (Stripped of markdown,
+        etc.)"""
         return self._bodyt
 
     @property
     def created_at(self):
+        """datetime object representing when the comment was created."""
         return self._created
 
     def delete(self):
-        """Delete this comment."""
+        """Delete this comment.
+        
+        :returns: bool
+        """
         return self._delete(self._api)
 
     def edit(self, body):
-        """Edit this comment."""
+        """Edit this comment.
+        
+        :param body: (required), new body of the comment, Markdown formatted
+        :type body: str
+        :returns: bool
+        """
         if body:
             json = self._patch(self._api, dumps({'body': body}))
             if json:
@@ -157,10 +171,12 @@ class BaseComment(GitHubCore):
 
     @property
     def id(self):
+        """Unique ID of the comment."""
         return self._id
 
     @property
     def user(self):
+        """:class:`User <user.User>` who created the comment."""
         return self._user
 
 

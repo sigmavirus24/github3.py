@@ -51,7 +51,7 @@ class GitHub(GitHubCore):
         :type files: dict
         :param public: (optional), make the gist public if True
         :type public: bool
-        :returns: :class:`Gist <Gist>`
+        :returns: :class:`Gist <gist.Gist>`
         """
         new_gist = {'description': description, 'public': public,
                 'files': files}
@@ -90,7 +90,7 @@ class GitHub(GitHubCore):
         :type milestone: str
         :param labels: (optional), List of label names.
         :type labels: list
-        :returns: :class:`Issue <Issue>`
+        :returns: :class:`Issue <issue.Issue>`
         """
         repo = None
         if owner and repository and title:
@@ -111,7 +111,7 @@ class GitHub(GitHubCore):
         :type title: str
         :param key: (required), actual key contents
         :type key: str or file
-        :returns: :class:`Key <Key>`
+        :returns: :class:`Key <user.Key>`
         """
         created = None
 
@@ -150,7 +150,7 @@ class GitHub(GitHubCore):
         :param has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
         :type has_downloads: bool
-        :returns: :class:`Repository <Repository>`
+        :returns: :class:`Repository <repo.Repository>`
         """
         url = self._github_url + '/user/repos'
         data = dumps({'name': name, 'description': description,
@@ -191,7 +191,7 @@ class GitHub(GitHubCore):
         
         :param id_num: (required), unique id of the key
         :type id_num: int
-        :returns: :class:`Key <Key>`
+        :returns: :class:`Key <user.Key>`
         """
         json = None
         if int(id_num) > 0:
@@ -205,7 +205,7 @@ class GitHub(GitHubCore):
         
         :param id_num: (required), unique id of the gist
         :type id_num: int
-        :returns: :class:`Gist <Gist>`
+        :returns: :class:`Gist <gist.Gist>`
         """
         url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
         json = self._get(url)
@@ -249,7 +249,7 @@ class GitHub(GitHubCore):
         :type repository: str
         :param number: (required), issue number
         :type number: int
-        :return: :class:`Issue <Issue>`
+        :return: :class:`Issue <issue.Issue>`
         """
         repo = self.repository(owner, repository)
         if repo:
@@ -267,7 +267,7 @@ class GitHub(GitHubCore):
     def list_events(self):
         """List public events.
         
-        :returns: list of :class:`Event <Event>`\ s
+        :returns: list of :class:`Event <event.Event>`\ s
         """
         json = self._get(self._github_url + '/events')
         return [Event(ev, self._session) for ev in json]
@@ -279,7 +279,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), login of the user to check
         :type login: str
-        :returns: list of :class:`User <User>`\ s
+        :returns: list of :class:`User <user.User>`\ s
         """
         if login:
             return self.user(login).list_followers()
@@ -292,7 +292,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), login of the user to check
         :type login: str
-        :returns: list of :class:`User <User>`\ s
+        :returns: list of :class:`User <user.User>`\ s
         """
         if login:
             return self.user(login).list_following()
@@ -304,7 +304,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), login of the user to check
         :type login: str
-        :returns: list of :class:`Gist <Gist>`\ s
+        :returns: list of :class:`Gist <gist.Gist>`\ s
         """
         url = [self._github_url]
         if username:
@@ -349,7 +349,7 @@ class GitHub(GitHubCore):
         :param since: ISO 8601 formatted timestamp, e.g.,
             2012-05-20T23:10:27Z
         :type since: str
-        :returns: list of :class:`Issue <Issue>`\ s
+        :returns: list of :class:`Issue <issue.Issue>`\ s
         """
         url = [self._github_url]
         if owner and repository:
@@ -371,7 +371,7 @@ class GitHub(GitHubCore):
     def list_keys(self):
         """List public keys for the authenticated user.
         
-        :returns: list of :class:`Key <Key>`\ s
+        :returns: list of :class:`Key <user.Key>`\ s
         """
         url = self._github_url + '/user/keys'
         json = self._get(url)
@@ -385,7 +385,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), user whose orgs you wish to list
         :type login: str
-        :returns: list of :class:`Organization <Organization>`\ s
+        :returns: list of :class:`Organization <org.Organization>`\ s
         """
         url = [self._github_url]
         if login:
@@ -417,7 +417,7 @@ class GitHub(GitHubCore):
             ('asc', 'desc'), API default: 'asc' when using 'full_name',
             'desc' otherwise
         :type direction: str
-        :returns: list of :class:`Repository <Repository>` objects
+        :returns: list of :class:`Repository <repo.Repository>` objects
         """
         url = [self._github_url]
         if login:
@@ -445,7 +445,7 @@ class GitHub(GitHubCore):
 
         :param login: (optional)
         :type login: str
-        :returns: list of :class:`Repository <Repository>` objects
+        :returns: list of :class:`Repository <repo.Repository>` objects
         """
         if login:
             url = self._github_url + '/users/' + login + '/watched'
@@ -474,7 +474,7 @@ class GitHub(GitHubCore):
         
         :param login: (required), login name of the org
         :type login: str
-        :returns: :class:`Organization <Organization>`
+        :returns: :class:`Organization <org.Organization>`
         """
         url = '{0}/orgs/{1}'.format(self._github_url, login)
         json = self._get(url)
@@ -488,7 +488,7 @@ class GitHub(GitHubCore):
         :type owner: str
         :param repository: (required)
         :type repository: str
-        :returns: :class:`Repository <Repository>`
+        :returns: :class:`Repository <repo.Repository>`
         """
         url = '/'.join([self._github_url, 'repos', owner, repository])
         json = self._get(url)
@@ -543,7 +543,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional)
         :type login: str
-        :returns: :class:`User <User>`
+        :returns: :class:`User <user.User>`
         """
         url = [self._github_url]
         if login:

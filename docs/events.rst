@@ -1,6 +1,3 @@
-.. _events:
-
-======
 Events
 ======
 
@@ -8,6 +5,9 @@ Events
 .. module:: github3.event
 
 This part of the documentation covers the :class:`Event <Event>` object.
+
+Event Objects
+-------------
 
 .. autoclass:: Event
     :inherited-members:

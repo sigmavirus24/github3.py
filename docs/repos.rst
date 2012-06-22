@@ -1,8 +1,8 @@
 .. _repos:
 
-=============================
-Repositories and Related Data
-=============================
+==========
+Repository
+==========
 
 .. module:: github3
 .. module:: github3.repo

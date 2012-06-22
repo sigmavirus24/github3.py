@@ -1,6 +1,5 @@
 .. _gists:
 
-=====
 Gists
 =====
 
@@ -15,7 +14,8 @@ This part of the documentation details the properties and methods associated
 with |Gist|, |GistComment|, and |GistFile| objects. These classes should never
 be instantiated by the user (developer) directly.
 
-------
+Gist Objects
+------------
 
 .. autoclass:: Gist
     :inherited-members:

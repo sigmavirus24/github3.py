@@ -13,6 +13,8 @@ from .user import User
 
 
 class Label(GitHubCore):
+    """The :class:`Label <Label>` object. Succintly represents a label that
+    exists in a repository."""
     def __init__(self, label, session):
         super(Label, self).__init__(session)
         self._update_(label)
@@ -27,16 +29,30 @@ class Label(GitHubCore):
 
     @property
     def color(self):
+        """Color of the label, e.g., 626262"""
         return self._color
 
     def delete(self):
+        """Delete this label.
+
+        :returns: bool
+        """
         return self._delete(self._api)
 
     @property
     def name(self):
+        """Name of the label, e.g., 'bug'"""
         return self._name
 
     def update(self, name, color):
+        """Update this label.
+
+        :param name: (required), new name of the label
+        :type name: str
+        :param color: (required), color code, e.g., 626262, no leading '#'
+        :type color: str
+        :returns: bool
+        """
         if color[0] == '#':
             color = color[1:]
 
@@ -50,6 +66,9 @@ class Label(GitHubCore):
 
 
 class Milestone(GitHubCore):
+    """The :class:`Milestone <Milestone>` object. This is a small class to
+    handle information about milestones on repositories and issues.
+    """
     def __init__(self, mile, session):
         super(Milestone, self).__init__(session)
         self._update_(mile)
@@ -73,31 +92,43 @@ class Milestone(GitHubCore):
 
     @property
     def closed_issues(self):
+        """The number of closed issues associated with this milestone."""
         return self._closed
 
     @property
     def created_at(self):
+        """datetime object representing when the milestone was created."""
         return self._created
 
     @property
     def creator(self):
+        """:class:`User <user.User>` object representing the creator of the
+        milestone."""
         return self._creator
 
     def delete(self):
-        """Delete this milestone."""
+        """Delete this milestone.
+        
+        :returns: bool
+        """
         return self._delete(self._api)
 
     @property
     def description(self):
+        """Description of this milestone."""
         return self._desc
 
     @property
     def due_on(self):
+        """datetime representing when this milestone is due."""
         return self._due
 
     def list_labels(self):
         """List the labels for every issue associated with this
-        milestone."""
+        milestone.
+        
+        :returns: list of :class:`Label <Label>`\ s
+        """
         url = self._api + '/labels'
         json = self._get(url)
         ses = self._session
@@ -105,18 +136,23 @@ class Milestone(GitHubCore):
 
     @property
     def number(self):
+        """Identifying number associated with milestone."""
         return self._num
 
     @property
     def open_issues(self):
+        """Number of issues associated with this milestone which are still
+        open."""
         return self._open
 
     @property
     def state(self):
+        """State of the milestone, e.g., open or closed."""
         return self._state
 
     @property
     def title(self):
+        """Title of the milestone, e.g., 0.2."""
         return self._title
 
     def update(self, title, state='', description='', due_on=''):
@@ -124,11 +160,15 @@ class Milestone(GitHubCore):
 
         state, description, and due_on are optional
 
-        :param title: *required*, string
+        :param title: (required), new title of the milestone
+        :type title: str
         :param state: (optional), ('open', 'closed')
-        :param description: (optional), string
-        :param due_on: (optional), ISO 8601 time string:
-        YYYY-MM-DDTHH:MM:SSZ
+        :type state: str
+        :param description: (optional)
+        :type description: str
+        :param due_on: (optional), ISO 8601 time format: YYYY-MM-DDTHH:MM:SSZ
+        :type due_on: str
+        :returns: bool
         """
         inp = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
@@ -140,6 +180,10 @@ class Milestone(GitHubCore):
 
 
 class Issue(GitHubCore):
+    """The :class:`Issue <Issue>` object. It structures and handles the data
+    returned via the `Issues <http://developer.github.com/v3/issues>`_ section
+    of the GitHub API.
+    """
     def __init__(self, issue, session):
         super(Issue, self).__init__(session)
         self._update_(issue)
@@ -179,24 +223,35 @@ class Issue(GitHubCore):
         self._user = User(issue.get('user'), self._session)
 
     def add_labels(self, *args):
+        """Add labels to this issue.
+
+        :param args: (required), names of the labels you wish to add
+        :type args: str
+        :returns: bool
+        """
         url = self._api + '/labels'
-        json = self._post(url, dumps(args), status_code=200)
+        json = self._post(url, dumps(list(args)), status_code=200)
         return True if json else False
 
     @property
     def assignee(self):
+        """:class:`User <user.User>` representing the user the issue was assigned
+        to."""
         return self._assign
 
     @property
     def body(self):
+        """Body (description) of the issue."""
         return self._body
 
     def close(self):
+        """Close this issue."""
         return self.edit(self._title, self._body, self._assign.login,
                 'closed', self._mile, self._labels)
 
     @property
     def closed_at(self):
+        """datetime object representing when the issue was closed."""
         return self._closed
 
     def comment(self, id_num):
@@ -205,20 +260,30 @@ class Issue(GitHubCore):
         The catch here is that id is NOT a simple number to obtain. If
         you were to look at the comments on issue #15 in
         sigmavirus24/Todo.txt-python, the first comment's id is 4150787.
+
+        :param id_num: (required), comment id, see example above
+        :type id_num: int
+        :returns: :class:`IssueComment <IssueComment>`
         """
         json = None
-        if id_num > 0:  # Might as well check that it's positive
+        if int(id_num) > 0:  # Might as well check that it's positive
             url = '/'.join([self._github_url, self._repo[0],
-                self._repo[1], 'issues', 'comments', str(id)])
+                self._repo[1], 'issues', 'comments', str(id_num)])
             json = self._get(url)
         return IssueComment(json) if json else None
 
     @property
     def comments(self):
+        """Number of comments on this issue."""
         return self._comments
 
     def create_comment(self, body):
-        """Create a comment on this issue."""
+        """Create a comment on this issue.
+        
+        :param body: (required), comment body
+        :type body: str
+        :returns: :class:`IssueComment <IssueComment>`
+        """
         json = None
         if body:
             url = self._api + '/comments'
@@ -227,19 +292,27 @@ class Issue(GitHubCore):
 
     @property
     def created_at(self):
+        """datetime object representing when the issue was created."""
         return self._created
 
     def edit(self, title=None, body=None, assignee=None, state=None,
             milestone=None, labels=[]):
         """Edit this issue.
 
-        :param title: Title of the issue, string
-        :param body: markdown formatted string
+        :param title: Title of the issue
+        :type title: str
+        :param body: markdown formatted body (description) of the issue
+        :type body: str
         :param assignee: login name of user the issue should be assigned to
-        :param state: ('open', 'closed')
+        :type assignee: str
+        :param state: accepted values: ('open', 'closed')
+        :type state: str
         :param milestone: the NUMBER (not title) of the milestone to assign
             this to [1]_
+        :type milestone: int
         :param labels: list of labels to apply this to
+        :type labels: list of str's
+        :returns: bool
 
         .. [1] Milestone numbering starts at 1, i.e. the first milestone you
                create is 1, the second is 2, etc.
@@ -255,82 +328,128 @@ class Issue(GitHubCore):
 
     @property
     def html_url(self):
+        """URL to view the issue at GitHub."""
         return self._url
 
     @property
     def id(self):
+        """Unique ID for the comment."""
         return self._id
 
     def is_closed(self):
+        """Checks if the issue is closed.
+        
+        :returns: bool
+        """
         if self._closed or (self._state == 'closed'):
             return True
         return False
 
     @property
     def labels(self):
+        """Returns the list of :class:`Label <Label>`\ s on this issue."""
         return self._labels
 
     def list_comments(self):
+        """List comments on this issue.
+
+        :returns: list of :class:`IssueComment <IssueComment>`
+        """
         url = self._api + '/comments'
         json = self._get(url)
         ses = self._session
         return [IssueComment(comment, ses) for comment in json]
 
     def list_events(self):
+        """List events associated with this issue only.
+
+        :returns: list of :class:`IssueEvent <IssueEvent>`\ s
+        """
         url = self._api + '/events'
         json = self._get(url)
         return [IssueEvent(event, self) for event in json]
 
     @property
     def milestone(self):
+        """:class:`Milestone <Milestone>` this issue was assigned to."""
         return self._mile
 
     @property
     def number(self):
+        """Issue number (e.g. #15)"""
         return self._num
 
     @property
     def pull_request(self):
+        """Dictionary URLs for the pull request (if they exist)"""
         return self._pull_req
 
     def remove_label(self, name):
+        """Removes label ``name`` from this issue.
+
+        :param name: (required), name of the label to remove
+        :type name: str
+        :returns: bool
+        """
         url = '{0}/labels/{1}'.format(self._api, name)
         return self._delete(url, status_code=200)
 
     def remove_all_labels(self):
+        """Remove all labels from this issue.
+
+        :returns: bool
+        """
         # Can either send DELETE or [] to remove all labels
         return self.replace_labels([])
 
     def replace_labels(self, labels):
+        """Replace all labels on this issue with ``labels``.
+
+        :param labels: label names
+        :type: list of str's
+        :returns: bool
+        """
         url = self._api + '/labels'
         return self._put(url, dumps(labels), status_code=200)
 
     def reopen(self):
+        """Re-open a closed issue.
+
+        :returns: bool
+        """
         return self.edit(self._title, self._body, self._assign.login,
                 'open', self._mile, self._labels)
 
     @property
     def repository(self):
+        """:class:`Repository <repo.Repository>` this issue was filed on."""
         return self._repo
 
     @property
     def state(self):
+        """State of the issue, e.g., open, closed"""
         return self._state
 
     @property
     def title(self):
+        """Title of the issue."""
         return self._title
 
     @property
     def updated_at(self):
+        """datetime object representing the last time the issue was updated."""
         return self._updated
 
     @property
     def user(self):
+        """:class:`User <user.User>` who opened the issue."""
         return self._user
 
 
 class IssueComment(BaseComment):
+    """The :class:`IssueComment <IssueComment>` object. This structures and
+    handles the comments on issues specifically.
+    """
     def __init__(self, comment, session):
         super(IssueComment, self).__init__(comment, session)
         self._user = User(comment.get('user'), self._session)
@@ -340,10 +459,17 @@ class IssueComment(BaseComment):
 
     @property
     def updated_at(self):
+        """datetime object representing the last time the comment was
+        updated."""
         return self._updated
 
 
 class IssueEvent(BaseEvent):
+    """The :class:`IssueEvent <IssueEvent>` object. This specifically deals with
+    events described in the
+    `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
+    the GitHub API.
+    """
     def __init__(self, event, issue):
         super(IssueEvent, self).__init__(event, None)
         # The type of event:
@@ -387,31 +513,28 @@ class IssueEvent(BaseEvent):
 
     @property
     def event(self):
+        """The type of event, e.g., closed"""
         return self._event
 
     @property
     def commit_id(self):
+        """SHA of the commit."""
         return self._commit_id
 
     @property
     def issue(self):
+        """:class:`Issue <Issue>` where this comment was made."""
         return self._issue
 
     @property
     def comments(self):
+        """Number of comments"""
         return self._comments
 
     @property
-    def closed_at(self):
-        return self._closed
-
-    @property
     def created_at(self):
+        """datetime object representing when the event happened."""
         return self._created
-
-    @property
-    def updated_at(self):
-        return self._updated
 
 
 def issue_params(filter, state, labels, sort, direction, since):

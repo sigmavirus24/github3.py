@@ -11,7 +11,7 @@ from .models import GitHubCore, BaseEvent
 
 class Event(BaseEvent):
     """The :class:`Event <Event>` object. It structures and handles the data
-    returned by via the `Events <http://developer.github.com/v3/events>`-
+    returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
     """
 

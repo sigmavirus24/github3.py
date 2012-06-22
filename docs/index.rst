@@ -60,14 +60,27 @@ Modules
     :maxdepth: 1
 
     api
+    events
     gists
     github
+    issue
     repos
-    events
+
+
+Installation
+------------
+
+.. code-block:: sh
+
+    $ pip install github3.py
+    # OR:
+    $ git clone git://github.com/sigmavirus24/github3.py.git github3.py
+    $ cd github3.py
+    $ python setup.py install
 
 
 Dependencies
-------------
+~~~~~~~~~~~~
 
 - requests_ by Kenneth Reitz
 
