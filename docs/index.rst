@@ -62,6 +62,7 @@ Modules
     api
     events
     gists
+    git
     github
     issue
     repos

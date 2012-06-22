@@ -13,6 +13,7 @@ from .user import User
 
 
 class Blob(object):
+    """The :class:`Blob <Blob>` object."""
     def __init__(self, blob):
         super(Blob, self).__init__()
         self._content = blob.get('content')
@@ -27,17 +28,24 @@ class Blob(object):
 
     @property
     def content(self):
+        """Raw content of the blob."""
         return self._content
 
     @property
     def decoded(self):
+        """Decoded content of the blob."""
         return self._decoded
 
     @property
     def encoding(self):
+        """Encoding of the raw content."""
         return self._enc
 
 class GitData(GitHubCore):
+    """The :class:`GitData <GitData>` object. This isn't directly returned to
+    the user (developer) ever. This is used to prevent duplication of some
+    common items among other Git Data objects.
+    """
     def __init__(self, data, session):
         super(GitData, self).__init__(session)
         self._sha = data.get('sha')
@@ -48,10 +56,14 @@ class GitData(GitHubCore):
 
     @property
     def sha(self):
+        """SHA of the object"""
         return self._sha
 
 
 class Commit(BaseCommit):
+    """The :class:`Commit <Commit>` object. This represents a commit made in a
+    repository.
+    """
     def __init__(self, commit, session):
         super(Commit, self).__init__(commit, session)
 
@@ -82,18 +94,24 @@ class Commit(BaseCommit):
 
     @property
     def author(self):
+        """:class:`User <user.User>` who authored the commit."""
         return self._author
 
     @property
     def committer(self):
+        """:class:`User <user.User>` who committed the commit."""
         return self._committer
 
     @property
     def tree(self):
+        """:class:`Tree <Tree>` the commit belongs to."""
         return self._tree
 
 
 class Reference(GitHubCore):
+    """The :class:`Reference <Reference>` object. This represents a reference
+    created on a repository.
+    """
     def __init__(self, ref, session):
         super(Reference, self).__init__(session)
         self._update_(ref)
@@ -107,17 +125,31 @@ class Reference(GitHubCore):
         self._obj = GitObject(ref.get('object'))
 
     def delete(self):
+        """Delete this reference.
+
+        :returns: bool
+        """
         return self._delete(self._api)
 
     @property
     def object(self):
+        """:class:`GitObject <GitObject>` the reference points to"""
         return self._obj
 
     @property
     def ref(self):
+        """The reference path, e.g., refs/heads/sc/featureA"""
         return self._ref
 
     def update(self, sha, force=False):
+        """Update this reference.
+
+        :param sha: (required), sha of the reference
+        :type sha: str
+        :param force: (optional), force the update or not
+        :type force: bool
+        :returns: bool
+        """
         data = dumps({'sha': sha, 'force': force})
         json = self._patch(self._api, data)
         if json:
@@ -127,6 +159,7 @@ class Reference(GitHubCore):
 
 
 class GitObject(GitData):
+    """The :class:`GitObject <GitObject>` object."""
     def __init__(self, obj):
         super(GitObject, self).__init__(obj, None)
         self._type = obj.get('type')
@@ -136,6 +169,7 @@ class GitObject(GitData):
 
     @property
     def type(self):
+        """The type of object."""
         return self._type
 
 
@@ -170,27 +204,31 @@ class Tag(GitData):
 
 
 class Tree(GitData):
+    """The :class:`Tree <Tree>` object."""
     def __init__(self, tree, session):
         super(Tree, self).__init__(tree, session)
-        self._tree = []
-        if tree.get('tree'):
-            for t in tree.get('tree'):
-                self._tree.append(Hash(t))
+        self._tree = [Hash(t) for t in tree.get('tree', [])]
 
     def __repr__(self):
         return '<Tree [%s]>' % self._sha
 
     def recurse(self):
+        """Recurse into the tree.
+
+        :returns: :class:`Tree <Tree>`
+        """
         url = self._api + '?recursive=1'
         json = self._get(url)
         return Tree(json, self._session) if json else None
 
     @property
     def tree(self):
+        """list of :class:`Hash <Hash>` objects"""
         return self._tree
 
 
 class Hash(object):
+    """The :class:`Hash <Hash>` object."""
     def __init__(self, info):
         super(Hash, self).__init__()
         self._path = info.get('path')
@@ -202,24 +240,30 @@ class Hash(object):
 
     @property
     def mode(self):
+        """File mode"""
         return self._mode
 
     @property
     def path(self):
+        """Path to file"""
         return self._path
 
     @property
     def sha(self):
+        """SHA of the hash"""
         return self._sha
 
     @property
     def size(self):
+        """Size of hash"""
         return self._size
 
     @property
     def type(self):
+        """Type of hash, e.g., blob"""
         return self._type
 
     @property
     def url(self):
+        """URL of this object in the GitHub API"""
         return self._url
