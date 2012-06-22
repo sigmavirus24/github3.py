@@ -129,10 +129,13 @@ I'm cheating here and using most of the follow functions in one example
 ::
 
     if not g.is_following(sigma):
-        g.follow(sigma):
+        g.follow(sigma)
 
     if not g.is_watching(sigma, github3py):
-        g.watch(sigma, , github3py)
+        g.watch(sigma, github3py)
+
+    if g.is_watching(sigma, todopy):
+        g.unwatch(sigma, todopy)
 
     for follower in g.list_followers():
         print("{0} is following me.".format(follower.login))
