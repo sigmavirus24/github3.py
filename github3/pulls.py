@@ -106,6 +106,7 @@ class PullFile(object):
 
 
 class PullRequest(GitHubCore):
+    """The :class:`PullRequest <PullRequest>` object."""
     def __init__(self, pull, session):
         super(PullRequest, self).__init__(session)
         self._update_(pull)
@@ -166,64 +167,87 @@ class PullRequest(GitHubCore):
 
     @property
     def base(self):
+        """Base of the merge"""
         return self._base
 
     @property
     def body(self):
+        """Body of the pull request message"""
         return self._body
 
     @property
     def closed_at(self):
+        """datetime object representing when the pull was closed"""
         return self._closed
 
     @property
     def created_at(self):
+        """datetime object representing when the pull was created"""
         return self._created
 
     @property
     def diff_url(self):
+        """URL to view the diff associated with the pull"""
         return self._diff
 
     @property
     def head(self):
+        """The new head after the pull request"""
         return self._head
 
     @property
     def html_url(self):
+        """The URL of the pull request"""
         return self._url
 
     @property
     def id(self):
+        """The unique id of the pull request"""
         return self._id
 
     def is_merged(self):
+        """Checks to see if the pull request was merged.
+
+        :returns: bool
+        """
         url = self._api + '/merge'
         return self._session.get(url).status_code == 204
 
     @property
     def issue_url(self):
+        """The URL of the associated issue"""
         return self._issue
 
     @property
     def links(self):
+        """Dictionary of _links"""
         return self._links
 
     def list_comments(self):
-        """List the comments on this pull request."""
+        """List the comments on this pull request.
+        
+        :returns: list of :class:`ReviewComment <ReviewComment>`\ s
+        """
         url = self._api + '/comments'
         resp = self._get(url)
         ses = self._session
         return [ReviewComment(comment, ses) for comment in json]
 
     def list_commits(self):
-        """List the commits on this pull request."""
+        """List the commits on this pull request.
+        
+        :returns: list of :class:`Commit <github3.git.Commit>`\ s
+        """
         url = self._api + '/commits'
         json = self._get(url)
         ses = self._session
         return [Commit(commit, ses) for commit in json]
 
     def list_files(self):
-        """List the files associated with this pull request."""
+        """List the files associated with this pull request.
+        
+        :returns: list of :class:`PullFile <PullFile>`\ s
+        """
         url = self._api + '/files'
         json = self._get(url)
         return [PullFile(f) for f in json]
@@ -231,7 +255,10 @@ class PullRequest(GitHubCore):
     def merge(self, commit_message=''):
         """Merge this pull request.
 
-        :param commit_message: (optional), string
+        :param commit_message: (optional), message to be used for the merge
+            commit
+        :type commit_message: str
+        :returns: bool
         """
         data = {'commit_message': commit_message} if commit_message else None
         url = self._api + '/merge'
@@ -242,30 +269,39 @@ class PullRequest(GitHubCore):
 
     @property
     def merged_at(self):
+        """datetime object representing when the pull was merged"""
         return self._merged
 
     @property
     def number(self):
+        """Number of the pull/issue on the repository"""
         return self._num
 
     @property
     def patch_url(self):
+        """The URL of the patch"""
         return self._patch_url
 
     @property
     def state(self):
+        """The state of the pull"""
         return self._state
 
     @property
     def title(self):
+        """The title of the request"""
         return self._title
 
     def update(self, title='', body='', state=''):
         """Update this pull request.
 
-        :param title: (optional), string
-        :param body: (optional), string
-        :param state: (optional), string, ('open', 'closed')
+        :param title: (optional), title of the pull
+        :type title: str
+        :param body: (optional), body of the pull request
+        :type body: str
+        :param state: (optional), ('open', 'closed')
+        :type state: str
+        :returns: bool
         """
         data = dumps({'title': title, 'body': body, 'state': state})
         json = self._patch(self._api, data)
@@ -276,6 +312,8 @@ class PullRequest(GitHubCore):
 
     @property
     def user(self):
+        """:class:`User <github3.user.User>` object representing the creator of
+        the pull request"""
         return self._user
 
 

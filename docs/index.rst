@@ -66,6 +66,7 @@ Modules
     github
     issue
     org
+    pulls
     repo
 
 Internals
