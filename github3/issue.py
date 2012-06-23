@@ -8,7 +8,7 @@ This module contains the classes related to issues.
 
 from json import dumps
 from re import match
-from .models import GitHubCore, BaseComment, BaseEvent
+from .models import GitHubCore, BaseComment
 from .user import User
 
 
@@ -464,7 +464,7 @@ class IssueComment(BaseComment):
         return self._updated
 
 
-class IssueEvent(BaseEvent):
+class IssueEvent(GitHubCore):
     """The :class:`IssueEvent <IssueEvent>` object. This specifically deals with
     events described in the
     `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
@@ -522,6 +522,11 @@ class IssueEvent(BaseEvent):
         return self._commit_id
 
     @property
+    def created_at(self):
+        """datetime object representing when the event was created."""
+        return self._created
+
+    @property
     def issue(self):
         """:class:`Issue <Issue>` where this comment was made."""
         return self._issue
@@ -530,11 +535,6 @@ class IssueEvent(BaseEvent):
     def comments(self):
         """Number of comments"""
         return self._comments
-
-    @property
-    def created_at(self):
-        """datetime object representing when the event happened."""
-        return self._created
 
 
 def issue_params(filter, state, labels, sort, direction, since):

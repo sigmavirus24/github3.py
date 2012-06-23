@@ -11,7 +11,9 @@ from json import dumps
 
 
 class GitHubCore(object):
-    """A basic class for the other classes."""
+    """The :class:`GitHubCore <GitHubCore>` object. This class provides some
+    basic attributes to other classes that are very useful to have.
+    """
     def __init__(self, session=None):
         self._session = session
         if self._session:
@@ -31,7 +33,7 @@ class GitHubCore(object):
         return None
 
     def _getr(self, url, status_code=200, **kwargs):
-        """In the rare instance we care about the entire response."""
+        # In the rare instance we care about the entire response.
         req = None
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
@@ -89,6 +91,7 @@ class GitHubCore(object):
         return req
 
     def _strptime(self, time_str):
+        """Converts an ISO 8601 formatted string into a datetime object."""
         if time_str:
             return datetime.strptime(time_str, self._time_format)
         else:
@@ -96,6 +99,7 @@ class GitHubCore(object):
 
     @property
     def ratelimit_remaining(self):
+        """Number of requests before GitHub imposes a ratelimit."""
         json = self._get(self._github_url + '/rate_limit')
         return json.get('remaining', 5000)
 
@@ -181,45 +185,37 @@ class BaseComment(GitHubCore):
 
 
 class BaseCommit(GitHubCore):
+    """The :class:`BaseCommit <BaseCommit>` object. This serves as the base for
+    the various types of commit objects returned by the API.
+    """
     def __init__(self, commit, session):
         super(BaseCommit, self).__init__(session)
         self._api = commit.get('url')
         self._sha = commit.get('sha')
         self._msg = commit.get('message')
-        self._parents = []
-        for parent in commit.get('parents', []):
-                api = parent.pop('url')
-                parent['_api'] = api
-                self._parents.append(type('Parent', (object, ), parent))
+        self._parents = commit.get('parents', [])
 
     @property
     def message(self):
+        """Commit message"""
         return self._msg
 
     @property
     def parents(self):
+        """List of parents to this commit."""
         return self._parents
 
     @property
     def sha(self):
+        """SHA of this commit."""
         return self._sha
 
 
-class BaseEvent(GitHubCore):
-    def __init__(self, event, session):
-        super(BaseEvent, self).__init__(session)
-        # Guaranteed to exist
-        self._created = self._strptime(event.get('created_at'))
-
-    def __repr__(self):
-        return '<github3-event at 0x%x>' % id(self)
-
-    @property
-    def created_at(self):
-        return self._created
-
-
 class BaseAccount(GitHubCore):
+    """The :class:`BaseAccount <BaseAccount>` object. This is used to do the
+    heavy lifting for :class:`Organization <org.Organization>` and :class:`User
+    <user.User>` objects.
+    """
     def __init__(self, acct, session):
         super(BaseAccount, self).__init__(session)
         self._update_(acct)
@@ -285,59 +281,73 @@ class BaseAccount(GitHubCore):
             self._private_repos = acct.get('total_private_repos')
 
     @property
-    def avatar(self):
+    def avatar_url(self):
+        """URL of the avatar at gravatar"""
         return self._avatar
 
     @property
     def bio(self):
+        """Markdown formatted biography"""
         return self._bio
 
     @property
     def blog(self):
+        """URL of the blog"""
         return self._blog
 
     @property
     def company(self):
+        """Name of the company"""
         return self._company
 
     @property
     def created_at(self):
+        """datetime object representing the date the account was created"""
         return self._created
 
     @property
     def email(self):
+        """E-mail address of the user/org"""
         return self._email
 
     @property
     def followers(self):
+        """Number of followers"""
         return self._followers
 
     @property
     def following(self):
+        """Number of people the user is following"""
         return self._following
 
     @property
     def html_url(self):
+        """URL of the user/org's profile"""
         return self._url
 
     @property
     def id(self):
+        """Unique ID of the user/org"""
         return self._id
 
     @property
     def location(self):
+        """Location of the user/org"""
         return self._location
 
     @property
     def login(self):
+        """login name of the user/org"""
         return self._login
 
     @property
     def name(self):
+        """Real name of the user/org"""
         return self._name
 
     @property
     def public_repos(self):
+        """Number of public repos owned by the user/org"""
         return self._public_repos
 
 class Error(BaseException):
@@ -347,9 +357,8 @@ class Error(BaseException):
         error = resp.json
         self._message = error.get('message')
         self._errors = []
-        if self._code == 422 or error.get('errors'):
-            errs = error.get('errors')
-            self._errors = errs
+        if error.get('errors'):
+            self._errors = error.get('errors')
 
     def __repr__(self):
         return '<Error [%s]>' % (self._message or self._code)

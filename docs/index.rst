@@ -67,6 +67,16 @@ Modules
     issue
     repos
 
+Internals
+~~~~~~~~~
+
+For objects you're not likely to see in practice.
+
+.. toctree::
+    :maxdepth: 1
+
+    models
+
 
 Installation
 ------------

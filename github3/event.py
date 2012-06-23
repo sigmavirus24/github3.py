@@ -6,10 +6,10 @@ This module contains the class(es) related to Events
 
 """
 
-from .models import GitHubCore, BaseEvent
+from .models import GitHubCore
 
 
-class Event(BaseEvent):
+class Event(GitHubCore):
     """The :class:`Event <Event>` object. It structures and handles the data
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
@@ -20,6 +20,7 @@ class Event(BaseEvent):
         from .user import User
         from .repo import Repository
         from .org import Organization
+        self._created = self._strptime(event.get('created_at'))
         self._type = event.get('type')
         self._public = event.get('public')
         self._repo = event.get('repo', {})
@@ -40,6 +41,11 @@ class Event(BaseEvent):
     def actor(self):
         """:class:`User <User>` object representing the actor."""
         return self._actor
+
+    @property
+    def created_at(self):
+        """datetime object representing when the event was created."""
+        return self._created
 
     @classmethod
     def list_types(cls):
