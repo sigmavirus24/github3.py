@@ -13,6 +13,7 @@ from .user import User
 
 
 class PullDestination(GitHubCore):
+    """The :class:`PullDestination <PullDestination>` object."""
     def __init__(self, dest, direction):
         super(PullDestination, self).__init__(None)
         self._dir = direction
@@ -33,26 +34,32 @@ class PullDestination(GitHubCore):
 
     @property
     def label(self):
+        """label of the destination"""
         return self._label
 
     @property
     def sha(self):
+        """SHA of the commit at the head"""
         return self._sha
 
     @property
     def ref(self):
+        """Full reference string of the object"""
         return self._ref
 
     @property
     def repo(self):
+        """(owner, name) representing the repository this is on"""
         return (self._repo_owner, self._repo_name)
 
     @property
     def user(self):
+        """:class:`User <user.User>` representing the owner"""
         return self._user
 
 
 class PullFile(object):
+    """The :class:`PullFile <PullFile>` object."""
     def __init__(self, pfile):
         super(PullFile, self).__init__()
         self._sha = pfile.get('sha')
@@ -70,38 +77,47 @@ class PullFile(object):
 
     @property
     def additions(self):
+        """Number of additions on this file"""
         return self._add
 
     @property
     def blob_url(self):
+        """URL to view the blob for this file"""
         return self._blob
 
     @property
     def changes(self):
+        """Number of changes made to this file"""
         return self._changes
 
     @property
     def deletions(self):
+        """Number of deletions on this file"""
         return self._del
 
     @property
     def filename(self):
+        """Name of the file"""
         return self._name
 
     @property
     def patch(self):
+        """URL to view the patch"""
         return self._patch
 
     @property
     def raw_url(self):
+        """URL to view the raw diff of this file"""
         return self._raw
 
     @property
     def sha(self):
+        """SHA of the commit"""
         return self._sha
 
     @property
     def status(self):
+        """Status of the file, e.g., 'added'"""
         return self._status
 
 
@@ -318,6 +334,9 @@ class PullRequest(GitHubCore):
 
 
 class ReviewComment(BaseComment):
+    """The :class:`ReviewComment <ReviewComment>` object. This is used to
+    represent comments on pull requests.
+    """
     def __init__(self, comment, session):
         super(ReviewComment, self).__init__(comment, session)
 
@@ -326,20 +345,25 @@ class ReviewComment(BaseComment):
 
     @property
     def commit_id(self):
+        """SHA of the commit the comment is on"""
         return self._cid
     
     @property
     def html_url(self):
+        """URL of the comment"""
         return self._url
 
     @property
     def path(self):
+        """Path to the file"""
         return self._path
 
     @property
     def position(self):
+        """Position within the commit"""
         return self._pos
 
     @property
     def updated_at(self):
+        """datetime object representing the last time the object was updated."""
         return self._updated

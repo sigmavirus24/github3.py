@@ -16,3 +16,18 @@ Pull Request Objects
 
 .. autoclass:: PullRequest
     :inherited-members:
+
+------
+
+.. autoclass:: ReviewComment
+    :inherited-members:
+
+------
+
+.. autoclass:: PullDestination
+    :inherited-members:
+
+------
+
+.. autoclass:: PullFile
+    :inherited-members:
