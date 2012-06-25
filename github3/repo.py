@@ -139,11 +139,25 @@ class Repository(GitHubCore):
 
         :param sha: (required), sha of the blob
         :type sha: str
-        :returns: :class:`Blob` if successful, otherwise None
+        :returns: :class:`Blob <github3.git.Blob>` if successful, otherwise
+            None
         """
         url = '{0}/git/blobs/{1}'.format(self._api, sha)
         json = self._get(url)
         return Blob(json) if json else None
+
+    def branch(self, name):
+        """Get the branch ``name`` of this repository.
+
+        :param name: (required), branch name
+        :type name: str
+        :returns: :class:`Branch <Branch>`
+        """
+        json = None
+        if name:
+            url = self._api + '/branches/' + name
+            json = self._get(url)
+        return Branch(json, self._session) if json else None
 
     @property
     def clone_url(self):
@@ -262,7 +276,8 @@ class Repository(GitHubCore):
         :param committer: (optional), if ommitted, GitHub will use the author
             parameters. Should be the same format as the author parameter.
         :type commiter: dict
-        :returns: :class:`Commit <Commit>` if successful, else None
+        :returns: :class:`Commit <github3.git.Commit>` if successful, else
+            None
         """
         commit = None
         if message and tree and isinstance(parents, list):
@@ -395,7 +410,8 @@ class Repository(GitHubCore):
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
-        :returns: :class:`Issue <Issue>` if successful, else None
+        :returns: :class:`Issue <github3.issue.Issue>` if successful, else
+            None
         """
         issue = dumps({'title': title, 'body': body,
             'assignee': assignee, 'milestone': milestone,
@@ -412,7 +428,7 @@ class Repository(GitHubCore):
         :type title: str
         :param key: (required), key text
         :type key: str
-        :returns: :class:`Key <Key>` if successful, else None
+        :returns: :class:`Key <github3.user.Key>` if successful, else None
         """
         data = dumps({'title': title, 'key': key})
         url = self._api + '/keys'
@@ -427,7 +443,8 @@ class Repository(GitHubCore):
         :param color: (required), value of the color to assign to the
             label
         :type color: str
-        :returns: :class:`Label <Label>` if successful, else None
+        :returns: :class:`Label <github3.issue.Label>` if successful, else
+            None
         """
         if color[0] == '#':
             color = color[1:]
@@ -450,7 +467,8 @@ class Repository(GitHubCore):
         :type description: str
         :param due_on: (optional), ISO 8601 formatted due date
         :type due_on: str
-        :returns: :class:`Milestone <Milestone>` if successful, else None
+        :returns: :class:`Milestone <github3.issue.Milestone>` if successful,
+            else None
         """
         url = self._api + '/milestones'
         if state not in ('open', 'closed'):
@@ -472,7 +490,8 @@ class Repository(GitHubCore):
         :type head: str
         :param body: (optional), markdown formatted description
         :type body: str
-        :returns: :class:`PullRequest <PullRequest>` if successful, else None
+        :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
+            successful, else None
         """
         data = dumps({'title': title, 'body': body, 'base': base,
             'head': head})
@@ -487,7 +506,8 @@ class Repository(GitHubCore):
         :type base: str
         :param head: (required), e.g., 'master', or a sha
         :type head: str
-        :returns: :class:`PullRequest <PullRequest>` if successful, else None
+        :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
+            successful, else None
         """
         data = dumps({'issue': issue, 'base': base, 'head': head})
         return self._create_pull(data)
@@ -501,7 +521,8 @@ class Repository(GitHubCore):
         :type ref: str
         :param sha: (required), SHA1 value to set the reference to
         :type sha: str
-        :returns: :class:`Reference <Reference>` if successful else None
+        :returns: :class:`Reference <github3.git.Reference>` if successful
+            else None
         """
         data = dumps({'ref': ref, 'sha': sha})
         url = self._api + '/git/refs'
@@ -527,8 +548,9 @@ class Repository(GitHubCore):
         :param lightweight: (optional), if False, create an annotated
             tag, otherwise create a lightweight tag (a Reference).
         :type lightweight: bool
-        :returns: If lightweight == False: :class:`Tag <Tag>` if successful,
-            else None. If lightweight == True: :class:`Reference <Reference>` 
+        :returns: If lightweight == False: :class:`Tag <github3.git.Tag>` if
+            successful, else None. If lightweight == True: :class:`Reference
+            <Reference>`
         """
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
@@ -554,7 +576,7 @@ class Repository(GitHubCore):
         :param base_tree: (optional), SHA1 of the tree you want
             to update with new data
         :type base_tree: str
-        :returns: :class:`Tree <Tree>` if successful, else None
+        :returns: :class:`Tree <github3.git.Tree>` if successful, else None
         """
         tree = None
         if tree and isinstance(tree, list):
@@ -719,7 +741,8 @@ class Repository(GitHubCore):
 
         :param number: (required), number of the issue on this repository
         :type number: int
-        :returns: :class:`Issue <Issue>` if successful, else None
+        :returns: :class:`Issue <github3.issue.Issue>` if successful, else
+            None
         """
         json = None
         if int(number) > 0:
@@ -745,7 +768,8 @@ class Repository(GitHubCore):
 
         :param name: (required), name of the label
         :type name: str
-        :returns: :class:`Label <Label>` if successful, else None
+        :returns: :class:`Label <github3.issue.Label>` if successful, else
+            None
         """
         json = None
         if name:
@@ -765,7 +789,7 @@ class Repository(GitHubCore):
         """
         url = self._api + '/branches'
         json = self._get(url)
-        return [Branch(b) for b in json]
+        return [Branch(b, self._session) for b in json]
 
     def list_comments(self):
         """List comments on all commits in the repository.
@@ -803,7 +827,7 @@ class Repository(GitHubCore):
 
         :param anon: (optional), True lists anonymous contributors as well
         :type anon: bool
-        :returns: list of :class:`User <User>`\ s
+        :returns: list of :class:`User <github3.user.User>`\ s
         """
         url = self._api + '/contributors'
         if anon:
@@ -824,7 +848,7 @@ class Repository(GitHubCore):
     def list_events(self):
         """List events on this repository.
 
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         url = self._api + '/events'
         json = self._get(url)
@@ -880,7 +904,7 @@ class Repository(GitHubCore):
         :type direction: str
         :param since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
         :type since: str
-        :returns: list of :class:`Issue <Issue>`\ s
+        :returns: list of :class:`Issue <github3.issue.Issue>`\ s
         """
         url = self._api + '/issues'
 
@@ -911,7 +935,7 @@ class Repository(GitHubCore):
     def list_issue_events(self):
         """List issue events on this repository.
 
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         url = self._api + '/issues/events'
         json = self._get(url)
@@ -957,7 +981,7 @@ class Repository(GitHubCore):
         :param direction: (optional), direction to sort the milestones,
             accepted values: ('asc', 'desc')
         :type direction: str
-        :returns: list of :class:`Milestone <Milestone>`\ s
+        :returns: list of :class:`Milestone <github3.issue.Milestone>`\ s
         """
         url = self._api + '/milestones'
 
@@ -982,7 +1006,7 @@ class Repository(GitHubCore):
     def list_network_events(self):
         """Lists events on a network of repositories.
 
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         from re import subn
         url = subn('repos', 'networks', self._api, 1) + '/events'
@@ -1009,7 +1033,7 @@ class Repository(GitHubCore):
 
         :param subspace: (optional), e.g. 'tags', 'stashes', 'notes'
         :type subspace: str
-        :returns: list of :class:`Reference <Reference>`\ s
+        :returns: list of :class:`Reference <github3.git.Reference>`\ s
         """
         if subspace:
             url = self._api + '/git/refs/' + subspace
@@ -1039,7 +1063,7 @@ class Repository(GitHubCore):
     def list_watchers(self):
         """List watchers of this repository.
         
-        :returns: list of :class:`User <User>`\ s
+        :returns: list of :class:`User <github3.user.User>`\ s
         """
         url = self._api + '/watchers'
         json = self._get(url)
@@ -1050,7 +1074,7 @@ class Repository(GitHubCore):
 
         :param number: (required), unique id number of the milestone
         :type number: int
-        :returns: :class:`Milestone <Milestone>`
+        :returns: :class:`Milestone <github3.issue.Milestone>`
         """
         url = '{0}/milestones/{1}'.format(self._api, str(number))
         json = self._get(url)
@@ -1137,7 +1161,7 @@ class Repository(GitHubCore):
 
         :param ref: (required)
         :type ref: str
-        :returns: :class:`Reference <Reference>`
+        :returns: :class:`Reference <github3.git.Reference>`
         """
         url = self._api + '/git/refs/' + ref
         json = self._get(url)
@@ -1178,7 +1202,7 @@ class Repository(GitHubCore):
 
         :param sha: (required), sha of the object for this tag
         :type sha: str
-        :returns: :class:`Tag <Tag>`
+        :returns: :class:`Tag <github3.git.Tag>`
         """
         url = self._api + '/git/tags/' + sha
         json = self._get(url)
@@ -1189,7 +1213,7 @@ class Repository(GitHubCore):
 
         :param sha: (required), sha of the object for this tree
         :type sha: str
-        :returns: :class:`Tree <Tree>`
+        :returns: :class:`Tree <github3.git.Tree>`
         """
         url = '{0}/git/trees/{1}'.format(self._api, sha)
         json = self._get(url)
@@ -1228,18 +1252,17 @@ class Repository(GitHubCore):
         return self._watchers
 
 
-class Branch(object):
+class Branch(GitHubCore):
     """The :class:`Branch <Branch>` object. It holds the information GitHub
     returns about a branch on a :class:`Repository <Repository>`.
     """
-
-    def __init__(self, branch):
-        super(Branch, self).__init__()
+    def __init__(self, branch, session):
+        super(Branch, self).__init__(session)
         self._name = branch.get('name')
         self._commit = None
         if branch.get('commit'):
-            self._commit = type('Branch Commit', (object, ),
-                    branch.get('commit'))
+            self._commit = Commit(branch.get('commit'), self._session)
+        self._links = branch.get('_links', {})
 
     def __repr__(self):
         return '<Repository Branch [%s]>' % self._name
@@ -1248,6 +1271,11 @@ class Branch(object):
     def commit(self):
         """Returns the branch commit."""
         return self._commit
+
+    @property
+    def links(self):
+        """Returns '_links' attribute."""
+        return self._links
 
     @property
     def name(self):

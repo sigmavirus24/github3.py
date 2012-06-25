@@ -68,7 +68,9 @@ class Commit(BaseCommit):
         super(Commit, self).__init__(commit, session)
 
         self._author = ''
-        if len(commit.get('author')) > 3:  # User object
+        self._author_name = ''
+        if commit.get('author') and len(commit.get('author')) > 3:
+            # User object
             # Typically there should be 5 keys, but more than 3 should 
             # be a sufficient test
             self._author = User(commit.get('author'), None)

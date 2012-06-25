@@ -39,6 +39,25 @@ class GitHub(GitHubCore):
         json = self._get(url)
         return [User(f, self._session) for f in json]
 
+    def authorize(self, login, password, scopes):
+        """Obtain an authorization token from the GitHub API for the GitHub 
+        API.
+        
+        :param login: (required)
+        :type login: str
+        :param password: (required)
+        :type password: str
+        :param scopes: (required), areas you want this token to apply to,
+            i.e., 'gist', 'user'
+        :type scopes: list of strings
+        :returns: str (the token)
+        """
+        json = {}
+        if isinstance(scopes, list) and scopes:
+            url = 'https://api.github.com/authorizations'
+            json = self._get(url, data={'scopes': scopes})
+        return json.get('token', '')
+
     def create_gist(self, description, files, public=True):
         """Create a new gist.
 
@@ -469,7 +488,9 @@ class GitHub(GitHubCore):
         if username and password:
             self._session.auth = (username, password)
         elif token:
-            self._session.headers.update({'access_token': token})
+            self._session.headers.update({
+                'Authorization': 'token ' + token
+                })
 
     def organization(self, login):
         """Returns a Organization object for the login name
