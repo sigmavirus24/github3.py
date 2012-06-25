@@ -162,43 +162,6 @@ Examples
 
   >>> from github3 import login
   >>> gh = login(username, password)
-  >>> gists = gh.list_gists()
-  >>> files = {'spam.txt' : {'content': 'What... is the air-speed velocity of an
-  unladen swallow?'}}
-  >>> gh.create_gist('Answer this to cross the bridge', files, public=False)
-  <Gist [gist-id]>
-
-::
-
-  >>> from github3 import create_gist
-  >>> files = {'spam.txt' : {'content': 'What... is the air-speed velocity of an
-  unladen swallow?'}}
-  >>> gist = create_gist('Answer this to cross the bridge', files, public=False)
-  >>> gist.list_comments()
-  []
-  >>> gist.create_comment('Bogus. This will not work.')
-  # Which of course it didn't, because you're not logged in
-
-::
-
-  >>> from github3 import login
-  >>> gh = login(username, password)
-  >>> issue = gh.issue('sigmavirus24', 'issues.py', 2)
-  >>> issue.html_url
-  u'https://github.com/sigmavirus24/issues.py/issues/2'
-  >>> issue.state
-  u'open'
-  >>> issue.close()
-  True
-  >>> issue.reopen()
-  True
-  >>> issue.edit('Testing Github3.py', 'Testing re-opening', 'sigmavirus24')
-  True
-
-::
-
-  >>> from github3 import login
-  >>> gh = login(username, password)
   >>> issue = gh.issue('sigmavirus24', 'Todo.txt-python', 17)
   >>> issue.html_url
   u'https://github.com/sigmavirus24/Todo.txt-python/issues/17'

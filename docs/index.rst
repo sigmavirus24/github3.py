@@ -38,7 +38,7 @@ Let's get information about a user::
     gh.list_followers('kennethreitz')
 
 
-Further Examples
+More Examples
 ~~~~~~~~~~~~~~~~
 
 .. toctree::
@@ -46,6 +46,7 @@ Further Examples
 
     examples/gist
     examples/github
+    examples/issue
 
 
 .. links
@@ -68,6 +69,7 @@ Modules
     org
     pulls
     repo
+    user
 
 Internals
 ~~~~~~~~~

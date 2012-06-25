@@ -7,6 +7,7 @@ This module contains all of the classes related to organizations.
 """
 
 from json import dumps
+from .event import Event
 from .models import BaseAccount, GitHubCore
 from .repo import Repository
 from .user import User
@@ -323,6 +324,15 @@ class Organization(BaseAccount):
         """
         url = '{0}/public_members/{1}'.format(self._api, login)
         return self._session.get(url).status_code == 204
+
+    def list_events(self):
+        """List events for this org.
+
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        url = self._api + '/events'
+        json = self._get(url)
+        return [Event(e, self._session) for e in json]
 
     def list_members(self):
         """List members of this organization.

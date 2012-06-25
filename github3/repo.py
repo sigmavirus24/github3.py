@@ -10,6 +10,7 @@ from base64 import b64decode, b64encode
 from time import time
 from json import dumps
 import requests
+from .event import Event
 from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag
 from .models import GitHubCore, BaseComment, BaseCommit
@@ -820,6 +821,15 @@ class Repository(GitHubCore):
         json = self._get(url)
         return [Download(dl, self._session) for dl in json]
 
+    def list_events(self):
+        """List events on this repository.
+
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        url = self._api + '/events'
+        json = self._get(url)
+        return [Event(e, self._session) for e in json]
+
     def list_forks(self, sort=''):
         """List forks of this repository.
 
@@ -898,6 +908,15 @@ class Repository(GitHubCore):
         ses = self._session
         return [Issue(i, ses) for i in json]
 
+    def list_issue_events(self):
+        """List issue events on this repository.
+
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        url = self._api + '/issues/events'
+        json = self._get(url)
+        return [Event(e, self._session) for e in json]
+
     def list_keys(self):
         """List deploy keys on this repository.
         
@@ -959,6 +978,16 @@ class Repository(GitHubCore):
         json = self._get(url)
         ses = self._session
         return [Milestone(mile, ses) for mile in json]
+
+    def list_network_events(self):
+        """Lists events on a network of repositories.
+
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        from re import subn
+        url = subn('repos', 'networks', self._api, 1) + '/events'
+        json = sub._get(url)
+        return [Event(e, self._session) for e in json]
 
     def list_pulls(self, state=None):
         """List pull requests on repository.

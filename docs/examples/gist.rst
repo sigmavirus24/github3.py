@@ -3,7 +3,7 @@
 Gist Code Examples
 ==================
 
-Examples with gists
+Examples with :class:`Gist <github3.gist.Gist>`\ s
 
 
 Listing gists after authenticating

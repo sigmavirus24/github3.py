@@ -3,7 +3,7 @@
 GitHub Examples
 ===============
 
-Examples using the GitHub object.
+Examples using the :class:`GitHub <github3.github.GitHub>` object.
 
 Assumptions
 -----------

@@ -229,11 +229,11 @@ class BaseAccount(GitHubCore):
         self._type = None
         if acct.get('type'):
             self._type = acct.get('type')
-        self._api = acct.get('url')
+        self._api = acct.get('url', '')
 
-        self._avatar = acct.get('avatar_url')
-        self._blog = acct.get('blog')
-        self._company = acct.get('company')
+        self._avatar = acct.get('avatar_url', '')
+        self._blog = acct.get('blog', '')
+        self._company = acct.get('company', '')
 
         self._created = None
         if acct.get('created_at'):
@@ -241,44 +241,44 @@ class BaseAccount(GitHubCore):
         self._email = acct.get('email')
 
         ## The number of people following this acct
-        self._followers = acct.get('followers')
+        self._followers = acct.get('followers', 0)
 
         ## The number of people this acct follows
-        self._following = acct.get('following')
+        self._following = acct.get('following', 0)
 
-        self._id = acct.get('id')
-        self._location = acct.get('location')
-        self._login = acct.get('login')
+        self._id = acct.get('id', 0)
+        self._location = acct.get('location', '')
+        self._login = acct.get('login', '')
 
         ## e.g. first_name last_name
-        self._name = acct.get('name')
+        self._name = acct.get('name', '')
 
         ## The number of public_repos
-        self._public_repos = acct.get('public_repos')
+        self._public_repos = acct.get('public_repos', 0)
 
         ## e.g. https://github.com/self._login
-        self._url = acct.get('html_url')
+        self._url = acct.get('html_url', '')
 
         ## The number of private repos
         if self._type == 'Organization':
-            self._private_repos = acct.get('private_repos')
+            self._private_repos = acct.get('private_repos', 0)
 
         self._bio = acct.get('bio')
         if self._type == 'User':
 
             ## The number of people this acct folows
-            self._grav_id = acct.get('gravatar_id')
-            self._hire = acct.get('hireable')
+            self._grav_id = acct.get('gravatar_id', '')
+            self._hire = acct.get('hireable', False)
 
             ## The number of public_gists
-            self._public_gists = acct.get('public_gists')
+            self._public_gists = acct.get('public_gists', 0)
 
             # Private information
-            self._disk = acct.get('disk_usage')
+            self._disk = acct.get('disk_usage', 0)
 
-            self._owned_private_repos = acct.get('owned_private_repos')
-            self._private_gists = acct.get('total_private_gists')
-            self._private_repos = acct.get('total_private_repos')
+            self._owned_private_repos = acct.get('owned_private_repos', 0)
+            self._private_gists = acct.get('total_private_gists', 0)
+            self._private_repos = acct.get('total_private_repos', 0)
 
     @property
     def avatar_url(self):
