@@ -7,6 +7,7 @@ This module contains everything relating to Users.
 """
 
 from json import dumps
+from .event import Event
 from .models import GitHubCore, BaseAccount
 
 
@@ -181,6 +182,20 @@ class User(BaseAccount):
         """True -- for hire, False -- not for hire"""
         return self._hire
 
+    def list_events(self, public=False):
+        """Events performed by this user.
+
+        :param public: (optional), only list public events for the
+            authenticated user
+        :type public: bool
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        url = self._api + '/events'
+        if public:
+            url = '/'.join([url, 'public'])
+        json = self._get(url)
+        return [Event(e, self._session) for e in json]
+
     def list_followers(self):
         """List followers of this user.
         
@@ -198,6 +213,36 @@ class User(BaseAccount):
         url = self._api + '/following'
         json = self._get(url)
         return [User(u, self._session) for u in json]
+
+    def list_org_events(self, org):
+        """List events as they appear on the user's organization dashboard.
+        You must be authenticated to view this.
+
+        :param org: (required), name of the organization
+        :type org: str
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        json = []
+        if org:
+            url = self._api + '/events/orgs/' + org
+            json = self._get(url)
+        return [Event(e, self._session) for e in json]
+
+    def list_received_events(self, public=False):
+        """List events that the user has received. If the user is the 
+        authenticated user, you will see private and public events, otherwise 
+        you will only see public events.
+
+        :param public: (optional), determines if the authenticated user sees
+            both private and public or just public
+        :type public: bool
+        :returns: list of :class:`Event <event.Event>`\ s
+        """
+        url = self._api + '/received_events'
+        if public:
+            url = '/'.join([url, 'public'])
+        json = self._get(url)
+        return [Event(e, self._session) for e in json]
 
     @property
     def owned_private_repos(self):

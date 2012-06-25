@@ -16,7 +16,7 @@ class Event(GitHubCore):
     """
 
     def __init__(self, event, session):
-        super(Event, self).__init__(event, session)
+        super(Event, self).__init__(session)
         from .user import User
         from .repo import Repository
         from .org import Organization
@@ -49,7 +49,7 @@ class Event(GitHubCore):
 
     @classmethod
     def list_types(cls):
-        return sorted(cls._payload_handlers.keys())
+        return sorted(_payload_handlers.keys())
 
     @property
     def org(self):
