@@ -188,7 +188,7 @@ class User(BaseAccount):
         :param public: (optional), only list public events for the
             authenticated user
         :type public: bool
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         url = self._api + '/events'
         if public:
@@ -220,7 +220,7 @@ class User(BaseAccount):
 
         :param org: (required), name of the organization
         :type org: str
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         json = []
         if org:
@@ -236,7 +236,7 @@ class User(BaseAccount):
         :param public: (optional), determines if the authenticated user sees
             both private and public or just public
         :type public: bool
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         url = self._api + '/received_events'
         if public:

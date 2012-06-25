@@ -51,7 +51,7 @@ class GitHub(GitHubCore):
         :type files: dict
         :param public: (optional), make the gist public if True
         :type public: bool
-        :returns: :class:`Gist <gist.Gist>`
+        :returns: :class:`Gist <github3.gist.Gist>`
         """
         new_gist = {'description': description, 'public': public,
                 'files': files}
@@ -90,7 +90,7 @@ class GitHub(GitHubCore):
         :type milestone: str
         :param labels: (optional), List of label names.
         :type labels: list
-        :returns: :class:`Issue <issue.Issue>`
+        :returns: :class:`Issue <github3.issue.Issue>`
         """
         repo = None
         if owner and repository and title:
@@ -111,7 +111,7 @@ class GitHub(GitHubCore):
         :type title: str
         :param key: (required), actual key contents
         :type key: str or file
-        :returns: :class:`Key <user.Key>`
+        :returns: :class:`Key <github3.user.Key>`
         """
         created = None
 
@@ -150,7 +150,7 @@ class GitHub(GitHubCore):
         :param has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
         :type has_downloads: bool
-        :returns: :class:`Repository <repo.Repository>`
+        :returns: :class:`Repository <github3.repo.Repository>`
         """
         url = self._github_url + '/user/repos'
         data = dumps({'name': name, 'description': description,
@@ -191,7 +191,7 @@ class GitHub(GitHubCore):
         
         :param id_num: (required), unique id of the key
         :type id_num: int
-        :returns: :class:`Key <user.Key>`
+        :returns: :class:`Key <github3.user.Key>`
         """
         json = None
         if int(id_num) > 0:
@@ -205,7 +205,7 @@ class GitHub(GitHubCore):
         
         :param id_num: (required), unique id of the gist
         :type id_num: int
-        :returns: :class:`Gist <gist.Gist>`
+        :returns: :class:`Gist <github3.gist.Gist>`
         """
         url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
         json = self._get(url)
@@ -249,7 +249,7 @@ class GitHub(GitHubCore):
         :type repository: str
         :param number: (required), issue number
         :type number: int
-        :return: :class:`Issue <issue.Issue>`
+        :return: :class:`Issue <github3.issue.Issue>`
         """
         repo = self.repository(owner, repository)
         if repo:
@@ -267,7 +267,7 @@ class GitHub(GitHubCore):
     def list_events(self):
         """List public events.
         
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         json = self._get(self._github_url + '/events')
         return [Event(ev, self._session) for ev in json]
@@ -279,7 +279,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), login of the user to check
         :type login: str
-        :returns: list of :class:`User <user.User>`\ s
+        :returns: list of :class:`User <github3.user.User>`\ s
         """
         if login:
             return self.user(login).list_followers()
@@ -292,7 +292,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), login of the user to check
         :type login: str
-        :returns: list of :class:`User <user.User>`\ s
+        :returns: list of :class:`User <github3.user.User>`\ s
         """
         if login:
             return self.user(login).list_following()
@@ -304,7 +304,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), login of the user to check
         :type login: str
-        :returns: list of :class:`Gist <gist.Gist>`\ s
+        :returns: list of :class:`Gist <github3.gist.Gist>`\ s
         """
         url = [self._github_url]
         if username:
@@ -349,7 +349,7 @@ class GitHub(GitHubCore):
         :param since: ISO 8601 formatted timestamp, e.g.,
             2012-05-20T23:10:27Z
         :type since: str
-        :returns: list of :class:`Issue <issue.Issue>`\ s
+        :returns: list of :class:`Issue <github3.issue.Issue>`\ s
         """
         url = [self._github_url]
         if owner and repository:
@@ -371,7 +371,7 @@ class GitHub(GitHubCore):
     def list_keys(self):
         """List public keys for the authenticated user.
         
-        :returns: list of :class:`Key <user.Key>`\ s
+        :returns: list of :class:`Key <github3.user.Key>`\ s
         """
         url = self._github_url + '/user/keys'
         json = self._get(url)
@@ -385,7 +385,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional), user whose orgs you wish to list
         :type login: str
-        :returns: list of :class:`Organization <org.Organization>`\ s
+        :returns: list of :class:`Organization <github3.org.Organization>`\ s
         """
         url = [self._github_url]
         if login:
@@ -417,7 +417,8 @@ class GitHub(GitHubCore):
             ('asc', 'desc'), API default: 'asc' when using 'full_name',
             'desc' otherwise
         :type direction: str
-        :returns: list of :class:`Repository <repo.Repository>` objects
+        :returns: list of :class:`Repository <github3.repo.Repository>` 
+        objects
         """
         url = [self._github_url]
         if login:
@@ -445,7 +446,8 @@ class GitHub(GitHubCore):
 
         :param login: (optional)
         :type login: str
-        :returns: list of :class:`Repository <repo.Repository>` objects
+        :returns: list of :class:`Repository <github3.repo.Repository>` 
+        objects
         """
         if login:
             url = self._github_url + '/users/' + login + '/watched'
@@ -488,11 +490,26 @@ class GitHub(GitHubCore):
         :type owner: str
         :param repository: (required)
         :type repository: str
-        :returns: :class:`Repository <repo.Repository>`
+        :returns: :class:`Repository <github3.repo.Repository>`
         """
         url = '/'.join([self._github_url, 'repos', owner, repository])
         json = self._get(url)
         return Repository(json, self._session) if json else None
+
+    def search_issues(self, owner, repo, state, keyword):
+        """Find issues by state and keyword.
+
+        :param owner: (required)
+        :type owner: str
+        :param repo: (required)
+        :type repo: str
+        :param state: (required), accepted values: ('open', 'closed')
+        :type state: str
+        :param keyword: (required), what to search for
+        :type keyword: str
+        :returns: None
+        """
+        pass
 
     def unfollow(self, login):
         """Make the authenticated user stop following login
@@ -543,7 +560,7 @@ class GitHub(GitHubCore):
         
         :param login: (optional)
         :type login: str
-        :returns: :class:`User <user.User>`
+        :returns: :class:`User <github3.user.User>`
         """
         url = [self._github_url]
         if login:
