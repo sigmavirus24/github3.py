@@ -11,7 +11,7 @@ from json import dumps
 from .event import Event
 from .gist import Gist
 from .issue import Issue, issue_params
-from .legacy import LegacyIssue
+from .legacy import LegacyIssue, LegacyRepo, LegacyUser
 from .models import GitHubCore
 from .org import Organization
 from .repo import Repository
@@ -565,12 +565,39 @@ class GitHub(GitHubCore):
         :type state: str
         :param keyword: (required), what to search for
         :type keyword: str
-        :returns: None
+        :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
         url = self._github_url + '/legacy/issues/search/{0}/{1}/{2}/{3}'.format(
                 owner, repo, state, keyword)
         json = self._get(url)
-        return [LegacyIssue(l, self._session) for l in json.get('issues', [])]
+        issues = json.get('issues', [])
+        return [LegacyIssue(l, self._session) for l in issues]
+
+    def search_repos(self, keyword, **params):
+        """Search all repositories by keyword.
+
+        :param keyword: (required)
+        :type keyword: str
+        :param params: (optional), filter by language and/or start_page
+        :type params: dict
+        :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
+        """
+        url = self._github_url + '/legacy/repos/search/{0}'.format(keyword)
+        json = self._get(url, params=params)
+        repos = json.get('repositories', [])
+        return [LegacyRepo(r, self._session) for r in repos]
+
+    def search_users(self, keyword):
+        """Search all users by keyword.
+
+        :param keyword: (required)
+        :type keyword: str
+        :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
+        """
+        url = self._github_url + '/legacy/users/search/{0}'.format(keyword)
+        json = self._get(url)
+        users = json.get('users', [])
+        return [LegacyUser(u, self._session) for u in users]
 
     def unfollow(self, login):
         """Make the authenticated user stop following login

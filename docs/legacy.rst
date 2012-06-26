@@ -13,4 +13,14 @@ Legacy Objects
 .. autoclass:: LegacyIssue
     :inherited-members:
 
+------
+
+.. autoclass:: LegacyRepo
+    :inherited-members:
+
+------
+
+.. autoclass:: LegacyUser
+    :inherited-members:
+
 .. _Search: http://developer.github.com/v3/search/

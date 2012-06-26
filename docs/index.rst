@@ -39,7 +39,7 @@ Let's get information about a user::
 
 
 More Examples
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. toctree::
     :maxdepth: 2
@@ -75,7 +75,8 @@ Modules
 Internals
 ~~~~~~~~~
 
-For objects you're not likely to see in practice.
+For objects you're not likely to see in practice. This is useful if you ever
+feel the need to contribute to the project.
 
 .. toctree::
     :maxdepth: 1
