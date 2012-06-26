@@ -53,9 +53,17 @@ class GitHub(GitHubCore):
         :returns: str (the token)
         """
         json = {}
-        if isinstance(scopes, list) and scopes:
+        auth = self._session.auth or (login and password)
+        if isinstance(scopes, list) and scopes and auth:
             url = 'https://api.github.com/authorizations'
-            json = self._get(url, data={'scopes': scopes})
+            data = dumps({'scopes': scopes})
+            if self._session.auth:
+                json = self._post(url, data=data)
+            else:
+                ses = session()
+                ses.auth = (login, password)
+                req = ses.post(url, data=data)
+                json = req.json if req.ok else {}
         return json.get('token', '')
 
     def create_gist(self, description, files, public=True):
