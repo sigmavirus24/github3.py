@@ -39,7 +39,20 @@ class GitHub(GitHubCore):
         json = self._get(url)
         return [User(f, self._session) for f in json]
 
-    def authorize(self, login, password, scopes):
+    def authorization(self, id_num):
+        """Get information about authorization ``id``.
+
+        :param id_num: (required), unique id of the authorization
+        :type id_num: int
+        :returns: :class:`Authorization <Authorization>`
+        """
+        json = None
+        if int(id_num) > 0:
+            url = self._github_url + '/authorizations/{0}'.format(id_num)
+            json = self._get(url)
+        return Authorization(json, self._session) if json else None
+
+    def authorize(self, login, password, scopes, note='', note_url=''):
         """Obtain an authorization token from the GitHub API for the GitHub 
         API.
         
@@ -50,13 +63,18 @@ class GitHub(GitHubCore):
         :param scopes: (required), areas you want this token to apply to,
             i.e., 'gist', 'user'
         :type scopes: list of strings
-        :returns: str (the token)
+        :param note: (optional), note about the authorization
+        :type note: str
+        :param note_url: (optional), URL pointing to a note
+        :type note_url: str
+        :returns: :class:`Authorization <Authorization>`
         """
-        json = {}
+        json = None
         auth = self._session.auth or (login and password)
         if isinstance(scopes, list) and scopes and auth:
-            url = 'https://api.github.com/authorizations'
-            data = dumps({'scopes': scopes})
+            url = self._github_url + '/authorizations'
+            data = dumps({'scopes': scopes, 'note': note,
+                'note_url': note_url})
             if self._session.auth:
                 json = self._post(url, data=data)
             else:
@@ -64,7 +82,7 @@ class GitHub(GitHubCore):
                 ses.auth = (login, password)
                 req = ses.post(url, data=data)
                 json = req.json if req.ok else {}
-        return json.get('token', '')
+        return Authorization(json, self._session) if json else None
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -282,6 +300,16 @@ class GitHub(GitHubCore):
         if repo:
             return repo.issue(number)
         return None
+
+    def list_authorizations(self):
+        """List authorizations for the authenticated user.
+
+        :returns: list of :class:`Authorization <Authorization>`\ s
+        """
+        url = self._github_url + '/authorizations'
+        json = self._get(url)
+        return [Authorization(a, self._session) for a in json]
+
 
     def list_emails(self):
         """List email addresses for the authenticated user.
@@ -630,3 +658,108 @@ class GitHub(GitHubCore):
             url = self._github_url + '/user/watched/' + login + '/' + repo
             resp = self._delete(url)
         return resp
+
+
+class Authorization(GitHubCore):
+    """The :class:`Authorization <Authorization>` object."""
+    def __init__(self, auth, session):
+        super(Authorization, self).__init__(session)
+        self._update_(auth)
+
+    def __repr__(self):
+        return '<Authorization [%s]>' % self._app.get('name', '')
+
+    def _update_(self, auth):
+        self._app = auth.get('app', {})
+        self._token = auth.get('token', '')
+        self._note_url = auth.get('note_url', '')
+        self._note = auth.get('note', '')
+        self._scopes = auth.get('scopes', [])
+        self._api = auth.get('url', '')
+        self._id = auth.get('id', 0)
+        self._created = None
+        if auth.get('created_at'):
+            self._created = self._strptime(auth.get('created_at'))
+        self._updated = None
+        if auth.get('updated_at'):
+            self._updated = self._strptime(auth.get('updated_at'))
+
+    @property
+    def app(self):
+        """Details about the application"""
+        return self._app
+
+    @property
+    def created_at(self):
+        """datetime object representing when the authorization was created."""
+        return self._created
+
+    def delete(self):
+        """delete this authorization"""
+        return self._delete(self._api)
+
+    @property
+    def id(self):
+        """Unique id of the authorization"""
+        return self._id
+
+    @property
+    def note(self):
+        """Note about the authorization"""
+        return self._note
+
+    @property
+    def note_url(self):
+        """URL about the note"""
+        return self._note_url
+
+    @property
+    def scopes(self):
+        """List of scopes this applies to"""
+        return self._scopes
+
+    @property
+    def token(self):
+        """Returns the Authorization token"""
+        return self._token
+
+    def update(self, scopes=[], add_scopes=[], rm_scopes=[], note='',
+            note_url=''):
+        """Update this authorization.
+
+        :param scopes: (optional), replaces the authorization scopes with these
+        :type scopes: list
+        :param add_scopes: (optional), scopes to be added
+        :type add_scopes: list
+        :param rm_scopes: (optional), scopes to be removed
+        :type rm_scopes: list
+        :param note: (optional), new note about authorization
+        :type note: str
+        :param note_url: (optional), new note URL about this authorization
+        :type note_url: str
+        :returns: bool
+        """
+        success = False
+        if scopes:
+            json = self._get(self._api, data={'scopes': scopes})
+            self._update_(json)
+            success = True
+        if new_scopes:
+            json = self._get(self._api, data={'add_scopes': add_scopes})
+            self._update_(json)
+            success = True
+        if rm_scopes:
+            json = self._get(self._api, data={'remove_scopes': rm_scopes})
+            self._update_(json)
+            success = True
+        if note or note_url:
+            json = self._get(self._api, data={'note': note,
+                'note_url': note_url})
+            self._update_(json)
+            success = True
+        return success
+
+    @property
+    def updated_at(self):
+        """datetime object representing when the authorization was created."""
+        return self._updated

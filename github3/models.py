@@ -101,7 +101,7 @@ class GitHubCore(object):
     def ratelimit_remaining(self):
         """Number of requests before GitHub imposes a ratelimit."""
         json = self._get(self._github_url + '/rate_limit')
-        return json.get('remaining', 5000)
+        return json.get('rate', {}).get('remaining', 5000)
 
 
 class BaseComment(GitHubCore):
