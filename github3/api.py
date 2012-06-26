@@ -64,6 +64,7 @@ def create_gist(description, files):
     gh = GitHub()
     return gh.create_gist(description, files)
 
+
 def issue(owner, repository, number):
     """Anonymously gets issue :number on :owner/:repository.
 
@@ -78,6 +79,7 @@ def issue(owner, repository, number):
     gh = GitHub()
     return gh.issue(owner, repository, number)
 
+
 def list_events():
     """List all recent public events from GitHub.
     
@@ -85,3 +87,55 @@ def list_events():
     """
     gh = GitHub()
     return gh.list_events()
+
+
+def search_issues(owner, repo, state, keyword):
+    """Find issues by state and keyword.
+
+    :param owner: (required)
+    :type owner: str
+    :param repo: (required)
+    :type repo: str
+    :param state: (required), accepted values: ('open', 'closed')
+    :type state: str
+    :param keyword: (required), what to search for
+    :type keyword: str
+    :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
+    """
+    gh = GitHub()
+    return gh.search_issues(owner, repo, state, keyword)
+
+
+def search_repos(keyword, **params):
+    """Search all repositories by keyword.
+
+    :param keyword: (required)
+    :type keyword: str
+    :param params: (optional), filter by language and/or start_page
+    :type params: dict
+    :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
+    """
+    gh = GitHub()
+    return gh.search_repos(keyword, **params)
+
+
+def search_users(keyword):
+    """Search all users by keyword.
+
+    :param keyword: (required)
+    :type keyword: str
+    :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
+    """
+    gh = GitHub()
+    return gh.search_users(keyword)
+
+
+def search_email(email):
+    """Search users by email.
+
+    :param email: (required)
+    :type keyword: str
+    :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
+    """
+    gh = GitHub()
+    return gh.search_email(email)

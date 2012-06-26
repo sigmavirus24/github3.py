@@ -172,6 +172,10 @@ class PullRequest(GitHubCore):
         # If the pull request has been merged
         if pull.get('merged_at'):
             self._merged = self._strptime(pull.get('merged_at'))
+        self._mergeable = pull.get('mergeable')
+        self._mergedby = None
+        if pull.get('merged_by'):
+            self._mergedby = User(pull.get('merged_by'), self._session)
         self._num = pull.get('number')
         self._patch_url = pull.get('patch_url')
         self._state = pull.get('state')
@@ -220,6 +224,13 @@ class PullRequest(GitHubCore):
     def id(self):
         """The unique id of the pull request"""
         return self._id
+
+    def is_mergeable(self):
+        """Checks to see if the pull request can be merged by GitHub.
+
+        :returns: bool
+        """
+        return self._mergeable
 
     def is_merged(self):
         """Checks to see if the pull request was merged.
@@ -287,6 +298,11 @@ class PullRequest(GitHubCore):
     def merged_at(self):
         """datetime object representing when the pull was merged"""
         return self._merged
+
+    @property
+    def merged_by(self):
+        """:class:`User <github3.user.User>` who merged this pull"""
+        return self._mergedby
 
     @property
     def number(self):

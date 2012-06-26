@@ -54,3 +54,19 @@ Or you can simply use the following functions
 ------
 
 .. autofunction:: github3.list_gists
+
+------
+
+.. autofunction:: github3.search_issues
+
+------
+
+.. autofunction:: github3.search_repos
+
+------
+
+.. autofunction:: github3.search_users
+
+------
+
+.. autofunction:: github3.search_email

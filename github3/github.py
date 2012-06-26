@@ -594,10 +594,22 @@ class GitHub(GitHubCore):
         :type keyword: str
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
-        url = self._github_url + '/legacy/users/search/{0}'.format(keyword)
+        url = self._github_url + '/legacy/user/search/{0}'.format(keyword)
         json = self._get(url)
         users = json.get('users', [])
         return [LegacyUser(u, self._session) for u in users]
+
+    def search_email(self, email):
+        """Search users by email.
+
+        :param email: (required)
+        :type keyword: str
+        :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
+        """
+        url = self._github_url + '/legacy/user/email/{0}'.format(email)
+        json = self._get(url)
+        u = json.get('user', {})
+        return LegacyUser(u, self._session) if u else None
 
     def unfollow(self, login):
         """Make the authenticated user stop following login
