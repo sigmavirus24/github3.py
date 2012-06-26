@@ -22,6 +22,10 @@ GitHub Object
 .. autoclass:: GitHub
     :inherited-members:
 
+------
+
+.. autoclass:: Authorization
+    :inherited-members:
 
 .. links
 .. _here: examples/githubex.html

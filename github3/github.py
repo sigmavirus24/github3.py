@@ -11,6 +11,7 @@ from json import dumps
 from .event import Event
 from .gist import Gist
 from .issue import Issue, issue_params
+from .legacy import LegacyIssue
 from .models import GitHubCore
 from .org import Organization
 from .repo import Repository
@@ -472,8 +473,8 @@ class GitHub(GitHubCore):
             ('asc', 'desc'), API default: 'asc' when using 'full_name',
             'desc' otherwise
         :type direction: str
-        :returns: list of :class:`Repository <github3.repo.Repository>` 
-        objects
+        :returns: list of :class:`Repository <github3.repo.Repository>`
+            objects
         """
         url = [self._github_url]
         if login:
@@ -501,8 +502,8 @@ class GitHub(GitHubCore):
 
         :param login: (optional)
         :type login: str
-        :returns: list of :class:`Repository <github3.repo.Repository>` 
-        objects
+        :returns: list of :class:`Repository <github3.repo.Repository>`
+            objects
         """
         if login:
             url = self._github_url + '/users/' + login + '/watched'
@@ -566,7 +567,10 @@ class GitHub(GitHubCore):
         :type keyword: str
         :returns: None
         """
-        pass
+        url = self._github_url + '/legacy/issues/search/{0}/{1}/{2}/{3}'.format(
+                owner, repo, state, keyword)
+        json = self._get(url)
+        return [LegacyIssue(l, self._session) for l in json.get('issues', [])]
 
     def unfollow(self, login):
         """Make the authenticated user stop following login

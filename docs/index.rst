@@ -66,6 +66,7 @@ Modules
     git
     github
     issue
+    legacy
     org
     pulls
     repo
