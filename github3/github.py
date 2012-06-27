@@ -529,6 +529,42 @@ class GitHub(GitHubCore):
                 'Authorization': 'token ' + token
                 })
 
+    def markdown(self, text, mode='', context='', raw=False):
+        """Render an arbitrary markdown document.
+
+        :param text: (required), the text of the document to render
+        :type text: str
+        :param mode: (optional), 'markdown' or 'gfm'. 
+        :type mode: str
+        :param context: (optional), only important when using mode 'gfm',
+            this is the repository to use as the context for the rendering
+        :type context: str
+        :param raw: (optional), renders a document like a README.md, no gfm, no
+            context
+        :type raw: bool
+        :returns: str -- HTML formatted text
+        """
+        url = self._github_url + '/markdown'
+        if raw:
+            url = '/'.join([url, '/raw'])
+
+        data = {}
+        if text:
+            data['text'] = text
+
+        if mode in ('markdown', 'gfm'):
+            data['mode'] = mode
+
+        if context:
+            data['context'] = context
+
+        if data:
+            data = dumps(data)
+            req = self._session.post(url, data=data)
+            if req.ok:
+                return req.content
+        return ''
+
     def organization(self, login):
         """Returns a Organization object for the login name
         

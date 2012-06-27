@@ -57,6 +57,10 @@ Or you can simply use the following functions
 
 ------
 
+.. autofunction:: github3.markdown
+
+------
+
 .. autofunction:: github3.search_issues
 
 ------

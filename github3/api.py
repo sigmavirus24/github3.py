@@ -89,6 +89,25 @@ def list_events():
     return gh.list_events()
 
 
+def markdown(text, mode='', context='', raw=False):
+    """Render an arbitrary markdown document.
+
+    :param text: (required), the text of the document to render
+    :type text: str
+    :param mode: (optional), 'markdown' or 'gfm'. 
+    :type mode: str
+    :param context: (optional), only important when using mode 'gfm',
+        this is the repository to use as the context for the rendering
+    :type context: str
+    :param raw: (optional), renders a document like a README.md, no gfm, no
+        context
+    :type raw: bool
+    :returns: str -- HTML formatted text
+    """
+    gh = GitHub()
+    return gh.markdown(text, mode, context, raw)
+
+
 def search_issues(owner, repo, state, keyword):
     """Find issues by state and keyword.
 

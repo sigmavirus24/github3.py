@@ -156,3 +156,7 @@ API Coverage
 - Events
 
   - Types
+
+- Search
+
+- Markdown

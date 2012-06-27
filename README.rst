@@ -28,122 +28,14 @@ Dependencies
   
 .. _requests: https://github.com/kennethreitz/requests
 
-Progress
---------
-
-- Gists_: **done**
-
-  - `Gist Comments`_: **done**
-
-.. _Gists: http://developer.github.com/v3/gists/
-.. _Gist Comments: http://developer.github.com/v3/gists/comments/
-
-- `Git Data`_: **done**
-
-  - Blobs_: **done**
-
-  - Commits_: **done**
-
-  - References_: **done**
-
-  - Tags_: **done**
-
-  - Trees_: **done**
-
-.. _Git Data: http://developer.github.com/v3/git/
-.. _Commits: http://developer.github.com/v3/events/
-.. _Blobs: http://developer.github.com/v3/git/blobs/
-.. _References: http://developer.github.com/v3/git/refs/
-.. _Tags: http://developer.github.com/v3/git/tags/
-.. _Trees: http://developer.github.com/v3/git/trees/
-
-- Issues_: **done**
-
-  - `Issue Comments`_: **done**
-
-  - `Issue Events`_: **done**
-
-  - Labels_: **done**
-
-  - Milestones_: **done**
-
-.. _Issues: http://developer.github.com/v3/issues/
-.. _Issue Comments: http://developer.github.com/v3/issues/comments/>
-.. _Issue Events: http://developer.github.com/v3/issues/events/
-.. _Labels: http://developer.github.com/v3/issues/labels/
-.. _Milestones: http://developer.github.com/v3/issues/milestones/
-
-- Organizations_: **done**
-
-  - Members_: **done**
-
-  - Teams_: **done**
-
-.. _Organizations: http://developer.github.com/v3/orgs/
-.. _Members: http://developer.github.com/v3/orgs/members/
-.. _Teams: http://developer.github.com/v3/orgs/teams/
-
-- `Pull Requests`_: **done**
-
-  - `Review Comments`_: **done**
-
-.. _Pull Requests: http://developer.github.com/v3/pulls/
-.. _Review Comments: http://developer.github.com/v3/pulls/comments/
+In Progress
+-----------
 
 - Repositories_: **done**
 
-  - Collaborators_: **done**
-
-  - `Repo Comments`_: **done**
-
-  - `Repo Commits`_: **done**
-
-  - Contents_: **done**
-
   - Downloads_: **stalled** [#]_
 
-  - Forks_: **done**
-
-  - `Repo Keys`_: **done**
-
-  - Watching_: **done**
-
-  - Hooks_: **done**
-
-.. _Repositories: http://developer.github.com/v3/repos/
-.. _Collaborators: http://developer.github.com/v3/repos/collaborators/
-.. _Repo Comments: http://developer.github.com/v3/repos/comments/
-.. _Repo Commits: http://developer.github.com/v3/repos/commits/
-.. _Contents: http://developer.github.com/v3/repos/contents/
 .. _Downloads: http://developer.github.com/v3/repos/downloads/
-.. _Forks: http://developer.github.com/v3/repos/forks/
-.. _Repo Keys: http://developer.github.com/v3/repos/keys/
-.. _Watching: http://developer.github.com/v3/repos/watching/
-.. _Hooks: http://developer.github.com/v3/repos/hooks/
-
-- Users_: **done**
-
-  - Emails_: **done**
-
-  - Followers_: **done**
-
-  - `User Keys`_: **done**
-
-.. _Users: http://developer.github.com/v3/users/
-.. _Emails: http://developer.github.com/v3/users/emails/
-.. _Followers: http://developer.github.com/v3/users/followers/
-.. _User Keys: http://developer.github.com/v3/users/keys/
-
-- Events_: **done**
-
-  - Types_: **done**
-
-.. _Events: http://developer.github.com/v3/events/
-.. _Types: http://developer.github.com/v3/events/types/
-
-- Search_: **in progress**
-
-.. _Search: http://developer.github.com/v3/search
 
 .. [#] Creating a download via Amazon S3 seems to always return an invalid
        multipart/form-data POST request.
