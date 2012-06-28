@@ -22,13 +22,13 @@ setup(
     description="Python wrapper for the GitHub API (http://developer.github.com/v3)",
     long_description="\n\n".join([open("README.rst").read(), 
         open("HISTORY.rst").read()]),
-    license=open('LICENSE').read()
-    author="Ian Cordasco",
+    license=open('LICENSE').read(),
+    author=github3.__author__,
     author_email="graffatcolmingov@gmail.com",
     url="https://github3py.readthedocs.org",
     packages=packages,
-    package_data={'': ['LICENSE']},
-    install_package_data=True,
+    package_data={'': ['LICENSE', 'AUTHORS.rst']},
+    include_package_data=True,
     install_requires=requires,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
