@@ -160,3 +160,40 @@ API Coverage
 - Search
 
 - Markdown
+
+Contributing
+------------
+
+I'm maintaining two public copies of the project. The first can be found on 
+GitHub_ and the second on BitBucket_. I would prefer pull requests to take 
+place on GitHub, but feel free to do them via BitBucket. Please make sure to 
+add yourself to the list of contributors in AUTHORS.rst, especially if you're 
+going to be working on the list below.
+
+.. links
+.. _GitHub: https://github.com/sigmavirus24/github3.py
+.. _BitBucket: https://bitbucket.org/icordasc/github3.py/src
+
+Contributor Friendly Work
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:func:`create_download <github3.repo.Repository.create_download>`
+
+    If you're familiar with Amazon's S3 web services and have the patience to 
+    debug this function, I would greatly appreciate it.
+
+Unittests
+
+    I really should have written these as they came along. I didn't, so they 
+    need to be written now. If you want to write some, I would sinerely 
+    appreciate it.
+
+Documentation
+
+    I know I'm not the best at writing documentation so if you want to clarify 
+    or correct something, please do so.
+
+Examples
+
+    Have a clever example that takes advantage of github3.py? Feel free to 
+    share it.

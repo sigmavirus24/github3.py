@@ -14,7 +14,6 @@ class Event(GitHubCore):
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
     """
-
     def __init__(self, event, session):
         super(Event, self).__init__(session)
         from .user import User
@@ -46,6 +45,11 @@ class Event(GitHubCore):
     def created_at(self):
         """datetime object representing when the event was created."""
         return self._created
+
+    @property
+    def id(self):
+        """Unique id of the event"""
+        return self._id
 
     @classmethod
     def list_types(cls):

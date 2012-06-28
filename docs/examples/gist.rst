@@ -24,8 +24,10 @@ Creating a gist after authenticating
     from github3 import login
 
     gh = login(username, password)
-    files = {'spam.txt' : {'content':
-        'What... is the air-speed velocity of an unladen swallow?'}
+    files = {
+        'spam.txt' : {
+            'content': 'What... is the air-speed velocity of an unladen swallow?'
+            }
         }
     gist = gh.create_gist('Answer this to cross the bridge', files, public=False)
     # gist == <Gist [gist-id]>
@@ -39,8 +41,10 @@ Creating an anonymous gist
 
     from github3 import create_gist
 
-    files = {'spam.txt' : {'content':
-        'What... is the air-speed velocity of an unladen swallow?'}
+    files = {
+        'spam.txt' : {
+            'content': 'What... is the air-speed velocity of an unladen swallow?'
+            }
         }
     gist = create_gist('Answer this to cross the bridge', files, public=False)
     gist.list_comments()
