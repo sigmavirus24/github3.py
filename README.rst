@@ -50,6 +50,10 @@ Modified BSD license_
 Examples
 --------
 
+See the docs_ for more detailed examples.
+
+.. _docs: http://github3py.readthedocs.org/en/latest/index.html#more-examples
+
 ::
 
   >>> from github3 import login
