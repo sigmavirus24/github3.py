@@ -31,7 +31,7 @@ Dependencies
 In Progress
 -----------
 
-- Repositories_: **done**
+- Repositories: **done**
 
   - Downloads_: **stalled** [#]_
 
