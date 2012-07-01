@@ -333,7 +333,7 @@ class Issue(GitHubCore):
 
     @property
     def id(self):
-        """Unique ID for the comment."""
+        """Unique ID for the issue."""
         return self._id
 
     def is_closed(self):
