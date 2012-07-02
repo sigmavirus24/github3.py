@@ -2,7 +2,7 @@
 
 import sys
 import os
-import github3
+import re
 
 try:
     from setuptools import setup
@@ -16,14 +16,26 @@ if sys.argv[-1] in ("submit", "publish"):
 packages = ["github3"]
 requires = ["requests>=0.12.1"]
 
+__version__ = ''
+with open('github3/__init__.py', 'r') as fd:
+    reg = re.compile(r'__version__ = [\'"]([^\'"]*)[\'"]')
+    for line in fd:
+        m = reg.match(line)
+        if m:
+            __version__ = m.group(1)
+            break
+
+if not __version__:
+    raise RuntimeError('Cannot find version information')
+
 setup(
     name="github3.py",
-    version=github3.__version__,
+    version=__version__,
     description="Python wrapper for the GitHub API (http://developer.github.com/v3)",
     long_description="\n\n".join([open("README.rst").read(), 
         open("HISTORY.rst").read()]),
     license=open('LICENSE').read(),
-    author=github3.__author__,
+    author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
     url="https://github3py.readthedocs.org",
     packages=packages,

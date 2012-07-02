@@ -13,7 +13,7 @@ __title__ = 'github3'
 __author__ = 'Ian Cordasco'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012 Ian Cordasco'
-__version__ = '0.1a'
+__version__ = '0.1a1'
 
 from .api import *
 from .github import GitHub
