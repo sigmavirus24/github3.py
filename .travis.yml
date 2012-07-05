@@ -5,9 +5,9 @@ python:
   - 3.2
 # command to install dependencies, e.g. pip install -r requirements.txt
 # --use-mirrors
-install: pip install requests
+install: pip install -r requirements
 # # command to run tests, e.g. python setup.py test
-script:  python run_tests.py
+script:  python unittests.py
 notifications:
    on_success: change
    on_failure: always
