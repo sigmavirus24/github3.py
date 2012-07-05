@@ -21,3 +21,12 @@ class BaseTest(unittest.TestCase):
         except Exception, e:
             self.fail('{0}({1}, {2}) raises unexpected exception: {3}'.format(
                 str(func), str(args), str(kwargs), str(e)))
+
+    def assertIsNotNone(self, value, msg=None):
+        if sys.version_info >= (2, 7):
+            super(BaseTest, self).assertIsNotNone(value, msg)
+        else:
+            try:
+                assert value is not None
+            except AssertionError:
+                self.fail('AssertionError: ' + msg)

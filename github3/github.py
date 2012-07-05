@@ -35,7 +35,7 @@ class GitHub(GitHubCore):
     def __repr__(self):
         return '<GitHub at 0x%x>' % id(self)
 
-    def _list_follow(self, login, which):
+    def _list_follow(self, which):
         url = self._github_url + '/user/' + which
         json = self._get(url)
         return [User(f, self._session) for f in json]

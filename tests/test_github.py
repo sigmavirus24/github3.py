@@ -37,6 +37,8 @@ class TestGitHub(base.BaseTest):
         self.assertRaisesError(g.is_following, 'sigmavirus24')
         self.assertRaisesError(g.follow, 'sigmavirus24')
         self.assertRaisesError(g.unfollow, 'sigmavirus24')
+        self.assertRaisesError(g.list_followers)
+        self.assertIsNotNone(g.list_followers('kennethreitz'))
 
     #def test_create_gist(self):
     #    pass
