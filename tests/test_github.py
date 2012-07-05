@@ -44,8 +44,7 @@ class TestGitHub(base.BaseTest):
 
     def test_watching(self):
         g = github3.GitHub()
-        sigm = 'sigmavirus24'
-        todo = 'Todo.txt-python'
+        sigm, todo = self.sigm, self.todo
         self.assertRaisesError(g.watch, sigm, todo)
         self.assertRaisesError(g.unwatch, sigm, todo)
         self.assertRaisesError(g.list_watching)
@@ -56,3 +55,17 @@ class TestGitHub(base.BaseTest):
 
     def test_create_gist(self):
         pass
+
+    def test_create_issue(self):
+        g = github3.GitHub()
+        sigm, todo = self.sigm, self.todo
+        title = 'Test issue for github3.py'
+        self.assertRaisesError(g.create_issue, sigm, todo, title)
+    
+    def test_create_key(self):
+        g = github3.GitHub()
+        self.assertRaisesError(g.create_key, 'Foo bar', 'bogus')
+
+    def test_create_repo(self):
+        g = github3.GitHub()
+        self.assertRaisesError(g.create_repo, 'test_github3.py')
