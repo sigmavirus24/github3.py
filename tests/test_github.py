@@ -19,7 +19,6 @@ class TestGitHub(base.BaseTest):
         for i in [self.g, h]:
             self.failUnlessEqual(i._session.headers['Authorization'],
                     'token ' + self.fake_oauth)
-
         self.assertRaisesError(self.g.user)
 
     def test_gist(self):
@@ -78,3 +77,13 @@ class TestGitHub(base.BaseTest):
 
     def test_list_emails(self):
         self.assertRaisesError(self.g.list_emails)
+
+    def test_list_gists(self):
+        for i in None, self.sigm:
+            self.assertIsNotNone(self.g.list_gists(i))
+
+    def test_list_issues(self):
+        self.assertIsNotNone(self.g.list_issues(self.sigm, self.todo))
+        issues = self.g.list_issues(self.sigm, self.todo, 'subscribed')
+        if issues:
+            self.fail('Cannot be subscribed to issues.')
