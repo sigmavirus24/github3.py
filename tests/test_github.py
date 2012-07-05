@@ -1,6 +1,5 @@
 import base
-from github3 import GitHub
-from github3.models import Error
+import github3
 
 class TestGitHub(base.BaseTest):
     def setUp(self):
@@ -9,7 +8,7 @@ class TestGitHub(base.BaseTest):
         self.fake_oauth = 'foobarbogusoauth'
 
     def test_login(self):
-        g = GitHub()
+        g = github3.GitHub()
         # Test "regular" auth
         g.login(*self.fake_auth)
         self.failUnlessEqual(self.fake_auth, g._session.auth)
@@ -19,7 +18,7 @@ class TestGitHub(base.BaseTest):
                 'token ' + self.fake_oauth)
         try:
             g.user()
-        except Error:
+        except github3.Error:
             pass
         except Exception:
             self.fail("Uncaught exception")
