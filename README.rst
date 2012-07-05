@@ -1,6 +1,11 @@
 github3.py
 ==========
 
+.. image::
+    https://secure.travis-ci.org/sigmavirus24/github3.py.png?branch=master
+    :alt: Build Status
+    :target: http://travis-ci.org/sigmavirus24/github3.py
+
 Eventually this will be a python module to access the GitHub v3 API.
 
 This is not stable yet and there is no backwards compatibility yet. There will 
