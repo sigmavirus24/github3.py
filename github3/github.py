@@ -311,7 +311,6 @@ class GitHub(GitHubCore):
         json = self._get(url)
         return [Authorization(a, self._session) for a in json]
 
-
     def list_emails(self):
         """List email addresses for the authenticated user.
         
