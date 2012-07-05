@@ -11,17 +11,31 @@ class TestGitHub(base.BaseTest):
         g = github3.GitHub()
         # Test "regular" auth
         g.login(*self.fake_auth)
-        self.failUnlessEqual(self.fake_auth, g._session.auth)
+        h = github3.login(*self.fake_auth)
+        for i in [g, h]:
+            self.failUnlessEqual(self.fake_auth, i._session.auth)
         # Test "oauth" auth
         g.login(token=self.fake_oauth)
-        self.failUnlessEqual(g._session.headers['Authorization'],
-                'token ' + self.fake_oauth)
-        try:
-            g.user()
-        except github3.Error:
-            pass
-        except Exception:
-            self.fail("Uncaught exception")
+        h = github3.login(token=self.fake_oauth)
+        for i in [g, h]:
+            self.failUnlessEqual(i._session.headers['Authorization'],
+                    'token ' + self.fake_oauth)
+
+        self.assertRaisesError(g.user)
+
+    def test_gist(self):
+        # My gcd example
+        gist_id = 2648112
+        g = github3.GitHub()
+        if not g.gist(gist_id):
+            self.fail('Check gcd gist')
+
+        if g.gist(-1):
+            self.fail('Negatively indexed gist')
+
+    def test_following(self):
+        g = github3.GitHub()
+        self.assertRaisesError(g.is_following, 'sigmavirus24')
 
     #def test_create_gist(self):
     #    pass
