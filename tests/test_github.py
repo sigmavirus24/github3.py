@@ -39,6 +39,20 @@ class TestGitHub(base.BaseTest):
         self.assertRaisesError(g.unfollow, 'sigmavirus24')
         self.assertRaisesError(g.list_followers)
         self.assertIsNotNone(g.list_followers('kennethreitz'))
+        self.assertRaisesError(g.list_following)
+        self.assertIsNotNone(g.list_following('kennethreitz'))
 
-    #def test_create_gist(self):
-    #    pass
+    def test_watching(self):
+        g = github3.GitHub()
+        sigm = 'sigmavirus24'
+        todo = 'Todo.txt-python'
+        self.assertRaisesError(g.watch, sigm, todo)
+        self.assertRaisesError(g.unwatch, sigm, todo)
+        self.assertRaisesError(g.list_watching)
+        self.assertIsNotNone(g.list_watching(sigm))
+        self.assertRaisesError(g.is_watching, sigm, todo)
+        self.assertRaisesError(g.watch, sigm, todo)
+        self.assertRaisesError(g.unwatch, sigm, todo)
+
+    def test_create_gist(self):
+        pass
