@@ -158,3 +158,9 @@ def search_email(email):
     """
     gh = GitHub()
     return gh.search_email(email)
+
+
+def ratelimit_remaining():
+    """Get the remaining number of requests allowed."""
+    gh = GitHub()
+    return gh.ratelimit_remaining
