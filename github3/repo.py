@@ -91,7 +91,7 @@ class Repository(GitHubCore):
 
     def add_collaborator(self, login):
         """Add ``login`` as a collaborator to a repository.
-        
+
         :param login: (required), login of the user
         :type login: str
         :returns: bool -- True if successful, False otherwise
@@ -109,7 +109,7 @@ class Repository(GitHubCore):
             'zipball')
         :type format: str
         :param path: (optional), path where the file should be saved
-            to, default is the filename provided in the headers and will be 
+            to, default is the filename provided in the headers and will be
             written in the current directory
         :type path: str
         :param ref: (optional)
@@ -166,17 +166,18 @@ class Repository(GitHubCore):
 
     def commit(self, sha):
         """Get a single commit.
-        
+
         :param sha: (required), sha of the commit
         :type sha: str
-        :returns: :class:`RepoCommit <RepoCommit>` if successful, otherwise None
+        :returns: :class:`RepoCommit <RepoCommit>` if successful, otherwise
+            None
         """
         json = self._get(self._api + '/commits/' + sha)
         return RepoCommit(json, self._session) if json else None
 
     def commit_comment(self, comment_id):
         """Get a single commit comment.
-        
+
         :param comment_id: (required), id of the comment used by GitHub
         :type comment_id: int
         :returns: :class:`RepoComment <RepoComment>` if successful, otherwise
@@ -188,7 +189,7 @@ class Repository(GitHubCore):
 
     def compare_commits(self, base, head):
         """Compare two commits.
-        
+
         :param base: (required), base for the comparison
         :type base: str
         :param head: (required), compare this against base
@@ -201,7 +202,7 @@ class Repository(GitHubCore):
 
     def contents(self, path):
         """Get the contents of the file pointed to by ``path``.
-        
+
         :param path: (required), path to file, e.g.
             github3/repo.py
         :type path: str
@@ -296,7 +297,7 @@ class Repository(GitHubCore):
 
         Create a new download on this repository.
 
-        I do not require you provide the size in bytes because it can be 
+        I do not require you provide the size in bytes because it can be
         determined by the operating system.
 
         :param name: (required), name of the file as it will appear
@@ -396,7 +397,7 @@ class Repository(GitHubCore):
         milestone=None,
         labels=[]):
         """Creates an issue on this repository.
-        
+
         :param title: (required), title of the issue
         :type title: str
         :param body: (optional), body of the issue
@@ -664,7 +665,7 @@ class Repository(GitHubCore):
 
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository.
-        
+
         :param login: (required), login for the user
         :type login: str
         :returns: bool -- True if successful, False otherwise
@@ -677,14 +678,14 @@ class Repository(GitHubCore):
 
     def is_fork(self):
         """Checks if this repository is a fork.
-        
+
         :returns: bool
         """
         return self._is_fork
 
     def is_private(self):
         """Checks if this repository is private.
-        
+
         :returns: bool
         """
         return self._priv
@@ -696,14 +697,14 @@ class Repository(GitHubCore):
 
     def has_downloads(self):
         """Checks if this repository has downloads.
-        
+
         :returns: bool
         """
         return self._has_dl
 
     def has_wiki(self):
         """Checks if this repository has a wiki.
-        
+
         :returns: bool
         """
         return self._has_wiki
@@ -752,7 +753,7 @@ class Repository(GitHubCore):
 
     def key(self, id_num):
         """Get the specified deploy key.
-        
+
         :param id_num: (required), id of the key
         :type id_num: int
         :returns: :class:`Key <Key>` if successful, else None
@@ -784,7 +785,7 @@ class Repository(GitHubCore):
 
     def list_branches(self):
         """List the branches in this repository.
-        
+
         :returns: list of :class:`Branch <Branch>`\ es
         """
         url = self._api + '/branches'
@@ -793,7 +794,7 @@ class Repository(GitHubCore):
 
     def list_comments(self):
         """List comments on all commits in the repository.
-        
+
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._api + '/comments'
@@ -802,7 +803,7 @@ class Repository(GitHubCore):
 
     def list_comments_on_commit(self, sha):
         """List comments for a single commit.
-        
+
         :param sha: (required), sha of the commit to list comments on
         :type sha: str
         :returns: list of :class:`RepoComment <RepoComment>`\ s
@@ -815,7 +816,7 @@ class Repository(GitHubCore):
 
     def list_commits(self):
         """List commits in this repository.
-        
+
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
         url = self._api + '/commits'
@@ -838,7 +839,7 @@ class Repository(GitHubCore):
 
     def list_downloads(self):
         """List available downloads for this repository.
-        
+
         :returns: list of :class:`Download <Download>`\ s
         """
         url = self._api + '/downloads'
@@ -870,7 +871,7 @@ class Repository(GitHubCore):
 
     def list_hooks(self):
         """List hooks registered on this repository.
-        
+
         :returns: list of :class:`Hook <Hook>`\ s
         """
         url = self._api + '/hooks'
@@ -943,7 +944,7 @@ class Repository(GitHubCore):
 
     def list_keys(self):
         """List deploy keys on this repository.
-        
+
         :returns: list of :class:`Key <Key>`\ s
         """
         url = self._api + '/keys'
@@ -952,7 +953,7 @@ class Repository(GitHubCore):
 
     def list_labels(self):
         """List labels on this repository.
-        
+
         :returns: list of :class:`Label <Label>`\ s
         """
         url = self._api + '/labels'
@@ -962,7 +963,7 @@ class Repository(GitHubCore):
 
     def list_languages(self):
         """List the programming languages used in the repository.
-        
+
         :returns: list of tuples
         """
         url = self._api + '/languages'
@@ -1045,7 +1046,7 @@ class Repository(GitHubCore):
 
     def list_tags(self):
         """List tags on this repository.
-        
+
         :returns: list of :class:`RepoTag <RepoTag>`\ s
         """
         url = self._api + '/tags'
@@ -1054,7 +1055,7 @@ class Repository(GitHubCore):
 
     def list_teams(self):
         """List teams with access to this repository.
-        
+
         :returns: list of dicts
         """
         url = self._api + '/teams'
@@ -1062,7 +1063,7 @@ class Repository(GitHubCore):
 
     def list_watchers(self):
         """List watchers of this repository.
-        
+
         :returns: list of :class:`User <github3.user.User>`\ s
         """
         url = self._api + '/watchers'
@@ -1138,13 +1139,13 @@ class Repository(GitHubCore):
 
     @property
     def pushed_at(self):
-        """``datetime`` object representing the last time commits were pushed to
-        the repository."""
+        """``datetime`` object representing the last time commits were pushed
+        to the repository."""
         return self._pushed
 
     def readme(self):
         """Get the README for this repository.
-        
+
         :returns: :class:`Contents <Contents>`
         """
         url = self._api + '/readme'
@@ -1169,7 +1170,7 @@ class Repository(GitHubCore):
 
     def remove_collaborator(self, login):
         """Remove collaborator ``login`` from the repository.
-        
+
         :param login: (required), login name of the collaborator
         :type login: str
         :returns: bool
@@ -1420,7 +1421,7 @@ class Download(GitHubCore):
 
     def saveas(self, path=''):
         """Save this download to the path specified.
-        
+
         :param path: (optional), if no path is specified, it will be
             saved in the current directory with the name specified by GitHub.
         :type path: str
@@ -1443,9 +1444,8 @@ class Download(GitHubCore):
 
 
 class Hook(GitHubCore):
-    """The :class:`Hook <Hook>` object. This handles the information returned by
-    GitHub about hooks set on a repository.
-    """
+    """The :class:`Hook <Hook>` object. This handles the information returned
+    by GitHub about hooks set on a repository."""
 
     def __init__(self, hook, session):
         super(Hook, self).__init__(session)
@@ -1478,7 +1478,7 @@ class Hook(GitHubCore):
 
     def delete(self):
         """Delete this hook.
-        
+
         :returns: bool
         """
         return self._delete(self._api)
@@ -1525,7 +1525,7 @@ class Hook(GitHubCore):
     def events(self):
         """Events which trigger the hook."""
         return self._events
-    
+
     @property
     def id(self):
         """Unique id of the hook."""
@@ -1533,7 +1533,7 @@ class Hook(GitHubCore):
 
     def is_active(self):
         """Checks whether the hook is marked as active on GitHub or not.
-        
+
         :returns: bool
         """
         return self._active
@@ -1545,7 +1545,7 @@ class Hook(GitHubCore):
 
     def test(self):
         """Test this hook
-        
+
         :returns: bool
         """
         return self._post(self._api + '/test')
@@ -1742,8 +1742,8 @@ class RepoCommit(BaseCommit):
 
 class Comparison(object):
     """The :class:`Comparison <Comparison>` object. This encapsulates the
-    information returned by GitHub comparing two commit objects in a repository.
-    """
+    information returned by GitHub comparing two commit objects in a
+    repository."""
 
     def __init__(self, compare):
         super(Comparison, self).__init__()
