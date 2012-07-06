@@ -2,7 +2,7 @@
 github3.legacy
 ==============
 
-This module contains legacy objects for use with the Search_ section of the 
+This module contains legacy objects for use with the Search_ section of the
 API.
 
 .. _Search: http://developer.github.com/v3/search/
@@ -10,6 +10,7 @@ API.
 """
 
 from .models import GitHubCore
+
 
 class LegacyIssue(GitHubCore):
     """The :class:`LegacyIssue <LegacyIssue>` object. This object is only
