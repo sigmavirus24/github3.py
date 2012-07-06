@@ -12,8 +12,8 @@ from .user import User
 
 
 class GistFile(object):
-    """The :class:`GistFile <GistFile>` object. This is used to represent a file
-    object returned by GitHub while interacting with gists.
+    """The :class:`GistFile <GistFile>` object. This is used to represent a
+    file object returned by GitHub while interacting with gists.
     """
 
     def __init__(self, attributes):
@@ -68,9 +68,10 @@ class GistComment(BaseComment):
 
 class Gist(GitHubCore):
     """The :class:`Gist <Gist>` object. This object holds all the information
-    returned by Github about a gist. With it you can comment on or fork the gist
-    (assuming you are authenticated), edit or delete the gist (assuming you own it).
-    You can also "star" or "unstar" the gist (again assuming you have authenticated).
+    returned by Github about a gist. With it you can comment on or fork the
+    gist (assuming you are authenticated), edit or delete the gist (assuming
+    you own it).  You can also "star" or "unstar" the gist (again assuming you
+    have authenticated).
     """
 
     def __init__(self, data, session):
@@ -109,7 +110,7 @@ class Gist(GitHubCore):
 
     def create_comment(self, body):
         """Create a comment on this gist.
-        
+
         :param body: (required), body of the comment
         :type body: str
         :returns: :class:`GistComment <GistComment>`
@@ -125,7 +126,7 @@ class Gist(GitHubCore):
 
     def delete(self):
         """Delete this gist.
-        
+
         :returns: bool -- whether the deletion was successful"""
         return self._delete(self._api)
 
@@ -141,9 +142,9 @@ class Gist(GitHubCore):
         :type description: str
         :param files: (optional), files that make up this gist; the key(s)
             should be the file name(s) and the values should be another
-            (optional) dictionary with (optional) keys: 'content' and 'filename'
-            where the former is the content of the file and the latter is the
-            new name of the file.
+            (optional) dictionary with (optional) keys: 'content' and
+            'filename' where the former is the content of the file and the
+            latter is the new name of the file.
         :type files: dict
         :returns: bool -- whether the edit was successful
         """
@@ -168,7 +169,7 @@ class Gist(GitHubCore):
 
     def fork(self):
         """Fork this gist.
-        
+
         :returns: :class:`Gist <Gist>` if successful, ``None`` otherwise
         """
         url = self._api + '/fork'
@@ -182,7 +183,7 @@ class Gist(GitHubCore):
 
     def get(self):
         """Updates this gist by getting the information from the API again.
-        
+
         :returns: bool -- whether the update was successful or not"""
         json = self._get(self._api)
         if json:
@@ -237,7 +238,7 @@ class Gist(GitHubCore):
 
     def star(self):
         """Star this gist.
-        
+
         :returns: bool -- True if successful, False otherwise
         """
         url = self._api + '/star'
@@ -245,7 +246,7 @@ class Gist(GitHubCore):
 
     def unstar(self):
         """Un-star this gist.
-        
+
         :returns: bool -- True if successful, False otherwise
         """
         url = self._api + '/star'
