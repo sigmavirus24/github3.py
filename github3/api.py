@@ -13,7 +13,7 @@ from .github import GitHub
 def login(username, password, token=None):
     """Constructs and returns a GitHub session with the username and
     password, or token
-    
+
     :param username: login name
     :type username: str
     :param password: password for the login
@@ -82,7 +82,7 @@ def issue(owner, repository, number):
 
 def list_events():
     """List all recent public events from GitHub.
-    
+
     :returns: list of :class:`Event <event.Event>`\ s
     """
     gh = GitHub()
@@ -94,7 +94,7 @@ def markdown(text, mode='', context='', raw=False):
 
     :param text: (required), the text of the document to render
     :type text: str
-    :param mode: (optional), 'markdown' or 'gfm'. 
+    :param mode: (optional), 'markdown' or 'gfm'
     :type mode: str
     :param context: (optional), only important when using mode 'gfm',
         this is the repository to use as the context for the rendering
