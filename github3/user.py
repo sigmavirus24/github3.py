@@ -88,7 +88,7 @@ class Plan(object):
 
     def is_free(self):
         """Checks if this is a free plan.
-        
+
         :returns: bool
         """
         return self._name == 'free'
@@ -150,7 +150,7 @@ class User(BaseAccount):
     def add_email_addresses(self, addresses=[]):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account.
-        
+
         :param addresses: (optional), email addresses to be added
         :type addresses: list
         :returns: list of email addresses
@@ -164,7 +164,7 @@ class User(BaseAccount):
     def delete_email_addresses(self, addresses=[]):
         """Delete the email addresses in ``addresses`` from the
         authenticated user's account.
-        
+
         :param addresses: (optional), email addresses to be removed
         :type addresses: list
         :returns: bool
@@ -198,7 +198,7 @@ class User(BaseAccount):
 
     def list_followers(self):
         """List followers of this user.
-        
+
         :returns: list of :class:`User <User>`\ s
         """
         url = self._api + '/followers'
@@ -207,7 +207,7 @@ class User(BaseAccount):
 
     def list_following(self):
         """List users being followed by this user.
-        
+
         :returns: list of :class:`User <User>`\ s
         """
         url = self._api + '/following'
@@ -229,8 +229,8 @@ class User(BaseAccount):
         return [Event(e, self._session) for e in json]
 
     def list_received_events(self, public=False):
-        """List events that the user has received. If the user is the 
-        authenticated user, you will see private and public events, otherwise 
+        """List events that the user has received. If the user is the
+        authenticated user, you will see private and public events, otherwise
         you will only see public events.
 
         :param public: (optional), determines if the authenticated user sees
