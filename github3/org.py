@@ -31,7 +31,7 @@ class Team(GitHubCore):
 
     def add_member(self, login):
         """Add ``login`` to this team.
-        
+
         :returns: bool
         """
         url = '{0}/members/{1}'.format(self._api, login)
@@ -74,8 +74,8 @@ class Team(GitHubCore):
         :param has_wiki: (optional), If ``True``, enable the wiki for this
             repository. API default: ``True``
         :type has_wiki: bool
-        :param has_downloads: (optional), If ``True``, enable downloads for this
-            repository. API default: ``True``
+        :param has_downloads: (optional), If ``True``, enable downloads for
+            this repository. API default: ``True``
         :type has_downloads: bool
         :param team_id: (optional), id of the team that will be granted
             access to this repository
@@ -94,7 +94,7 @@ class Team(GitHubCore):
 
     def delete(self):
         """Delete this team.
-        
+
         :returns: bool
         """
         return self._delete(self._api)
@@ -133,7 +133,7 @@ class Team(GitHubCore):
 
     def is_member(self, login):
         """Check if ``login`` is a member of this team.
-        
+
         :param login: (required), login name of the user
         :type login: str
         :returns: bool
@@ -143,7 +143,7 @@ class Team(GitHubCore):
 
     def list_members(self):
         """List the members of this team.
-        
+
         :returns: list of :class:`User <github3.user.User>`\ s
         """
         url = self._api + '/members'
@@ -153,7 +153,7 @@ class Team(GitHubCore):
 
     def list_repos(self):
         """List the repositories this team has access to.
-        
+
         :returns: list of :class:`Repository <github3.repo.Repository>` objects
         """
         url = self._api + '/repos'
@@ -173,7 +173,7 @@ class Team(GitHubCore):
 
     def remove_member(self, login):
         """Remove ``login`` from this team.
-        
+
         :param login: (required), login of the member to remove
         :type login: str
         :returns: bool
@@ -220,7 +220,7 @@ class Organization(BaseAccount):
 
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
-        
+
         :param login: (required), login name of the user to be added
         :type login: str
         :param team: (required), team name
@@ -247,7 +247,7 @@ class Organization(BaseAccount):
 
     def conceal_member(self, login):
         """Conceal ``login``'s membership in this organization.
-        
+
         :returns: bool
         """
         url = '{0}/public_members/{1}'.format(self._api, login)
@@ -311,7 +311,7 @@ class Organization(BaseAccount):
 
     def is_member(self, login):
         """Check if the user with login ``login`` is a member.
-        
+
         :returns: bool
         """
         url = '{0}/members/{1}'.format(self._api, login)
@@ -319,7 +319,7 @@ class Organization(BaseAccount):
 
     def is_public_member(self, login):
         """Check if the user with login ``login`` is a public member.
-        
+
         :returns: bool
         """
         url = '{0}/public_members/{1}'.format(self._api, login)
@@ -336,14 +336,14 @@ class Organization(BaseAccount):
 
     def list_members(self):
         """List members of this organization.
-        
+
         :returns: list of :class:`User <github3.user.User>`\ s
         """
         return self._list_members('/members')
 
     def list_public_members(self):
         """List public members of this organization.
-        
+
         :returns: list of :class:`User <github3.user.User>`\ s
         """
         return self._list_members('/public_members')
@@ -365,7 +365,7 @@ class Organization(BaseAccount):
 
     def list_teams(self):
         """List teams that are part of this organization.
-        
+
         :returns: list of :class:`Team <Team>`\ s
         """
         url = self._api + '/teams'
@@ -380,7 +380,7 @@ class Organization(BaseAccount):
 
     def publicize_member(self, login):
         """Make ``login``'s membership in this organization public.
-        
+
         :returns: bool
         """
         url = '{0}/public_members/{1}'.format(self._api, login)
@@ -389,7 +389,7 @@ class Organization(BaseAccount):
     def remove_member(self, login):
         """Remove the user with login ``login`` from this
         organization.
-        
+
         :returns: bool
         """
         url = '{0}/members/{1}'.format(self._api, login)
