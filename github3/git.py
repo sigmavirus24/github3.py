@@ -41,6 +41,7 @@ class Blob(object):
         """Encoding of the raw content."""
         return self._enc
 
+
 class GitData(GitHubCore):
     """The :class:`GitData <GitData>` object. This isn't directly returned to
     the user (developer) ever. This is used to prevent duplication of some
@@ -71,7 +72,7 @@ class Commit(BaseCommit):
         self._author_name = ''
         if commit.get('author') and len(commit.get('author')) > 3:
             # User object
-            # Typically there should be 5 keys, but more than 3 should 
+            # Typically there should be 5 keys, but more than 3 should
             # be a sufficient test
             self._author = User(commit.get('author'), None)
             self._author_name = self._author.login
