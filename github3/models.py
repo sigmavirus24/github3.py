@@ -154,14 +154,14 @@ class BaseComment(GitHubCore):
 
     def delete(self):
         """Delete this comment.
-        
+
         :returns: bool
         """
         return self._delete(self._api)
 
     def edit(self, body):
         """Edit this comment.
-        
+
         :param body: (required), new body of the comment, Markdown formatted
         :type body: str
         :returns: bool
@@ -349,6 +349,7 @@ class BaseAccount(GitHubCore):
     def public_repos(self):
         """Number of public repos owned by the user/org"""
         return self._public_repos
+
 
 class Error(BaseException):
     def __init__(self, resp):
