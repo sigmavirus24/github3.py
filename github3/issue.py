@@ -108,7 +108,7 @@ class Milestone(GitHubCore):
 
     def delete(self):
         """Delete this milestone.
-        
+
         :returns: bool
         """
         return self._delete(self._api)
@@ -126,7 +126,7 @@ class Milestone(GitHubCore):
     def list_labels(self):
         """List the labels for every issue associated with this
         milestone.
-        
+
         :returns: list of :class:`Label <Label>`\ s
         """
         url = self._api + '/labels'
@@ -235,8 +235,8 @@ class Issue(GitHubCore):
 
     @property
     def assignee(self):
-        """:class:`User <user.User>` representing the user the issue was assigned
-        to."""
+        """:class:`User <user.User>` representing the user the issue was
+        assigned to."""
         return self._assign
 
     @property
@@ -279,7 +279,7 @@ class Issue(GitHubCore):
 
     def create_comment(self, body):
         """Create a comment on this issue.
-        
+
         :param body: (required), comment body
         :type body: str
         :returns: :class:`IssueComment <IssueComment>`
@@ -338,7 +338,7 @@ class Issue(GitHubCore):
 
     def is_closed(self):
         """Checks if the issue is closed.
-        
+
         :returns: bool
         """
         if self._closed or (self._state == 'closed'):
@@ -465,8 +465,8 @@ class IssueComment(BaseComment):
 
 
 class IssueEvent(GitHubCore):
-    """The :class:`IssueEvent <IssueEvent>` object. This specifically deals with
-    events described in the
+    """The :class:`IssueEvent <IssueEvent>` object. This specifically deals
+    with events described in the
     `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
     the GitHub API.
     """
