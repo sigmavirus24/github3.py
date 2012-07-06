@@ -94,6 +94,10 @@ class TestGitHub(base.BaseTest):
             self.assertIsNotNone(list_issues(self.sigm, self.todo, state=s))
         self.assertIsNotNone(list_issues(self.sigm, self.todo, state='closed', 
             labels='Bug,Enhancement'))
+        for s in ('created', 'updated', 'comments'):
+            self.assertIsNotNone(list_issues(self.sigm, self.todo, sort=s))
         for d in ('asc', 'desc'):
             self.assertIsNotNone(list_issues(self.sigm, self.todo, 
                 state='closed', direction=d))
+        self.assertIsNotNone(list_issues(self.sigm, self.todo, 
+            since='2011-01-01T00:00:01Z'))
