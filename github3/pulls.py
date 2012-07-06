@@ -252,7 +252,7 @@ class PullRequest(GitHubCore):
 
     def list_comments(self):
         """List the comments on this pull request.
-        
+
         :returns: list of :class:`ReviewComment <ReviewComment>`\ s
         """
         url = self._api + '/comments'
@@ -262,7 +262,7 @@ class PullRequest(GitHubCore):
 
     def list_commits(self):
         """List the commits on this pull request.
-        
+
         :returns: list of :class:`Commit <github3.git.Commit>`\ s
         """
         url = self._api + '/commits'
@@ -272,7 +272,7 @@ class PullRequest(GitHubCore):
 
     def list_files(self):
         """List the files associated with this pull request.
-        
+
         :returns: list of :class:`PullFile <PullFile>`\ s
         """
         url = self._api + '/files'
@@ -363,7 +363,7 @@ class ReviewComment(BaseComment):
     def commit_id(self):
         """SHA of the commit the comment is on"""
         return self._cid
-    
+
     @property
     def html_url(self):
         """URL of the comment"""
@@ -381,5 +381,6 @@ class ReviewComment(BaseComment):
 
     @property
     def updated_at(self):
-        """datetime object representing the last time the object was updated."""
+        """datetime object representing the last time the object was
+        updated."""
         return self._updated
