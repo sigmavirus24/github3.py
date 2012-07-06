@@ -256,7 +256,7 @@ class PullRequest(GitHubCore):
         :returns: list of :class:`ReviewComment <ReviewComment>`\ s
         """
         url = self._api + '/comments'
-        resp = self._get(url)
+        json = self._get(url)
         ses = self._session
         return [ReviewComment(comment, ses) for comment in json]
 

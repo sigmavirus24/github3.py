@@ -17,7 +17,6 @@ class Event(GitHubCore):
     def __init__(self, event, session):
         super(Event, self).__init__(session)
         from .user import User
-        from .repo import Repository
         from .org import Organization
         self._created = self._strptime(event.get('created_at'))
         self._type = event.get('type')

@@ -165,7 +165,7 @@ class GitHub(GitHubCore):
             url = self._github_url + '/user/keys'
             json = self._post(url, {'title': title, 'key': key})
             if json:
-                created = Key(resp.json, self._session)
+                created = Key(json, self._session)
         return created
 
     def create_repo(self,
@@ -822,7 +822,7 @@ class Authorization(GitHubCore):
             json = self._get(self._api, data={'scopes': scopes})
             self._update_(json)
             success = True
-        if new_scopes:
+        if add_scopes:
             json = self._get(self._api, data={'add_scopes': add_scopes})
             self._update_(json)
             success = True

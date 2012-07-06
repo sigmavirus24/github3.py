@@ -6,13 +6,12 @@ This module contains the class relating to repositories.
 
 """
 
-from base64 import b64decode, b64encode
-from time import time
+from base64 import b64decode
 from json import dumps
 import requests
 from .event import Event
 from .issue import Issue, Label, Milestone, issue_params
-from .git import Blob, Commit, Reference, Tag
+from .git import Blob, Commit, Reference, Tag, Tree
 from .models import GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
 from .user import User, Key
@@ -81,13 +80,11 @@ class Repository(GitHubCore):
         self._watch = repo.get('watchers')
 
     def _create_pull(self, data):
-        pull = None
+        json = None
         if data:
             url = self._api + '/pulls'
             json = self._post(url, data)
-            if resp.status_code == 201:
-                pull = PullRequest(json, self._session)
-        return None
+        return PullRequest(json, self._session) if json else None
 
     def add_collaborator(self, login):
         """Add ``login`` as a collaborator to a repository.
@@ -128,7 +125,7 @@ class Repository(GitHubCore):
                 written = True
         elif resp:
             header = resp.headers['content-disposition']
-            i = h.find('filename=') + len('filename=')
+            i = header.find('filename=') + len('filename=')
             with open(header[i:], 'wb') as fd:
                 fd.write(resp.content)
                 written = True
@@ -1011,7 +1008,7 @@ class Repository(GitHubCore):
         """
         from re import subn
         url = subn('repos', 'networks', self._api, 1) + '/events'
-        json = sub._get(url)
+        json = self._get(url)
         return [Event(e, self._session) for e in json]
 
     def list_pulls(self, state=None):

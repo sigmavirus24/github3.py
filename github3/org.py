@@ -147,7 +147,7 @@ class Team(GitHubCore):
         :returns: list of :class:`User <github3.user.User>`\ s
         """
         url = self._api + '/members'
-        resp = self._get(url)
+        json = self._get(url)
         ses = self._session
         return [User(m, ses) for m in json]
 
@@ -157,7 +157,7 @@ class Team(GitHubCore):
         :returns: list of :class:`Repository <github3.repo.Repository>` objects
         """
         url = self._api + '/repos'
-        resp = self._get(url)
+        json = self._get(url)
         ses = self._session
         return [Repository(r, ses) for r in json]
 
