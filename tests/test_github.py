@@ -87,3 +87,7 @@ class TestGitHub(base.BaseTest):
         issues = self.g.list_issues(self.sigm, self.todo, 'subscribed')
         if issues:
             self.fail('Cannot be subscribed to issues.')
+        for f in ('assigned', 'created', 'mentioned'):
+            self.assertIsNotNone(self.g.list_issues(self.sigm, self.todo,
+                f))
+
