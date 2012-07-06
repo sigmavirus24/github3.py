@@ -74,3 +74,7 @@ Or you can simply use the following functions
 ------
 
 .. autofunction:: github3.search_email
+
+------
+
+.. autofunction:: github3.ratelimit_remaining
