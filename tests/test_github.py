@@ -84,10 +84,16 @@ class TestGitHub(base.BaseTest):
 
     def test_list_issues(self):
         self.assertIsNotNone(self.g.list_issues(self.sigm, self.todo))
-        issues = self.g.list_issues(self.sigm, self.todo, 'subscribed')
+        list_issues = self.g.list_issues
+        issues = list_issues(self.sigm, self.todo, 'subscribed')
         if issues:
             self.fail('Cannot be subscribed to issues.')
         for f in ('assigned', 'created', 'mentioned'):
-            self.assertIsNotNone(self.g.list_issues(self.sigm, self.todo,
-                f))
-
+            self.assertIsNotNone(list_issues(self.sigm, self.todo, f))
+        for s in ('open', 'closed'):
+            self.assertIsNotNone(list_issues(self.sigm, self.todo, state=s))
+        self.assertIsNotNone(list_issues(self.sigm, self.todo, state='closed', 
+            labels='Bug,Enhancement'))
+        for d in ('asc', 'desc'):
+            self.assertIsNotNone(list_issues(self.sigm, self.todo, 
+                state='closed', direction=d))
