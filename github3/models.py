@@ -38,7 +38,7 @@ class GitHubCore(object):
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
             if req.status_code != status_code or req.status_code >= 400:
-                raise Error(request)
+                raise Error(req)
         return req
 
     def _boolean(self, request, status_code):

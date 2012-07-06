@@ -122,7 +122,7 @@ class LegacyRepo(GitHubCore):
         self._followers = repo.get('followers', 0)
         self._fork = repo.get('fork', False)
         self._forks = repo.get('forks', 0)
-        sefl._has_dl = repo.get('has_downloads', False)
+        self._has_dl = repo.get('has_downloads', False)
         self._has_is = repo.get('has_issues', False)
         self._has_w = repo.get('has_wiki', False)
         self._home = repo.get('homepage', '')
