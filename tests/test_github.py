@@ -55,7 +55,7 @@ class TestGitHub(base.BaseTest):
         sigm, todo = self.sigm, self.todo
         title = 'Test issue for github3.py'
         self.assertRaisesError(self.g.create_issue, sigm, todo, title)
-    
+
     def test_create_key(self):
         self.assertRaisesError(self.g.create_key, 'Foo bar', 'bogus')
 
@@ -92,12 +92,12 @@ class TestGitHub(base.BaseTest):
             self.assertIsNotNone(list_issues(self.sigm, self.todo, f))
         for s in ('open', 'closed'):
             self.assertIsNotNone(list_issues(self.sigm, self.todo, state=s))
-        self.assertIsNotNone(list_issues(self.sigm, self.todo, state='closed', 
+        self.assertIsNotNone(list_issues(self.sigm, self.todo, state='closed',
             labels='Bug,Enhancement'))
         for s in ('created', 'updated', 'comments'):
             self.assertIsNotNone(list_issues(self.sigm, self.todo, sort=s))
         for d in ('asc', 'desc'):
-            self.assertIsNotNone(list_issues(self.sigm, self.todo, 
+            self.assertIsNotNone(list_issues(self.sigm, self.todo,
                 state='closed', direction=d))
-        self.assertIsNotNone(list_issues(self.sigm, self.todo, 
+        self.assertIsNotNone(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z'))

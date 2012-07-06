@@ -70,7 +70,7 @@ class Event(GitHubCore):
 
     def is_public(self):
         """Indicates whether the Event is public or not.
-        
+
         :returns: bool -- True if event is pubic, False otherwise
         """
         return self._public
