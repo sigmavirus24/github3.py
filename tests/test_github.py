@@ -101,3 +101,14 @@ class TestGitHub(base.BaseTest):
                 state='closed', direction=d))
         self.assertIsNotNone(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z'))
+
+    def test_list_keys(self):
+        self.assertRaisesError(self.g.list_keys())
+
+    def test_list_orgs(self):
+        self.assertRaisesError(self.g.list_orgs())
+        self.assertIsNotNone(self.g.list_orgs(self.kr))
+
+    def test_list_repos(self):
+        self.assertRaisesError(self.g.list_repos())
+        self.assertIsNotNone(self.g.list_repos(self.sigm))
