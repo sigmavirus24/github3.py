@@ -264,8 +264,7 @@ class LegacyUser(GitHubCore):
         super(LegacyUser, self).__init__(session)
         self._created = None
         if user.get('created'):
-            created = user.get('created')[:-6] + 'Z'
-            self._created = self._strptime(created)
+            self._created = self._strptime(user.get('created'))
         self._followers = user.get('followers', 0)
         # same as followers_count
         self._fullname = user.get('fullname', '')
@@ -278,7 +277,7 @@ class LegacyUser(GitHubCore):
         self._pubrepo = user.get('public_repo_count', 0)
         self._pushed = None
         if user.get('pushed'):
-            pushed = user.get('pushed')[:-6] + 'Z'
+            pushed = user.get('pushed')[:-5] + 'Z'
             self._pushed = self._strptime(pushed)
         self._rec = user.get('record', '')
         self._repos = user.get('repos', 0)

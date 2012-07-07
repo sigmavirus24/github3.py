@@ -109,3 +109,14 @@ class TestGitHub(base.BaseTest):
         reg = self.g.markdown(md)
         raw = self.g.markdown(md, raw=True)
         self.assertEqual(reg, raw)
+
+    def test_search(self):
+        self.assertIsNotNone(self.g.search_issues(self.sigm, self.todo,
+            'closed', 'todo'))
+        self.assertIsNotNone(self.g.search_users(self.sigm))
+        self.assertIsNotNone(self.g.search_email('graffatcolmingov@gmail.com'))
+
+    def test_users(self):
+        self.assertRaisesError(self.g.update_user)
+        self.assertRaisesError(self.g.user)
+        self.assertIsNotNone(self.g.user(self.sigm))
