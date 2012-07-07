@@ -65,9 +65,6 @@ class GitHub(GitHubCore):
             i.e., 'gist', 'user'
         :type scopes: list of strings
         :param note: (optional), note about the authorization
-        :type note: str
-        :param note_url: (optional), URL pointing to a note
-        :type note_url: str
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
@@ -541,22 +538,28 @@ class GitHub(GitHubCore):
         :returns: str -- HTML formatted text
         """
         url = self._github_url + '/markdown'
+        data = None
+        headers = {}
         if raw:
-            url = '/'.join([url, '/raw'])
+            url = '/'.join([url, 'raw'])
+            data = text
+            headers['content-type'] = 'text/plain'
+        else:
+            data = {}
 
-        data = {}
-        if text:
-            data['text'] = text
+            if text:
+                data['text'] = text
 
-        if mode in ('markdown', 'gfm'):
-            data['mode'] = mode
+            if mode in ('markdown', 'gfm'):
+                data['mode'] = mode
 
-        if context:
-            data['context'] = context
+            if context:
+                data['context'] = context
+
+            data = dumps(data)
 
         if data:
-            data = dumps(data)
-            req = self._session.post(url, data=data)
+            req = self._session.post(url, data=data, headers=headers)
             if req.ok:
                 return req.content
         return ''
