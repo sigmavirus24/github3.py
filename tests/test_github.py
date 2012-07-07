@@ -28,6 +28,8 @@ class TestGitHub(base.BaseTest):
             self.fail('Check gcd gist')
 
         self.assertRaisesError(self.g.gist, -1)
+        for i in None, self.sigm:
+            self.assertIsNotNone(self.g.list_gists(i))
 
     def test_following(self):
         self.assertRaisesError(self.g.is_following, 'sigmavirus24')
@@ -56,30 +58,7 @@ class TestGitHub(base.BaseTest):
         # Try to get individual ones
         self.assertRaisesError(self.g.issue, self.sigm, self.todo, 2000)
         self.assertIsNotNone(self.g.issue(self.sigm, self.todo, 1))
-
-    def test_keys(self):
-        self.assertRaisesError(self.g.create_key, 'Foo bar', 'bogus')
-        self.assertRaisesError(self.g.delete_key, 2000)
-        self.assertRaisesError(self.g.get_key, 2000)
-        self.assertRaisesError(self.g.list_keys)
-
-    def test_create_repo(self):
-        self.assertRaisesError(self.g.create_repo, 'test_github3.py')
-
-    def test_delete_key(self):
-        self.assertRaisesError(self.g.delete_key, -1)
-
-    def test_list_auth(self):
-        self.assertRaisesError(self.g.list_authorizations)
-
-    def test_list_emails(self):
-        self.assertRaisesError(self.g.list_emails)
-
-    def test_list_gists(self):
-        for i in None, self.sigm:
-            self.assertIsNotNone(self.g.list_gists(i))
-
-    def test_list_issues(self):
+        # Test listing issues
         self.assertIsNotNone(self.g.list_issues(self.sigm, self.todo))
         list_issues = self.g.list_issues
         issues = list_issues(self.sigm, self.todo, 'subscribed')
@@ -99,13 +78,34 @@ class TestGitHub(base.BaseTest):
         self.assertIsNotNone(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z'))
 
-    def test_list_keys(self):
+    def test_keys(self):
+        self.assertRaisesError(self.g.create_key, 'Foo bar', 'bogus')
+        self.assertRaisesError(self.g.delete_key, 2000)
+        self.assertRaisesError(self.g.get_key, 2000)
         self.assertRaisesError(self.g.list_keys)
 
-    def test_list_orgs(self):
-        self.assertRaisesError(self.g.list_orgs)
-        self.assertIsNotNone(self.g.list_orgs(self.kr))
-
-    def test_list_repos(self):
+    def test_repos(self):
+        self.assertRaisesError(self.g.create_repo, 'test_github3.py')
         self.assertRaisesError(self.g.list_repos)
         self.assertIsNotNone(self.g.list_repos(self.sigm))
+        self.assertIsNotNone(self.g.repository(self.sigm, self.todo))
+
+    def test_auths(self):
+        self.assertRaisesError(self.g.list_authorizations)
+        self.assertRaisesError(self.g.authorization, -1)
+        self.assertRaisesError(self.g.authorize, 'foo', 'bar', ['gist',
+            'user'])
+
+    def test_list_emails(self):
+        self.assertRaisesError(self.g.list_emails)
+
+    def test_orgs(self):
+        self.assertRaisesError(self.g.list_orgs)
+        self.assertIsNotNone(self.g.list_orgs(self.kr))
+        self.assertIsNotNone(self.g.organization(self.gh3py))
+
+    def test_markdown(self):
+        md = "# Header\n\nParagraph\n\n## Header 2\n\nParagraph"
+        reg = self.g.markdown(md)
+        raw = self.g.markdown(md, raw=True)
+        self.assertEqual(reg, raw)

@@ -9,6 +9,7 @@ class BaseTest(unittest.TestCase):
     kr = 'kennethreitz'
     sigm = 'sigmavirus24'
     todo = 'Todo.txt-python'
+    gh3py = 'github3py'
 
     def setUp(self):
         super(BaseTest, self).setUp()

@@ -9,6 +9,7 @@ github3.api
 
 from .github import GitHub
 
+gh = GitHub()
 
 def login(username, password, token=None):
     """Constructs and returns a GitHub session with the username and
@@ -22,9 +23,9 @@ def login(username, password, token=None):
     :type token: str
     :returns: :class:`GitHub <github.GitHub>`
     """
-    gh = GitHub()
-    gh.login(username, password, token)
-    return gh
+    g = GitHub()
+    g.login(username, password, token)
+    return g
 
 
 def gist(id_num):
@@ -34,7 +35,6 @@ def gist(id_num):
     :type id_num: int
     :returns: :class:`Gist <gist.Gist>`
     """
-    gh = GitHub()
     return gh.gist(id_num)
 
 
@@ -46,7 +46,6 @@ def list_gists(username=None):
     :type username: str
     :returns: list of :class:`Gist <gist.Gist>`\ s
     """
-    gh = GitHub()
     return gh.list_gists(username)
 
 
@@ -61,7 +60,6 @@ def create_gist(description, files):
     :type files: dict
     :returns: :class:`Gist <gist.Gist>`
     """
-    gh = GitHub()
     return gh.create_gist(description, files)
 
 
@@ -76,7 +74,6 @@ def issue(owner, repository, number):
     :type number: int
     :returns: :class:`Issue <issue.Issue>`
     """
-    gh = GitHub()
     return gh.issue(owner, repository, number)
 
 
@@ -85,7 +82,6 @@ def list_events():
 
     :returns: list of :class:`Event <event.Event>`\ s
     """
-    gh = GitHub()
     return gh.list_events()
 
 
@@ -104,13 +100,16 @@ def markdown(text, mode='', context='', raw=False):
     :type raw: bool
     :returns: str -- HTML formatted text
     """
-    gh = GitHub()
     return gh.markdown(text, mode, context, raw)
+
+
+def organization(login):
+    """See :func:`organization <github3.github.GitHub.organization>`."""
+    return gh.organization(login)
 
 
 def repository(owner, repository):
     """See :func:`repository <github3.github.GitHub.repository>`."""
-    gh = GitHub()
     return gh.repository(owner, repository)
 
 
@@ -127,7 +126,6 @@ def search_issues(owner, repo, state, keyword):
     :type keyword: str
     :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
     """
-    gh = GitHub()
     return gh.search_issues(owner, repo, state, keyword)
 
 
@@ -140,7 +138,6 @@ def search_repos(keyword, **params):
     :type params: dict
     :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
     """
-    gh = GitHub()
     return gh.search_repos(keyword, **params)
 
 
@@ -151,7 +148,6 @@ def search_users(keyword):
     :type keyword: str
     :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
     """
-    gh = GitHub()
     return gh.search_users(keyword)
 
 
@@ -162,11 +158,9 @@ def search_email(email):
     :type keyword: str
     :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
     """
-    gh = GitHub()
     return gh.search_email(email)
 
 
 def ratelimit_remaining():
     """Get the remaining number of requests allowed."""
-    gh = GitHub()
     return gh.ratelimit_remaining
