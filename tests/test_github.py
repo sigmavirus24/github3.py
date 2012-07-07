@@ -21,7 +21,7 @@ class TestGitHub(base.BaseTest):
                     'token ' + self.fake_oauth)
         self.assertRaisesError(self.g.user)
 
-    def test_gist(self):
+    def test_gists(self):
         # My gcd example
         gist_id = 2648112
         if not self.g.gist(gist_id):
@@ -48,29 +48,26 @@ class TestGitHub(base.BaseTest):
         self.assertRaisesError(self.g.watch, sigm, todo)
         self.assertRaisesError(self.g.unwatch, sigm, todo)
 
-    def test_create_gist(self):
-        pass
-
-    def test_create_issue(self):
+    def test_issues(self):
         sigm, todo = self.sigm, self.todo
         title = 'Test issue for github3.py'
+        # Try to create one without authenticating
         self.assertRaisesError(self.g.create_issue, sigm, todo, title)
+        # Try to get individual ones
+        self.assertRaisesError(self.g.issue, self.sigm, self.todo, 2000)
+        self.assertIsNotNone(self.g.issue(self.sigm, self.todo, 1))
 
-    def test_create_key(self):
+    def test_keys(self):
         self.assertRaisesError(self.g.create_key, 'Foo bar', 'bogus')
+        self.assertRaisesError(self.g.delete_key, 2000)
+        self.assertRaisesError(self.g.get_key, 2000)
+        self.assertRaisesError(self.g.list_keys)
 
     def test_create_repo(self):
         self.assertRaisesError(self.g.create_repo, 'test_github3.py')
 
     def test_delete_key(self):
         self.assertRaisesError(self.g.delete_key, -1)
-
-    def test_get_key(self):
-        self.assertRaisesError(self.g.get_key, -1)
-
-    def test_issue(self):
-        self.assertRaisesError(self.g.issue, self.sigm, self.todo, 2000)
-        self.assertIsNotNone(self.g.issue(self.sigm, self.todo, 1))
 
     def test_list_auth(self):
         self.assertRaisesError(self.g.list_authorizations)
@@ -103,12 +100,12 @@ class TestGitHub(base.BaseTest):
             since='2011-01-01T00:00:01Z'))
 
     def test_list_keys(self):
-        self.assertRaisesError(self.g.list_keys())
+        self.assertRaisesError(self.g.list_keys)
 
     def test_list_orgs(self):
-        self.assertRaisesError(self.g.list_orgs())
+        self.assertRaisesError(self.g.list_orgs)
         self.assertIsNotNone(self.g.list_orgs(self.kr))
 
     def test_list_repos(self):
-        self.assertRaisesError(self.g.list_repos())
+        self.assertRaisesError(self.g.list_repos)
         self.assertIsNotNone(self.g.list_repos(self.sigm))
