@@ -29,23 +29,23 @@ class TestGitHub(base.BaseTest):
 
         self.assertRaisesError(self.g.gist, -1)
         for i in None, self.sigm:
-            self.assertIsNotNone(self.g.list_gists(i))
+            assert self.g.list_gists(i) != []
 
     def test_following(self):
         self.assertRaisesError(self.g.is_following, 'sigmavirus24')
         self.assertRaisesError(self.g.follow, 'sigmavirus24')
         self.assertRaisesError(self.g.unfollow, 'sigmavirus24')
         self.assertRaisesError(self.g.list_followers)
-        self.assertIsNotNone(self.g.list_followers('kennethreitz'))
+        assert self.g.list_followers('kennethreitz') != []
         self.assertRaisesError(self.g.list_following)
-        self.assertIsNotNone(self.g.list_following('kennethreitz'))
+        assert self.g.list_following('kennethreitz') != []
 
     def test_watching(self):
         sigm, todo = self.sigm, self.todo
         self.assertRaisesError(self.g.watch, sigm, todo)
         self.assertRaisesError(self.g.unwatch, sigm, todo)
         self.assertRaisesError(self.g.list_watching)
-        self.assertIsNotNone(self.g.list_watching(sigm))
+        assert self.g.list_watching(sigm) != []
         self.assertRaisesError(self.g.is_watching, sigm, todo)
         self.assertRaisesError(self.g.watch, sigm, todo)
         self.assertRaisesError(self.g.unwatch, sigm, todo)
@@ -59,8 +59,8 @@ class TestGitHub(base.BaseTest):
         self.assertRaisesError(self.g.issue, self.sigm, self.todo, 2000)
         self.assertIsNotNone(self.g.issue(self.sigm, self.todo, 1))
         # Test listing issues
-        self.assertIsNotNone(self.g.list_issues(self.sigm, self.todo))
         list_issues = self.g.list_issues
+        assert list_issues(self.kr, 'requests') != []
         issues = list_issues(self.sigm, self.todo, 'subscribed')
         if issues:
             self.fail('Cannot be subscribed to issues.')
@@ -87,7 +87,7 @@ class TestGitHub(base.BaseTest):
     def test_repos(self):
         self.assertRaisesError(self.g.create_repo, 'test_github3.py')
         self.assertRaisesError(self.g.list_repos)
-        self.assertIsNotNone(self.g.list_repos(self.sigm))
+        assert self.g.list_repos(self.sigm) != []
         self.assertIsNotNone(self.g.repository(self.sigm, self.todo))
 
     def test_auths(self):
@@ -101,7 +101,7 @@ class TestGitHub(base.BaseTest):
 
     def test_orgs(self):
         self.assertRaisesError(self.g.list_orgs)
-        self.assertIsNotNone(self.g.list_orgs(self.kr))
+        assert self.g.list_orgs(self.kr) != []
         self.assertIsNotNone(self.g.organization(self.gh3py))
 
     def test_markdown(self):
