@@ -415,10 +415,7 @@ class GitHub(GitHubCore):
             url = '/'.join(url)
             params = issue_params(filter, state, labels, sort, direction,
                     since)
-            if params:
-                url = '{0}?{1}'.format(url, params)
-
-            json = self._get(url)
+            json = self._get(url, params=params)
             ses = self._session
             issues = [Issue(issue, ses) for issue in json]
         return issues

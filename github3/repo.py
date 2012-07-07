@@ -906,27 +906,22 @@ class Repository(GitHubCore):
         """
         url = self._api + '/issues'
 
-        params = []
+        params = {}
         if milestone in ('*', 'none') or isinstance(milestone, int):
-            params.append('milestone=%s' % str(milestone).lower())
+            params['milestone'] = str(milestone).lower()
             # str(None) = 'None' which is invalid, so .lower() it to make it
             # work.
 
         if assignee:
-            params.append('assignee=%s' % assignee)
+            params['assignee'] = assignee
 
         if mentioned:
-            params.append('mentioned=%s' % mentioned)
+            params['mentioned'] = mentioned
 
-        tmp = issue_params(None, state, labels, sort, direction, since)
+        params.update(issue_params(None, state, labels, sort, direction,
+            since))
 
-        params = '&'.join(params) if params else None
-        params = '{0}&{1}'.format(tmp, params) if params else tmp
-
-        if params:
-            url = '{0}?{1}'.format(url, params)
-
-        json = self._get(url)
+        json = self._get(url, params=params)
         ses = self._session
         return [Issue(i, ses) for i in json]
 

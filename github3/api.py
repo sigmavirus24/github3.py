@@ -108,6 +108,12 @@ def markdown(text, mode='', context='', raw=False):
     return gh.markdown(text, mode, context, raw)
 
 
+def repository(owner, repository):
+    """See :func:`repository <github3.github.GitHub.repository>`."""
+    gh = GitHub()
+    return gh.repository(owner, repository)
+
+
 def search_issues(owner, repo, state, keyword):
     """Find issues by state and keyword.
 

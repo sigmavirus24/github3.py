@@ -538,23 +538,23 @@ class IssueEvent(GitHubCore):
 
 
 def issue_params(filter, state, labels, sort, direction, since):
-    params = []
+    params = {}
     if filter in ('assigned', 'created', 'mentioned', 'subscribed'):
-        params.append('filter=%s' % filter)
+        params['filter'] = filter
 
     if state in ('open', 'closed'):
-        params.append('state=%s' % state)
+        params['state'] = state
 
     if labels:
-        params.append('labels=%s' % labels)
+        params['labels'] = labels
 
     if sort in ('created', 'updated', 'comments'):
-        params.append('sort=%s' % sort)
+        params['sort'] = sort
 
     if direction in ('asc', 'desc'):
-        params.append('direction=%s' % direction)
+        params['direction'] = direction
 
     if since and match('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', since):
-        params.append('since=%s' % since)
+        params['since'] = since
 
-    return '&'.join(params)
+    return params
