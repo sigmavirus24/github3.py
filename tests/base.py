@@ -26,7 +26,7 @@ class BaseTest(unittest.TestCase):
             func(*args, **kwargs)
         except github3.Error:
             pass
-        except Exception, e:
+        except Exception as e:
             self.fail('{0}({1}, {2}) raises unexpected exception: {3}'.format(
                 str(func), str(args), str(kwargs), str(e)))
 
