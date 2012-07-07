@@ -1,5 +1,6 @@
 import base
 import github3
+from expecter import expect
 
 class TestGitHub(base.BaseTest):
     def setUp(self):
@@ -12,14 +13,16 @@ class TestGitHub(base.BaseTest):
         self.g.login(*self.fake_auth)
         h = github3.login(*self.fake_auth)
         for i in [self.g, h]:
-            self.failUnlessEqual(self.fake_auth, i._session.auth)
+            expect(self.fake_auth) == i._session.auth
         # Test "oauth" auth
         self.g.login(token=self.fake_oauth)
         h = github3.login('', '', token=self.fake_oauth)
         for i in [self.g, h]:
-            self.failUnlessEqual(i._session.headers['Authorization'],
-                    'token ' + self.fake_oauth)
-        self.assertRaisesError(self.g.user)
+            expect(i._session.headers['Authorization']) == 'token ' +\
+                self.fake_oauth
+
+        with expect.raises(github3.Error):
+            self.g.user()
 
     def test_gists(self):
         # My gcd example
@@ -27,40 +30,42 @@ class TestGitHub(base.BaseTest):
         if not self.g.gist(gist_id):
             self.fail('Check gcd gist')
 
-        self.assertRaisesError(self.g.gist, -1)
+        with expect.raises(github3.Error):
+            self.g.gist(-1)
+
         for i in None, self.sigm:
-            assert self.g.list_gists(i) != []
+            expect(self.g.list_gists(i)) != []
 
     def test_following(self):
-        self.assertRaisesError(self.g.is_following, 'sigmavirus24')
-        self.assertRaisesError(self.g.follow, 'sigmavirus24')
-        self.assertRaisesError(self.g.unfollow, 'sigmavirus24')
-        self.assertRaisesError(self.g.list_followers)
-        assert self.g.list_followers('kennethreitz') != []
-        self.assertRaisesError(self.g.list_following)
-        assert self.g.list_following('kennethreitz') != []
+        expect(self.g.list_followers('kennethreitz')) != []
+        expect(self.g.list_following('kennethreitz')) != []
+        with expect.raises(github3.Error):
+            self.g.is_following(self.sigm)
+            self.g.follow(self.sigm)
+            self.g.unfollow(self.sigm)
+            self.g.list_followers()
+            self.g.list_following()
 
     def test_watching(self):
-        sigm, todo = self.sigm, self.todo
-        self.assertRaisesError(self.g.watch, sigm, todo)
-        self.assertRaisesError(self.g.unwatch, sigm, todo)
-        self.assertRaisesError(self.g.list_watching)
-        assert self.g.list_watching(sigm) != []
-        self.assertRaisesError(self.g.is_watching, sigm, todo)
-        self.assertRaisesError(self.g.watch, sigm, todo)
-        self.assertRaisesError(self.g.unwatch, sigm, todo)
+        expect(self.g.list_watching(self.sigm)) != []
+        with expect.raises(github3.Error):
+            self.g.watch(self.sigm, self.todo)
+            self.g.unwatch(self.sigm, self.todo)
+            self.g.list_watching()
+            self.g.is_watching(self.sigm, self.todo)
 
     def test_issues(self):
-        sigm, todo = self.sigm, self.todo
         title = 'Test issue for github3.py'
-        # Try to create one without authenticating
-        self.assertRaisesError(self.g.create_issue, sigm, todo, title)
-        # Try to get individual ones
-        self.assertRaisesError(self.g.issue, self.sigm, self.todo, 2000)
+        with expect.raises(github3.Error):
+            # Try to create one without authenticating
+            self.g.create_issue(self.sigm, self.todo, title)
+            # Try to get individual ones
+            self.g.issue(self.sigm, self.todo, 2000)
+
         self.assertIsNotNone(self.g.issue(self.sigm, self.todo, 1))
         # Test listing issues
         list_issues = self.g.list_issues
-        assert list_issues(self.kr, 'requests') != []
+        expect(list_issues(self.kr, 'requests')) != []
         issues = list_issues(self.sigm, self.todo, 'subscribed')
         if issues:
             self.fail('Cannot be subscribed to issues.')
@@ -79,30 +84,34 @@ class TestGitHub(base.BaseTest):
             since='2011-01-01T00:00:01Z'))
 
     def test_keys(self):
-        self.assertRaisesError(self.g.create_key, 'Foo bar', 'bogus')
-        self.assertRaisesError(self.g.delete_key, 2000)
-        self.assertRaisesError(self.g.get_key, 2000)
-        self.assertRaisesError(self.g.list_keys)
+        with expect.raises(github3.Error):
+            self.g.create_key('Foo bar', 'bogus')
+            self.g.delete_key(2000)
+            self.g.get_key(2000)
+            self.g.list_keys()
 
     def test_repos(self):
-        self.assertRaisesError(self.g.create_repo, 'test_github3.py')
-        self.assertRaisesError(self.g.list_repos)
-        assert self.g.list_repos(self.sigm) != []
+        with expect.raises(github3.Error):
+            self.g.create_repo('test_github3.py')
+            self.g.list_repos()
+        expect(self.g.list_repos(self.sigm)) != []
         self.assertIsNotNone(self.g.repository(self.sigm, self.todo))
 
     def test_auths(self):
-        self.assertRaisesError(self.g.list_authorizations)
-        self.assertRaisesError(self.g.authorization, -1)
-        self.assertRaisesError(self.g.authorize, 'foo', 'bar', ['gist',
-            'user'])
+        with expect.raises(github3.Error):
+            self.g.list_authorizations()
+            self.g.authorization(-1)
+            self.g.authorize('foo', 'bar', ['gist', 'user'])
 
     def test_list_emails(self):
-        self.assertRaisesError(self.g.list_emails)
+        with expect.raises(github3.Error):
+            self.g.list_emails()
 
     def test_orgs(self):
-        self.assertRaisesError(self.g.list_orgs)
-        assert self.g.list_orgs(self.kr) != []
+        expect(self.g.list_orgs(self.kr)) != []
         self.assertIsNotNone(self.g.organization(self.gh3py))
+        with expect.raises(github3.Error):
+            self.g.list_orgs()
 
     def test_markdown(self):
         md = "# Header\n\nParagraph\n\n## Header 2\n\nParagraph"
@@ -117,6 +126,7 @@ class TestGitHub(base.BaseTest):
         self.assertIsNotNone(self.g.search_email('graffatcolmingov@gmail.com'))
 
     def test_users(self):
-        self.assertRaisesError(self.g.update_user)
-        self.assertRaisesError(self.g.user)
+        with expect.raises(github3.Error):
+            self.g.update_user()
+            self.g.user()
         self.assertIsNotNone(self.g.user(self.sigm))
