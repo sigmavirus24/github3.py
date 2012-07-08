@@ -1,5 +1,7 @@
+#import os
 import sys
 import unittest
+#from getpass import getpass
 
 #sys.path.insert(0, os.path.abspath('..'))
 import github3
@@ -14,21 +16,25 @@ class BaseTest(unittest.TestCase):
     def setUp(self):
         super(BaseTest, self).setUp()
         self.g = github3.GitHub()
+        self.auth = False
+        #if not (os.environ.get('CI') or os.environ.get('TRAVIS')):
+        #    if hasattr(__builtins__, 'raw_input'):
+        #        prompt = raw_input
+        #    else:
+        #        prompt = input
+        #    user = ''
+        #    pw = ''
+        #    while not user:
+        #        user = prompt('Enter GitHub username: ')
+        #    while not pw:
+        #        pw = getpass('Password for {0}: '.format(user))
+        #    self._g = github3.login(user, pw)
+        #    self.auth = True
 
     def assertIsInstance(self, obj, cls):
         """Assert that ``obj`` is an instance of ``cls``"""
         if not isinstance(obj, cls):
             self.fail()
-
-    def assertRaisesError(self, func, *args, **kwargs):
-        """Assert that func raises github3.Error"""
-        try:
-            func(*args, **kwargs)
-        except github3.Error:
-            pass
-        except Exception as e:
-            self.fail('{0}({1}, {2}) raises unexpected exception: {3}'.format(
-                str(func), str(args), str(kwargs), str(e)))
 
     def assertIsNotNone(self, value, msg=None):
         if sys.version_info >= (2, 7):

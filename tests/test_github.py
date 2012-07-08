@@ -24,6 +24,9 @@ class TestGitHub(base.BaseTest):
         with expect.raises(github3.Error):
             self.g.user()
 
+        if self.auth:
+            expect(self._g.user()) != None
+
     def test_gists(self):
         # My gcd example
         gist_id = 2648112
@@ -35,6 +38,16 @@ class TestGitHub(base.BaseTest):
 
         for i in None, self.sigm:
             expect(self.g.list_gists(i)) != []
+
+        if self.auth:
+            desc = 'Testing gist creation'
+            files = {'test.txt': {'content': 'Test contents'}}
+            gist = self._g.create_gist(desc, files, False)
+            expect(gist) != None
+            expect(gist.description) == desc
+            expect(gist.is_public()) == False
+            for g in gist.files:
+                expect(g.content) == files[g.name]['content']
 
     def test_following(self):
         expect(self.g.list_followers('kennethreitz')) != []
