@@ -48,6 +48,7 @@ class TestGitHub(base.BaseTest):
             expect(gist.is_public()) == False
             for g in gist.files:
                 expect(g.content) == files[g.name]['content']
+            expect(gist.delete()) == True
 
     def test_following(self):
         expect(self.g.list_followers('kennethreitz')) != []
@@ -59,6 +60,13 @@ class TestGitHub(base.BaseTest):
             self.g.list_followers()
             self.g.list_following()
 
+        if self.auth:
+            expect(self._g.is_following(self.sigm)).isinstance(bool)
+            expect(self._g.follow(self.sigm)).isinstance(bool)
+            expect(self._g.unfollow(self.sigm)).isinstance(bool)
+            expect(self._g.list_followers()) != []
+            expect(self._g.list_following()) != []
+
     def test_watching(self):
         expect(self.g.list_watching(self.sigm)) != []
         with expect.raises(github3.Error):
@@ -66,6 +74,10 @@ class TestGitHub(base.BaseTest):
             self.g.unwatch(self.sigm, self.todo)
             self.g.list_watching()
             self.g.is_watching(self.sigm, self.todo)
+
+        if self.auth:
+            expect(self._g.watch(self.sigm, self.todo)).isinstance(bool)
+            expect(self._g.unwatch(self.sigm, self.todo)).isinstance(bool)
 
     def test_issues(self):
         title = 'Test issue for github3.py'
