@@ -160,7 +160,7 @@ class GitHub(GitHubCore):
 
         if title and key:
             url = self._github_url + '/user/keys'
-            json = self._post(url, {'title': title, 'key': key})
+            json = self._post(url, dumps({'title': title, 'key': key}))
             if json:
                 created = Key(json, self._session)
         return created
