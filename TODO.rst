@@ -4,15 +4,17 @@ TODO
 HIGH PRIORITY
 -------------
 
-- Fix installing github3.py when requests doesn't exist on the system already.
-  Currently, this fails which prevents pip from installing github3.py. I 
-  wonder if no one ran into this problem or if they just didn't bother 
-  reporting it.
-
 everywhere
 ----------
 
+- Open a branch to experiment with slumber_ instead of requests. (It will 
+  still rely on requests, but slumber just looks so much cleaner that what I 
+  have now)
 - Use requests ``params`` parameter to send parameters from the URl
+
+
+.. links
+.. _slumber: http://slumber.in/
 
 github3.api
 -----------
