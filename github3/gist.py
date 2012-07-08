@@ -101,7 +101,10 @@ class Gist(GitHubCore):
         # date the gist was created
         self._created = self._strptime(data.get('created_at'))
         self._updated = self._strptime(data.get('updated_at'))
-        self._user = User(data.get('user'), self._session)
+        if data.get('user'):
+            self._user = User(data.get('user'), self._session)
+        else:
+            self._user = None
 
         # Create a list of files in the gist
         self._files = []
