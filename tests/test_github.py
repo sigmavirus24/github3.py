@@ -78,6 +78,8 @@ class TestGitHub(base.BaseTest):
         if self.auth:
             expect(self._g.watch(self.sigm, self.todo)).isinstance(bool)
             expect(self._g.unwatch(self.sigm, self.todo)).isinstance(bool)
+            expect(self._g.list_watching()) != []
+            expect(self._g.is_watching(self.sigm, self.todo)) != []
 
     def test_issues(self):
         title = 'Test issue for github3.py'
@@ -114,6 +116,10 @@ class TestGitHub(base.BaseTest):
             self.g.delete_key(2000)
             self.g.get_key(2000)
             self.g.list_keys()
+
+        if self.auth:
+            k = self._g.create_key('Foo bar', 'bogus')
+            expect(k).isinstance(github3.user.Key)
 
     def test_repos(self):
         with expect.raises(github3.Error):
