@@ -370,14 +370,14 @@ class GitHub(GitHubCore):
         return [Gist(gist, ses) for gist in json]
 
     def list_issues(self,
-        owner=None,
-        repository=None,
-        filter=None,
-        state=None,
-        labels=None,
-        sort=None,
-        direction=None,
-        since=None):
+        owner='',
+        repository='',
+        filter='',
+        state='',
+        labels='',
+        sort='',
+        direction='',
+        since=''):
         """If no parameters are provided, this gets the issues for the
         authenticated user. All parameters are optional with the
         exception that owner and repository must be supplied together.

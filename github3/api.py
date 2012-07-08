@@ -11,6 +11,12 @@ from .github import GitHub
 
 gh = GitHub()
 
+
+def authorize(login, password, scopes, note='', note_url=''):
+    """See :func:`authorize <github3.github.GitHub.authorize>`"""
+    return gh.authorize(login, password, scopes, note, note_url)
+
+
 def login(username, password, token=None):
     """Constructs and returns a GitHub session with the username and
     password, or token
@@ -47,6 +53,48 @@ def list_gists(username=None):
     :returns: list of :class:`Gist <gist.Gist>`\ s
     """
     return gh.list_gists(username)
+
+
+def list_followers(username):
+    """List the followers of ``username``.
+
+    :param username: (required), login of the person to list the followers of
+    :type username: str
+    """
+    return gh.list_followers(username) if username else []
+
+
+def list_following(username):
+    """List the people ``username`` follows.
+
+    :param username: (required), login of the user
+    :type username: str
+    """
+    return gh.list_following(username) if username else []
+
+
+def list_issues(owner, repository, filter='', state='', labels='', sort='',
+        direction='', since=''):
+    """See :func:`github3.github.GitHub.list_issues()`"""
+    issues = []
+    if owner and repository:
+        issues = gh.list_issues(owner, repository, filter, state, labels, 
+                sort, direction, since)
+    return issues
+
+
+def list_orgs(username):
+    """List the organizations associated with ``username``.
+
+    :param username: (required), login of the user
+    :type username: str
+    """
+    return gh.list_orgs(username) if username else []
+
+
+def list_repos(login, type='', sort='', direction=''):
+    """See :func:`github3.github.GitHub.list_repos`"""
+    return gh.list_repos(login, type, sort, direction) if login else []
 
 
 def create_gist(description, files):
