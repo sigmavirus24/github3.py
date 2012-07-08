@@ -6,9 +6,23 @@ import unittest
 import sys
 import os
 import re
-import tests
+from getpass import getpass
 
 if __name__ == "__main__":
+    if not (os.environ.get('CI') or os.environ.get('TRAVIS')):
+        if hasattr(__builtins__, 'raw_input'):
+            prompt = raw_input
+        else:
+            prompt = input
+        user = pw = ''
+        while not user:
+            user = prompt('Enter GitHub username: ')
+        while not pw:
+            pw = getpass('Password for {0}: '.format(user))
+
+        os.environ['__USER'] = user
+        os.environ['__PASS'] = pw
+
     if sys.version_info >= (2, 7):
         suite = unittest.defaultTestLoader.discover("tests")
     else:
