@@ -1,9 +1,9 @@
 *.pyc
 *.swp
-test.py
 docs/_build
 bin/
 include/
 lib/
 lib64/
+dist/
 *.egg-info/
