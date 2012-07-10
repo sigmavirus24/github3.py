@@ -351,7 +351,7 @@ class BaseAccount(GitHubCore):
         return self._public_repos
 
 
-class Error(BaseException):
+class Error(Exception):
     def __init__(self, resp):
         super(Error, self).__init__()
         self._code = resp.status_code
