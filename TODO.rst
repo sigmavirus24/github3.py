@@ -12,9 +12,12 @@ everywhere
   have now)
 - Use requests ``params`` parameter to send parameters from the URl
 
+  - Alternative: furl_
+
 
 .. links
 .. _slumber: http://slumber.in/
+.. _furl: https://github.com/doda/furl
 
 github3.api
 -----------

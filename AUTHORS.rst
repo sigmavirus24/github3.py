@@ -10,3 +10,5 @@ Requests
 
 Contributors
 ------------
+
+- Dominik Dabrowski (@doda)
