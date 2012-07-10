@@ -4,6 +4,10 @@ TODO
 HIGH PRIORITY
 -------------
 
+- Add ``json`` functions to allow users/developers to access the original json 
+  content. See: 
+  https://github.com/doda/github3.py/commit/169a6c2977fa2708c69655af3cae0f643c09e7c1#-P0
+
 everywhere
 ----------
 
