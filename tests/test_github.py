@@ -89,7 +89,10 @@ class TestGitHub(base.BaseTest):
             # Try to get individual ones
             self.g.issue(self.sigm, self.todo, 2000)
 
-        self.assertIsNotNone(self.g.issue(self.sigm, self.todo, 1))
+        i = self.g.issue(self.sigm, self.todo, 1)
+        self.assertIsNotNone(i)
+        expect(i).isinstance(github3.issue.Issue)
+        expect(i.list_comments()) != []
         # Test listing issues
         list_issues = self.g.list_issues
         expect(list_issues(self.kr, 'requests')) != []
@@ -109,6 +112,11 @@ class TestGitHub(base.BaseTest):
                 state='closed', direction=d))
         self.assertIsNotNone(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z'))
+
+        #if self.auth:
+        #    i = self._g.create_issue(self.sigm, 'issues.py',
+        #    'Testing github3.py', 'Ignore this.')
+        #    expect(i).isinstance(github3.issue.Issue)
 
     def test_keys(self):
         with expect.raises(github3.Error):
