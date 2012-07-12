@@ -15,7 +15,7 @@ from .user import User
 class Label(GitHubCore):
     """The :class:`Label <Label>` object. Succintly represents a label that
     exists in a repository."""
-    def __init__(self, label, session):
+    def __init__(self, label, session=None):
         super(Label, self).__init__(session)
         self._update_(label)
 
@@ -69,7 +69,7 @@ class Milestone(GitHubCore):
     """The :class:`Milestone <Milestone>` object. This is a small class to
     handle information about milestones on repositories and issues.
     """
-    def __init__(self, mile, session):
+    def __init__(self, mile, session=None):
         super(Milestone, self).__init__(session)
         self._update_(mile)
 
@@ -184,7 +184,7 @@ class Issue(GitHubCore):
     returned via the `Issues <http://developer.github.com/v3/issues>`_ section
     of the GitHub API.
     """
-    def __init__(self, issue, session):
+    def __init__(self, issue, session=None):
         super(Issue, self).__init__(session)
         self._update_(issue)
 
@@ -450,7 +450,7 @@ class IssueComment(BaseComment):
     """The :class:`IssueComment <IssueComment>` object. This structures and
     handles the comments on issues specifically.
     """
-    def __init__(self, comment, session):
+    def __init__(self, comment, session=None):
         super(IssueComment, self).__init__(comment, session)
         self._user = User(comment.get('user'), self._session)
 

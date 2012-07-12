@@ -14,7 +14,7 @@ from .user import User
 
 
 class Team(GitHubCore):
-    def __init__(self, team, session):
+    def __init__(self, team, session=None):
         super(Team, self).__init__(session)
         self._update_(team)
 
@@ -199,7 +199,7 @@ class Team(GitHubCore):
 
 class Organization(BaseAccount):
     """The :class:`Organization <Organization>` object."""
-    def __init__(self, org, session):
+    def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
         self._update_(org)
         if not self._type:

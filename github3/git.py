@@ -47,7 +47,7 @@ class GitData(GitHubCore):
     the user (developer) ever. This is used to prevent duplication of some
     common items among other Git Data objects.
     """
-    def __init__(self, data, session):
+    def __init__(self, data, session=None):
         super(GitData, self).__init__(session)
         self._sha = data.get('sha')
         self._api = data.get('url')
@@ -65,7 +65,7 @@ class Commit(BaseCommit):
     """The :class:`Commit <Commit>` object. This represents a commit made in a
     repository.
     """
-    def __init__(self, commit, session):
+    def __init__(self, commit, session=None):
         super(Commit, self).__init__(commit, session)
 
         self._author = ''
@@ -115,7 +115,7 @@ class Reference(GitHubCore):
     """The :class:`Reference <Reference>` object. This represents a reference
     created on a repository.
     """
-    def __init__(self, ref, session):
+    def __init__(self, ref, session=None):
         super(Reference, self).__init__(session)
         self._update_(ref)
 
@@ -208,7 +208,7 @@ class Tag(GitData):
 
 class Tree(GitData):
     """The :class:`Tree <Tree>` object."""
-    def __init__(self, tree, session):
+    def __init__(self, tree, session=None):
         super(Tree, self).__init__(tree, session)
         self._tree = [Hash(t) for t in tree.get('tree', [])]
 

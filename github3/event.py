@@ -14,7 +14,7 @@ class Event(GitHubCore):
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
     """
-    def __init__(self, event, session):
+    def __init__(self, event, session=None):
         super(Event, self).__init__(session)
         from .user import User
         from .org import Organization

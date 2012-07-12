@@ -123,7 +123,7 @@ class PullFile(object):
 
 class PullRequest(GitHubCore):
     """The :class:`PullRequest <PullRequest>` object."""
-    def __init__(self, pull, session):
+    def __init__(self, pull, session=None):
         super(PullRequest, self).__init__(session)
         self._update_(pull)
 
@@ -353,7 +353,7 @@ class ReviewComment(BaseComment):
     """The :class:`ReviewComment <ReviewComment>` object. This is used to
     represent comments on pull requests.
     """
-    def __init__(self, comment, session):
+    def __init__(self, comment, session=None):
         super(ReviewComment, self).__init__(comment, session)
 
     def __repr__(self):

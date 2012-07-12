@@ -59,7 +59,7 @@ class GistComment(BaseComment):
     on a gist.
     """
 
-    def __init__(self, comment, session):
+    def __init__(self, comment, session=None):
         super(GistComment, self).__init__(comment, session)
 
     def __repr__(self):
@@ -74,7 +74,7 @@ class Gist(GitHubCore):
     have authenticated).
     """
 
-    def __init__(self, data, session):
+    def __init__(self, data, session=None):
         super(Gist, self).__init__(session)
 
         self._update_(data)

@@ -18,7 +18,7 @@ class LegacyIssue(GitHubCore):
     <github3.github.GitHub.search_issues>`. Unfortunately, GitHub hasn't
     updated the search functionality to use the objects as they exist now.
     """
-    def __init__(self, issue, session):
+    def __init__(self, issue, session=None):
         super(LegacyIssue, self).__init__(session)
         self._gravid = issue.get('gravatar_id', '')
         self._pos = issue.get('position', 0)
@@ -112,7 +112,7 @@ class LegacyIssue(GitHubCore):
 class LegacyRepo(GitHubCore):
     """The :class:`LegacyRepo <LegacyRepo>` object. This wraps data returned
     using the :func:`search_repos <github3.github.GitHub.search_repos>`"""
-    def __init__(self, repo, session):
+    def __init__(self, repo, session=None):
         super(LegacyRepo, self).__init__(session)
         self._created = None
         if repo.get('created'):
@@ -260,7 +260,7 @@ class LegacyUser(GitHubCore):
     """The :class:`LegacyUser <LegacyUser>` object. This handles information
     returned by :func:`search_users <github3.github.GitHub.search_users>`.
     """
-    def __init__(self, user, session):
+    def __init__(self, user, session=None):
         super(LegacyUser, self).__init__(session)
         self._created = None
         if user.get('created'):
