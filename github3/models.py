@@ -15,13 +15,14 @@ class GitHubCore(object):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
     """
-    def __init__(self, ses=None):
+    def __init__(self, json, ses=None):
         if hasattr(ses, '_session'):
             # i.e. session is actually a GitHub object
             ses = ses._session
         if ses is None:
             ses = session()
         self._session = ses
+        self._json_data = json
         self._github_url = 'https://api.github.com'
         self._time_format = '%Y-%m-%dT%H:%M:%SZ'
         self._remaining = 5000
@@ -36,15 +37,6 @@ class GitHubCore(object):
             raise Error(request)
         return None
 
-    def _getr(self, url, status_code=200, **kwargs):
-        # In the rare instance we care about the entire response.
-        req = None
-        if self._remaining > 0:
-            req = self._session.get(url, **kwargs)
-            if req.status_code != status_code or req.status_code >= 400:
-                raise Error(req)
-        return req
-
     def _boolean(self, request, status_code):
         if request.status_code == status_code:
             return True
@@ -56,7 +48,6 @@ class GitHubCore(object):
         req = False
         if self._remaining > 0:
             req = self._session.delete(url, **kwargs)
-            req = self._boolean(req, status_code)
         return req
 
     def _get(self, url, status_code=200, **kwargs):
@@ -105,20 +96,26 @@ class GitHubCore(object):
     def ratelimit_remaining(self):
         """Number of requests before GitHub imposes a ratelimit."""
         json = self._get(self._github_url + '/rate_limit')
-        return json.get('rate', {}).get('remaining', 5000)
+        self._remaining = json.get('rate', {}).get('remaining', 0)
+        return self._remaining
+
+    def to_json(self):
+        """Return the json representing this object."""
+        return self._json_data
 
 
 class BaseComment(GitHubCore):
     """The :class:`BaseComment <BaseComment>` object. A basic class for Gist,
     Issue and Pull Request Comments."""
     def __init__(self, comment, session):
-        super(BaseComment, self).__init__(session)
+        super(BaseComment, self).__init__(comment, session)
         self._update_(comment)
 
     def __repr__(self):
         return '<github3-comment at 0x%x>' % id(self)
 
     def _update_(self, comment):
+        self._json_data = comment
         self._id = comment.get('id')
         self._body = comment.get('body')
         self._bodyt = comment.get('body_text')
@@ -193,7 +190,7 @@ class BaseCommit(GitHubCore):
     the various types of commit objects returned by the API.
     """
     def __init__(self, commit, session):
-        super(BaseCommit, self).__init__(session)
+        super(BaseCommit, self).__init__(commit, session)
         self._api = commit.get('url')
         self._sha = commit.get('sha')
         self._msg = commit.get('message')
@@ -221,7 +218,7 @@ class BaseAccount(GitHubCore):
     <user.User>` objects.
     """
     def __init__(self, acct, session):
-        super(BaseAccount, self).__init__(session)
+        super(BaseAccount, self).__init__(acct, session)
         self._update_(acct)
 
     def __repr__(self):
@@ -230,6 +227,7 @@ class BaseAccount(GitHubCore):
     def _update_(self, acct):
         # Public information
         ## e.g. https://api.github.com/users/self._login
+        self._json_data = acct
         self._type = None
         if acct.get('type'):
             self._type = acct.get('type')
