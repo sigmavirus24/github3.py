@@ -333,7 +333,7 @@ class Repository(GitHubCore):
                         '', v]
                 form_data.extend(tmp)
             form_data.append(boundary)
-            form_data.append('Content-Disposition: form-data; ' +\
+            form_data.append('Content-Disposition: form-data; ' +
                     'name="{0}"; filename="{1}"'.format(k, json.get('name')))
             #form_data.append('Content-Type: ' + json.get('mime_type'))
             form_data.extend(['', open(path, 'rb').read()])
