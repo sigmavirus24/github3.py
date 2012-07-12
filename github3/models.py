@@ -8,16 +8,20 @@ This module provides the basic models used in github3.py
 
 from datetime import datetime
 from json import dumps
+from requests import session
 
 
 class GitHubCore(object):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
     """
-    def __init__(self, session=None):
-        self._session = session
-        if self._session:
-            setattr(self._session, '_remain', 5000)
+    def __init__(self, ses=None):
+        if hasattr(ses, '_session'):
+            # i.e. session is actually a GitHub object
+            ses = ses._session
+        if ses is None:
+            ses = session()
+        self._session = ses
         self._github_url = 'https://api.github.com'
         self._time_format = '%Y-%m-%dT%H:%M:%SZ'
         self._remaining = 5000

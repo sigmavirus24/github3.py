@@ -13,7 +13,7 @@ from .models import GitHubCore, BaseAccount
 
 class Key(GitHubCore):
     """The :class:`Key <Key>` object."""
-    def __init__(self, key, session):
+    def __init__(self, key, session=None):
         super(Key, self).__init__(session)
         self._update_(key)
 
@@ -128,7 +128,7 @@ class User(BaseAccount):
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
     """
-    def __init__(self, user, session):
+    def __init__(self, user, session=None):
         super(User, self).__init__(user, session)
         self._update_(user)
         if not self._type:
