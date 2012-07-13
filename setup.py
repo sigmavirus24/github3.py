@@ -14,7 +14,7 @@ if sys.argv[-1] in ("submit", "publish"):
     sys.exit()
 
 packages = ["github3"]
-requires = ["requests>=0.12.1"]
+requires = ["requests>=0.13.2"]
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:

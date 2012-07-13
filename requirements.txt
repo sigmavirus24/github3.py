@@ -1,2 +1,2 @@
-requests>=0.12.1
+requests>=0.13.2
 git+git://github.com/garybernhardt/expecter.git
