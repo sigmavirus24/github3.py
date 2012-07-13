@@ -31,20 +31,21 @@ class GitHubCore(object):
         return '<github3-core at 0x%x>' % id(self)
 
     def _json(self, request, status_code):
-        if request.status_code == status_code:
-            return request.json if request.content else True
+        ret = None
+        if request.status_code == status_code and request.content:
+            ret = request.json
         if request.status_code >= 400:
             raise Error(request)
-        return None
+        return ret
 
-    def _boolean(self, request, status_code):
-        if request.status_code == status_code:
+    def _boolean(self, request, true_code, false_code):
+        if request.status_code == true_code:
             return True
-        if request.status_code != 404 and request.status_code >= 400:
+        if request.status_code != false_code and request.status_code >= 400:
             raise Error(request)
         return False
 
-    def _delete(self, url, status_code=204, **kwargs):
+    def _delete(self, url, **kwargs):
         req = False
         if self._remaining > 0:
             req = self._session.delete(url, **kwargs)

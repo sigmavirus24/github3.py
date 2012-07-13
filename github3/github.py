@@ -21,8 +21,7 @@ from .user import User, Key
 class GitHub(GitHubCore):
     """Stores all the session information."""
     def __init__(self):
-        super(GitHub, self).__init__()
-        self._session = session()
+        super(GitHub, self).__init__({})
         # Only accept JSON responses
         self._session.headers.update(
                 {'Accept': 'application/vnd.github.full+json'})
@@ -37,7 +36,8 @@ class GitHub(GitHubCore):
 
     def _list_follow(self, which):
         url = self._github_url + '/user/' + which
-        json = self._get(url)
+        resp = self._get(url)
+        json = self._json(resp, 200)
         return [User(f, self._session) for f in json]
 
     def authorization(self, id_num):
@@ -50,7 +50,7 @@ class GitHub(GitHubCore):
         json = None
         if int(id_num) > 0:
             url = self._github_url + '/authorizations/{0}'.format(id_num)
-            json = self._get(url)
+            json = self._json(self._get(url), 200)
         return Authorization(json, self._session) if json else None
 
     def authorize(self, login, password, scopes, note='', note_url=''):
@@ -74,7 +74,7 @@ class GitHub(GitHubCore):
             data = dumps({'scopes': scopes, 'note': note,
                 'note_url': note_url})
             if self._session.auth:
-                json = self._post(url, data=data)
+                json = self._json(self._post(url, data=data), 201)
             else:
                 ses = session()
                 ses.auth = (login, password)
