@@ -78,8 +78,7 @@ class GitHub(GitHubCore):
             else:
                 ses = session()
                 ses.auth = (login, password)
-                req = ses.post(url, data=data)
-                json = req.json if req.ok else {}
+                json = self._json(ses.post(url, data=data))
         return Authorization(json, self._session) if json else None
 
     def create_gist(self, description, files, public=True):
@@ -100,7 +99,7 @@ class GitHub(GitHubCore):
                 'files': files}
 
         url = self._github_url + '/gists'
-        json = self._post(url, dumps(new_gist))
+        json = self._json(self._post(url, dumps(new_gist)))
         return Gist(json, self._session) if json else None
 
     def create_issue(self,
@@ -160,7 +159,8 @@ class GitHub(GitHubCore):
 
         if title and key:
             url = self._github_url + '/user/keys'
-            json = self._post(url, dumps({'title': title, 'key': key}))
+            req = self._post(url, dumps({'title': title, 'key': key}))
+            json = self._json(req)
             if json:
                 created = Key(json, self._session)
         return created
@@ -200,7 +200,7 @@ class GitHub(GitHubCore):
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads})
-        json = self._post(url, data)
+        json = self._json(self._post(url, data))
         return Repository(json, self._session) if json else None
 
     def delete_key(self, key_id):
@@ -226,7 +226,7 @@ class GitHub(GitHubCore):
         if login:
             url = '{0}/user/following/{1}'.format(self._github_url,
                     login)
-            resp = self._put(url)
+            resp = self._boolean(self._put(url))
         return resp
 
     def get_key(self, id_num):
@@ -240,7 +240,7 @@ class GitHub(GitHubCore):
         if int(id_num) > 0:
             url = '{0}/user/keys/{1}'.format(self._github_url,
                     str(id_num))
-            json = self._get(url)
+            json = self.json(self._get(url))
         return Key(json, self._session) if json else None
 
     def gist(self, id_num):

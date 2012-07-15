@@ -51,39 +51,29 @@ class GitHubCore(object):
             req = self._session.delete(url, **kwargs)
         return req
 
-    def _get(self, url, status_code=200, **kwargs):
+    def _get(self, url, **kwargs):
         req = None
         if self._remaining > 0:
             req = self._session.get(url, **kwargs)
-            if status_code == 204:
-                # We're not expecting any json back
-                # If we left it as a simple _json() call there would be a
-                #  TypeError since requests doesn't handle that cleanly
-                req = self._boolean(req, status_code)
-            else:
-                req = self._json(req, status_code)
         return req
 
-    def _patch(self, url, data=None, status_code=200, **kwargs):
+    def _patch(self, url, **kwargs):
         req = None
         if self._remaining > 0:
-            req = self._session.patch(url, data, **kwargs)
-            req = self._json(req, status_code)
+            req = self._session.patch(url, **kwargs)
         return req
 
-    def _post(self, url, data=None, status_code=201, **kwargs):
+    def _post(self, url, **kwargs):
         req = None
         if self._remaining > 0:
-            req = self._session.post(url, data, **kwargs)
-            req = self._json(req, status_code)
+            req = self._session.post(url, **kwargs)
         return req
 
-    def _put(self, url, data=None, status_code=204, **kwargs):
+    def _put(self, url, **kwargs):
         req = False
         if self._remaining > 0:
             kwargs.update(headers={'Content-Length': '0'})
-            req = self._session.put(url, data, **kwargs)
-            req = self._boolean(req, status_code)
+            req = self._session.put(url, **kwargs)
         return req
 
     def _strptime(self, time_str):
