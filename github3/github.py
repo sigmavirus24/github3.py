@@ -35,7 +35,7 @@ class GitHub(GitHubCore):
         return '<GitHub at 0x%x>' % id(self)
 
     def _list_follow(self, which):
-        url = self._github_url + '/user/' + which
+        url = self._build_url('user', which)
         resp = self._get(url)
         json = self._json(resp, 200)
         return [User(f, self._session) for f in json]
@@ -49,7 +49,7 @@ class GitHub(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._github_url + '/authorizations/{0}'.format(id_num)
+            url = self._github_url('authorizations', str(id_num))
             json = self._json(self._get(url), 200)
         return Authorization(json, self._session) if json else None
 
@@ -70,7 +70,7 @@ class GitHub(GitHubCore):
         json = None
         auth = self._session.auth or (login and password)
         if isinstance(scopes, list) and scopes and auth:
-            url = self._github_url + '/authorizations'
+            url = self._build_url('authorizations')
             data = dumps({'scopes': scopes, 'note': note,
                 'note_url': note_url})
             if self._session.auth:
@@ -97,8 +97,7 @@ class GitHub(GitHubCore):
         """
         new_gist = {'description': description, 'public': public,
                 'files': files}
-
-        url = self._github_url + '/gists'
+        url = self._build_url('gists')
         json = self._json(self._post(url, dumps(new_gist)))
         return Gist(json, self._session) if json else None
 
@@ -158,7 +157,7 @@ class GitHub(GitHubCore):
         created = None
 
         if title and key:
-            url = self._github_url + '/user/keys'
+            url = self._build_url('user', 'keys')
             req = self._post(url, dumps({'title': title, 'key': key}))
             json = self._json(req)
             if json:
@@ -195,7 +194,7 @@ class GitHub(GitHubCore):
         :type has_downloads: bool
         :returns: :class:`Repository <github3.repo.Repository>`
         """
-        url = self._github_url + '/user/repos'
+        url = self._build_url('user', 'repos')
         data = dumps({'name': name, 'description': description,
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
@@ -224,9 +223,8 @@ class GitHub(GitHubCore):
         """
         resp = False
         if login:
-            url = '{0}/user/following/{1}'.format(self._github_url,
-                    login)
-            resp = self._boolean(self._put(url))
+            url = self._build_url('user', 'following', 'login')
+            resp = self._boolean(self._put(url), 204, 0)
         return resp
 
     def get_key(self, id_num):
@@ -238,8 +236,7 @@ class GitHub(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = '{0}/user/keys/{1}'.format(self._github_url,
-                    str(id_num))
+            url = self._build_url('user', 'keys', str(id_num))
             json = self.json(self._get(url))
         return Key(json, self._session) if json else None
 
@@ -250,8 +247,8 @@ class GitHub(GitHubCore):
         :type id_num: int
         :returns: :class:`Gist <github3.gist.Gist>`
         """
-        url = '{0}/gists/{1}'.format(self._github_url, str(id_num))
-        json = self._get(url)
+        url = self._build_url('gists', str(id_num))
+        json = self._json(self._get(url))
         return Gist(json, self._session) if json else None
 
     def is_following(self, login):
@@ -262,11 +259,11 @@ class GitHub(GitHubCore):
         :type login: str
         :returns: bool
         """
-        json = None
+        json = False
         if login:
-            url = '{0}/user/following/{1}'.format(self._github_url, login)
-            json = self._session.get(url).status_code == 204
-        return True if json else False
+            url = self._build_url('user', 'following', login)
+            json = self._boolean(self._get(url), 204, 404)
+        return json
 
     def is_watching(self, login, repo):
         """Check if the authenticated user is following login/repo.
@@ -277,11 +274,11 @@ class GitHub(GitHubCore):
         :type repo: str
         :returns: bool
         """
-        json = None
+        json = False
         if login and repo:
-            url = '/'.join([self._github_url, 'user/watched', login, repo])
-            json = self._session.get(url).status_code == 204
-        return True if json else False
+            url = self._build_url('user', 'watched', login, repo)
+            json = self._boolean(self._get(url), 204, 404)
+        return json
 
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from https://github.com/:owner:/:repository:
@@ -304,8 +301,8 @@ class GitHub(GitHubCore):
 
         :returns: list of :class:`Authorization <Authorization>`\ s
         """
-        url = self._github_url + '/authorizations'
-        json = self._get(url)
+        url = self._build_url('authorizations')
+        json = self._json(self._get(url))
         return [Authorization(a, self._session) for a in json]
 
     def list_emails(self):
@@ -313,8 +310,9 @@ class GitHub(GitHubCore):
 
         :returns: list of dicts
         """
-        url = self._github_url + '/user/emails'
-        return self._get(url) or []
+        url = self._build_url('user', 'emails')
+        req = self._get(url)
+        return self._json(req) or []
 
     def list_events(self):
         """List public events.

@@ -83,6 +83,12 @@ class GitHubCore(object):
         else:
             return None
 
+    def _build_url(self, *args):
+        """Builds a new API url from scratch."""
+        parts = [self._github_url]
+        parts.extend(args)
+        return '/'.join(parts)
+
     @property
     def ratelimit_remaining(self):
         """Number of requests before GitHub imposes a ratelimit."""
