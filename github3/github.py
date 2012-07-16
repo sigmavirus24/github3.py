@@ -223,8 +223,8 @@ class GitHub(GitHubCore):
         """
         resp = False
         if login:
-            url = self._build_url('user', 'following', 'login')
-            resp = self._boolean(self._put(url), 204, 0)
+            url = self._build_url('user', 'following', login)
+            resp = self._boolean(self._put(url), 204, 404)
         return resp
 
     def get_key(self, id_num):
@@ -587,11 +587,11 @@ class GitHub(GitHubCore):
         :type keyword: str
         :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
-        url = '/'.join([self._github_url, 'legacy/issues/search', owner, repo,
-            state, keyword])
-        json = self._get(url)
+        url = self._build_url('legacy', 'issues', 'search', owner, repo,
+                state, keyword)
+        json = self._json(self._get(url), 200)
         issues = json.get('issues', [])
-        return [LegacyIssue(l, self._session) for l in issues]
+        return [LegacyIssue(l, self) for l in issues]
 
     def search_repos(self, keyword, **params):
         """Search all repositories by keyword.
@@ -602,10 +602,10 @@ class GitHub(GitHubCore):
         :type params: dict
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
-        url = self._github_url + '/legacy/repos/search/{0}'.format(keyword)
-        json = self._get(url, params=params)
+        url = self._build_url('legacy', 'repos', 'search', keyword)
+        json = self._json(self._get(url, params=params), 200)
         repos = json.get('repositories', [])
-        return [LegacyRepo(r, self._session) for r in repos]
+        return [LegacyRepo(r, self) for r in repos]
 
     def search_users(self, keyword):
         """Search all users by keyword.
@@ -615,9 +615,9 @@ class GitHub(GitHubCore):
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
         url = self._github_url + '/legacy/user/search/{0}'.format(keyword)
-        json = self._get(url)
+        json = self._json(self._get(url))
         users = json.get('users', [])
-        return [LegacyUser(u, self._session) for u in users]
+        return [LegacyUser(u, self) for u in users]
 
     def search_email(self, email):
         """Search users by email.
@@ -626,10 +626,10 @@ class GitHub(GitHubCore):
         :type keyword: str
         :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
         """
-        url = self._github_url + '/legacy/user/email/{0}'.format(email)
-        json = self._get(url)
+        url = self._build_url('legacy', 'user', 'email', email)
+        json = self._json(self._get(url))
         u = json.get('user', {})
-        return LegacyUser(u, self._session) if u else None
+        return LegacyUser(u, self) if u else None
 
     def unfollow(self, login):
         """Make the authenticated user stop following login
@@ -640,9 +640,8 @@ class GitHub(GitHubCore):
         """
         resp = False
         if login:
-            url = '{0}/user/following/{1}'.format(self._github_url,
-                    login)
-            resp = self._delete(url)
+            url = self._build_url('user', 'following', login)
+            resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
     def update_user(self, name=None, email=None, blog=None,
@@ -669,8 +668,8 @@ class GitHub(GitHubCore):
         """
         user = self.user()
         if user:
-            return user.update(name, email, blog, company, location,
-                    hireable, bio)
+            return user.update(name, email, blog, company, location, hireable,
+                    bio)
         return False
 
     def user(self, login=None):
@@ -682,14 +681,12 @@ class GitHub(GitHubCore):
         :type login: str
         :returns: :class:`User <github3.user.User>`
         """
-        url = [self._github_url]
         if login:
-            url.extend(['users', login])
+            url = self._build_url('users', login)
         else:
-            url.append('user')
-        url = '/'.join(url)
+            url = self._build_url('user')
 
-        json = self._get(url)
+        json = self._json(self._get(url), 200)
         return User(json, self._session) if json else None
 
     def watch(self, login, repo):
@@ -703,8 +700,8 @@ class GitHub(GitHubCore):
         """
         resp = False
         if login and repo:
-            url = self._github_url + '/user/watched/' + login + '/' + repo
-            resp = self._put(url)
+            url = self._build_url('user', 'watched', login, repo)
+            resp = self._boolean(self._put(url), 204, 404)
         return resp
 
     def unwatch(self, login, repo):
@@ -718,8 +715,8 @@ class GitHub(GitHubCore):
         """
         resp = False
         if login and repo:
-            url = self._github_url + '/user/watched/' + login + '/' + repo
-            resp = self._delete(url)
+            url = self._build_url('user', 'watched', login, repo)
+            resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
 
@@ -738,8 +735,8 @@ class Authorization(GitHubCore):
         self._note_url = auth.get('note_url', '')
         self._note = auth.get('note', '')
         self._scopes = auth.get('scopes', [])
-        self._api = auth.get('url', '')
         self._id = auth.get('id', 0)
+        self._api = self._build_url('authorizations', str(self._id))
         self._created = None
         if auth.get('created_at'):
             self._created = self._strptime(auth.get('created_at'))
@@ -759,7 +756,7 @@ class Authorization(GitHubCore):
 
     def delete(self):
         """delete this authorization"""
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def id(self):
@@ -804,20 +801,23 @@ class Authorization(GitHubCore):
         """
         success = False
         if scopes:
-            json = self._get(self._api, data={'scopes': scopes})
+            d = dumps({'scopes': scopes})
+            json = self._json(self._get(self._api, data=d), 200)
             self._update_(json)
             success = True
         if add_scopes:
-            json = self._get(self._api, data={'add_scopes': add_scopes})
+            d = dumps({'add_scopes': add_scopes})
+            json = self._json(self._get(self._api, data=d), 200)
             self._update_(json)
             success = True
         if rm_scopes:
-            json = self._get(self._api, data={'remove_scopes': rm_scopes})
+            d = dumps({'remove_scopes': rm_scopes})
+            json = self._json(self._get(self._api, data=d), 200)
             self._update_(json)
             success = True
         if note or note_url:
-            json = self._get(self._api, data={'note': note,
-                'note_url': note_url})
+            d = dumps({'note': note, 'note_url': note_url})
+            json = self._json(self._get(self._api, data=d), 200)
             self._update_(json)
             success = True
         return success
