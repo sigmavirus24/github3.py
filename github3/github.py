@@ -38,7 +38,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', which)
         resp = self._get(url)
         json = self._json(resp, 200)
-        return [User(f, self._session) for f in json]
+        return [User(f, self) for f in json]
 
     def authorization(self, id_num):
         """Get information about authorization ``id``.
@@ -51,7 +51,7 @@ class GitHub(GitHubCore):
         if int(id_num) > 0:
             url = self._github_url('authorizations', str(id_num))
             json = self._json(self._get(url), 200)
-        return Authorization(json, self._session) if json else None
+        return Authorization(json, self) if json else None
 
     def authorize(self, login, password, scopes, note='', note_url=''):
         """Obtain an authorization token from the GitHub API for the GitHub
@@ -78,8 +78,8 @@ class GitHub(GitHubCore):
             else:
                 ses = session()
                 ses.auth = (login, password)
-                json = self._json(ses.post(url, data=data))
-        return Authorization(json, self._session) if json else None
+                json = self._json(ses.post(url, data=data), 201)
+        return Authorization(json, self) if json else None
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -98,8 +98,8 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                 'files': files}
         url = self._build_url('gists')
-        json = self._json(self._post(url, dumps(new_gist)))
-        return Gist(json, self._session) if json else None
+        json = self._json(self._post(url, dumps(new_gist)), 201)
+        return Gist(json, self) if json else None
 
     def create_issue(self,
         owner,
@@ -159,9 +159,9 @@ class GitHub(GitHubCore):
         if title and key:
             url = self._build_url('user', 'keys')
             req = self._post(url, dumps({'title': title, 'key': key}))
-            json = self._json(req)
+            json = self._json(req, 201)
             if json:
-                created = Key(json, self._session)
+                created = Key(json, self)
         return created
 
     def create_repo(self,
@@ -199,8 +199,8 @@ class GitHub(GitHubCore):
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads})
-        json = self._json(self._post(url, data))
-        return Repository(json, self._session) if json else None
+        json = self._json(self._post(url, data), 201)
+        return Repository(json, self) if json else None
 
     def delete_key(self, key_id):
         """Delete user key pointed to by ``key_id``.
@@ -237,8 +237,8 @@ class GitHub(GitHubCore):
         json = None
         if int(id_num) > 0:
             url = self._build_url('user', 'keys', str(id_num))
-            json = self.json(self._get(url))
-        return Key(json, self._session) if json else None
+            json = self.json(self._get(url), 200)
+        return Key(json, self) if json else None
 
     def gist(self, id_num):
         """Gets the gist using the specified id number.
@@ -248,8 +248,8 @@ class GitHub(GitHubCore):
         :returns: :class:`Gist <github3.gist.Gist>`
         """
         url = self._build_url('gists', str(id_num))
-        json = self._json(self._get(url))
-        return Gist(json, self._session) if json else None
+        json = self._json(self._get(url), 200)
+        return Gist(json, self) if json else None
 
     def is_following(self, login):
         """Check if the authenticated user is following login.
@@ -302,8 +302,8 @@ class GitHub(GitHubCore):
         :returns: list of :class:`Authorization <Authorization>`\ s
         """
         url = self._build_url('authorizations')
-        json = self._json(self._get(url))
-        return [Authorization(a, self._session) for a in json]
+        json = self._json(self._get(url), 200)
+        return [Authorization(a, self) for a in json]
 
     def list_emails(self):
         """List email addresses for the authenticated user.
@@ -312,15 +312,16 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'emails')
         req = self._get(url)
-        return self._json(req) or []
+        return self._json(req, 200) or []
 
     def list_events(self):
         """List public events.
 
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        json = self._get(self._github_url + '/events')
-        return [Event(ev, self._session) for ev in json]
+        url = self._build_url('events')
+        json = self._json(self._get(url), 200)
+        return [Event(ev, self) for ev in json]
 
     def list_followers(self, login=None):
         """If login is provided, return a list of followers of that
@@ -356,16 +357,12 @@ class GitHub(GitHubCore):
         :type login: str
         :returns: list of :class:`Gist <github3.gist.Gist>`\ s
         """
-        url = [self._github_url]
         if username:
-            url.extend(['users', username, 'gists'])
+            url = self._build_url('users', username, 'gists')
         else:
-            url.append('gists')
-        url = '/'.join(url)
-
-        json = self._get(url)
-        ses = self._session
-        return [Gist(gist, ses) for gist in json]
+            url = self._build_url('gists')
+        json = self._json(self._get(url), 200)
+        return [Gist(gist, self) for gist in json]
 
     def list_issues(self,
         owner='',
@@ -401,18 +398,15 @@ class GitHub(GitHubCore):
         :type since: str
         :returns: list of :class:`Issue <github3.issue.Issue>`\ s
         """
-        url = [self._github_url]
         if owner and repository:
             repo = self.repository(owner, repository)
             issues = repo.list_issues()
         else:
-            url.append('issues')
-            url = '/'.join(url)
+            url = self._build_url('issues')
             params = issue_params(filter, state, labels, sort, direction,
                     since)
-            json = self._get(url, params=params)
-            ses = self._session
-            issues = [Issue(issue, ses) for issue in json]
+            json = self._json(self._get(url, params=params), 200)
+            issues = [Issue(issue, self) for issue in json]
         return issues
 
     def list_keys(self):
@@ -420,10 +414,9 @@ class GitHub(GitHubCore):
 
         :returns: list of :class:`Key <github3.user.Key>`\ s
         """
-        url = self._github_url + '/user/keys'
-        json = self._get(url)
-        ses = self._session
-        return [Key(key, ses) for key in json]
+        url = self._build_url('user', 'keys')
+        json = self._json(self._get(url), 200)
+        return [Key(key, self) for key in json]
 
     def list_orgs(self, login=None):
         """List public organizations for login if provided; otherwise
@@ -434,16 +427,13 @@ class GitHub(GitHubCore):
         :type login: str
         :returns: list of :class:`Organization <github3.org.Organization>`\ s
         """
-        url = [self._github_url]
         if login:
-            url.extend(['users', login, 'orgs'])
+            url = self._build_url('users', login, 'orgs')
         else:
-            url.extend(['user', 'orgs'])
-        url = '/'.join(url)
+            url = self._build_url('usr', 'orgs')
 
-        json = self._get(url)
-        ses = self._session
-        return [Organization(org, ses) for org in json]
+        json = self._json(self._get(url), 200)
+        return [Organization(org, self) for org in json]
 
     def list_repos(self, login=None, type='', sort='', direction=''):
         """List public repositories for the specified ``login`` or all
@@ -467,12 +457,10 @@ class GitHub(GitHubCore):
         :returns: list of :class:`Repository <github3.repo.Repository>`
             objects
         """
-        url = [self._github_url]
         if login:
-            url.extend(['users', login, 'repos'])
+            url = self._build_url('users', login, 'repos')
         else:
-            url.extend(['user', 'repos'])
-        url = '/'.join(url)
+            url = self._build_url('user', 'repos')
 
         params = {}
         if type in ('all', 'owner', 'public', 'private', 'member'):
@@ -483,9 +471,8 @@ class GitHub(GitHubCore):
             if direction in ('asc', 'desc'):
                 params.update(direction=direction)
 
-        json = self._get(url, params=params)
-        ses = self._session
-        return [Repository(repo, ses) for repo in json]
+        json = self._json(self._get(url, params=params), 200)
+        return [Repository(repo, self) for repo in json]
 
     def list_watching(self, login=None):
         """List the repositories being watched by ``login`` if provided or the
@@ -497,11 +484,11 @@ class GitHub(GitHubCore):
             objects
         """
         if login:
-            url = self._github_url + '/users/' + login + '/watched'
+            url = self._build_url('users', login, 'watched')
         else:
-            url = self._github_url + '/user/watched'
-        json = self._get(url)
-        return [Repository(repo, self._session) for repo in json]
+            url = self._build_url('user', 'watched')
+        json = self._json(self._get(url), 200)
+        return [Repository(repo, self) for repo in json]
 
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls.
@@ -535,14 +522,14 @@ class GitHub(GitHubCore):
         :type raw: bool
         :returns: str -- HTML formatted text
         """
-        url = self._github_url + '/markdown'
         data = None
         headers = {}
         if raw:
-            url = '/'.join([url, 'raw'])
+            url = self._build_url('markdown', 'raw')
             data = text
             headers['content-type'] = 'text/plain'
         else:
+            url = self._build_url('markdown')
             data = {}
 
             if text:
@@ -557,7 +544,7 @@ class GitHub(GitHubCore):
             data = dumps(data)
 
         if data:
-            req = self._session.post(url, data=data, headers=headers)
+            req = self._post(url, data=data, headers=headers)
             if req.ok:
                 return req.content
         return ''
@@ -569,9 +556,9 @@ class GitHub(GitHubCore):
         :type login: str
         :returns: :class:`Organization <org.Organization>`
         """
-        url = '{0}/orgs/{1}'.format(self._github_url, login)
-        json = self._get(url)
-        return Organization(json, self._session) if json else None
+        url = self._build_url('orgs', login)
+        json = self._json(self._get(url), 200)
+        return Organization(json, self) if json else None
 
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
@@ -583,9 +570,9 @@ class GitHub(GitHubCore):
         :type repository: str
         :returns: :class:`Repository <github3.repo.Repository>`
         """
-        url = '/'.join([self._github_url, 'repos', owner, repository])
-        json = self._get(url)
-        return Repository(json, self._session) if json else None
+        url = self._build_url('repos', owner, repository)
+        json = self._json(self._get(url), 200)
+        return Repository(json, self) if json else None
 
     def search_issues(self, owner, repo, state, keyword):
         """Find issues by state and keyword.
