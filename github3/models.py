@@ -100,6 +100,22 @@ class GitHubCore(object):
         """Return the json representing this object."""
         return self._json_data
 
+    @staticmethod
+    def requires_auth(func):
+        """Decorator to note which class methods require authorization."""
+        def auth_wrapper(self, *args, **kwargs):
+            auth = False
+            if hasattr(self, '_session'):
+                auth = self._session.auth or \
+                    self._session.headers['Authorization']
+
+            if auth:
+                return func(self, *args, **kwargs)
+            else:
+                raise Error(type('Faux Request', (object, ),
+                    {'status_code': 401, 'message': 'Requires authentication'}
+                    ))
+
 
 class BaseComment(GitHubCore):
     """The :class:`BaseComment <BaseComment>` object. A basic class for Gist,
@@ -150,13 +166,15 @@ class BaseComment(GitHubCore):
         """datetime object representing when the comment was created."""
         return self._created
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this comment.
 
         :returns: bool
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
+    @GitHubCore.requires_auth
     def edit(self, body):
         """Edit this comment.
 
