@@ -127,12 +127,13 @@ class Reference(GitHubCore):
         self._api = ref.get('url')
         self._obj = GitObject(ref.get('object'))
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this reference.
 
         :returns: bool
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def object(self):
