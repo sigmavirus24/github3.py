@@ -83,9 +83,9 @@ class GitHubCore(object):
         else:
             return None
 
-    def _build_url(self, *args):
+    def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
-        parts = [self._github_url]
+        parts = [kwargs.get('base_url') or self._github_url]
         parts.extend(args)
         return '/'.join(parts)
 
