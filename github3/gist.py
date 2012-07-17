@@ -89,6 +89,7 @@ class Gist(GitHubCore):
 
         # e.g. https://api.github.com/gists/1
         self._api = data.get('url')
+        #self._api = self._build_url('gists', str(self._id))
         # e.g. https://gist.github.com/1
         self._url = data.get('html_url')
         self._public = data.get('public')
@@ -118,26 +119,28 @@ class Gist(GitHubCore):
         :type body: str
         :returns: :class:`GistComment <GistComment>`
         """
-        url = self._api + '/comments'
-        json = self._post(url, dumps({'body': body}))
-        return GistComment(json, self._session) if json else None
+        url = self._build_url('comments', base_url=self._api)
+        json = self._json(self._post(url, dumps({'body': body})), 201)
+        return GistComment(json, self) if json else None
 
     @property
     def created_at(self):
         """datetime object representing when the gist was created."""
         return self._created
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this gist.
 
         :returns: bool -- whether the deletion was successful"""
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def description(self):
         """Description of the gist"""
         return self._desc
 
+    @GitHubCore.requires_auth
     def edit(self, description='', files={}):
         """Edit this gist.
 
@@ -158,7 +161,7 @@ class Gist(GitHubCore):
         if files:
             data['files'] = files
         if data:
-            json = self._patch(self._api, dumps(data))
+            json = self._json(self._patch(self._api, dumps(data)), 200)
         if json:
             self._update_(json)
             return True
@@ -170,29 +173,20 @@ class Gist(GitHubCore):
         stored in this gist."""
         return self._files
 
+    @GitHubCore.requires_auth
     def fork(self):
         """Fork this gist.
 
         :returns: :class:`Gist <Gist>` if successful, ``None`` otherwise
         """
         url = self._api + '/fork'
-        json = self._post(url)
-        return Gist(json) if json else None
+        json = self._json(self._post(url), 201)
+        return Gist(json, self) if json else None
 
     @property
     def forks(self):
         """The number of forks of this gist."""
         return self._forks
-
-    def get(self):
-        """Updates this gist by getting the information from the API again.
-
-        :returns: bool -- whether the update was successful or not"""
-        json = self._get(self._api)
-        if json:
-            self._update_(json)
-            return True
-        return False
 
     @property
     def git_pull_url(self):
@@ -226,34 +220,45 @@ class Gist(GitHubCore):
 
         :returns: bool -- True if it is starred, False otherwise
         """
-        url = self._api + '/star'
-        return self._get(url, status_code=204)
+        url = self._build_url('star', base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     def list_comments(self):
         """List comments on this gist.
 
         :returns: list of :class:`GistComment <GistComment>`\ s
         """
-        url = self._api + '/comments'
-        json = self._get(url)
-        ses = self._session
-        return [GistComment(comment, ses) for comment in json]
+        url = self._build_url('comments', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [GistComment(c, self) for c in json]
 
+    def refresh(self):
+        """Updates this gist by getting the information from the API again.
+
+        :returns: bool -- whether the update was successful or not"""
+        json = self._json(self._get(self._api), 200)
+        if json:
+            self._update_(json)
+            return True
+        return False
+
+    @GitHubCore.requires_auth
     def star(self):
         """Star this gist.
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._api + '/star'
-        return self._put(url)
+        url = self._build_url('star', base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def unstar(self):
         """Un-star this gist.
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._api + '/star'
-        return self._delete(url)
+        url = self._build_url('star', base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     @property
     def updated_at(self):
@@ -262,5 +267,6 @@ class Gist(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <User>` object representing the owner of the gist."""
+        """:class:`User <github3.user.User>` object representing the owner of
+        the gist."""
         return self._user
