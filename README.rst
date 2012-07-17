@@ -42,9 +42,6 @@ In Progress
 
 .. _Downloads: http://developer.github.com/v3/repos/downloads/
 
-.. [#] Creating a download via Amazon S3 seems to always return an invalid
-       multipart/form-data POST request.
-
 License
 -------
 
@@ -113,3 +110,13 @@ Author
 ------
 
 Ian Cordasco (sigmavirus24)
+
+Contact Options
+---------------
+
+- You may contact (via email) the author directly with questions/suggestions
+- You may send your email to github3.py@librelist.com
+
+.. [#] Creating a download via Amazon S3 seems to always return an invalid
+       multipart/form-data POST request.
+
