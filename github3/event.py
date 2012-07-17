@@ -50,8 +50,9 @@ class Event(GitHubCore):
         """Unique id of the event"""
         return self._id
 
-    @classmethod
-    def list_types(cls):
+    @staticmethod
+    def list_types():
+        """List all possible types of Events"""
         return sorted(_payload_handlers.keys())
 
     @property
@@ -76,11 +77,12 @@ class Event(GitHubCore):
 
     @property
     def repo(self):
+        """Return ``tuple(owner, repository_name)``"""
         return self._repo
 
     @property
     def type(self):
-
+        """Event type"""
         return self._type
 
 
