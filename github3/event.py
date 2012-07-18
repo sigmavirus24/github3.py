@@ -15,7 +15,7 @@ class Event(GitHubCore):
     section of the GitHub API.
     """
     def __init__(self, event, session=None):
-        super(Event, self).__init__(session)
+        super(Event, self).__init__(event, session)
         from .user import User
         from .org import Organization
         self._created = self._strptime(event.get('created_at'))

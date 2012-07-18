@@ -20,7 +20,7 @@ from .user import User, Key
 
 class GitHub(GitHubCore):
     """Stores all the session information."""
-    def __init__(self):
+    def __init__(self, login='', password=''):
         super(GitHub, self).__init__({})
         # Only accept JSON responses
         self._session.headers.update(
@@ -30,6 +30,8 @@ class GitHub(GitHubCore):
         # Identify who we are
         self._session.config['base_headers'].update(
                 {'User-Agent': 'github3.py/pre-alpha'})
+        if login and password:
+            self.login(login, password)
 
     def __repr__(self):
         return '<GitHub at 0x%x>' % id(self)
@@ -723,7 +725,7 @@ class GitHub(GitHubCore):
 class Authorization(GitHubCore):
     """The :class:`Authorization <Authorization>` object."""
     def __init__(self, auth, session):
-        super(Authorization, self).__init__(session)
+        super(Authorization, self).__init__(auth, session)
         self._update_(auth)
 
     def __repr__(self):

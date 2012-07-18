@@ -48,7 +48,7 @@ class GitData(GitHubCore):
     common items among other Git Data objects.
     """
     def __init__(self, data, session=None):
-        super(GitData, self).__init__(session)
+        super(GitData, self).__init__(data, session)
         self._sha = data.get('sha')
         self._api = data.get('url')
 

@@ -75,14 +75,14 @@ class Gist(GitHubCore):
     """
 
     def __init__(self, data, session=None):
-        super(Gist, self).__init__(session)
-
+        super(Gist, self).__init__(data, session)
         self._update_(data)
 
     def __repr__(self):
         return '<Gist [%s]>' % self._id
 
     def _update_(self, data):
+        self._json_data = data
         # The gist identifier
         self._id = data.get('id')
         self._desc = data.get('description')
@@ -112,6 +112,7 @@ class Gist(GitHubCore):
         for file in data['files']:
             self._files.append(GistFile(data['files'][file]))
 
+    @GitHubCore.requires_auth
     def create_comment(self, body):
         """Create a comment on this gist.
 
