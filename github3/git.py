@@ -116,7 +116,7 @@ class Reference(GitHubCore):
     created on a repository.
     """
     def __init__(self, ref, session=None):
-        super(Reference, self).__init__(session)
+        super(Reference, self).__init__(ref, session)
         self._update_(ref)
 
     def __repr__(self):
@@ -155,7 +155,7 @@ class Reference(GitHubCore):
         :returns: bool
         """
         data = dumps({'sha': sha, 'force': force})
-        json = self._patch(self._api, data)
+        json = self._json(self._patch(self._api, data), 200)
         if json:
             self._update_(json)
             return True
@@ -222,7 +222,7 @@ class Tree(GitData):
         :returns: :class:`Tree <Tree>`
         """
         url = self._api + '?recursive=1'
-        json = self._get(url)
+        json = self._json(self._get(url), 200)
         return Tree(json, self._session) if json else None
 
     @property
