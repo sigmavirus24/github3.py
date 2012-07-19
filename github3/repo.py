@@ -22,7 +22,7 @@ class Repository(GitHubCore):
     sends information about repositories.
     """
 
-    def __init__(self, repo, session):
+    def __init__(self, repo, session=None):
         super(Repository, self).__init__(session)
         self._update_(repo)
 
@@ -1249,7 +1249,7 @@ class Branch(GitHubCore):
     """The :class:`Branch <Branch>` object. It holds the information GitHub
     returns about a branch on a :class:`Repository <Repository>`.
     """
-    def __init__(self, branch, session):
+    def __init__(self, branch, session=None):
         super(Branch, self).__init__(session)
         self._name = branch.get('name')
         self._commit = None
@@ -1367,7 +1367,7 @@ class Download(GitHubCore):
     information about files uploaded to the downloads section of a repository.
     """
 
-    def __init__(self, download, session):
+    def __init__(self, download, session=None):
         super(Download, self).__init__(session)
         self._api = download.get('url')
         self._html = download.get('html_url')
@@ -1439,7 +1439,7 @@ class Hook(GitHubCore):
     """The :class:`Hook <Hook>` object. This handles the information returned
     by GitHub about hooks set on a repository."""
 
-    def __init__(self, hook, session):
+    def __init__(self, hook, session=None):
         super(Hook, self).__init__(session)
         self._update_(hook)
 
@@ -1589,7 +1589,7 @@ class RepoComment(BaseComment):
     information about a comment on a file in a repository.
     """
 
-    def __init__(self, comment, session):
+    def __init__(self, comment, session=None):
         super(RepoComment, self).__init__(comment, session)
         self._update_(comment)
 
@@ -1674,7 +1674,7 @@ class RepoCommit(BaseCommit):
     returned from the git data section.
     """
 
-    def __init__(self, commit, session):
+    def __init__(self, commit, session=None):
         super(RepoCommit, self).__init__(commit, session)
         self._author = User(commit.get('author'), self._session)
         self._committer = User(commit.get('committer'), self._session)
