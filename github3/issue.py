@@ -16,13 +16,14 @@ class Label(GitHubCore):
     """The :class:`Label <Label>` object. Succintly represents a label that
     exists in a repository."""
     def __init__(self, label, session=None):
-        super(Label, self).__init__(session)
+        super(Label, self).__init__(label, session)
         self._update_(label)
 
     def __repr__(self):
         return '<Label [%s]>' % self._name
 
     def _update_(self, label):
+        self._json_data = label
         self._api = label.get('url')
         self._color = label.get('color')
         self._name = label.get('name')
@@ -32,18 +33,20 @@ class Label(GitHubCore):
         """Color of the label, e.g., 626262"""
         return self._color
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this label.
 
         :returns: bool
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def name(self):
         """Name of the label, e.g., 'bug'"""
         return self._name
 
+    @GitHubCore.requires_auth
     def update(self, name, color):
         """Update this label.
 
@@ -56,8 +59,8 @@ class Label(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        json = self._patch(self._api, dumps({'name': name,
-            'color': color}))
+        json = self._json(self._patch(self._api, dumps({'name': name,
+            'color': color})), 200)
         if json:
             self._update_(json)
             return True
@@ -70,13 +73,14 @@ class Milestone(GitHubCore):
     handle information about milestones on repositories and issues.
     """
     def __init__(self, mile, session=None):
-        super(Milestone, self).__init__(session)
+        super(Milestone, self).__init__(mile, session)
         self._update_(mile)
 
     def __repr__(self):
         return '<Milestone [%s]>' % self._title
 
     def _update_(self, mile):
+        self._json_data = mile
         self._api = mile.get('url')
         self._num = mile.get('number')
         self._state = mile.get('state')
@@ -106,12 +110,13 @@ class Milestone(GitHubCore):
         milestone."""
         return self._creator
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this milestone.
 
         :returns: bool
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def description(self):
@@ -129,10 +134,9 @@ class Milestone(GitHubCore):
 
         :returns: list of :class:`Label <Label>`\ s
         """
-        url = self._api + '/labels'
-        json = self._get(url)
-        ses = self._session
-        return [Label(label, ses) for label in json]
+        url = self._build_url('labels', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Label(label, self) for label in json]
 
     @property
     def number(self):
@@ -155,6 +159,7 @@ class Milestone(GitHubCore):
         """Title of the milestone, e.g., 0.2."""
         return self._title
 
+    @GitHubCore.requires_auth
     def update(self, title, state='', description='', due_on=''):
         """Update this milestone.
 
@@ -172,7 +177,7 @@ class Milestone(GitHubCore):
         """
         inp = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        json = self._patch(self._api, inp)
+        json = self._json(self._patch(self._api, inp), 200)
         if json:
             self._update_(json)
             return True
@@ -185,7 +190,7 @@ class Issue(GitHubCore):
     of the GitHub API.
     """
     def __init__(self, issue, session=None):
-        super(Issue, self).__init__(session)
+        super(Issue, self).__init__(issue, session)
         self._update_(issue)
 
     def __repr__(self):
@@ -193,6 +198,7 @@ class Issue(GitHubCore):
                 self._num)
 
     def _update_(self, issue):
+        self._json_data = issue
         if issue.get('assignee'):
             self._assign = User(issue.get('assignee'), self._session)
         self._body = issue.get('body')
@@ -222,6 +228,7 @@ class Issue(GitHubCore):
         self._api = issue.get('url')
         self._user = User(issue.get('user'), self._session)
 
+    @GitHubCore.requires_auth
     def add_labels(self, *args):
         """Add labels to this issue.
 
@@ -229,7 +236,7 @@ class Issue(GitHubCore):
         :type args: str
         :returns: bool
         """
-        url = self._api + '/labels'
+        url = self._build_url('labels', base_url=self._api)
         json = self._post(url, dumps(list(args)), status_code=200)
         return True if json else False
 
@@ -244,6 +251,7 @@ class Issue(GitHubCore):
         """Body (description) of the issue."""
         return self._body
 
+    @GitHubCore.requires_auth
     def close(self):
         """Close this issue."""
         return self.edit(self._title, self._body, self._assign.login,
@@ -254,6 +262,7 @@ class Issue(GitHubCore):
         """datetime object representing when the issue was closed."""
         return self._closed
 
+    @GitHubCore.requires_auth
     def comment(self, id_num):
         """Get a single comment by its id.
 
@@ -267,9 +276,9 @@ class Issue(GitHubCore):
         """
         json = None
         if int(id_num) > 0:  # Might as well check that it's positive
-            url = '/'.join([self._github_url, self._repo[0],
-                self._repo[1], 'issues', 'comments', str(id_num)])
-            json = self._get(url)
+            url = self._build_url(self._repo[0], self._repo[1], 'issues',
+                    'comments', str(id_num))
+            json = self._json(self._get(url), 200)
         return IssueComment(json) if json else None
 
     @property
@@ -277,6 +286,7 @@ class Issue(GitHubCore):
         """Number of comments on this issue."""
         return self._comments
 
+    @GitHubCore.requires_auth
     def create_comment(self, body):
         """Create a comment on this issue.
 
@@ -286,15 +296,16 @@ class Issue(GitHubCore):
         """
         json = None
         if body:
-            url = self._api + '/comments'
-            json = self._post(url, dumps({'body': body}))
-        return IssueComment(json, self._session) if json else None
+            url = self._build_url('comments', base_url=self._api)
+            json = self._json(self._post(url, dumps({'body': body})), 200)
+        return IssueComment(json, self) if json else None
 
     @property
     def created_at(self):
         """datetime object representing when the issue was created."""
         return self._created
 
+    @GitHubCore.requires_auth
     def edit(self, title=None, body=None, assignee=None, state=None,
             milestone=None, labels=[]):
         """Edit this issue.
@@ -319,11 +330,10 @@ class Issue(GitHubCore):
         """
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        json = self._patch(self._api, dumps(data))
+        json = self._json(self._patch(self._api, dumps(data)), 200)
         if json:
             self._update_(json)
             return True
-
         return False
 
     @property
@@ -355,18 +365,17 @@ class Issue(GitHubCore):
 
         :returns: list of :class:`IssueComment <IssueComment>`
         """
-        url = self._api + '/comments'
-        json = self._get(url)
-        ses = self._session
-        return [IssueComment(comment, ses) for comment in json]
+        url = self._build_url('comments', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [IssueComment(comment, self) for comment in json]
 
     def list_events(self):
         """List events associated with this issue only.
 
         :returns: list of :class:`IssueEvent <IssueEvent>`\ s
         """
-        url = self._api + '/events'
-        json = self._get(url)
+        url = self._build_url('events', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return [IssueEvent(event, self) for event in json]
 
     @property
@@ -384,6 +393,7 @@ class Issue(GitHubCore):
         """Dictionary URLs for the pull request (if they exist)"""
         return self._pull_req
 
+    #XXX
     def remove_label(self, name):
         """Removes label ``name`` from this issue.
 
@@ -470,7 +480,7 @@ class IssueEvent(GitHubCore):
     `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
     the GitHub API.
     """
-    def __init__(self, event, issue):
+    def __init__(self, event, issue=None):
         super(IssueEvent, self).__init__(event, None)
         # The type of event:
         #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
@@ -481,7 +491,7 @@ class IssueEvent(GitHubCore):
 
         # The actual issue in question
         if event.get('issue'):
-            self._issue = Issue(event.get('issue'), self._session)
+            self._issue = Issue(event.get('issue'), self)
         else:
             self._issue = issue
 
