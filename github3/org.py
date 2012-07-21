@@ -161,10 +161,9 @@ class Team(GitHubCore):
 
         :returns: list of :class:`Repository <github3.repo.Repository>` objects
         """
-        url = self._api + '/repos'
-        json = self._get(url)
-        ses = self._session
-        return [Repository(r, ses) for r in json]
+        url = self._build_url('repos', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Repository(r, self) for r in json]
 
     @property
     def members_count(self):

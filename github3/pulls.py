@@ -54,7 +54,7 @@ class PullDestination(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <user.User>` representing the owner"""
+        """:class:`User <github3.user.User>` representing the owner"""
         return self._user
 
 

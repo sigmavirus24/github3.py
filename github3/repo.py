@@ -21,7 +21,6 @@ class Repository(GitHubCore):
     """The :class:`Repository <Repository>` object. It represents how GitHub
     sends information about repositories.
     """
-
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(session)
         self._update_(repo)
@@ -937,7 +936,7 @@ class Repository(GitHubCore):
     def list_keys(self):
         """List deploy keys on this repository.
 
-        :returns: list of :class:`Key <Key>`\ s
+        :returns: list of :class:`Key <github3.user.Key>`\ s
         """
         url = self._api + '/keys'
         json = self._get(url)
@@ -946,7 +945,7 @@ class Repository(GitHubCore):
     def list_labels(self):
         """List labels on this repository.
 
-        :returns: list of :class:`Label <Label>`\ s
+        :returns: list of :class:`Label <github3.issue.Label>`\ s
         """
         url = self._api + '/labels'
         json = self._get(url)
@@ -1011,7 +1010,7 @@ class Repository(GitHubCore):
 
         :param state: (optional), accepted values: ('open', 'closed')
         :type state: str
-        :returns: list of :class:`PullRequest <PullRequest>`\ s
+        :returns: list of :class:`PullRequest <github3.pulls.PullRequest>`\ s
         """
         if state in ('open', 'closed'):
             url = '{0}/pulls?state={1}'.format(self._api, state)
@@ -1090,7 +1089,8 @@ class Repository(GitHubCore):
 
     @property
     def owner(self):
-        """:class:`User <User>` object representing the repository owner."""
+        """:class:`User <github3.user.User>` object representing the
+        repository owner."""
         return self._owner
 
     def pubsubhubbub(self, mode, topic, callback, secret=''):
@@ -1121,7 +1121,7 @@ class Repository(GitHubCore):
 
         :param number: (required), number of the pull request.
         :type number: int
-        :returns: :class:`PullRequest <PullRequest>`
+        :returns: :class:`PullRequest <github3.pulls.PullRequest>`
         """
         json = None
         if int(number) > 0:
@@ -1703,17 +1703,17 @@ class RepoCommit(BaseCommit):
 
     @property
     def author(self):
-        """:class:`User <User>` who authored the commit."""
+        """:class:`User <github3.user.User>` who authored the commit."""
         return self._author
 
     @property
     def commit(self):
-        """:class:`Commit <Commit>`."""
+        """:class:`Commit <github3.git.Commit>`."""
         return self._commit
 
     @property
     def committer(self):
-        """:class:`User <User>` who committed the commit."""
+        """:class:`User <github3.user.User>` who committed the commit."""
         return self._committer
 
     @property
