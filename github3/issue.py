@@ -106,8 +106,8 @@ class Milestone(GitHubCore):
 
     @property
     def creator(self):
-        """:class:`User <user.User>` object representing the creator of the
-        milestone."""
+        """:class:`User <github3.user.User>` object representing the creator
+        of the milestone."""
         return self._creator
 
     @GitHubCore.requires_auth
@@ -242,8 +242,8 @@ class Issue(GitHubCore):
 
     @property
     def assignee(self):
-        """:class:`User <user.User>` representing the user the issue was
-        assigned to."""
+        """:class:`User <github3.user.User>` representing the user the issue
+        was assigned to."""
         return self._assign
 
     @property
@@ -393,7 +393,7 @@ class Issue(GitHubCore):
         """Dictionary URLs for the pull request (if they exist)"""
         return self._pull_req
 
-    #XXX
+    @GitHubCore.requires_auth
     def remove_label(self, name):
         """Removes label ``name`` from this issue.
 
@@ -401,9 +401,10 @@ class Issue(GitHubCore):
         :type name: str
         :returns: bool
         """
-        url = '{0}/labels/{1}'.format(self._api, name)
-        return self._delete(url, status_code=200)
+        url = self._build_url('labels', name, base_url=self._api)
+        return self._boolean(self._delete(url), 200, 404)
 
+    @GitHubCore.requires_auth
     def remove_all_labels(self):
         """Remove all labels from this issue.
 
@@ -412,6 +413,7 @@ class Issue(GitHubCore):
         # Can either send DELETE or [] to remove all labels
         return self.replace_labels([])
 
+    @GitHubCore.requires_auth
     def replace_labels(self, labels):
         """Replace all labels on this issue with ``labels``.
 
@@ -419,9 +421,10 @@ class Issue(GitHubCore):
         :type: list of str's
         :returns: bool
         """
-        url = self._api + '/labels'
-        return self._put(url, dumps(labels), status_code=200)
+        url = self._build_url('labels', base_url=self._api)
+        return self._boolean(self._put(url, dumps(labels)), 200, 404)
 
+    @GitHubCore.requires_auth
     def reopen(self):
         """Re-open a closed issue.
 
@@ -432,7 +435,7 @@ class Issue(GitHubCore):
 
     @property
     def repository(self):
-        """:class:`Repository <repo.Repository>` this issue was filed on."""
+        """Returns ('owner', 'repository') this issue was filed on."""
         return self._repo
 
     @property
@@ -452,7 +455,7 @@ class Issue(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <user.User>` who opened the issue."""
+        """:class:`User <github3.user.User>` who opened the issue."""
         return self._user
 
 
