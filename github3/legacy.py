@@ -19,7 +19,7 @@ class LegacyIssue(GitHubCore):
     updated the search functionality to use the objects as they exist now.
     """
     def __init__(self, issue, session=None):
-        super(LegacyIssue, self).__init__(session)
+        super(LegacyIssue, self).__init__(issue, session)
         self._gravid = issue.get('gravatar_id', '')
         self._pos = issue.get('position', 0)
         self._num = issue.get('number', 0)
@@ -113,7 +113,7 @@ class LegacyRepo(GitHubCore):
     """The :class:`LegacyRepo <LegacyRepo>` object. This wraps data returned
     using the :func:`search_repos <github3.github.GitHub.search_repos>`"""
     def __init__(self, repo, session=None):
-        super(LegacyRepo, self).__init__(session)
+        super(LegacyRepo, self).__init__(repo, session)
         self._created = None
         if repo.get('created'):
             created = repo.get('created')[:-6] + 'Z'
@@ -261,7 +261,7 @@ class LegacyUser(GitHubCore):
     returned by :func:`search_users <github3.github.GitHub.search_users>`.
     """
     def __init__(self, user, session=None):
-        super(LegacyUser, self).__init__(session)
+        super(LegacyUser, self).__init__(user, session)
         self._created = None
         if user.get('created'):
             self._created = self._strptime(user.get('created'))

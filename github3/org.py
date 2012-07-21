@@ -15,13 +15,14 @@ from .user import User
 
 class Team(GitHubCore):
     def __init__(self, team, session=None):
-        super(Team, self).__init__(session)
+        super(Team, self).__init__(team, session)
         self._update_(team)
 
     def __repr__(self):
         return '<Team [%s]>' % self._name
 
     def _update_(self, team):
+        self._json_data = team
         self._api = team.get('url')
         self._name = team.get('name')
         self._id = team.get('id')
@@ -29,14 +30,16 @@ class Team(GitHubCore):
         self._members = team.get('members_count')
         self._repos = team.get('repos_count')
 
+    @GitHubCore.requires_auth
     def add_member(self, login):
         """Add ``login`` to this team.
 
         :returns: bool
         """
-        url = '{0}/members/{1}'.format(self._api, login)
-        return self._put(url)
+        url = self._build_url('members', login, base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def add_repo(self, repo):
         """Add ``repo`` to this team.
 
@@ -44,9 +47,10 @@ class Team(GitHubCore):
         :type repo: str
         :returns: bool
         """
-        url = '{0}/repos/{1}'.format(self._api, repo)
-        return self._put(url)
+        url = self._build_url('repos', repo, base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def create_repo(self,
         name,
         description='',
@@ -82,23 +86,26 @@ class Team(GitHubCore):
         :type team_id: int
         :returns: :class:`Repository <github3.repo.Repository>`
         """
-        url = self._github_url + '/user/repos'
-        data = dumps({'name': name, 'description': description,
+        url = self._build_url('user', 'repos')
+        data = {'name': name, 'description': description,
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads})
+            'has_downloads': has_downloads}
         if team_id > 0:
             data.update({'team_id': team_id})
-        json = self._post(url, data)
-        return Repository(json, self._session) if json else None
+        json = self._json(self._post(url, dumps(data)), 204)
+        return Repository(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this team.
 
         :returns: bool
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
+    #XXX
+    @GitHubCore.requires_auth
     def edit(self, name, permission=''):
         """Edit this team.
 
