@@ -175,6 +175,7 @@ class Team(GitHubCore):
         """This team's name."""
         return self._name
 
+    @GitHubCore.requires_auth
     def remove_member(self, login):
         """Remove ``login`` from this team.
 
@@ -182,9 +183,10 @@ class Team(GitHubCore):
         :type login: str
         :returns: bool
         """
-        url = '{0}/members/{1}'.format(self._api, login)
-        return self._delete(url)
+        url = self._build_url('members', login, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def remove_repo(self, repo):
         """Remove ``repo`` from this team.
 
@@ -192,8 +194,8 @@ class Team(GitHubCore):
         :type repo: str
         :returns: bool
         """
-        url = '{0}/repos/{1}'.format(self._api, repo)
-        return self._delete(url)
+        url = self._build_url('repos', repo, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     @property
     def repos_count(self):
@@ -219,6 +221,7 @@ class Organization(BaseAccount):
         ses = self._session
         return [User(memb, ses) for memb in json]
 
+    @GitHubCore.requires_auth
     def add_member(self, login, team):
         """Add ``login`` to ``team`` and thereby to this organization.
 
@@ -237,6 +240,7 @@ class Organization(BaseAccount):
                 return t.add_member(login)
         return False
 
+    @GitHubCore.requires_auth
     def add_repo(self, repo, team):
         """Add ``repo`` to ``team``.
 
@@ -249,14 +253,16 @@ class Organization(BaseAccount):
                 return t.add_repo(repo)
         return False
 
+    @GitHubCore.requires_auth
     def conceal_member(self, login):
         """Conceal ``login``'s membership in this organization.
 
         :returns: bool
         """
-        url = '{0}/public_members/{1}'.format(self._api, login)
-        return self._delete(url)
+        url = self._build_url('public_members', login, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def create_team(self, name, repo_names=[], permissions=''):
         """Assuming the authenticated user owns this organization,
         create and return a new team.
@@ -280,10 +286,11 @@ class Organization(BaseAccount):
         """
         data = dumps({'name': name, 'repo_names': repo_names,
             'permissions': permissions})
-        url = self._api + '/teams'
-        json = self._post(url, data)
+        url = self._build_url('teams', base_url=self._api)
+        json = self._json(self._post(url, data), 201)
         return Team(json, self._session) if json else None
 
+    @GitHubCore.requires_auth
     def edit(self,
         billing_email=None,
         company=None,
@@ -304,10 +311,9 @@ class Organization(BaseAccount):
         :type name: str
         :returns: bool
         """
-        json = self._patch(self._api,
-                dumps({'billing_email': billing_email,
-                    'company': company, 'email': email,
-                    'location': location,  'name': name}))
+        data = dumps({'billing_email': billing_email, 'company': company,
+            'email': email, 'location': location, 'name': name})
+        json = self._json(self._patch(self._api, data), 200)
         if json:
             self._update_(json)
             return True
@@ -318,24 +324,24 @@ class Organization(BaseAccount):
 
         :returns: bool
         """
-        url = '{0}/members/{1}'.format(self._api, login)
-        return self._session.get(url).status_code == 204
+        url = self._build_url('members', login, base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     def is_public_member(self, login):
         """Check if the user with login ``login`` is a public member.
 
         :returns: bool
         """
-        url = '{0}/public_members/{1}'.format(self._api, login)
-        return self._session.get(url).status_code == 204
+        url = self._build_url('public_members', login, base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     def list_events(self):
         """List events for this org.
 
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        url = self._api + '/events'
-        json = self._get(url)
+        url = self._build_url('events', self._api)
+        json = self._json(self._get(url), 200)
         return [Event(e, self._session) for e in json]
 
     def list_members(self):
@@ -360,45 +366,47 @@ class Organization(BaseAccount):
         :type type: str
         :returns: list of :class:`Repository <github3.repo.Repository>` objects
         """
-        url = self._api + '/repos'
+        url = self._build_url('repos', base_url=self._api)
+        params = {}
         if type in ('all', 'public', 'member', 'private'):
-            url = '?'.join([url, 'type=' + type])
-        json = self._get(url)
-        ses = self._session
-        return [Repository(r, ses) for r in json]
+            params['type'] = type
+        json = self._json(self._get(url, params=params), 200)
+        return [Repository(r, self) for r in json]
 
     def list_teams(self):
         """List teams that are part of this organization.
 
         :returns: list of :class:`Team <Team>`\ s
         """
-        url = self._api + '/teams'
-        json = self._get(url)
-        ses = self._session
-        return [Team(team, ses) for team in json]
+        url = self._build_url('teams', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Team(team, self) for team in json]
 
     @property
     def private_repos(self):
         """Number of private repositories."""
         return self._private_repos
 
+    @GitHubCore.requires_auth
     def publicize_member(self, login):
         """Make ``login``'s membership in this organization public.
 
         :returns: bool
         """
-        url = '{0}/public_members/{1}'.format(self._api, login)
-        return self._put(url)
+        url = self._build_ur('public_members', login, base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def remove_member(self, login):
         """Remove the user with login ``login`` from this
         organization.
 
         :returns: bool
         """
-        url = '{0}/members/{1}'.format(self._api, login)
-        return self._delete(url)
+        url = self._build_url('members', login, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
+    @GitHubCore.requires_auth
     def remove_repo(self, repo, team):
         """Remove ``repo`` from ``team``.
 
@@ -424,6 +432,6 @@ class Organization(BaseAccount):
         """
         json = None
         if int(team_id) > 0:
-            url = '{0}/teams/{1}'.format(self._github_url, str(team_id))
-            json = self._get(url)
+            url = self._build_url('teams', str(team_id))
+            json = self._json(self._get(url), 200)
         return Team(json, self._session) if json else None
