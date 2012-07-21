@@ -27,7 +27,7 @@ def login(username, password, token=None):
     :type password: str
     :param token: (optional), OAuth token
     :type token: str
-    :returns: :class:`GitHub <github.GitHub>`
+    :returns: :class:`GitHub <github3.github.GitHub>`
     """
     g = GitHub()
     g.login(username, password, token)
@@ -39,7 +39,7 @@ def gist(id_num):
 
     :param id_num: (required), unique id of the gist
     :type id_num: int
-    :returns: :class:`Gist <gist.Gist>`
+    :returns: :class:`Gist <github3.gist.Gist>`
     """
     return gh.gist(id_num)
 
@@ -50,7 +50,7 @@ def list_gists(username=None):
     :param username: (optional), if provided, get the gists for this user
         instead of the authenticated user.
     :type username: str
-    :returns: list of :class:`Gist <gist.Gist>`\ s
+    :returns: list of :class:`Gist <github3.gist.Gist>`\ s
     """
     return gh.list_gists(username)
 
@@ -75,10 +75,10 @@ def list_following(username):
 
 def list_issues(owner, repository, filter='', state='', labels='', sort='',
         direction='', since=''):
-    """See :func:`github3.github.GitHub.list_issues()`"""
+    """See :func:`github3.github.GitHub.list_issues`"""
     issues = []
     if owner and repository:
-        issues = gh.list_issues(owner, repository, filter, state, labels, 
+        issues = gh.list_issues(owner, repository, filter, state, labels,
                 sort, direction, since)
     return issues
 
@@ -106,7 +106,7 @@ def create_gist(description, files):
         dictionaries for content, e.g.
         {'spam.txt': {'content': 'File contents ...'}}
     :type files: dict
-    :returns: :class:`Gist <gist.Gist>`
+    :returns: :class:`Gist <github3.gist.Gist>`
     """
     return gh.create_gist(description, files)
 
@@ -120,7 +120,7 @@ def issue(owner, repository, number):
     :type repository: str
     :param number: (required), issue number
     :type number: int
-    :returns: :class:`Issue <issue.Issue>`
+    :returns: :class:`Issue <github3.issue.Issue>`
     """
     return gh.issue(owner, repository, number)
 
@@ -128,7 +128,7 @@ def issue(owner, repository, number):
 def list_events():
     """List all recent public events from GitHub.
 
-    :returns: list of :class:`Event <event.Event>`\ s
+    :returns: list of :class:`Event <github3.event.Event>`\ s
     """
     return gh.list_events()
 
