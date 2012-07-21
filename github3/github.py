@@ -556,7 +556,7 @@ class GitHub(GitHubCore):
 
         :param login: (required), login name of the org
         :type login: str
-        :returns: :class:`Organization <org.Organization>`
+        :returns: :class:`Organization <github3.org.Organization>`
         """
         url = self._build_url('orgs', login)
         json = self._json(self._get(url), 200)

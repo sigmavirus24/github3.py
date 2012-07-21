@@ -333,7 +333,7 @@ class Organization(BaseAccount):
     def list_events(self):
         """List events for this org.
 
-        :returns: list of :class:`Event <event.Event>`\ s
+        :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         url = self._api + '/events'
         json = self._get(url)
