@@ -104,7 +104,6 @@ class Team(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    #XXX
     @GitHubCore.requires_auth
     def edit(self, name, permission=''):
         """Edit this team.
@@ -117,7 +116,7 @@ class Team(GitHubCore):
         """
         if name:
             data = dumps({'name': name, 'permission': permission})
-            json = self._patch(self._api, data)
+            json = self._json(self._patch(self._api, data), 200)
             if json:
                 self._update_(json)
                 return True
@@ -130,8 +129,8 @@ class Team(GitHubCore):
         :type repo: str
         :returns: bool
         """
-        url = '{0}/repos/{1}'.format(self._api, repo)
-        return self._session.get(url).status_code == 204
+        url = self._build_url('repos', repo, base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     @property
     def id(self):
@@ -145,18 +144,17 @@ class Team(GitHubCore):
         :type login: str
         :returns: bool
         """
-        url = '{0}/members/{1}'.format(self._api, login)
-        return self._session.get(url).status_code == 204
+        url = self._build_url('members', login, base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     def list_members(self):
         """List the members of this team.
 
         :returns: list of :class:`User <github3.user.User>`\ s
         """
-        url = self._api + '/members'
-        json = self._get(url)
-        ses = self._session
-        return [User(m, ses) for m in json]
+        url = self._build_url('members', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(m, self) for m in json]
 
     def list_repos(self):
         """List the repositories this team has access to.
