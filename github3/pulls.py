@@ -124,13 +124,14 @@ class PullFile(object):
 class PullRequest(GitHubCore):
     """The :class:`PullRequest <PullRequest>` object."""
     def __init__(self, pull, session=None):
-        super(PullRequest, self).__init__(session)
+        super(PullRequest, self).__init__(pull, session)
         self._update_(pull)
 
     def __repr__(self):
         return '<Pull Request [#%d]>' % self._num
 
     def _update_(self, pull):
+        self._json_data = pull
         self._api = pull.get('url')
         self._base = PullDestination(pull.get('base'), 'Base')
         self._body = pull.get('body')
@@ -175,7 +176,7 @@ class PullRequest(GitHubCore):
         self._mergeable = pull.get('mergeable')
         self._mergedby = None
         if pull.get('merged_by'):
-            self._mergedby = User(pull.get('merged_by'), self._session)
+            self._mergedby = User(pull.get('merged_by'), self)
         self._num = pull.get('number')
         self._patch_url = pull.get('patch_url')
         self._state = pull.get('state')
@@ -183,7 +184,7 @@ class PullRequest(GitHubCore):
         self._updated = self._strptime(pull.get('updated_at'))
         self._user = None
         if pull.get('user'):
-            self._user = User(pull.get('user'), self._session)
+            self._user = User(pull.get('user'), self)
 
     @property
     def base(self):
@@ -237,8 +238,8 @@ class PullRequest(GitHubCore):
 
         :returns: bool
         """
-        url = self._api + '/merge'
-        return self._session.get(url).status_code == 204
+        url = self._build_url('merge', base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     @property
     def issue_url(self):
@@ -255,30 +256,29 @@ class PullRequest(GitHubCore):
 
         :returns: list of :class:`ReviewComment <ReviewComment>`\ s
         """
-        url = self._api + '/comments'
-        json = self._get(url)
-        ses = self._session
-        return [ReviewComment(comment, ses) for comment in json]
+        url = self._build_url('comments', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [ReviewComment(comment, self) for comment in json]
 
     def list_commits(self):
         """List the commits on this pull request.
 
         :returns: list of :class:`Commit <github3.git.Commit>`\ s
         """
-        url = self._api + '/commits'
-        json = self._get(url)
-        ses = self._session
-        return [Commit(commit, ses) for commit in json]
+        url = self._build_url('commits', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Commit(commit, self) for commit in json]
 
     def list_files(self):
         """List the files associated with this pull request.
 
         :returns: list of :class:`PullFile <PullFile>`\ s
         """
-        url = self._api + '/files'
-        json = self._get(url)
+        url = self._build_url('files', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return [PullFile(f) for f in json]
 
+    @GitHubCore.requires_auth
     def merge(self, commit_message=''):
         """Merge this pull request.
 
@@ -287,11 +287,11 @@ class PullRequest(GitHubCore):
         :type commit_message: str
         :returns: bool
         """
-        data = {'commit_message': commit_message} if commit_message else None
-        url = self._api + '/merge'
+        data = None
+        if commit_message:
+            data = dumps({'commit_message': commit_message})
+        url = self._build_url('merge', base_url=self._api)
         resp = self._put(url, data)
-        if resp.status_code == 200:
-            return resp.json['merged']
         return resp.json['merged']
 
     @property
@@ -324,6 +324,7 @@ class PullRequest(GitHubCore):
         """The title of the request"""
         return self._title
 
+    @GitHubCore.requires_auth
     def update(self, title='', body='', state=''):
         """Update this pull request.
 
@@ -336,7 +337,7 @@ class PullRequest(GitHubCore):
         :returns: bool
         """
         data = dumps({'title': title, 'body': body, 'state': state})
-        json = self._patch(self._api, data)
+        json = self._json(self._patch(self._api, data), 200)
         if json:
             self._update_(json)
             return True
