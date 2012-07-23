@@ -14,13 +14,14 @@ from .models import GitHubCore, BaseAccount
 class Key(GitHubCore):
     """The :class:`Key <Key>` object."""
     def __init__(self, key, session=None):
-        super(Key, self).__init__(session)
+        super(Key, self).__init__(key, session)
         self._update_(key)
 
     def __repr__(self):
-        return '<User Key [%s]>' % self._title
+        return '<User Key [{0}]>'.format(self._title)
 
     def _update_(self, key):
+        self._json_data = key
         self._api = key.get('url')
         self._id = key.get('id')
         self._title = key.get('title')
@@ -28,7 +29,7 @@ class Key(GitHubCore):
 
     def delete(self):
         """Delete this Key"""
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def key(self):
@@ -45,6 +46,7 @@ class Key(GitHubCore):
         """The title the user gave to the key"""
         return self._title
 
+    @GitHubCore.requires_auth
     def update(self, title, key):
         """Update this key.
 
@@ -59,8 +61,9 @@ class Key(GitHubCore):
         if not key:
             key = self._key
 
-        json = self._patch(self._api, dumps({'title': title,
-            'key': key}))
+        data = dumps({'title': title, 'key': key})
+        json = self._json(self._patch(self._api, data), 200)
+
         if json:
             self._update_(json)
             return True
@@ -79,7 +82,7 @@ class Plan(object):
         self._space = plan.get('space')
 
     def __repr__(self):
-        return '<Plan [%s]>' % self._name
+        return '<Plan [{0}]>'.format(self._name)
 
     @property
     def collaborators(self):
@@ -135,7 +138,7 @@ class User(BaseAccount):
             self._type = 'User'
 
     def __repr__(self):
-        return '<User [%s:%s]>' % (self._login, self._name)
+        return '<User [{0}:{1}]>'.format(self._login, self._name)
 
     def _update_(self, user):
         # Private information
@@ -147,6 +150,7 @@ class User(BaseAccount):
         else:
             self._plan = None
 
+    @GitHubCore.requires_auth
     def add_email_addresses(self, addresses=[]):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account.
@@ -157,10 +161,11 @@ class User(BaseAccount):
         """
         json = []
         if addresses:
-            url = self._github_url + '/user/emails'
-            json = self._post(url, dumps(addresses))
+            url = self._build_url('user', 'emails')
+            json = self._json(self._post(url, dumps(addresses)), 201)
         return json
 
+    @GitHubCore.requires_auth
     def delete_email_addresses(self, addresses=[]):
         """Delete the email addresses in ``addresses`` from the
         authenticated user's account.
@@ -169,8 +174,8 @@ class User(BaseAccount):
         :type addresses: list
         :returns: bool
         """
-        url = self._github_url + '/user/emails'
-        return self._delete(url, data=dumps(addresses))
+        url = self._build_url('user', 'emails')
+        return self._boolean(self._delete(url, dumps(addresses)), 204, 404)
 
     @property
     def disk_usage(self):
@@ -190,29 +195,33 @@ class User(BaseAccount):
         :type public: bool
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        url = self._api + '/events'
+        # Paginate
+        path = ['events']
         if public:
-            url = '/'.join([url, 'public'])
-        json = self._get(url)
-        return [Event(e, self._session) for e in json]
+            path.append('public')
+        url = self._build_url(*path, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Event(e, self) for e in json]
 
     def list_followers(self):
         """List followers of this user.
 
         :returns: list of :class:`User <User>`\ s
         """
-        url = self._api + '/followers'
-        json = self._get(url)
-        return [User(u, self._session) for u in json]
+        # Paginate
+        url = self._build_url('followers', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(u, self) for u in json]
 
     def list_following(self):
         """List users being followed by this user.
 
         :returns: list of :class:`User <User>`\ s
         """
-        url = self._api + '/following'
-        json = self._get(url)
-        return [User(u, self._session) for u in json]
+        # Paginate
+        url = self._build_url('following', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(u, self) for u in json]
 
     def list_org_events(self, org):
         """List events as they appear on the user's organization dashboard.
@@ -222,11 +231,12 @@ class User(BaseAccount):
         :type org: str
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
+        # Paginate
         json = []
         if org:
-            url = self._api + '/events/orgs/' + org
-            json = self._get(url)
-        return [Event(e, self._session) for e in json]
+            url = self._build_url('events', 'orgs', org, base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return [Event(e, self) for e in json]
 
     def list_received_events(self, public=False):
         """List events that the user has received. If the user is the
@@ -238,11 +248,13 @@ class User(BaseAccount):
         :type public: bool
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        url = self._api + '/received_events'
+        # Paginate
+        path = ['received_events']
         if public:
-            url = '/'.join([url, 'public'])
-        json = self._get(url)
-        return [Event(e, self._session) for e in json]
+            path.append('public')
+        url = self._build_url(*path, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Event(e, self) for e in json]
 
     @property
     def owned_private_repos(self):
@@ -269,6 +281,7 @@ class User(BaseAccount):
         """Total number of private repos"""
         return self._private_repos
 
+    @GitHubCore.requires_auth
     def update(self, name=None, email=None, blog=None, company=None,
             location=None, hireable=False, bio=None):
         """If authenticated as this user, update the information with
@@ -293,8 +306,8 @@ class User(BaseAccount):
         user = dumps({'name': name, 'email': email, 'blog': blog,
             'company': company, 'location': location,
             'hireable': hireable, 'bio': bio})
-        url = self._github_url + '/user'
-        json = self._patch(url, user)
+        url = self._build_url('user')
+        json = self._json(self._patch(url, user), 200)
         if json:
             self._update_(json)
             return True
