@@ -199,3 +199,12 @@ Examples
 
     Have a clever example that takes advantage of github3.py? Feel free to 
     share it.
+
+Contact
+-------
+
+- Twitter: @sigmavirus24_
+- Private email: graffatcolmingov [at] gmail
+- Mailing list: github3.py [at] librelist.com
+
+.. _sigmavirus24: https://twitter.com/sigmavirus24

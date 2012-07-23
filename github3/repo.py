@@ -8,7 +8,6 @@ This module contains the class relating to repositories.
 
 from base64 import b64decode
 from json import dumps
-import requests
 from .event import Event
 from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag, Tree
@@ -22,13 +21,14 @@ class Repository(GitHubCore):
     sends information about repositories.
     """
     def __init__(self, repo, session=None):
-        super(Repository, self).__init__(session)
+        super(Repository, self).__init__(repo, session)
         self._update_(repo)
 
     def __repr__(self):
         return '<Repository [%s/%s]>' % (self._owner.login, self._name)
 
     def _update_(self, repo):
+        self._json_data = repo
         # Clone url using Smart HTTP(s)
         self._https_clone = repo.get('clone_url')
         self._created = self._strptime(repo.get('created_at'))
@@ -81,8 +81,8 @@ class Repository(GitHubCore):
     def _create_pull(self, data):
         json = None
         if data:
-            url = self._api + '/pulls'
-            json = self._post(url, data)
+            url = self._build_url('pulls', self._api)
+            json = self._json(self._post(url, data), 201)
         return PullRequest(json, self._session) if json else None
 
     def add_collaborator(self, login):
@@ -115,10 +115,10 @@ class Repository(GitHubCore):
         resp = None
         written = False
         if format in ('tarball', 'zipball'):
-            url = '/'.join([self._api, format, ref])
-            resp = self._getr(url, allow_redirects=True)
+            url = self._build_url(format, ref, base_url=self._api)
+            resp = self._get(url, allow_redirects=True)
 
-        if resp and path:
+        if resp.ok and path:
             with open(path, 'wb') as fd:
                 fd.write(resp.content)
                 written = True
@@ -138,8 +138,8 @@ class Repository(GitHubCore):
         :returns: :class:`Blob <github3.git.Blob>` if successful, otherwise
             None
         """
-        url = '{0}/git/blobs/{1}'.format(self._api, sha)
-        json = self._get(url)
+        url = self._build_url('git', 'blobs', sha, base_url=self._api)
+        json = self._json(self._get(url), 200)
         return Blob(json) if json else None
 
     def branch(self, name):
@@ -151,9 +151,9 @@ class Repository(GitHubCore):
         """
         json = None
         if name:
-            url = self._api + '/branches/' + name
-            json = self._get(url)
-        return Branch(json, self._session) if json else None
+            url = self._build_url('branches', name, base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Branch(json, self) if json else None
 
     @property
     def clone_url(self):
@@ -168,8 +168,9 @@ class Repository(GitHubCore):
         :returns: :class:`RepoCommit <RepoCommit>` if successful, otherwise
             None
         """
-        json = self._get(self._api + '/commits/' + sha)
-        return RepoCommit(json, self._session) if json else None
+        url = self._build_url('commits', sha, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return RepoCommit(json, self) if json else None
 
     def commit_comment(self, comment_id):
         """Get a single commit comment.
@@ -179,9 +180,9 @@ class Repository(GitHubCore):
         :returns: :class:`RepoComment <RepoComment>` if successful, otherwise
             None
         """
-        url = '{0}/comments/{1}'.format(self._api, comment_id)
-        json = self._get(url)
-        return RepoComment(json, self._session) if json else None
+        url = self._build_url('comments', comment_id, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return RepoComment(json, self) if json else None
 
     def compare_commits(self, base, head):
         """Compare two commits.
@@ -192,8 +193,9 @@ class Repository(GitHubCore):
         :type head: str
         :returns: :class:`Comparison <Comparison>` if successful, else None
         """
-        url = self._api + '/compare/{0}...{1}'.format(base, head)
-        json = self._get(url)
+        url = self._build_url('compare', base + '...' + head,
+                base_url=self._api)
+        json = self._json(self._get(url), 200)
         return Comparison(json) if json else None
 
     def contents(self, path):
@@ -204,10 +206,11 @@ class Repository(GitHubCore):
         :type path: str
         :returns: :class:`Contents <Contents>` if successful, else None
         """
-        url = self._api + '/contents/' + path
-        json = self._get(url)
+        url = self._build_url('contents', path, base_url=self._api)
+        json = self._json(self._get(url), 200)
         return Contents(json) if json else None
 
+    @GitHubCore.requires_auth
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
@@ -219,13 +222,14 @@ class Repository(GitHubCore):
         """
         sha = ''
         if encoding in ('base64', 'utf-8') and content:
-            url = self._api + '/git/blobs'
+            url = self._build_url('git', 'blobs', base_url=self._api)
             data = dumps({'content': content, 'encoding': encoding})
-            json = self._post(url, data)
+            json = self._json(self._post(url, data), 201)
             if json:
                 sha = json.get('sha')
         return sha
 
+    @GitHubCore.requires_auth
     def create_comment(self, body, sha, line, path, position):
         """Create a comment on a commit.
 
@@ -248,10 +252,12 @@ class Repository(GitHubCore):
         if body and sha and line > 0 and path and position > 0:
             data = dumps({'body': body, 'commit_id': sha, 'line': line,
                 'path': path, 'position': position})
-            url = self._api + '/commits/' + sha + '/comments'
-            json = self._post(url, data)
-        return RepoComment(json, self._session) if json else None
+            url = self._build_url('commits', sha, 'comments',
+                    base_url=self._api)
+            json = self._json(self._post(url, data), 201)
+        return RepoComment(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_commit(self, message, tree, parents, author={}, committer={}):
         """Create a commit on this repository.
 
@@ -276,20 +282,18 @@ class Repository(GitHubCore):
         :returns: :class:`Commit <github3.git.Commit>` if successful, else
             None
         """
-        commit = None
+        json = None
         if message and tree and isinstance(parents, list):
-            url = self._api + '/git/commits'
-            data = dumps({'message': message, 'tree': tree,
-                'parents': parents, 'author': author,
-                'committer': committer})
-            json = self._post(url, data)
-            if json:
-                commit = Commit(json, self._session)
-        return commit
+            url = self._build_url('git', 'commits', base_url=self._api)
+            data = dumps({'message': message, 'tree': tree, 'parents': parents,
+                'author': author, 'committer': committer})
+            json = self._json(self._post(url, data), 201)
+        return Commit(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_download(self, name, path, description='',
             content_type='text/plain'):
-        """ THIS DOES NOT WORK.
+        """THIS DOES NOT WORK.
 
         Create a new download on this repository.
 
@@ -308,12 +312,12 @@ class Repository(GitHubCore):
         """
         json = None
         if name and path:
-            url = self._api + '/downloads'
+            url = self._build_url('downloads', base_url=self._api)
             from os import stat
             info = stat(path)
             data = dumps({'name': name, 'size': info.st_size,
                 'description': description, 'content_type': content_type})
-            json = self._post(url, data)
+            json = self._json(self._post(url, data), 201)
 
         if json:
             form = [('key', json.get('path')),
@@ -342,10 +346,11 @@ class Repository(GitHubCore):
             headers = {'Content-Type':
                     'multipart/form-data; boundary={0}'.format(boundary[2:]),
                     'Content-Length': str(len(form_data))}
-            resp = requests.post(json.get('s3_url'), data, headers=headers)
+            resp = self._post(json.get('s3_url'), data, headers=headers)
             print(resp)
             print(resp.content)
 
+    @GitHubCore.requires_auth
     def create_fork(self, organization=None):
         """Create a fork of this repository.
 
@@ -354,15 +359,16 @@ class Repository(GitHubCore):
         :type organization: str
         :returns: :class:`Repository <Repository>` if successful, else None
         """
-        url = self._api + '/forks'
+        url = self._build_url('forks', base_url=self._api)
         if organization:
-            json = self._post(url, dumps({'org': organization}),
-                    status_code=202)
+            resp = self._post(url, dumps({'org': organization}))
         else:
-            json = self._post(url, status_code=202)
+            resp = self._post(url)
+        json = self._json(resp, 202)
 
-        return Repository(json, self._session) if json else None
+        return Repository(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_hook(self, name, config, events=['push'], active=True):
         """Create a hook on this repository.
 
@@ -380,12 +386,13 @@ class Repository(GitHubCore):
         """
         json = None
         if name and config and isinstance(config, dict):
-            url = self._api + '/hooks'
-            data = {'name': name, 'config': config, 'events': events, 'active':
-                    active}
-            json = self._post(url, data)
-        return Hook(json, self._session) if json else None
+            url = self._build_url('hooks', base_url=self._api)
+            data = dumps({'name': name, 'config': config, 'events': events,
+                'active': active})
+            json = self._json(self._post(url, data), 201)
+        return Hook(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_issue(self,
         title,
         body=None,
@@ -410,14 +417,14 @@ class Repository(GitHubCore):
         :returns: :class:`Issue <github3.issue.Issue>` if successful, else
             None
         """
-        issue = dumps({'title': title, 'body': body,
-            'assignee': assignee, 'milestone': milestone,
-            'labels': labels})
-        url = self._api + '/issues'
+        issue = dumps({'title': title, 'body': body, 'assignee': assignee,
+            'milestone': milestone, 'labels': labels})
+        url = self._build_url('issues', base_url=self._api)
 
-        json = self._post(url, issue)
-        return Issue(json, self._session) if json else None
+        json = self._json(self._post(url, issue), 201)
+        return Issue(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_key(self, title, key):
         """Create a deploy key.
 
@@ -428,10 +435,11 @@ class Repository(GitHubCore):
         :returns: :class:`Key <github3.user.Key>` if successful, else None
         """
         data = dumps({'title': title, 'key': key})
-        url = self._api + '/keys'
-        json = self._post(url, data)
-        return Key(json, self._session) if json else None
+        url = self._build_url('keys', base_url=self._api)
+        json = self._json(self._post(url, data), 201)
+        return Key(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_label(self, name, color):
         """Create a label for this repository.
 
@@ -443,14 +451,12 @@ class Repository(GitHubCore):
         :returns: :class:`Label <github3.issue.Label>` if successful, else
             None
         """
-        if color[0] == '#':
-            color = color[1:]
+        data = dumps({'name': name, 'color': color.strip('#')})
+        url = self._build_url('labels', base_url=self._api)
+        json = self._json(self._post(url, data), 201)
+        return Label(json, self) if json else None
 
-        url = self._api + '/labels'
-        json = self._post(url, dumps({'name': name, 'color': color}))
-
-        return Label(json, self._session) if json else None
-
+    @GitHubCore.requires_auth
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
         """Create a milestone for this repository.
@@ -467,14 +473,15 @@ class Repository(GitHubCore):
         :returns: :class:`Milestone <github3.issue.Milestone>` if successful,
             else None
         """
-        url = self._api + '/milestones'
+        url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
             state = 'open'
-        mile = dumps({'title': title, 'state': state,
+        data = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        json = self._post(url, mile)
-        return Milestone(json, self._session) if json else None
+        json = self._json(self._post(url, data), 201)
+        return Milestone(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_pull(self, title, base, head, body=''):
         """Create a pull request using commits from ``head`` and comparing
         against ``base``.
@@ -494,6 +501,7 @@ class Repository(GitHubCore):
             'head': head})
         return self._create_pull(data)
 
+    @GitHubCore.requires_auth
     def create_pull_from_issue(self, issue, base, head):
         """Create a pull request from issue #``issue``.
 
@@ -509,6 +517,7 @@ class Repository(GitHubCore):
         data = dumps({'issue': issue, 'base': base, 'head': head})
         return self._create_pull(data)
 
+    @GitHubCore.requires_auth
     def create_ref(self, ref, sha):
         """Create a reference in this repository.
 
@@ -522,10 +531,11 @@ class Repository(GitHubCore):
             else None
         """
         data = dumps({'ref': ref, 'sha': sha})
-        url = self._api + '/git/refs'
-        json = self._post(url, data)
-        return Reference(json, self._session) if json else None
+        url = self._build_url('git', 'refs', base_url=self._api)
+        json = self._json(self._post(url, data), 201)
+        return Reference(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
             lightweight=False):
         """Create a tag in this repository.
@@ -552,17 +562,17 @@ class Repository(GitHubCore):
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
 
-        t = None
+        json = None
         if tag and message and sha and obj_type and len(tagger) == 3:
             data = dumps({'tag': tag, 'message': message, 'object': sha,
                 'type': obj_type, 'tagger': tagger})
-            url = self._api + '/git/tags'
-            json = self._post(url, data)
+            url = self._build_url('git', 'tags', base_url=self._api)
+            json = self._json(self._post(url, data), 201)
             if json:
-                t = Tag(json)
                 self.create_ref('refs/tags/' + tag, sha)
-        return t
+        return Tag(json) if json else None
 
+    @GitHubCore.requires_auth
     def create_tree(self, tree, base_tree=''):
         """Create a tree on this repository.
 
@@ -575,14 +585,12 @@ class Repository(GitHubCore):
         :type base_tree: str
         :returns: :class:`Tree <github3.git.Tree>` if successful, else None
         """
-        tree = None
+        json = None
         if tree and isinstance(tree, list):
             data = dumps({'tree': tree, 'base_tree': base_tree})
-            url = self._api + '/git/trees'
-            json = self._post(url, data)
-            if json:
-                tree = Tree(json)
-        return tree
+            url = self._build_url('git', 'trees', base_url=self._api)
+            json = self._json(self._post(url, data), 201)
+        return Tree(json) if json else None
 
     @property
     def created_at(self):
@@ -594,7 +602,7 @@ class Repository(GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def description(self):
@@ -610,10 +618,12 @@ class Repository(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._api + '/downloads/' + str(id_num)
-            json = self._get(url)
-        return Download(json, self._session) if json else None
+            url = self._build_url('downloads', str(id_num),
+                    base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Download(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def edit(self,
         name,
         description='',
@@ -648,7 +658,7 @@ class Repository(GitHubCore):
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads})
-        json = self._patch(self._api, data)
+        json = self._json(self._patch(self._api, data), 200)
         if json:
             self._update_(json)
             return True
@@ -666,11 +676,10 @@ class Repository(GitHubCore):
         :type login: str
         :returns: bool -- True if successful, False otherwise
         """
-        resp = False
         if login:
-            url = self._api + '/collaborators/' + login
-            resp = self._session.get(url).status_code == 204
-        return resp
+            url = self._build_url('collaborators', login, base_url=self._api)
+            return self._boolean(self._get(url), 204, 404)
+        return False
 
     def is_fork(self):
         """Checks if this repository is a fork.
@@ -719,9 +728,9 @@ class Repository(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._api + '/hooks/{0}'.format(id_num)
-            json = self._get(url)
-        return Hook(json, self._session) if json else None
+            url = self._build_url('hooks', str(id_num), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Hook(json, self) if json else None
 
     @property
     def html_url(self):
@@ -743,9 +752,9 @@ class Repository(GitHubCore):
         """
         json = None
         if int(number) > 0:
-            url = '{0}/issues/{1}'.format(self._api, str(number))
-            json = self._get(url)
-        return Issue(json, self._session) if json else None
+            url = self._build_url('issues', str(number), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Issue(json, self) if json else None
 
     def key(self, id_num):
         """Get the specified deploy key.
@@ -756,9 +765,9 @@ class Repository(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._api + '/keys/' + str(id_num)
-            json = self._get(url)
-        return Key(json, self._session) if json else None
+            url = self._build_url('keys', str(id_num), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Key(json, self) if json else None
 
     def label(self, name):
         """Get the label specified by ``name``
@@ -770,9 +779,9 @@ class Repository(GitHubCore):
         """
         json = None
         if name:
-            url = '{0}/labels/{1}'.format(self._api, name)
-            json = self._get(url)
-        return Label(json, self._session) if json else None
+            url = self._build_url('labels', name, base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Label(json, self) if json else None
 
     @property
     def language(self):
@@ -784,19 +793,20 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`Branch <Branch>`\ es
         """
-        url = self._api + '/branches'
-        json = self._get(url)
-        return [Branch(b, self._session) for b in json]
+        url = self._build_url('labels', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Branch(b, self) for b in json]
 
     def list_comments(self):
         """List comments on all commits in the repository.
 
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
-        url = self._api + '/comments'
-        json = self._get(url)
-        return [RepoComment(comment, self._session) for comment in json]
+        url = self._build_url('comments', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [RepoComment(comment, self) for comment in json]
 
+    #XXX
     def list_comments_on_commit(self, sha):
         """List comments for a single commit.
 
