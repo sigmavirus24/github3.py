@@ -793,6 +793,7 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`Branch <Branch>`\ es
         """
+        # Paginate?
         url = self._build_url('labels', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Branch(b, self) for b in json]
@@ -802,11 +803,11 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
+        # Paginate?
         url = self._build_url('comments', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [RepoComment(comment, self) for comment in json]
 
-    #XXX
     def list_comments_on_commit(self, sha):
         """List comments for a single commit.
 
@@ -814,20 +815,23 @@ class Repository(GitHubCore):
         :type sha: str
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
+        # Paginate?
         json = []
         if sha:
-            url = self._api + '/commits/' + sha + '/comments'
-            json = self._get(url)
-        return [RepoComment(comm, self._session) for comm in json]
+            url = self._build_url('commits', sha, 'comments',
+                    base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return [RepoComment(comm, self) for comm in json]
 
     def list_commits(self):
         """List commits in this repository.
 
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
-        url = self._api + '/commits'
-        json = self._get(url)
-        return [RepoCommit(commit, self._session) for commit in json]
+        # Paginate
+        url = self._build_url('commits', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [RepoCommit(commit, self) for commit in json]
 
     def list_contributors(self, anon=False):
         """List the contributors to this repository.
@@ -836,30 +840,33 @@ class Repository(GitHubCore):
         :type anon: bool
         :returns: list of :class:`User <github3.user.User>`\ s
         """
-        url = self._api + '/contributors'
+        # Paginate
+        url = self._build_url('contributors', base_url=self._api)
+        params = {}
         if anon:
-            url = '?'.join([url, 'anon=true'])
-        json = self._get(url)
-        ses = self._session
-        return [User(c, ses) for c in json]
+            params = {'anon': anon}
+        json = self._json(self._get(url, params=params), 200)
+        return [User(c, self) for c in json]
 
     def list_downloads(self):
         """List available downloads for this repository.
 
         :returns: list of :class:`Download <Download>`\ s
         """
-        url = self._api + '/downloads'
-        json = self._get(url)
-        return [Download(dl, self._session) for dl in json]
+        # Paginate?
+        url = self._build_url('downloads', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Download(dl, self) for dl in json]
 
     def list_events(self):
         """List events on this repository.
 
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        url = self._api + '/events'
-        json = self._get(url)
-        return [Event(e, self._session) for e in json]
+        # Paginate
+        url = self._build_url('events', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Event(e, self) for e in json]
 
     def list_forks(self, sort=''):
         """List forks of this repository.
@@ -869,20 +876,23 @@ class Repository(GitHubCore):
         :type sort: str
         :returns: list of :class:`Repository <Repository>`
         """
-        url = self._api + '/forks'
+        # Paginate?
+        url = self._build_url('forks', base_url=self._api)
+        params = {}
         if sort in ('newest', 'oldest', 'watchers'):
-            url = ''.join([url, '?sort=', sort])
-        json = self._get(url)
-        return [Repository(r, self._session) for r in json]
+            params = {'sort': sort}
+        json = self._json(self._get(url, params=params), 200)
+        return [Repository(r, self) for r in json]
 
     def list_hooks(self):
         """List hooks registered on this repository.
 
         :returns: list of :class:`Hook <Hook>`\ s
         """
-        url = self._api + '/hooks'
-        json = self._get(url)
-        return [Hook(h, self._session) for h in json]
+        # Paginate?
+        url = self._build_url('hooks', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Hook(h, self) for h in json]
 
     def list_issues(self,
         milestone=None,
@@ -913,7 +923,8 @@ class Repository(GitHubCore):
         :type since: str
         :returns: list of :class:`Issue <github3.issue.Issue>`\ s
         """
-        url = self._api + '/issues'
+        # Paginate
+        url = self._build_url('issues', base_url=self._api)
 
         params = {}
         if milestone in ('*', 'none') or isinstance(milestone, int):
@@ -930,26 +941,27 @@ class Repository(GitHubCore):
         params.update(issue_params(None, state, labels, sort, direction,
             since))
 
-        json = self._get(url, params=params)
-        ses = self._session
-        return [Issue(i, ses) for i in json]
+        json = self._json(self._get(url, params=params), 200)
+        return [Issue(i, self) for i in json]
 
     def list_issue_events(self):
         """List issue events on this repository.
 
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        url = self._api + '/issues/events'
-        json = self._get(url)
-        return [Event(e, self._session) for e in json]
+        # Paginate
+        url = self._build_url('issues', 'events', self._api)
+        json = self._json(self._get(url), 200)
+        return [Event(e, self) for e in json]
 
     def list_keys(self):
         """List deploy keys on this repository.
 
         :returns: list of :class:`Key <github3.user.Key>`\ s
         """
-        url = self._api + '/keys'
-        json = self._get(url)
+        # Paginate?
+        url = self._build_url('keys', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return [Key(k, self._session) for k in json]
 
     def list_labels(self):
@@ -957,18 +969,19 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`Label <github3.issue.Label>`\ s
         """
-        url = self._api + '/labels'
-        json = self._get(url)
-        ses = self._session
-        return [Label(label, ses) for label in json]
+        # Paginate?
+        url = self._build_url('labels', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Label(label, self) for label in json]
 
     def list_languages(self):
         """List the programming languages used in the repository.
 
         :returns: list of tuples
         """
-        url = self._api + '/languages'
-        json = self._get(url)
+        # Paginate?
+        url = self._build_url('languages', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return [(k, v) for k, v in json.items()]
 
     def list_milestones(self, state=None, sort=None, direction=None):
@@ -985,35 +998,33 @@ class Repository(GitHubCore):
         :type direction: str
         :returns: list of :class:`Milestone <github3.issue.Milestone>`\ s
         """
-        url = self._api + '/milestones'
+        # Paginate?
+        url = self._build_url('milestones', base_url=self._api)
 
-        params = []
+        params = {}
         if state in ('open', 'closed'):
-            params.append('state=' + state)
+            params['state'] = state
 
         if sort in ('due_date', 'completeness'):
-            params.append('sort=' + sort)
+            params['sort'] = sort
 
         if direction in ('asc', 'desc'):
-            params.append('direction=' + direction)
+            params['direction'] = direction
 
-        if params:
-            params = '&'.join(params)
-            url = '{0}?{1}'.format(url, params)
-
-        json = self._get(url)
-        ses = self._session
-        return [Milestone(mile, ses) for mile in json]
+        json = self._json(self._get(url, params=params), 200)
+        return [Milestone(mile, self) for mile in json]
 
     def list_network_events(self):
         """Lists events on a network of repositories.
 
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
+        # Paginate
         from re import subn
-        url = subn('repos', 'networks', self._api, 1) + '/events'
-        json = self._get(url)
-        return [Event(e, self._session) for e in json]
+        base = subn('repos', 'networks', self._api, 1)
+        url = self._build_url('events', base_url=base)
+        json = self._json(self._get(url), 200)
+        return [Event(e, self) for e in json]
 
     def list_pulls(self, state=None):
         """List pull requests on repository.
@@ -1022,14 +1033,15 @@ class Repository(GitHubCore):
         :type state: str
         :returns: list of :class:`PullRequest <github3.pulls.PullRequest>`\ s
         """
+        # Paginate
+        url = self._build_url('pulls', base_url=self._api)
+        params = {}
         if state in ('open', 'closed'):
-            url = '{0}/pulls?state={1}'.format(self._api, state)
-        else:
-            url = self._api + '/pulls'
-        json = self._get(url)
-        ses = self._session
-        return [PullRequest(pull, ses) for pull in json]
+            params['state'] = state
+        json = self._json(self._get(url, params=params), 200)
+        return [PullRequest(pull, self) for pull in json]
 
+    # XXX
     def list_refs(self, subspace=''):
         """List references for this repository.
 
@@ -1037,6 +1049,7 @@ class Repository(GitHubCore):
         :type subspace: str
         :returns: list of :class:`Reference <github3.git.Reference>`\ s
         """
+        # Paginate
         if subspace:
             url = self._api + '/git/refs/' + subspace
         else:
