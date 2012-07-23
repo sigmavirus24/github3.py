@@ -1041,7 +1041,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return [PullRequest(pull, self) for pull in json]
 
-    # XXX
     def list_refs(self, subspace=''):
         """List references for this repository.
 
@@ -1049,22 +1048,22 @@ class Repository(GitHubCore):
         :type subspace: str
         :returns: list of :class:`Reference <github3.git.Reference>`\ s
         """
-        # Paginate
+        # Paginate?
         if subspace:
-            url = self._api + '/git/refs/' + subspace
+            args = ('git', 'refs', subspace)
         else:
-            url = self._api + '/git/refs'
-        json = self._get(url)
-        ses = self._session
-        return [Reference(r, ses) for r in json]
+            args = ('git', 'refs')
+        url = self._build_url(*args, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Reference(r, self) for r in json]
 
     def list_tags(self):
         """List tags on this repository.
 
         :returns: list of :class:`RepoTag <RepoTag>`\ s
         """
-        url = self._api + '/tags'
-        json = self._get(url)
+        url = self._build_url('tags', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return [RepoTag(tag) for tag in json]
 
     def list_teams(self):
@@ -1072,17 +1071,17 @@ class Repository(GitHubCore):
 
         :returns: list of dicts
         """
-        url = self._api + '/teams'
-        return self._get(url)
+        url = self._build_url('teams', base_url=self._api)
+        return self._json(self._get(url), 200)
 
     def list_watchers(self):
         """List watchers of this repository.
 
         :returns: list of :class:`User <github3.user.User>`\ s
         """
-        url = self._api + '/watchers'
-        json = self._get(url)
-        return [User(u, self._session) for u in json]
+        url = self._build_url('watchers', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(u, self) for u in json]
 
     def milestone(self, number):
         """Get the milestone indicated by ``number``.
@@ -1091,9 +1090,9 @@ class Repository(GitHubCore):
         :type number: int
         :returns: :class:`Milestone <github3.issue.Milestone>`
         """
-        url = '{0}/milestones/{1}'.format(self._api, str(number))
-        json = self._get(url)
-        return Milestone(json, self._session) if json else None
+        url = self._build_url('milestones', str(number), base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Milestone(json, self) if json else None
 
     @property
     def mirror(self):
@@ -1133,11 +1132,13 @@ class Repository(GitHubCore):
         """
         from re import match
         m = match('https://github\.com/\w+/\w+/events/\w+', topic)
+        status = False
         if mode and topic and callback and m:
             data = {'hub.mode': mode, 'hub.topic': topic,
                     'hub.callback': callback, 'hub.secret': secret}
-            return self._post('https://api.github.com/hub', data)
-        return False
+            url = self._build_url('hub')
+            status = self._boolean(self._post(url, data), 201, 404)
+        return status
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
@@ -1148,9 +1149,9 @@ class Repository(GitHubCore):
         """
         json = None
         if int(number) > 0:
-            url = '{0}/pulls/{1}'.format(self._api, str(number))
-            json = self._get(url)
-        return PullRequest(json, self._session) if json else None
+            url = self._build_url('pulls', str(number), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return PullRequest(json, self) if json else None
 
     @property
     def pushed_at(self):
@@ -1163,8 +1164,8 @@ class Repository(GitHubCore):
 
         :returns: :class:`Contents <Contents>`
         """
-        url = self._api + '/readme'
-        json = self._get(url)
+        url = self._build_url('readme', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return Contents(json) if json else None
 
     def ref(self, ref):
@@ -1179,9 +1180,9 @@ class Repository(GitHubCore):
         :type ref: str
         :returns: :class:`Reference <github3.git.Reference>`
         """
-        url = self._api + '/git/refs/' + ref
-        json = self._get(url)
-        return Reference(json, self._session) if json else None
+        url = self._build_url('git', 'refs', ref, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Reference(json, self) if json else None
 
     def remove_collaborator(self, login):
         """Remove collaborator ``login`` from the repository.
@@ -1192,8 +1193,8 @@ class Repository(GitHubCore):
         """
         resp = False
         if login:
-            url = self._api + '/collaborators/' + login
-            resp = self._delete(url)
+            url = self._build_url('collaborators', login, base_url=self._api)
+            resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
     @property
@@ -1220,8 +1221,8 @@ class Repository(GitHubCore):
         :type sha: str
         :returns: :class:`Tag <github3.git.Tag>`
         """
-        url = self._api + '/git/tags/' + sha
-        json = self._get(url)
+        url = self._build_url('git', 'tags', sha, base_url=self._api)
+        json = self._json(self._get(url), 200)
         return Tag(json) if json else None
 
     def tree(self, sha):
@@ -1231,9 +1232,9 @@ class Repository(GitHubCore):
         :type sha: str
         :returns: :class:`Tree <github3.git.Tree>`
         """
-        url = '{0}/git/trees/{1}'.format(self._api, sha)
-        json = self._get(url)
-        return Tree(json, self._session) if json else None
+        url = self._build_url('git', 'trees', sha, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Tree(json, self) if json else None
 
     @property
     def updated_at(self):
@@ -1253,14 +1254,11 @@ class Repository(GitHubCore):
         :returns: bool
         """
         label = self.get_label(name)
-
+        resp = False
         if label:
-            if not new_name:
-                return label.update(name, color)
-            return label.update(new_name, color)
-
-        # label == None
-        return False
+            upd = label.update
+            resp = upd(new_name, color) if new_name else upd(name, color)
+        return resp
 
     @property
     def watchers(self):
@@ -1273,7 +1271,7 @@ class Branch(GitHubCore):
     returns about a branch on a :class:`Repository <Repository>`.
     """
     def __init__(self, branch, session=None):
-        super(Branch, self).__init__(session)
+        super(Branch, self).__init__(branch, session)
         self._name = branch.get('name')
         self._commit = None
         if branch.get('commit'):
@@ -1391,7 +1389,7 @@ class Download(GitHubCore):
     """
 
     def __init__(self, download, session=None):
-        super(Download, self).__init__(session)
+        super(Download, self).__init__(download, session)
         self._api = download.get('url')
         self._html = download.get('html_url')
         self._id = download.get('id')
@@ -1445,8 +1443,8 @@ class Download(GitHubCore):
         if not path:
             path = self.name
 
-        resp = self._getr(self.html_url, allow_redirects=True)
-        if resp:
+        resp = self._get(self.html_url, allow_redirects=True)
+        if self._boolean(resp, 200, 404):
             with open(path, 'wb') as fd:
                 fd.write(resp.content)
                 return True
@@ -1463,13 +1461,14 @@ class Hook(GitHubCore):
     by GitHub about hooks set on a repository."""
 
     def __init__(self, hook, session=None):
-        super(Hook, self).__init__(session)
+        super(Hook, self).__init__(hook, session)
         self._update_(hook)
 
     def __repr__(self):
         return '<Hook [%s]>' % self._name
 
     def _update_(self, hook):
+        self._json_data = hook
         self._api = hook.get('url')
         self._updated = None
         if hook.get('updated_at'):
@@ -1496,8 +1495,9 @@ class Hook(GitHubCore):
 
         :returns: bool
         """
-        return self._delete(self._api)
+        return self._boolean(self._delete(self._api), 204, 404)
 
+    @GitHubCore.requires_auth
     def edit(self, name, config, events=[], add_events=[], rm_events=[],
             active=True):
         """Edit this hook.
@@ -1531,7 +1531,9 @@ class Hook(GitHubCore):
             if rm_events:
                 data['remove_events'] = rm_events
 
-            json = self._patch(self._api, dumps(data))
+            json = self._json(self._patch(self._api, dumps(data)), 200)
+
+        if json:
             self._update_(json)
             return True
         return False
@@ -1563,7 +1565,7 @@ class Hook(GitHubCore):
 
         :returns: bool
         """
-        return self._post(self._api + '/test')
+        return self._boolean(self._post(self._api + '/test'), 204, 404)
 
     @property
     def updated_at(self):
@@ -1654,6 +1656,7 @@ class RepoComment(BaseComment):
         """The position in the diff where the comment was made."""
         return self._pos
 
+    @GitHubCore.requires_auth
     def update(self, body, sha, line, path, position):
         """Update this comment.
 
@@ -1674,7 +1677,8 @@ class RepoComment(BaseComment):
         if body and sha and path and line > 0 and position > 0:
             data = dumps({'body': body, 'commit_id': sha, 'line': line,
                 'path': path, 'position': position})
-            json = self._post(self._api, data)
+            json = self._json(self._post(self._api, data), 200)
+
         if json:
             self._update_(json)
             return True
