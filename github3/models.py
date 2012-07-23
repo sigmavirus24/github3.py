@@ -100,6 +100,11 @@ class GitHubCore(object):
         """Return the json representing this object."""
         return self._json_data
 
+    @classmethod
+    def from_json(cls, json):
+        """Return an instance of ``cls`` formed from ``json``."""
+        return cls(json)
+
     @staticmethod
     def requires_auth(func):
         """Decorator to note which class methods require authorization."""
