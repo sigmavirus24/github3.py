@@ -15,7 +15,7 @@ from .user import User
 class Blob(GitHubObject):
     """The :class:`Blob <Blob>` object."""
     def __init__(self, blob):
-        super(Blob, self).__init__()
+        super(Blob, self).__init__(blob)
         self._content = blob.get('content')
         self._enc = blob.get('encoding')
         if self._enc == 'base64':
@@ -234,7 +234,7 @@ class Tree(GitData):
 class Hash(GitHubObject):
     """The :class:`Hash <Hash>` object."""
     def __init__(self, info):
-        super(Hash, self).__init__()
+        super(Hash, self).__init__(info)
         self._path = info.get('path')
         self._mode = info.get('mode')
         self._type = info.get('type')

@@ -75,7 +75,7 @@ class Plan(GitHubObject):
     information about a user easier.
     """
     def __init__(self, plan):
-        super(Plan, self).__init__()
+        super(Plan, self).__init__(plan)
         self._collab = plan.get('collaborators')
         self._name = plan.get('name')
         self._private = plan.get('private_repos')

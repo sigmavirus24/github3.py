@@ -17,7 +17,7 @@ class GistFile(GitHubObject):
     """
 
     def __init__(self, attributes):
-        super(GistFile, self).__init__()
+        super(GistFile, self).__init__(attributes)
 
         self._raw = attributes.get('raw_url')
         self._name = attributes.get('filename')

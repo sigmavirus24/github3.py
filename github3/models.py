@@ -34,13 +34,13 @@ class GitHubCore(GitHubObject):
     basic attributes to other classes that are very useful to have.
     """
     def __init__(self, json, ses=None):
+        super(GitHubCore, self).__init__(json)
         if hasattr(ses, '_session'):
             # i.e. session is actually a GitHub object
             ses = ses._session
         if ses is None:
             ses = session()
         self._session = ses
-        self._json_data = json
         self._github_url = 'https://api.github.com'
         self._time_format = '%Y-%m-%dT%H:%M:%SZ'
         self._remaining = 5000

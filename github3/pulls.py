@@ -61,7 +61,7 @@ class PullDestination(GitHubCore):
 class PullFile(GitHubObject):
     """The :class:`PullFile <PullFile>` object."""
     def __init__(self, pfile):
-        super(PullFile, self).__init__()
+        super(PullFile, self).__init__(pfile)
         self._sha = pfile.get('sha')
         self._name = pfile.get('filename')
         self._status = pfile.get('status')

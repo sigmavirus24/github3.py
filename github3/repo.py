@@ -1303,7 +1303,7 @@ class Contents(GitHubObject):
     """
 
     def __init__(self, content):
-        super(Contents, self).__init__()
+        super(Contents, self).__init__(content)
         # links
         self._api = content['_links'].get('self')
         self._html = content['_links'].get('html')
@@ -1579,7 +1579,7 @@ class RepoTag(GitHubObject):
     """
 
     def __init__(self, tag):
-        super(RepoTag, self).__init__()
+        super(RepoTag, self).__init__(tag)
         self._name = tag.get('name')
         self._zip = tag.get('zipball_url')
         self._tar = tag.get('tarball_url')
@@ -1765,7 +1765,7 @@ class Comparison(GitHubObject):
     repository."""
 
     def __init__(self, compare):
-        super(Comparison, self).__init__()
+        super(Comparison, self).__init__(compare)
         self._api = compare.get('api')
         self._html = compare.get('html_url')
         self._perma = compare.get('permalink_url')
