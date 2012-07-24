@@ -81,10 +81,10 @@ class GitHubCore(GitHubObject):
             req = self._session.patch(url, **kwargs)
         return req
 
-    def _post(self, url, **kwargs):
+    def _post(self, url, data=None, **kwargs):
         req = None
         if self._remaining > 0:
-            req = self._session.post(url, **kwargs)
+            req = self._session.post(url, data, **kwargs)
         return req
 
     def _put(self, url, **kwargs):
@@ -129,6 +129,7 @@ class GitHubCore(GitHubObject):
                 raise GitHubError(type('Faux Request', (object, ),
                     {'status_code': 401, 'message': 'Requires authentication'}
                     ))
+        return auth_wrapper
 
 
 class BaseComment(GitHubCore):

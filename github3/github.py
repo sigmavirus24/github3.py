@@ -140,8 +140,7 @@ class GitHub(GitHubCore):
             repo = self.repository(owner, repository)
 
         if repo:
-            return repo.create_issue(title, body, assignee, milestone,
-                    labels)
+            return repo.create_issue(title, body, assignee, milestone, labels)
 
         # Regardless, something went wrong. We were unable to create the
         # issue
@@ -617,7 +616,7 @@ class GitHub(GitHubCore):
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
         url = self._github_url + '/legacy/user/search/{0}'.format(keyword)
-        json = self._json(self._get(url))
+        json = self._json(self._get(url), 200)
         users = json.get('users', [])
         return [LegacyUser(u, self) for u in users]
 
@@ -629,7 +628,7 @@ class GitHub(GitHubCore):
         :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
         """
         url = self._build_url('legacy', 'user', 'email', email)
-        json = self._json(self._get(url))
+        json = self._json(self._get(url), 200)
         u = json.get('user', {})
         return LegacyUser(u, self) if u else None
 
