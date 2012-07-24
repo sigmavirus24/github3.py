@@ -121,13 +121,14 @@ class GitHubCore(GitHubObject):
             auth = False
             if hasattr(self, '_session'):
                 auth = self._session.auth or \
-                    self._session.headers['Authorization']
+                    self._session.headers.get('Authorization')
 
             if auth:
                 return func(self, *args, **kwargs)
             else:
                 raise GitHubError(type('Faux Request', (object, ),
-                    {'status_code': 401, 'message': 'Requires authentication'}
+                    {'status_code': 401, 'message': 'Requires authentication',
+                        'json': {}}
                     ))
         return auth_wrapper
 

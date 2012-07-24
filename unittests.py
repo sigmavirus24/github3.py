@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Originally co-authored by Jeff V Stein and Ian Cordasco for Todo.txt-python 
+# Originally co-authored by Jeff V Stein and Ian Cordasco for Todo.txt-python
 # (http://git.io/todo.py)
 
 import unittest
@@ -7,6 +7,12 @@ import sys
 import os
 import re
 from getpass import getpass
+
+try:
+    import readline
+    readline.parse_and_bind('tab: complete')
+except ImportError:
+    pass
 
 if __name__ == "__main__":
     if not (os.environ.get('CI') or os.environ.get('TRAVIS')):
