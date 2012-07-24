@@ -21,7 +21,7 @@ class TestGitHub(base.BaseTest):
             expect(i._session.headers['Authorization']) == 'token ' +\
                 self.fake_oauth
 
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.user()
 
         if self.auth:
@@ -33,7 +33,7 @@ class TestGitHub(base.BaseTest):
         if not self.g.gist(gist_id):
             self.fail('Check gcd gist')
 
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.gist(-1)
 
         for i in None, self.sigm:
@@ -53,7 +53,7 @@ class TestGitHub(base.BaseTest):
     def test_following(self):
         expect(self.g.list_followers('kennethreitz')) != []
         expect(self.g.list_following('kennethreitz')) != []
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.is_following(self.sigm)
             self.g.follow(self.sigm)
             self.g.unfollow(self.sigm)
@@ -69,7 +69,7 @@ class TestGitHub(base.BaseTest):
 
     def test_watching(self):
         expect(self.g.list_watching(self.sigm)) != []
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.watch(self.sigm, self.todo)
             self.g.unwatch(self.sigm, self.todo)
             self.g.list_watching()
@@ -83,7 +83,7 @@ class TestGitHub(base.BaseTest):
 
     def test_issues(self):
         title = 'Test issue for github3.py'
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             # Try to create one without authenticating
             self.g.create_issue(self.sigm, self.todo, title)
             # Try to get individual ones
@@ -119,7 +119,7 @@ class TestGitHub(base.BaseTest):
         #    expect(i).isinstance(github3.issue.Issue)
 
     def test_keys(self):
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.create_key('Foo bar', 'bogus')
             self.g.delete_key(2000)
             self.g.get_key(2000)
@@ -130,26 +130,26 @@ class TestGitHub(base.BaseTest):
             expect(k).isinstance(github3.user.Key)
 
     def test_repos(self):
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.create_repo('test_github3.py')
             self.g.list_repos()
         expect(self.g.list_repos(self.sigm)) != []
         self.assertIsNotNone(self.g.repository(self.sigm, self.todo))
 
     def test_auths(self):
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.list_authorizations()
             self.g.authorization(-1)
             self.g.authorize('foo', 'bar', ['gist', 'user'])
 
     def test_list_emails(self):
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.list_emails()
 
     def test_orgs(self):
         expect(self.g.list_orgs(self.kr)) != []
         self.assertIsNotNone(self.g.organization(self.gh3py))
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.list_orgs()
 
     def test_markdown(self):
@@ -165,7 +165,7 @@ class TestGitHub(base.BaseTest):
         self.assertIsNotNone(self.g.search_email('graffatcolmingov@gmail.com'))
 
     def test_users(self):
-        with expect.raises(github3.Error):
+        with expect.raises(github3.GitHubError):
             self.g.update_user()
             self.g.user()
         self.assertIsNotNone(self.g.user(self.sigm))

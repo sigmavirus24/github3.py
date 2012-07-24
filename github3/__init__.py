@@ -17,4 +17,4 @@ __version__ = '0.1a3'
 
 from .api import *
 from .github import GitHub
-from .models import Error
+from .models import GitHubError
