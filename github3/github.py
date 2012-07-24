@@ -34,7 +34,7 @@ class GitHub(GitHubCore):
             self.login(login, password)
 
     def __repr__(self):
-        return '<GitHub at 0x%x>' % id(self)
+        return '<GitHub at 0x{0:x}>'.format(id(self))
 
     def _list_follow(self, which):
         url = self._build_url('user', which)
@@ -729,7 +729,7 @@ class Authorization(GitHubCore):
         self._update_(auth)
 
     def __repr__(self):
-        return '<Authorization [%s]>' % self._app.get('name', '')
+        return '<Authorization [{0}]>'.format(self._app.get('name', ''))
 
     def _update_(self, auth):
         self._app = auth.get('app', {})

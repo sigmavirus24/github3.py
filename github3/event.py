@@ -33,7 +33,7 @@ class Event(GitHubCore):
             Organization(self._org, self._session)
 
     def __repr__(self):
-        return '<Event [%s]>' % self._type[:-5]
+        return '<Event [{0}]>'.format(self._type[:-5])
 
     @property
     def actor(self):

@@ -25,7 +25,7 @@ class Repository(GitHubCore):
         self._update_(repo)
 
     def __repr__(self):
-        return '<Repository [%s/%s]>' % (self._owner.login, self._name)
+        return '<Repository [{0}/{1}]>'.format(self._owner.login, self._name)
 
     def _update_(self, repo):
         self._json_data = repo
@@ -1279,7 +1279,7 @@ class Branch(GitHubCore):
         self._links = branch.get('_links', {})
 
     def __repr__(self):
-        return '<Repository Branch [%s]>' % self._name
+        return '<Repository Branch [{0}]>'.format(self._name)
 
     @property
     def commit(self):
@@ -1330,7 +1330,7 @@ class Contents(object):
         self._type = content.get('type')
 
     def __repr__(self):
-        return '<Content [%s]>' % self.path
+        return '<Content [{0}]>'.format(self.path)
 
     @property
     def content(self):
@@ -1400,7 +1400,7 @@ class Download(GitHubCore):
         self._type = download.get('content_type')
 
     def __repr__(self):
-        return '<Download [%s]>' % self.name
+        return '<Download [{0}]>'.format(self.name)
 
     @property
     def content_type(self):
@@ -1465,7 +1465,7 @@ class Hook(GitHubCore):
         self._update_(hook)
 
     def __repr__(self):
-        return '<Hook [%s]>' % self._name
+        return '<Hook [{0}]>'.format(self._name)
 
     def _update_(self, hook):
         self._json_data = hook
@@ -1586,7 +1586,7 @@ class RepoTag(object):
         self._commit = tag.get('commit', {})
 
     def __repr__(self):
-        return '<Repository Tag [%s]>' % self._name
+        return '<Repository Tag [{0}]>'.format(self._name)
 
     @property
     def commit(self):
@@ -1619,7 +1619,7 @@ class RepoComment(BaseComment):
         self._update_(comment)
 
     def __repr__(self):
-        return '<Repository Comment [%s]>' % self._user.login
+        return '<Repository Comment [{0}]>'.format(self._user.login)
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
@@ -1721,7 +1721,7 @@ class RepoCommit(BaseCommit):
                 append(type('RepoCommit File', (object, ), f))
 
     def __repr__(self):
-        return '<Repository Commit [%s]>' % self._sha
+        return '<Repository Commit [{0}]>'.format(self._sha)
 
     @property
     def additions(self):
@@ -1781,7 +1781,7 @@ class Comparison(object):
         self._files = compare.get('files')
 
     def __repr__(self):
-        return '<Comparison of %d commits>' % self.total_commits
+        return '<Comparison of {0} commits>'.format(self.total_commits)
 
     @property
     def ahead_by(self):

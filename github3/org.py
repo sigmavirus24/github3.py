@@ -19,7 +19,7 @@ class Team(GitHubCore):
         self._update_(team)
 
     def __repr__(self):
-        return '<Team [%s]>' % self._name
+        return '<Team [{0}]>'.format(self._name)
 
     def _update_(self, team):
         self._json_data = team
@@ -212,7 +212,7 @@ class Organization(BaseAccount):
             self._type = 'Organization'
 
     def __repr__(self):
-        return '<Organization [%s:%s]>' % (self._login, self._name)
+        return '<Organization [{0}:{1}]>'.format(self._login, self._name)
 
     def _list_members(self, tail):
         """List members of this organization."""

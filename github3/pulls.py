@@ -30,7 +30,7 @@ class PullDestination(GitHubCore):
             self._repo_owner = dest['repo']['owner'].get('login')
 
     def __repr__(self):
-        return '<%s [%s]>' % (self._dir, self._label)
+        return '<{0} [{1}]>'.format(self._dir, self._label)
 
     @property
     def label(self):
@@ -73,7 +73,7 @@ class PullFile(object):
         self._patch = pfile.get('patch')
 
     def __repr__(self):
-        return '<Pull Request File [%s]>' % self._name
+        return '<Pull Request File [{0}]>'.format(self._name)
 
     @property
     def additions(self):
@@ -128,7 +128,7 @@ class PullRequest(GitHubCore):
         self._update_(pull)
 
     def __repr__(self):
-        return '<Pull Request [#%d]>' % self._num
+        return '<Pull Request [#{0}]>'.format(self._num)
 
     def _update_(self, pull):
         self._json_data = pull
@@ -358,7 +358,7 @@ class ReviewComment(BaseComment):
         super(ReviewComment, self).__init__(comment, session)
 
     def __repr__(self):
-        return '<Review Comment [%s]>' % self._user.login
+        return '<Review Comment [{0}]>'.format(self._user.login)
 
     @property
     def commit_id(self):

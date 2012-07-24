@@ -24,7 +24,7 @@ class Blob(object):
             self._decoded = self._content
 
     def __repr__(self):
-        return '<Blob [%0.10s]>' % self._decoded
+        return '<Blob [{0:.10}]>'.format(self._decoded)
 
     @property
     def content(self):
@@ -53,7 +53,7 @@ class GitData(GitHubCore):
         self._api = data.get('url')
 
     def __repr__(self):
-        return '<github3-gitdata at 0x%x>' % id(self)
+        return '<github3-gitdata at 0x{0:x}>'.format(id(self))
 
     @property
     def sha(self):
@@ -93,7 +93,7 @@ class Commit(BaseCommit):
             self._tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
-        return '<Commit [%s:%s]>' % (self._author_name, self._sha)
+        return '<Commit [{0}:{1}]>'.format(self._author_name, self._sha)
 
     @property
     def author(self):
@@ -120,7 +120,7 @@ class Reference(GitHubCore):
         self._update_(ref)
 
     def __repr__(self):
-        return '<Reference [%s]>' % self._ref
+        return '<Reference [{0}]>'.format(self._ref)
 
     def _update_(self, ref):
         self._ref = ref.get('ref')
@@ -169,7 +169,7 @@ class GitObject(GitData):
         self._type = obj.get('type')
 
     def __repr__(self):
-        return '<Git Object [%s]>' % self._sha
+        return '<Git Object [{0}]>'.format(self._sha)
 
     @property
     def type(self):
@@ -188,7 +188,7 @@ class Tag(GitData):
         self._obj = GitObject(tag.get('object'))
 
     def __repr__(self):
-        return '<Tag [%s]>' % self._tag
+        return '<Tag [{0}]>'.format(self._tag)
 
     @property
     def message(self):
@@ -214,7 +214,7 @@ class Tree(GitData):
         self._tree = [Hash(t) for t in tree.get('tree', [])]
 
     def __repr__(self):
-        return '<Tree [%s]>' % self._sha
+        return '<Tree [{0}]>'.format(self._sha)
 
     def recurse(self):
         """Recurse into the tree.

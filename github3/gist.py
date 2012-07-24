@@ -26,7 +26,7 @@ class GistFile(object):
         self._content = attributes.get('content')
 
     def __repr__(self):
-        return '<Gist File [%s]>' % self._name
+        return '<Gist File [{0}]>'.format(self._name)
 
     @property
     def content(self):
@@ -63,7 +63,7 @@ class GistComment(BaseComment):
         super(GistComment, self).__init__(comment, session)
 
     def __repr__(self):
-        return '<Gist Comment [%s]>' % self._user.login
+        return '<Gist Comment [{0}]>'.format(self._user.login)
 
 
 class Gist(GitHubCore):
@@ -79,7 +79,7 @@ class Gist(GitHubCore):
         self._update_(data)
 
     def __repr__(self):
-        return '<Gist [%s]>' % self._id
+        return '<Gist [{0}]>'.format(self._id)
 
     def _update_(self, data):
         self._json_data = data

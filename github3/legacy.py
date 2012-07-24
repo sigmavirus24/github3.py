@@ -41,7 +41,7 @@ class LegacyIssue(GitHubCore):
         self._state = issue.get('state', '')
 
     def __repr__(self):
-        return '<Legacy Issue [%s:%s]>' % (self._user, self._num)
+        return '<Legacy Issue [{0}:{1}]>'.format(self._user, self._num)
 
     @property
     def body(self):
@@ -143,7 +143,7 @@ class LegacyRepo(GitHubCore):
         self._watchers = repo.get('watchers', 0)
 
     def __repr__(self):
-        return '<Legacy Repo [%s/%s]>' % (self._owner, self._name)
+        return '<Legacy Repo [{0}/{1}]>'.format(self._owner, self._name)
 
     @property
     def created(self):
@@ -286,7 +286,7 @@ class LegacyUser(GitHubCore):
         # username: same as login
 
     def __repr__(self):
-        return '<Legacy User [%s]>' % self._login
+        return '<Legacy User [{0}]>'.format(self._login)
 
     @property
     def created(self):

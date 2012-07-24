@@ -28,7 +28,7 @@ class GitHubCore(object):
         self._remaining = 5000
 
     def __repr__(self):
-        return '<github3-core at 0x%x>' % id(self)
+        return '<github3-core at 0x{0:x}>'.format(id(self))
 
     def _json(self, request, status_code):
         ret = None
@@ -130,7 +130,7 @@ class BaseComment(GitHubCore):
         self._update_(comment)
 
     def __repr__(self):
-        return '<github3-comment at 0x%x>' % id(self)
+        return '<github3-comment at 0x{0:x}>'.format(id(self))
 
     def _update_(self, comment):
         self._json_data = comment
@@ -384,7 +384,7 @@ class Error(Exception):
             self._errors = error.get('errors')
 
     def __repr__(self):
-        return '<Error [%s]>' % (self._message or self._code)
+        return '<Error [{0}]>'.format(self._message or self._code)
 
     def __str__(self):
         if not self._errors:

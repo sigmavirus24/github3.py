@@ -20,7 +20,7 @@ class Label(GitHubCore):
         self._update_(label)
 
     def __repr__(self):
-        return '<Label [%s]>' % self._name
+        return '<Label [{0}]>'.format(self._name)
 
     def _update_(self, label):
         self._json_data = label
@@ -77,7 +77,7 @@ class Milestone(GitHubCore):
         self._update_(mile)
 
     def __repr__(self):
-        return '<Milestone [%s]>' % self._title
+        return '<Milestone [{0}]>'.format(self._title)
 
     def _update_(self, mile):
         self._json_data = mile
@@ -194,7 +194,7 @@ class Issue(GitHubCore):
         self._update_(issue)
 
     def __repr__(self):
-        return '<Issue [%s/%s #%s]>' % (self._repo[0], self._repo[1],
+        return '<Issue [{0}/{1} #{2}]>'.format(self._repo[0], self._repo[1],
                 self._num)
 
     def _update_(self, issue):
@@ -468,7 +468,7 @@ class IssueComment(BaseComment):
         self._user = User(comment.get('user'), self._session)
 
     def __repr__(self):
-        return '<Issue Comment [%s]>' % self._user.login
+        return '<Issue Comment [{0}]>'.format(self._user.login)
 
     @property
     def updated_at(self):
@@ -521,7 +521,7 @@ class IssueEvent(GitHubCore):
             self._pull_patch = pull_req.get('patch_url')
 
     def __repr__(self):
-        return '<Issue Event [#%s - %s - %s]>' % (str(self._issue.number),
+        return '<Issue Event [#{0} - {1} - {2}]>'.format(self._issue.number,
                 self._event, self._actor.login)
 
     @property
