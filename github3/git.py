@@ -8,11 +8,11 @@ This module contains all the classes relating to Git Data.
 
 from base64 import b64decode
 from json import dumps
-from .models import GitHubCore, BaseCommit
+from .models import GitHubObject, GitHubCore, BaseCommit
 from .user import User
 
 
-class Blob(object):
+class Blob(GitHubObject):
     """The :class:`Blob <Blob>` object."""
     def __init__(self, blob):
         super(Blob, self).__init__()
@@ -231,7 +231,7 @@ class Tree(GitData):
         return self._tree
 
 
-class Hash(object):
+class Hash(GitHubObject):
     """The :class:`Hash <Hash>` object."""
     def __init__(self, info):
         super(Hash, self).__init__()

@@ -8,7 +8,7 @@ This module contains all the classes relating to pull requests.
 
 from json import dumps
 from .git import Commit
-from .models import GitHubCore, BaseComment
+from .models import GitHubObject, GitHubCore, BaseComment
 from .user import User
 
 
@@ -58,7 +58,7 @@ class PullDestination(GitHubCore):
         return self._user
 
 
-class PullFile(object):
+class PullFile(GitHubObject):
     """The :class:`PullFile <PullFile>` object."""
     def __init__(self, pfile):
         super(PullFile, self).__init__()

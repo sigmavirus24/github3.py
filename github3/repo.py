@@ -11,7 +11,7 @@ from json import dumps
 from .event import Event
 from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag, Tree
-from .models import GitHubCore, BaseComment, BaseCommit
+from .models import GitHubObject, GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
 from .user import User, Key
 
@@ -1297,7 +1297,7 @@ class Branch(GitHubCore):
         return self._name
 
 
-class Contents(object):
+class Contents(GitHubObject):
     """The :class:`Contents <Contents>` object. It holds the information
     concerning any content in a repository requested via the API.
     """
@@ -1573,7 +1573,7 @@ class Hook(GitHubCore):
         return self._updated
 
 
-class RepoTag(object):
+class RepoTag(GitHubObject):
     """The :class:`RepoTag <RepoTag>` object. This stores the information
     representing a tag that was created on a repository.
     """
@@ -1759,7 +1759,7 @@ class RepoCommit(BaseCommit):
         return self._total
 
 
-class Comparison(object):
+class Comparison(GitHubObject):
     """The :class:`Comparison <Comparison>` object. This encapsulates the
     information returned by GitHub comparing two commit objects in a
     repository."""

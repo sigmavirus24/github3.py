@@ -8,7 +8,7 @@ This module contains everything relating to Users.
 
 from json import dumps
 from .event import Event
-from .models import GitHubCore, BaseAccount
+from .models import GitHubObject, GitHubCore, BaseAccount
 
 
 class Key(GitHubCore):
@@ -70,7 +70,7 @@ class Key(GitHubCore):
         return False
 
 
-class Plan(object):
+class Plan(GitHubObject):
     """The :class:`Plan <Plan>` object. This makes interacting with the plan
     information about a user easier.
     """

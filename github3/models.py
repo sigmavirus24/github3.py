@@ -11,7 +11,25 @@ from json import dumps
 from requests import session
 
 
-class GitHubCore(object):
+class GitHubObject(object):
+    """The :class:`GitHubObject <GitHubObject>` object. A basic class to be
+    subclassed by GitHubCore and other classes that would otherwise subclass
+    object."""
+    def __init__(self, json):
+        super(GitHubObject, self).__init__()
+        self._json_data = json
+
+    def to_json(self):
+        """Return the json representing this object."""
+        return self._json_data
+
+    @classmethod
+    def from_json(cls, json):
+        """Return an instance of ``cls`` formed from ``json``."""
+        return cls(json)
+
+
+class GitHubCore(GitHubObject):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
     """
@@ -35,14 +53,14 @@ class GitHubCore(object):
         if request.status_code == status_code and request.content:
             ret = request.json
         if request.status_code >= 400:
-            raise Error(request)
+            raise GitHubError(request)
         return ret
 
     def _boolean(self, request, true_code, false_code):
         if request.status_code == true_code:
             return True
         if request.status_code != false_code and request.status_code >= 400:
-            raise Error(request)
+            raise GitHubError(request)
         return False
 
     def _delete(self, url, **kwargs):
@@ -96,15 +114,6 @@ class GitHubCore(object):
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining
 
-    def to_json(self):
-        """Return the json representing this object."""
-        return self._json_data
-
-    @classmethod
-    def from_json(cls, json):
-        """Return an instance of ``cls`` formed from ``json``."""
-        return cls(json)
-
     @staticmethod
     def requires_auth(func):
         """Decorator to note which class methods require authorization."""
@@ -117,7 +126,7 @@ class GitHubCore(object):
             if auth:
                 return func(self, *args, **kwargs)
             else:
-                raise Error(type('Faux Request', (object, ),
+                raise GitHubError(type('Faux Request', (object, ),
                     {'status_code': 401, 'message': 'Requires authentication'}
                     ))
 
@@ -373,9 +382,9 @@ class BaseAccount(GitHubCore):
         return self._public_repos
 
 
-class Error(Exception):
+class GitHubError(Exception):
     def __init__(self, resp):
-        super(Error, self).__init__()
+        super(GitHubError, self).__init__()
         self._code = resp.status_code
         error = resp.json
         self._message = error.get('message')

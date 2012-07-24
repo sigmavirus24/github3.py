@@ -7,11 +7,11 @@ Module which contains all the gist related material.
 """
 
 from json import dumps
-from .models import GitHubCore, BaseComment
+from .models import GitHubObject, GitHubCore, BaseComment
 from .user import User
 
 
-class GistFile(object):
+class GistFile(GitHubObject):
     """The :class:`GistFile <GistFile>` object. This is used to represent a
     file object returned by GitHub while interacting with gists.
     """
