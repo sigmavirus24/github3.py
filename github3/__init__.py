@@ -18,3 +18,8 @@ __version__ = '0.1a3'
 from .api import *
 from .github import GitHub
 from .models import GitHubError
+
+from .event import Event
+from .gist import Gist, GistComment, GistFile
+from .git import Blob, GitData, Commit, Reference, GitObject, Tag, Tree, Hash
+from .issue import Issue, IssueComment, IssueEvent, Label, Milestone
