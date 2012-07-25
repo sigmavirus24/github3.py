@@ -200,6 +200,25 @@ Examples
     Have a clever example that takes advantage of github3.py? Feel free to 
     share it.
 
+Running the Unittests
+~~~~~~~~~~~~~~~~~~~~~
+
+To run the tests as they would be run by Travis CI::
+
+    CI=true ./unittests.py
+
+To test functions that require proper authorization::
+
+    ./unittests.py
+
+The latter will prompt you for your username and password, e.g.::
+
+    [ sigma: ~/sandbox/github3.py ] ./unittests.py
+    Enter GitHub username: sigmavirus24
+    Password for sigmavirus24:
+    === Starting unittest suite ===
+
+
 Contact
 -------
 

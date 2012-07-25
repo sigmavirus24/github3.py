@@ -36,9 +36,7 @@ Dependencies
 In Progress
 -----------
 
-- Repositories: **done**
-
-  - Downloads_: **stalled** [#]_
+- Repository Downloads_: **stalled** [#]_
 
 .. _Downloads: http://developer.github.com/v3/repos/downloads/
 
@@ -105,6 +103,27 @@ See the docs_ for more detailed examples.
   u'24ea44d302c6394a0372dcde8fd8aed899c0034b'
   >>> tag.object.type
   u'commit'
+
+Contributing
+------------
+
+Please see the section_ of the documentation pertaining to this.
+
+Testing
+~~~~~~~
+
+If you want to run the unittests with authentication, simply run::
+
+    ./unittests.py 
+
+From the root of the repository. If you would rather see what will take place 
+on Travis, run::
+
+    CI=true ./unittests.py
+
+
+.. links
+.. _section: http://github3py.readthedocs.org/en/latest/index.html#contributing
 
 Author
 ------
