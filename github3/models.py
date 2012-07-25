@@ -9,6 +9,7 @@ This module provides the basic models used in github3.py
 from datetime import datetime
 from json import dumps
 from requests import session
+from re import compile
 
 __url_cache__ = {}
 
@@ -46,6 +47,8 @@ class GitHubCore(GitHubObject):
         self._github_url = 'https://api.github.com'
         self._time_format = '%Y-%m-%dT%H:%M:%SZ'
         self._remaining = 5000
+        self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '
+                'rel="(\w+)"')
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))

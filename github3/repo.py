@@ -942,7 +942,9 @@ class Repository(GitHubCore):
         params.update(issue_params(None, state, labels, sort, direction,
             since))
 
-        json = self._json(self._get(url, params=params), 200)
+        request = self._get(url, params=params)
+
+        json = self._json(request, 200)
         return [Issue(i, self) for i in json]
 
     def list_issue_events(self):
