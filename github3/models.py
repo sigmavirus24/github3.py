@@ -10,6 +10,8 @@ from datetime import datetime
 from json import dumps
 from requests import session
 
+__url_cache__ = {}
+
 
 class GitHubObject(object):
     """The :class:`GitHubObject <GitHubObject>` object. A basic class to be
@@ -105,7 +107,10 @@ class GitHubCore(GitHubObject):
         """Builds a new API url from scratch."""
         parts = [kwargs.get('base_url') or self._github_url]
         parts.extend(args)
-        return '/'.join(parts)
+        key = tuple(parts)
+        if not key in __url_cache__:
+            __url_cache__[key] = '/'.join(parts)
+        return __url_cache__[key]
 
     @property
     def ratelimit_remaining(self):
