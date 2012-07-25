@@ -30,7 +30,7 @@ class Event(GitHubCore):
         self._payload = handler(event.get('payload'))
         self._org = event.get('org', {})
         if self._org:
-            Organization(self._org, self._session)
+            self._org = Organization(self._org, self)
 
     def __repr__(self):
         return '<Event [{0}]>'.format(self._type[:-5])
@@ -79,7 +79,7 @@ class Event(GitHubCore):
     @property
     def repo(self):
         """Return ``tuple(owner, repository_name)``"""
-        return self._repo
+        return tuple(self._repo['name'].split('/'))
 
     @property
     def type(self):
