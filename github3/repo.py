@@ -230,20 +230,21 @@ class Repository(GitHubCore):
         return sha
 
     @GitHubCore.requires_auth
-    def create_comment(self, body, sha, line, path, position):
+    def create_comment(self, body, sha, path, position, line=1):
         """Create a comment on a commit.
 
         :param body: (required), body of the message
         :type body: str
         :param sha: (required), commit id
         :type sha: str
-        :param line: (required), line number of the file to comment on
-        :type line: int
         :param path: (required), relative path of the file to comment
             on
         :type path: str
         :param position: (required), line index in the diff to comment on
         :type position: int
+        :param line: (optional), line number of the file to comment on,
+            default: 1
+        :type line: int
         :returns: :class:`RepoComment <RepoComment>` if successful else None
         """
         line = int(line)

@@ -10,6 +10,7 @@ API.
 """
 
 from .models import GitHubCore
+from re import match
 
 
 class LegacyIssue(GitHubCore):
@@ -264,6 +265,9 @@ class LegacyUser(GitHubCore):
         super(LegacyUser, self).__init__(user, session)
         self._created = None
         if user.get('created'):
+            pushed = user.get('pushed')
+            if not match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', pushed):
+                pushed = pushed[:-5] + 'Z'
             self._created = self._strptime(user.get('created'))
         self._followers = user.get('followers', 0)
         # same as followers_count
