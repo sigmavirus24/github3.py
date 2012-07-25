@@ -222,7 +222,7 @@ The latter will prompt you for your username and password, e.g.::
 Contact
 -------
 
-- Twitter: @sigmavirus24_
+- Twitter: @\ sigmavirus24_
 - Private email: graffatcolmingov [at] gmail
 - Mailing list: github3.py [at] librelist.com
 
