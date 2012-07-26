@@ -16,15 +16,18 @@ class Blob(GitHubObject):
     """The :class:`Blob <Blob>` object."""
     def __init__(self, blob):
         super(Blob, self).__init__(blob)
+        self._api = blob.get('url')
         self._content = blob.get('content')
         self._enc = blob.get('encoding')
         if self._enc == 'base64':
             self._decoded = b64decode(self._content)
         else:
             self._decoded = self._content
+        self._size = blob.get('size')
+        self._sha = blob.get('sha')
 
     def __repr__(self):
-        return '<Blob [{0:.10}]>'.format(self._decoded)
+        return '<Blob [{0:.10}]>'.format(self._sha)
 
     @property
     def content(self):
@@ -40,6 +43,16 @@ class Blob(GitHubObject):
     def encoding(self):
         """Encoding of the raw content."""
         return self._enc
+
+    @property
+    def sha(self):
+        """SHA1 of the blob"""
+        return self._sha
+
+    @property
+    def size(self):
+        """Size of the blob in bytes"""
+        return self._size
 
 
 class GitData(GitHubCore):
