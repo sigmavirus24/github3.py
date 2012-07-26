@@ -1,8 +1,6 @@
 import os
 import sys
 import unittest
-
-#sys.path.insert(0, os.path.abspath('..'))
 import github3
 
 
@@ -17,7 +15,7 @@ class BaseTest(unittest.TestCase):
         super(BaseTest, self).setUp()
         self.g = github3.GitHub()
         self.auth = False
-        user = os.environ.get('__USER')
+        user = self.user = os.environ.get('__USER')
         pw = os.environ.get('__PASS')
         if user and pw:
             self._g = github3.login(user, pw)
@@ -31,3 +29,8 @@ class BaseTest(unittest.TestCase):
                 assert value is not None
             except AssertionError:
                 self.fail('AssertionError: ' + msg)
+
+    def assertAreNotNone(self, obj, *attrs):
+        """Assert the attributes of the object are not none"""
+        for attr in attrs:
+            self.assertIsNotNone(getattr(obj, attr))
