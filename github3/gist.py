@@ -170,9 +170,8 @@ class Gist(GitHubCore):
 
     @property
     def files(self):
-        """List of :class:`GistFile <GistFile>` objects representing the files
-        stored in this gist."""
-        return self._files
+        """Number of files in this gist."""
+        return len(self._files)
 
     @GitHubCore.requires_auth
     def fork(self):
@@ -232,6 +231,11 @@ class Gist(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [GistComment(c, self) for c in json]
+
+    def list_files(self):
+        """List of :class:`GistFile <GistFile>` objects representing the files
+        stored in this gist."""
+        return self._files
 
     def refresh(self):
         """Updates this gist by getting the information from the API again.
