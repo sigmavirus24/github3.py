@@ -8,16 +8,14 @@ class TestEvent(base.BaseTest):
     def __test_events(self, events):
         expect(events) != []
         for e in events:
-            self.assertIsNotNone(e.actor)
-            self.assertIsNotNone(e.created_at)
-            self.assertIsNotNone(e.id)
+            self.assertAreNotNone(e, 'actor', 'created_at', 'id', 'repo',
+                    'type')
             if e.org:
                 expect(e.org).isinstance(Organization)
             expect(e.payload).isinstance(dict)
             expect(e.is_public()).isinstance(bool)
-            self.assertIsNotNone(e.repo)
+            expect(e.to_json()).isinstance(dict)
             expect(e.repo).isinstance(tuple)
-            self.assertIsNotNone(e.type)
 
     def test_events(self):
         expect(Event.list_types()) != []
