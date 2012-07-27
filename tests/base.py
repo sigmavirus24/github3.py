@@ -28,9 +28,10 @@ class BaseTest(unittest.TestCase):
             try:
                 assert value is not None
             except AssertionError:
-                self.fail('AssertionError: ' + msg)
+                self.fail(msg)
 
     def assertAreNotNone(self, obj, *attrs):
         """Assert the attributes of the object are not none"""
         for attr in attrs:
-            self.assertIsNotNone(getattr(obj, attr))
+            self.assertIsNotNone(getattr(obj, attr),
+                '{0} is None'.format(attr))

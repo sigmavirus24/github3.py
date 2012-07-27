@@ -161,7 +161,8 @@ class Repository(GitHubCore):
         return self._https_clone
 
     def commit(self, sha):
-        """Get a single commit.
+        """Get a single (repo) commit. See :func:`git_commit` for the Git Data
+        Commit.
 
         :param sha: (required), sha of the commit
         :type sha: str
@@ -695,6 +696,18 @@ class Repository(GitHubCore):
         :returns: bool
         """
         return self._priv
+
+    def git_commit(self, sha):
+        """Get a single (git) commit.
+
+        :param sha: (required), sha of the commit
+        :type sha: str
+        :returns: :class:`Commit <github3.git.Commit>` if successful,
+            otherwise None
+        """
+        url = self._build_url('git', 'commits', sha, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Commit(json, self) if json else None
 
     @property
     def git_clone(self):

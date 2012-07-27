@@ -234,6 +234,9 @@ class BaseCommit(GitHubCore):
         self._sha = commit.get('sha')
         self._msg = commit.get('message')
         self._parents = commit.get('parents', [])
+        if not self._sha:
+            i = self._api.rfind('/')
+            self._sha = self._api[i + 1:]
 
     @property
     def message(self):
