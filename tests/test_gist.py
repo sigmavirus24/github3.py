@@ -15,8 +15,7 @@ class TestGist(base.BaseTest):
             expect(g.list_files()).isinstance(list)
             expect(g.forks) >= 0
             self.assertAreNotNone(g, 'created_at', 'description',
-                    'git_pull_url', 'git_push_url', 'html_url')
-            expect(g.id) >= 1
+                    'git_pull_url', 'git_push_url', 'html_url', 'id')
             expect(g.is_public()).isinstance(bool)
             expect(g.is_starred()).isinstance(bool)
             expect(g.to_json()).isinstance(dict)
