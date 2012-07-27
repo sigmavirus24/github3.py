@@ -158,6 +158,7 @@ class Reference(GitHubCore):
         """The reference path, e.g., refs/heads/sc/featureA"""
         return self._ref
 
+    @GitHubCore.requires_auth
     def update(self, sha, force=False):
         """Update this reference.
 
