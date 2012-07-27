@@ -43,8 +43,15 @@ class TestGit(base.BaseTest):
         hashes = tree.tree  # Odd access, right?
         for h in hashes:
             expect(h).isinstance(Hash)
+            self.assertAreNotNone(h, 'mode', 'path', 'sha', 'size', 'type',
+                    'url')
 
     def test_refs(self):
         r = self.todor
         ref = r.ref('heads/development')
         expect(ref).isinstance(Reference)
+        self.assertAreNotNone(ref, 'object', 'ref')
+
+        with expect.raises(github3.GitHubError):
+            ref.delete()
+            ref.update('31e862095dffa60744f1ce16a431ea040381f053')
