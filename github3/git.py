@@ -18,6 +18,8 @@ class Blob(GitHubObject):
         super(Blob, self).__init__(blob)
         self._api = blob.get('url')
         self._content = blob.get('content')
+        if isinstance(self._content, bytes):
+            self._content = self._content.decode('utf-8')
         self._enc = blob.get('encoding')
         if self._enc == 'base64':
             self._decoded = b64decode(self._content)

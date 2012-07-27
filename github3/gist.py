@@ -186,7 +186,7 @@ class Gist(GitHubCore):
     @property
     def forks(self):
         """The number of forks of this gist."""
-        return self._forks
+        return len(self._forks)
 
     @property
     def git_pull_url(self):
@@ -236,6 +236,10 @@ class Gist(GitHubCore):
         """List of :class:`GistFile <GistFile>` objects representing the files
         stored in this gist."""
         return self._files
+
+    def list_forks(self):
+        """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
+        return self._forks
 
     def refresh(self):
         """Updates this gist by getting the information from the API again.
