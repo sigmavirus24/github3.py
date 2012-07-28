@@ -209,6 +209,11 @@ def search_email(email):
     return gh.search_email(email)
 
 
+def user(login):
+    """See :func:`user <github3.github.GitHub.user>`."""
+    return gh.user(login)
+
+
 def ratelimit_remaining():
     """Get the remaining number of requests allowed."""
     return gh.ratelimit_remaining

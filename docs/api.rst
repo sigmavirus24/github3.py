@@ -77,4 +77,8 @@ Or you can simply use the following functions
 
 ------
 
+.. autofunction:: github3.user
+
+------
+
 .. autofunction:: github3.ratelimit_remaining

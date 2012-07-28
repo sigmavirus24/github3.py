@@ -756,6 +756,15 @@ class Repository(GitHubCore):
         """Unique id of the repository."""
         return self._id
 
+    def is_assignee(self, login):
+        """Check if the user is a possible assignee for an issue on this
+        repository.
+
+        :returns: :class:`bool`
+        """
+        url = self._build_url('assignees', login, base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
+
     def issue(self, number):
         """Get the issue specified by ``number``.
 
@@ -801,6 +810,15 @@ class Repository(GitHubCore):
     def language(self):
         """Language property."""
         return self._lang
+
+    def list_assignees(self):
+        """List all available assignees to which an issue may be assigned.
+
+        :returns: list of :class:`User <github3.user.User>`\ s
+        """
+        url = self._build_url('assignees', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(u, self) for u in json]
 
     def list_branches(self):
         """List the branches in this repository.
