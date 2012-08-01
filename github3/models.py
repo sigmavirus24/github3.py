@@ -10,6 +10,7 @@ from datetime import datetime
 from json import dumps
 from requests import session
 from re import compile
+from functools import wraps
 
 __url_cache__ = {}
 
@@ -125,6 +126,7 @@ class GitHubCore(GitHubObject):
     @staticmethod
     def requires_auth(func):
         """Decorator to note which class methods require authorization."""
+        @wraps(func)
         def auth_wrapper(self, *args, **kwargs):
             auth = False
             if hasattr(self, '_session'):
