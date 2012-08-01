@@ -8,6 +8,7 @@ This module contains the class relating to repositories.
 
 from base64 import b64decode
 from json import dumps
+from requests import post
 from .event import Event
 from .issue import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag, Tree
@@ -295,15 +296,16 @@ class Repository(GitHubCore):
     @GitHubCore.requires_auth
     def create_download(self, name, path, description='',
             content_type='text/plain'):
-        """THIS DOES NOT WORK.
-
-        Create a new download on this repository.
+        """Create a new download on this repository.
 
         I do not require you provide the size in bytes because it can be
         determined by the operating system.
 
-        :param name: (required), name of the file as it will appear
-        :type name: str
+        .. warning::
+            This will not work until the release of requests after 0.13.5 or
+            unless I vendorize requests as it is now (1 Aug 2012)
+
+        :param str name: (required), name of the file as it will appear
         :param path: (required), path to the file
         :type path: str
         :param description: (optional), description of the file
@@ -321,36 +323,20 @@ class Repository(GitHubCore):
                 'description': description, 'content_type': content_type})
             json = self._json(self._post(url, data), 201)
 
-        if json:
-            form = [('key', json.get('path')),
-                ('acl', json.get('acl')),
-                ('success_action_status', '201'),
-                ('Filename', json.get('name')),
-                ('AWSAccessKeyId', json.get('accesskeyid')),
-                ('Policy', json.get('policy')),
-                ('Signature', json.get('signature')),
-                ('Content-Type', json.get('mime_type'))]
-            boundary = '--GitHubBoundary'
-            form_data = []
-            for (k, v) in form:
-                tmp = [boundary,
-                        'Content-Disposition: form-data; name="{0}"'.format(k),
-                        '', v]
-                form_data.extend(tmp)
-            form_data.append(boundary)
-            form_data.append('Content-Disposition: form-data; ' +
-                    'name="{0}"; filename="{1}"'.format(k, json.get('name')))
-            #form_data.append('Content-Type: ' + json.get('mime_type'))
-            form_data.extend(['', open(path, 'rb').read()])
-            form_data.append(boundary + '--')
-            form_data.append('')
-            form_data = '\r\n'.join(form_data)
-            headers = {'Content-Type':
-                    'multipart/form-data; boundary={0}'.format(boundary[2:]),
-                    'Content-Length': str(len(form_data))}
-            resp = self._post(json.get('s3_url'), data, headers=headers)
-            print(resp)
-            print(resp.content)
+        if not json:
+            return None
+
+        form = [('key', json.get('path')),
+            ('acl', json.get('acl')),
+            ('success_action_status', '201'),
+            ('Filename', json.get('name')),
+            ('AWSAccessKeyId', json.get('accesskeyid')),
+            ('Policy', json.get('policy')),
+            ('Signature', json.get('signature')),
+            ('Content-Type', json.get('mime_type'))]
+        resp = post(json.get('s3_url'), data=form,
+                files={'file': open(path, 'rb').read()})
+        return resp
 
     @GitHubCore.requires_auth
     def create_fork(self, organization=None):
