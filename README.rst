@@ -11,20 +11,12 @@ Eventually this will be a python module to access the GitHub v3 API.
 This is not stable yet and there is no backwards compatibility yet. There will 
 likely be some changes which change behavior in the near future.
 
-Easy Cloning
+Installation
 ------------
-
-Assuming you have git 1.7.x (although I'm not entirely certain what version
-it was introduced in) you can perform ``git clone --recursive
-git://github.com/sigmavirus24/github3.py.git github3.py`` to clone this 
-and the submodule at the same time. Otherwise you have to do:
 
 ::
 
-    $ git clone git://github.com/sigmavirus24/github3.py.git
-    $ cd github3.py
-    $ git submodule init
-    $ git submodule update
+    $ pip install github3.py
 
 Dependencies
 ------------
@@ -32,13 +24,6 @@ Dependencies
 - requests_  by Kenneth Reitz
   
 .. _requests: https://github.com/kennethreitz/requests
-
-In Progress
------------
-
-- Repository Downloads_: **stalled** [#]_
-
-.. _Downloads: http://developer.github.com/v3/repos/downloads/
 
 License
 -------
@@ -135,7 +120,3 @@ Contact Options
 
 - You may contact (via email) the author directly with questions/suggestions
 - You may send your email to github3.py@librelist.com
-
-.. [#] Creating a download via Amazon S3 seems to always return an invalid
-       multipart/form-data POST request.
-
