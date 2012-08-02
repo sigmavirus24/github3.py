@@ -332,18 +332,18 @@ class Repository(GitHubCore):
         # While requests doesn't have the ability to accept k/v lists leave
         # this commented.
         #file = [('file', open(path, 'rb').read())]
-        #resp = self._post(json.get('s3_url', data=form, files=file,
+        #resp = self._post(json.get('s3_url'), data=form, files=file,
         #           auth=tuple())
 
         # Recipe so we don't need to wait for requests to have this
         # functionality
         boundary = '--GitHubBoundary'
         content_disposition = 'Content-Disposition: form-data; name="{0}"'
-        data = []
+        data = [boundary]
+
         for (k, v) in form:
-            tmp = [boundary, content_disposition.format(k), '', v]
-            data.extend(tmp)
-        data.append(boundary)
+            data.extend([content_disposition.format(k), '', v, boundary])
+
         data.append(content_disposition.format('file') +
                 '; filename="{0}"'.format(json.get('name')))
         data.extend(['', open(path, 'rb').read(), boundary + '--', ''])
