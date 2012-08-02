@@ -125,7 +125,15 @@ class GitHubCore(GitHubObject):
 
     @staticmethod
     def requires_auth(func):
-        """Decorator to note which class methods require authorization."""
+        """Decorator to note which object methods require authorization."""
+        note = """
+        .. note::
+            The signature of this function may not appear correctly in
+            documentation. Please adhere to the defined parameters and their
+            types.
+        """
+        func.__doc__ = '\n'.join([func.__doc__, note])
+
         @wraps(func)
         def auth_wrapper(self, *args, **kwargs):
             auth = False

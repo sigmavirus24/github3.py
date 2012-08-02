@@ -179,15 +179,10 @@ Contributor Friendly Work
 
 In order of importance:
 
-:func:`create_download <github3.repo.Repository.create_download>`
-
-    If you're familiar with Amazon's S3 web services and have the patience to 
-    debug this function, I would greatly appreciate it.
-
 Unittests
 
     I really should have written these as I wrote the code. I didn't, so they 
-    need to be written now. If you want to write some, I would sinerely 
+    need to be written now. If you want to write some, I would sincerely 
     appreciate it.
 
 Documentation
