@@ -7,7 +7,7 @@ This module contains everything relating to Users.
 """
 
 from json import dumps
-from .event import Event
+from .events import Event
 from .models import GitHubObject, GitHubCore, BaseAccount
 
 

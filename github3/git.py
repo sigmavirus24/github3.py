@@ -9,7 +9,7 @@ This module contains all the classes relating to Git Data.
 from base64 import b64decode
 from json import dumps
 from .models import GitHubObject, GitHubCore, BaseCommit
-from .user import User
+from .users import User
 
 
 class Blob(GitHubObject):

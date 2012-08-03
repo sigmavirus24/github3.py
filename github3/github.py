@@ -8,14 +8,14 @@ This module contains the main GitHub session object.
 
 from requests import session
 from json import dumps
-from .event import Event
-from .gist import Gist
-from .issue import Issue, issue_params
+from .events import Event
+from .gists import Gist
+from .issues import Issue, issue_params
 from .legacy import LegacyIssue, LegacyRepo, LegacyUser
 from .models import GitHubCore
-from .org import Organization
-from .repo import Repository
-from .user import User, Key
+from .orgs import Organization
+from .repos import Repository
+from .users import User, Key
 
 
 class GitHub(GitHubCore):

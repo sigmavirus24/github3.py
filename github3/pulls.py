@@ -9,7 +9,7 @@ This module contains all the classes relating to pull requests.
 from json import dumps
 from .git import Commit
 from .models import GitHubObject, GitHubCore, BaseComment
-from .user import User
+from .users import User
 
 
 class PullDestination(GitHubCore):

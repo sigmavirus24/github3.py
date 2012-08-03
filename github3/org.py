@@ -7,10 +7,10 @@ This module contains all of the classes related to organizations.
 """
 
 from json import dumps
-from .event import Event
+from .events import Event
 from .models import BaseAccount, GitHubCore
-from .repo import Repository
-from .user import User
+from .repos import Repository
+from .users import User
 
 
 class Team(GitHubCore):

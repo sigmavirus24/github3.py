@@ -9,7 +9,7 @@ This module contains the classes related to issues.
 from json import dumps
 from re import match
 from .models import GitHubCore, BaseComment
-from .user import User
+from .users import User
 
 
 class Label(GitHubCore):

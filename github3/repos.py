@@ -8,12 +8,12 @@ This module contains the class relating to repositories.
 
 from base64 import b64decode
 from json import dumps
-from .event import Event
-from .issue import Issue, Label, Milestone, issue_params
+from .events import Event
+from .issues import Issue, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag, Tree
 from .models import GitHubObject, GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
-from .user import User, Key
+from .users import User, Key
 
 
 class Repository(GitHubCore):

@@ -8,7 +8,7 @@ Module which contains all the gist related material.
 
 from json import dumps
 from .models import GitHubObject, GitHubCore, BaseComment
-from .user import User
+from .users import User
 
 
 class GistFile(GitHubObject):
