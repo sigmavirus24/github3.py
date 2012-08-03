@@ -1,7 +1,7 @@
 import base
 from expecter import expect
-from github3.event import Event
-from github3.org import Organization
+from github3.events import Event
+from github3.orgs import Organization
 
 
 class TestEvent(base.BaseTest):

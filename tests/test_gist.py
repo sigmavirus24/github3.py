@@ -1,7 +1,8 @@
 import base
 from expecter import expect
 import github3
-from github3 import Gist, GistComment, GistFile, User
+from github3.gists import Gist, GistComment, GistFile
+from github3.users import User
 
 
 class TestGist(base.BaseTest):

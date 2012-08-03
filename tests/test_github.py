@@ -92,7 +92,7 @@ class TestGitHub(base.BaseTest):
 
         i = self.g.issue(self.sigm, self.todo, 1)
         self.assertIsNotNone(i)
-        expect(i).isinstance(github3.github.Issue)
+        expect(i).isinstance(github3.issues.Issue)
         expect(i.list_comments()) != []
         # Test listing issues
         list_issues = self.g.list_issues

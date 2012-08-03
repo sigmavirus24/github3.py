@@ -1,7 +1,7 @@
 import base
 from expecter import expect
 import github3
-from github3 import Commit, Blob, Reference, Tag, Tree, Hash
+from github3.git import Commit, Blob, Reference, Tag, Tree, Hash
 
 
 class TestGit(base.BaseTest):
