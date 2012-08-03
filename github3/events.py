@@ -16,8 +16,8 @@ class Event(GitHubCore):
     """
     def __init__(self, event, session=None):
         super(Event, self).__init__(event, session)
-        from .user import User
-        from .org import Organization
+        from .users import User
+        from .orgs import Organization
         self._created = self._strptime(event.get('created_at'))
         self._type = event.get('type')
         self._public = event.get('public')
@@ -88,42 +88,42 @@ class Event(GitHubCore):
 
 
 def _commitcomment(payload):
-    from .repo import RepoComment
+    from .repos import RepoComment
     if payload.get('comment'):
         payload['comment'] = RepoComment(payload['comment'], None)
     return payload
 
 
 def _download(payload):
-    from .repo import Download
+    from .repos import Download
     if payload.get('download'):
         payload['download'] = Download(payload['download'], None)
     return payload
 
 
 def _follow(payload):
-    from .user import User
+    from .users import User
     if payload.get('target'):
         payload['target'] = User(payload['target'], None)
     return payload
 
 
 def _forkev(payload):
-    from .repo import Repository
+    from .repos import Repository
     if payload.get('forkee'):
         payload['forkee'] = Repository(payload['forkee'], None)
     return payload
 
 
 def _gist(payload):
-    from .gist import Gist
+    from .gists import Gist
     if payload.get('gist'):
         payload['gist'] = Gist(payload['gist'], None)
     return payload
 
 
 def _issuecomm(payload):
-    from .issue import Issue, IssueComment
+    from .issues import Issue, IssueComment
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     if payload.get('comment'):
@@ -132,14 +132,14 @@ def _issuecomm(payload):
 
 
 def _issueevent(payload):
-    from .issue import Issue
+    from .issues import Issue
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     return payload
 
 
 def _member(payload):
-    from .user import User
+    from .users import User
     if payload.get('member'):
         payload['member'] = User(payload['member'], None)
     return payload
@@ -160,9 +160,9 @@ def _pullreqcomm(payload):
 
 
 def _team(payload):
-    from .org import Team
-    from .repo import Repository
-    from .user import User
+    from .orgs import Team
+    from .repos import Repository
+    from .users import User
     if payload.get('team'):
         payload['team'] = Team(payload['team'], None)
     if payload.get('repo'):

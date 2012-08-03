@@ -85,7 +85,7 @@ class Gist(GitHubCore):
         self._json_data = data
         # The gist identifier
         self._id = data.get('id')
-        self._desc = data.get('description')
+        self._desc = data.get('description', '')
 
         # e.g. https://api.github.com/gists/1
         self._api = data.get('url')

@@ -145,8 +145,8 @@ class GitHubCore(GitHubObject):
                 return func(self, *args, **kwargs)
             else:
                 raise GitHubError(type('Faux Request', (object, ),
-                    {'status_code': 401, 'message': 'Requires authentication',
-                        'json': {}}
+                    {'status_code': 401, 'json': {
+                        'message': 'Requires authentication'}}
                     ))
         return auth_wrapper
 

@@ -89,17 +89,16 @@ class TestGitHub(base.BaseTest):
             self.g.create_issue(self.sigm, self.todo, title)
             # Try to get individual ones
             self.g.issue(self.sigm, self.todo, 2000)
+            self.g.list_user_issues()
 
         i = self.g.issue(self.sigm, self.todo, 1)
         self.assertIsNotNone(i)
         expect(i).isinstance(github3.issues.Issue)
         expect(i.list_comments()) != []
         # Test listing issues
-        list_issues = self.g.list_issues
+        list_issues = self.g.list_repo_issues
         expect(list_issues(self.kr, 'requests')) != []
-        issues = list_issues(self.sigm, self.todo, 'subscribed')
-        if issues:
-            self.fail('Cannot be subscribed to issues.')
+        expect(list_issues(self.sigm, self.todo)).isinstance(list)
         for f in ('assigned', 'created', 'mentioned'):
             self.assertIsNotNone(list_issues(self.sigm, self.todo, f))
         for s in ('open', 'closed'):

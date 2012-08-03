@@ -365,49 +365,59 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Gist(gist, self) for gist in json]
 
-    def list_issues(self,
-        owner='',
-        repository='',
-        filter='',
-        state='',
-        labels='',
-        sort='',
-        direction='',
-        since=''):
-        """If no parameters are provided, this gets the issues for the
-        authenticated user. All parameters are optional with the
-        exception that owner and repository must be supplied together.
+    @GitHubCore.requires_auth
+    def list_user_issues(self, filter='', state='', labels='', sort='',
+        direction='', since=''):
+        """List the authenticated user's issues.
 
-        :param filter: accepted values:
+        :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
             api-default: 'assigned'
-        :type filter: str
-        :param state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('open', 'closed')
             api-default: 'open'
-        :type state: str
-        :param labels: comma-separated list of label names, e.g.,
+        :param str labels: comma-separated list of label names, e.g.,
             'bug,ui,@high'
-        :type labels: str
-        :param sort: accepted values: ('created', 'updated', 'comments')
+        :param str sort: accepted values: ('created', 'updated', 'comments')
             api-default: created
-        :type sort: str
-        :param direction: accepted values: ('asc', 'desc')
+        :param str direction: accepted values: ('asc', 'desc')
             api-default: desc
-        :type direction: str
-        :param since: ISO 8601 formatted timestamp, e.g.,
+        :param str since: ISO 8601 formatted timestamp, e.g.,
             2012-05-20T23:10:27Z
-        :type since: str
+        """
+        url = self._build_url('issues')
+        params = issue_params(filter, state, labels, sort, direction,
+                since)
+        json = self._json(self._get(url, params=params), 200)
+        return [Issue(issue, self) for issue in json]
+
+    def list_repo_issues(self, owner, repository, milestone=None,
+        state='', assignee='', mentioned='', labels='', sort='', direction='',
+        since=''):
+        """List issues on owner/repository. Only owner and repository are
+        required.
+
+        :param str owner: login of the owner of the repository
+        :param str repository: name of the repository
+        :param int milestone: None, '*', or ID of milestone
+        :param str state: accepted values: ('open', 'closed')
+            api-default: 'open'
+        :param str assignee: '*' or login of the user
+        :param str mentioned: login of the user
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param str since: ISO 8601 formatted timestamp, e.g.,
+            2012-05-20T23:10:27Z
         :returns: list of :class:`Issue <github3.issue.Issue>`\ s
         """
+        issues = None
         if owner and repository:
             repo = self.repository(owner, repository)
-            issues = repo.list_issues()
-        else:
-            url = self._build_url('issues')
-            params = issue_params(filter, state, labels, sort, direction,
-                    since)
-            json = self._json(self._get(url, params=params), 200)
-            issues = [Issue(issue, self) for issue in json]
+            issues = repo.list_issues(milestone, state, assignee, mentioned,
+                    labels, direction, since)
         return issues
 
     def list_keys(self):
