@@ -21,12 +21,9 @@ def login(username, password, token=None):
     """Constructs and returns a GitHub session with the username and
     password, or token
 
-    :param username: login name
-    :type username: str
-    :param password: password for the login
-    :type password: str
-    :param token: (optional), OAuth token
-    :type token: str
+    :param str username: login name
+    :param str password: password for the login
+    :param str token: (optional), OAuth token
     :returns: :class:`GitHub <github3.github.GitHub>`
     """
     g = GitHub()
@@ -37,8 +34,7 @@ def login(username, password, token=None):
 def gist(id_num):
     """Get the gist identified by ``id_num``.
 
-    :param id_num: (required), unique id of the gist
-    :type id_num: int
+    :param int id_num: (required), unique id of the gist
     :returns: :class:`Gist <github3.gist.Gist>`
     """
     return gh.gist(id_num)
@@ -47,9 +43,8 @@ def gist(id_num):
 def list_gists(username=None):
     """Get public gists or gists for the provided username.
 
-    :param username: (optional), if provided, get the gists for this user
+    :param str username: (optional), if provided, get the gists for this user
         instead of the authenticated user.
-    :type username: str
     :returns: list of :class:`Gist <github3.gist.Gist>`\ s
     """
     return gh.list_gists(username)
@@ -58,8 +53,8 @@ def list_gists(username=None):
 def list_followers(username):
     """List the followers of ``username``.
 
-    :param username: (required), login of the person to list the followers of
-    :type username: str
+    :param str username: (required), login of the person to list the followers
+        of
     """
     return gh.list_followers(username) if username else []
 
@@ -67,8 +62,7 @@ def list_followers(username):
 def list_following(username):
     """List the people ``username`` follows.
 
-    :param username: (required), login of the user
-    :type username: str
+    :param str username: (required), login of the user
     """
     return gh.list_following(username) if username else []
 
@@ -86,8 +80,7 @@ def list_issues(owner, repository, filter='', state='', labels='', sort='',
 def list_orgs(username):
     """List the organizations associated with ``username``.
 
-    :param username: (required), login of the user
-    :type username: str
+    :param str username: (required), login of the user
     """
     return gh.list_orgs(username) if username else []
 
@@ -100,12 +93,10 @@ def list_repos(login, type='', sort='', direction=''):
 def create_gist(description, files):
     """Creates an anonymous public gist.
 
-    :param description: (required), short description of the gist
-    :type description: str
-    :param files: (required), file names with associated
+    :param str description: (required), short description of the gist
+    :param dict files: (required), file names with associated
         dictionaries for content, e.g.
         {'spam.txt': {'content': 'File contents ...'}}
-    :type files: dict
     :returns: :class:`Gist <github3.gist.Gist>`
     """
     return gh.create_gist(description, files)
@@ -114,12 +105,9 @@ def create_gist(description, files):
 def issue(owner, repository, number):
     """Anonymously gets issue :number on :owner/:repository.
 
-    :param owner: (required), repository owner
-    :type owner: str
-    :param repository: (required), repository name
-    :type repository: str
-    :param number: (required), issue number
-    :type number: int
+    :param str owner: (required), repository owner
+    :param str repository: (required), repository name
+    :param int number: (required), issue number
     :returns: :class:`Issue <github3.issue.Issue>`
     """
     return gh.issue(owner, repository, number)
@@ -136,16 +124,12 @@ def list_events():
 def markdown(text, mode='', context='', raw=False):
     """Render an arbitrary markdown document.
 
-    :param text: (required), the text of the document to render
-    :type text: str
-    :param mode: (optional), 'markdown' or 'gfm'
-    :type mode: str
-    :param context: (optional), only important when using mode 'gfm',
+    :param str text: (required), the text of the document to render
+    :param str mode: (optional), 'markdown' or 'gfm'
+    :param str context: (optional), only important when using mode 'gfm',
         this is the repository to use as the context for the rendering
-    :type context: str
-    :param raw: (optional), renders a document like a README.md, no gfm, no
-        context
-    :type raw: bool
+    :param bool raw: (optional), renders a document like a README.md, no gfm,
+        no context
     :returns: str -- HTML formatted text
     """
     return gh.markdown(text, mode, context, raw)
@@ -164,14 +148,10 @@ def repository(owner, repository):
 def search_issues(owner, repo, state, keyword):
     """Find issues by state and keyword.
 
-    :param owner: (required)
-    :type owner: str
-    :param repo: (required)
-    :type repo: str
-    :param state: (required), accepted values: ('open', 'closed')
-    :type state: str
-    :param keyword: (required), what to search for
-    :type keyword: str
+    :param str owner: (required)
+    :param str repo: (required)
+    :param str state: (required), accepted values: ('open', 'closed')
+    :param str keyword: (required), what to search for
     :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
     """
     return gh.search_issues(owner, repo, state, keyword)
@@ -192,8 +172,7 @@ def search_repos(keyword, **params):
 def search_users(keyword):
     """Search all users by keyword.
 
-    :param keyword: (required)
-    :type keyword: str
+    :param str keyword: (required)
     :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
     """
     return gh.search_users(keyword)
@@ -202,8 +181,7 @@ def search_users(keyword):
 def search_email(email):
     """Search users by email.
 
-    :param email: (required)
-    :type keyword: str
+    :param str email: (required)
     :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
     """
     return gh.search_email(email)
