@@ -50,51 +50,6 @@ class Team(GitHubCore):
         url = self._build_url('repos', repo, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
-    @GitHubCore.requires_auth
-    def create_repo(self,
-        name,
-        description='',
-        homepage='',
-        private=False,
-        has_issues=True,
-        has_wiki=True,
-        has_downloads=True,
-        team_id=0):
-        """Create a repository for this organization if the authenticated user
-        is a member.
-
-        :param name: (required), name of the repository
-        :type name: str
-        :param description: (optional)
-        :type description: str
-        :param homepage: (optional)
-        :type homepage: str
-        :param private: (optional), If ``True``, create a private repository.
-            API default: ``False``
-        :type private: bool
-        :param has_issues: (optional), If ``True``, enable issues for this
-            repository. API default: ``True``
-        :type has_issues: bool
-        :param has_wiki: (optional), If ``True``, enable the wiki for this
-            repository. API default: ``True``
-        :type has_wiki: bool
-        :param has_downloads: (optional), If ``True``, enable downloads for
-            this repository. API default: ``True``
-        :type has_downloads: bool
-        :param team_id: (optional), id of the team that will be granted
-            access to this repository
-        :type team_id: int
-        :returns: :class:`Repository <github3.repo.Repository>`
-        """
-        url = self._build_url('user', 'repos')
-        data = {'name': name, 'description': description,
-            'homepage': homepage, 'private': private,
-            'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads}
-        if team_id > 0:
-            data.update({'team_id': team_id})
-        json = self._json(self._post(url, dumps(data)), 204)
-        return Repository(json, self) if json else None
 
     @GitHubCore.requires_auth
     def delete(self):
@@ -252,6 +207,55 @@ class Organization(BaseAccount):
             if team == t.name:
                 return t.add_repo(repo)
         return False
+
+    @GitHubCore.requires_auth
+    def create_repo(self,
+        name,
+        description='',
+        homepage='',
+        private=False,
+        has_issues=True,
+        has_wiki=True,
+        has_downloads=True,
+        team_id=0):
+        """Create a repository for this organization if the authenticated user
+        is a member.
+
+        :param name: (required), name of the repository
+        :type name: str
+        :param description: (optional)
+        :type description: str
+        :param homepage: (optional)
+        :type homepage: str
+        :param private: (optional), If ``True``, create a private repository.
+            API default: ``False``
+        :type private: bool
+        :param has_issues: (optional), If ``True``, enable issues for this
+            repository. API default: ``True``
+        :type has_issues: bool
+        :param has_wiki: (optional), If ``True``, enable the wiki for this
+            repository. API default: ``True``
+        :type has_wiki: bool
+        :param has_downloads: (optional), If ``True``, enable downloads for
+            this repository. API default: ``True``
+        :type has_downloads: bool
+        :param team_id: (optional), id of the team that will be granted
+            access to this repository
+        :type team_id: int
+        :returns: :class:`Repository <github3.repo.Repository>`
+        """
+        url = self._build_url('repos',base_url=self._api)
+        print url
+        data = {'name': name, 'description': description,
+            'homepage': homepage, 'private': private,
+            'has_issues': has_issues, 'has_wiki': has_wiki,
+            'has_downloads': has_downloads}
+        if team_id > 0:
+            data.update({'team_id': team_id})
+        print dumps(data)
+        json = self._json(self._post(url, dumps(data)), 204)
+        return Repository(json, self) if json else None
+
 
     @GitHubCore.requires_auth
     def conceal_member(self, login):
