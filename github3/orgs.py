@@ -50,7 +50,6 @@ class Team(GitHubCore):
         url = self._build_url('repos', repo, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
-
     @GitHubCore.requires_auth
     def delete(self):
         """Delete this team.
@@ -244,18 +243,15 @@ class Organization(BaseAccount):
         :type team_id: int
         :returns: :class:`Repository <github3.repo.Repository>`
         """
-        url = self._build_url('repos',base_url=self._api)
-        print url
+        url = self._build_url('repos', base_url=self._api)
         data = {'name': name, 'description': description,
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads}
         if team_id > 0:
             data.update({'team_id': team_id})
-        print dumps(data)
         json = self._json(self._post(url, dumps(data)), 204)
         return Repository(json, self) if json else None
-
 
     @GitHubCore.requires_auth
     def conceal_member(self, login):
