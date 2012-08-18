@@ -12,3 +12,6 @@ tests: travis
 
 alltests:
 	./unittests.py
+
+docs:
+	make -C docs/ html
