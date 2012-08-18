@@ -47,7 +47,7 @@ class TestGitHub(base.BaseTest):
             self.assertIsNotNone(gist)
             expect(gist.description) == desc
             expect(gist.is_public()) == False
-            for g in gist.files:
+            for g in gist.list_files():
                 expect(g.content) == files[g.name]['content']
             expect(gist.delete()) == True
 

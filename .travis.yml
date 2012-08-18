@@ -7,7 +7,7 @@ python:
 # --use-mirrors
 install: pip install -r requirements.txt
 # # command to run tests, e.g. python setup.py test
-script:  python unittests.py
+script:  make travis
 notifications:
    on_success: change
    on_failure: always
