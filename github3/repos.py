@@ -328,34 +328,11 @@ class Repository(GitHubCore):
             ('AWSAccessKeyId', json.get('accesskeyid')),
             ('Policy', json.get('policy')),
             ('Signature', json.get('signature')),
-            ('Content-Type', json.get('mime_type'))]
-        # While requests doesn't have the ability to accept k/v lists leave
-        # this commented.
-        #file = [('file', open(path, 'rb').read())]
-        #resp = self._post(json.get('s3_url'), data=form, files=file,
-        #           auth=tuple())
+            ('Content-Type', json.get('mime_type')),
+            ('file', open(path, 'rb').read())]
+        resp = self._post(json.get('s3_url'), files=form, auth=tuple())
 
-        # Recipe so we don't need to wait for requests to have this
-        # functionality
-        boundary = '--GitHubBoundary'
-        content_disposition = 'Content-Disposition: form-data; name="{0}"'
-        data = [boundary]
-
-        for (k, v) in form:
-            data.extend([content_disposition.format(k), '', v, boundary])
-
-        data.append(content_disposition.format('file') +
-                '; filename="{0}"'.format(json.get('name')))
-        data.extend(['', open(path, 'rb').read(), boundary + '--', ''])
-        form = '\r\n'.join(data)
-        headers = {'Content-Type': 'multipart/form-data; boundary={0}'.format(
-            boundary[2:]), 'Content-Length': str(len(form))}
-
-        # Need to disable auth so Amazon doesn't think we're trying to
-        # authenticate that way
-        resp = self._post(json.get('s3_url'), data=form, headers=headers,
-                auth=tuple())
-        return resp.status_code == 201
+        return Download(json, self) if self._boolean(resp, 201, 404) else None
 
     @GitHubCore.requires_auth
     def create_fork(self, organization=None):
