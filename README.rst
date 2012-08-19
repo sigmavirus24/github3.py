@@ -99,12 +99,14 @@ Testing
 
 If you want to run the unittests with authentication, simply run::
 
-    ./unittests.py 
+    make alltests
 
 From the root of the repository. If you would rather see what will take place 
 on Travis, run::
 
-    CI=true ./unittests.py
+    make travis
+    # or
+    make tests
 
 
 .. links

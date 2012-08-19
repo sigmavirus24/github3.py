@@ -521,8 +521,8 @@ class IssueEvent(GitHubCore):
             self._pull_patch = pull_req.get('patch_url')
 
     def __repr__(self):
-        return '<Issue Event [#{0} - {1} - {2}]>'.format(self._issue.number,
-                self._event, self._actor.login)
+        return '<Issue Event [#{0} - {1}]>'.format(self._issue.number,
+                self._event)
 
     @property
     def event(self):
