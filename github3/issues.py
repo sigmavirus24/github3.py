@@ -50,10 +50,8 @@ class Label(GitHubCore):
     def update(self, name, color):
         """Update this label.
 
-        :param name: (required), new name of the label
-        :type name: str
-        :param color: (required), color code, e.g., 626262, no leading '#'
-        :type color: str
+        :param str name: (required), new name of the label
+        :param str color: (required), color code, e.g., 626262, no leading '#'
         :returns: bool
         """
         if color[0] == '#':
@@ -165,14 +163,11 @@ class Milestone(GitHubCore):
 
         state, description, and due_on are optional
 
-        :param title: (required), new title of the milestone
-        :type title: str
-        :param state: (optional), ('open', 'closed')
-        :type state: str
-        :param description: (optional)
-        :type description: str
-        :param due_on: (optional), ISO 8601 time format: YYYY-MM-DDTHH:MM:SSZ
-        :type due_on: str
+        :param str title: (required), new title of the milestone
+        :param str state: (optional), ('open', 'closed')
+        :param str description: (optional)
+        :param str due_on: (optional), ISO 8601 time format:
+            YYYY-MM-DDTHH:MM:SSZ
         :returns: bool
         """
         inp = dumps({'title': title, 'state': state,
@@ -199,6 +194,7 @@ class Issue(GitHubCore):
 
     def _update_(self, issue):
         self._json_data = issue
+        self._assign = None
         if issue.get('assignee'):
             self._assign = User(issue.get('assignee'), self._session)
         self._body = issue.get('body')
@@ -232,8 +228,7 @@ class Issue(GitHubCore):
     def add_labels(self, *args):
         """Add labels to this issue.
 
-        :param args: (required), names of the labels you wish to add
-        :type args: str
+        :param str args: (required), names of the labels you wish to add
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
@@ -262,7 +257,6 @@ class Issue(GitHubCore):
         """datetime object representing when the issue was closed."""
         return self._closed
 
-    @GitHubCore.requires_auth
     def comment(self, id_num):
         """Get a single comment by its id.
 
@@ -270,14 +264,13 @@ class Issue(GitHubCore):
         you were to look at the comments on issue #15 in
         sigmavirus24/Todo.txt-python, the first comment's id is 4150787.
 
-        :param id_num: (required), comment id, see example above
-        :type id_num: int
+        :param int id_num: (required), comment id, see example above
         :returns: :class:`IssueComment <IssueComment>`
         """
         json = None
         if int(id_num) > 0:  # Might as well check that it's positive
-            url = self._build_url(self._repo[0], self._repo[1], 'issues',
-                    'comments', str(id_num))
+            url = self._build_url('repos', self._repo[0], self._repo[1],
+                    'issues', 'comments', str(id_num))
             json = self._json(self._get(url), 200)
         return IssueComment(json) if json else None
 
@@ -290,13 +283,13 @@ class Issue(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this issue.
 
-        :param body: (required), comment body
-        :type body: str
+        :param str body: (required), comment body
         :returns: :class:`IssueComment <IssueComment>`
         """
         json = None
         if body:
-            url = self._build_url('comments', base_url=self._api)
+            url = self._build_url('repos', self._repo[0], self._repo[1],
+                    'issues', 'comments')
             json = self._json(self._post(url, dumps({'body': body})), 200)
         return IssueComment(json, self) if json else None
 
@@ -397,8 +390,7 @@ class Issue(GitHubCore):
     def remove_label(self, name):
         """Removes label ``name`` from this issue.
 
-        :param name: (required), name of the label to remove
-        :type name: str
+        :param str name: (required), name of the label to remove
         :returns: bool
         """
         url = self._build_url('labels', name, base_url=self._api)
