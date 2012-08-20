@@ -328,9 +328,10 @@ class Repository(GitHubCore):
             ('AWSAccessKeyId', json.get('accesskeyid')),
             ('Policy', json.get('policy')),
             ('Signature', json.get('signature')),
-            ('Content-Type', json.get('mime_type')),
-            ('file', open(path, 'rb').read())]
-        resp = self._post(json.get('s3_url'), files=form, auth=tuple())
+            ('Content-Type', json.get('mime_type'))]
+        file = [('file', open(path, 'rb').read())]
+        resp = self._post(json.get('s3_url'), data=form, files=file,
+                auth=tuple())
 
         return Download(json, self) if self._boolean(resp, 201, 404) else None
 
@@ -1422,6 +1423,11 @@ class Download(GitHubCore):
     def content_type(self):
         """Content type of the download."""
         return self._type
+
+    @GitHubCore.requires_auth
+    def delete(self):
+        """Delete this download if authenticated"""
+        return self._boolean(self._delete(self._api), 204, 404)
 
     @property
     def description(self):
