@@ -1,6 +1,12 @@
 import base
 import github3
-from expecter import expect
+from expecter import expect, add_expectation
+
+
+add_expectation(base.is_not_None)
+add_expectation(base.is_None)
+add_expectation(base.is_True)
+add_expectation(base.is_False)
 
 
 class TestGitHub(base.BaseTest):
@@ -26,7 +32,7 @@ class TestGitHub(base.BaseTest):
             self.g.user()
 
         if self.auth:
-            self.assertIsNotNone(self._g.user())
+            expect(self._g.user()).is_not_None()
 
     def test_gists(self):
         # My gcd example
@@ -44,12 +50,12 @@ class TestGitHub(base.BaseTest):
             desc = 'Testing gist creation'
             files = {'test.txt': {'content': 'Test contents'}}
             gist = self._g.create_gist(desc, files, False)
-            self.assertIsNotNone(gist)
+            expect(gist).is_not_None()
             expect(gist.description) == desc
-            expect(gist.is_public()) == False
+            expect(gist.is_public()).is_False()
             for g in gist.list_files():
                 expect(g.content) == files[g.name]['content']
-            expect(gist.delete()) == True
+            expect(gist.delete()).is_True()
 
     def test_following(self):
         expect(self.g.list_followers('kennethreitz')) != []
@@ -110,8 +116,8 @@ class TestGitHub(base.BaseTest):
         for d in ('asc', 'desc'):
             self.assertIsNotNone(list_issues(self.sigm, self.todo,
                 state='closed', direction=d))
-        self.assertIsNotNone(list_issues(self.sigm, self.todo,
-            since='2011-01-01T00:00:01Z'))
+        expect(list_issues(self.sigm, self.todo,
+            since='2011-01-01T00:00:01Z')).is_not_None()
 
         #if self.auth:
         #    i = self._g.create_issue(self.sigm, 'issues.py',
@@ -135,7 +141,7 @@ class TestGitHub(base.BaseTest):
             self.g.create_repo('test_github3.py')
             self.g.list_repos()
         expect(self.g.list_repos(self.sigm)) != []
-        self.assertIsNotNone(self.g.repository(self.sigm, self.todo))
+        expect(self.g.repository(self.sigm, self.todo)).is_not_None()
 
     def test_auths(self):
         with expect.raises(github3.GitHubError):
@@ -149,7 +155,7 @@ class TestGitHub(base.BaseTest):
 
     def test_orgs(self):
         expect(self.g.list_orgs(self.kr)) != []
-        self.assertIsNotNone(self.g.organization(self.gh3py))
+        expect(self.g.organization(self.gh3py)).is_not_None()
         with expect.raises(github3.GitHubError):
             self.g.list_orgs()
 
@@ -160,13 +166,13 @@ class TestGitHub(base.BaseTest):
         self.assertEqual(reg, raw)
 
     def test_search(self):
-        self.assertIsNotNone(self.g.search_issues(self.sigm, self.todo,
-            'closed', 'todo'))
-        self.assertIsNotNone(self.g.search_users(self.sigm))
-        self.assertIsNotNone(self.g.search_email('graffatcolmingov@gmail.com'))
+        expect(self.g.search_issues(self.sigm, self.todo, 'closed',
+                'todo')).is_not_None()
+        expect(self.g.search_users(self.sigm)).is_not_None()
+        expect(self.g.search_email('graffatcolmingov@gmail.com')).is_not_None()
 
     def test_users(self):
         with expect.raises(github3.GitHubError):
             self.g.update_user()
             self.g.user()
-        self.assertIsNotNone(self.g.user(self.sigm))
+        expect(self.g.user(self.sigm)).is_not_None()

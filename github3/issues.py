@@ -212,6 +212,7 @@ class Issue(GitHubCore):
         self._labels = [Label(l, self._session) for l in issue.get('labels')]
 
         # Don't want to pass a NoneType to Milestone.__init__()
+        self._mile = None
         if issue.get('milestone'):
             self._mile = Milestone(issue.get('milestone'), self._session)
         self._num = issue.get('number')

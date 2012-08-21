@@ -35,3 +35,19 @@ class BaseTest(unittest.TestCase):
         for attr in attrs:
             self.assertIsNotNone(getattr(obj, attr),
                 '{0} is None'.format(attr))
+
+
+def is_not_None(var):
+    return var is not None
+
+
+def is_None(var):
+    return var is None
+
+
+def is_True(var):
+    return var is True
+
+
+def is_False(var):
+    return var is False
