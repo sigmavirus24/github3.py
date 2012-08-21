@@ -250,8 +250,11 @@ class Issue(GitHubCore):
     @GitHubCore.requires_auth
     def close(self):
         """Close this issue."""
-        return self.edit(self._title, self._body, self._assign.login,
-                'closed', self._mile, self._labels)
+        assignee = ''
+        if self._assign:
+            assignee = self._assign.login
+        return self.edit(self._title, self._body, assignee, 'closed',
+                self._mile, self._labels)
 
     @property
     def closed_at(self):
@@ -289,9 +292,8 @@ class Issue(GitHubCore):
         """
         json = None
         if body:
-            url = self._build_url('repos', self._repo[0], self._repo[1],
-                    'issues', 'comments')
-            json = self._json(self._post(url, dumps({'body': body})), 200)
+            url = self._build_url('comments', base_url=self._api)
+            json = self._json(self._post(url, dumps({'body': body})), 201)
         return IssueComment(json, self) if json else None
 
     @property
@@ -324,7 +326,7 @@ class Issue(GitHubCore):
         """
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        json = self._json(self._patch(self._api, dumps(data)), 200)
+        json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)
             return True
@@ -423,8 +425,11 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        return self.edit(self._title, self._body, self._assign.login,
-                'open', self._mile, self._labels)
+        assignee = ''
+        if self._assign:
+            assignee = self._assign.login
+        return self.edit(self._title, self._body, assignee, 'open', self._mile,
+                self._labels)
 
     @property
     def repository(self):

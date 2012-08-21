@@ -10,6 +10,7 @@ class BaseTest(unittest.TestCase):
     sigm = 'sigmavirus24'
     todo = 'Todo.txt-python'
     gh3py = 'github3py'
+    test_repo = 'github3.py_test'
 
     def setUp(self):
         super(BaseTest, self).setUp()

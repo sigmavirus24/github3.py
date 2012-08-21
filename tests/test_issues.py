@@ -56,6 +56,26 @@ class TestIssues(base.BaseTest):
         expect(issue.updated_at).isinstance(datetime)
         expect(issue.user).isinstance(User)
 
+        if self.auth:
+            issue = self._g.issue(self.gh3py, self.test_repo, '1')
+            c = issue.create_comment('Test commenting')
+            expect(c).isinstance(IssueComment)
+            expect(c.delete()).is_True()
+
+            # I would like to try this functionality but right now, I
+            # (sigmavirus24) am the only person with permission on the org and
+            # I am the issue creator so for others it may not work and that is
+            # not a failure, just standard Github behavior
+            try:
+                issue.close()
+                issue.reopen()
+                old_title = issue.title
+                old_body = issue.body
+                issue.edit('New title', 'Monty spam spam python spam')
+                issue.edit(old_title, old_body)
+            except github3.GitHubError:
+                pass
+
     def test_label(self):
         issue = self.g.issue(self.sigm, self.todo, '6')
         label = issue.labels[0]
@@ -91,3 +111,17 @@ class TestIssues(base.BaseTest):
         expect(milestone.open_issues) == 0
         expect(milestone.state) == 'closed'
         expect(milestone.title) == '0.2'
+
+    def test_comment(self):
+        issue = self.g.issue(self.sigm, self.todo, '2')
+        comment = issue.list_comments()[0]
+        expect(comment).isinstance(IssueComment)
+        expect(comment.updated_at).isinstance(datetime)
+        self.assertAreNotNone(comment, 'body', 'body_html', 'body_text',
+                'created_at', 'user')
+        expect(comment.created_at).isinstance(datetime)
+        expect(comment.id) > 0
+        expect(comment.user).isinstance(User)
+        with expect.raises(github3.GitHubError):
+            comment.delete()
+            comment.edit('foo')
