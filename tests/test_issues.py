@@ -58,9 +58,6 @@ class TestIssues(base.BaseTest):
 
         if self.auth:
             issue = self._g.issue(self.gh3py, self.test_repo, '1')
-            c = issue.create_comment('Test commenting')
-            expect(c).isinstance(IssueComment)
-            expect(c.delete()).is_True()
 
             # I would like to try this functionality but right now, I
             # (sigmavirus24) am the only person with permission on the org and
@@ -112,6 +109,13 @@ class TestIssues(base.BaseTest):
         expect(milestone.state) == 'closed'
         expect(milestone.title) == '0.2'
 
+        if self.auth:
+            repo = self._g.repository(self.gh3py, self.test_repo)
+            m = repo.create_milestone('test_creation', 'open')
+            expect(m).isinstance(Milestone)
+            m.update('test_update', 'closed')
+            expect(m.delete()).is_True()
+
     def test_comment(self):
         issue = self.g.issue(self.sigm, self.todo, '2')
         comment = issue.list_comments()[0]
@@ -122,6 +126,14 @@ class TestIssues(base.BaseTest):
         expect(comment.created_at).isinstance(datetime)
         expect(comment.id) > 0
         expect(comment.user).isinstance(User)
+
         with expect.raises(github3.GitHubError):
             comment.delete()
             comment.edit('foo')
+
+        if self.auth:
+            issue = self._g.issue(self.gh3py, self.test_repo, '1')
+            c = issue.create_comment('Test commenting')
+            expect(c).isinstance(IssueComment)
+            expect(c.edit('Test editing comments')).is_True()
+            expect(c.delete()).is_True()

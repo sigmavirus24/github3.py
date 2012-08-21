@@ -170,9 +170,9 @@ class Milestone(GitHubCore):
             YYYY-MM-DDTHH:MM:SSZ
         :returns: bool
         """
-        inp = dumps({'title': title, 'state': state,
+        data = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        json = self._json(self._patch(self._api, inp), 200)
+        json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True

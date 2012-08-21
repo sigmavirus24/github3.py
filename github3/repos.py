@@ -643,7 +643,7 @@ class Repository(GitHubCore):
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
             'has_downloads': has_downloads})
-        json = self._json(self._patch(self._api, data), 200)
+        json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True
@@ -1553,7 +1553,7 @@ class Hook(GitHubCore):
             if rm_events:
                 data['remove_events'] = rm_events
 
-            json = self._json(self._patch(self._api, dumps(data)), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)

@@ -217,7 +217,8 @@ class BaseComment(GitHubCore):
         :returns: bool
         """
         if body:
-            json = self._patch(self._api, dumps({'body': body}))
+            json = self._json(self._patch(self._api,
+                data=dumps({'body': body})))
             if json:
                 self._update_(json)
                 return True
