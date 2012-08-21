@@ -85,6 +85,7 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data), 201)
         return PullRequest(json, self._session) if json else None
 
+    @GitHubCore.requires_auth
     def add_collaborator(self, login):
         """Add ``login`` as a collaborator to a repository.
 
@@ -181,7 +182,7 @@ class Repository(GitHubCore):
         :returns: :class:`RepoComment <RepoComment>` if successful, otherwise
             None
         """
-        url = self._build_url('comments', comment_id, base_url=self._api)
+        url = self._build_url('comments', str(comment_id), base_url=self._api)
         json = self._json(self._get(url), 200)
         return RepoComment(json, self) if json else None
 
