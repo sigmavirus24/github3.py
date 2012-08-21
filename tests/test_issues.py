@@ -22,11 +22,11 @@ class TestIssues(base.BaseTest):
         if issue.assignee:
             expect(issue.assignee).isinstance(User)
 
-        expect(issue.body).isinstance((str, bytes, unicode))
+        expect(issue.body).isinstance(base.str_test)
         expect(issue.created_at).isinstance(datetime)
         expect(issue.closed_at).isinstance(datetime)
         expect(issue.comment(2965299)).isinstance(IssueComment)
-        expect(issue.html_url).isinstance((str, bytes, unicode))
+        expect(issue.html_url).isinstance(base.str_test)
         expect(issue.id) > 0
         expect(issue.is_closed()).isinstance(bool)
 
@@ -45,13 +45,13 @@ class TestIssues(base.BaseTest):
         expect(issue.number) > 0
         expect(issue.pull_request).isinstance(dict)
         expect(issue.repository).isinstance(tuple)
-        expect(issue.state).isinstance((str, bytes, unicode))
+        expect(issue.state).isinstance(base.str_test)
 
         if issue.state not in ('open', 'closed'):
             self.fail('State not valid')
 
         if issue.title:
-            expect(issue.title).isinstance((str, bytes, unicode))
+            expect(issue.title).isinstance(base.str_test)
 
         expect(issue.updated_at).isinstance(datetime)
         expect(issue.user).isinstance(User)
