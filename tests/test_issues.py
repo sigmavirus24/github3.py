@@ -35,6 +35,15 @@ class TestIssues(base.BaseTest):
 
         for ev in issue.list_events():
             expect(ev).isinstance(IssueEvent)
+            expect(ev.event).isinstance(base.str_test)
+            if ev.commit_id:
+                expect(ev.commit_id).isinstance(base.str_test)
+            expect(ev.created_at).isinstance(datetime)
+            expect(ev.issue).isinstance(Issue)
+            expect(ev.comments) >= 0
+            expect(ev.pull_request).isinstance(dict)
+            if ev.updated_at:
+                expect(ev.updated_at).isinstance(datetime)
 
         if issue.milestone:
             expect(issue.milestone).isinstance(Milestone)
@@ -85,6 +94,14 @@ class TestIssues(base.BaseTest):
 
         expect(label.name) == 'Enhancement'
         expect(label.color) != ''
+
+        if self.auth:
+            repo = self._g.repository(self.gh3py, self.test_repo)
+            label = repo.create_label('Test_label', 'abc123')
+            expect(label.color) == 'abc123'
+            expect(label.name) == 'Test_label'
+            expect(label.update('Test_update', 'abd124')).is_True()
+            expect(label.delete()).is_True()
 
     def test_milestone(self):
         issue = self.g.issue(self.sigm, self.todo, '6')

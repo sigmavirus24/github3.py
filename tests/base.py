@@ -57,4 +57,4 @@ def is_False(var):
 if sys.version_info >= (3, 0):
     str_test = (str, bytes)
 else:
-    str_test = (str, bytes, unicode)
+    str_test = (str, unicode)

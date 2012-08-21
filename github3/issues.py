@@ -57,7 +57,7 @@ class Label(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        json = self._json(self._patch(self._api, dumps({'name': name,
+        json = self._json(self._patch(self._api, data=dumps({'name': name,
             'color': color})), 200)
         if json:
             self._update_(json)
@@ -497,7 +497,7 @@ class IssueEvent(GitHubCore):
             self._issue = issue
 
         # The number of comments
-        self._comments = event.get('comments')
+        self._comments = event.get('comments', 0)
 
         self._closed = None
         if event.get('closed_at'):
@@ -509,23 +509,18 @@ class IssueEvent(GitHubCore):
         if event.get('updated_at'):
             self._updated = self._strptime(event.get('updated_at'))
 
-        self._pull_html = None
-        self._pull_diff = None
-        self._pull_patch = None
+        self._pull_req = {}
         if event.get('pull_request'):
-            pull_req = event.get('pull_request')
-            self._pull_html = pull_req.get('html_url')
-            self._pull_diff = pull_req.get('diff_url')
-            self._pull_patch = pull_req.get('patch_url')
+            self._pull_req = event.get('pull_request')
 
     def __repr__(self):
         return '<Issue Event [#{0} - {1}]>'.format(self._issue.number,
                 self._event)
 
     @property
-    def event(self):
-        """The type of event, e.g., closed"""
-        return self._event
+    def comments(self):
+        """Number of comments"""
+        return self._comments
 
     @property
     def commit_id(self):
@@ -538,14 +533,24 @@ class IssueEvent(GitHubCore):
         return self._created
 
     @property
+    def event(self):
+        """The type of event, e.g., closed"""
+        return self._event
+
+    @property
     def issue(self):
         """:class:`Issue <Issue>` where this comment was made."""
         return self._issue
 
     @property
-    def comments(self):
-        """Number of comments"""
-        return self._comments
+    def pull_request(self):
+        """Dictionary of links for the pull request"""
+        return self._pull_req
+
+    @property
+    def updated_at(self):
+        """datetime object representing when the event was updated."""
+        return self._updated
 
 
 def issue_params(filter, state, labels, sort, direction, since):

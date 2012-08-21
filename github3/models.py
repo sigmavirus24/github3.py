@@ -218,7 +218,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                data=dumps({'body': body})))
+                data=dumps({'body': body})), 200)
             if json:
                 self._update_(json)
                 return True
