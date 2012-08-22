@@ -26,7 +26,10 @@ class TestGist(base.BaseTest):
                     expect(c).isinstance(GistComment)
 
             expect(g.refresh()).isinstance(bool)
-            expect(g.user).isinstance(User)
+
+            # if it is not an anonymous gist
+            if g.user:
+                expect(g.user).isinstance(User)
 
             with expect.raises(github3.GitHubError):
                 g.create_comment('Foo')
