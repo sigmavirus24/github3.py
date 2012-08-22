@@ -1,6 +1,6 @@
 """
-github3.repo
-============
+github3.repos
+=============
 
 This module contains the class relating to repositories.
 
@@ -583,6 +583,7 @@ class Repository(GitHubCore):
         """``datetime`` object representing when the Repository was created."""
         return self._created
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this repository.
 

@@ -1,6 +1,6 @@
 """
-github3.org
-===========
+github3.orgs
+============
 
 This module contains all of the classes related to organizations.
 

@@ -1,6 +1,6 @@
 """
-github3.event
-=============
+github3.events
+==============
 
 This module contains the class(es) related to Events
 

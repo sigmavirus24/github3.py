@@ -119,7 +119,7 @@ class GitHubCore(GitHubObject):
     @property
     def ratelimit_remaining(self):
         """Number of requests before GitHub imposes a ratelimit."""
-        json = self._get(self._github_url + '/rate_limit')
+        json = self._json(self._get(self._github_url + '/rate_limit'), 200)
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining
 

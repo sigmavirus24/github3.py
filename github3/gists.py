@@ -1,6 +1,6 @@
 """
-gist.py
-=======
+github3.gists
+=============
 
 Module which contains all the gist related material.
 

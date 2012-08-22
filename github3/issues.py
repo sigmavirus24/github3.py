@@ -1,6 +1,6 @@
 """
-github3.issue
-=============
+github3.issues
+==============
 
 This module contains the classes related to issues.
 

@@ -1,6 +1,6 @@
 """
-github3.user
-============
+github3.users
+=============
 
 This module contains everything relating to Users.
 
