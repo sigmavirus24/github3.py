@@ -718,6 +718,7 @@ class Repository(GitHubCore):
         """URL of the home page for the project."""
         return self._homepg
 
+    @GitHubCore.requires_auth
     def hook(self, id_num):
         """Get a single hook.
 
@@ -764,6 +765,7 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Issue(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def key(self, id_num):
         """Get the specified deploy key.
 
@@ -901,6 +903,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return [Repository(r, self) for r in json]
 
+    @GitHubCore.requires_auth
     def list_hooks(self):
         """List hooks registered on this repository.
 

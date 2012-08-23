@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 import github3
+from expecter import expect, add_expectation
 
 
 class BaseTest(unittest.TestCase):
@@ -37,6 +38,10 @@ class BaseTest(unittest.TestCase):
             self.assertIsNotNone(getattr(obj, attr),
                 '{0} is None'.format(attr))
 
+    def expect_list_of_class(self, l, cls):
+        for i in l:
+            expect(i).isinstance(cls)
+
 
 def is_not_None(var):
     return var is not None
@@ -53,6 +58,10 @@ def is_True(var):
 def is_False(var):
     return var is False
 
+add_expectation(is_not_None)
+add_expectation(is_None)
+add_expectation(is_True)
+add_expectation(is_False)
 
 if sys.version_info >= (3, 0):
     str_test = (str, bytes)

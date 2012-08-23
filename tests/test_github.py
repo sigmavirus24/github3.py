@@ -1,12 +1,6 @@
 import base
 import github3
-from expecter import expect, add_expectation
-
-
-add_expectation(base.is_not_None)
-add_expectation(base.is_None)
-add_expectation(base.is_True)
-add_expectation(base.is_False)
+from base import expect
 
 
 class TestGitHub(base.BaseTest):

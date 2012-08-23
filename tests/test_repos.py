@@ -1,22 +1,26 @@
 import base
 import github3
-from expecter import expect
+from base import expect
 from datetime import datetime
 from os import unlink
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
-        Comparison, Contents, Download, Hook)
+        Comparison, Contents, Download)
 from github3.users import User
 from github3.git import Commit
-#from github3.issues import (Issue, Label, Milestone)
-#from github3.events import Event
+from github3.issues import (Issue, Label, Milestone)
+from github3.events import Event
 
 
-class TestRepos(base.BaseTest):
+class TestRepository(base.BaseTest):
+    def setUp(self):
+        super(TestRepository, self).setUp()
+        self.repo = self.g.repository(self.sigm, self.todo)
+
     def test_repository(self):
-        repo = self.g.repository(self.sigm, self.todo)
-        expect(repo).isinstance(Repository)
+        expect(self.repo).isinstance(Repository)
 
-        # Attributes
+    def test_attributess(self):
+        repo = self.repo
         expect(repo.clone_url).is_not_None()
         expect(repo.created_at).isinstance(datetime)
         expect(repo.forks) > 0
@@ -26,8 +30,10 @@ class TestRepos(base.BaseTest):
         expect(repo.owner).isinstance(User)
         expect(repo.html_url) != ''
         expect(repo.id) > 0
+        expect(repo.language) != ''
 
-        # Methods
+    def test_methods(self):
+        repo = self.repo
         expect(repo.archive('tarball', 'archive.tar.gz')).is_True()
         unlink('archive.tar.gz')
 
@@ -60,10 +66,24 @@ class TestRepos(base.BaseTest):
         expect(repo.has_downloads()).is_True()
         expect(repo.has_wiki()).is_True()
 
-        expect(repo.hook(74859)).isinstance(Hook)
         expect(repo.is_assignee(self.sigm)).is_True()
-        # XXX: Next up: issue()
+        expect(repo.issue(1)).isinstance(Issue)
+        expect(repo.label('Bug')).isinstance(Label)
+        expect(repo.milestone(1)).isinstance(Milestone)
 
+        self.expect_list_of_class(repo.list_assignees(), User)
+        self.expect_list_of_class(repo.list_branches(), Branch)
+        self.expect_list_of_class(repo.list_comments(), RepoComment)
+        comments = repo.list_comments_on_commit(
+                '38c76375ae1a766b44c729b4b2ff0363312b6d13')
+        self.expect_list_of_class(comments, RepoComment)
+        self.expect_list_of_class(repo.list_commits(), RepoCommit)
+        self.expect_list_of_class(repo.list_downloads(), Download)
+        self.expect_list_of_class(repo.list_downloads(), Event)
+        self.expect_list_of_class(repo.list_forks(), Repository)
+
+    def test_requires_auth(self):
+        repo = self.repo
         with expect.raises(github3.GitHubError):
             # It's going to fail anyway by default so the username is
             # unimportant
@@ -77,7 +97,7 @@ class TestRepos(base.BaseTest):
             repo.create_fork(self.gh3py)
             repo.create_hook('Hook', {'foo': 'bar'})
             repo.create_issue('New issue')
-            repo.create_keY('Key', 'foobarbogus')
+            repo.create_key('Key', 'foobarbogus')
             repo.create_label('Foo bar', 'abc123')
             repo.create_milestone('milestone')
             repo.create_pull('PR',
@@ -92,3 +112,5 @@ class TestRepos(base.BaseTest):
                 'sha': '731691616b71258c7ad7c141379856b5ebbab310'})
             repo.delete()
             repo.edit('todo.py', '#', 'http://git.io/todo.py')
+            repo.hook(74859)
+            repo.key(1234)
