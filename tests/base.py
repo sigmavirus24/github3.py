@@ -13,15 +13,23 @@ class BaseTest(unittest.TestCase):
     gh3py = 'github3py'
     test_repo = 'github3.py_test'
 
-    def setUp(self):
-        super(BaseTest, self).setUp()
-        self.g = github3.GitHub()
+    def __init__(self, methodName='runTest'):
+        super(BaseTest, self).__init__(methodName)
         self.auth = False
         user = self.user = os.environ.get('__USER')
-        pw = os.environ.get('__PASS')
+        pw = self.pw = os.environ.get('__PASS')
         if user and pw:
             self._g = github3.login(user, pw)
-            self.auth = True
+        self.__reinit_github__()
+
+    def __reinit_github__(self):
+        self.g = github3.GitHub()
+        if self.auth:
+            self._g = github3.login(self.user, self.pw)
+
+    def setUp(self):
+        super(BaseTest, self).setUp()
+        self.__reinit_github__()
 
     def assertIsNotNone(self, value, msg=None):
         if sys.version_info >= (2, 7):

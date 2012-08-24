@@ -9,7 +9,7 @@ This module contains the class relating to repositories.
 from base64 import b64decode
 from json import dumps
 from .events import Event
-from .issues import Issue, Label, Milestone, issue_params
+from .issues import Issue, IssueEvent, Label, Milestone, issue_params
 from .git import Blob, Commit, Reference, Tag, Tree
 from .models import GitHubObject, GitHubCore, BaseComment, BaseCommit
 from .pulls import PullRequest
@@ -969,12 +969,12 @@ class Repository(GitHubCore):
     def list_issue_events(self):
         """List issue events on this repository.
 
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`IssueEvent <github3.issues.IssueEvent>`\ s
         """
         # Paginate
-        url = self._build_url('issues', 'events', self._api)
+        url = self._build_url('issues', 'events', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return [Event(e, self) for e in json]
+        return [IssueEvent(e, self) for e in json]
 
     @GitHubCore.requires_auth
     def list_keys(self):
@@ -1043,8 +1043,7 @@ class Repository(GitHubCore):
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
         # Paginate
-        from re import subn
-        base = subn('repos', 'networks', self._api, 1)
+        base = self._api.replace('repos', 'networks', 1)
         url = self._build_url('events', base_url=base)
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
@@ -1118,7 +1117,7 @@ class Repository(GitHubCore):
         return Milestone(json, self) if json else None
 
     @property
-    def mirror(self):
+    def mirror_url(self):
         """Mirror property."""
         return self._mirror
 
@@ -1138,6 +1137,7 @@ class Repository(GitHubCore):
         repository owner."""
         return self._owner
 
+    @GitHubCore.requires_auth
     def pubsubhubbub(self, mode, topic, callback, secret=''):
         """Create/update a pubsubhubbub hook.
 
@@ -1207,6 +1207,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Reference(json, self) if json else None
 
+    @GitHubCore.requires_auth
     def remove_collaborator(self, login):
         """Remove collaborator ``login`` from the repository.
 
@@ -1657,7 +1658,9 @@ class RepoComment(BaseComment):
         self._path = comment.get('path')
         self._pos = comment.get('position')
         self._updated = comment.get('updated_at')
-        self._user = User(comment.get('user'), self._session)
+        self._user = None
+        if comment.get('user'):
+            self._user = User(comment.get('user'), self)
 
     @property
     def commit_id(self):

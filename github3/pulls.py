@@ -357,6 +357,10 @@ class ReviewComment(BaseComment):
     def __init__(self, comment, session=None):
         super(ReviewComment, self).__init__(comment, session)
 
+        self._user = None
+        if comment.get('user'):
+            self._user = User(comment.get('user'), self)
+
     def __repr__(self):
         return '<Review Comment [{0}]>'.format(self._user.login)
 

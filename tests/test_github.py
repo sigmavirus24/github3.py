@@ -4,8 +4,8 @@ from base import expect
 
 
 class TestGitHub(base.BaseTest):
-    def setUp(self):
-        super(TestGitHub, self).setUp()
+    def __init__(self, methodName='runTest'):
+        super(TestGitHub, self).__init__(methodName)
         self.fake_auth = ('fake_user', 'fake_password')
         self.fake_oauth = 'foobarbogusoauth'
 
@@ -15,6 +15,8 @@ class TestGitHub(base.BaseTest):
         h = github3.login(*self.fake_auth)
         for i in [self.g, h]:
             expect(self.fake_auth) == i._session.auth
+
+    def test_oauth(self):
         # Test "oauth" auth
         self.g.login(token=self.fake_oauth)
         h = github3.login('', '', token=self.fake_oauth)
@@ -31,8 +33,10 @@ class TestGitHub(base.BaseTest):
     def test_gists(self):
         # My gcd example
         gist_id = 2648112
-        if not self.g.gist(gist_id):
+        g = self.g.gist(gist_id)
+        if not g:
             self.fail('Check gcd gist')
+        expect(g).isinstance(github3.gists.Gist)
 
         with expect.raises(github3.GitHubError):
             self.g.gist(-1)
@@ -113,10 +117,11 @@ class TestGitHub(base.BaseTest):
         expect(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z')).is_not_None()
 
-        #if self.auth:
-        #    i = self._g.create_issue(self.sigm, 'issues.py',
-        #    'Testing github3.py', 'Ignore this.')
-        #    expect(i).isinstance(github3.issue.Issue)
+        if self.auth:
+            i = self._g.create_issue(self.gh3py, self.test_repo,
+            'Testing github3.py', 'Ignore this.')
+            expect(i).isinstance(github3.issue.Issue)
+            expect(i.close()).is_True()
 
     def test_keys(self):
         with expect.raises(github3.GitHubError):

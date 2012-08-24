@@ -6,12 +6,16 @@ from github3.users import User
 
 
 class TestGist(base.BaseTest):
-    def test_gists(self):
-        gists = self.g.list_gists()
-        expect(gists) != []
+    def __init__(self, methodName='runTest'):
+        super(TestGist, self).__init__(methodName)
+        self.gists = self.g.list_gists()
 
-        for g in gists:
-            expect(g).isinstance(Gist)
+    def test_gists_not_empty(self):
+        expect(self.gists) != []
+        self.expect_list_of_class(self.gists, Gist)
+
+    def test_files(self):
+        for g in self.gists:
             expect(g.files) >= 0
             expect(g.list_files()).isinstance(list)
             expect(g.forks) >= 0
@@ -31,7 +35,9 @@ class TestGist(base.BaseTest):
             if g.user:
                 expect(g.user).isinstance(User)
 
-            with expect.raises(github3.GitHubError):
+    def test_requires_auth(self):
+        with expect.raises(github3.GitHubError):
+            for g in self.gists:
                 g.create_comment('Foo')
                 g.delete()
                 g.edit()
@@ -39,23 +45,35 @@ class TestGist(base.BaseTest):
                 g.star()
                 g.unstar()
 
-    def test_files(self):
-        ninjax = self.g.gist(3156487)  # An gist I used for someone in
-        ##python on freenode. I promise not to update it further
-        expect(ninjax.files) == 2
-        coms = ninjax.list_comments()
-        if coms:
-            for c in coms:
-                expect(c).isinstance(GistComment)
-                self.assertAreNotNone(c, 'body', 'body_html', 'body_text',
-                        'created_at', 'id', 'user')
-                with expect.raises(github3.GitHubError):
-                    c.delete()
-                    c.edit('foo')
 
-        files = ninjax.list_files()
+class TestGistFile(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestGistFile, self).__init__(methodName)
+        self.ninjax = self.g.gist(3156487)
+        self.comments = self.ninjax.list_comments()
+        # A gist I had wrote for someone in #python freenode.
+        # It won't be deleted and won't be further updated
+
+    def test_files_eq_2(self):
+        expect(self.ninjax.files) == 2
+
+    def test_comments(self):
+        for c in self.comments:
+            expect(c).isinstance(GistComment)
+            self.assertAreNotNone(c, 'body', 'body_html', 'body_text',
+                    'created_at', 'id', 'user')
+            expect(c.user).isinstance(User)
+
+    def test_files(self):
+        files = self.ninjax.list_files()
         expect(files) != []
         for f in files:
             expect(f).isinstance(GistFile)
             self.assertAreNotNone(f, 'content', 'name', 'lang', 'raw_url',
                     'size')
+
+    def test_requires_auth(self):
+        with expect.raises(github3.GitHubError):
+            for c in self.comments:
+                c.delete()
+                c.edit('foo')

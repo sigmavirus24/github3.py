@@ -2,6 +2,8 @@
 #
 # Copyright 2012, Ian Cordasco
 
+COVERAGE_INCLUDE := github3/*.py
+
 clean:
 	git clean -Xdf
 
@@ -15,3 +17,9 @@ alltests:
 
 docs:
 	make -C docs/ html
+
+coverage_all:
+	coverage run --include=$(COVERAGE_INCLUDE) ./unittests.py
+
+coverage:
+	CI=true coverage run --include=$(COVERAGE_INCLUDE) ./unittests.py

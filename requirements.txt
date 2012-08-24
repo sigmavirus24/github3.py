@@ -1,2 +1,3 @@
 requests>=0.13.8
 git+git://github.com/garybernhardt/expecter.git
+coverage>=3.5.2
