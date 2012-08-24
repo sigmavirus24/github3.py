@@ -1287,7 +1287,7 @@ class Repository(GitHubCore):
     @property
     def watchers(self):
         """Number of users watching the repository."""
-        return self._watchers
+        return self._watch
 
 
 class Branch(GitHubCore):

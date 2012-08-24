@@ -6,7 +6,7 @@ from os import unlink
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
         Comparison, Contents, Download, Hook, RepoTag)
 from github3.users import User, Key
-from github3.git import Commit, Reference
+from github3.git import Commit, Reference, Tag, Tree, Blob
 from github3.issues import (Issue, IssueEvent, Label, Milestone)
 from github3.events import Event
 from github3.pulls import PullRequest
@@ -74,11 +74,19 @@ class TestRepository(base.BaseTest):
     def test_updated_at(self):
         expect(self.repo.updated_at).isinstance(datetime)
 
+    def test_watchers(self):
+        expect(self.repo.watchers) >= 1
+
+    # Methods
     def test_archive(self):
         expect(self.repo.archive('tarball', 'archive.tar.gz')).is_True()
         unlink('archive.tar.gz')
 
         #blob = repo.blob("sha"")
+    def test_blob(self):
+        expect(self.repo.blob(
+            '2494c145b614f8c945d67cb456536f8b1903e672'
+            )).isinstance(Blob)
 
     def test_branch(self):
         master = self.repo.branch('master')
@@ -195,6 +203,16 @@ class TestRepository(base.BaseTest):
     def test_ref(self):
         expect(self.repo.ref('tags/0.3')).isinstance(Reference)
 
+    def test_tag(self):
+        expect(self.repo.tag(
+            '21501fd1630546af3ee4bc58ddef6604f6983607'
+            )).isinstance(Tag)
+
+    def test_tree(self):
+        expect(self.repo.tree(
+            '239bdbfa86adec94c0d13fb039796da3efe7c7db'
+            )).isinstance(Tree)
+
     def test_requires_auth(self):
         repo = self.repo
         with expect.raises(github3.GitHubError):
@@ -235,6 +253,7 @@ class TestRepository(base.BaseTest):
                     'https://httpbin.org/post'
                     )
             repo.remove_collaborator('foobarbogus')
+            repo.update_label('Foo', 'abc123')
 
     def test_with_auth(self):
         if self.auth:
