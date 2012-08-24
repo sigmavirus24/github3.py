@@ -271,3 +271,23 @@ class TestRepository(base.BaseTest):
                 expect(repo.remove_collaborator('jcordasc')).is_True()
             except github3.GitHubError:
                 pass
+
+
+class TestBranch(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestBranch, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.branch = repo.branch('master')
+
+    def test_commit(self):
+        expect(self.branch.commit).isinstance(Commit)
+
+    def test_links(self):
+        expect(self.branch.links).isinstance(dict)
+
+    def test_name(self):
+        expect(self.branch.name) == 'master'
+
+
+class TestContents(base.BaseTest):
+    pass
