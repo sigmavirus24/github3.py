@@ -976,6 +976,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
 
+    @GitHubCore.requires_auth
     def list_keys(self):
         """List deploy keys on this repository.
 

@@ -4,11 +4,12 @@ from base import expect
 from datetime import datetime
 from os import unlink
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
-        Comparison, Contents, Download)
-from github3.users import User
-from github3.git import Commit
+        Comparison, Contents, Download, Hook, RepoTag)
+from github3.users import User, Key
+from github3.git import Commit, Reference
 from github3.issues import (Issue, Label, Milestone)
 from github3.events import Event
+from github3.pulls import PullRequest
 
 
 class TestRepository(base.BaseTest):
@@ -79,8 +80,18 @@ class TestRepository(base.BaseTest):
         self.expect_list_of_class(comments, RepoComment)
         self.expect_list_of_class(repo.list_commits(), RepoCommit)
         self.expect_list_of_class(repo.list_downloads(), Download)
-        self.expect_list_of_class(repo.list_downloads(), Event)
+        self.expect_list_of_class(repo.list_events(), Event)
         self.expect_list_of_class(repo.list_forks(), Repository)
+        self.expect_list_of_class(repo.list_issues(), Issue)
+        self.expect_list_of_class(repo.list_issue_events(), Event)
+        self.expect_list_of_class(repo.list_milestones(), Milestone)
+        self.expect_list_of_class(repo.list_network_events(), Event)
+        self.expect_list_of_class(repo.list_pulls(state='closed'),
+                PullRequest)
+        self.expect_list_of_class(repo.list_refs(), Reference)
+        self.expect_list_of_class(repo.list_tags(), RepoTag)
+        self.expect_list_of_class(repo.list_watchers(), User)
+        # XXX: next up list_hooks() -> requires_auth
 
     def test_requires_auth(self):
         repo = self.repo
@@ -114,3 +125,14 @@ class TestRepository(base.BaseTest):
             repo.edit('todo.py', '#', 'http://git.io/todo.py')
             repo.hook(74859)
             repo.key(1234)
+            repo.list_keys()
+            repo.list_teams()
+
+        if self.auth:
+            repo = self._g.repository(self.sigm, self.todo)
+            # Try somethings only I can test
+            try:
+                expect(repo.hook(74859)).isinstance(Hook)
+                expect(repo.key(3069618)).isinstance(Key)
+            except github3.GitHubError:
+                pass
