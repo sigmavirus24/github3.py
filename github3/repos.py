@@ -1339,7 +1339,7 @@ class Contents(GitHubObject):
         # content, base64 encoded and decoded
         self._content = content.get('content')
         if self._enc == 'base64':
-            self._dec = b64decode(self._content)
+            self._dec = b64decode(self._content.encode())
         else:
             self._dec = self._b64
 
