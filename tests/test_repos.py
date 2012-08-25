@@ -442,3 +442,43 @@ class TestRepoTag(base.BaseTest):
 
     def test_zipball_url(self):
         expect(self.tag.zipball_url).isinstance(base.str_test)
+
+
+class TestRepoCommit(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestRepoCommit, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.commit = repo.commit('04d55444a3ec06ca8d2aa0a5e333cdaf27113254')
+        self.sha = self.commit.sha
+
+    def test_additions(self):
+        expect(self.commit.additions) == 12
+
+    def test_author(self):
+        expect(self.commit.author).isinstance(User)
+
+    def test_commit(self):
+        expect(self.commit.commit).isinstance(Commit)
+
+    def test_committer(self):
+        expect(self.commit.committer).isinstance(User)
+
+    def test_deletions(self):
+        expect(self.commit.deletions) == 5
+
+    def test_files(self):
+        expect(self.commit.files).isinstance(list)
+        expect(self.commit.files) > []
+        for file in self.commit.files:
+            expect(file.additions) > 0
+            expect(file.deletions) > 0
+            expect(file.changes) == file.additions + file.deletions
+            expect(file.filename).isinstance(base.str_test)
+            expect(file.blob_url).isinstance(base.str_test)
+            expect(file.raw_url).isinstance(base.str_test)
+            expect(file.sha) == self.sha
+            expect(file.status) == 'modified'
+            expect(file.patch).isinstance(base.str_test)
+
+    def test_total(self):
+        expect(self.commit.total) == 17
