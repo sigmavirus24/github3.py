@@ -1523,6 +1523,7 @@ class Hook(GitHubCore):
         """datetime object representing the date the hook was created."""
         return self._created
 
+    @GitHubCore.requires_auth
     def delete(self):
         """Delete this hook.
 
@@ -1593,6 +1594,7 @@ class Hook(GitHubCore):
         """The name of the hook."""
         return self._name
 
+    @GitHubCore.requires_auth
     def test(self):
         """Test this hook
 

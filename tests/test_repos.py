@@ -334,4 +334,111 @@ class TestContents(base.BaseTest):
 
 
 class TestDownload(base.BaseTest):
-    pass
+    def __init__(self, methodName='runTest'):
+        super(TestDownload, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.dl = repo.download(248618)
+
+    def test_content_type(self):
+        expect(self.dl.content_type) == 'application/zip'
+
+    def test_description(self):
+        expect(self.dl.description) == ('zip of the essential files for ' +
+            'version 0.3')
+
+    def test_download_count(self):
+        expect(self.dl.download_count) > 0
+
+    def test_html_url(self):
+        assert self.dl.html_url.startswith(
+                'https://github.com/downloads/sigmavirus24/Todo'), (
+                        'Download HTML URL is invalid'
+                        )
+
+    def test_id(self):
+        expect(self.dl.id) == 248618
+
+    def test_name(self):
+        expect(self.dl.name) == 'todo.txt-python-0.3.zip'
+
+    def test_size(self):
+        expect(self.dl.size) == 26624
+
+    def test_requires_auth(self):
+        with expect.raises(github3.GitHubError):
+            self.dl.delete()
+
+
+class TestHook(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestHook, self).__init__(methodName)
+        if self.auth:
+            repo = self._g.repository(self.sigm, self.todo)
+            self.hook = repo.hook(74859)
+        else:
+            json = {
+                'name': 'twitter',
+                'url':
+                'https://api.github.com/repos/sigmavirus24/Todo.txt-python/' +
+                'hooks/74859',
+                'created_at': '2011-09-05T18:19:50Z',
+                'updated_at': '2012-03-08T17:03:25Z',
+                'id': 74859,
+                'active': False,
+                'config': {'token': 'fake_token', 'secret': 'fake_secret'},
+                'events': ['push'],
+                'last_response': {'status': 'ok', 'message': '', 'code': 200}
+                }
+            self.hook = Hook(json)
+
+    def test_config(self):
+        expect(self.hook.config).isinstance(dict)
+        assert 'token' in self.hook.config, (
+                'token not in config')
+        assert 'secret' in self.hook.config, (
+                'secret not in config')
+
+    def test_created_at(self):
+        expect(self.hook.created_at).isinstance(datetime)
+
+    def test_events(self):
+        self.expect_list_of_class(self.hook.events, base.str_test)
+
+    def test_id(self):
+        expect(self.hook.id) == 74859
+
+    def test_is_active(self):
+        expect(self.hook.is_active()).is_False()
+
+    def test_name(self):
+        expect(self.hook.name) == 'twitter'
+
+    def test_updated_at(self):
+        expect(self.hook.updated_at).isinstance(datetime)
+
+    def test_requires_auth(self):
+        if self.auth:
+            return
+        with expect.raises(github3.GitHubError):
+            self.hook.edit('tweeter', self.hook.config)
+            self.hook.delete()
+            self.hook.test()
+
+
+class TestRepoTag(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestRepoTag, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.tag = repo.list_tags()[0]
+
+    def test_commit(self):
+        expect(self.tag.commit).isinstance(dict)
+
+    def test_name(self):
+        expect(self.tag.commit).isinstance(base.str_test)
+
+    def test_tarball_url(self):
+        expect(self.tag.tarball_url).isinstance(base.str_test)
+
+    def test_zipball_url(self):
+        expect(self.tag.zipball_url).isinstance(base.str_test)
