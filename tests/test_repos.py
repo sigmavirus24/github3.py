@@ -290,4 +290,44 @@ class TestBranch(base.BaseTest):
 
 
 class TestContents(base.BaseTest):
-    pass
+    def __init__(self, methodName='runTest'):
+        super(TestContents, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.contents = repo.contents('todo.py')
+
+    def _test_str_(self, val):
+        expect(val).is_not_None()
+        expect(val) > ''
+        expect(val).isinstance(base.str_test)
+
+    def test_content(self):
+        expect(len(self.contents.content)) > 0
+        self._test_str_(self.contents.content)
+
+    def test_decoded(self):
+        expect(len(self.contents.decoded)) > 0
+        self._test_str_(self.contents.content)
+
+    def test_encoding(self):
+        self._test_str_(self.contents.encoding)
+
+    def test_git(self):
+        self._test_str_(self.contents.git)
+
+    def test_html(self):
+        self._test_str_(self.contents.html)
+
+    def test_name(self):
+        self._test_str_(self.contents.name)
+
+    def test_path(self):
+        self._test_str_(self.contents.path)
+
+    def test_sha(self):
+        self._test_str_(self.contents.sha)
+
+    def test_size(self):
+        expect(self.contents.size) > 0
+
+    def test_type(self):
+        expect(self.contents.type) == 'file'

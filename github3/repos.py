@@ -1330,8 +1330,7 @@ class Contents(GitHubObject):
         super(Contents, self).__init__(content)
         # links
         self._api = content['_links'].get('self')
-        self._html = content['_links'].get('html')
-        self._git = content['_links'].get('git')
+        self._links = content.get('_links')
 
         # should always be 'base64'
         self._enc = content.get('encoding')
@@ -1373,13 +1372,18 @@ class Contents(GitHubObject):
 
     @property
     def git(self):
-        """Git URL for cloning."""
-        return self._git
+        """API URL for this blob"""
+        return self._links['git']
 
     @property
     def html(self):
         """URL pointing to the content on GitHub."""
-        return self._html
+        return self._links['html']
+
+    @property
+    def links(self):
+        """Dictionary of links"""
+        return self._links
 
     @property
     def name(self):
