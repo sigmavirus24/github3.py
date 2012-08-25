@@ -435,7 +435,7 @@ class TestRepoTag(base.BaseTest):
         expect(self.tag.commit).isinstance(dict)
 
     def test_name(self):
-        expect(self.tag.commit).isinstance(base.str_test)
+        expect(self.tag.name).isinstance(base.str_test)
 
     def test_tarball_url(self):
         expect(self.tag.tarball_url).isinstance(base.str_test)
