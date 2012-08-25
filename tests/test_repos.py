@@ -331,3 +331,7 @@ class TestContents(base.BaseTest):
 
     def test_type(self):
         expect(self.contents.type) == 'file'
+
+
+class TestDownload(base.BaseTest):
+    pass

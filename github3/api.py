@@ -67,12 +67,12 @@ def list_following(username):
     return gh.list_following(username) if username else []
 
 
-def list_issues(owner, repository, filter='', state='', labels='', sort='',
-        direction='', since=''):
+def list_repo_issues(owner, repository, filter='', state='', labels='',
+        sort='', direction='', since=''):
     """See :func:`github3.github.GitHub.list_issues`"""
     issues = []
     if owner and repository:
-        issues = gh.list_issues(owner, repository, filter, state, labels,
+        issues = gh.list_repo_issues(owner, repository, filter, state, labels,
                 sort, direction, since)
     return issues
 
