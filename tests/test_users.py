@@ -1,7 +1,7 @@
 import base
 import github3
 from base import expect
-from github3.users import User, Plan
+from github3.users import User, Plan, Key
 from github3.events import Event
 
 
@@ -71,3 +71,37 @@ class TestUser(base.BaseTest):
         except github3.GitHubError:
             pass
         expect(user.update()).isinstance(bool)
+
+
+class TestKey(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestKey, self).__init__(methodName)
+        if self.auth:
+            self.key = self._g.list_keys()[0]
+        else:
+            json = {
+                    'url': 'https://api.github.com/user/keys/id',
+                    'verified': True,
+                    'id': 999999,
+                    'key': 'ssh-rsa AAAAB4...',
+                    'title': 'fake'
+                    }
+            self.key = Key(json)
+
+    def test_key(self):
+        expect(self.key).isinstance(Key)
+
+    def test_pubkey(self):
+        expect(self.key.key).isinstance(base.str_test)
+
+    def test_id(self):
+        expect(self.key.id) > 0
+
+    def test_title(self):
+        expect(self.key.title).isinstance(base.str_test)
+
+    def test_requires_auth(self):
+        if not self.auth:
+            with expect.raises(github3.GitHubError):
+                self.key.update('title', 'ssha-rsa AAAAB2...')
+                self.key.delete()

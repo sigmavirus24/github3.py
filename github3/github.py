@@ -228,7 +228,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
-    def get_key(self, id_num):
+    def key(self, id_num):
         """Gets the authenticated user's key specified by id_num.
 
         :param id_num: (required), unique id of the key
