@@ -1815,7 +1815,11 @@ class Comparison(GitHubObject):
         self._ttl_commits = compare.get('total_commits')
         self._commits = [RepoCommit(com, None) for com in
                 compare.get('commits')]
-        self._files = compare.get('files')
+        self._files = []
+        if compare.get('files'):
+            append = self._files.append
+            for f in compare.get('files'):
+                append(type('Comparison File', (object, ), f))
 
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
@@ -1849,7 +1853,7 @@ class Comparison(GitHubObject):
 
     @property
     def files(self):
-        """List of dictionaries describing the files modified."""
+        """List of objects describing the files modified."""
         return self._files
 
     @property

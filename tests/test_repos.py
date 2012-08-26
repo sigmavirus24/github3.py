@@ -444,6 +444,20 @@ class TestRepoTag(base.BaseTest):
         expect(self.tag.zipball_url).isinstance(base.str_test)
 
 
+def __test_files__(fd, sha):
+    expect(fd.additions) > 0
+    expect(fd.deletions) >= 0
+    expect(fd.changes) == fd.additions + fd.deletions
+    expect(fd.filename).isinstance(base.str_test)
+    expect(fd.blob_url).isinstance(base.str_test)
+    expect(fd.raw_url).isinstance(base.str_test)
+    expect(fd.sha).isinstance(base.str_test)
+    if sha:
+        expect(fd.sha) == sha
+    expect(fd.status) == 'modified'
+    expect(fd.patch).isinstance(base.str_test)
+
+
 class TestRepoCommit(base.BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestRepoCommit, self).__init__(methodName)
@@ -469,16 +483,56 @@ class TestRepoCommit(base.BaseTest):
     def test_files(self):
         expect(self.commit.files).isinstance(list)
         expect(self.commit.files) > []
+        self.expect_list_of_class(self.commit.files, type)
         for file in self.commit.files:
-            expect(file.additions) > 0
-            expect(file.deletions) > 0
-            expect(file.changes) == file.additions + file.deletions
-            expect(file.filename).isinstance(base.str_test)
-            expect(file.blob_url).isinstance(base.str_test)
-            expect(file.raw_url).isinstance(base.str_test)
-            expect(file.sha) == self.sha
-            expect(file.status) == 'modified'
-            expect(file.patch).isinstance(base.str_test)
+            __test_files__(file, self.sha)
 
     def test_total(self):
         expect(self.commit.total) == 17
+
+
+class TestComparison(base.BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestComparison, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.comp = repo.compare_commits(
+                '04d55444a3ec06ca8d2aa0a5e333cdaf27113254',
+                '731691616b71258c7ad7c141379856b5ebbab310'
+                )
+
+    def test_ahead_by(self):
+        expect(self.comp.ahead_by) > 0
+
+    def test_base_commit(self):
+        expect(self.comp.base_commit).isinstance(RepoCommit)
+
+    def test_behind_by(self):
+        expect(self.comp.behind_by) >= 0
+
+    def test_commits(self):
+        self.expect_list_of_class(self.comp.commits, RepoCommit)
+
+    def test_diff_url(self):
+        expect(self.comp.diff_url).isinstance(base.str_test)
+
+    def test_files(self):
+        expect(self.comp.files).isinstance(list)
+        expect(self.comp.files) > []
+        self.expect_list_of_class(self.comp.files, type)
+        for file in self.comp.files:
+            __test_files__(file, '')
+
+    def test_html_url(self):
+        expect(self.comp.html_url).isinstance(base.str_test)
+
+    def test_patch_url(self):
+        expect(self.comp.patch_url).isinstance(base.str_test)
+
+    def test_permalink_url(self):
+        expect(self.comp.permalink_url).isinstance(base.str_test)
+
+    def test_status(self):
+        expect(self.comp.status) == 'ahead'
+
+    def test_total_commits(self):
+        expect(self.comp.total_commits) == 18
