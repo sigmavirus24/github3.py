@@ -43,7 +43,7 @@ class TestAPI(base.BaseTest):
         s = github3.markdown(
                 '# Header 1\n\nParagraph\n------\n# Header 2\n\nParagraph'
                 )
-        expect(str(s)) == f
+        expect(s.decode()) == f
 
     def test_organization(self):
         expect(github3.organization(self.gh3py)).isinstance(
