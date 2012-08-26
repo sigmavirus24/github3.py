@@ -171,9 +171,8 @@ class Organization(BaseAccount):
     def _list_members(self, tail):
         """List members of this organization."""
         url = self._api + tail
-        json = self._get(url)
-        ses = self._session
-        return [User(memb, ses) for memb in json]
+        json = self._json(self._get(url), 200)
+        return [User(memb, self) for memb in json]
 
     @GitHubCore.requires_auth
     def add_member(self, login, team):
@@ -340,7 +339,7 @@ class Organization(BaseAccount):
 
         :returns: list of :class:`Event <github3.event.Event>`\ s
         """
-        url = self._build_url('events', self._api)
+        url = self._build_url('events', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Event(e, self._session) for e in json]
 
@@ -373,6 +372,7 @@ class Organization(BaseAccount):
         json = self._json(self._get(url, params=params), 200)
         return [Repository(r, self) for r in json]
 
+    @GitHubCore.requires_auth
     def list_teams(self):
         """List teams that are part of this organization.
 
