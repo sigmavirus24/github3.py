@@ -445,7 +445,7 @@ class TestRepoTag(base.BaseTest):
 
 
 def __test_files__(fd, sha):
-    expect(fd.additions) > 0
+    expect(fd.additions) >= 0
     expect(fd.deletions) >= 0
     expect(fd.changes) == fd.additions + fd.deletions
     expect(fd.filename).isinstance(base.str_test)
@@ -454,7 +454,7 @@ def __test_files__(fd, sha):
     expect(fd.sha).isinstance(base.str_test)
     if sha:
         expect(fd.sha) == sha
-    expect(fd.status) == 'modified'
+    expect(fd.status).isinstance(base.str_test)
     expect(fd.patch).isinstance(base.str_test)
 
 

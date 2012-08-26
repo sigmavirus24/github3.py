@@ -38,5 +38,4 @@ if __name__ == "__main__":
         names = [join(['tests', f[:-3]]) for f in names if regex.match(f)]
         suite = unittest.defaultTestLoader.loadTestsFromNames(names)
 
-    print("=== Starting unittest suite ===")
     unittest.TextTestRunner(verbosity=1).run(suite)
