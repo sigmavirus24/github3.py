@@ -62,7 +62,7 @@ class Key(GitHubCore):
             key = self._key
 
         data = dumps({'title': title, 'key': key})
-        json = self._json(self._patch(self._api, data), 200)
+        json = self._json(self._patch(self._api, data=data), 200)
 
         if json:
             self._update_(json)
@@ -316,7 +316,7 @@ class User(BaseAccount):
             'company': company, 'location': location,
             'hireable': hireable, 'bio': bio})
         url = self._build_url('user')
-        json = self._json(self._patch(url, user), 200)
+        json = self._json(self._patch(url, data=user), 200)
         if json:
             self._update_(json)
             return True
