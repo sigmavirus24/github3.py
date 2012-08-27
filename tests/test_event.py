@@ -12,7 +12,9 @@ class TestEvent(base.BaseTest):
                     'type')
             if e.org:
                 expect(e.org).isinstance(Organization)
-            expect(e.payload).isinstance(dict)
+
+            payload = (dict, base.str_test[0], base.str_test[1])
+            expect(e.payload).isinstance(payload)
             expect(e.is_public()).isinstance(bool)
             expect(e.to_json()).isinstance(dict)
             expect(e.repo).isinstance(tuple)
