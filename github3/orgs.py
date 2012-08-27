@@ -153,7 +153,7 @@ class Team(GitHubCore):
 
     @property
     def repos_count(self):
-        """Number of repos owned by this org."""
+        """Number of repos owned by this team."""
         return self._repos
 
 
