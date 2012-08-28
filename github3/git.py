@@ -169,7 +169,7 @@ class Reference(GitHubCore):
         :returns: bool
         """
         data = dumps({'sha': sha, 'force': force})
-        json = self._json(self._patch(self._api, data), 200)
+        json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True

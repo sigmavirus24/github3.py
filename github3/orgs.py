@@ -70,7 +70,7 @@ class Team(GitHubCore):
         """
         if name:
             data = dumps({'name': name, 'permission': permission})
-            json = self._json(self._patch(self._api, data), 200)
+            json = self._json(self._patch(self._api, data=data), 200)
             if json:
                 self._update_(json)
                 return True
@@ -312,7 +312,7 @@ class Organization(BaseAccount):
         """
         data = dumps({'billing_email': billing_email, 'company': company,
             'email': email, 'location': location, 'name': name})
-        json = self._json(self._patch(self._api, data), 200)
+        json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True

@@ -166,7 +166,7 @@ class Gist(GitHubCore):
         if files:
             data['files'] = files
         if data:
-            json = self._json(self._patch(self._api, dumps(data)), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)
             return True

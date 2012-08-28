@@ -337,7 +337,7 @@ class PullRequest(GitHubCore):
         :returns: bool
         """
         data = dumps({'title': title, 'body': body, 'state': state})
-        json = self._json(self._patch(self._api, data), 200)
+        json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True
