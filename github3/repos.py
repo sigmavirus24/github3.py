@@ -1112,6 +1112,19 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [User(u, self) for u in json]
 
+    def merge(self, base, head, message=''):
+        """Perform a merge from ``head`` into ``base``.
+
+        :param str base: (required), where you're merging into
+        :param str head: (required), where you're merging from
+        :param str message: (optional), message to be used for the commit
+        :returns: :class:`RepoCommit <RepoCommit>`
+        """
+        url = self._build_url('merges', base_url=self._api)
+        data = dumps({'base': base, 'head': head, 'commit_message': message})
+        json = self._json(self._post(url, data=data), 201)
+        return RepoCommit(json, self) if json else None
+
     def milestone(self, number):
         """Get the milestone indicated by ``number``.
 
