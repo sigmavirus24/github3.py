@@ -842,8 +842,15 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return [RepoComment(comm, self) for comm in json]
 
-    def list_commits(self):
+    def list_commits(self, sha='', path='', author=''):
         """List commits in this repository.
+
+        :param str sha: (optional), sha or branch to start listing commits
+            from
+        :param str path: (optional), commits containing this path will be
+            listed
+        :param str author: (optional), GitHub login, real name, or email to
+            filter commits by (using commit author)
 
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
