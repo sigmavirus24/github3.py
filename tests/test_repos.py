@@ -115,9 +115,10 @@ class TestRepository(base.BaseTest):
         expect(download).isinstance(Download)
 
     def test_git_commit(self):
-        commit = self.repo.git_commit(
-                '04d55444a3ec06ca8d2aa0a5e333cdaf27113254')
+        sha = '04d55444a3ec06ca8d2aa0a5e333cdaf27113254'
+        commit = self.repo.git_commit(sha)
         expect(commit).isinstance(Commit)
+        expect(commit.sha) == sha
 
     def test_is_fork(self):
         expect(self.repo.is_fork()).is_False()
@@ -135,30 +136,56 @@ class TestRepository(base.BaseTest):
         expect(self.repo.is_assignee(self.sigm)).is_True()
 
     def test_issue(self):
-        expect(self.repo.issue(1)).isinstance(Issue)
+        issue = self.repo.issue(1)
+        expect(issue).isinstance(Issue)
+        expect(issue.title) == 'Change get_todos()?'
 
     def test_label(self):
         expect(self.repo.label('Bug')).isinstance(Label)
 
     def test_list_assignees(self):
-        self.expect_list_of_class(self.repo.list_assignees(), User)
+        assignees = self.repo.list_assignees()
+        self.expect_list_of_class(assignees, User)
+        for a in assignees:
+            if a.login == 'sigmavirus24':
+                return
+        self.fail('No user with login sigmavirus24')
 
     def test_list_branches(self):
-        self.expect_list_of_class(self.repo.list_branches(), Branch)
+        branches = self.repo.list_branches()
+        self.expect_list_of_class(branches, Branch)
+        for b in branches:
+            if b.name == 'master':
+                return
+        self.fail('No branch named master')
 
     def test_list_comments(self):
-        self.expect_list_of_class(self.repo.list_comments(), RepoComment)
+        comments = self.repo.list_comments()
+        self.expect_list_of_class(comments, RepoComment)
+        for c in comments:
+            if c.user.login in ('sigmavirus24', 'jvstein'):
+                return
+        self.fail('No commenter with login sigmavirus24 or jvstein')
 
     def test_list_comments_on_commit(self):
         comments = self.repo.list_comments_on_commit(
                 '38c76375ae1a766b44c729b4b2ff0363312b6d13')
         self.expect_list_of_class(comments, RepoComment)
+        for c in comments:
+            if c.user.login in ('sigmavirus24', 'jvstein'):
+                return
+        self.fail('No commenter with login sigmavirus24 or jvstein')
 
     def test_list_commits(self):
         self.expect_list_of_class(self.repo.list_commits(), RepoCommit)
 
     def test_list_downloads(self):
-        self.expect_list_of_class(self.repo.list_downloads(), Download)
+        downloads = self.repo.list_downloads()
+        self.expect_list_of_class(downloads, Download)
+        for d in downloads:
+            if d.name == 'todo.txt-python-0.3.zip':
+                return
+        self.fail('No download with name todo.txt-python-0.3.zip')
 
     def test_list_events(self):
         self.expect_list_of_class(self.repo.list_events(), Event)
