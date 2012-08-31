@@ -813,7 +813,7 @@ class Repository(GitHubCore):
         :returns: list of :class:`Branch <Branch>`\ es
         """
         # Paginate?
-        url = self._build_url('labels', base_url=self._api)
+        url = self._build_url('branches', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Branch(b, self) for b in json]
 
