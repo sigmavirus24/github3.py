@@ -254,6 +254,7 @@ class TestRepository(base.BaseTest):
                     )
             repo.remove_collaborator('foobarbogus')
             repo.update_label('Foo', 'abc123')
+            repo.merge('development', 'master', 'Fails')
 
     def test_with_auth(self):
         if self.auth:
@@ -261,13 +262,25 @@ class TestRepository(base.BaseTest):
             # Try somethings only I can test
             try:
                 expect(repo.hook(74859)).isinstance(Hook)
+            except github3.GitHubError:
+                pass
+            try:
                 expect(repo.key(3069618)).isinstance(Key)
+            except github3.GitHubError:
+                pass
+            try:
                 expect(repo.pubsubhubbub(
                     'subscribe',
                     'https://github.com/sigmavirus24/github3.py/events',
                     'https://httpbin.org/post'
                     )).is_False()
+            except github3.GitHubError:
+                pass
+            try:
                 expect(repo.add_collaborator('jcordasc')).is_True()
+            except github3.GitHubError:
+                pass
+            try:
                 expect(repo.remove_collaborator('jcordasc')).is_True()
             except github3.GitHubError:
                 pass
