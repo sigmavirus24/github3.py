@@ -135,6 +135,8 @@ class PullRequest(GitHubCore):
         self._api = pull.get('url')
         self._base = PullDestination(pull.get('base'), 'Base')
         self._body = pull.get('body')
+        self._body_html = pull.get('body_html')
+        self._body_txt = pull.get('body_text')
 
         self._closed = None
         # If the pull request has been closed
@@ -197,6 +199,16 @@ class PullRequest(GitHubCore):
         return self._body
 
     @property
+    def body_html(self):
+        """Body of the pull request as HTML"""
+        return self._body_html
+
+    @property
+    def body_text(self):
+        """Body of the pull request as plain text"""
+        return self._body_txt
+
+    @property
     def closed_at(self):
         """datetime object representing when the pull was closed"""
         return self._closed
@@ -231,6 +243,8 @@ class PullRequest(GitHubCore):
 
         :returns: bool
         """
+        if self._mergeable is None:
+            return False
         return self._mergeable
 
     def is_merged(self):

@@ -1,0 +1,138 @@
+from base import BaseTest, expect, str_test
+from datetime import datetime
+from github3 import GitHubError
+from github3.git import Commit
+from github3.pulls import (PullRequest, PullDestination, ReviewComment,
+        PullFile)
+from github3.users import User
+
+
+class TestPullRequest(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestPullRequest, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.pr = repo.pull_request(5)
+        self.body = [
+        'I use this config setting to set the color for unprioritized items.',
+        '', 'export DEFAULT=$LIGHT_GREY', '',
+        ('Should be on both of my branches. Feel free to pull from me '
+         "whenever - I'm not always in the mood to add a pull request."
+         ' :-)')
+        ]
+        self.body_html = [
+        ('<p>'
+         'I use this config setting to set the color for unprioritized items.'
+         '</p>'),
+        '', '<p>export DEFAULT=$LIGHT_GREY</p>', '',
+        ('<p>Should be on both of my branches. Feel free to pull from me '
+         "whenever - I'm not always in the mood to add a pull request."
+         ' :-)</p>')
+        ]
+        self.url = 'https://github.com/{s.sigm}/{s.todo}/pull/5'.format(
+                s=self)
+
+    def test_pull_request(self):
+        expect(self.pr).isinstance(PullRequest)
+
+    def test_base(self):
+        expect(self.pr.base).is_not_None()
+        expect(self.pr.base).isinstance(PullDestination)
+        expect(self.pr.base.label) == 'sigmavirus24:master'
+
+    def test_body(self):
+        expect(self.pr.body).isinstance(str_test)
+        body = '\r\n'.join(self.body)
+        expect(self.pr.body) == body
+
+    def test_body_html(self):
+        expect(self.pr.body_html).isinstance(str_test)
+        body = '\n'.join(self.body_html)
+        expect(self.pr.body_html) == body
+
+    def test_body_text(self):
+        expect(self.pr.body_text).isinstance(str_test)
+        body = '\n'.join(self.body)
+        expect(self.pr.body_text) == body
+
+    def test_closed_at(self):
+        expect(self.pr.closed_at).isinstance(datetime)
+
+    def test_created_at(self):
+        expect(self.pr.created_at).isinstance(datetime)
+
+    def test_diff_url(self):
+        url = self.pr.diff_url
+        expect(url).isinstance(str_test)
+        expect(url) == self.url + '.diff'
+
+    def test_head(self):
+        head = self.pr.head
+        label = head.label
+        expect(head).isinstance(PullDestination)
+        expect(label) == 'jvstein:0171bf7bea88cac6884bb72bd26c07e6a826677e'
+
+    def test_html_url(self):
+        url = self.pr.html_url
+        expect(url).isinstance(str_test)
+        expect(url) == self.url
+
+    def test_id(self):
+        expect(self.pr.id) == 555164
+
+    def test_is_mergeable(self):
+        expect(self.pr.is_mergeable()).is_False()
+
+    def test_is_merged(self):
+        expect(self.pr.is_merged()).is_True()
+
+    def test_issue_url(self):
+        expect(self.pr.issue_url).isinstance(str_test)
+        expect(self.pr.issue_url) == self.url.replace('pull', 'issues')
+
+    def test_links(self):
+        expect(self.pr.links).isinstance(dict)
+        expect(self.pr.links.keys()) == ['self', 'html', 'issue',
+                'review_comments', 'comments']
+
+    def test_list_comments(self):
+        comments = self.pr.list_comments()
+        self.expect_list_of_class(comments, ReviewComment)
+
+    def test_list_commits(self):
+        commits = self.pr.list_commits()
+        self.expect_list_of_class(commits, Commit)
+
+    def test_list_files(self):
+        files = self.pr.list_files()
+        self.expect_list_of_class(files, PullFile)
+
+    def test_merged_at(self):
+        expect(self.pr.merged_at).isinstance(datetime)
+
+    def test_merged_by(self):
+        u = self.pr.merged_by
+        expect(u).isinstance(User)
+        expect(u.login) == 'sigmavirus24'
+
+    def test_number(self):
+        expect(self.pr.number) == 5
+
+    def test_patch_url(self):
+        expect(self.pr.patch_url).isinstance(str_test)
+        expect(self.pr.patch_url) == self.url + '.patch'
+
+    def test_requires_auth(self):
+        with expect.raises(GitHubError):
+            self.pr.merge('foo bar')
+            self.pr.update('New title')
+
+    def test_state(self):
+        expect(self.pr.state) == 'closed'
+
+    def test_title(self):
+        expect(self.pr.title) == ('Handle the DEFAULT config setting like'
+        ' todo.sh')
+
+    def test_user(self):
+        expect(self.pr.user).isinstance(User)
+        expect(self.pr.user.login) == 'jvstein'
