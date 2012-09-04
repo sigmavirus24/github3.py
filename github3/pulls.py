@@ -248,9 +248,7 @@ class PullRequest(GitHubCore):
 
         :returns: bool
         """
-        if self._mergeable is None:
-            return False
-        return self._mergeable
+        return False if self._mergeable is None else self._mergeable
 
     def is_merged(self):
         """Checks to see if the pull request was merged.

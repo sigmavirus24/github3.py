@@ -137,6 +137,14 @@ class TestPullRequest(BaseTest):
         expect(self.pr.user).isinstance(User)
         expect(self.pr.user.login) == 'jvstein'
 
+    def test_with_auth(self):
+        if not self.auth:
+            return
+        pr = self._g.repository(self.gh3py, self.test_repo)
+        title, body, state = pr.title, pr.body, pr.state
+        expect(pr.update('Test editing', 'New body')).is_True()
+        expect(pr.update(title, body, state)).is_True()
+
 
 class TestReviewComment(BaseTest):
     def __init__(self, methodName='runTest'):
