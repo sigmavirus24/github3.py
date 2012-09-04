@@ -136,3 +136,34 @@ class TestPullRequest(BaseTest):
     def test_user(self):
         expect(self.pr.user).isinstance(User)
         expect(self.pr.user.login) == 'jvstein'
+
+
+class TestReviewComment(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestReviewComment, self).__init__(methodName)
+        repo = self.g.repository(self.kr, 'requests')
+        self.comment = repo.pull_request(819).list_comments()[0]
+
+    def test_review_comment(self):
+        expect(self.comment).isinstance(ReviewComment)
+
+    def test_commit_id(self):
+        cid = self.comment.commit_id
+        expect(cid).isinstance(str_test)
+        expect(cid) == 'babac7368b9aa34fd1f0e5d29d4f80c2006ad614'
+
+    def test_html_url(self):
+        url = ('https://github.com/kennethreitz/requests'
+        '/pull/819#discussion_r1472088')
+        expect(self.comment.html_url).isinstance(dict)
+        expect(self.comment.html_url['href']) == url
+
+    def test_path(self):
+        expect(self.comment.path).isinstance(str_test)
+        expect(self.comment.path) == 'requests/auth.py'
+
+    def test_position(self):
+        expect(self.comment.position) >= 0
+
+    def test_updated_at(self):
+        expect(self.comment.updated_at).isinstance(datetime)
