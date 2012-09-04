@@ -393,7 +393,7 @@ class Organization(BaseAccount):
 
         :returns: bool
         """
-        url = self._build_ur('public_members', login, base_url=self._api)
+        url = self._build_url('public_members', login, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @GitHubCore.requires_auth
