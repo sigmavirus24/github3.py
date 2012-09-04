@@ -112,7 +112,7 @@ class TestPullRequest(BaseTest):
     def test_merged_by(self):
         u = self.pr.merged_by
         expect(u).isinstance(User)
-        expect(u.login) == 'sigmavirus24'
+        expect(u.login) == self.sigm
 
     def test_number(self):
         expect(self.pr.number) == 5
@@ -198,3 +198,70 @@ class TestReviewComment(BaseTest):
         with expect.raises(GitHubError):
             self.comment.delete()
             self.comment.edit('foo')
+
+
+class TestPullDestination(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestPullDestination, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.dest = repo.pull_request(5).base
+
+    def test_pull_destination(self):
+        expect(self.dest).isinstance(PullDestination)
+
+    def test_direction(self):
+        expect(self.dest.direction) == 'Base'
+
+    def test_label(self):
+        expect(self.dest.label) == 'sigmavirus24:master'
+
+    def test_sha(self):
+        expect(self.dest.sha) == 'f55a45094f67d5659462c3fbb18d4bca97d92e7c'
+
+    def test_ref(self):
+        expect(self.dest.ref) == 'master'
+
+    def test_repo(self):
+        expect(self.dest.repo) == (self.sigm, self.todo)
+
+    def test_user(self):
+        expect(self.dest.user.login) == self.sigm
+
+
+class TestPullFile(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestPullFile, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, self.todo)
+        self.pf = repo.pull_request(5).list_files()[0]
+        self.blob = ('https://github.com/{s.sigm}/{s.todo}/'
+                'blob/{f.sha}/{f.filename}').format(s=self, f=self.pf)
+
+    def test_file(self):
+        expect(self.pf).isinstance(PullFile)
+
+    def test_additions(self):
+        expect(self.pf.additions) == 2
+
+    def test_blob_url(self):
+        expect(self.pf.blob_url) == self.blob
+
+    def test_changes(self):
+        expect(self.pf.changes) == 4
+
+    def test_deletions(self):
+        expect(self.pf.deletions) == 2
+
+    def test_filename(self):
+        expect(self.pf.filename) == 'todo.py'
+
+    def test_patch(self):
+        expect(self.pf.patch).isinstance(str_test)
+
+    def test_raw_url(self):
+        expect(self.pf.raw_url) == self.blob.replace('blob', 'raw')
+
+    def test_sha(self):
+        expect(self.pf.sha) == '0171bf7bea88cac6884bb72bd26c07e6a826677e'
+
+    def test_status(self):
+        expect(self.pf.status) == 'modified'
