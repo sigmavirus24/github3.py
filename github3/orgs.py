@@ -422,6 +422,7 @@ class Organization(BaseAccount):
                 return t.remove_repo(repo)
         return False
 
+    @GitHubCore.requires_auth
     def team(self, team_id):
         """Returns Team object with information about team specified by
         ``team_id``.

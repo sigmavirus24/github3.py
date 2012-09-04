@@ -74,8 +74,9 @@ class TestOrganization(BaseTest):
             pass
 
         try:
-            expect(org.add_repo(self.test_repo, 'Contributors')).is_True()
-            expect(org.remove_repo(self.test_repo, 'Contributors')).is_True()
+            repo = self.gh3py + '/' + self.test_repo
+            expect(org.add_repo(repo, 'Contributors')).is_True()
+            expect(org.remove_repo(repo, 'Contributors')).is_True()
         except github3.GitHubError:
             pass
 
