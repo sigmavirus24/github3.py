@@ -30,6 +30,14 @@ class TestAPI(base.BaseTest):
     def test_list_events(self):
         self.expect_list_of_class(github3.list_events(), github3.events.Event)
 
+    def test_list_orgs(self):
+        self.expect_list_of_class(github3.list_orgs(self.sigm),
+                github3.orgs.Organization)
+
+    def test_list_repos(self):
+        self.expect_list_of_class(github3.list_repos(self.sigm),
+                github3.repos.Repository)
+
     def test_markdown(self):
         f = ['<h1>\n<a name="header-1" class="anchor" href="#header-1">',
             '<span class="mini-icon mini-icon-link"></span>',
@@ -68,8 +76,21 @@ class TestAPI(base.BaseTest):
         expect(github3.search_email('graffatcolmingov@gmail.com')).isinstance(
                 github3.legacy.LegacyUser)
 
+    def test_search_repository(self):
+        self.expect_list_of_class(github3.search_repos('python'),
+                github3.legacy.LegacyRepo)
+
     def test_user(self):
         expect(github3.user(self.sigm)).isinstance(github3.users.User)
 
     def test_ratelimit_remaining(self):
         expect(github3.ratelimit_remaining()) > 0
+
+    def test_with_auth(self):
+        if not self.auth:
+            return
+        authorization = github3.authorize(self.user, self.pw, ['user'],
+                'Test github3.py',
+                'https://github.com/sigmavirus24/github3.py')
+        expect(authorization).isinstance(github3.github.Authorization)
+        expect(authorization.delete()).is_True()
