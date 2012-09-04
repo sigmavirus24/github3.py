@@ -86,7 +86,7 @@ class TestAPI(base.BaseTest):
     def test_ratelimit_remaining(self):
         expect(github3.ratelimit_remaining()) > 0
 
-    def test_with_auth(self):
+    def test_authorize(self):
         if not self.auth:
             return
         authorization = github3.authorize(self.user, self.pw, ['user'],

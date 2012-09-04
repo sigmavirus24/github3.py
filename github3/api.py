@@ -99,7 +99,7 @@ def create_gist(description, files):
         {'spam.txt': {'content': 'File contents ...'}}
     :returns: :class:`Gist <github3.gist.Gist>`
     """
-    return gh.create_gist(description, files)
+    return gh.create_gist(description, files)  # (No coverage)
 
 
 def issue(owner, repository, number):

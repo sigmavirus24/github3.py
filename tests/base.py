@@ -20,6 +20,7 @@ class BaseTest(unittest.TestCase):
         pw = self.pw = os.environ.get('__PASS')
         if user and pw:
             self._g = github3.login(user, pw)
+            self.auth = True
         self.__reinit_github__()
 
     def __reinit_github__(self):
