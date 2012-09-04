@@ -65,7 +65,7 @@ class TestGist(BaseTest):
         expect(my_gist).isinstance(Gist)
         files = {'test.txt': 'testing github3.py'}
         expect(my_gist.edit(files=files)).is_True()
-        expect(my_gist.create_comment('foo bar bogus')).is_True()
+        expect(my_gist.create_comment('foo bar bogus')).is_not_None()
         expect(my_gist.delete()).is_True()
 
 
