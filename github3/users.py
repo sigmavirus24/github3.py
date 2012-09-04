@@ -194,7 +194,8 @@ class User(BaseAccount):
         :returns: bool
         """
         url = self._build_url('user', 'emails')
-        return self._boolean(self._delete(url, dumps(addresses)), 204, 404)
+        return self._boolean(self._delete(url, data=dumps(addresses)),
+                204, 404)
 
     @property
     def disk_usage(self):
