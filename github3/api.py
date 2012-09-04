@@ -17,17 +17,19 @@ def authorize(login, password, scopes, note='', note_url=''):
     return gh.authorize(login, password, scopes, note, note_url)
 
 
-def login(username, password, token=None):
+def login(username=None, password=None, token=None):
     """Constructs and returns a GitHub session with the username and
     password, or token
 
     :param str username: login name
     :param str password: password for the login
-    :param str token: (optional), OAuth token
+    :param str token: OAuth token
     :returns: :class:`GitHub <github3.github.GitHub>`
     """
-    g = GitHub()
-    g.login(username, password, token)
+    g = None
+    if (username and password) or token:
+        g = GitHub()
+        g.login(username, password, token)
     return g
 
 

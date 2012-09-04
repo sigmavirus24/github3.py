@@ -9,13 +9,13 @@ from github3.repos import Repository
 class TestOrganization(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestOrganization, self).__init__(methodName)
-        self.org = github3.organization(self.gh3py)
+        self.org = self.g.organization(self.gh3py)
 
     def test_organization(self):
         expect(self.org).isinstance(Organization)
 
     def test_is_member(self):
-        expect(self.org.is_member(self.sigm)).is_False()
+        expect(self.org.is_member(self.sigm)).is_True()
 
     def test_is_public_member(self):
         expect(self.org.is_public_member(self.sigm)).is_True()
@@ -47,7 +47,7 @@ class TestOrganization(BaseTest):
 
     def test_requires_auth(self):
         with expect.raises(github3.GitHubError):
-            self.org.add_member(self.kr, 'Collaborators')
+            self.org.add_member('jcordasc', 'Collaborators')
             self.org.add_repo(self.test_repo, 'Collaborators')
             self.org.create_repo(self.test_repo + '2')
             self.org.conceal_member(self.sigm)
