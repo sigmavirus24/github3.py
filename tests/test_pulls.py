@@ -151,10 +151,14 @@ class TestReviewComment(BaseTest):
         expect(self.comment.body).isinstance(str_test)
 
     def test_body_html(self):
-        expect(self.comment.body_html).isinstance(str_test)
+        html = self.comment.body_html
+        if html:
+            expect(html).isinstance(str_test)
 
     def test_body_text(self):
-        expect(self.comment.body_text).isinstance(str_test)
+        text = self.comment.body_text
+        if text:
+            expect(text).isinstance(str_test)
 
     def test_created_at(self):
         expect(self.comment.created_at).isinstance(datetime)
