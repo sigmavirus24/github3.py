@@ -21,9 +21,21 @@ Installation
 Dependencies
 ------------
 
+Every-day Use
+~~~~~~~~~~~~~
+
 - requests_  by Kenneth Reitz
   
 .. _requests: https://github.com/kennethreitz/requests
+
+Testing
+~~~~~~~
+
+- expecter_ by Gary Bernhardt
+- (optional) coverage_ by Ned Batchelder
+
+.. _expecter: https://github.com/garybernhardt/expecter
+.. _coverage: http://nedbatchelder.com/code/coverage/
 
 License
 -------
@@ -107,6 +119,18 @@ on Travis, run::
     make travis
     # or
     make tests
+
+To test how much of the library is covered::
+
+    make coverage_auth
+    # equivalently
+    make coverage_all
+    # or without authentication
+    make coverage
+
+Depending on which you run, you will see different percentages reported by 
+coverage. As of this writing (2012-09-04), ``coverage_auth`` reports 81% 
+covered.
 
 
 .. links

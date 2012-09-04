@@ -252,8 +252,7 @@ class Gist(GitHubCore):
         json = self._json(self._get(self._api), 200)
         if json:
             self._update_(json)
-            return True
-        return False
+        return True if json else False
 
     @GitHubCore.requires_auth
     def star(self):

@@ -63,8 +63,13 @@ class TestUser(base.BaseTest):
         if not self.auth:
             return
         user = self._g.user()
-        expect(user.add_email_addresses(['new_email@gmail.com'])).is_True()
-        expect(user.delete_email_addresses(['new_email@gmail.com'])).is_True()
+        email = 'new_email@gmail.com'
+        addresses = user.add_email_addresses([email])
+        expect(addresses).isinstance(list)
+        expect(user.delete_email_addresses([email])).is_True()
+        addresses = user.add_email_address(email)
+        expect(addresses).isinstance(list)
+        expect(user.delete_email_address(email)).is_True()
         try:
             ev = user.list_org_events(self.gh3py)
             self.expect_list_of_class(ev, Event)

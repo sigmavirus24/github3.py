@@ -22,6 +22,8 @@ coverage_all:
 	coverage run --include=$(COVERAGE_INCLUDE) ./unittests.py
 	coverage report
 
+coverage_auth: coverage_all
+
 coverage:
 	CI=true coverage run --include=$(COVERAGE_INCLUDE) ./unittests.py
 	coverage report

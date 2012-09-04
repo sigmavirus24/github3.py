@@ -151,6 +151,16 @@ class User(BaseAccount):
             self._plan = None
 
     @GitHubCore.requires_auth
+    def add_email_address(self, address):
+        """Add the single email address to the authenticated user's
+        account.
+
+        :param str address: (required), email address to add
+        :returns: list of email addresses
+        """
+        return self.add_email_addresses([address])
+
+    @GitHubCore.requires_auth
     def add_email_addresses(self, addresses=[]):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account.
@@ -164,6 +174,15 @@ class User(BaseAccount):
             url = self._build_url('user', 'emails')
             json = self._json(self._post(url, dumps(addresses)), 201)
         return json
+
+    @GitHubCore.requires_auth
+    def delete_email_address(self, address):
+        """Delete the email address from the user's account.
+
+        :param str address: (required), email address to delete
+        :returns: bool
+        """
+        return self.delete_email_addresses([address])
 
     @GitHubCore.requires_auth
     def delete_email_addresses(self, addresses=[]):
