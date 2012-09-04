@@ -147,6 +147,18 @@ class TestReviewComment(BaseTest):
     def test_review_comment(self):
         expect(self.comment).isinstance(ReviewComment)
 
+    def test_body(self):
+        expect(self.comment.body).isinstance(str_test)
+
+    def test_body_html(self):
+        expect(self.comment.body_html).isinstance(str_test)
+
+    def test_body_text(self):
+        expect(self.comment.body_text).isinstance(str_test)
+
+    def test_created_at(self):
+        expect(self.comment.created_at).isinstance(datetime)
+
     def test_commit_id(self):
         cid = self.comment.commit_id
         expect(cid).isinstance(str_test)
@@ -158,6 +170,9 @@ class TestReviewComment(BaseTest):
         expect(self.comment.html_url).isinstance(dict)
         expect(self.comment.html_url['href']) == url
 
+    def test_id(self):
+        expect(self.comment.id) == 1472088
+
     def test_path(self):
         expect(self.comment.path).isinstance(str_test)
         expect(self.comment.path) == 'requests/auth.py'
@@ -165,5 +180,17 @@ class TestReviewComment(BaseTest):
     def test_position(self):
         expect(self.comment.position) >= 0
 
+    def test_original_position(self):
+        expect(self.comment.original_position) == 46
+
     def test_updated_at(self):
         expect(self.comment.updated_at).isinstance(datetime)
+
+    def test_user(self):
+        expect(self.comment.user).isinstance(User)
+        expect(self.comment.user.login) == 'idan'
+
+    def test_requires_auth(self):
+        with expect.raises(GitHubError):
+            self.comment.delete()
+            self.comment.edit('foo')

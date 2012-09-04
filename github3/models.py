@@ -176,7 +176,7 @@ class BaseComment(GitHubCore):
             self._pull = comment['_links'].get('pull_request')
 
         self._path = comment.get('path')
-        self._pos = comment.get('position', 0)
+        self._pos = comment.get('position') or 0
         self._cid = comment.get('commit_id')
 
     @property

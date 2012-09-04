@@ -375,6 +375,8 @@ class ReviewComment(BaseComment):
         if comment.get('user'):
             self._user = User(comment.get('user'), self)
 
+        self._orig = comment.get('original_position')
+
     def __repr__(self):
         return '<Review Comment [{0}]>'.format(self._user.login)
 
@@ -387,6 +389,11 @@ class ReviewComment(BaseComment):
     def html_url(self):
         """URL of the comment"""
         return self._url
+
+    @property
+    def original_position(self):
+        """Original position inside the file"""
+        return self._orig
 
     @property
     def path(self):
