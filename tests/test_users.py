@@ -59,7 +59,7 @@ class TestUser(base.BaseTest):
             self.user.list_org_events(self.gh3py)
             self.user.update()
 
-    def test_authenticated(self):
+    def test_with_auth(self):
         if not self.auth:
             return
         user = self._g.user()

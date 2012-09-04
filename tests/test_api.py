@@ -93,4 +93,5 @@ class TestAPI(base.BaseTest):
                 'Test github3.py',
                 'https://github.com/sigmavirus24/github3.py')
         expect(authorization).isinstance(github3.github.Authorization)
+        authorization._session.auth = (self.user, self.pw)
         expect(authorization.delete()).is_True()

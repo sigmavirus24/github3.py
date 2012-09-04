@@ -69,7 +69,7 @@ class TestOrganization(BaseTest):
         org = Organization(self.org.to_json(), self._g)
         try:
             expect(org.add_member('jcordasc', 'Collaborators')).is_True()
-            expect(org.remove_member('jcordasc', 'Collaborators')).is_True()
+            expect(org.remove_member('jcordasc')).is_True()
         except github3.GitHubError:
             pass
 
@@ -120,5 +120,5 @@ class TestOrganization(BaseTest):
 class TestTeam(BaseTest):
     pass
 
-# I have to decide how to test Teams. They're all entirely dependent upon 
+# I have to decide how to test Teams. They're all entirely dependent upon
 # being authenticated and being part of an organization.

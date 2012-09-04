@@ -95,8 +95,8 @@ class Repository(GitHubCore):
         """
         resp = False
         if login:
-            url = self._api + '/collaborators/' + login
-            resp = self._put(url)
+            url = self._build_url('collaborators', login, base_url=self._api)
+            resp = self._boolean(self._put(url), 204, 404)
         return resp
 
     def archive(self, format, path='', ref='master'):

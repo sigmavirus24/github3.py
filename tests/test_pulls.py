@@ -140,7 +140,8 @@ class TestPullRequest(BaseTest):
     def test_with_auth(self):
         if not self.auth:
             return
-        pr = self._g.repository(self.gh3py, self.test_repo)
+        r = self._g.repository(self.gh3py, self.test_repo)
+        pr = r.pull_request(2)
         title, body, state = pr.title, pr.body, pr.state
         expect(pr.update('Test editing', 'New body')).is_True()
         expect(pr.update(title, body, state)).is_True()

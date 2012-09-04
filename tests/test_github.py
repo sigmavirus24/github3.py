@@ -120,7 +120,7 @@ class TestGitHub(base.BaseTest):
         if self.auth:
             i = self._g.create_issue(self.gh3py, self.test_repo,
             'Testing github3.py', 'Ignore this.')
-            expect(i).isinstance(github3.issue.Issue)
+            expect(i).isinstance(github3.issues.Issue)
             expect(i.close()).is_True()
 
     def test_keys(self):
