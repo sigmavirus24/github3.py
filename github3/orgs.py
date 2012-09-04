@@ -249,7 +249,7 @@ class Organization(BaseAccount):
             'has_downloads': has_downloads}
         if team_id > 0:
             data.update({'team_id': team_id})
-        json = self._json(self._post(url, dumps(data)), 204)
+        json = self._json(self._post(url, dumps(data)), 201)
         return Repository(json, self) if json else None
 
     @GitHubCore.requires_auth

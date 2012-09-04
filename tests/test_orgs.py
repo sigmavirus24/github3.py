@@ -15,7 +15,7 @@ class TestOrganization(BaseTest):
         expect(self.org).isinstance(Organization)
 
     def test_is_member(self):
-        expect(self.org.is_member(self.sigm)).is_True()
+        expect(self.org.is_member(self.sigm)).isinstance(bool)
 
     def test_is_public_member(self):
         expect(self.org.is_public_member(self.sigm)).is_True()
