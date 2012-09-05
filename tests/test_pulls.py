@@ -91,7 +91,7 @@ class TestPullRequest(BaseTest):
 
     def test_links(self):
         expect(self.pr.links).isinstance(dict)
-        expect(self.pr.links.keys()) == ['self', 'html', 'issue',
+        expect(list(self.pr.links.keys())) == ['self', 'html', 'issue',
                 'review_comments', 'comments']
 
     def test_list_comments(self):
