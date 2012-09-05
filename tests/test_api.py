@@ -73,15 +73,8 @@ class TestAPI(base.BaseTest):
                 github3.legacy.LegacyUser)
 
     def test_search_email(self):
-        try:
-            expect(github3.search_email(
-                'graffatcolmingov@gmail.com')).isinstance(
+        expect(github3.search_email('wynn@github.com')).isinstance(
                         github3.legacy.LegacyUser)
-        except github3.GitHubError as err:
-            if err.code == 404:
-                pass
-            else:
-                raise err
 
     def test_search_repository(self):
         self.expect_list_of_class(github3.search_repos('python'),

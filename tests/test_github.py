@@ -168,14 +168,7 @@ class TestGitHub(base.BaseTest):
         expect(self.g.search_issues(self.sigm, self.todo, 'closed',
                 'todo')).is_not_None()
         expect(self.g.search_users(self.sigm)).is_not_None()
-        try:
-            expect(self.g.search_email('graffatcolmingov@gmail.com')
-                    ).is_not_None()
-        except github3.GitHubError as err:
-            if err.code == 404:
-                pass
-            else:
-                raise err
+        expect(self.g.search_email('wynn@github.com')).is_not_None()
 
     def test_users(self):
         with expect.raises(github3.GitHubError):
