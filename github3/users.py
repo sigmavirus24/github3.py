@@ -222,7 +222,7 @@ class User(BaseAccount):
         :param public: (optional), only list public events for the
             authenticated user
         :type public: bool
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         # Paginate
         path = ['events']
@@ -258,7 +258,7 @@ class User(BaseAccount):
 
         :param org: (required), name of the organization
         :type org: str
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         # Paginate
         json = []
@@ -275,7 +275,7 @@ class User(BaseAccount):
         :param public: (optional), determines if the authenticated user sees
             both private and public or just public
         :type public: bool
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         # Paginate
         path = ['received_events']

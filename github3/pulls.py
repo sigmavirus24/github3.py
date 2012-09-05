@@ -59,7 +59,7 @@ class PullDestination(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <github3.user.User>` representing the owner"""
+        """:class:`User <github3.users.User>` representing the owner"""
         return self._user
 
 
@@ -318,7 +318,7 @@ class PullRequest(GitHubCore):
 
     @property
     def merged_by(self):
-        """:class:`User <github3.user.User>` who merged this pull"""
+        """:class:`User <github3.users.User>` who merged this pull"""
         return self._mergedby
 
     @property
@@ -362,8 +362,8 @@ class PullRequest(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <github3.user.User>` object representing the creator of
-        the pull request"""
+        """:class:`User <github3.users.User>` object representing the creator
+        of the pull request"""
         return self._user
 
 

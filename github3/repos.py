@@ -400,7 +400,7 @@ class Repository(GitHubCore):
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
-        :returns: :class:`Issue <github3.issue.Issue>` if successful, else
+        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
             None
         """
         issue = dumps({'title': title, 'body': body, 'assignee': assignee,
@@ -418,7 +418,7 @@ class Repository(GitHubCore):
         :type title: str
         :param key: (required), key text
         :type key: str
-        :returns: :class:`Key <github3.user.Key>` if successful, else None
+        :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
         data = dumps({'title': title, 'key': key})
         url = self._build_url('keys', base_url=self._api)
@@ -434,7 +434,7 @@ class Repository(GitHubCore):
         :param color: (required), value of the color to assign to the
             label
         :type color: str
-        :returns: :class:`Label <github3.issue.Label>` if successful, else
+        :returns: :class:`Label <github3.issues.Label>` if successful, else
             None
         """
         data = dumps({'name': name, 'color': color.strip('#')})
@@ -456,7 +456,7 @@ class Repository(GitHubCore):
         :type description: str
         :param due_on: (optional), ISO 8601 formatted due date
         :type due_on: str
-        :returns: :class:`Milestone <github3.issue.Milestone>` if successful,
+        :returns: :class:`Milestone <github3.issues.Milestone>` if successful,
             else None
         """
         url = self._build_url('milestones', base_url=self._api)
@@ -756,7 +756,7 @@ class Repository(GitHubCore):
 
         :param number: (required), number of the issue on this repository
         :type number: int
-        :returns: :class:`Issue <github3.issue.Issue>` if successful, else
+        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
             None
         """
         json = None
@@ -784,7 +784,7 @@ class Repository(GitHubCore):
 
         :param name: (required), name of the label
         :type name: str
-        :returns: :class:`Label <github3.issue.Label>` if successful, else
+        :returns: :class:`Label <github3.issues.Label>` if successful, else
             None
         """
         json = None
@@ -801,7 +801,7 @@ class Repository(GitHubCore):
     def list_assignees(self):
         """List all available assignees to which an issue may be assigned.
 
-        :returns: list of :class:`User <github3.user.User>`\ s
+        :returns: list of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('assignees', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -864,7 +864,7 @@ class Repository(GitHubCore):
 
         :param anon: (optional), True lists anonymous contributors as well
         :type anon: bool
-        :returns: list of :class:`User <github3.user.User>`\ s
+        :returns: list of :class:`User <github3.users.User>`\ s
         """
         # Paginate
         url = self._build_url('contributors', base_url=self._api)
@@ -887,7 +887,7 @@ class Repository(GitHubCore):
     def list_events(self):
         """List events on this repository.
 
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         # Paginate
         url = self._build_url('events', base_url=self._api)
@@ -948,7 +948,7 @@ class Repository(GitHubCore):
         :type direction: str
         :param since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
         :type since: str
-        :returns: list of :class:`Issue <github3.issue.Issue>`\ s
+        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
         """
         # Paginate
         url = self._build_url('issues', base_url=self._api)
@@ -987,7 +987,7 @@ class Repository(GitHubCore):
     def list_keys(self):
         """List deploy keys on this repository.
 
-        :returns: list of :class:`Key <github3.user.Key>`\ s
+        :returns: list of :class:`Key <github3.users.Key>`\ s
         """
         # Paginate?
         url = self._build_url('keys', base_url=self._api)
@@ -997,7 +997,7 @@ class Repository(GitHubCore):
     def list_labels(self):
         """List labels on this repository.
 
-        :returns: list of :class:`Label <github3.issue.Label>`\ s
+        :returns: list of :class:`Label <github3.issues.Label>`\ s
         """
         # Paginate?
         url = self._build_url('labels', base_url=self._api)
@@ -1026,7 +1026,7 @@ class Repository(GitHubCore):
         :param direction: (optional), direction to sort the milestones,
             accepted values: ('asc', 'desc')
         :type direction: str
-        :returns: list of :class:`Milestone <github3.issue.Milestone>`\ s
+        :returns: list of :class:`Milestone <github3.issues.Milestone>`\ s
         """
         # Paginate?
         url = self._build_url('milestones', base_url=self._api)
@@ -1047,7 +1047,7 @@ class Repository(GitHubCore):
     def list_network_events(self):
         """Lists events on a network of repositories.
 
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         # Paginate
         base = self._api.replace('repos', 'networks', 1)
@@ -1106,7 +1106,7 @@ class Repository(GitHubCore):
     def list_watchers(self):
         """List watchers of this repository.
 
-        :returns: list of :class:`User <github3.user.User>`\ s
+        :returns: list of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('watchers', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -1130,7 +1130,7 @@ class Repository(GitHubCore):
 
         :param number: (required), unique id number of the milestone
         :type number: int
-        :returns: :class:`Milestone <github3.issue.Milestone>`
+        :returns: :class:`Milestone <github3.issues.Milestone>`
         """
         url = self._build_url('milestones', str(number), base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -1153,7 +1153,7 @@ class Repository(GitHubCore):
 
     @property
     def owner(self):
-        """:class:`User <github3.user.User>` object representing the
+        """:class:`User <github3.users.User>` object representing the
         repository owner."""
         return self._owner
 
@@ -1787,7 +1787,7 @@ class RepoCommit(BaseCommit):
 
     @property
     def author(self):
-        """:class:`User <github3.user.User>` who authored the commit."""
+        """:class:`User <github3.users.User>` who authored the commit."""
         return self._author
 
     @property
@@ -1797,7 +1797,7 @@ class RepoCommit(BaseCommit):
 
     @property
     def committer(self):
-        """:class:`User <github3.user.User>` who committed the commit."""
+        """:class:`User <github3.users.User>` who committed the commit."""
         return self._committer
 
     @property

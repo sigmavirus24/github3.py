@@ -279,6 +279,6 @@ class Gist(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <github3.user.User>` object representing the owner of
+        """:class:`User <github3.users.User>` object representing the owner of
         the gist."""
         return self._user

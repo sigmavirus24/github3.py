@@ -104,7 +104,7 @@ class Team(GitHubCore):
     def list_members(self):
         """List the members of this team.
 
-        :returns: list of :class:`User <github3.user.User>`\ s
+        :returns: list of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('members', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -113,7 +113,8 @@ class Team(GitHubCore):
     def list_repos(self):
         """List the repositories this team has access to.
 
-        :returns: list of :class:`Repository <github3.repo.Repository>` objects
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        objects
         """
         url = self._build_url('repos', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -240,7 +241,7 @@ class Organization(BaseAccount):
         :param team_id: (optional), id of the team that will be granted
             access to this repository
         :type team_id: int
-        :returns: :class:`Repository <github3.repo.Repository>`
+        :returns: :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repos', base_url=self._api)
         data = {'name': name, 'description': description,
@@ -337,7 +338,7 @@ class Organization(BaseAccount):
     def list_events(self):
         """List events for this org.
 
-        :returns: list of :class:`Event <github3.event.Event>`\ s
+        :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         url = self._build_url('events', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -346,14 +347,14 @@ class Organization(BaseAccount):
     def list_members(self):
         """List members of this organization.
 
-        :returns: list of :class:`User <github3.user.User>`\ s
+        :returns: list of :class:`User <github3.users.User>`\ s
         """
         return self._list_members('/members')
 
     def list_public_members(self):
         """List public members of this organization.
 
-        :returns: list of :class:`User <github3.user.User>`\ s
+        :returns: list of :class:`User <github3.users.User>`\ s
         """
         return self._list_members('/public_members')
 
@@ -363,7 +364,8 @@ class Organization(BaseAccount):
         :param type: (optional), accepted values:
             ('all', 'public', 'member', 'private'), API default: 'all'
         :type type: str
-        :returns: list of :class:`Repository <github3.repo.Repository>` objects
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        objects
         """
         url = self._build_url('repos', base_url=self._api)
         params = {}

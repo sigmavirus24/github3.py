@@ -37,7 +37,8 @@ class Event(GitHubCore):
 
     @property
     def actor(self):
-        """:class:`User <github3.user.User>` object representing the actor."""
+        """:class:`User <github3.users.User>` object representing the 
+        actor."""
         return self._actor
 
     @property
@@ -57,7 +58,7 @@ class Event(GitHubCore):
 
     @property
     def org(self):
-        """:class:`Organization <github3.org.Organization>` object if actor
+        """:class:`Organization <github3.orgs.Organization>` object if actor
         was an org."""
         return self._org
 

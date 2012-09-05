@@ -37,7 +37,7 @@ def gist(id_num):
     """Get the gist identified by ``id_num``.
 
     :param int id_num: (required), unique id of the gist
-    :returns: :class:`Gist <github3.gist.Gist>`
+    :returns: :class:`Gist <github3.gists.Gist>`
     """
     return gh.gist(id_num)
 
@@ -47,7 +47,7 @@ def list_gists(username=None):
 
     :param str username: (optional), if provided, get the gists for this user
         instead of the authenticated user.
-    :returns: list of :class:`Gist <github3.gist.Gist>`\ s
+    :returns: list of :class:`Gist <github3.gists.Gist>`\ s
     """
     return gh.list_gists(username)
 
@@ -99,7 +99,7 @@ def create_gist(description, files):
     :param dict files: (required), file names with associated
         dictionaries for content, e.g.
         {'spam.txt': {'content': 'File contents ...'}}
-    :returns: :class:`Gist <github3.gist.Gist>`
+    :returns: :class:`Gist <github3.gists.Gist>`
     """
     return gh.create_gist(description, files)  # (No coverage)
 
@@ -110,7 +110,7 @@ def issue(owner, repository, number):
     :param str owner: (required), repository owner
     :param str repository: (required), repository name
     :param int number: (required), issue number
-    :returns: :class:`Issue <github3.issue.Issue>`
+    :returns: :class:`Issue <github3.issues.Issue>`
     """
     return gh.issue(owner, repository, number)
 
@@ -118,7 +118,7 @@ def issue(owner, repository, number):
 def list_events():
     """List all recent public events from GitHub.
 
-    :returns: list of :class:`Event <github3.event.Event>`\ s
+    :returns: list of :class:`Event <github3.events.Event>`\ s
     """
     return gh.list_events()
 

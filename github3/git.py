@@ -110,7 +110,7 @@ class Commit(BaseCommit):
 
     @property
     def author(self):
-        """:class:`User <github3.user.User>` who authored the commit."""
+        """:class:`User <github3.users.User>` who authored the commit."""
         return self._author
 
     @property

@@ -104,7 +104,7 @@ class Milestone(GitHubCore):
 
     @property
     def creator(self):
-        """:class:`User <github3.user.User>` object representing the creator
+        """:class:`User <github3.users.User>` object representing the creator
         of the milestone."""
         return self._creator
 
@@ -238,7 +238,7 @@ class Issue(GitHubCore):
 
     @property
     def assignee(self):
-        """:class:`User <github3.user.User>` representing the user the issue
+        """:class:`User <github3.users.User>` representing the user the issue
         was assigned to."""
         return self._assign
 
@@ -453,7 +453,7 @@ class Issue(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <github3.user.User>` who opened the issue."""
+        """:class:`User <github3.users.User>` who opened the issue."""
         return self._user
 
 

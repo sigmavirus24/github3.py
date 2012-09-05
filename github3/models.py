@@ -231,7 +231,7 @@ class BaseComment(GitHubCore):
 
     @property
     def user(self):
-        """:class:`User <github3.user.User>` who created the comment."""
+        """:class:`User <github3.users.User>` who created the comment."""
         return self._user
 
 
@@ -267,8 +267,8 @@ class BaseCommit(GitHubCore):
 
 class BaseAccount(GitHubCore):
     """The :class:`BaseAccount <BaseAccount>` object. This is used to do the
-    heavy lifting for :class:`Organization <github3.org.Organization>` and
-    :class:`User <github3.user.User>` objects.
+    heavy lifting for :class:`Organization <github3.orgs.Organization>` and
+    :class:`User <github3.users.User>` objects.
     """
     def __init__(self, acct, session):
         super(BaseAccount, self).__init__(acct, session)
