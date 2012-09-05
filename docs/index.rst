@@ -59,9 +59,19 @@ Modules
 
 .. toctree::
     :maxdepth: 1
-    :blob:
 
-    *
+    api
+    events
+    gists
+    git
+    github
+    issues
+    legacy
+    models
+    orgs
+    pulls
+    repos
+    users
 
 Internals
 ~~~~~~~~~
