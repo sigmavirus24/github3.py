@@ -15,7 +15,8 @@ This part of the documentation covers:
 - :class:`RepoComment <RepoComment>`
 - :class:`RepoCommit <RepoCommit>`
 - :class:`Comparison <Comparison>`
-  
+- :class:`Status <Status>`
+
 None of these objects should be instantiated directly by the user (developer).
 These are here for reference only.
 

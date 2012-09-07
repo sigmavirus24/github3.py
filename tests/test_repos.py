@@ -1,10 +1,10 @@
-import base
 import github3
-from base import expect
+import re
+from base import expect, BaseTest, str_test
 from datetime import datetime
-from os import unlink
+from os import unlink, listdir
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
-        Comparison, Contents, Download, Hook, RepoTag)
+        Comparison, Contents, Download, Hook, RepoTag, Status)
 from github3.users import User, Key
 from github3.git import Commit, Reference, Tag, Tree, Blob
 from github3.issues import (Issue, IssueEvent, Label, Milestone)
@@ -12,13 +12,15 @@ from github3.events import Event
 from github3.pulls import PullRequest
 
 
-class TestRepository(base.BaseTest):
+class TestRepository(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestRepository, self).__init__(methodName)
         self.repo = self.g.repository(self.sigm, self.todo)
 
     def test_repository(self):
         expect(self.repo).isinstance(Repository)
+        expect(repr(self.repo)).isinstance(str_test)
+        expect(repr(self.repo)) != ''
 
     def test_clone_url(self):
         expect(self.repo.clone_url).is_not_None()
@@ -81,8 +83,12 @@ class TestRepository(base.BaseTest):
     def test_archive(self):
         expect(self.repo.archive('tarball', 'archive.tar.gz')).is_True()
         unlink('archive.tar.gz')
+        expect(self.repo.archive('tarball')).is_True()
+        reg = re.compile('{0}-{1}-.*\.tar\.gz'.format(self.sigm, self.todo))
+        for f in listdir('.'):
+            if reg.match(f):
+                unlink(f)
 
-        #blob = repo.blob("sha"")
     def test_blob(self):
         expect(self.repo.blob(
             '2494c145b614f8c945d67cb456536f8b1903e672'
@@ -212,6 +218,13 @@ class TestRepository(base.BaseTest):
     def test_list_refs(self):
         self.expect_list_of_class(self.repo.list_refs(), Reference)
 
+    def test_list_statuses(self):
+        statuses = self.repo.list_statuses(
+                '04d55444a3ec06ca8d2aa0a5e333cdaf27113254'
+                )
+        if statuses:
+            self.expect_list_of_class(statuses, Status)
+
     def test_list_tags(self):
         self.expect_list_of_class(self.repo.list_tags(), RepoTag)
 
@@ -313,7 +326,7 @@ class TestRepository(base.BaseTest):
                 pass
 
 
-class TestBranch(base.BaseTest):
+class TestBranch(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestBranch, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
@@ -329,7 +342,7 @@ class TestBranch(base.BaseTest):
         expect(self.branch.name) == 'master'
 
 
-class TestContents(base.BaseTest):
+class TestContents(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestContents, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
@@ -338,7 +351,7 @@ class TestContents(base.BaseTest):
     def _test_str_(self, val):
         expect(val).is_not_None()
         expect(val) > ''
-        expect(val).isinstance(base.str_test)
+        expect(val).isinstance(str_test)
 
     def test_content(self):
         expect(len(self.contents.content)) > 0
@@ -373,7 +386,7 @@ class TestContents(base.BaseTest):
         expect(self.contents.type) == 'file'
 
 
-class TestDownload(base.BaseTest):
+class TestDownload(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestDownload, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
@@ -409,7 +422,7 @@ class TestDownload(base.BaseTest):
             self.dl.delete()
 
 
-class TestHook(base.BaseTest):
+class TestHook(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestHook, self).__init__(methodName)
         if self.auth:
@@ -442,7 +455,7 @@ class TestHook(base.BaseTest):
         expect(self.hook.created_at).isinstance(datetime)
 
     def test_events(self):
-        self.expect_list_of_class(self.hook.events, base.str_test)
+        self.expect_list_of_class(self.hook.events, str_test)
 
     def test_id(self):
         expect(self.hook.id) == 74859
@@ -465,7 +478,7 @@ class TestHook(base.BaseTest):
             self.hook.test()
 
 
-class TestRepoTag(base.BaseTest):
+class TestRepoTag(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestRepoTag, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
@@ -475,30 +488,30 @@ class TestRepoTag(base.BaseTest):
         expect(self.tag.commit).isinstance(dict)
 
     def test_name(self):
-        expect(self.tag.name).isinstance(base.str_test)
+        expect(self.tag.name).isinstance(str_test)
 
     def test_tarball_url(self):
-        expect(self.tag.tarball_url).isinstance(base.str_test)
+        expect(self.tag.tarball_url).isinstance(str_test)
 
     def test_zipball_url(self):
-        expect(self.tag.zipball_url).isinstance(base.str_test)
+        expect(self.tag.zipball_url).isinstance(str_test)
 
 
 def __test_files__(fd, sha):
     expect(fd.additions) >= 0
     expect(fd.deletions) >= 0
     expect(fd.changes) == fd.additions + fd.deletions
-    expect(fd.filename).isinstance(base.str_test)
-    expect(fd.blob_url).isinstance(base.str_test)
-    expect(fd.raw_url).isinstance(base.str_test)
-    expect(fd.sha).isinstance(base.str_test)
+    expect(fd.filename).isinstance(str_test)
+    expect(fd.blob_url).isinstance(str_test)
+    expect(fd.raw_url).isinstance(str_test)
+    expect(fd.sha).isinstance(str_test)
     if sha:
         expect(fd.sha) == sha
-    expect(fd.status).isinstance(base.str_test)
-    expect(fd.patch).isinstance(base.str_test)
+    expect(fd.status).isinstance(str_test)
+    expect(fd.patch).isinstance(str_test)
 
 
-class TestRepoCommit(base.BaseTest):
+class TestRepoCommit(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestRepoCommit, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
@@ -531,7 +544,7 @@ class TestRepoCommit(base.BaseTest):
         expect(self.commit.total) == 17
 
 
-class TestComparison(base.BaseTest):
+class TestComparison(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestComparison, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
@@ -553,7 +566,7 @@ class TestComparison(base.BaseTest):
         self.expect_list_of_class(self.comp.commits, RepoCommit)
 
     def test_diff_url(self):
-        expect(self.comp.diff_url).isinstance(base.str_test)
+        expect(self.comp.diff_url).isinstance(str_test)
 
     def test_files(self):
         expect(self.comp.files).isinstance(list)
@@ -563,16 +576,57 @@ class TestComparison(base.BaseTest):
             __test_files__(file, '')
 
     def test_html_url(self):
-        expect(self.comp.html_url).isinstance(base.str_test)
+        expect(self.comp.html_url).isinstance(str_test)
 
     def test_patch_url(self):
-        expect(self.comp.patch_url).isinstance(base.str_test)
+        expect(self.comp.patch_url).isinstance(str_test)
 
     def test_permalink_url(self):
-        expect(self.comp.permalink_url).isinstance(base.str_test)
+        expect(self.comp.permalink_url).isinstance(str_test)
 
     def test_status(self):
         expect(self.comp.status) == 'ahead'
 
     def test_total_commits(self):
         expect(self.comp.total_commits) == 18
+
+
+class TestStatus(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestStatus, self).__init__(methodName)
+        repo = self.g.repository(self.sigm, 'c_libs')
+        statuses = repo.list_statuses(
+                '60fc424765753121d0173073fec22a1c9a6d758b'
+                )
+        self.status = statuses[0]
+
+    def test_status(self):
+        expect(self.status).isinstance(Status)
+        expect(repr(self.status)).isinstance(str_test)
+        expect(repr(self.status)) != ''
+
+    def test_created_at(self):
+        expect(self.status.created_at).isinstance(datetime)
+
+    def test_creator(self):
+        expect(self.status.creator).isinstance(User)
+        expect(self.status.creator.login) == self.sigm
+
+    def test_description(self):
+        expect(self.status.description).isinstance(str_test)
+        expect(self.status.description) == 'Testing github3.py'
+
+    def test_id(self):
+        expect(self.status.id) == 259373
+
+    def test_state(self):
+        expect(self.status.state).isinstance(str_test)
+        expect(self.status.state) == 'success'
+
+    def test_target_url(self):
+        expect(self.status.target_url).isinstance(str_test)
+        expect(self.status.target_url) == ('https://github.com/sigmavirus24/'
+            'github3.py')
+
+    def test_updated_at(self):
+        expect(self.status.updated_at).isinstance(datetime)
