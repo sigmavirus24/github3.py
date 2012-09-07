@@ -5,4 +5,7 @@ History/Changelog
 ---------------
 
 - Support for the complete GitHub API (accomplished)
-- Partial coverage (unittests)
+  
+  - Now also includes the Statuses API
+
+- 85% coverage (unittests)
