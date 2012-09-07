@@ -1952,28 +1952,39 @@ class Status(GitHubObject):
 
     @property
     def created_at(self):
+        """datetime object representing the creation of the status object"""
         return self._created
 
     @property
     def creator(self):
+        """:class:`User <github3.users.User>` who created the object"""
         return self._creator
 
     @property
     def description(self):
+        """Short description of the Status"""
         return self._desc
 
     @property
     def id(self):
+        """GitHub ID for the status object"""
         return self._id
 
     @property
     def state(self):
+        """State of the status, e.g., 'success', 'pending', 'failed',
+        'error'
+        """
         return self._stat
 
     @property
     def target_url(self):
+        """URL to view more information about the status"""
         return self._tgt
 
     @property
     def updated_at(self):
+        """datetime object representing the last time the status was
+        updated
+        """
         return self._updated

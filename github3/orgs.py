@@ -114,7 +114,7 @@ class Team(GitHubCore):
         """List the repositories this team has access to.
 
         :returns: list of :class:`Repository <github3.repos.Repository>`
-        objects
+            objects
         """
         url = self._build_url('repos', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -365,7 +365,7 @@ class Organization(BaseAccount):
             ('all', 'public', 'member', 'private'), API default: 'all'
         :type type: str
         :returns: list of :class:`Repository <github3.repos.Repository>`
-        objects
+            objects
         """
         url = self._build_url('repos', base_url=self._api)
         params = {}
