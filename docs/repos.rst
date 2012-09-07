@@ -32,27 +32,27 @@ Repository Objects
 ---------
 
 .. autoclass:: Branch
-    :inherited-members:
+    :members:
 
 ---------
 
 .. autoclass:: Contents
-    :inherited-members:
+    :members:
 
 ---------
 
 .. autoclass:: Download
-    :inherited-members:
+    :members:
 
 ---------
 
 .. autoclass:: Hook
-    :inherited-members:
+    :members:
 
 ---------
 
 .. autoclass:: RepoTag
-    :inherited-members:
+    :members:
 
 ---------
 
@@ -65,9 +65,14 @@ about `comments <http://developer.github.com/v3/repos/comments/>`_.
 ---------
 
 .. autoclass:: RepoCommit
-    :inherited-members:
+    :members:
 
 ---------
 
 .. autoclass:: Comparison
-    :inherited-members:
+    :members:
+
+---------
+
+.. autoclass:: Status
+    :members:

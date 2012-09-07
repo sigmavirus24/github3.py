@@ -522,6 +522,24 @@ class Repository(GitHubCore):
         return Reference(json, self) if json else None
 
     @GitHubCore.requires_auth
+    def create_status(self, sha, state, target_url='', description=''):
+        """Create a status object on a commit.
+
+        :param str sha: (required), SHA of the commit to create the status on
+        :param str state: (required), state of the test; only the following
+            are accepted: 'pending', 'success', 'error', 'failure'
+        :param str target_url: (optional), URL to associate with this status.
+        :param str description: (optional), short description of the status
+        """
+        json = {}
+        if sha and state:
+            data = dumps({'state': state, 'target_url': target_url,
+                    'description': description})
+            url = self._build_url('statuses', sha, base_url=self._api)
+            json = self._json(self._post(url, data=data), 201)
+        return Status(json) if json else None
+
+    @GitHubCore.requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
             lightweight=False):
         """Create a tag in this repository.
@@ -1085,6 +1103,18 @@ class Repository(GitHubCore):
         url = self._build_url(*args, base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Reference(r, self) for r in json]
+
+    def list_statuses(self, sha):
+        """List the statuses for a specific SHA.
+
+        :param str sha: SHA of the commit to list the statuses of
+        :returns: list of :class:`Status <Status>`
+        """
+        json = []
+        if sha:
+            url = self._build_url('statuses', sha, base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return [Status(s) for s in json]
 
     def list_tags(self):
         """List tags on this repository.
@@ -1900,3 +1930,50 @@ class Comparison(GitHubObject):
     def total_commits(self):
         """Number of commits difference in the comparison."""
         return self._ttl_commits
+
+
+class Status(GitHubObject):
+    """The :class:`Status <Status>` object. This represents information from
+    the Repo Status API."""
+    def __init__(self, status):
+        super(Status, self).__init__(status)
+        self._created = self._strptime(status.get('created_at'))
+        self._creator = User(status.get('creator'))
+        self._desc = status.get('description')
+        self._id = status.get('id')
+        self._stat = status.get('state')
+        self._tgt = status.get('target_url')
+        self._updated = None
+        if status.get('updated_at'):
+            self._updated = self._strptime(status.get('updated_at'))
+
+    def __repr__(self):
+        return '<Status [{s.id}:{s.state}]>'.format(s=self)
+
+    @property
+    def created_at(self):
+        return self._created
+
+    @property
+    def creator(self):
+        return self._creator
+
+    @property
+    def description(self):
+        return self._desc
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def state(self):
+        return self._stat
+
+    @property
+    def target_url(self):
+        return self._tgt
+
+    @property
+    def updated_at(self):
+        return self._updated

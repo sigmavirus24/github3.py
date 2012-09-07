@@ -27,6 +27,13 @@ class GitHubObject(object):
         """Return the json representing this object."""
         return self._json_data
 
+    def _strptime(self, time_str):
+        """Converts an ISO 8601 formatted string into a datetime object."""
+        if time_str:
+            return datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%SZ')
+        else:
+            return None
+
     @classmethod
     def from_json(cls, json):
         """Return an instance of ``cls`` formed from ``json``."""
@@ -46,7 +53,6 @@ class GitHubCore(GitHubObject):
             ses = session()
         self._session = ses
         self._github_url = 'https://api.github.com'
-        self._time_format = '%Y-%m-%dT%H:%M:%SZ'
         self._remaining = 5000
         self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '
                 'rel="(\w+)"')
@@ -99,13 +105,6 @@ class GitHubCore(GitHubObject):
             kwargs.update(headers={'Content-Length': '0'})
             req = self._session.put(url, **kwargs)
         return req
-
-    def _strptime(self, time_str):
-        """Converts an ISO 8601 formatted string into a datetime object."""
-        if time_str:
-            return datetime.strptime(time_str, self._time_format)
-        else:
-            return None
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
