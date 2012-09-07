@@ -76,7 +76,7 @@ class TestUser(base.BaseTest):
         except github3.GitHubError:
             pass
         expect(user.update(user.name, user.email, user.blog, user.company,
-            user.location, user.is_hireable(), user.bio)).isinstance(bool)
+            user.location, user.for_hire, user.bio)).isinstance(bool)
 
 
 class TestKey(base.BaseTest):
