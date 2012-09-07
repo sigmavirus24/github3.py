@@ -6,19 +6,29 @@ High priority
 
 (In order of priority)
 
-statuses
-~~~~~~~~
-
-- http://developer.github.com/v3/repos/statuses/
-
 unittests
 ~~~~~~~~~
 
-- We're currently at ~82% coverage. I want to get each module close to if not 
-  above 90% coverage before December. 100% by next year.
+- We're currently at ~85% coverage. I want to get each module close to if not 
+  above 90% coverage before December. 100% by next year (at the latest).
 - Develop/find a better way to run the tests. Since I'm doing as much testing 
   directly against the API as possible, running the tests takes a while and 
-  we're only at 82% coverage.
+  we're only at 85% coverage.
+
+remove ``@property`` decorated functions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- I hadn't considered that because these were functions, they add unnecessary 
+  delay in accessing the attributes. If someone is insistent on presenting bad 
+  information to an end-user, they'll do it no matter what, so I may as well 
+  just make maintaining the code easier on myself.
+
+plan
+++++
+
+- Wherever there is a ``@property`` decorated function that just returns a 
+  value, rename that value to the name of the function everywhere in the 
+  class.
 
 pagination
 ~~~~~~~~~~
