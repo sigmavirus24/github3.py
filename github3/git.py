@@ -83,7 +83,7 @@ class Commit(BaseCommit):
             self.tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
-        return '<Commit [{0}:{1}]>'.format(self.author.name, self._sha)
+        return '<Commit [{0}:{1}]>'.format(self.author.name, self.sha)
 
 
 class Reference(GitHubCore):
@@ -154,7 +154,7 @@ class Tag(GitData):
         self.object = GitObject(tag.get('object'))
 
     def __repr__(self):
-        return '<Tag [{0}]>'.format(self._tag)
+        return '<Tag [{0}]>'.format(self.tag)
 
 
 class Tree(GitData):
@@ -165,15 +165,15 @@ class Tree(GitData):
         self.tree = [Hash(t) for t in tree.get('tree', [])]
 
     def __repr__(self):
-        return '<Tree [{0}]>'.format(self._sha)
+        return '<Tree [{0}]>'.format(self.sha)
 
     def recurse(self):
         """Recurse into the tree.
 
         :returns: :class:`Tree <Tree>`
         """
-        url = self._api + '?recursive=1'
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(self._api, params={'recursive': '1'}),
+                200)
         return Tree(json, self._session) if json else None
 
 

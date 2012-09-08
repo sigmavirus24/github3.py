@@ -35,12 +35,34 @@ class TestBlob(BaseTest):
     def test_size(self):
         expect_str(self.blob.size)
 
+
+class TestCommit(BaseTest):
+    def __init__(self, methodName='runTest'):
+        r = self.g.repository(self.sigm, self.todo)
+        self.commit = r.git_commit('8b0704374914f03a54b89d938de1c09d5831824e')
+
     def test_commit(self):
-        r = self.todor
-        commit = r.git_commit('8b0704374914f03a54b89d938de1c09d5831824e')
-        expect(commit).isinstance(Commit)
-        self.assertAreNotNone(commit, 'author', 'committer', 'tree', 'message',
-                'parents', 'sha')
+        expect(self.commit).isinstance(Commit)
+        expect_str(repr(self.commit))
+
+    def test_author(self):
+        expect(self.commit.author).is_not_None()
+
+    def test_committer(self):
+        expect(self.commit.author).is_not_None()
+
+    def test_tree(self):
+        expect(self.commit.tree).isinstance(Tree)
+
+    def test_message(self):
+        expect_str(self.commit.message)
+
+    def test_parents(self):
+        expect(self.commit.parents).isinstance(list)
+        self.expect_list_of_class(self.commit.parents, dict)
+
+    def test_sha(self):
+        expect_str(self.commit.sha)
 
 
 class TestTag(BaseTest):
@@ -74,6 +96,8 @@ class TestTreeHash(BaseTest):
         super(TestTreeHash, self).__init__(methodName)
         r = self.g.repository(self.sigm, self.todo)
         self.tree = r.tree('31e862095dffa60744f1ce16a431ea040381f053')
+        self.hashes = self.tree.tree
+        self.hash = self.hashes[0]
 
     def test_tree(self):
         expect(self.tree).isinstance(Tree)
@@ -86,10 +110,8 @@ class TestTreeHash(BaseTest):
         expect(self.tree.recurse()).isinstance(Tree)
 
     def test_hash(self):
-        self.hashes = self.tree.tree
         for h in self.hashes:
             expect(h).isinstance(Hash)
-        self.hash = self.hashes[0]
 
     def test_hash_mode(self):
         expect_str(self.hash.mode)
