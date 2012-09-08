@@ -64,6 +64,7 @@ class Milestone(GitHubCore):
     """
     def __init__(self, mile, session=None):
         super(Milestone, self).__init__(mile, session)
+        self._api = mile.get('url')
         #: Identifying number associated with milestone.
         self.number = mile.get('number')
         #: State of the milestone, e.g., open or closed.
@@ -140,6 +141,7 @@ class Issue(GitHubCore):
     """
     def __init__(self, issue, session=None):
         super(Issue, self).__init__(issue, session)
+        self._api = issue.get('url')
         #: :class:`User <github3.users.User>` representing the user the issue
         #  was assigned to.
         self.assignee = None
@@ -173,7 +175,7 @@ class Issue(GitHubCore):
         self.number = issue.get('number')
         #: Dictionary URLs for the pull request (if they exist)
         self.pull_request = issue.get('pull_request')
-        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+', self._url)
+        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+', self.html_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
         #: State of the issue, e.g., open, closed
@@ -224,8 +226,9 @@ class Issue(GitHubCore):
         """
         json = None
         if int(id_num) > 0:  # Might as well check that it's positive
-            url = self._build_url('repos', self._repo[0], self._repo[1],
-                    'issues', 'comments', str(id_num))
+            owner, repo = self.repository
+            url = self._build_url('repos', owner, repo, 'issues', 'comments',
+                    str(id_num))
             json = self._json(self._get(url), 200)
         return IssueComment(json) if json else None
 
@@ -278,7 +281,7 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        if self._closed or (self._state == 'closed'):
+        if self.closed_at or (self.state == 'closed'):
             return True
         return False
 
