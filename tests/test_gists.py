@@ -96,7 +96,7 @@ class TestGistFile(BaseTest):
     def test_files(self):
         for f in self.files:
             expect(f).isinstance(GistFile)
-            self.assertAreNotNone(f, 'content', 'name', 'lang', 'raw_url',
+            self.assertAreNotNone(f, 'content', 'name', 'language', 'raw_url',
                     'size')
             expect(repr(f)) != ''
 

@@ -31,7 +31,7 @@ class GistFile(GitHubObject):
         self.content = attributes.get('content')
 
     def __repr__(self):
-        return '<Gist File [{0}]>'.format(self._name)
+        return '<Gist File [{0}]>'.format(self.name)
 
 
 # TODO(Ian) come back and finish this after doing BaseComment
@@ -61,34 +61,35 @@ class Gist(GitHubCore):
 
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)
-        self._update_(data)
-
-    def __repr__(self):
-        return '<Gist [{0}]>'.format(self._id)
-
-    def _update_(self, data):
-        self._json_data = data
         #: Unique id for this gist.
         self.id = data.get('id', '')
+
         #: Description of the gist
         self.description = data.get('description', '')
 
         # e.g. https://api.github.com/gists/1
         self._api = data.get('url')
         #self._api = self._build_url('gists', str(self._id))
+
         #: URL of this gist at Github, e.g., https://gist.github.com/1
         self.html_url = data.get('html_url')
         self._public = data.get('public')
+
         #: The number of forks of this gist.
         self.forks = data.get('forks', [])
+
         #: Git URL to pull this gist, e.g., git://gist.github.com/1.git
         self.git_pull_url = data.get('git_pull_url', '')
+
         #: Git URL to push to gist, e.g., git@gist.github.com/1.git
         self.git_push_url = data.get('git_push_url', '')
+
         #: datetime object representing when the gist was created.
         self.created_at = self._strptime(data.get('created_at'))
+
         #: datetime object representing the last time this gist was updated.
         self.updated_at = self._strptime(data.get('updated_at'))
+
         #: :class:`User <github3.users.User>` object representing the owner of
         #  the gist.
         self.user = data.get('user')
@@ -97,6 +98,13 @@ class Gist(GitHubCore):
 
         #: Number of files in this gist.
         self.files = [GistFile(data['files'][f]) for f in data['files']]
+
+    def __repr__(self):
+        return '<Gist [{0}]>'.format(self.id)
+
+    def _update_(self, data):
+        self._json_data = data
+        self.__init__(data, self._session)
 
     @requires_auth
     def create_comment(self, body):
@@ -181,11 +189,11 @@ class Gist(GitHubCore):
     def list_files(self):
         """List of :class:`GistFile <GistFile>` objects representing the files
         stored in this gist."""
-        return self._files
+        return self.files
 
     def list_forks(self):
         """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
-        return self._forks
+        return self.forks
 
     def refresh(self):
         """Updates this gist by getting the information from the API again.
