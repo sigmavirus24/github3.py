@@ -46,6 +46,16 @@ Low priority
 
 (In order of priority)
 
+nose2
+~~~~~
+
+Nose2_ has a built-in plugin (that defaults off) to run the tests in 
+parallel_.  This wouls greatly improve how long (overall) the tests take to 
+run. I need to investigate this first.
+
+.. _Nose2: http://nose2.readthedocs.org/en/latest/
+.. _parallel: http://nose2.readthedocs.org/en/latest/plugins/mp.html
+
 Plan
 ====
 
