@@ -1,0 +1,4 @@
+"Pull a docstring and place it after a #:
+let @q = '2f"ldi"2g;a ""'
+
+" vim: ft=vim

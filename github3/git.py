@@ -8,8 +8,9 @@ This module contains all the classes relating to Git Data.
 
 from base64 import b64decode
 from json import dumps
-from .models import GitHubObject, GitHubCore, BaseCommit
-from .users import User
+from github3.models import GitHubObject, GitHubCore, BaseCommit
+from github3.users import User
+from github3.decorators import requires_auth
 
 
 class Blob(GitHubObject):
@@ -17,42 +18,25 @@ class Blob(GitHubObject):
     def __init__(self, blob):
         super(Blob, self).__init__(blob)
         self._api = blob.get('url')
-        self._content = blob.get('content').encode()
-        self._enc = blob.get('encoding')
-        if self._enc == 'base64':
-            self._decoded = b64decode(self._content)
-        else:
-            self._decoded = self._content
-        self._size = blob.get('size')
-        self._sha = blob.get('sha')
+
+        #: Raw content of the blob.
+        self.content = blob.get('content').encode()
+
+        #: Encoding of the raw content.
+        self.encoding = blob.get('encoding')
+
+        #: Decoded content of the blob.
+        self.decoded = self.content
+        if self.encoding == 'base64':
+            self.decoded = b64decode(self.content)
+
+        #: Size of the blob in bytes
+        self.size = blob.get('size')
+        #: SHA1 of the blob
+        self.sha = blob.get('sha')
 
     def __repr__(self):
-        return '<Blob [{0:.10}]>'.format(self._sha)
-
-    @property
-    def content(self):
-        """Raw content of the blob."""
-        return self._content
-
-    @property
-    def decoded(self):
-        """Decoded content of the blob."""
-        return self._decoded
-
-    @property
-    def encoding(self):
-        """Encoding of the raw content."""
-        return self._enc
-
-    @property
-    def sha(self):
-        """SHA1 of the blob"""
-        return self._sha
-
-    @property
-    def size(self):
-        """Size of the blob in bytes"""
-        return self._size
+        return '<Blob [{0:.10}]>'.format(self.sha)
 
 
 class GitData(GitHubCore):
@@ -62,16 +46,12 @@ class GitData(GitHubCore):
     """
     def __init__(self, data, session=None):
         super(GitData, self).__init__(data, session)
-        self._sha = data.get('sha')
+        #: SHA of the object
+        self.sha = data.get('sha')
         self._api = data.get('url')
 
     def __repr__(self):
         return '<github3-gitdata at 0x{0:x}>'.format(id(self))
-
-    @property
-    def sha(self):
-        """SHA of the object"""
-        return self._sha
 
 
 class Commit(BaseCommit):
@@ -81,47 +61,29 @@ class Commit(BaseCommit):
     def __init__(self, commit, session=None):
         super(Commit, self).__init__(commit, session)
 
-        self._author = ''
-        self._author_name = ''
+        #: :class:`User <github3.users.User>` who authored the commit.
+        self.author = commit.get('author')
+        self._author_name = commit.get('author')
         if commit.get('author') and len(commit.get('author')) > 3:
             # User object
             # Typically there should be 5 keys, but more than 3 should
             # be a sufficient test
-            self._author = User(commit.get('author'), None)
-            self._author_name = self._author.login
+            self.author = User(commit.get('author'), None)
         elif commit.get('author'):  # Not a User object
-            self._author = type('Author', (object, ), commit.get('author'))
-            self._author_name = self._author.name
+            self.author = type('Author', (object, ), commit.get('author'))
 
-        self._committer = ''
+        #: :class:`User <github3.user.User>` who committed the commit.
+        self.committer = None
         if commit.get('committer'):
-            if len(commit.get('committer')) > 3:
-                self._committer = User(commit.get('committer'), None)
-            else:
-                self._committer = type('Committer', (object, ),
-                        commit.get('committer'))
+            self.committer = User(commit.get('committer'), None)
 
-        self._tree = None
+        #: :class:`Tree <Tree>` the commit belongs to.
+        self.tree = None
         if commit.get('tree'):
-            self._tree = Tree(commit.get('tree'), self._session)
+            self.tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
-        return '<Commit [{0}:{1}]>'.format(self._author_name, self._sha)
-
-    @property
-    def author(self):
-        """:class:`User <github3.users.User>` who authored the commit."""
-        return self._author
-
-    @property
-    def committer(self):
-        """:class:`User <github3.user.User>` who committed the commit."""
-        return self._committer
-
-    @property
-    def tree(self):
-        """:class:`Tree <Tree>` the commit belongs to."""
-        return self._tree
+        return '<Commit [{0}:{1}]>'.format(self.author.name, self._sha)
 
 
 class Reference(GitHubCore):
@@ -130,17 +92,18 @@ class Reference(GitHubCore):
     """
     def __init__(self, ref, session=None):
         super(Reference, self).__init__(ref, session)
-        self._update_(ref)
+        #: The reference path, e.g., refs/heads/sc/featureA
+        self.ref = ref.get('ref')
+        #: :class:`GitObject <GitObject>` the reference points to
+        self.object = GitObject(ref.get('object'))
 
     def __repr__(self):
-        return '<Reference [{0}]>'.format(self._ref)
+        return '<Reference [{0}]>'.format(self.ref)
 
     def _update_(self, ref):
-        self._ref = ref.get('ref')
-        self._api = ref.get('url')
-        self._obj = GitObject(ref.get('object'))
+        self.__init__(ref, self._session)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this reference.
 
@@ -148,17 +111,7 @@ class Reference(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @property
-    def object(self):
-        """:class:`GitObject <GitObject>` the reference points to"""
-        return self._obj
-
-    @property
-    def ref(self):
-        """The reference path, e.g., refs/heads/sc/featureA"""
-        return self._ref
-
-    @GitHubCore.requires_auth
+    @requires_auth
     def update(self, sha, force=False):
         """Update this reference.
 
@@ -180,52 +133,35 @@ class GitObject(GitData):
     """The :class:`GitObject <GitObject>` object."""
     def __init__(self, obj):
         super(GitObject, self).__init__(obj, None)
-        self._type = obj.get('type')
+        #: The type of object.
+        self.type = obj.get('type')
 
     def __repr__(self):
-        return '<Git Object [{0}]>'.format(self._sha)
-
-    @property
-    def type(self):
-        """The type of object."""
-        return self._type
+        return '<Git Object [{0}]>'.format(self.sha)
 
 
 class Tag(GitData):
     def __init__(self, tag):
         super(Tag, self).__init__(tag, None)
-        self._tag = tag.get('tag')
-        self._msg = tag.get('message')
-        self._tagger = None
-        if tag.get('tagger'):
-            self._tagger = type('Tagger', (object, ), tag.get('tagger'))
-        self._obj = GitObject(tag.get('object'))
+        #: String of the tag
+        self.tag = tag.get('tag')
+        #: Commit message for the tag
+        self.message = tag.get('message')
+        #: dict containing the name and email of the person
+        self.tagger = tag.get('tagger')
+        #: :class:`GitObject <GitObject>` for the tag
+        self.object = GitObject(tag.get('object'))
 
     def __repr__(self):
         return '<Tag [{0}]>'.format(self._tag)
-
-    @property
-    def message(self):
-        return self._msg
-
-    @property
-    def object(self):
-        return self._obj
-
-    @property
-    def tag(self):
-        return self._tag
-
-    @property
-    def tagger(self):
-        return self._tagger
 
 
 class Tree(GitData):
     """The :class:`Tree <Tree>` object."""
     def __init__(self, tree, session=None):
         super(Tree, self).__init__(tree, session)
-        self._tree = [Hash(t) for t in tree.get('tree', [])]
+        #: list of :class:`Hash <Hash>` objects
+        self.tree = [Hash(t) for t in tree.get('tree', [])]
 
     def __repr__(self):
         return '<Tree [{0}]>'.format(self._sha)
@@ -239,49 +175,23 @@ class Tree(GitData):
         json = self._json(self._get(url), 200)
         return Tree(json, self._session) if json else None
 
-    @property
-    def tree(self):
-        """list of :class:`Hash <Hash>` objects"""
-        return self._tree
-
 
 class Hash(GitHubObject):
     """The :class:`Hash <Hash>` object."""
     def __init__(self, info):
         super(Hash, self).__init__(info)
-        self._path = info.get('path')
-        self._mode = info.get('mode')
-        self._type = info.get('type')
-        self._size = info.get('size')
-        self._sha = info.get('sha')
-        self._url = info.get('url')
+        #: Path to file
+        self.path = info.get('path')
+        #: File mode
+        self.mode = info.get('mode')
+        #: Type of hash, e.g., blob
+        self.type = info.get('type')
+        #: Size of hash
+        self.size = info.get('size')
+        #: SHA of the hash
+        self.sha = info.get('sha')
+        #: URL of this object in the GitHub API
+        self.url = info.get('url')
 
-    @property
-    def mode(self):
-        """File mode"""
-        return self._mode
-
-    @property
-    def path(self):
-        """Path to file"""
-        return self._path
-
-    @property
-    def sha(self):
-        """SHA of the hash"""
-        return self._sha
-
-    @property
-    def size(self):
-        """Size of hash"""
-        return self._size
-
-    @property
-    def type(self):
-        """Type of hash, e.g., blob"""
-        return self._type
-
-    @property
-    def url(self):
-        """URL of this object in the GitHub API"""
-        return self._url
+    def __repr__(self):
+        return '<Hash [{0}]>'.format(self.sha)
