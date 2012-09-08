@@ -1,4 +1,4 @@
-from base import BaseTest, expect
+from base import BaseTest, expect, str_test
 from datetime import datetime
 import github3
 from github3.gists import Gist, GistComment, GistFile
@@ -25,25 +25,52 @@ class TestGist(BaseTest):
         expect(self.gist.updated_at).isinstance(datetime)
 
     def test_files(self):
-        for g in self.gists:
-            expect(g.files) >= 0
-            expect(g.list_files()).isinstance(list)
-            expect(g.forks) >= 0
-            self.assertAreNotNone(g, 'created_at', 'git_pull_url',
-                    'git_push_url', 'html_url', 'id')
-            expect(g.is_public()).isinstance(bool)
-            expect(g.is_starred()).isinstance(bool)
-            expect(g.to_json()).isinstance(dict)
-            comments = g.list_comments()
-            if comments:
-                for c in comments:
-                    expect(c).isinstance(GistComment)
+        expect(self.gist.files) >= 0
 
-            expect(g.refresh()).isinstance(bool)
+    def test_list_files(self):
+        expect(self.gist.list_files()).isinstance(list)
 
-            # if it is not an anonymous gist
-            if g.user:
-                expect(g.user).isinstance(User)
+    def test_forks(self):
+        expect(self.gist.forks) >= 0
+
+    def test_created_at(self):
+        expect(self.gist.created_at).isinstance(datetime)
+
+    def test_git_pull_url(self):
+        expect(self.gist.git_pull_url).isinstance(str_test)
+        expect(self.gist.git_pull_url) != ''
+
+    def test_git_push_url(self):
+        expect(self.gist.git_push_url).isinstance(str_test)
+        expect(self.gist.git_push_url) != ''
+
+    def test_html_url(self):
+        expect(self.gist.html_url).isinstance(str_test)
+        expect(self.gist.html_url) != ''
+
+    def test_id(self):
+        expect(self.gist.id) >= 0
+
+    def test_is_public(self):
+        expect(self.gist.is_public()).isinstance(bool)
+
+    def test_is_starred(self):
+        expect(self.gist.is_starred()).isinstance(bool)
+
+    def test_to_json(self):
+        expect(self.gist.to_json()).isinstance(dict)
+
+    def test_list_comments(self):
+        for c in self.gist.list_comments():
+            expect(c).isinstance(GistComment)
+
+    def test_refresh(self):
+        expect(self.gist.refresh()).isinstance(bool)
+
+        # if it is not an anonymous gist
+    def test_user(self):
+        if self.gist.user:
+            expect(self.gist.user).isinstance(User)
 
     def test_requires_auth(self):
         with expect.raises(github3.GitHubError):
