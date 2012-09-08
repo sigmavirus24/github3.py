@@ -25,7 +25,7 @@ class Label(GitHubCore):
         self.name = label.get('name')
 
     def __repr__(self):
-        return '<Label [{0}]>'.format(self._name)
+        return '<Label [{0}]>'.format(self.name)
 
     def _update_(self, label):
         self.__init__(label, self._session)
@@ -89,7 +89,7 @@ class Milestone(GitHubCore):
             self.due_on = self._strptime(mile.get('due_on'))
 
     def __repr__(self):
-        return '<Milestone [{0}]>'.format(self._title)
+        return '<Milestone [{0}]>'.format(self.title)
 
     def _update_(self, mile):
         self.__init__(mile, self._session)
@@ -209,10 +209,10 @@ class Issue(GitHubCore):
     def close(self):
         """Close this issue."""
         assignee = ''
-        if self._assign:
-            assignee = self._assign.login
-        return self.edit(self._title, self._body, assignee, 'closed',
-                self._mile, self._labels)
+        if self.assignee:
+            assignee = self.assignee.login
+        return self.edit(self.title, self.body, assignee, 'closed',
+                self.milestone, self.labels)
 
     def comment(self, id_num):
         """Get a single comment by its id.
@@ -340,10 +340,10 @@ class Issue(GitHubCore):
         :returns: bool
         """
         assignee = ''
-        if self._assign:
-            assignee = self._assign.login
-        return self.edit(self._title, self._body, assignee, 'open', self._mile,
-                self._labels)
+        if self.assignee:
+            assignee = self.assignee.login
+        return self.edit(self.title, self.body, assignee, 'open',
+                self.milestone, self.labels)
 
 
 # TODO(Ian) come back to this after finish models
