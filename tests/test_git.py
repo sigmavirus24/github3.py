@@ -1,24 +1,39 @@
-import base
-from expecter import expect
+from base import BaseTest, expect, expect_str
 import github3
-from github3.git import Commit, Blob, Reference, Tag, Tree, Hash
+from github3.git import (Commit, Blob, Reference, Tag, Tree, Hash, GitObject)
 
 
-class TestGit(base.BaseTest):
+class TestGit(BaseTest):
     def setUp(self):
         super(TestGit, self).setUp()
         self.todor = self.g.repository(self.sigm, self.todo)
         self.gh3r = self.g.repository(self.sigm, 'github3.py')
 
-    def test_blob(self):
-        r = self.todor
-        blob = r.blob('f737918b90118a6aea991f89f444b150a2360393')
-        expect(blob).isinstance(Blob)
-        self.assertAreNotNone(blob, 'content', 'decoded', 'encoding', 'sha',
-                'size')
 
-        with expect.raises(github3.GitHubError):
-            r.create_blob('Foo bar bogus', 'utf-8')
+class TestBlob(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestBlob, self).__init__(methodName)
+        self.r = self.g.repository(self.sigm, self.todo)
+        self.blob = self.r.blob('f737918b90118a6aea991f89f444b150a2360393')
+
+    def test_blob(self):
+        expect(self.blob).isinstance(Blob)
+        expect_str(repr(self.blob))
+
+    def test_content(self):
+        expect_str(self.blob.content)
+
+    def test_decoded(self):
+        expect_str(self.blob.decoded)
+
+    def test_encoding(self):
+        expect_str(self.blob.encoding)
+
+    def test_sha(self):
+        expect_str(self.blob.sha)
+
+    def test_size(self):
+        expect_str(self.blob.size)
 
     def test_commit(self):
         r = self.todor
@@ -27,31 +42,100 @@ class TestGit(base.BaseTest):
         self.assertAreNotNone(commit, 'author', 'committer', 'tree', 'message',
                 'parents', 'sha')
 
+
+class TestTag(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestTag, self).__init__(methodName)
+        r = self.g.repository(self.sigm, 'github3.py')
+        self.tag = r.tag('495404cbf4918f46a428b268104de37893dad449')
+
     def test_tag(self):
-        r = self.gh3r
-        tag = r.tag('495404cbf4918f46a428b268104de37893dad449')
-        expect(tag).isinstance(Tag)
-        self.assertAreNotNone(tag, 'message', 'object', 'tag', 'tagger',
-                'sha')
+        expect(self.tag).isinstance(Tag)
+        expect_str(repr(self.tag))
 
-    def test_tree_and_hash(self):
-        r = self.todor
-        tree = r.tree('31e862095dffa60744f1ce16a431ea040381f053')
-        expect(tree).isinstance(Tree)
-        self.assertAreNotNone(tree, 'sha', 'tree')
-        expect(tree.recurse()).isinstance(Tree)
-        hashes = tree.tree  # Odd access, right?
-        for h in hashes:
+    def test_message(self):
+        expect_str(self.tag.message)
+
+    def test_object(self):
+        expect(self.tag.object).isinstance(GitObject)
+
+    def test_tagname(self):
+        expect_str(self.tag.tag)
+
+    def test_tagger(self):
+        expect(self.tag.tagger).isinstance(dict)
+
+    def test_sha(self):
+        expect_str(self.tag.sha)
+
+
+class TestTreeHash(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestTreeHash, self).__init__(methodName)
+        r = self.g.repository(self.sigm, self.todo)
+        self.tree = r.tree('31e862095dffa60744f1ce16a431ea040381f053')
+
+    def test_tree(self):
+        expect(self.tree).isinstance(Tree)
+        expect_str(repr(self.tree))
+
+    def test_tree_sha(self):
+        expect_str(self.sha)
+
+    def test_tree_recurse(self):
+        expect(self.tree.recurse()).isinstance(Tree)
+
+    def test_hash(self):
+        self.hashes = self.tree.tree
+        for h in self.hashes:
             expect(h).isinstance(Hash)
-            self.assertAreNotNone(h, 'mode', 'path', 'sha', 'size', 'type',
-                    'url')
+        self.hash = self.hashes[0]
 
-    def test_refs(self):
-        r = self.todor
-        ref = r.ref('heads/development')
-        expect(ref).isinstance(Reference)
-        self.assertAreNotNone(ref, 'object', 'ref')
+    def test_hash_mode(self):
+        expect_str(self.hash.mode)
 
+    def test_hash_path(self):
+        expect_str(self.hash.path)
+
+    def test_hash_size(self):
+        expect(self.hash.size) >= 0
+
+    def test_hash_type(self):
+        expect_str(self.hash.type)
+
+    def test_hash_url(self):
+        expect_str(self.hash.url)
+
+
+class TestReference(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestReference, self).__init__(methodName)
+        r = self.g.repository(self.sigm, self.todo)
+        self.ref = r.ref('heads/development')
+
+    def test_reference(self):
+        expect(self.ref).isinstance(Reference)
+        expect_str(repr(self.ref))
+
+    def test_object(self):
+        expect(self.ref.object).isinstance(GitObject)
+        expect_str(repr(self.ref.object))
+
+    def test_ref(self):
+        expect_str(self.ref.ref)
+
+    def test_requires_auth(self):
         with expect.raises(github3.GitHubError):
-            ref.delete()
-            ref.update('31e862095dffa60744f1ce16a431ea040381f053')
+            self.ref.delete()
+            self.ref.update('31e862095dffa60744f1ce16a431ea040381f053')
+
+    def test_with_auth(self):
+        if not self.auth:
+            return
+        r = self._g.repository(self.gh3py, self.test_repo)
+        ref = r.create_ref('refs/tags/test_refs',
+                '5bd14b07155cf555bda5b8081ba6dc4ac5e645dd')
+        expect(ref.update(
+            '82b8dd20e95ea34f3d46349a8731d6f18866f8af'
+            )).isinstance(bool)
+        expect(ref.delete()).is_True()

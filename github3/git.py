@@ -92,6 +92,7 @@ class Reference(GitHubCore):
     """
     def __init__(self, ref, session=None):
         super(Reference, self).__init__(ref, session)
+        self._api = ref.get('url')
         #: The reference path, e.g., refs/heads/sc/featureA
         self.ref = ref.get('ref')
         #: :class:`GitObject <GitObject>` the reference points to
@@ -126,7 +127,7 @@ class Reference(GitHubCore):
         if json:
             self._update_(json)
             return True
-        return False
+        return False  # (No coverage)
 
 
 class GitObject(GitData):

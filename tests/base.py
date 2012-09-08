@@ -67,3 +67,8 @@ if sys.version_info >= (3, 0):
     str_test = (str, bytes)
 else:
     str_test = (str, unicode)
+
+
+def expect_str(val):
+    expect(val).isinstance(str_test)
+    expect(val) != ''
