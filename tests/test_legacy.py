@@ -1,6 +1,6 @@
 from base import BaseTest, expect, str_test
 from datetime import datetime
-from github3.legacy import LegacyIssue
+from github3.legacy import LegacyIssue, LegacyRepo, LegacyUser
 
 
 class TestLegacyIssue(BaseTest):
@@ -70,6 +70,11 @@ class TestLegacyRepo(BaseTest):
             if r.owner == 'sigmavirus24':
                 self.repo = r
                 break
+
+    def test_legacy_repo(self):
+        expect(self.repo).isinstance(LegacyRepo)
+        expect(repr(self.repo)).isinstance(str_test)
+        expect(repr(self.repo)) != ''
 
     def test_created(self):
         expect(self.repo.created).isinstance(datetime)
@@ -147,3 +152,68 @@ class TestLegacyRepo(BaseTest):
 class TestLegacyUser(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestLegacyUser, self).__init__(methodName)
+        self.user = self.g.search_users(self.sigm)[0]
+
+    def test_legacy_user(self):
+        expect(self.user).isinstance(LegacyUser)
+        expect(repr(self.user)).isinstance(str_test)
+        expect(repr(self.user)) != ''
+
+    def test_created(self):
+        if self.user.created:
+            expect(self.user.created).isinstance(datetime)
+
+    def test_created_at(self):
+        if self.user.created_at:
+            expect(self.user.created_at).isinstance(datetime)
+
+    def test_followers(self):
+        expect(self.user.followers) >= 0
+
+    def test_followers_count(self):
+        expect(self.user.followers_count) >= 0
+
+    def test_fullname(self):
+        expect(self.user.fullname).isinstance(str_test)
+
+    def test_gravatar_id(self):
+        expect(self.user.gravatar_id).isinstance(str_test)
+
+    def test_id(self):
+        expect(self.user.id).isinstance(str_test)
+
+    def test_language(self):
+        expect(self.user.language).isinstance(str_test)
+
+    def test_location(self):
+        if self.user.location:
+            expect(self.user.location).isinstance(str_test)
+
+    def test_login(self):
+        expect(self.user.login).isinstance(str_test)
+
+    def test_name(self):
+        expect(self.user.name).isinstance(str_test)
+
+    def test_public_repo_count(self):
+        expect(self.user.public_repo_count) >= 0
+
+    def test_pushed(self):
+        if self.user.pushed:
+            expect(self.user.pushed).isinstance(datetime)
+
+    def test_pushed_at(self):
+        if self.user.pushed_at:
+            expect(self.user.pushed_at).isinstance(datetime)
+
+    def test_record(self):
+        expect(self.user.record).isinstance(str_test)
+
+    def test_repos(self):
+        expect(self.user.repos) >= 0
+
+    def test_score(self):
+        expect(self.user.score) >= 0
+
+    def test_type(self):
+        expect(self.user.type) >= 0

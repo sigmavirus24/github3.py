@@ -70,7 +70,7 @@ class LegacyRepo(GitHubCore):
             created = repo.get('created')[:-6] + 'Z'
             self.created_at = self._strptime(created)
         #: datetime object representing the date of creation of this repo
-        self.created
+        self.created = self.created_at
         #: description of this repository
         self.description = repo.get('description', '')
         #: Number of followers
@@ -98,7 +98,7 @@ class LegacyRepo(GitHubCore):
             pushed = repo.get('pushed_at')[:-6] + 'Z'
             self.pushed = self._strptime(pushed)
         #: datetime object representing the last time the repo was pushed to
-        self.pushed_at
+        self.pushed_at = self.pushed
         #: Score
         self.score = repo.get('score', 0.0)
         #: Size of the repo
@@ -126,6 +126,10 @@ class LegacyRepo(GitHubCore):
     def has_wiki(self):
         """Checks if this repository has a wiki"""
         return self._has_w
+
+    def is_fork(self):
+        """Checks if this repository is a fork"""
+        return self._fork
 
     def is_private(self):
         """Checks if this repository is private"""
