@@ -7,53 +7,34 @@ Module which contains all the gist related material.
 """
 
 from json import dumps
-from .models import GitHubObject, GitHubCore, BaseComment
-from .users import User
+from github3.models import GitHubObject, GitHubCore, BaseComment
+from github3.users import User
+from github3.decorators import requires_auth
 
 
 class GistFile(GitHubObject):
     """The :class:`GistFile <GistFile>` object. This is used to represent a
     file object returned by GitHub while interacting with gists.
     """
-
     def __init__(self, attributes):
         super(GistFile, self).__init__(attributes)
 
-        self._raw = attributes.get('raw_url')
-        self._name = attributes.get('filename')
-        self._language = attributes.get('language')
-        self._size = attributes.get('size')
-        self._content = attributes.get('content')
+        #: The raw URL for the file at GitHub.
+        self.raw_url = attributes.get('raw_url')
+        #: The name of the file.
+        self.name = attributes.get('filename')
+        #: The language associated with the file.
+        self.language = attributes.get('language')
+        #: The size of the file.
+        self.size = attributes.get('size')
+        #: The content of the file.
+        self.content = attributes.get('content')
 
     def __repr__(self):
         return '<Gist File [{0}]>'.format(self._name)
 
-    @property
-    def content(self):
-        """The content of the file."""
-        return self._content
 
-    @property
-    def name(self):
-        """The name of the file."""
-        return self._name
-
-    @property
-    def lang(self):
-        """The language associated with the file."""
-        return self._language
-
-    @property
-    def raw_url(self):
-        """The raw URL for the file at GitHub."""
-        return self._raw
-
-    @property
-    def size(self):
-        """The size of the file."""
-        return self._size
-
-
+# TODO(Ian) come back and finish this after doing BaseComment
 class GistComment(BaseComment):
     """The :class:`GistComment <GistComment>` object. This represents a comment
     on a gist.
@@ -87,36 +68,37 @@ class Gist(GitHubCore):
 
     def _update_(self, data):
         self._json_data = data
-        # The gist identifier
-        self._id = data.get('id')
-        self._desc = data.get('description', '')
+        #: Unique id for this gist.
+        self.id = data.get('id', '')
+        #: Description of the gist
+        self.description = data.get('description', '')
 
         # e.g. https://api.github.com/gists/1
         self._api = data.get('url')
         #self._api = self._build_url('gists', str(self._id))
-        # e.g. https://gist.github.com/1
-        self._url = data.get('html_url')
+        #: URL of this gist at Github, e.g., https://gist.github.com/1
+        self.html_url = data.get('html_url')
         self._public = data.get('public')
-        # a list of all the forks of that gist
-        self._forks = data.get('forks', [])
-        # e.g. git://gist.github.com/1.git
-        self._pull = data.get('git_pull_url')
-        # e.g. git@gist.github.com/1.git
-        self._push = data.get('git_push_url')
-        # date the gist was created
-        self._created = self._strptime(data.get('created_at'))
-        self._updated = self._strptime(data.get('updated_at'))
+        #: The number of forks of this gist.
+        self.forks = data.get('forks', [])
+        #: Git URL to pull this gist, e.g., git://gist.github.com/1.git
+        self.git_pull_url = data.get('git_pull_url', '')
+        #: Git URL to push to gist, e.g., git@gist.github.com/1.git
+        self.git_push_url = data.get('git_push_url', '')
+        #: datetime object representing when the gist was created.
+        self.created_at = self._strptime(data.get('created_at'))
+        #: datetime object representing the last time this gist was updated.
+        self.updated_at = self._strptime(data.get('updated_at'))
+        #: :class:`User <github3.users.User>` object representing the owner of
+        #  the gist.
+        self.user = data.get('user')
         if data.get('user'):
-            self._user = User(data.get('user'), self._session)
-        else:
-            self._user = None
+            self.user = User(data.get('user'), self._session)
 
-        # Create a list of files in the gist
-        self._files = []
-        for file in data['files']:
-            self._files.append(GistFile(data['files'][file]))
+        #: Number of files in this gist.
+        self.files = [GistFile(data['files'][f]) for f in data['files']]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_comment(self, body):
         """Create a comment on this gist.
 
@@ -128,24 +110,14 @@ class Gist(GitHubCore):
         json = self._json(self._post(url, dumps({'body': body})), 201)
         return GistComment(json, self) if json else None
 
-    @property
-    def created_at(self):
-        """datetime object representing when the gist was created."""
-        return self._created
-
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this gist.
 
         :returns: bool -- whether the deletion was successful"""
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @property
-    def description(self):
-        """Description of the gist"""
-        return self._desc
-
-    @GitHubCore.requires_auth
+    @requires_auth
     def edit(self, description='', files={}):
         """Edit this gist.
 
@@ -172,12 +144,7 @@ class Gist(GitHubCore):
             return True
         return False
 
-    @property
-    def files(self):
-        """Number of files in this gist."""
-        return len(self._files)
-
-    @GitHubCore.requires_auth
+    @requires_auth
     def fork(self):
         """Fork this gist.
 
@@ -186,31 +153,6 @@ class Gist(GitHubCore):
         url = self._api + '/fork'
         json = self._json(self._post(url), 201)
         return Gist(json, self) if json else None
-
-    @property
-    def forks(self):
-        """The number of forks of this gist."""
-        return len(self._forks)
-
-    @property
-    def git_pull_url(self):
-        """Git URL to pull this gist."""
-        return self._pull
-
-    @property
-    def git_push_url(self):
-        """Git URL to push to gist."""
-        return self._push
-
-    @property
-    def html_url(self):
-        """URL of this gist at Github."""
-        return self._url
-
-    @property
-    def id(self):
-        """Unique id for this gist."""
-        return self._id
 
     def is_public(self):
         """Checks to see if this gist is public or not.
@@ -254,7 +196,7 @@ class Gist(GitHubCore):
             self._update_(json)
         return True if json else False
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def star(self):
         """Star this gist.
 
@@ -263,7 +205,7 @@ class Gist(GitHubCore):
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def unstar(self):
         """Un-star this gist.
 
@@ -271,14 +213,3 @@ class Gist(GitHubCore):
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
-
-    @property
-    def updated_at(self):
-        """datetime object representing the last time this gist was updated."""
-        return self._updated
-
-    @property
-    def user(self):
-        """:class:`User <github3.users.User>` object representing the owner of
-        the gist."""
-        return self._user

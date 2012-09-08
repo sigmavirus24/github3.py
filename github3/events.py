@@ -6,7 +6,7 @@ This module contains the class(es) related to Events
 
 """
 
-from .models import GitHubCore
+from github3.models import GitHubCore
 
 
 class Event(GitHubCore):
@@ -16,59 +16,37 @@ class Event(GitHubCore):
     """
     def __init__(self, event, session=None):
         super(Event, self).__init__(event, session)
-        from .users import User
-        from .orgs import Organization
-        self._created = self._strptime(event.get('created_at'))
-        self._type = event.get('type')
+        from github3.users import User
+        from github3.orgs import Organization
+        #: :class:`User <github3.users.User>` object representing the actor.
+        self.actor = User(event.get('actor')) if event.get('actor') else None
+        #: datetime object representing when the event was created.
+        self.created_at = self._strptime(event.get('created_at'))
+        #: Unique id of the event
+        self.id = event.get('id')
+        #: List all possible types of Events
+        self.org = None
+        if event.get('org'):
+            self.org = Organization(event.get('org'))
+        #: Event type
+        self.type = event.get('type')
+        handler = _payload_handlers[self.type]
+        #: Dictionary with the payload. Payload structure is defined by type_.
+        #  _type: http://developer.github.com/v3/events/types
+        self.payload = handler(event.get('payload'))
+        #: Return ``tuple(owner, repository_name)``
+        self.repo = event.get('repo')
+        if self.repo is not None:
+            self.repo = tuple(self.repo['name'].split('/'))
         self._public = event.get('public')
-        self._repo = event.get('repo', {})
-        self._actor = event.get('actor', {})
-        if self._actor:
-            self._actor = User(self._actor, self._session)
-        self._id = event.get('id')
-        handler = _payload_handlers[self._type]
-        self._payload = handler(event.get('payload'))
-        self._org = event.get('org', {})
-        if self._org:
-            self._org = Organization(self._org, self)
 
     def __repr__(self):
-        return '<Event [{0}]>'.format(self._type[:-5])
-
-    @property
-    def actor(self):
-        """:class:`User <github3.users.User>` object representing the 
-        actor."""
-        return self._actor
-
-    @property
-    def created_at(self):
-        """datetime object representing when the event was created."""
-        return self._created
-
-    @property
-    def id(self):
-        """Unique id of the event"""
-        return self._id
+        return '<Event [{0}]>'.format(self.type[:-5])
 
     @staticmethod
     def list_types():
-        """List all possible types of Events"""
+        """"""
         return sorted(_payload_handlers.keys())
-
-    @property
-    def org(self):
-        """:class:`Organization <github3.orgs.Organization>` object if actor
-        was an org."""
-        return self._org
-
-    @property
-    def payload(self):
-        """Dictionary with the payload. Payload structure is defined by type_.
-
-        .. _type: http://developer.github.com/v3/events/types
-        """
-        return self._payload
 
     def is_public(self):
         """Indicates whether the Event is public or not.
@@ -77,54 +55,44 @@ class Event(GitHubCore):
         """
         return self._public
 
-    @property
-    def repo(self):
-        """Return ``tuple(owner, repository_name)``"""
-        return tuple(self._repo['name'].split('/'))
-
-    @property
-    def type(self):
-        """Event type"""
-        return self._type
-
 
 def _commitcomment(payload):
-    from .repos import RepoComment
+    from github3.repos import RepoComment
     if payload.get('comment'):
         payload['comment'] = RepoComment(payload['comment'], None)
     return payload
 
 
 def _download(payload):
-    from .repos import Download
+    from github3.repos import Download
     if payload.get('download'):
         payload['download'] = Download(payload['download'], None)
     return payload
 
 
 def _follow(payload):
-    from .users import User
+    from github3.users import User
     if payload.get('target'):
         payload['target'] = User(payload['target'], None)
     return payload
 
 
 def _forkev(payload):
-    from .repos import Repository
+    from github3.repos import Repository
     if payload.get('forkee'):
         payload['forkee'] = Repository(payload['forkee'], None)
     return payload
 
 
 def _gist(payload):
-    from .gists import Gist
+    from github3.gists import Gist
     if payload.get('gist'):
         payload['gist'] = Gist(payload['gist'], None)
     return payload
 
 
 def _issuecomm(payload):
-    from .issues import Issue, IssueComment
+    from github3.issues import Issue, IssueComment
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     if payload.get('comment'):
@@ -133,37 +101,37 @@ def _issuecomm(payload):
 
 
 def _issueevent(payload):
-    from .issues import Issue
+    from github3.issues import Issue
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     return payload
 
 
 def _member(payload):
-    from .users import User
+    from github3.users import User
     if payload.get('member'):
         payload['member'] = User(payload['member'], None)
     return payload
 
 
 def _pullreqev(payload):
-    from .pulls import PullRequest
+    from github3.pulls import PullRequest
     if payload.get('pull_request'):
         payload['pull_request'] = PullRequest(payload['pull_request'], None)
     return payload
 
 
 def _pullreqcomm(payload):
-    from .pulls import ReviewComment
+    from github3.pulls import ReviewComment
     if payload.get('comment'):
         payload['comment'] = ReviewComment(payload['comment'], None)
     return payload
 
 
 def _team(payload):
-    from .orgs import Team
-    from .repos import Repository
-    from .users import User
+    from github3.orgs import Team
+    from github3.repos import Repository
+    from github3.users import User
     if payload.get('team'):
         payload['team'] = Team(payload['team'], None)
     if payload.get('repo'):
