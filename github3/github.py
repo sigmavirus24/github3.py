@@ -748,7 +748,7 @@ class Authorization(GitHubCore):
         self.scopes = auth.get('scopes', [])
         #: Unique id of the authorization
         self.id = auth.get('id', 0)
-        self._api = self._build_url('authorizations', str(self._id))
+        self._api = self._build_url('authorizations', str(self.id))
         #: datetime object representing when the authorization was created.
         self.created_at = None
         if auth.get('created_at'):
