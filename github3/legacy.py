@@ -95,8 +95,8 @@ class LegacyRepo(GitHubCore):
         #: datetime object representing the last time the repo was pushed to
         self.pushed = None
         if repo.get('pushed_at'):
-            pushed = repo.get('pushed_at')[:-6] + 'Z'
-            self.pushed = self._strptime(pushed)
+            pushed = repo.get('pushed_at')[:-6] + 'Z'  # (No coverage)
+            self.pushed = self._strptime(pushed)  # (No coverage)
         #: datetime object representing the last time the repo was pushed to
         self.pushed_at = self.pushed
         #: Score
