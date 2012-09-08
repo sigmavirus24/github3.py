@@ -7,9 +7,10 @@ This module contains all the classes relating to pull requests.
 """
 
 from json import dumps
-from .git import Commit
-from .models import GitHubObject, GitHubCore, BaseComment
-from .users import User
+from github3.git import Commit
+from github3.models import GitHubObject, GitHubCore, BaseComment
+from github3.users import User
+from github3.decorators import requires_auth
 
 
 class PullDestination(GitHubCore):
@@ -295,7 +296,7 @@ class PullRequest(GitHubCore):
         json = self._json(self._get(url), 200)
         return [PullFile(f) for f in json]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def merge(self, commit_message=''):
         """Merge this pull request.
 
@@ -341,7 +342,7 @@ class PullRequest(GitHubCore):
         """The title of the request"""
         return self._title
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def update(self, title='', body='', state=''):
         """Update this pull request.
 

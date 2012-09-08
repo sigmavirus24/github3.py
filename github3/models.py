@@ -10,7 +10,7 @@ from datetime import datetime
 from json import dumps
 from requests import session
 from re import compile
-from functools import wraps
+from github3.decorators import requires_auth
 
 __url_cache__ = {}
 
@@ -122,33 +122,6 @@ class GitHubCore(GitHubObject):
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining
 
-    @staticmethod
-    def requires_auth(func):
-        """Decorator to note which object methods require authorization."""
-        note = """
-        .. note::
-            The signature of this function may not appear correctly in
-            documentation. Please adhere to the defined parameters and their
-            types.
-        """
-        func.__doc__ = '\n'.join([func.__doc__, note])
-
-        @wraps(func)
-        def auth_wrapper(self, *args, **kwargs):
-            auth = False
-            if hasattr(self, '_session'):
-                auth = self._session.auth or \
-                    self._session.headers.get('Authorization')
-
-            if auth:
-                return func(self, *args, **kwargs)
-            else:
-                raise GitHubError(type('Faux Request', (object, ),
-                    {'status_code': 401, 'json': {
-                        'message': 'Requires authentication'}}
-                    ))
-        return auth_wrapper
-
 
 class BaseComment(GitHubCore):
     """The :class:`BaseComment <BaseComment>` object. A basic class for Gist,
@@ -199,7 +172,7 @@ class BaseComment(GitHubCore):
         """datetime object representing when the comment was created."""
         return self._created
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this comment.
 
@@ -207,7 +180,7 @@ class BaseComment(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def edit(self, body):
         """Edit this comment.
 

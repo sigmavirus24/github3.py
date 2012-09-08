@@ -8,14 +8,15 @@ This module contains the main GitHub session object.
 
 from requests import session
 from json import dumps
-from .events import Event
-from .gists import Gist
-from .issues import Issue, issue_params
-from .legacy import LegacyIssue, LegacyRepo, LegacyUser
-from .models import GitHubCore
-from .orgs import Organization
-from .repos import Repository
-from .users import User, Key
+from github3.events import Event
+from github3.gists import Gist
+from github3.issues import Issue, issue_params
+from github3.legacy import LegacyIssue, LegacyRepo, LegacyUser
+from github3.models import GitHubCore
+from github3.orgs import Organization
+from github3.repos import Repository
+from github3.users import User, Key
+from github3.decorators import requires_auth
 
 
 class GitHub(GitHubCore):
@@ -365,7 +366,7 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Gist(gist, self) for gist in json]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def list_user_issues(self, filter='', state='', labels='', sort='',
         direction='', since=''):
         """List the authenticated user's issues.
@@ -735,64 +736,37 @@ class Authorization(GitHubCore):
     """The :class:`Authorization <Authorization>` object."""
     def __init__(self, auth, session):
         super(Authorization, self).__init__(auth, session)
-        self._update_(auth)
+        #: Details about the application
+        self.app = auth.get('app', {})
+        #: Returns the Authorization token
+        self.token = auth.get('token', '')
+        #: URL about the note
+        self.note_url = auth.get('note_url', '')
+        #: Note about the authorization
+        self.note = auth.get('note', '')
+        #: List of scopes this applies to
+        self.scopes = auth.get('scopes', [])
+        #: Unique id of the authorization
+        self.id = auth.get('id', 0)
+        self._api = self._build_url('authorizations', str(self._id))
+        #: datetime object representing when the authorization was created.
+        self.created_at = None
+        if auth.get('created_at'):
+            self.created_at = self._strptime(auth.get('created_at'))
+        #: datetime object representing when the authorization was created.
+        self.updated_at = None
+        if auth.get('updated_at'):
+            self.updated_at = self._strptime(auth.get('updated_at'))
 
     def __repr__(self):
-        return '<Authorization [{0}]>'.format(self._app.get('name', ''))
+        return '<Authorization [{0}]>'.format(self.app.get('name', ''))
 
     def _update_(self, auth):
-        self._app = auth.get('app', {})
-        self._token = auth.get('token', '')
-        self._note_url = auth.get('note_url', '')
-        self._note = auth.get('note', '')
-        self._scopes = auth.get('scopes', [])
-        self._id = auth.get('id', 0)
-        self._api = self._build_url('authorizations', str(self._id))
-        self._created = None
-        if auth.get('created_at'):
-            self._created = self._strptime(auth.get('created_at'))
-        self._updated = None
-        if auth.get('updated_at'):
-            self._updated = self._strptime(auth.get('updated_at'))
-
-    @property
-    def app(self):
-        """Details about the application"""
-        return self._app
-
-    @property
-    def created_at(self):
-        """datetime object representing when the authorization was created."""
-        return self._created
+        self.__init__(auth, self._session)
 
     def delete(self):
         """delete this authorization"""
         return self._boolean(self._delete(self._api), 204, 404)
-
-    @property
-    def id(self):
-        """Unique id of the authorization"""
-        return self._id
-
-    @property
-    def note(self):
-        """Note about the authorization"""
-        return self._note
-
-    @property
-    def note_url(self):
-        """URL about the note"""
-        return self._note_url
-
-    @property
-    def scopes(self):
-        """List of scopes this applies to"""
-        return self._scopes
-
-    @property
-    def token(self):
-        """Returns the Authorization token"""
-        return self._token
 
     def update(self, scopes=[], add_scopes=[], rm_scopes=[], note='',
             note_url=''):
@@ -832,8 +806,3 @@ class Authorization(GitHubCore):
             self._update_(json)
             success = True
         return success
-
-    @property
-    def updated_at(self):
-        """datetime object representing when the authorization was created."""
-        return self._updated

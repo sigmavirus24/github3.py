@@ -7,8 +7,9 @@ This module contains everything relating to Users.
 """
 
 from json import dumps
-from .events import Event
-from .models import GitHubObject, GitHubCore, BaseAccount
+from github3.events import Event
+from github3.models import GitHubObject, GitHubCore, BaseAccount
+from github3.decorators import requires_auth
 
 
 class Key(GitHubCore):
@@ -46,7 +47,7 @@ class Key(GitHubCore):
         """The title the user gave to the key"""
         return self._title
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def update(self, title, key):
         """Update this key.
 
@@ -150,7 +151,7 @@ class User(BaseAccount):
         else:
             self._plan = None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_email_address(self, address):
         """Add the single email address to the authenticated user's
         account.
@@ -160,7 +161,7 @@ class User(BaseAccount):
         """
         return self.add_email_addresses([address])
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_email_addresses(self, addresses=[]):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account.
@@ -175,7 +176,7 @@ class User(BaseAccount):
             json = self._json(self._post(url, dumps(addresses)), 201)
         return json
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete_email_address(self, address):
         """Delete the email address from the user's account.
 
@@ -184,7 +185,7 @@ class User(BaseAccount):
         """
         return self.delete_email_addresses([address])
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete_email_addresses(self, addresses=[]):
         """Delete the email addresses in ``addresses`` from the
         authenticated user's account.
@@ -310,7 +311,7 @@ class User(BaseAccount):
         """Total number of private repos"""
         return self._private_repos
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def update(self, name=None, email=None, blog=None, company=None,
             location=None, hireable=False, bio=None):
         """If authenticated as this user, update the information with

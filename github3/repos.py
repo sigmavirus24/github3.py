@@ -8,12 +8,13 @@ This module contains the class relating to repositories.
 
 from base64 import b64decode
 from json import dumps
-from .events import Event
-from .issues import Issue, IssueEvent, Label, Milestone, issue_params
-from .git import Blob, Commit, Reference, Tag, Tree
-from .models import GitHubObject, GitHubCore, BaseComment, BaseCommit
-from .pulls import PullRequest
-from .users import User, Key
+from github3.events import Event
+from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
+from github3.git import Blob, Commit, Reference, Tag, Tree
+from github3.models import GitHubObject, GitHubCore, BaseComment, BaseCommit
+from github3.pulls import PullRequest
+from github3.users import User, Key
+from github3.decorators import requires_auth
 
 
 class Repository(GitHubCore):
@@ -85,7 +86,7 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data), 201)
         return PullRequest(json, self._session) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_collaborator(self, login):
         """Add ``login`` as a collaborator to a repository.
 
@@ -212,7 +213,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Contents(json) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
@@ -231,7 +232,7 @@ class Repository(GitHubCore):
                 sha = json.get('sha')
         return sha
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_comment(self, body, sha, path, position, line=1):
         """Create a comment on a commit.
 
@@ -260,7 +261,7 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data), 201)
         return RepoComment(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_commit(self, message, tree, parents, author={}, committer={}):
         """Create a commit on this repository.
 
@@ -293,7 +294,7 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data), 201)
         return Commit(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_download(self, name, path, description='',
             content_type='text/plain'):
         """Create a new download on this repository.
@@ -336,7 +337,7 @@ class Repository(GitHubCore):
 
         return Download(json, self) if self._boolean(resp, 201, 404) else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_fork(self, organization=None):
         """Create a fork of this repository.
 
@@ -354,7 +355,7 @@ class Repository(GitHubCore):
 
         return Repository(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_hook(self, name, config, events=['push'], active=True):
         """Create a hook on this repository.
 
@@ -378,7 +379,7 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data), 201)
         return Hook(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_issue(self,
         title,
         body=None,
@@ -410,7 +411,7 @@ class Repository(GitHubCore):
         json = self._json(self._post(url, issue), 201)
         return Issue(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_key(self, title, key):
         """Create a deploy key.
 
@@ -425,7 +426,7 @@ class Repository(GitHubCore):
         json = self._json(self._post(url, data), 201)
         return Key(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_label(self, name, color):
         """Create a label for this repository.
 
@@ -442,7 +443,7 @@ class Repository(GitHubCore):
         json = self._json(self._post(url, data), 201)
         return Label(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_milestone(self, title, state=None, description=None,
             due_on=None):
         """Create a milestone for this repository.
@@ -467,7 +468,7 @@ class Repository(GitHubCore):
         json = self._json(self._post(url, data), 201)
         return Milestone(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_pull(self, title, base, head, body=''):
         """Create a pull request using commits from ``head`` and comparing
         against ``base``.
@@ -487,7 +488,7 @@ class Repository(GitHubCore):
             'head': head})
         return self._create_pull(data)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_pull_from_issue(self, issue, base, head):
         """Create a pull request from issue #``issue``.
 
@@ -503,7 +504,7 @@ class Repository(GitHubCore):
         data = dumps({'issue': issue, 'base': base, 'head': head})
         return self._create_pull(data)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_ref(self, ref, sha):
         """Create a reference in this repository.
 
@@ -521,7 +522,7 @@ class Repository(GitHubCore):
         json = self._json(self._post(url, data), 201)
         return Reference(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_status(self, sha, state, target_url='', description=''):
         """Create a status object on a commit.
 
@@ -539,7 +540,7 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return Status(json) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
             lightweight=False):
         """Create a tag in this repository.
@@ -576,7 +577,7 @@ class Repository(GitHubCore):
                 self.create_ref('refs/tags/' + tag, sha)
         return Tag(json) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_tree(self, tree, base_tree=''):
         """Create a tree on this repository.
 
@@ -601,7 +602,7 @@ class Repository(GitHubCore):
         """``datetime`` object representing when the Repository was created."""
         return self._created
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this repository.
 
@@ -628,7 +629,7 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Download(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def edit(self,
         name,
         description='',
@@ -736,7 +737,7 @@ class Repository(GitHubCore):
         """URL of the home page for the project."""
         return self._homepg
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def hook(self, id_num):
         """Get a single hook.
 
@@ -783,7 +784,7 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Issue(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def key(self, id_num):
         """Get the specified deploy key.
 
@@ -928,7 +929,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return [Repository(r, self) for r in json]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def list_hooks(self):
         """List hooks registered on this repository.
 
@@ -1001,7 +1002,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [IssueEvent(e, self) for e in json]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def list_keys(self):
         """List deploy keys on this repository.
 
@@ -1187,7 +1188,7 @@ class Repository(GitHubCore):
         repository owner."""
         return self._owner
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def pubsubhubbub(self, mode, topic, callback, secret=''):
         """Create/update a pubsubhubbub hook.
 
@@ -1257,7 +1258,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Reference(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def remove_collaborator(self, login):
         """Remove collaborator ``login`` from the repository.
 
@@ -1485,7 +1486,7 @@ class Download(GitHubCore):
         """Content type of the download."""
         return self._type
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this download if authenticated"""
         return self._boolean(self._delete(self._api), 204, 404)
@@ -1573,7 +1574,7 @@ class Hook(GitHubCore):
         """datetime object representing the date the hook was created."""
         return self._created
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this hook.
 
@@ -1581,7 +1582,7 @@ class Hook(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def edit(self, name, config, events=[], add_events=[], rm_events=[],
             active=True):
         """Edit this hook.
@@ -1644,7 +1645,7 @@ class Hook(GitHubCore):
         """The name of the hook."""
         return self._name
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def test(self):
         """Test this hook
 
@@ -1743,7 +1744,7 @@ class RepoComment(BaseComment):
         """The position in the diff where the comment was made."""
         return self._pos
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def update(self, body, sha, line, path, position):
         """Update this comment.
 

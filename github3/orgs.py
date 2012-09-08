@@ -7,10 +7,11 @@ This module contains all of the classes related to organizations.
 """
 
 from json import dumps
-from .events import Event
-from .models import BaseAccount, GitHubCore
-from .repos import Repository
-from .users import User
+from github3.events import Event
+from github3.models import BaseAccount, GitHubCore
+from github3.repos import Repository
+from github3.users import User
+from github3.decorators import requires_auth
 
 
 class Team(GitHubCore):
@@ -30,7 +31,7 @@ class Team(GitHubCore):
         self._members = team.get('members_count')
         self._repos = team.get('repos_count')
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_member(self, login):
         """Add ``login`` to this team.
 
@@ -39,7 +40,7 @@ class Team(GitHubCore):
         url = self._build_url('members', login, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_repo(self, repo):
         """Add ``repo`` to this team.
 
@@ -50,7 +51,7 @@ class Team(GitHubCore):
         url = self._build_url('repos', repo, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def delete(self):
         """Delete this team.
 
@@ -58,7 +59,7 @@ class Team(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def edit(self, name, permission=''):
         """Edit this team.
 
@@ -130,7 +131,7 @@ class Team(GitHubCore):
         """This team's name."""
         return self._name
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def remove_member(self, login):
         """Remove ``login`` from this team.
 
@@ -141,7 +142,7 @@ class Team(GitHubCore):
         url = self._build_url('members', login, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def remove_repo(self, repo):
         """Remove ``repo`` from this team.
 
@@ -175,7 +176,7 @@ class Organization(BaseAccount):
         json = self._json(self._get(url), 200)
         return [User(memb, self) for memb in json]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_member(self, login, team):
         """Add ``login`` to ``team`` and thereby to this organization.
 
@@ -194,7 +195,7 @@ class Organization(BaseAccount):
                 return t.add_member(login)
         return False
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def add_repo(self, repo, team):
         """Add ``repo`` to ``team``.
 
@@ -207,7 +208,7 @@ class Organization(BaseAccount):
                 return t.add_repo(repo)
         return False
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_repo(self,
         name,
         description='',
@@ -253,7 +254,7 @@ class Organization(BaseAccount):
         json = self._json(self._post(url, dumps(data)), 201)
         return Repository(json, self) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def conceal_member(self, login):
         """Conceal ``login``'s membership in this organization.
 
@@ -262,7 +263,7 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', login, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def create_team(self, name, repo_names=[], permissions=''):
         """Assuming the authenticated user owns this organization,
         create and return a new team.
@@ -290,7 +291,7 @@ class Organization(BaseAccount):
         json = self._json(self._post(url, data), 201)
         return Team(json, self._session) if json else None
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def edit(self,
         billing_email=None,
         company=None,
@@ -374,7 +375,7 @@ class Organization(BaseAccount):
         json = self._json(self._get(url, params=params), 200)
         return [Repository(r, self) for r in json]
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def list_teams(self):
         """List teams that are part of this organization.
 
@@ -389,7 +390,7 @@ class Organization(BaseAccount):
         """Number of private repositories."""
         return self._private_repos
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def publicize_member(self, login):
         """Make ``login``'s membership in this organization public.
 
@@ -398,7 +399,7 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', login, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def remove_member(self, login):
         """Remove the user with login ``login`` from this
         organization.
@@ -408,7 +409,7 @@ class Organization(BaseAccount):
         url = self._build_url('members', login, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def remove_repo(self, repo, team):
         """Remove ``repo`` from ``team``.
 
@@ -424,7 +425,7 @@ class Organization(BaseAccount):
                 return t.remove_repo(repo)
         return False
 
-    @GitHubCore.requires_auth
+    @requires_auth
     def team(self, team_id):
         """Returns Team object with information about team specified by
         ``team_id``.
