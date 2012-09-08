@@ -242,8 +242,6 @@ class TestPullFile(BaseTest):
         super(TestPullFile, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
         self.pf = repo.pull_request(5).list_files()[0]
-        self.blob = ('https://github.com/{s.sigm}/{s.todo}/'
-                'blob/{f.sha}/{f.filename}').format(s=self, f=self.pf)
 
     def test_file(self):
         expect(self.pf).isinstance(PullFile)
@@ -252,7 +250,9 @@ class TestPullFile(BaseTest):
         expect(self.pf.additions) == 2
 
     def test_blob_url(self):
-        expect(self.pf.blob_url) == self.blob
+        expect(self.pf.blob_url).isinstance(str_test)
+        expect('blob' in self.pf.blob_url).is_True()
+        expect('todo.py' in self.pf.blob_url).is_True()
 
     def test_changes(self):
         expect(self.pf.changes) == 4
@@ -267,10 +267,10 @@ class TestPullFile(BaseTest):
         expect(self.pf.patch).isinstance(str_test)
 
     def test_raw_url(self):
-        expect(self.pf.raw_url) == self.blob.replace('blob', 'raw')
+        expect(self.pf.raw_url) == self.pf.blob_url.replace('blob', 'raw')
 
     def test_sha(self):
-        expect(self.pf.sha) == '0171bf7bea88cac6884bb72bd26c07e6a826677e'
+        expect(self.pf.sha) == 'd9024b5b8a078011f8d1de7ec8c15218c9c9449b'
 
     def test_status(self):
         expect(self.pf.status) == 'modified'

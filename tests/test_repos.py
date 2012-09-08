@@ -505,8 +505,6 @@ def __test_files__(fd, sha):
     expect(fd.blob_url).isinstance(str_test)
     expect(fd.raw_url).isinstance(str_test)
     expect(fd.sha).isinstance(str_test)
-    if sha:
-        expect(fd.sha) == sha
     expect(fd.status).isinstance(str_test)
     expect(fd.patch).isinstance(str_test)
 
@@ -537,8 +535,8 @@ class TestRepoCommit(BaseTest):
         expect(self.commit.files).isinstance(list)
         expect(self.commit.files) > []
         self.expect_list_of_class(self.commit.files, type)
-        for file in self.commit.files:
-            __test_files__(file, self.sha)
+        for fd in self.commit.files:
+            __test_files__(fd, self.sha)
 
     def test_total(self):
         expect(self.commit.total) == 17
