@@ -13,7 +13,8 @@ class TestGitHub(base.BaseTest):
         # Test "regular" auth
         self.g.login(*self.fake_auth)
         h = github3.login(*self.fake_auth)
-        for i in [self.g, h]:
+        l = github3.GitHub(*self.fake_auth)
+        for i in [self.g, h, l]:
             expect(self.fake_auth) == i._session.auth
 
     def test_oauth(self):
@@ -142,7 +143,7 @@ class TestGitHub(base.BaseTest):
         expect(self.g.list_repos(self.sigm)) != []
         expect(self.g.repository(self.sigm, self.todo)).is_not_None()
 
-    def test_auths(self):
+    def test_requires_auth(self):
         with expect.raises(github3.GitHubError):
             self.g.list_authorizations()
             self.g.authorization(-1)

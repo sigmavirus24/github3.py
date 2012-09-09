@@ -43,6 +43,7 @@ class GitHub(GitHubCore):
         json = self._json(resp, 200)
         return [User(f, self) for f in json]
 
+    @requires_auth
     def authorization(self, id_num):
         """Get information about authorization ``id``.
 
