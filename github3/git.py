@@ -50,9 +50,6 @@ class GitData(GitHubCore):
         self.sha = data.get('sha')
         self._api = data.get('url')
 
-    def __repr__(self):
-        return '<github3-gitdata at 0x{0:x}>'.format(id(self))
-
 
 class Commit(BaseCommit):
     """The :class:`Commit <Commit>` object. This represents a commit made in a

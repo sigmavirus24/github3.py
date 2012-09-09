@@ -113,6 +113,7 @@ class TestTreeHash(BaseTest):
     def test_hash(self):
         for h in self.hashes:
             expect(h).isinstance(Hash)
+            expect_str(repr(h))
 
     def test_hash_mode(self):
         expect_str(self.hash.mode)
