@@ -157,8 +157,8 @@ class TestReference(BaseTest):
             return
         r = self._g.repository(self.gh3py, self.test_repo)
         ref = r.create_ref('refs/tags/test_refs',
-                '5bd14b07155cf555bda5b8081ba6dc4ac5e645dd')
+                '499faa66a0f56235ee55bf295bac2f2f3c3f0a04')
         expect(ref.update(
-            '82b8dd20e95ea34f3d46349a8731d6f18866f8af'
+            '499faa66a0f56235ee55bf295bac2f2f3c3f0a04'
             )).isinstance(bool)
         expect(ref.delete()).is_True()
