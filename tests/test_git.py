@@ -33,11 +33,12 @@ class TestBlob(BaseTest):
         expect_str(self.blob.sha)
 
     def test_size(self):
-        expect_str(self.blob.size)
+        expect(self.blob.size) >= 0
 
 
 class TestCommit(BaseTest):
     def __init__(self, methodName='runTest'):
+        super(TestCommit, self).__init__(methodName)
         r = self.g.repository(self.sigm, self.todo)
         self.commit = r.git_commit('8b0704374914f03a54b89d938de1c09d5831824e')
 
@@ -104,7 +105,7 @@ class TestTreeHash(BaseTest):
         expect_str(repr(self.tree))
 
     def test_tree_sha(self):
-        expect_str(self.sha)
+        expect_str(self.tree.sha)
 
     def test_tree_recurse(self):
         expect(self.tree.recurse()).isinstance(Tree)
