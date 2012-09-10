@@ -122,7 +122,7 @@ class PullRequest(GitHubCore):
                 'comments': '/'.join([self._api.replace('pulls', 'issues'),
                     'comments']),
                 'issue': self._api.replace('pulls', 'issues'),
-                'html': self._url,
+                'html': self.html_url,
                 'review_comments': self._api + '/comments'
                 }
 
