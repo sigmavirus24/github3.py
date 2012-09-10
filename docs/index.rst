@@ -44,6 +44,7 @@ More Examples
 .. toctree::
     :maxdepth: 2
 
+    examples/oauth
     examples/gist
     examples/github
     examples/issue
