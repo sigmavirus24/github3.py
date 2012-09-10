@@ -17,19 +17,23 @@ from github3.decorators import requires_auth
 class Team(GitHubCore):
     def __init__(self, team, session=None):
         super(Team, self).__init__(team, session)
-        self._update_(team)
+        self._api = team.get('url')
+        #: This team's name.
+        self.name = team.get('name')
+        #: Unique ID of the team.
+        self.id = team.get('id')
+        #: Permission leve of the group
+        self.permission = team.get('permission')
+        #: Number of members in this team.
+        self.members_count = team.get('members_count')
+        #: Number of repos owned by this team.
+        self.repos_count = team.get('repos_count')
 
     def __repr__(self):
-        return '<Team [{0}]>'.format(self._name)
+        return '<Team [{0}]>'.format(self.name)
 
     def _update_(self, team):
-        self._json_data = team
-        self._api = team.get('url')
-        self._name = team.get('name')
-        self._id = team.get('id')
-        self._perm = team.get('permissions')
-        self._members = team.get('members_count')
-        self._repos = team.get('repos_count')
+        self.__init__(team, self._session)
 
     @requires_auth
     def add_member(self, login):
@@ -87,11 +91,6 @@ class Team(GitHubCore):
         url = self._build_url('repos', repo, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    @property
-    def id(self):
-        """Unique ID of the team."""
-        return self._id
-
     def is_member(self, login):
         """Check if ``login`` is a member of this team.
 
@@ -121,16 +120,6 @@ class Team(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Repository(r, self) for r in json]
 
-    @property
-    def members_count(self):
-        """Number of members in this team."""
-        return self._members
-
-    @property
-    def name(self):
-        """This team's name."""
-        return self._name
-
     @requires_auth
     def remove_member(self, login):
         """Remove ``login`` from this team.
@@ -153,12 +142,8 @@ class Team(GitHubCore):
         url = self._build_url('repos', repo, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    @property
-    def repos_count(self):
-        """Number of repos owned by this team."""
-        return self._repos
 
-
+# TODO(Ian) come back to this after finishing models
 class Organization(BaseAccount):
     """The :class:`Organization <Organization>` object."""
     def __init__(self, org, session=None):
