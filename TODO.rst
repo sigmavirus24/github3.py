@@ -56,6 +56,12 @@ run. I need to investigate this first.
 .. _Nose2: http://nose2.readthedocs.org/en/latest/
 .. _parallel: http://nose2.readthedocs.org/en/latest/plugins/mp.html
 
+logging
+~~~~~~~
+
+I need to determine if there is a desire for logging and where it would be 
+most useful. I would probably take a cue from urllib3 in this instance.
+
 Plan
 ====
 
