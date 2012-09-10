@@ -23,7 +23,7 @@ probably the least objectionable of the evils. The token has scopes so there
 is only so much someone can do with it and it works well with github3.py.
 
 Requesting a token
-------------------
+~~~~~~~~~~~~~~~~~~
 
 If you're not doing a web application, you are more than welcome to use 
 github3.py (otherwise work with redirects_). Let's say your application needs 
