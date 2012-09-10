@@ -56,6 +56,12 @@ run. I need to investigate this first.
 .. _Nose2: http://nose2.readthedocs.org/en/latest/
 .. _parallel: http://nose2.readthedocs.org/en/latest/plugins/mp.html
 
+I just realized that because of how I have structed the unittests (making the 
+majority of requests to the API during the __init__ calls for the test cases), 
+nose2 would actually make things far worse_ in all likelihood.
+
+.. _worse: http://nose2.readthedocs.org/en/latest/plugins/mp.html#tests-load-twice
+
 logging
 ~~~~~~~
 
