@@ -176,8 +176,8 @@ class LegacyUser(GitHubCore):
         #: datetime representing the last time this user pushed
         self.pushed = None
         if user.get('pushed'):
-            pushed = user.get('pushed')[:-5] + 'Z'
-            self.pushed = self._strptime(pushed)
+            pushed = user.get('pushed')[:-5] + 'Z'  # (No coverage)
+            self.pushed = self._strptime(pushed)  # (No coverage)
         #: datetime representing the last time this user pushed
         self.pushed_at = self.pushed
         #: User's record
