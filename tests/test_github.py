@@ -1,13 +1,16 @@
-import base
 import github3
-from base import expect
+from base import expect, expect_str, BaseTest
 
 
-class TestGitHub(base.BaseTest):
+class TestGitHub(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestGitHub, self).__init__(methodName)
         self.fake_auth = ('fake_user', 'fake_password')
         self.fake_oauth = 'foobarbogusoauth'
+
+    def test_github(self):
+        expect(self.g).isinstance(github3.GitHub)
+        expect_str(repr(self.g))
 
     def test_login(self):
         # Test "regular" auth
@@ -176,3 +179,18 @@ class TestGitHub(base.BaseTest):
             self.g.update_user()
             self.g.user()
         expect(self.g.user(self.sigm)).is_not_None()
+
+    def test_authorization(self):
+        with expect.raises(github3.GitHubError):
+            self.g.authorization(1000)
+
+        if self.auth:
+            auth = self.g.authorize(self.user, self.pw, [])
+            expect(auth).isinstance(github3.github.Authorization)
+            auth_g = self._g.authorization(auth.id)
+            expect(auth_g).isinstance(github3.github.Authorization)
+            auth.delete()
+            del auth
+            auth = self._g.authorize(None, None, [])
+            expect(auth).isinstance(github3.github.Authorization)
+            auth.delete()

@@ -73,7 +73,7 @@ class GitHub(GitHubCore):
         """
         json = None
         auth = self._session.auth or (login and password)
-        if isinstance(scopes, list) and scopes and auth:
+        if isinstance(scopes, list) and auth:
             url = self._build_url('authorizations')
             data = dumps({'scopes': scopes, 'note': note,
                 'note_url': note_url})
