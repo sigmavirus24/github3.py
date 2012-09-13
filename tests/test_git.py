@@ -1,6 +1,7 @@
 from base import BaseTest, expect, expect_str
 import github3
-from github3.git import (Commit, Blob, Reference, Tag, Tree, Hash, GitObject)
+from github3.git import (Commit, Blob, Reference, Tag, Tree, Hash, GitObject,
+        GitData)
 
 
 class TestGit(BaseTest):
@@ -163,3 +164,18 @@ class TestReference(BaseTest):
             '499faa66a0f56235ee55bf295bac2f2f3c3f0a04'
             )).isinstance(bool)
         expect(ref.delete()).is_True()
+
+
+class TestGitData(BaseTest):
+    def setUp(self):
+        json = {'sha': 'fakesha', 'url': 'http://www.example.com'}
+        self.gitdata = GitData(json)
+
+    def test_gitdata(self):
+        expect(self.gitdata).isinstance(GitData)
+        expect_str(repr(self.gitdata))
+        expect(repr(self.gitdata)) != ''
+
+    def test_sha(self):
+        expect_str(self.gitdata.sha)
+        expect(self.gitdata.sha) == 'fakesha'
