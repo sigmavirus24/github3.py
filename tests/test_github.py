@@ -184,13 +184,15 @@ class TestGitHub(BaseTest):
         with expect.raises(github3.GitHubError):
             self.g.authorization(1000)
 
-        if self.auth:
-            auth = self.g.authorize(self.user, self.pw, [])
-            expect(auth).isinstance(github3.github.Authorization)
-            auth_g = self._g.authorization(auth.id)
-            expect(auth_g).isinstance(github3.github.Authorization)
-            auth.delete()
-            del auth
-            auth = self._g.authorize(None, None, [])
-            expect(auth).isinstance(github3.github.Authorization)
-            auth.delete()
+        if not self.auth:
+            return
+
+        auth = self.g.authorize(self.user, self.pw, [])
+        expect(auth).isinstance(github3.github.Authorization)
+        auth_g = self._g.authorization(auth.id)
+        expect(auth_g).isinstance(github3.github.Authorization)
+        auth.delete()
+        del auth
+        auth = self._g.authorize(None, None, [])
+        expect(auth).isinstance(github3.github.Authorization)
+        auth.delete()
