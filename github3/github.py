@@ -53,7 +53,7 @@ class GitHub(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._github_url('authorizations', str(id_num))
+            url = self._build_url('authorizations', str(id_num))
             json = self._json(self._get(url), 200)
         return Authorization(json, self) if json else None
 
@@ -148,6 +148,7 @@ class GitHub(GitHubCore):
         # issue
         return None
 
+    @requires_auth
     def create_key(self, title, key):
         """Create a new key for the authenticated user.
 
@@ -230,6 +231,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
+    @requires_auth
     def key(self, id_num):
         """Gets the authenticated user's key specified by id_num.
 
@@ -240,7 +242,7 @@ class GitHub(GitHubCore):
         json = None
         if int(id_num) > 0:
             url = self._build_url('user', 'keys', str(id_num))
-            json = self.json(self._get(url), 200)
+            json = self._json(self._get(url), 200)
         return Key(json, self) if json else None
 
     def gist(self, id_num):
@@ -422,6 +424,7 @@ class GitHub(GitHubCore):
                     labels, direction, since)
         return issues
 
+    @requires_auth
     def list_keys(self):
         """List public keys for the authenticated user.
 
@@ -627,7 +630,7 @@ class GitHub(GitHubCore):
         :type keyword: str
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
-        url = self._github_url + '/legacy/user/search/{0}'.format(keyword)
+        url = self._build_url('legacy', 'user', 'search', str(keyword))
         json = self._json(self._get(url), 200)
         users = json.get('users', [])
         return [LegacyUser(u, self) for u in users]

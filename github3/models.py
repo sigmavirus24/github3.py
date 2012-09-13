@@ -184,8 +184,8 @@ class BaseComment(GitHubCore):
     def edit(self, body):
         """Edit this comment.
 
-        :param body: (required), new body of the comment, Markdown formatted
-        :type body: str
+        :param str body: (required), new body of the comment, Markdown
+            formatted
         :returns: bool
         """
         if body:
