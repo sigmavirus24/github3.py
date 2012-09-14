@@ -346,7 +346,6 @@ class Issue(GitHubCore):
                 self.milestone, self.labels)
 
 
-# TODO(Ian) come back to this after finish models
 class IssueComment(BaseComment):
     """The :class:`IssueComment <IssueComment>` object. This structures and
     handles the comments on issues specifically.
@@ -354,18 +353,13 @@ class IssueComment(BaseComment):
     def __init__(self, comment, session=None):
         super(IssueComment, self).__init__(comment, session)
 
-        self._user = None
+        #: :class:`User <github3.users.User>` who made the comment
+        self.user = None
         if comment.get('user'):
-            self._user = User(comment.get('user'), self)
+            self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Issue Comment [{0}]>'.format(self._user.login)
-
-    @property
-    def updated_at(self):
-        """datetime object representing the last time the comment was
-        updated."""
-        return self._updated
+        return '<Issue Comment [{0}]>'.format(self.user.login)
 
 
 class IssueEvent(GitHubCore):

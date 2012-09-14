@@ -128,49 +128,35 @@ class BaseComment(GitHubCore):
     Issue and Pull Request Comments."""
     def __init__(self, comment, session):
         super(BaseComment, self).__init__(comment, session)
-        self._update_(comment)
+        #: Unique ID of the comment.
+        self.id = comment.get('id')
+        #: Body of the comment. (As written by the commenter)
+        self.body = comment.get('body')
+        #: Body of the comment formatted as plain-text. (Stripped of markdown,
+        #  etc.)
+        self.body_text = comment.get('body_text')
+        #: Body of the comment formatted as html.
+        self.body_html = comment.get('body_html')
+        #: datetime object representing when the comment was created.
+        self.created_at = self._strptime(comment.get('created_at'))
+        #: datetime object representing when the comment was updated.
+        self.updated_at = self._strptime(comment.get('updated_at'))
+
+        self._api = comment.get('url')
+        self.links = comment.get('_links')
+        #: The url of this comment at GitHub
+        self.html_url = ''
+        #: The url of the pull request, if it exists
+        self.pull_request_url = ''
+        if self.links:
+            self.html_url = self.links.get('html')
+            self.pull_request_url = self.links.get('pull_request')
 
     def __repr__(self):
         return '<github3-comment at 0x{0:x}>'.format(id(self))
 
     def _update_(self, comment):
-        self._json_data = comment
-        self._id = comment.get('id')
-        self._body = comment.get('body')
-        self._bodyt = comment.get('body_text')
-        self._bodyh = comment.get('body_html')
-        self._created = self._strptime(comment.get('created_at'))
-        self._updated = self._strptime(comment.get('updated_at'))
-
-        self._api = comment.get('url')
-        if comment.get('_links'):
-            self._url = comment['_links'].get('html')
-            self._pull = comment['_links'].get('pull_request')
-
-        self._path = comment.get('path')
-        self._pos = comment.get('position') or 0
-        self._cid = comment.get('commit_id')
-
-    @property
-    def body(self):
-        """Body of the comment. (As written by the commenter)"""
-        return self._body
-
-    @property
-    def body_html(self):
-        """Body of the comment formatted as html."""
-        return self._bodyh
-
-    @property
-    def body_text(self):
-        """Body of the comment formatted as plain-text. (Stripped of markdown,
-        etc.)"""
-        return self._bodyt
-
-    @property
-    def created_at(self):
-        """datetime object representing when the comment was created."""
-        return self._created
+        self.__init__(comment, self._session)
 
     @requires_auth
     def delete(self):
@@ -195,16 +181,6 @@ class BaseComment(GitHubCore):
                 self._update_(json)
                 return True
         return False
-
-    @property
-    def id(self):
-        """Unique ID of the comment."""
-        return self._id
-
-    @property
-    def user(self):
-        """:class:`User <github3.users.User>` who created the comment."""
-        return self._user
 
 
 class BaseCommit(GitHubCore):

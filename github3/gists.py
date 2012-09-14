@@ -34,21 +34,20 @@ class GistFile(GitHubObject):
         return '<Gist File [{0}]>'.format(self.name)
 
 
-# TODO(Ian) come back and finish this after doing BaseComment
 class GistComment(BaseComment):
     """The :class:`GistComment <GistComment>` object. This represents a comment
     on a gist.
     """
-
     def __init__(self, comment, session=None):
         super(GistComment, self).__init__(comment, session)
 
-        self._user = None
+        #: :class:`User <github3.users.User>` who made the comment
+        self.user = None
         if comment.get('user'):
-            self._user = User(comment.get('user'), self)
+            self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Gist Comment [{0}]>'.format(self._user.login)
+        return '<Gist Comment [{0}]>'.format(self.user.login)
 
 
 class Gist(GitHubCore):

@@ -236,7 +236,6 @@ class PullRequest(GitHubCore):
         return False
 
 
-#: TODO(Ian) come back after finishing models
 class ReviewComment(BaseComment):
     """The :class:`ReviewComment <ReviewComment>` object. This is used to
     represent comments on pull requests.
@@ -244,42 +243,20 @@ class ReviewComment(BaseComment):
     def __init__(self, comment, session=None):
         super(ReviewComment, self).__init__(comment, session)
 
-        self._user = None
+        #: :class:`User <github3.users.User>` who made the comment
+        self.user = None
         if comment.get('user'):
-            self._user = User(comment.get('user'), self)
+            self.user = User(comment.get('user'), self)
 
-        self._orig = comment.get('original_position')
+        #: Original position inside the file
+        self.original_position = comment.get('original_position')
+
+        #: Path to the file
+        self.path = comment.get('path')
+        #: Position within the commit
+        self.position = comment.get('position') or 0
+        #: SHA of the commit the comment is on
+        self.commit_id = comment.get('commit_id')
 
     def __repr__(self):
-        return '<Review Comment [{0}]>'.format(self._user.login)
-
-    @property
-    def commit_id(self):
-        """SHA of the commit the comment is on"""
-        return self._cid
-
-    @property
-    def html_url(self):
-        """URL of the comment"""
-        return self._url
-
-    @property
-    def original_position(self):
-        """Original position inside the file"""
-        return self._orig
-
-    @property
-    def path(self):
-        """Path to the file"""
-        return self._path
-
-    @property
-    def position(self):
-        """Position within the commit"""
-        return self._pos
-
-    @property
-    def updated_at(self):
-        """datetime object representing the last time the object was
-        updated."""
-        return self._updated
+        return '<Review Comment [{0}]>'.format(self.user.login)

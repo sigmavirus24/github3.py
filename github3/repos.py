@@ -23,61 +23,81 @@ class Repository(GitHubCore):
     """
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(repo, session)
-        self._update_(repo)
-
-    def __repr__(self):
-        return '<Repository [{0}/{1}]>'.format(self._owner.login, self._name)
-
-    def _update_(self, repo):
-        self._json_data = repo
-        # Clone url using Smart HTTP(s)
-        self._https_clone = repo.get('clone_url')
-        self._created = self._strptime(repo.get('created_at'))
-        self._desc = repo.get('description')
+        #: URL used to clone via HTTPS.
+        self.clone_url = repo.get('clone_url')
+        #: ``datetime`` object representing when the Repository was created.
+        self.created_at = self._strptime(repo.get('created_at'))
+        #: Description of the repository.
+        self.description = repo.get('description')
 
         # The number of forks
-        self._forks = repo.get('forks')
+        #: The number of forks made of this repository.
+        self.forks = repo.get('forks')
 
         # Is this repository a fork?
         self._is_fork = repo.get('fork')
 
         # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
-        self._git_clone = repo.get('git_url')
+        #: Plain git url for an anonymous clone.
+        self.git_url = repo.get('git_url')
         self._has_dl = repo.get('has_downloads')
         self._has_issues = repo.get('has_issues')
         self._has_wiki = repo.get('has_wiki')
 
         # e.g. https://sigmavirus24.github.com/github3.py
-        self._homepg = repo.get('homepage')
+        #: URL of the home page for the project.
+        self.homepage = repo.get('homepage')
 
         # e.g. https://github.com/sigmavirus24/github3.py
-        self._url = repo.get('html_url')
-        self._id = repo.get('id')
-        self._lang = repo.get('lang')
-        self._mirror = repo.get('mirror_url')
+        #: URL of the project at GitHub.
+        self.html_url = repo.get('html_url')
+        #: Unique id of the repository.
+        self.id = repo.get('id')
+        #: Language property.
+        self.language = repo.get('language')
+        #: Mirror property.
+        self.mirror_url = repo.get('mirror_url')
 
         # Repository name, e.g. github3.py
-        self._name = repo.get('name')
+        #: Name of the repository.
+        self.name = repo.get('name')
 
         # Number of open issues
-        self._open_issues = repo.get('open_issues')
+        #: Number of open issues on the repository.
+        self.open_issues = repo.get('open_issues')
 
         # Repository owner's name
-        self._owner = User(repo.get('owner'), self._session)
+        #: :class:`User <github3.users.User>` object representing the
+        #  repository owner.
+        self.owner = User(repo.get('owner'), self._session)
 
         # Is this repository private?
         self._priv = repo.get('private')
-        self._pushed = self._strptime(repo.get('pushed_at'))
-        self._size = repo.get('size')
+        #: ``datetime`` object representing the last time commits were pushed
+        #  to the repository.
+        self.pushed_at = self._strptime(repo.get('pushed_at'))
+        #: Size of the repository.
+        self.size = repo.get('size')
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
-        self._ssh = repo.get('ssh_url')
-        self._svn = repo.get('svn_url')
-        self._updated = self._strptime(repo.get('updated_at'))
+        #: URL to clone the repository via SSH.
+        self.ssh_url = repo.get('ssh_url')
+        #: If it exists, url to clone the repository via SVN.
+        self.svn_url = repo.get('svn_url')
+        #: ``datetime`` object representing the last time the repository was
+        #  updated.
+        self.updated_at = self._strptime(repo.get('updated_at'))
         self._api = repo.get('url')
 
         # The number of watchers
-        self._watch = repo.get('watchers')
+        #: Number of users watching the repository.
+        self.watchers = repo.get('watchers')
+
+    def __repr__(self):
+        return '<Repository [{0}/{1}]>'.format(self.owner.login, self.name)
+
+    def _update_(self, repo):
+        self.__init__(repo, self._session)
 
     def _create_pull(self, data):
         json = None
@@ -156,11 +176,6 @@ class Repository(GitHubCore):
             url = self._build_url('branches', name, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Branch(json, self) if json else None
-
-    @property
-    def clone_url(self):
-        """URL used to clone via HTTPS."""
-        return self._https_clone
 
     def commit(self, sha):
         """Get a single (repo) commit. See :func:`git_commit` for the Git Data
@@ -597,11 +612,6 @@ class Repository(GitHubCore):
             json = self._json(self._post(url, data), 201)
         return Tree(json) if json else None
 
-    @property
-    def created_at(self):
-        """``datetime`` object representing when the Repository was created."""
-        return self._created
-
     @requires_auth
     def delete(self):
         """Delete this repository.
@@ -609,11 +619,6 @@ class Repository(GitHubCore):
         :returns: bool -- True if successful, False otherwise
         """
         return self._boolean(self._delete(self._api), 204, 404)
-
-    @property
-    def description(self):
-        """Description of the repository."""
-        return self._desc
 
     def download(self, id_num):
         """Get a single download object by its id.
@@ -670,11 +675,6 @@ class Repository(GitHubCore):
             return True
         return False
 
-    @property
-    def forks(self):
-        """The number of forks made of this repository."""
-        return self._forks
-
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository.
 
@@ -713,11 +713,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Commit(json, self) if json else None
 
-    @property
-    def git_clone(self):
-        """Plain git url for an anonymous clone."""
-        return self._git_clone
-
     def has_downloads(self):
         """Checks if this repository has downloads.
 
@@ -725,17 +720,19 @@ class Repository(GitHubCore):
         """
         return self._has_dl
 
+    def has_issues(self):
+        """Checks if this repository has issues enabled.
+
+        :returns: bool
+        """
+        return self._has_issues
+
     def has_wiki(self):
         """Checks if this repository has a wiki.
 
         :returns: bool
         """
         return self._has_wiki
-
-    @property
-    def homepage(self):
-        """URL of the home page for the project."""
-        return self._homepg
 
     @requires_auth
     def hook(self, id_num):
@@ -750,16 +747,6 @@ class Repository(GitHubCore):
             url = self._build_url('hooks', str(id_num), base_url=self._api)
             json = self._json(self._get(url), 200)
         return Hook(json, self) if json else None
-
-    @property
-    def html_url(self):
-        """URL of the project at GitHub."""
-        return self._url
-
-    @property
-    def id(self):
-        """Unique id of the repository."""
-        return self._id
 
     def is_assignee(self, login):
         """Check if the user is a possible assignee for an issue on this
@@ -811,11 +798,6 @@ class Repository(GitHubCore):
             url = self._build_url('labels', name, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Label(json, self) if json else None
-
-    @property
-    def language(self):
-        """Language property."""
-        return self._lang
 
     def list_assignees(self):
         """List all available assignees to which an issue may be assigned.
@@ -1167,27 +1149,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Milestone(json, self) if json else None
 
-    @property
-    def mirror_url(self):
-        """Mirror property."""
-        return self._mirror
-
-    @property
-    def name(self):
-        """Name of the repository."""
-        return self._name
-
-    @property
-    def open_issues(self):
-        """Number of open issues on the repository."""
-        return self._open_issues
-
-    @property
-    def owner(self):
-        """:class:`User <github3.users.User>` object representing the
-        repository owner."""
-        return self._owner
-
     @requires_auth
     def pubsubhubbub(self, mode, topic, callback, secret=''):
         """Create/update a pubsubhubbub hook.
@@ -1226,12 +1187,6 @@ class Repository(GitHubCore):
             url = self._build_url('pulls', str(number), base_url=self._api)
             json = self._json(self._get(url), 200)
         return PullRequest(json, self) if json else None
-
-    @property
-    def pushed_at(self):
-        """``datetime`` object representing the last time commits were pushed
-        to the repository."""
-        return self._pushed
 
     def readme(self):
         """Get the README for this repository.
@@ -1272,21 +1227,6 @@ class Repository(GitHubCore):
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
-    @property
-    def size(self):
-        """Size of the repository."""
-        return self._size
-
-    @property
-    def ssh_url(self):
-        """URL to clone the repository via SSH."""
-        return self._ssh
-
-    @property
-    def svn_url(self):
-        """If it exists, url to clone the repository via SVN."""
-        return self._svn
-
     def tag(self, sha):
         """Get an annotated tag.
 
@@ -1311,12 +1251,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Tree(json, self) if json else None
 
-    @property
-    def updated_at(self):
-        """``datetime`` object representing the last time the repository was
-        updated."""
-        return self._updated
-
     def update_label(self, name, color, new_name=''):
         """Update the label ``name``.
 
@@ -1335,11 +1269,6 @@ class Repository(GitHubCore):
             resp = upd(new_name, color) if new_name else upd(name, color)
         return resp
 
-    @property
-    def watchers(self):
-        """Number of users watching the repository."""
-        return self._watch
-
 
 class Branch(GitHubCore):
     """The :class:`Branch <Branch>` object. It holds the information GitHub
@@ -1347,29 +1276,18 @@ class Branch(GitHubCore):
     """
     def __init__(self, branch, session=None):
         super(Branch, self).__init__(branch, session)
-        self._name = branch.get('name')
-        self._commit = None
+        #: Name of the branch.
+        self.name = branch.get('name')
+        #: Returns the branch :class:`Commit <github3.git.Commit>` or
+        #  ``None``.
+        self.commit = None
         if branch.get('commit'):
-            self._commit = Commit(branch.get('commit'), self._session)
-        self._links = branch.get('_links', {})
+            self.commit = Commit(branch.get('commit'), self._session)
+        #: Returns '_links' attribute.
+        self.links = branch.get('_links', {})
 
     def __repr__(self):
         return '<Repository Branch [{0}]>'.format(self._name)
-
-    @property
-    def commit(self):
-        """Returns the branch commit."""
-        return self._commit
-
-    @property
-    def links(self):
-        """Returns '_links' attribute."""
-        return self._links
-
-    @property
-    def name(self):
-        """Name of the branch."""
-        return self._name
 
 
 class Contents(GitHubObject):
@@ -1381,85 +1299,48 @@ class Contents(GitHubObject):
         super(Contents, self).__init__(content)
         # links
         self._api = content['_links'].get('self')
-        self._links = content.get('_links')
+        #: Dictionary of links
+        self.links = content.get('_links')
 
         # should always be 'base64'
-        self._enc = content.get('encoding')
+        #: Returns encoding used on the content.
+        self.encoding = content.get('encoding')
 
         # content, base64 encoded and decoded
-        self._content = content.get('content')
-        if self._enc == 'base64':
-            self._dec = b64decode(self._content.encode())
-        else:
-            self._dec = self._b64
+        #: Base64-encoded content of the file.
+        self.content = content.get('content')
+
+        #: Decoded content of the file.
+        self.decoded = self.content
+        if self.encoding == 'base64':
+            self.decoded = b64decode(self.content.encode())
 
         # file name, path, and size
-        self._name = content.get('name')
-        self._path = content.get('path')
-        self._sz = content.get('size')
-
-        self._sha = content.get('sha')
+        #: Name of the content.
+        self.name = content.get('name')
+        #: Path to the content.
+        self.path = content.get('path')
+        #: Size of the content
+        self.size = content.get('size')
+        #: SHA string.
+        self.sha = content.get('sha')
 
         # should always be 'file'
-        self._type = content.get('type')
+        #: Type of content.
+        self.type = content.get('type')
 
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
 
     @property
-    def content(self):
-        """Base64-encoded content of the file."""
-        return self._content
-
-    @property
-    def decoded(self):
-        """Decoded content of the file."""
-        return self._dec
-
-    @property
-    def encoding(self):
-        """Returns encoding used on the content."""
-        return self._enc
-
-    @property
-    def git(self):
+    def git_url(self):
         """API URL for this blob"""
-        return self._links['git']
+        return self.links['git']
 
     @property
-    def html(self):
+    def html_url(self):
         """URL pointing to the content on GitHub."""
-        return self._links['html']
-
-    @property
-    def links(self):
-        """Dictionary of links"""
-        return self._links
-
-    @property
-    def name(self):
-        """Name of the content."""
-        return self._name
-
-    @property
-    def path(self):
-        """Path to the content."""
-        return self._path
-
-    @property
-    def sha(self):
-        """SHA string."""
-        return self._sha
-
-    @property
-    def size(self):
-        """Size of the content"""
-        return self._sz
-
-    @property
-    def type(self):
-        """Type of content."""
-        return self._type
+        return self.links['html']
 
 
 class Download(GitHubCore):
@@ -1470,51 +1351,28 @@ class Download(GitHubCore):
     def __init__(self, download, session=None):
         super(Download, self).__init__(download, session)
         self._api = download.get('url')
-        self._html = download.get('html_url')
-        self._id = download.get('id')
-        self._name = download.get('name')
-        self._desc = download.get('description')
-        self._sz = download.get('size')
-        self._dlct = download.get('download_count')
-        self._type = download.get('content_type')
+        #: URL of the download at GitHub.
+        self.html_url = download.get('html_url')
+        #: Unique id of the download on GitHub.
+        self.id = download.get('id')
+        #: Name of the download.
+        self.name = download.get('name')
+        #: Description of the download.
+        self.description = download.get('description')
+        #: Size of the download.
+        self.size = download.get('size')
+        #: How many times this particular file has been downloaded.
+        self.download_count = download.get('download_count')
+        #: Content type of the download.
+        self.content_type = download.get('content_type')
 
     def __repr__(self):
         return '<Download [{0}]>'.format(self.name)
-
-    @property
-    def content_type(self):
-        """Content type of the download."""
-        return self._type
 
     @requires_auth
     def delete(self):
         """Delete this download if authenticated"""
         return self._boolean(self._delete(self._api), 204, 404)
-
-    @property
-    def description(self):
-        """Description of the download."""
-        return self._desc
-
-    @property
-    def download_count(self):
-        """How many times this particular file has been downloaded."""
-        return self._dlct
-
-    @property
-    def html_url(self):
-        """URL of the download at GitHub."""
-        return self._html
-
-    @property
-    def id(self):
-        """Unique id of the download on GitHub."""
-        return self._id
-
-    @property
-    def name(self):
-        """Name of the download."""
-        return self._name
 
     def saveas(self, path=''):
         """Save this download to the path specified.
@@ -1534,11 +1392,6 @@ class Download(GitHubCore):
                 return True
         return False
 
-    @property
-    def size(self):
-        """Size of the download."""
-        return self._sz
-
 
 class Hook(GitHubCore):
     """The :class:`Hook <Hook>` object. This handles the information returned
@@ -1546,33 +1399,28 @@ class Hook(GitHubCore):
 
     def __init__(self, hook, session=None):
         super(Hook, self).__init__(hook, session)
-        self._update_(hook)
+        self._api = hook.get('url')
+        #: datetime object representing when this hook was last updated.
+        self.updated_at = None
+        if hook.get('updated_at'):
+            self.updated_at = self._strptime(hook.get('updated_at'))
+        #: datetime object representing the date the hook was created.
+        self.created_at = self._strptime(hook.get('created_at'))
+        #: The name of the hook.
+        self.name = hook.get('name')
+        #: Events which trigger the hook.
+        self.events = hook.get('events')
+        self._active = hook.get('active')
+        #: Dictionary containing the configuration for the Hook.
+        self.config = hook.get('config')
+        #: Unique id of the hook.
+        self.id = hook.get('id')
 
     def __repr__(self):
-        return '<Hook [{0}]>'.format(self._name)
+        return '<Hook [{0}]>'.format(self.name)
 
     def _update_(self, hook):
-        self._json_data = hook
-        self._api = hook.get('url')
-        self._updated = None
-        if hook.get('updated_at'):
-            self._updated = self._strptime(hook.get('updated_at'))
-        self._created = self._strptime(hook.get('created_at'))
-        self._name = hook.get('name')
-        self._events = hook.get('events')
-        self._active = hook.get('active')
-        self._config = hook.get('config')
-        self._id = hook.get('id')
-
-    @property
-    def config(self):
-        """Dictionary containing the configuration for the Hook."""
-        return self._config
-
-    @property
-    def created_at(self):
-        """datetime object representing the date the hook was created."""
-        return self._created
+        self.__init__(hook, self._session)
 
     @requires_auth
     def delete(self):
@@ -1623,27 +1471,12 @@ class Hook(GitHubCore):
             return True
         return False
 
-    @property
-    def events(self):
-        """Events which trigger the hook."""
-        return self._events
-
-    @property
-    def id(self):
-        """Unique id of the hook."""
-        return self._id
-
     def is_active(self):
         """Checks whether the hook is marked as active on GitHub or not.
 
         :returns: bool
         """
         return self._active
-
-    @property
-    def name(self):
-        """The name of the hook."""
-        return self._name
 
     @requires_auth
     def test(self):
@@ -1653,11 +1486,6 @@ class Hook(GitHubCore):
         """
         return self._boolean(self._post(self._api + '/test'), 204, 404)
 
-    @property
-    def updated_at(self):
-        """datetime object representing when this hook was last updated."""
-        return self._updated
-
 
 class RepoTag(GitHubObject):
     """The :class:`RepoTag <RepoTag>` object. This stores the information
@@ -1666,83 +1494,49 @@ class RepoTag(GitHubObject):
 
     def __init__(self, tag):
         super(RepoTag, self).__init__(tag)
-        self._name = tag.get('name')
-        self._zip = tag.get('zipball_url')
-        self._tar = tag.get('tarball_url')
-        self._commit = tag.get('commit', {})
+        #: Name of the tag.
+        self.name = tag.get('name')
+        #: URL for the GitHub generated zipball associated with the tag.
+        self.zipball_url = tag.get('zipball_url')
+        #: URL for the GitHub generated tarball associated with the tag.
+        self.tarball_url = tag.get('tarball_url')
+        #: Dictionary containing the SHA and URL of the commit.
+        self.commit = tag.get('commit', {})
 
     def __repr__(self):
-        return '<Repository Tag [{0}]>'.format(self._name)
-
-    @property
-    def commit(self):
-        """Dictionary containing the SHA and URL of the commit."""
-        return self._commit
-
-    @property
-    def name(self):
-        """Name of the tag."""
-        return self._name
-
-    @property
-    def tarball_url(self):
-        """URL for the GitHub generated tarball associated with the tag."""
-        return self._tar
-
-    @property
-    def zipball_url(self):
-        """URL for the GitHub generated zipball associated with the tag."""
-        return self._zip
+        return '<Repository Tag [{0}]>'.format(self.name)
 
 
+# TODO(Ian) Come back to this after doing models.py
 class RepoComment(BaseComment):
     """The :class:`RepoComment <RepoComment>` object. This stores the
     information about a comment on a file in a repository.
     """
-
     def __init__(self, comment, session=None):
         super(RepoComment, self).__init__(comment, session)
-        self._update_(comment)
+        #: Commit id on which the comment was made.
+        self.commit_id = comment.get('commit_id')
+        #: URL of the comment on GitHub.
+        self.html_url = comment.get('html_url')
+        #: The line number where the comment is located.
+        self.line = comment.get('line')
+        #: The path to the file where the comment was made.
+        self.path = comment.get('path')
+        #: The position in the diff where the comment was made.
+        self.position = comment.get('position')
+        #: datetime object representing when the comment was updated.
+        self.updated_at = comment.get('updated_at')
+        #: Login of the user who left the comment.
+        self.user = None
+        if comment.get('user'):
+            self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Repository Comment [{0}]>'.format(self._user.login)
+        return '<Repository Comment [{0}]>'.format(self.user.login or '')
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
-        self._cid = comment.get('commit_id')
-        self._html = comment.get('html_url')
-        self._line = comment.get('line')
-        self._path = comment.get('path')
-        self._pos = comment.get('position')
-        self._updated = comment.get('updated_at')
-        self._user = None
-        if comment.get('user'):
-            self._user = User(comment.get('user'), self)
-
-    @property
-    def commit_id(self):
-        """Commit id on which the comment was made."""
-        return self._cid
-
-    @property
-    def html_url(self):
-        """URL of the comment on GitHub."""
-        return self._html
-
-    @property
-    def line(self):
-        """The line number where the comment is located."""
-        return self._line
-
-    @property
-    def path(self):
-        """The path to the file where the comment was made."""
-        return self._path
-
-    @property
-    def position(self):
-        """The position in the diff where the comment was made."""
-        return self._pos
+        self.__init__(comment, self._session)
 
     @requires_auth
     def update(self, body, sha, line, path, position):
@@ -1772,17 +1566,8 @@ class RepoComment(BaseComment):
             return True
         return False
 
-    @property
-    def updated_at(self):
-        """datetime object representing when the comment was updated."""
-        return self._updated
 
-    @property
-    def user(self):
-        """Login of the user who left the comment."""
-        return self._user
-
-
+# TODO(Ian) Come back to this after doing models.py
 class RepoCommit(BaseCommit):
     """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
     viewed by a :class:`Repository`. This is different from a Commit object
@@ -1791,60 +1576,34 @@ class RepoCommit(BaseCommit):
 
     def __init__(self, commit, session=None):
         super(RepoCommit, self).__init__(commit, session)
-        self._author = User(commit.get('author'), self._session)
-        self._committer = User(commit.get('committer'), self._session)
-        self._commit = Commit(commit.get('commit'), self._session)
+        #: :class:`User <github3.users.User>` who authored the commit.
+        self.author = User(commit.get('author'), self._session)
+        #: :class:`User <github3.users.User>` who committed the commit.
+        self.committer = User(commit.get('committer'), self._session)
+        #: :class:`Commit <github3.git.Commit>`.
+        self.commit = Commit(commit.get('commit'), self._session)
 
+        #: The number of additions made in the commit.
+        self.additions = 0
+        #: The number of deletions made in the commit.
+        self.deletions = 0
+        #: Total number of changes in the files.
+        self.total = 0
         if commit.get('stats'):
-            self._addts = commit['stats'].get('additions')
-            self._delts = commit['stats'].get('deletions')
-            self._total = commit['stats'].get('total')
-        else:
-            self._addts = self._delts = self._total = 0
+            self.additions = commit['stats'].get('additions')
+            self.deletions = commit['stats'].get('deletions')
+            self.total = commit['stats'].get('total')
 
-        self._files = []
+        #: The files that were modified by this commit.
+        self.files = []
         if commit.get('files'):
-            append = self._files.append
+            append = self.files.append
             for f in commit.get('files'):
                 append(type('RepoCommit File', (object, ), f))
 
     def __repr__(self):
+        # TODO(Ian) come back to this after models.py
         return '<Repository Commit [{0}]>'.format(self._sha)
-
-    @property
-    def additions(self):
-        """The number of additions made in the commit."""
-        return self._addts
-
-    @property
-    def author(self):
-        """:class:`User <github3.users.User>` who authored the commit."""
-        return self._author
-
-    @property
-    def commit(self):
-        """:class:`Commit <github3.git.Commit>`."""
-        return self._commit
-
-    @property
-    def committer(self):
-        """:class:`User <github3.users.User>` who committed the commit."""
-        return self._committer
-
-    @property
-    def deletions(self):
-        """The number of deletions made in the commit."""
-        return self._delts
-
-    @property
-    def files(self):
-        """The files that were modified by this commit."""
-        return self._files
-
-    @property
-    def total(self):
-        """Total number of changes in the files."""
-        return self._total
 
 
 class Comparison(GitHubObject):
@@ -1855,82 +1614,36 @@ class Comparison(GitHubObject):
     def __init__(self, compare):
         super(Comparison, self).__init__(compare)
         self._api = compare.get('api')
-        self._html = compare.get('html_url')
-        self._perma = compare.get('permalink_url')
-        self._diff = compare.get('diff_url')
-        self._patch = compare.get('patch_url')
-        self._base = RepoCommit(compare.get('base_commit'), None)
-        self._stat = compare.get('status')
-        self._ahead_by = compare.get('ahead_by')
-        self._behind = compare.get('behind_by')
-        self._ttl_commits = compare.get('total_commits')
-        self._commits = [RepoCommit(com, None) for com in
-                compare.get('commits')]
-        self._files = []
+        #: URL to view the comparison at GitHub
+        self.html_url = compare.get('html_url')
+        #: Permanent link to this comparison.
+        self.permalink_url = compare.get('permalink_url')
+        #: URL to see the diff between the two commits.
+        self.diff_url = compare.get('diff_url')
+        #: Patch URL at GitHub for the comparison.
+        self.patch_url = compare.get('patch_url')
+        #: :class:`RepoCommit <RepoCommit>` object representing the base of
+        #  comparison.
+        self.base_commit = RepoCommit(compare.get('base_commit'), None)
+        #: Behind or ahead.
+        self.status = compare.get('status')
+        #: Number of commits ahead by.
+        self.ahead_by = compare.get('ahead_by')
+        #: Number of commits behind by.
+        self.behind_by = compare.get('behind_by')
+        #: Number of commits difference in the comparison.
+        self.total_commits = compare.get('total_commits')
+        #: List of :class:`RepoCommit <RepoCommit>` objects.
+        self.commits = [RepoCommit(com) for com in compare.get('commits')]
+        #: List of objects describing the files modified.
+        self.files = []
         if compare.get('files'):
-            append = self._files.append
+            append = self.files.append
             for f in compare.get('files'):
                 append(type('Comparison File', (object, ), f))
 
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
-
-    @property
-    def ahead_by(self):
-        """Number of commits ahead by."""
-        return self._ahead_by
-
-    @property
-    def base_commit(self):
-        """:class:`RepoCommit <RepoCommit>` object representing the base of
-        comparison.
-        """
-        return self._base
-
-    @property
-    def behind_by(self):
-        """Number of commits behind by."""
-        return self._behind
-
-    @property
-    def commits(self):
-        """List of :class:`RepoCommit <RepoCommit>` objects."""
-        return self._commits
-
-    @property
-    def diff_url(self):
-        """URL to see the diff between the two commits."""
-        return self._diff
-
-    @property
-    def files(self):
-        """List of objects describing the files modified."""
-        return self._files
-
-    @property
-    def html_url(self):
-        """URL to view the comparison at GitHub."""
-        return self._html
-
-    @property
-    def patch_url(self):
-        """Patch URL at GitHub for the comparison."""
-        return self._patch
-
-    @property
-    def permalink_url(self):
-        """Permanent link to this comparison."""
-        return self._perma
-
-    @property
-    def status(self):
-        """Behind or ahead."""
-        return self._stat
-
-    @property
-    def total_commits(self):
-        """Number of commits difference in the comparison."""
-        return self._ttl_commits
 
 
 class Status(GitHubObject):
@@ -1938,54 +1651,22 @@ class Status(GitHubObject):
     the Repo Status API."""
     def __init__(self, status):
         super(Status, self).__init__(status)
-        self._created = self._strptime(status.get('created_at'))
-        self._creator = User(status.get('creator'))
-        self._desc = status.get('description')
-        self._id = status.get('id')
-        self._stat = status.get('state')
-        self._tgt = status.get('target_url')
-        self._updated = None
+        #: datetime object representing the creation of the status object
+        self.created_at = self._strptime(status.get('created_at'))
+        #: :class:`User <github3.users.User>` who created the object
+        self.creator = User(status.get('creator'))
+        #: Short description of the Status
+        self.description = status.get('description')
+        #: GitHub ID for the status object
+        self.id = status.get('id')
+        #: State of the status, e.g., 'success', 'pending', 'failed', 'error'
+        self.state = status.get('state')
+        #: URL to view more information about the status
+        self.target_url = status.get('target_url')
+        #: datetime object representing the last time the status was updated
+        self.updated_at = None
         if status.get('updated_at'):
-            self._updated = self._strptime(status.get('updated_at'))
+            self.updated_at = self._strptime(status.get('updated_at'))
 
     def __repr__(self):
         return '<Status [{s.id}:{s.state}]>'.format(s=self)
-
-    @property
-    def created_at(self):
-        """datetime object representing the creation of the status object"""
-        return self._created
-
-    @property
-    def creator(self):
-        """:class:`User <github3.users.User>` who created the object"""
-        return self._creator
-
-    @property
-    def description(self):
-        """Short description of the Status"""
-        return self._desc
-
-    @property
-    def id(self):
-        """GitHub ID for the status object"""
-        return self._id
-
-    @property
-    def state(self):
-        """State of the status, e.g., 'success', 'pending', 'failed',
-        'error'
-        """
-        return self._stat
-
-    @property
-    def target_url(self):
-        """URL to view more information about the status"""
-        return self._tgt
-
-    @property
-    def updated_at(self):
-        """datetime object representing the last time the status was
-        updated
-        """
-        return self._updated

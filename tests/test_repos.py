@@ -34,8 +34,8 @@ class TestRepository(BaseTest):
     def test_is_collaborator(self):
         expect(self.repo.is_collaborator(self.sigm)).is_True()
 
-    def test_git_clone(self):
-        expect(self.repo.git_clone) != ''
+    def test_git_url(self):
+        expect(self.repo.git_url) != ''
 
     def test_homepage(self):
         expect(self.repo.homepage) != ''
@@ -364,11 +364,11 @@ class TestContents(BaseTest):
     def test_encoding(self):
         self._test_str_(self.contents.encoding)
 
-    def test_git(self):
-        self._test_str_(self.contents.git)
+    def test_git_url(self):
+        self._test_str_(self.contents.git_url)
 
     def test_html(self):
-        self._test_str_(self.contents.html)
+        self._test_str_(self.contents.html_url)
 
     def test_name(self):
         self._test_str_(self.contents.name)
