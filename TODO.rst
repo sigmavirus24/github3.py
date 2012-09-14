@@ -46,6 +46,13 @@ Low priority
 
 (In order of priority)
 
+monkey patching unittest
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+It should be entirely possible to monkey patch unittest so that it loads and 
+then runs the tests asynchronously. There should not be a need to write my own 
+test runner from scratch.
+
 nose2
 ~~~~~
 
