@@ -1,6 +1,6 @@
 import github3
 import re
-from base import expect, BaseTest, str_test
+from base import expect, BaseTest, str_test, expect_str
 from datetime import datetime
 from os import unlink, listdir
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
@@ -16,11 +16,15 @@ class TestRepository(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestRepository, self).__init__(methodName)
         self.repo = self.g.repository(self.sigm, self.todo)
+        if self.auth:
+            self.alt_repo = self._g.repository(self.gh3py, self.test_repo)
+            self.auth_todo = self._g.repository(self.sigm, self.todo)
 
     def test_repository(self):
         expect(self.repo).isinstance(Repository)
-        expect(repr(self.repo)).isinstance(str_test)
+        expect_str(repr(self.repo))
         expect(repr(self.repo)) != ''
+        self.repo.__update__(self.repo.to_json())
 
     def test_clone_url(self):
         expect(self.repo.clone_url).is_not_None()
@@ -296,34 +300,78 @@ class TestRepository(BaseTest):
             repo.update_label('Foo', 'abc123')
             repo.merge('development', 'master', 'Fails')
 
+    def test_create_blob(self):
+        if not self.auth:
+            return
+        content = 'foo bar bogus'
+        sha = self.alt_repo.create_blob(content, 'utf-8')
+        expect_str(sha)
+        blob = self.alt_repo.blob(sha)
+        expect(blob).isinstance(Blob)
+        expect(self.alt_repo.create_blob('', '')) == ''
+
+    def test_create_comment(self):
+        if not self.auth:
+            return
+        sha = '499faa66a0f56235ee55bf295bac2f2f3c3f0a04'
+        body = 'Spelling error: reposity -> repository'
+        path = 'README.md'
+        line = pos = 4
+        comment = self.alt_repo.create_comment(body, sha, path, pos, line)
+        expect(comment).isinstance(RepoComment)
+        comment.delete()
+
+    def test_create_download(self):
+        if not self.auth:
+            return
+        dl = self.alt_repo.create_download('test_dls.py', __file__)
+        expect(dl).isinstance(Download)
+        dl.delete()
+
+    def test_create_fork_org(self):
+        if not self.auth:
+            return
+        r = self.auth_todo.create_fork(self.gh3py)
+        expect(r).isinstance(Repository)
+        r.delete()
+
+    def test_create_fork(self):
+        if not self.auth:
+            return
+        repo = self._g.repository(self.gh3py, 'fork_this')
+        r = repo.create_fork()
+        expect(r).isinstance(Repository)
+        r.delete()
+
     def test_with_auth(self):
-        if self.auth:
-            repo = self._g.repository(self.sigm, self.todo)
-            # Try somethings only I can test
-            try:
-                expect(repo.hook(74859)).isinstance(Hook)
-            except github3.GitHubError:
-                pass
-            try:
-                expect(repo.key(3069618)).isinstance(Key)
-            except github3.GitHubError:
-                pass
-            try:
-                expect(repo.pubsubhubbub(
-                    'subscribe',
-                    'https://github.com/sigmavirus24/github3.py/events',
-                    'https://httpbin.org/post'
-                    )).is_False()
-            except github3.GitHubError:
-                pass
-            try:
-                expect(repo.add_collaborator('jcordasc')).is_True()
-            except github3.GitHubError:
-                pass
-            try:
-                expect(repo.remove_collaborator('jcordasc')).is_True()
-            except github3.GitHubError:
-                pass
+        if not self.auth:
+            return
+        repo = self.auth_todo
+        # Try somethings only I can test
+        try:
+            expect(repo.hook(74859)).isinstance(Hook)
+        except github3.GitHubError:
+            pass
+        try:
+            expect(repo.key(3069618)).isinstance(Key)
+        except github3.GitHubError:
+            pass
+        try:
+            expect(repo.pubsubhubbub(
+                'subscribe',
+                'https://github.com/sigmavirus24/github3.py/events',
+                'https://httpbin.org/post'
+                )).is_False()
+        except github3.GitHubError:
+            pass
+        try:
+            expect(repo.add_collaborator('jcordasc')).is_True()
+        except github3.GitHubError:
+            pass
+        try:
+            expect(repo.remove_collaborator('jcordasc')).is_True()
+        except github3.GitHubError:
+            pass
 
 
 class TestBranch(BaseTest):
@@ -351,7 +399,7 @@ class TestContents(BaseTest):
     def _test_str_(self, val):
         expect(val).is_not_None()
         expect(val) > ''
-        expect(val).isinstance(str_test)
+        expect_str(val)
 
     def test_content(self):
         expect(len(self.contents.content)) > 0
@@ -488,25 +536,25 @@ class TestRepoTag(BaseTest):
         expect(self.tag.commit).isinstance(dict)
 
     def test_name(self):
-        expect(self.tag.name).isinstance(str_test)
+        expect_str(self.tag.name)
 
     def test_tarball_url(self):
-        expect(self.tag.tarball_url).isinstance(str_test)
+        expect_str(self.tag.tarball_url)
 
     def test_zipball_url(self):
-        expect(self.tag.zipball_url).isinstance(str_test)
+        expect_str(self.tag.zipball_url)
 
 
 def __test_files__(fd, sha):
     expect(fd.additions) >= 0
     expect(fd.deletions) >= 0
     expect(fd.changes) == fd.additions + fd.deletions
-    expect(fd.filename).isinstance(str_test)
-    expect(fd.blob_url).isinstance(str_test)
-    expect(fd.raw_url).isinstance(str_test)
-    expect(fd.sha).isinstance(str_test)
-    expect(fd.status).isinstance(str_test)
-    expect(fd.patch).isinstance(str_test)
+    expect_str(fd.filename)
+    expect_str(fd.blob_url)
+    expect_str(fd.raw_url)
+    expect_str(fd.sha)
+    expect_str(fd.status)
+    expect_str(fd.patch)
 
 
 class TestRepoCommit(BaseTest):
@@ -564,7 +612,7 @@ class TestComparison(BaseTest):
         self.expect_list_of_class(self.comp.commits, RepoCommit)
 
     def test_diff_url(self):
-        expect(self.comp.diff_url).isinstance(str_test)
+        expect_str(self.comp.diff_url)
 
     def test_files(self):
         expect(self.comp.files).isinstance(list)
@@ -574,13 +622,13 @@ class TestComparison(BaseTest):
             __test_files__(file, '')
 
     def test_html_url(self):
-        expect(self.comp.html_url).isinstance(str_test)
+        expect_str(self.comp.html_url)
 
     def test_patch_url(self):
-        expect(self.comp.patch_url).isinstance(str_test)
+        expect_str(self.comp.patch_url)
 
     def test_permalink_url(self):
-        expect(self.comp.permalink_url).isinstance(str_test)
+        expect_str(self.comp.permalink_url)
 
     def test_status(self):
         expect(self.comp.status) == 'ahead'
@@ -600,7 +648,7 @@ class TestStatus(BaseTest):
 
     def test_status(self):
         expect(self.status).isinstance(Status)
-        expect(repr(self.status)).isinstance(str_test)
+        expect_str(repr(self.status))
         expect(repr(self.status)) != ''
 
     def test_created_at(self):
@@ -611,18 +659,18 @@ class TestStatus(BaseTest):
         expect(self.status.creator.login) == self.sigm
 
     def test_description(self):
-        expect(self.status.description).isinstance(str_test)
+        expect_str(self.status.description)
         expect(self.status.description) == 'Testing github3.py'
 
     def test_id(self):
         expect(self.status.id) == 259373
 
     def test_state(self):
-        expect(self.status.state).isinstance(str_test)
+        expect_str(self.status.state)
         expect(self.status.state) == 'success'
 
     def test_target_url(self):
-        expect(self.status.target_url).isinstance(str_test)
+        expect_str(self.status.target_url)
         expect(self.status.target_url) == ('https://github.com/sigmavirus24/'
             'github3.py')
 
