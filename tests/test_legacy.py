@@ -6,9 +6,12 @@ from github3.legacy import LegacyIssue, LegacyRepo, LegacyUser
 class TestLegacyIssue(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestLegacyIssue, self).__init__(methodName)
-        issues = self.g.search_issues(self.sigm, self.todo, 'closed',
-                'iter_todos')
-        self.issue = issues[0]
+        issues = self.g.search_issues(self.sigm, 'requests', 'closed',
+                'Order of Operations')
+        for i in issues:
+            if i.title == 'Order of Operations':
+                self.issue = i
+                break
 
     def test_legacy_issue(self):
         expect(self.issue).isinstance(LegacyIssue)
@@ -31,14 +34,14 @@ class TestLegacyIssue(BaseTest):
 
     def test_html_url(self):
         expect(self.issue.html_url).isinstance(str_test)
-        expect(self.issue.html_url) == ('https://github.com/sigmavirus24/'
-                'Todo.txt-python/issues/1')
+        expect(self.issue.html_url) == ('https://github.com/kennethreitz/'
+                'requests/issues/795')
 
     def test_labels(self):
-        expect(self.issue.labels) == ['Enhancement']
+        expect(self.issue.labels) == []
 
     def test_number(self):
-        expect(self.issue.number) == 1
+        expect(self.issue.number) == 795
 
     def test_position(self):
         expect(self.issue.position) == 1.0
@@ -49,7 +52,7 @@ class TestLegacyIssue(BaseTest):
 
     def test_title(self):
         expect(self.issue.title).isinstance(str_test)
-        expect(self.issue.title) == 'Change get_todos()?'
+        expect(self.issue.title) == 'Order of Operations'
 
     def test_updated_at(self):
         expect(self.issue.updated_at).isinstance(datetime)

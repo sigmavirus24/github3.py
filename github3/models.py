@@ -283,7 +283,7 @@ class GitHubError(Exception):
         return '<Error [{0}]>'.format(self.message or self.code)
 
     def __str__(self):
-        if not self._errors:
+        if not self.errors:
             return '{0} {1}'.format(self.code, self.message)
         else:
             return '{0} {1}: {2}'.format(self.code, self.message,

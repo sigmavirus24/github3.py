@@ -16,6 +16,7 @@ class TestRepository(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestRepository, self).__init__(methodName)
         self.repo = self.g.repository(self.sigm, self.todo)
+        self.requests_repo = self.g.repository(self.kr, 'requests')
         if self.auth:
             self.alt_repo = self._g.repository(self.gh3py, self.test_repo)
             self.auth_todo = self._g.repository(self.sigm, self.todo)
@@ -107,7 +108,7 @@ class TestRepository(BaseTest):
         expect(commit).isinstance(RepoCommit)
 
     def test_commit_comment(self):
-        comment = self.repo.commit_comment('766400')
+        comment = self.repo.commit_comment('1859766')
         expect(comment).isinstance(RepoComment)
 
     def test_compare_commits(self):
@@ -179,7 +180,7 @@ class TestRepository(BaseTest):
 
     def test_list_comments_on_commit(self):
         comments = self.repo.list_comments_on_commit(
-                '38c76375ae1a766b44c729b4b2ff0363312b6d13')
+                '04d55444a3ec06ca8d2aa0a5e333cdaf27113254')
         self.expect_list_of_class(comments, RepoComment)
         for c in comments:
             if c.user.login in ('sigmavirus24', 'jvstein'):
@@ -258,7 +259,7 @@ class TestRepository(BaseTest):
             )).isinstance(Tree)
 
     def test_requires_auth(self):
-        repo = self.repo
+        repo = self.requests_repo
         with expect.raises(github3.GitHubError):
             # It's going to fail anyway by default so the username is
             # unimportant
@@ -343,33 +344,45 @@ class TestRepository(BaseTest):
         expect(r).isinstance(Repository)
         r.delete()
 
-    def test_with_auth(self):
+    # Try somethings only I should be able to do hence the try/except blocks
+    def test_pubsubhubub(self):
         if not self.auth:
             return
-        repo = self.auth_todo
-        # Try somethings only I can test
         try:
-            expect(repo.hook(74859)).isinstance(Hook)
-        except github3.GitHubError:
-            pass
-        try:
-            expect(repo.key(3069618)).isinstance(Key)
-        except github3.GitHubError:
-            pass
-        try:
-            expect(repo.pubsubhubbub(
-                'subscribe',
+            expect(self.auth_todo.pubsubhubbub('subscribe',
                 'https://github.com/sigmavirus24/github3.py/events',
                 'https://httpbin.org/post'
                 )).is_False()
         except github3.GitHubError:
             pass
+
+    def test_hook(self):
+        if not self.auth:
+            return
         try:
-            expect(repo.add_collaborator('jcordasc')).is_True()
+            expect(self.auth_todo.hook(423134)).isinstance(Hook)
+        except github3.GitHubError:
+            pass
+
+    def test_deploy_key(self):
+        if not self.auth:
+            return
+        try:
+            expect(self.auth_todo.key(3195385)).isinstance(Key)
+        except github3.GitHubError:
+            pass
+
+    def test_add_remove_collab(self):
+        if not self.auth:
+            return
+        repo = self.auth_todo
+        # Try somethings only I can test
+        try:
+            expect(repo.add_collaborator('gh3test')).is_True()
         except github3.GitHubError:
             pass
         try:
-            expect(repo.remove_collaborator('jcordasc')).is_True()
+            expect(repo.remove_collaborator('gh3test')).is_True()
         except github3.GitHubError:
             pass
 
