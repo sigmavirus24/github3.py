@@ -17,7 +17,10 @@ class TestUser(base.BaseTest):
         expect(self.user.disk_usage) >= 0
 
     def test_for_hire(self):
-        expect(self.user.for_hire).isinstance(bool)
+        expect(self.user.for_hire).raises(DeprecationWarning)
+
+    def test_hireable(self):
+        expect(self.user.hireable).isinstance(bool)
 
     def test_is_assignee_on(self):
         expect(self.user.is_assignee_on(self.sigm, self.todo)).is_True()
@@ -38,8 +41,11 @@ class TestUser(base.BaseTest):
     def test_owned_private_repos(self):
         expect(self.user.owned_private_repos) >= 0
 
+    def test_total_private_gists(self):
+        expect(self.user.total_private_gists) >= 0
+
     def test_private_gists(self):
-        expect(self.user.private_gists) >= 0
+        expect(self.user.private_gists).raises(DeprecationWarning)
 
     def test_plan(self):
         if self.user.plan:
@@ -76,7 +82,7 @@ class TestUser(base.BaseTest):
         except github3.GitHubError:
             pass
         expect(user.update(user.name, user.email, user.blog, user.company,
-            user.location, user.for_hire, user.bio)).isinstance(bool)
+            user.location, user.hireable, user.bio)).isinstance(bool)
 
 
 class TestKey(base.BaseTest):

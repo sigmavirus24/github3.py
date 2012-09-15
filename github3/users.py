@@ -10,42 +10,31 @@ from json import dumps
 from github3.events import Event
 from github3.models import GitHubObject, GitHubCore, BaseAccount
 from github3.decorators import requires_auth
+import warnings
 
 
 class Key(GitHubCore):
     """The :class:`Key <Key>` object."""
     def __init__(self, key, session=None):
         super(Key, self).__init__(key, session)
-        self._update_(key)
+        self._api = key.get('url')
+        #: The text of the actual key
+        self.key = key.get('key')
+        #: The unique id of the key at GitHub
+        self.id = key.get('id')
+        #: The title the user gave to the key
+        self.title = key.get('title')
 
     def __repr__(self):
-        return '<User Key [{0}]>'.format(self._title)
+        return '<User Key [{0}]>'.format(self.title)
 
     def _update_(self, key):
-        self._json_data = key
-        self._api = key.get('url')
-        self._id = key.get('id')
-        self._title = key.get('title')
-        self._key = key.get('key')
+        self.__init__(key, self._session)
 
+    @requires_auth
     def delete(self):
         """Delete this Key"""
         return self._boolean(self._delete(self._api), 204, 404)
-
-    @property
-    def key(self):
-        """The text of the actual key"""
-        return self._key
-
-    @property
-    def id(self):
-        """The unique id of the key at GitHub"""
-        return self._id
-
-    @property
-    def title(self):
-        """The title the user gave to the key"""
-        return self._title
 
     @requires_auth
     def update(self, title, key):
@@ -58,9 +47,9 @@ class Key(GitHubCore):
         :returns: bool
         """
         if not title:
-            title = self._title
+            title = self.title
         if not key:
-            key = self._key
+            key = self.key
 
         data = dumps({'title': title, 'key': key})
         json = self._json(self._patch(self._api, data=data), 200)
@@ -77,40 +66,24 @@ class Plan(GitHubObject):
     """
     def __init__(self, plan):
         super(Plan, self).__init__(plan)
-        self._collab = plan.get('collaborators')
-        self._name = plan.get('name')
-        self._private = plan.get('private_repos')
-        self._space = plan.get('space')
+        #: Number of collaborators
+        self.collaborators = plan.get('collaborators')
+        #: Name of the plan
+        self.name = plan.get('name')
+        #: Number of private repos
+        self.private_repos = plan.get('private_repos')
+        #: Space allowed
+        self.space = plan.get('space')
 
     def __repr__(self):
-        return '<Plan [{0}]>'.format(self._name)
-
-    @property
-    def collaborators(self):
-        """Number of collaborators"""
-        return self._collab
+        return '<Plan [{0}]>'.format(self.name)
 
     def is_free(self):
         """Checks if this is a free plan.
 
         :returns: bool
         """
-        return self._name == 'free'
-
-    @property
-    def name(self):
-        """Name of the plan"""
-        return self._name
-
-    @property
-    def private_repos(self):
-        """Number of private repos"""
-        return self._private
-
-    @property
-    def space(self):
-        """Space allowed"""
-        return self._space
+        return self.name == 'free'
 
 
 _large = Plan({'name': 'large', 'private_repos': 50,
@@ -134,22 +107,40 @@ class User(BaseAccount):
     """
     def __init__(self, user, session=None):
         super(User, self).__init__(user, session)
-        self._update_(user)
-        if not self._type:
-            self._type = 'User'
+        if not self.type:
+            self.type = 'User'
+
+        #: ID of the user's image on Gravatar
+        self.gravatar_id = user.get('gravatar_id', '')
+        #: True -- for hire, False -- not for hire
+        self.hireable = user.get('hireable', False)
+
+        ## The number of public_gists
+        #: Number of public gists
+        self.public_gists = user.get('public_gists', 0)
+
+        # Private information
+        #: How much disk consumed by the user
+        self.disk_usage = user.get('disk_usage', 0)
+
+        #: Number of private repos owned by this user
+        self.owned_private_repos = user.get('owned_private_repos', 0)
+        #: Number of private gists owned by this user
+        self.total_private_gists = user.get('total_private_gists', 0)
+        #: Total number of private repos
+        self.total_private_repos = user.get('total_private_repos', 0)
+
+        #: Which plan this user is on
+        self.plan = None
+        if user.get('plan'):
+            self.plan = plans[user['plan']['name'].lower()]
+            self.plan.space = user['plan']['space']
 
     def __repr__(self):
-        return '<User [{0}:{1}]>'.format(self._login, self._name)
+        return '<User [{0}:{1}]>'.format(self.login, self.name)
 
     def _update_(self, user):
-        # Private information
-        super(User, self)._update_(user)
-        if user.get('plan'):
-            _plan = user.get('plan')
-            self._plan = plans[_plan['name'].lower()]
-            self._plan._space = _plan['space']
-        else:
-            self._plan = None
+        self.__init__(user, self._session)
 
     @requires_auth
     def add_email_address(self, address):
@@ -199,14 +190,9 @@ class User(BaseAccount):
                 204, 404)
 
     @property
-    def disk_usage(self):
-        """How much disk consumed by the user"""
-        return self._disk
-
-    @property
     def for_hire(self):
-        """True -- for hire, False -- not for hire"""
-        return self._hire
+        """DEPRECATED: Use hireable instead"""
+        warnings.warn('Use hireable instead', DeprecationWarning)
 
     def is_assignee_on(self, login, repository):
         """Checks if this user can be assigned to issues on login/repository.
@@ -285,31 +271,12 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
-
-    @property
-    def owned_private_repos(self):
-        """Number of private repos owned by this user"""
         return self._owned_private_repos
 
     @property
     def private_gists(self):
-        """Number of private gists owned by this user"""
-        return self._private_gists
-
-    @property
-    def plan(self):
-        """Which plan this user is on"""
-        return self._plan
-
-    @property
-    def public_gists(self):
-        """Number of public gists"""
-        return self._public_gists
-
-    @property
-    def total_private_repos(self):
-        """Total number of private repos"""
-        return self._private_repos
+        """DEPRECATED: Use total_private_gists"""
+        warnings.warn('Use total_private_gists', DeprecationWarning)
 
     @requires_auth
     def update(self, name=None, email=None, blog=None, company=None,

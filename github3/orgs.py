@@ -143,17 +143,18 @@ class Team(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
 
-# TODO(Ian) come back to this after finishing models
 class Organization(BaseAccount):
     """The :class:`Organization <Organization>` object."""
     def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
-        self._update_(org)
-        if not self._type:
-            self._type = 'Organization'
+        if not self.type:
+            self.type = 'Organization'
+
+        #: Number of private repositories.
+        self.private_repos = org.get('private_repos', 0)
 
     def __repr__(self):
-        return '<Organization [{0}:{1}]>'.format(self._login, self._name)
+        return '<Organization [{0}:{1}]>'.format(self.login, self.name)
 
     def _list_members(self, tail):
         """List members of this organization."""
@@ -369,11 +370,6 @@ class Organization(BaseAccount):
         url = self._build_url('teams', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Team(team, self) for team in json]
-
-    @property
-    def private_repos(self):
-        """Number of private repositories."""
-        return self._private_repos
 
     @requires_auth
     def publicize_member(self, login):

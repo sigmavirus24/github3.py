@@ -190,27 +190,15 @@ class BaseCommit(GitHubCore):
     def __init__(self, commit, session):
         super(BaseCommit, self).__init__(commit, session)
         self._api = commit.get('url')
-        self._sha = commit.get('sha')
-        self._msg = commit.get('message')
-        self._parents = commit.get('parents', [])
-        if not self._sha:
+        #: SHA of this commit.
+        self.sha = commit.get('sha')
+        #: Commit message
+        self.message = commit.get('message')
+        #: List of parents to this commit.
+        self.parents = commit.get('parents', [])
+        if not self.sha:
             i = self._api.rfind('/')
-            self._sha = self._api[i + 1:]
-
-    @property
-    def message(self):
-        """Commit message"""
-        return self._msg
-
-    @property
-    def parents(self):
-        """List of parents to this commit."""
-        return self._parents
-
-    @property
-    def sha(self):
-        """SHA of this commit."""
-        return self._sha
+            self.sha = self._api[i + 1:]
 
 
 class BaseAccount(GitHubCore):
@@ -220,168 +208,83 @@ class BaseAccount(GitHubCore):
     """
     def __init__(self, acct, session):
         super(BaseAccount, self).__init__(acct, session)
-        self._update_(acct)
-
-    def __repr__(self):
-        return '<BaseAccount [%s:%s]>' % (self._login, self._name)
-
-    def _update_(self, acct):
-        # Public information
-        ## e.g. https://api.github.com/users/self._login
-        self._json_data = acct
-        self._type = None
+        #: Tells you what type of account this is
+        self.type = None
         if acct.get('type'):
-            self._type = acct.get('type')
+            self.type = acct.get('type')
         self._api = acct.get('url', '')
 
-        self._avatar = acct.get('avatar_url', '')
-        self._blog = acct.get('blog', '')
-        self._company = acct.get('company', '')
+        #: URL of the avatar at gravatar
+        self.avatar_url = acct.get('avatar_url', '')
+        #: URL of the blog
+        self.blog = acct.get('blog', '')
+        #: Name of the company
+        self.company = acct.get('company', '')
 
-        self._created = None
+        #: datetime object representing the date the account was created
+        self.created_at = None
         if acct.get('created_at'):
-            self._created = self._strptime(acct.get('created_at'))
-        self._email = acct.get('email')
+            self.created_at = self._strptime(acct.get('created_at'))
+
+        #: E-mail address of the user/org
+        self.email = acct.get('email')
 
         ## The number of people following this acct
-        self._followers = acct.get('followers', 0)
+        #: Number of followers
+        self.followers = acct.get('followers', 0)
 
         ## The number of people this acct follows
-        self._following = acct.get('following', 0)
+        #: Number of people the user is following
+        self.following = acct.get('following', 0)
 
-        self._id = acct.get('id', 0)
-        self._location = acct.get('location', '')
-        self._login = acct.get('login', '')
+        #: Unique ID of the account
+        self.id = acct.get('id', 0)
+        #: Location of the user/org
+        self.location = acct.get('location', '')
+        #: login name of the user/org
+        self.login = acct.get('login', '')
 
         ## e.g. first_name last_name
-        self._name = acct.get('name', '')
+        #: Real name of the user/org
+        self.name = acct.get('name', '')
 
         ## The number of public_repos
-        self._public_repos = acct.get('public_repos', 0)
+        #: Number of public repos owned by the user/org
+        self.public_repos = acct.get('public_repos', 0)
 
         ## e.g. https://github.com/self._login
-        self._url = acct.get('html_url', '')
+        #: URL of the user/org's profile
+        self.html_url = acct.get('html_url', '')
 
-        ## The number of private repos
-        if self._type == 'Organization':
-            self._private_repos = acct.get('private_repos', 0)
+        #: Markdown formatted biography
+        self.bio = acct.get('bio')
 
-        self._bio = acct.get('bio')
-        if self._type == 'User':
+    def __repr__(self):
+        return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
 
-            ## The number of people this acct folows
-            self._grav_id = acct.get('gravatar_id', '')
-            self._hire = acct.get('hireable', False)
-
-            ## The number of public_gists
-            self._public_gists = acct.get('public_gists', 0)
-
-            # Private information
-            self._disk = acct.get('disk_usage', 0)
-
-            self._owned_private_repos = acct.get('owned_private_repos', 0)
-            self._private_gists = acct.get('total_private_gists', 0)
-            self._private_repos = acct.get('total_private_repos', 0)
-
-    @property
-    def avatar_url(self):
-        """URL of the avatar at gravatar"""
-        return self._avatar
-
-    @property
-    def bio(self):
-        """Markdown formatted biography"""
-        return self._bio
-
-    @property
-    def blog(self):
-        """URL of the blog"""
-        return self._blog
-
-    @property
-    def company(self):
-        """Name of the company"""
-        return self._company
-
-    @property
-    def created_at(self):
-        """datetime object representing the date the account was created"""
-        return self._created
-
-    @property
-    def email(self):
-        """E-mail address of the user/org"""
-        return self._email
-
-    @property
-    def followers(self):
-        """Number of followers"""
-        return self._followers
-
-    @property
-    def following(self):
-        """Number of people the user is following"""
-        return self._following
-
-    @property
-    def html_url(self):
-        """URL of the user/org's profile"""
-        return self._url
-
-    @property
-    def id(self):
-        """Unique ID of the user/org"""
-        return self._id
-
-    @property
-    def location(self):
-        """Location of the user/org"""
-        return self._location
-
-    @property
-    def login(self):
-        """login name of the user/org"""
-        return self._login
-
-    @property
-    def name(self):
-        """Real name of the user/org"""
-        return self._name
-
-    @property
-    def public_repos(self):
-        """Number of public repos owned by the user/org"""
-        return self._public_repos
+    def _update_(self, acct):
+        self.__init__(acct, self._session)
 
 
 class GitHubError(Exception):
     def __init__(self, resp):
         super(GitHubError, self).__init__()
-        self._code = resp.status_code
+        #: Response code that triggered the error
+        self.code = resp.status_code
         error = resp.json
-        self._message = error.get('message')
-        self._errors = []
+        #: Message associated with the error
+        self.message = error.get('message')
+        #: List of errors provided by GitHub
+        self.errors = []
         if error.get('errors'):
-            self._errors = error.get('errors')
+            self.errors = error.get('errors')
 
     def __repr__(self):
-        return '<Error [{0}]>'.format(self._message or self._code)
+        return '<Error [{0}]>'.format(self.message or self.code)
 
     def __str__(self):
         if not self._errors:
-            return '{0} {1}'.format(self._code, self._message)
+            return '{0} {1}'.format(self.code, self.message)
         else:
-            return '{0} {1}: {2}'.format(self._code, self._message,
-                ', '.join(self._errors))
-
-    @property
-    def code(self):
-        return self._code
-
-    @property
-    def errors(self):
-        return self._errors
-
-    @property
-    def message(self):
-        return self._message
+            return '{0} {1}: {2}'.format(self.code, self.message,
+                ', '.join(self.errors))
