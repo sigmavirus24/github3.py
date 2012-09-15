@@ -122,7 +122,7 @@ class TestRepository(BaseTest):
         expect(contents).isinstance(Contents)
 
     def test_download(self):
-        download = self.repo.download(248618)
+        download = self.alt_repo.download(310737)
         expect(download).isinstance(Download)
 
     def test_git_commit(self):
@@ -450,8 +450,8 @@ class TestContents(BaseTest):
 class TestDownload(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestDownload, self).__init__(methodName)
-        repo = self.g.repository(self.sigm, self.todo)
-        self.dl = repo.download(248618)
+        repo = self.g.repository(self.gh3py, self.test_repo)
+        self.dl = repo.download(310737)
 
     def test_content_type(self):
         expect(self.dl.content_type) == 'application/zip'
