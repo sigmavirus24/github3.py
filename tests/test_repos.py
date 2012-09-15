@@ -488,7 +488,7 @@ class TestHook(BaseTest):
         super(TestHook, self).__init__(methodName)
         if self.auth:
             repo = self._g.repository(self.sigm, self.todo)
-            self.hook = repo.hook(74859)
+            self.hook = repo.hook(423134)
         else:
             json = {
                 'name': 'twitter',
