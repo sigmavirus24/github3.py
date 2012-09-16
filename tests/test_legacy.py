@@ -52,7 +52,7 @@ class TestLegacyIssue(BaseTest):
 
     def test_title(self):
         expect(self.issue.title).isinstance(str_test)
-        expect(self.issue.title) == 'Order of Operations'
+        expect(self.issue.title) == 'Order of operations'
 
     def test_updated_at(self):
         expect(self.issue.updated_at).isinstance(datetime)
@@ -89,7 +89,7 @@ class TestLegacyRepo(BaseTest):
         expect(self.repo.description).isinstance(str_test)
         expect(self.repo.description) != ''
         expect(self.repo.description) == ("Python port of Gina "
-                "Trapani's popular todo.txt-cli project.")
+                "Trapani's popular todo.txt-cli project")
 
     def test_followers(self):
         expect(self.repo.followers) >= 0

@@ -36,7 +36,7 @@ class TestIssue(BaseTest):
         expect(self.issue.closed_at).isinstance(datetime)
 
     def test_comment(self):
-        expect(self.issue.comment(2965299)).isinstance(IssueComment)
+        expect(self.issue.comment(770775)).isinstance(IssueComment)
 
     def test_html_url(self):
         expect(self.issue.html_url).isinstance(str_test)

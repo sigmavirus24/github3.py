@@ -82,7 +82,7 @@ class TestRepository(BaseTest):
         expect(self.repo.updated_at).isinstance(datetime)
 
     def test_watchers(self):
-        expect(self.repo.watchers) >= 1
+        expect(self.requests_repo.watchers) >= 1
 
     # Methods
     def test_archive(self):
@@ -171,7 +171,7 @@ class TestRepository(BaseTest):
         self.fail('No branch named master')
 
     def test_list_comments(self):
-        comments = self.repo.list_comments()
+        comments = self.requests_repo.list_comments()
         self.expect_list_of_class(comments, RepoComment)
         for c in comments:
             if c.user.login == self.kr:
