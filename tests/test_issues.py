@@ -8,7 +8,7 @@ from github3.issues import Issue, IssueComment, IssueEvent, Label, Milestone
 class TestIssue(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestIssue, self).__init__(methodName)
-        self.issue = self.g.issue(self.sigm, self.todo, 2)
+        self.issue = self.g.issue(self.kr, 'requests', 2)
 
     def test_issue(self):
         expect(self.issue).isinstance(Issue)
@@ -108,7 +108,7 @@ class TestIssue(BaseTest):
 class TestLabel(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestLabel, self).__init__(methodName)
-        issue = self.g.issue(self.sigm, self.todo, '6')
+        issue = self.g.issue(self.kr, 'requests', '6')
         self.label = issue.labels[0]
 
     def test_label(self):
@@ -120,7 +120,7 @@ class TestLabel(BaseTest):
             self.label.update('foo', 'abc123')
 
     def test_name(self):
-        expect(self.label.name) == 'Enhancement'
+        expect(self.label.name) == 'Feature Request'
 
     def test_color(self):
         expect(self.label.color) != ''
@@ -140,7 +140,7 @@ class TestLabel(BaseTest):
 class TestMilestone(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestMilestone, self).__init__(methodName)
-        issue = self.g.issue(self.sigm, self.todo, '6')
+        issue = self.g.issue(self.kr, 'requests', '179')
         self.milestone = issue.milestone
 
     def test_milestone(self):
@@ -152,7 +152,7 @@ class TestMilestone(BaseTest):
             self.milestone.update('New title', 'closed')
 
     def test_closed_issues(self):
-        expect(self.milestone.closed_issues) == 5
+        expect(self.milestone.closed_issues) >= 6
 
     def test_created_at(self):
         expect(self.milestone.created_at).isinstance(datetime)
@@ -161,7 +161,7 @@ class TestMilestone(BaseTest):
         expect(self.milestone.creator).isinstance(User)
 
     def test_description(self):
-        expect(self.milestone.description) == 'Next stable release'
+        expect(self.milestone.description) == 'Way out there.'
 
     def test_due_on(self):
         if self.milestone.due_on:
@@ -174,13 +174,13 @@ class TestMilestone(BaseTest):
         expect(self.milestone.number) > 0
 
     def test_open_issues(self):
-        expect(self.milestone.open_issues) == 0
+        expect(self.milestone.open_issues) >= 0
 
     def test_state(self):
-        expect(self.milestone.state) == 'closed'
+        expect(self.milestone.state in ('closed', 'open')).is_True()
 
     def test_title(self):
-        expect(self.milestone.title) == '0.2'
+        expect(self.milestone.title) == 'v1.0.0'
 
     def test_with_auth(self):
         if not self.auth:
@@ -196,7 +196,7 @@ class TestMilestone(BaseTest):
 class TestIssueComment(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestIssueComment, self).__init__(methodName)
-        issue = self.g.issue(self.sigm, self.todo, '2')
+        issue = self.g.issue(self.kr, 'requests', '179')
         self.comment = issue.list_comments()[0]
 
     def test_comment(self):
@@ -242,7 +242,7 @@ class TestIssueComment(BaseTest):
 class TestIssueEvent(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestIssueEvent, self).__init__(methodName)
-        issue = self.g.issue(self.sigm, self.todo, 2)
+        issue = self.g.issue(self.kr, 'requests', 179)
         self.ev = issue.list_events()[0]
 
     def test_issueevent(self):
