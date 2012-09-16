@@ -3,6 +3,7 @@ import github3
 from base import expect
 from github3.users import User, Plan, Key
 from github3.events import Event
+from warnings import catch_warnings, simplefilter
 
 
 class TestUser(base.BaseTest):
@@ -17,7 +18,9 @@ class TestUser(base.BaseTest):
         expect(self.user.disk_usage) >= 0
 
     def test_for_hire(self):
-        expect(self.user.for_hire).raises(DeprecationWarning)
+        with catch_warnings():
+            simplefilter('ignore')
+            self.user.for_hire
 
     def test_hireable(self):
         expect(self.user.hireable).isinstance(bool)
@@ -45,7 +48,9 @@ class TestUser(base.BaseTest):
         expect(self.user.total_private_gists) >= 0
 
     def test_private_gists(self):
-        expect(self.user.private_gists).raises(DeprecationWarning)
+        with catch_warnings():
+            simplefilter('ignore')
+            self.user.private_gists
 
     def test_plan(self):
         if self.user.plan:

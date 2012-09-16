@@ -6,7 +6,7 @@ from github3.legacy import LegacyIssue, LegacyRepo, LegacyUser
 class TestLegacyIssue(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestLegacyIssue, self).__init__(methodName)
-        issues = self.g.search_issues(self.sigm, 'requests', 'closed',
+        issues = self.g.search_issues(self.kr, 'requests', 'closed',
                 'Order of Operations')
         for i in issues:
             if i.title == 'Order of Operations':

@@ -25,7 +25,7 @@ class TestAPI(base.BaseTest):
             self.todo, state='closed'), github3.issues.Issue)
 
     def test_issue(self):
-        expect(github3.issue(self.sigm, self.todo, 1))
+        expect(github3.issue(self.gh3py, self.test_repo, 1))
 
     def test_list_events(self):
         self.expect_list_of_class(github3.list_events(), github3.events.Event)
@@ -65,7 +65,7 @@ class TestAPI(base.BaseTest):
 
     def test_search_issues(self):
         self.expect_list_of_class(github3.search_issues(
-            self.sigm, self.todo, 'closed', 'addons'
+            self.kr, 'requests', 'closed', 'Order of Operations'
             ), github3.legacy.LegacyIssue)
 
     def test_search_users(self):

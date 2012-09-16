@@ -363,7 +363,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
-            resp = self._post(url, dumps({'org': organization}))
+            resp = self._post(url, params={'org': organization})
         else:
             resp = self._post(url)
         json = self._json(resp, 202)
