@@ -360,7 +360,7 @@ class TestRepository(BaseTest):
         if not self.auth:
             return
         try:
-            expect(self.auth_todo.hook(423134)).isinstance(Hook)
+            expect(self.auth_todo.hook(424033)).isinstance(Hook)
         except github3.GitHubError:
             pass
 
@@ -368,7 +368,7 @@ class TestRepository(BaseTest):
         if not self.auth:
             return
         try:
-            expect(self.auth_todo.key(3195385)).isinstance(Key)
+            expect(self.auth_todo.key(3199081)).isinstance(Key)
         except github3.GitHubError:
             pass
 
@@ -488,7 +488,7 @@ class TestHook(BaseTest):
         super(TestHook, self).__init__(methodName)
         if self.auth:
             repo = self._g.repository(self.sigm, self.todo)
-            self.hook = repo.hook(423134)
+            self.hook = repo.hook(424033)
         else:
             json = {
                 'name': 'twitter',
