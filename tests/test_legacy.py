@@ -9,7 +9,7 @@ class TestLegacyIssue(BaseTest):
         issues = self.g.search_issues(self.kr, 'requests', 'closed',
                 'Order of Operations')
         for i in issues:
-            if i.title == 'Order of Operations':
+            if i.title == 'Order of operations':
                 self.issue = i
                 break
 
@@ -87,8 +87,9 @@ class TestLegacyRepo(BaseTest):
 
     def test_description(self):
         expect(self.repo.description).isinstance(str_test)
-        expect(self.repo.description) == ("Python version of Gina "
-                "Trapani's popular bash script.")
+        expect(self.repo.description) != ''
+        expect(self.repo.description) == ("Python port of Gina "
+                "Trapani's popular todo.txt-cli project.")
 
     def test_followers(self):
         expect(self.repo.followers) >= 0

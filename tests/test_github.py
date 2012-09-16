@@ -99,7 +99,7 @@ class TestGitHub(BaseTest):
             self.g.issue(self.sigm, self.todo, 2000)
             self.g.list_user_issues()
 
-        i = self.g.issue(self.sigm, self.todo, 1)
+        i = self.g.issue(self.kr, 'requests', 1)
         self.assertIsNotNone(i)
         expect(i).isinstance(github3.issues.Issue)
         expect(i.list_comments()) != []

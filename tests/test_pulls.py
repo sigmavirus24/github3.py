@@ -23,7 +23,7 @@ class TestPullRequest(BaseTest):
          '<br>'),
          '2-tuples everywhere.</p>'
         ]
-        self.url = 'https://github.com/{0}/requests/pull/5'.format(self.kr)
+        self.url = 'https://github.com/{0}/requests/pull/833'.format(self.kr)
 
     def test_pull_request(self):
         expect(self.pr).isinstance(PullRequest)
@@ -71,10 +71,7 @@ class TestPullRequest(BaseTest):
         expect(url) == self.url
 
     def test_id(self):
-        expect(self.pr.id) == 555164
-
-    def test_is_mergeable(self):
-        expect(self.pr.is_mergeable()).is_False()
+        expect(self.pr.id) == 2228458
 
     def test_is_merged(self):
         expect(self.pr.is_merged()).is_True()
@@ -106,10 +103,10 @@ class TestPullRequest(BaseTest):
     def test_merged_by(self):
         u = self.pr.merged_by
         expect(u).isinstance(User)
-        expect(u.login) == self.sigm
+        expect(u.login) == self.kr
 
     def test_number(self):
-        expect(self.pr.number) == 5
+        expect(self.pr.number) == 833
 
     def test_patch_url(self):
         expect(self.pr.patch_url).isinstance(str_test)
@@ -124,7 +121,7 @@ class TestPullRequest(BaseTest):
         expect(self.pr.state) == 'closed'
 
     def test_title(self):
-        expect(self.pr.title) == 'Fixes #817'
+        expect(self.pr.title) == 'Fixes #817.'
 
     def test_user(self):
         expect(self.pr.user).isinstance(User)

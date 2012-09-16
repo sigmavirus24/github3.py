@@ -25,7 +25,7 @@ class TestRepository(BaseTest):
         expect(self.repo).isinstance(Repository)
         expect_str(repr(self.repo))
         expect(repr(self.repo)) != ''
-        self.repo.__update__(self.repo.to_json())
+        self.repo._update_(self.repo.to_json())
 
     def test_clone_url(self):
         expect(self.repo.clone_url).is_not_None()
@@ -34,7 +34,7 @@ class TestRepository(BaseTest):
         expect(self.repo.created_at).isinstance(datetime)
 
     def test_forks(self):
-        expect(self.repo.forks) > 0
+        expect(self.requests_repo.forks) > 0
 
     def test_is_collaborator(self):
         expect(self.repo.is_collaborator(self.sigm)).is_True()
@@ -108,7 +108,7 @@ class TestRepository(BaseTest):
         expect(commit).isinstance(RepoCommit)
 
     def test_commit_comment(self):
-        comment = self.repo.commit_comment('1859766')
+        comment = self.requests_repo.commit_comment('270904')
         expect(comment).isinstance(RepoComment)
 
     def test_compare_commits(self):
@@ -147,12 +147,12 @@ class TestRepository(BaseTest):
         expect(self.repo.is_assignee(self.sigm)).is_True()
 
     def test_issue(self):
-        issue = self.repo.issue(1)
+        issue = self.requests_repo.issue(1)
         expect(issue).isinstance(Issue)
-        expect(issue.title) == 'Change get_todos()?'
+        expect(issue.title) == 'Cookie support?'
 
     def test_label(self):
-        expect(self.repo.label('Bug')).isinstance(Label)
+        expect(self.requests_repo.label('Bug')).isinstance(Label)
 
     def test_list_assignees(self):
         assignees = self.repo.list_assignees()
@@ -174,18 +174,18 @@ class TestRepository(BaseTest):
         comments = self.repo.list_comments()
         self.expect_list_of_class(comments, RepoComment)
         for c in comments:
-            if c.user.login in ('sigmavirus24', 'jvstein'):
+            if c.user.login == self.kr:
                 return
-        self.fail('No commenter with login sigmavirus24 or jvstein')
+        self.fail('No commenter with login kennethreitz')
 
     def test_list_comments_on_commit(self):
-        comments = self.repo.list_comments_on_commit(
-                '04d55444a3ec06ca8d2aa0a5e333cdaf27113254')
+        comments = self.requests_repo.list_comments_on_commit(
+                '10280c697dcfd3d334f1c9c381a11c324bb550bc')
         self.expect_list_of_class(comments, RepoComment)
         for c in comments:
-            if c.user.login in ('sigmavirus24', 'jvstein'):
+            if c.user.login in 'brunobord':
                 return
-        self.fail('No commenter with login sigmavirus24 or jvstein')
+        self.fail('No commenter with login brunobord')
 
     def test_list_commits(self):
         self.expect_list_of_class(self.repo.list_commits(), RepoCommit)
@@ -237,10 +237,10 @@ class TestRepository(BaseTest):
         self.expect_list_of_class(self.repo.list_watchers(), User)
 
     def test_milestone(self):
-        expect(self.repo.milestone(1)).isinstance(Milestone)
+        expect(self.requests_repo.milestone(15)).isinstance(Milestone)
 
     def test_pull_request(self):
-        expect(self.repo.pull_request(2)).isinstance(PullRequest)
+        expect(self.requests_repo.pull_request(833)).isinstance(PullRequest)
 
     def test_readme(self):
         expect(self.repo.readme()).isinstance(Contents)
@@ -451,7 +451,7 @@ class TestDownload(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestDownload, self).__init__(methodName)
         repo = self.g.repository(self.gh3py, self.test_repo)
-        self.dl = repo.download(310737)
+        self.dl = repo.download(316176)
 
     def test_content_type(self):
         expect(self.dl.content_type) == 'application/zip'
@@ -470,13 +470,13 @@ class TestDownload(BaseTest):
                         )
 
     def test_id(self):
-        expect(self.dl.id) == 248618
+        expect(self.dl.id) == 316176
 
     def test_name(self):
         expect(self.dl.name) == 'todo.txt-python-0.3.zip'
 
     def test_size(self):
-        expect(self.dl.size) == 26624
+        expect(self.dl.size) == 23552
 
     def test_requires_auth(self):
         with expect.raises(github3.GitHubError):
@@ -488,7 +488,7 @@ class TestHook(BaseTest):
         super(TestHook, self).__init__(methodName)
         if self.auth:
             repo = self._g.repository(self.sigm, self.todo)
-            self.hook = repo.hook(424033)
+            self.hook = repo.hook(424182)
         else:
             json = {
                 'name': 'twitter',
@@ -497,7 +497,7 @@ class TestHook(BaseTest):
                 'hooks/74859',
                 'created_at': '2011-09-05T18:19:50Z',
                 'updated_at': '2012-03-08T17:03:25Z',
-                'id': 74859,
+                'id': 424182,
                 'active': False,
                 'config': {'token': 'fake_token', 'secret': 'fake_secret'},
                 'events': ['push'],
@@ -519,7 +519,7 @@ class TestHook(BaseTest):
         self.expect_list_of_class(self.hook.events, str_test)
 
     def test_id(self):
-        expect(self.hook.id) == 74859
+        expect(self.hook.id) == 424182
 
     def test_is_active(self):
         expect(self.hook.is_active()).is_False()

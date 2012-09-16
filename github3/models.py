@@ -273,18 +273,22 @@ class GitHubError(Exception):
         self.code = resp.status_code
         error = resp.json
         #: Message associated with the error
-        self.message = error.get('message')
+        self.msg = error.get('message')
         #: List of errors provided by GitHub
         self.errors = []
         if error.get('errors'):
             self.errors = error.get('errors')
 
     def __repr__(self):
-        return '<Error [{0}]>'.format(self.message or self.code)
+        return '<Error [{0}]>'.format(self.msg or self.code)
 
     def __str__(self):
         if not self.errors:
-            return '{0} {1}'.format(self.code, self.message)
+            return '{0} {1}'.format(self.code, self.msg)
         else:
-            return '{0} {1}: {2}'.format(self.code, self.message,
+            return '{0} {1}: {2}'.format(self.code, self.msg,
                 ', '.join(self.errors))
+
+    @property
+    def message(self):
+        return self.message
