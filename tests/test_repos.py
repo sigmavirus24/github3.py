@@ -450,7 +450,7 @@ class TestContents(BaseTest):
 class TestDownload(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestDownload, self).__init__(methodName)
-        repo = self.g.repository(self.gh3py, self.test_repo)
+        repo = self.g.repository(self.sigm, self.todo)
         self.dl = repo.download(316176)
 
     def test_content_type(self):
