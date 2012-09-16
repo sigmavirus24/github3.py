@@ -10,26 +10,20 @@ from github3.users import User
 class TestPullRequest(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestPullRequest, self).__init__(methodName)
-        repo = self.g.repository(self.sigm, self.todo)
-        self.pr = repo.pull_request(5)
+        repo = self.g.repository(self.kr, 'requests')
+        self.pr = repo.pull_request(833)
         self.body = [
-        'I use this config setting to set the color for unprioritized items.',
-        '', 'export DEFAULT=$LIGHT_GREY', '',
-        ('Should be on both of my branches. Feel free to pull from me '
-         "whenever - I'm not always in the mood to add a pull request."
-         ' :-)')
+        ('Use dicts and lists where necessary but accept both dicts and lists'
+            ' of'), '2-tuples everywhere.'
         ]
         self.body_html = [
         ('<p>'
-         'I use this config setting to set the color for unprioritized items.'
-         '</p>'),
-        '', '<p>export DEFAULT=$LIGHT_GREY</p>', '',
-        ('<p>Should be on both of my branches. Feel free to pull from me '
-         "whenever - I'm not always in the mood to add a pull request."
-         ' :-)</p>')
+         'Use dicts and lists where necessary but accept both dicts and lists'
+         ' of'
+         '<br>'),
+         '2-tuples everywhere.</p>'
         ]
-        self.url = 'https://github.com/{s.sigm}/{s.todo}/pull/5'.format(
-                s=self)
+        self.url = 'https://github.com/{0}/requests/pull/5'.format(self.kr)
 
     def test_pull_request(self):
         expect(self.pr).isinstance(PullRequest)
@@ -37,11 +31,11 @@ class TestPullRequest(BaseTest):
     def test_base(self):
         expect(self.pr.base).is_not_None()
         expect(self.pr.base).isinstance(PullDestination)
-        expect(self.pr.base.label) == 'sigmavirus24:master'
+        expect(self.pr.base.label) == 'kennethreitz:develop'
 
     def test_body(self):
         expect(self.pr.body).isinstance(str_test)
-        body = '\r\n'.join(self.body)
+        body = '\n'.join(self.body)
         expect(self.pr.body) == body
 
     def test_body_html(self):
@@ -69,7 +63,7 @@ class TestPullRequest(BaseTest):
         head = self.pr.head
         label = head.label
         expect(head).isinstance(PullDestination)
-        expect(label) == 'jvstein:0171bf7bea88cac6884bb72bd26c07e6a826677e'
+        expect(label) == 'sigmavirus24:fix_key_val_args'
 
     def test_html_url(self):
         url = self.pr.html_url
@@ -130,12 +124,11 @@ class TestPullRequest(BaseTest):
         expect(self.pr.state) == 'closed'
 
     def test_title(self):
-        expect(self.pr.title) == ('Handle the DEFAULT config setting like'
-        ' todo.sh')
+        expect(self.pr.title) == 'Fixes #817'
 
     def test_user(self):
         expect(self.pr.user).isinstance(User)
-        expect(self.pr.user.login) == 'jvstein'
+        expect(self.pr.user.login) == self.sigm
 
     def test_with_auth(self):
         if not self.auth:
@@ -212,8 +205,8 @@ class TestReviewComment(BaseTest):
 class TestPullDestination(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestPullDestination, self).__init__(methodName)
-        repo = self.g.repository(self.sigm, self.todo)
-        self.dest = repo.pull_request(5).base
+        repo = self.g.repository(self.kr, 'requests')
+        self.dest = repo.pull_request(833).base
 
     def test_pull_destination(self):
         expect(self.dest).isinstance(PullDestination)
@@ -222,26 +215,26 @@ class TestPullDestination(BaseTest):
         expect(self.dest.direction) == 'Base'
 
     def test_label(self):
-        expect(self.dest.label) == 'sigmavirus24:master'
+        expect(self.dest.label) == 'kennethreitz:develop'
 
     def test_sha(self):
-        expect(self.dest.sha) == 'f55a45094f67d5659462c3fbb18d4bca97d92e7c'
+        expect(self.dest.sha) == 'c8f166f696327dc8ec07a248863fcc35fafa2038'
 
     def test_ref(self):
-        expect(self.dest.ref) == 'master'
+        expect(self.dest.ref) == 'develop'
 
     def test_repo(self):
-        expect(self.dest.repo) == (self.sigm, self.todo)
+        expect(self.dest.repo) == (self.kr, 'requests')
 
     def test_user(self):
-        expect(self.dest.user.login) == self.sigm
+        expect(self.dest.user.login) == self.kr
 
 
 class TestPullFile(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestPullFile, self).__init__(methodName)
-        repo = self.g.repository(self.sigm, self.todo)
-        self.pf = repo.pull_request(5).list_files()[0]
+        repo = self.g.repository(self.kr, 'requests')
+        self.pf = repo.pull_request(833).list_files()[0]
 
     def test_file(self):
         expect(self.pf).isinstance(PullFile)
@@ -252,16 +245,16 @@ class TestPullFile(BaseTest):
     def test_blob_url(self):
         expect(self.pf.blob_url).isinstance(str_test)
         expect('blob' in self.pf.blob_url).is_True()
-        expect('todo.py' in self.pf.blob_url).is_True()
+        expect('compat.py' in self.pf.blob_url).is_True()
 
     def test_changes(self):
-        expect(self.pf.changes) == 4
+        expect(self.pf.changes) == 2
 
     def test_deletions(self):
-        expect(self.pf.deletions) == 2
+        expect(self.pf.deletions) == 0
 
     def test_filename(self):
-        expect(self.pf.filename) == 'todo.py'
+        expect(self.pf.filename) == 'requests/compat.py'
 
     def test_patch(self):
         expect(self.pf.patch).isinstance(str_test)
@@ -270,7 +263,7 @@ class TestPullFile(BaseTest):
         expect(self.pf.raw_url) == self.pf.blob_url.replace('blob', 'raw')
 
     def test_sha(self):
-        expect(self.pf.sha) == 'd9024b5b8a078011f8d1de7ec8c15218c9c9449b'
+        expect(self.pf.sha) == '351b7c6e03070523b963d9adc71ef2b89a0fa574'
 
     def test_status(self):
         expect(self.pf.status) == 'modified'
