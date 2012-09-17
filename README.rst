@@ -129,8 +129,30 @@ To test how much of the library is covered::
     make coverage
 
 Depending on which you run, you will see different percentages reported by 
-coverage. As of this writing (2012-09-06), ``coverage_auth`` reports 85% 
-covered.
+coverage. As of this writing (2012-09-16), ``coverage_auth`` reports 87% of 
+the library is covered and every module has coverage >= 80%.
+
+::
+
+    coverage report
+    Name                 Stmts   Miss  Cover
+    ----------------------------------------
+    github3/__init__         8      0   100%
+    github3/api             50      0   100%
+    github3/decorators      13      0   100%
+    github3/events          89      0   100%
+    github3/gists           92      0   100%
+    github3/git             94      0   100%
+    github3/github         304     61    80%
+    github3/issues         189     28    85%
+    github3/legacy          97      0   100%
+    github3/models         165     11    93%
+    github3/orgs           148     30    80%
+    github3/pulls          120     12    90%
+    github3/repos          646    115    82%
+    github3/users          126     19    85%
+    ----------------------------------------
+    TOTAL                 2141    276    87%
 
 
 .. links
