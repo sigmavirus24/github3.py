@@ -31,7 +31,7 @@ class TestGist(BaseTest):
         expect(self.gist.list_files()).isinstance(list)
 
     def test_forks(self):
-        expect(self.gist.forks) >= 0
+        expect(int(self.gist.forks)) >= 0
 
     def test_created_at(self):
         expect(self.gist.created_at).isinstance(datetime)
