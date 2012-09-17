@@ -123,7 +123,7 @@ class TestRepository(BaseTest):
         expect(contents).isinstance(Contents)
 
     def test_download(self):
-        download = self.alt_repo.download(310737)
+        download = self.repo.download(316176)
         expect(download).isinstance(Download)
 
     def test_git_commit(self):
@@ -384,6 +384,8 @@ class TestRepository(BaseTest):
             pass
 
     def test_edit(self):
+        if not self.auth:
+            return
         old = {'name': self.alt_repo.name,
                 'description': self.alt_repo.description,
                 'homepage': self.alt_repo.homepage,

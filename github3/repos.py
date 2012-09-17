@@ -87,7 +87,7 @@ class Repository(GitHubCore):
         #: ``datetime`` object representing the last time the repository was
         #  updated.
         self.updated_at = self._strptime(repo.get('updated_at'))
-        self._api = repo.get('url')
+        self._api = repo.get('url', '')
 
         # The number of watchers
         #: Number of users watching the repository.
@@ -1309,7 +1309,7 @@ class Contents(GitHubObject):
     def __init__(self, content):
         super(Contents, self).__init__(content)
         # links
-        self._api = content['_links'].get('self')
+        self._api = content['_links'].get('self', '')
         #: Dictionary of links
         self.links = content.get('_links')
 
@@ -1361,7 +1361,7 @@ class Download(GitHubCore):
 
     def __init__(self, download, session=None):
         super(Download, self).__init__(download, session)
-        self._api = download.get('url')
+        self._api = download.get('url', '')
         #: URL of the download at GitHub.
         self.html_url = download.get('html_url')
         #: Unique id of the download on GitHub.
@@ -1410,7 +1410,7 @@ class Hook(GitHubCore):
 
     def __init__(self, hook, session=None):
         super(Hook, self).__init__(hook, session)
-        self._api = hook.get('url')
+        self._api = hook.get('url', '')
         #: datetime object representing when this hook was last updated.
         self.updated_at = None
         if hook.get('updated_at'):
@@ -1624,7 +1624,7 @@ class Comparison(GitHubObject):
 
     def __init__(self, compare):
         super(Comparison, self).__init__(compare)
-        self._api = compare.get('api')
+        self._api = compare.get('api', '')
         #: URL to view the comparison at GitHub
         self.html_url = compare.get('html_url')
         #: Permanent link to this comparison.

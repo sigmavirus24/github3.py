@@ -157,7 +157,7 @@ class BaseComment(GitHubCore):
         #: datetime object representing when the comment was updated.
         self.updated_at = self._strptime(comment.get('updated_at'))
 
-        self._api = comment.get('url')
+        self._api = comment.get('url', '')
         self.links = comment.get('_links')
         #: The url of this comment at GitHub
         self.html_url = ''
@@ -204,7 +204,7 @@ class BaseCommit(GitHubCore):
     """
     def __init__(self, commit, session):
         super(BaseCommit, self).__init__(commit, session)
-        self._api = commit.get('url')
+        self._api = commit.get('url', '')
         #: SHA of this commit.
         self.sha = commit.get('sha')
         #: Commit message

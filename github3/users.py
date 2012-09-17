@@ -17,7 +17,7 @@ class Key(GitHubCore):
     """The :class:`Key <Key>` object."""
     def __init__(self, key, session=None):
         super(Key, self).__init__(key, session)
-        self._api = key.get('url')
+        self._api = key.get('url', '')
         #: The text of the actual key
         self.key = key.get('key')
         #: The unique id of the key at GitHub

@@ -18,7 +18,7 @@ class Label(GitHubCore):
     exists in a repository."""
     def __init__(self, label, session=None):
         super(Label, self).__init__(label, session)
-        self._api = label.get('url')
+        self._api = label.get('url', '')
         #: Color of the label, e.g., 626262
         self.color = label.get('color')
         #: Name of the label, e.g., 'bug'
@@ -64,7 +64,7 @@ class Milestone(GitHubCore):
     """
     def __init__(self, mile, session=None):
         super(Milestone, self).__init__(mile, session)
-        self._api = mile.get('url')
+        self._api = mile.get('url', '')
         #: Identifying number associated with milestone.
         self.number = mile.get('number')
         #: State of the milestone, e.g., open or closed.
@@ -141,7 +141,7 @@ class Issue(GitHubCore):
     """
     def __init__(self, issue, session=None):
         super(Issue, self).__init__(issue, session)
-        self._api = issue.get('url')
+        self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
         #  was assigned to.
         self.assignee = None
@@ -377,7 +377,7 @@ class IssueEvent(GitHubCore):
         self.event = event.get('event')
         #: SHA of the commit.
         self.commit_id = event.get('commit_id')
-        self._api = event.get('url')
+        self._api = event.get('url', '')
 
         #: :class:`Issue <Issue>` where this comment was made.
         self.issue = issue

@@ -67,8 +67,7 @@ class Gist(GitHubCore):
         self.description = data.get('description', '')
 
         # e.g. https://api.github.com/gists/1
-        self._api = data.get('url')
-        #self._api = self._build_url('gists', str(self._id))
+        self._api = data.get('url', '')
 
         #: URL of this gist at Github, e.g., https://gist.github.com/1
         self.html_url = data.get('html_url')
