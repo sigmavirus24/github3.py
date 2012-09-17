@@ -75,7 +75,7 @@ class PullRequest(GitHubCore):
     """The :class:`PullRequest <PullRequest>` object."""
     def __init__(self, pull, session=None):
         super(PullRequest, self).__init__(pull, session)
-        self._api = pull.get('url')
+        self._api = pull.get('url', '')
         #: Base of the merge
         self.base = PullDestination(pull.get('base'), 'Base')
         #: Body of the pull request message

@@ -220,4 +220,4 @@ class TestLegacyUser(BaseTest):
         expect(self.user.score) >= 0
 
     def test_type(self):
-        expect(self.user.type) >= 0
+        expect(self.user.type) == 'user'

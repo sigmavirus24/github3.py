@@ -17,7 +17,7 @@ class Blob(GitHubObject):
     """The :class:`Blob <Blob>` object."""
     def __init__(self, blob):
         super(Blob, self).__init__(blob)
-        self._api = blob.get('url')
+        self._api = blob.get('url', '')
 
         #: Raw content of the blob.
         self.content = blob.get('content').encode()
@@ -48,7 +48,7 @@ class GitData(GitHubCore):
         super(GitData, self).__init__(data, session)
         #: SHA of the object
         self.sha = data.get('sha')
-        self._api = data.get('url')
+        self._api = data.get('url', '')
 
 
 class Commit(BaseCommit):
@@ -89,7 +89,7 @@ class Reference(GitHubCore):
     """
     def __init__(self, ref, session=None):
         super(Reference, self).__init__(ref, session)
-        self._api = ref.get('url')
+        self._api = ref.get('url', '')
         #: The reference path, e.g., refs/heads/sc/featureA
         self.ref = ref.get('ref')
         #: :class:`GitObject <GitObject>` the reference points to

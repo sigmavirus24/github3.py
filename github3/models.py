@@ -12,6 +12,13 @@ from requests import session
 from re import compile
 from github3.decorators import requires_auth
 
+try:
+    # Python 2.x
+    from urlparse import urlparse
+except ImportError:
+    # Python 3.x
+    from urllib.parse import urlparse
+
 __url_cache__ = {}
 
 
@@ -116,6 +123,14 @@ class GitHubCore(GitHubObject):
         return __url_cache__[key]
 
     @property
+    def _api(self):
+        return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
+
+    @_api.setter
+    def _api(self, uri):
+        self._uri = urlparse(uri)
+
+    @property
     def ratelimit_remaining(self):
         """Number of requests before GitHub imposes a ratelimit."""
         json = self._json(self._get(self._github_url + '/rate_limit'), 200)
@@ -142,7 +157,7 @@ class BaseComment(GitHubCore):
         #: datetime object representing when the comment was updated.
         self.updated_at = self._strptime(comment.get('updated_at'))
 
-        self._api = comment.get('url')
+        self._api = comment.get('url', '')
         self.links = comment.get('_links')
         #: The url of this comment at GitHub
         self.html_url = ''
@@ -189,7 +204,7 @@ class BaseCommit(GitHubCore):
     """
     def __init__(self, commit, session):
         super(BaseCommit, self).__init__(commit, session)
-        self._api = commit.get('url')
+        self._api = commit.get('url', '')
         #: SHA of this commit.
         self.sha = commit.get('sha')
         #: Commit message

@@ -17,7 +17,7 @@ from github3.decorators import requires_auth
 class Team(GitHubCore):
     def __init__(self, team, session=None):
         super(Team, self).__init__(team, session)
-        self._api = team.get('url')
+        self._api = team.get('url', '')
         #: This team's name.
         self.name = team.get('name')
         #: Unique ID of the team.

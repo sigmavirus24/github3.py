@@ -49,7 +49,7 @@ class TestGist(BaseTest):
         expect(self.gist.html_url) != ''
 
     def test_id(self):
-        expect(self.gist.id) >= 0
+        expect(self.gist.id) >= str(0)
 
     def test_is_public(self):
         expect(self.gist.is_public()).isinstance(bool)

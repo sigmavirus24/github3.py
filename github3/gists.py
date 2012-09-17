@@ -61,21 +61,21 @@ class Gist(GitHubCore):
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)
         #: Unique id for this gist.
-        self.id = data.get('id', '')
+        self.id = '{0}'.format(data.get('id', ''))
 
         #: Description of the gist
         self.description = data.get('description', '')
 
         # e.g. https://api.github.com/gists/1
-        self._api = data.get('url')
-        #self._api = self._build_url('gists', str(self._id))
+        self._api = data.get('url', '')
 
         #: URL of this gist at Github, e.g., https://gist.github.com/1
         self.html_url = data.get('html_url')
         self._public = data.get('public')
 
+        self._forks = data.get('forks', [])
         #: The number of forks of this gist.
-        self.forks = data.get('forks', [])
+        self.forks = len(self._forks)
 
         #: Git URL to pull this gist, e.g., git://gist.github.com/1.git
         self.git_pull_url = data.get('git_pull_url', '')
@@ -95,8 +95,9 @@ class Gist(GitHubCore):
         if data.get('user'):
             self.user = User(data.get('user'), self._session)
 
+        self._files = [GistFile(data['files'][f]) for f in data['files']]
         #: Number of files in this gist.
-        self.files = [GistFile(data['files'][f]) for f in data['files']]
+        self.files = len(self._files)
 
     def __repr__(self):
         return '<Gist [{0}]>'.format(self.id)
@@ -188,11 +189,11 @@ class Gist(GitHubCore):
     def list_files(self):
         """List of :class:`GistFile <GistFile>` objects representing the files
         stored in this gist."""
-        return self.files
+        return self._files
 
     def list_forks(self):
         """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
-        return self.forks
+        return self._forks
 
     def refresh(self):
         """Updates this gist by getting the information from the API again.
