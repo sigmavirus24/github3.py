@@ -12,6 +12,13 @@ from requests import session
 from re import compile
 from github3.decorators import requires_auth
 
+try:
+    # Python 2.x
+    from urlparse import urlparse
+except ImportError:
+    # Python 3.x
+    from urllib.parse import urlparse
+
 __url_cache__ = {}
 
 
@@ -114,6 +121,14 @@ class GitHubCore(GitHubObject):
         if not key in __url_cache__:
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
+
+    @property
+    def _api(self):
+        return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
+
+    @_api.setter
+    def _api(self, uri):
+        self._uri = urlparse(uri)
 
     @property
     def ratelimit_remaining(self):
