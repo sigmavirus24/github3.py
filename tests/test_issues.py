@@ -191,6 +191,10 @@ class TestMilestone(BaseTest):
         expect(m).isinstance(Milestone)
         m.update('test_update', 'closed')
         expect(m.delete()).is_True()
+        m = None
+        m = repo.create_milestone('test_creation')
+        expect(m).isinstance(Milestone)
+        expect(m.delete()).is_True()
 
 
 class TestIssueComment(BaseTest):

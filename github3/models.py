@@ -270,6 +270,7 @@ class GitHubError(Exception):
     def __init__(self, resp):
         super(GitHubError, self).__init__()
         #: Response code that triggered the error
+        self.response = resp
         self.code = resp.status_code
         error = resp.json
         #: Message associated with the error
@@ -280,7 +281,7 @@ class GitHubError(Exception):
             self.errors = error.get('errors')
 
     def __repr__(self):
-        return '<Error [{0}]>'.format(self.msg or self.code)
+        return '<GitHubError [{0}]>'.format(self.msg or self.code)
 
     def __str__(self):
         if not self.errors:
@@ -291,4 +292,4 @@ class GitHubError(Exception):
 
     @property
     def message(self):
-        return self.message
+        return self.msg

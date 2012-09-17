@@ -38,6 +38,7 @@ class TestRepository(BaseTest):
 
     def test_is_collaborator(self):
         expect(self.repo.is_collaborator(self.sigm)).is_True()
+        expect(self.repo.is_collaborator('')).is_False()
 
     def test_git_url(self):
         expect(self.repo.git_url) != ''
@@ -137,6 +138,9 @@ class TestRepository(BaseTest):
     def test_is_private(self):
         expect(self.repo.is_private()).is_False()
 
+    def test_has_issues(self):
+        expect(self.repo.has_issues()).is_True()
+
     def test_has_downloads(self):
         expect(self.repo.has_downloads()).is_True()
 
@@ -190,6 +194,9 @@ class TestRepository(BaseTest):
     def test_list_commits(self):
         self.expect_list_of_class(self.repo.list_commits(), RepoCommit)
 
+    def test_list_contributors(self):
+        self.expect_list_of_class(self.repo.list_contributors(), User)
+
     def test_list_downloads(self):
         downloads = self.repo.list_downloads()
         self.expect_list_of_class(downloads, Download)
@@ -203,6 +210,7 @@ class TestRepository(BaseTest):
 
     def test_list_forks(self):
         self.expect_list_of_class(self.repo.list_forks(), Repository)
+        self.expect_list_of_class(self.repo.list_forks('oldest'), Repository)
 
     def test_list_issues(self):
         self.expect_list_of_class(self.repo.list_issues(), Issue)
@@ -301,6 +309,7 @@ class TestRepository(BaseTest):
             repo.update_label('Foo', 'abc123')
             repo.merge('development', 'master', 'Fails')
 
+    # Try somethings only I should be able to do hence the try/except blocks
     def test_create_blob(self):
         if not self.auth:
             return
@@ -328,13 +337,17 @@ class TestRepository(BaseTest):
         dl = self.alt_repo.create_download('test_dls.py', __file__)
         expect(dl).isinstance(Download)
         dl.delete()
+        expect(self.alt_repo.create_download('', '')).is_None()
 
     def test_create_fork_org(self):
         if not self.auth:
             return
-        r = self.auth_todo.create_fork(self.gh3py)
-        expect(r).isinstance(Repository)
-        r.delete()
+        try:
+            r = self.auth_todo.create_fork(self.gh3py)
+            expect(r).isinstance(Repository)
+            r.delete()
+        except github3.GitHubError:
+            pass
 
     def test_create_fork(self):
         if not self.auth:
@@ -344,7 +357,45 @@ class TestRepository(BaseTest):
         expect(r).isinstance(Repository)
         r.delete()
 
-    # Try somethings only I should be able to do hence the try/except blocks
+    def test_create_hook(self):
+        if not self.auth:
+            return
+        hook = self.alt_repo.create_hook('web',
+                {'url': 'http://httpbin.org/post'})
+        expect(hook).isinstance(Hook)
+        hook.delete()
+
+    def test_create_key(self):
+        if not self.auth:
+            return
+        try:
+            key = self.alt_repo.create_key('test_key', (
+                  'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxGTCJTMYmsBhLL0PQ2RwLp3'
+                  'sgcJ8uz6RqOrlB/6lKzIXYOcvdaHqEEF9G+1xlJck7kA8pSNR9AkEWP2uoy'
+                  '1tJVp4nUVzPYKSrkoMppzA34vT+iqW/H4rRCADxIRillvpXZB2CWQ8fbRlD'
+                  '9Mjreh0L2A4NPKSmGxs5XfZXD9lWPb1+U6oQrZYG2h1ulyI7rt+adWOhfP2'
+                  'UYq6V5JSdNDi4r1nGxBccZgguiL7XNjl9TSsgr8QKmAacubyNEwIrmQIS9h'
+                  'ipKg3k10VcqfVmSzF1GuzDUKFfIHU/zyd6aJ0emAqgft/fho+BkrXBihhxf'
+                  '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
+                  )
+            expect(key).isinstance(Key)
+            self.alt_repo.delete_key(key.id)
+        except github3.GitHubError:
+            pass
+
+    def test_edit(self):
+        old = {'name': self.alt_repo.name,
+                'description': self.alt_repo.description,
+                'homepage': self.alt_repo.homepage,
+                'has_issues': self.alt_repo.has_issues(),
+                'has_wiki': self.alt_repo.has_wiki(),
+                'has_downloads': self.alt_repo.has_downloads(),
+                }
+        expect(self.alt_repo.edit(self.alt_repo.name,
+            'Test editing of github3.py', 'www.example.com', False, False,
+            False)).is_True()
+        expect(self.alt_repo.edit(**old)).is_True()
+
     def test_pubsubhubub(self):
         if not self.auth:
             return
