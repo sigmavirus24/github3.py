@@ -6,7 +6,9 @@ This module provides decorators to the rest of the library
 
 """
 
+from StringIO import StringIO
 from functools import wraps
+from requests.models import Response
 
 
 def requires_auth(func):
@@ -32,8 +34,8 @@ def requires_auth(func):
         else:
             from github3.models import GitHubError
             # Mock a 401 response
-            raise GitHubError(type('Faux Request', (object, ),
-                {'status_code': 401, 'json': {
-                    'message': 'Requires authentication'}}
-                ))
+            r = Response()
+            r.status_code = 401
+            r.raw = StringIO('{"message": "Requires authentication"}')
+            raise GitHubError(r)
     return auth_wrapper
