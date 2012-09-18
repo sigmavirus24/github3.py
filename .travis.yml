@@ -11,3 +11,7 @@ script:  make travis
 notifications:
    on_success: change
    on_failure: always
+
+branches:
+   except:
+      - uricore
