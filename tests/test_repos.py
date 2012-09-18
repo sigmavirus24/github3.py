@@ -1,6 +1,6 @@
 import github3
 import re
-from base import expect, BaseTest, str_test, expect_str
+from .base import expect, BaseTest, str_test, expect_str
 from datetime import datetime
 from os import unlink, listdir
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,

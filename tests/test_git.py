@@ -1,4 +1,4 @@
-from base import BaseTest, expect, expect_str
+from .base import BaseTest, expect, expect_str
 import github3
 from github3.git import (Commit, Blob, Reference, Tag, Tree, Hash, GitObject,
         GitData)

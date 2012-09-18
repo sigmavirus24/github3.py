@@ -1,4 +1,4 @@
-from base import BaseTest, expect, str_test
+from .base import BaseTest, expect, str_test
 from datetime import datetime
 from github3 import GitHubError
 from github3.git import Commit

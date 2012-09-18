@@ -1,4 +1,4 @@
-from base import BaseTest, expect, str_test
+from .base import BaseTest, expect, str_test
 from github3.events import Event, _payload_handlers
 from github3.orgs import Organization
 from github3.repos import RepoComment, Download, Repository

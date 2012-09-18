@@ -1,5 +1,5 @@
 import github3
-from base import expect, BaseTest, str_test
+from .base import expect, BaseTest, str_test
 from github3.orgs import Organization, Team
 from github3.events import Event
 from github3.users import User

@@ -1,5 +1,5 @@
 import github3
-from base import BaseTest, expect, str_test
+from .base import BaseTest, expect, str_test
 from datetime import datetime
 from github3.users import User
 from github3.issues import Issue, IssueComment, IssueEvent, Label, Milestone

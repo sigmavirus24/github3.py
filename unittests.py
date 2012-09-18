@@ -40,7 +40,7 @@ if __name__ == "__main__":
     join = '.'.join
     names = [join(['tests', f[:-3]]) for f in names if regex.match(f)]
     result = pool.map_async(load_test, names)
-    suites = result.get()
+    suites = result.get(timeout=(5 * 60))  # 5 minutes
     suite = suites.pop(0)
     for s in suites:
         suite.addTests(s._tests)

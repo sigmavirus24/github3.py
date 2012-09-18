@@ -1,6 +1,6 @@
-import base
+from . import base
 import github3
-from base import expect
+from .base import expect
 from github3.users import User, Plan, Key
 from github3.events import Event
 from warnings import catch_warnings, simplefilter

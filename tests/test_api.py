@@ -1,4 +1,4 @@
-import base
+from . import base
 import github3
 from base import expect
 
