@@ -1,5 +1,6 @@
 import github3
 from .base import expect, expect_str, BaseTest
+from github3.repos import Repository
 
 
 class TestGitHub(BaseTest):
@@ -121,11 +122,20 @@ class TestGitHub(BaseTest):
         expect(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z')).is_not_None()
 
+        expect(self.g.create_issue(None, None, None)).is_None()
+        expect(self.g.issue(None, None, None)).is_None()
+
         if self.auth:
             i = self._g.create_issue(self.gh3py, self.test_repo,
             'Testing github3.py', 'Ignore this.')
             expect(i).isinstance(github3.issues.Issue)
             expect(i.close()).is_True()
+
+    def test_list_user_issues(self):
+        if not self.auth:
+            return
+        i = self._g.list_user_issues(state='closed')
+        self.expect_list_of_class(i, github3.issues.Issue)
 
     def test_keys(self):
         with expect.raises(github3.GitHubError):
@@ -144,7 +154,14 @@ class TestGitHub(BaseTest):
             self.g.create_repo('test_github3.py')
             self.g.list_repos()
         expect(self.g.list_repos(self.sigm)) != []
-        expect(self.g.repository(self.sigm, self.todo)).is_not_None()
+        expect(self.g.repository(self.sigm, self.todo)).isinstance(Repository)
+
+    def test_create_repo(self):
+        if not self.auth:
+            return
+        r = self._g.create_repo('test.repo.creation')
+        expect(r).isinstance(Repository)
+        r.delete()
 
     def test_requires_auth(self):
         with expect.raises(github3.GitHubError):

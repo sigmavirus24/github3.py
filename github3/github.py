@@ -213,7 +213,7 @@ class GitHub(GitHubCore):
         :type: int
         :returns: bool
         """
-        key = self.get_key(key_id)
+        key = self.key(key_id)
         if key:
             return key.delete()
         return False
@@ -586,8 +586,10 @@ class GitHub(GitHubCore):
         :type repository: str
         :returns: :class:`Repository <github3.repos.Repository>`
         """
-        url = self._build_url('repos', owner, repository)
-        json = self._json(self._get(url), 200)
+        json = None
+        if owner and repository:
+            url = self._build_url('repos', owner, repository)
+            json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
     def search_issues(self, owner, repo, state, keyword):

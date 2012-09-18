@@ -2,6 +2,7 @@ from .base import BaseTest, expect, expect_str
 import github3
 from github3.git import (Commit, Blob, Reference, Tag, Tree, Hash, GitObject,
         GitData)
+from github3.users import User
 
 
 class TestGit(BaseTest):
@@ -50,8 +51,20 @@ class TestCommit(BaseTest):
     def test_author(self):
         expect(self.commit.author).is_not_None()
 
+    def test_author_as_User(self):
+        try:
+            expect(self.commit.author_as_User()).isintance(User)
+        except:
+            pass
+
     def test_committer(self):
-        expect(self.commit.author).is_not_None()
+        expect(self.commit.committer).is_not_None()
+
+    def test_committer_as_User(self):
+        try:
+            expect(self.commit.committer_as_User()).isintance(User)
+        except:
+            pass
 
     def test_tree(self):
         expect(self.commit.tree).isinstance(Tree)
