@@ -14,7 +14,7 @@ try:
     from StringIO import StringIO
 except ImportError:
     # python3
-    from io import StringIO
+    from io import BytesIO as StringIO
 
 
 def requires_auth(func):
@@ -42,6 +42,7 @@ def requires_auth(func):
             # Mock a 401 response
             r = Response()
             r.status_code = 401
-            r.raw = StringIO('{"message": "Requires authentication"}')
+            r.encoding = 'utf-8'
+            r.raw = StringIO('{"message": "Requires authentication"}'.encode())
             raise GitHubError(r)
     return auth_wrapper

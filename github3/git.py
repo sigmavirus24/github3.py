@@ -60,13 +60,12 @@ class Commit(BaseCommit):
 
         #: dict containing at least the name, email and date the commit was
         #  created
-        self.author = commit.get('author')
+        self.author = commit.get('author', {})
         self._author_name = self.author.get('name', '')
 
         #: dict containing similar information to the author attribute
-        self.committer = commit.get('committer')
-        if commit.get('committer'):
-            self.committer = User(commit.get('committer'), None)
+        self.committer = commit.get('committer', {})
+        self._commit_name = self.committer.get('name', '')
 
         #: :class:`Tree <Tree>` the commit belongs to.
         self.tree = None
