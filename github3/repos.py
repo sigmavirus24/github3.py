@@ -1606,11 +1606,7 @@ class RepoCommit(BaseCommit):
             self.total = commit['stats'].get('total')
 
         #: The files that were modified by this commit.
-        self.files = []
-        if commit.get('files'):
-            append = self.files.append
-            for f in commit.get('files'):
-                append(type('RepoCommit File', (object, ), f))
+        self.files = commit.get('files', [])
 
     def __repr__(self):
         # TODO(Ian) come back to this after models.py
@@ -1646,12 +1642,8 @@ class Comparison(GitHubObject):
         self.total_commits = compare.get('total_commits')
         #: List of :class:`RepoCommit <RepoCommit>` objects.
         self.commits = [RepoCommit(com) for com in compare.get('commits')]
-        #: List of objects describing the files modified.
-        self.files = []
-        if compare.get('files'):
-            append = self.files.append
-            for f in compare.get('files'):
-                append(type('Comparison File', (object, ), f))
+        #: List of dicts describing the files modified.
+        self.files = compare.get('files', [])
 
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
