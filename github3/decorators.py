@@ -6,9 +6,15 @@ This module provides decorators to the rest of the library
 
 """
 
-from StringIO import StringIO
 from functools import wraps
 from requests.models import Response
+
+try:
+    # python2
+    from StringIO import StringIO
+except ImportError:
+    # python3
+    from io import StringIO
 
 
 def requires_auth(func):

@@ -61,7 +61,7 @@ class Commit(BaseCommit):
         #: dict containing at least the name, email and date the commit was
         #  created
         self.author = commit.get('author')
-        self._author_name = commit.get('author')
+        self._author_name = self.author['name']
 
         #: dict containing similar information to the author attribute
         self.committer = commit.get('committer')
@@ -74,7 +74,7 @@ class Commit(BaseCommit):
             self.tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
-        return '<Commit [{0}:{1}]>'.format(self.author.name, self.sha)
+        return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
 
     def author_as_User(self):
         """Attempt to return the author attribute as a

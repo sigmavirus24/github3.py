@@ -613,7 +613,7 @@ class TestRepoTag(BaseTest):
 
 def __test_files__(fd, sha):
     expect(fd['additions']) >= 0
-    expect(fd['deleteions']) >= 0
+    expect(fd['deletions']) >= 0
     expect(fd['changes']) == fd['additions'] + fd['deletions']
     expect_str(fd['filename'])
     expect_str(fd['blob_url'])
