@@ -1,6 +1,6 @@
 import github3
 import re
-from base import expect, BaseTest, str_test, expect_str
+from .base import expect, BaseTest, str_test, expect_str
 from datetime import datetime
 from os import unlink, listdir
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
@@ -612,15 +612,15 @@ class TestRepoTag(BaseTest):
 
 
 def __test_files__(fd, sha):
-    expect(fd.additions) >= 0
-    expect(fd.deletions) >= 0
-    expect(fd.changes) == fd.additions + fd.deletions
-    expect_str(fd.filename)
-    expect_str(fd.blob_url)
-    expect_str(fd.raw_url)
-    expect_str(fd.sha)
-    expect_str(fd.status)
-    expect_str(fd.patch)
+    expect(fd['additions']) >= 0
+    expect(fd['deletions']) >= 0
+    expect(fd['changes']) == fd['additions'] + fd['deletions']
+    expect_str(fd['filename'])
+    expect_str(fd['blob_url'])
+    expect_str(fd['raw_url'])
+    expect_str(fd['sha'])
+    expect_str(fd['status'])
+    expect_str(fd['patch'])
 
 
 class TestRepoCommit(BaseTest):
@@ -648,7 +648,7 @@ class TestRepoCommit(BaseTest):
     def test_files(self):
         expect(self.commit.files).isinstance(list)
         expect(self.commit.files) > []
-        self.expect_list_of_class(self.commit.files, type)
+        self.expect_list_of_class(self.commit.files, dict)
         for fd in self.commit.files:
             __test_files__(fd, self.sha)
 
@@ -683,7 +683,7 @@ class TestComparison(BaseTest):
     def test_files(self):
         expect(self.comp.files).isinstance(list)
         expect(self.comp.files) > []
-        self.expect_list_of_class(self.comp.files, type)
+        self.expect_list_of_class(self.comp.files, dict)
         for file in self.comp.files:
             __test_files__(file, '')
 

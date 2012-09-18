@@ -1,5 +1,5 @@
 import github3
-from base import expect, expect_str, BaseTest
+from .base import expect, expect_str, BaseTest
 
 
 class TestGitHub(BaseTest):

@@ -1,4 +1,4 @@
-from base import BaseTest, expect, str_test
+from .base import BaseTest, expect, str_test
 from datetime import datetime
 from github3 import GitHubError
 from github3.git import Commit
@@ -82,8 +82,8 @@ class TestPullRequest(BaseTest):
 
     def test_links(self):
         expect(self.pr.links).isinstance(dict)
-        expect(list(self.pr.links.keys())) == ['self', 'html', 'issue',
-                'review_comments', 'comments']
+        links = ['comments', 'html', 'issue', 'review_comments', 'self']
+        expect(sorted(list(self.pr.links.keys()))) == links
 
     def test_list_comments(self):
         comments = self.pr.list_comments()

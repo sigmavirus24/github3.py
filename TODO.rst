@@ -9,11 +9,23 @@ High priority
 unittests
 ~~~~~~~~~
 
-- We're currently at ~85% coverage. I want to get each module close to if not 
+- We're currently at ~87% coverage. I want to get each module close to if not 
   above 90% coverage before December. 100% by next year (at the latest).
-- Develop/find a better way to run the tests. Since I'm doing as much testing 
-  directly against the API as possible, running the tests takes a while and 
-  we're only at 85% coverage.
+- Make all of the objects picklable. This will allow us to load the tests in 
+  parallel. Running the current branch's test script inside a virtualenv on my 
+  machine works fine but Travis complains_. Next I need to figure out what to 
+  do to make this work in python3k. Currently in python3k I get this::
+
+    Traceback (most recent call last):
+      File "./unittests.py", line 43, in <module>
+        suites = result.get()
+      File "/usr/lib64/python3.2/multiprocessing/pool.py", line 556, in get
+        raise self._value
+    AttributeError: 'module' object has no attribute 'test_gists'
+    make: *** [alltests] Error 1
+
+.. links
+.. _complains: http://travis-ci.org/#!/sigmavirus24/github3.py/jobs/2487677
 
 remove ``@property`` decorated functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,29 +57,6 @@ Low priority
 ------------
 
 (In order of priority)
-
-monkey patching unittest
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-It should be entirely possible to monkey patch unittest so that it loads and 
-then runs the tests asynchronously. There should not be a need to write my own 
-test runner from scratch.
-
-nose2
-~~~~~
-
-Nose2_ has a built-in plugin (that defaults off) to run the tests in 
-parallel_.  This wouls greatly improve how long (overall) the tests take to 
-run. I need to investigate this first.
-
-.. _Nose2: http://nose2.readthedocs.org/en/latest/
-.. _parallel: http://nose2.readthedocs.org/en/latest/plugins/mp.html
-
-I just realized that because of how I have structed the unittests (making the 
-majority of requests to the API during the __init__ calls for the test cases), 
-nose2 would actually make things far worse_ in all likelihood.
-
-.. _worse: http://nose2.readthedocs.org/en/latest/plugins/mp.html#tests-load-twice
 
 logging
 ~~~~~~~

@@ -1,4 +1,4 @@
-from base import BaseTest, expect, str_test
+from .base import BaseTest, expect, str_test
 from datetime import datetime
 import github3
 from github3.gists import Gist, GistComment, GistFile

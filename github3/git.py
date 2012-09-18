@@ -58,21 +58,14 @@ class Commit(BaseCommit):
     def __init__(self, commit, session=None):
         super(Commit, self).__init__(commit, session)
 
-        #: :class:`User <github3.users.User>` who authored the commit.
-        self.author = commit.get('author')
-        self._author_name = commit.get('author')
-        if commit.get('author') and len(commit.get('author')) > 3:
-            # User object
-            # Typically there should be 5 keys, but more than 3 should
-            # be a sufficient test
-            self.author = User(commit.get('author'), None)
-        elif commit.get('author'):  # Not a User object
-            self.author = type('Author', (object, ), commit.get('author'))
+        #: dict containing at least the name, email and date the commit was
+        #  created
+        self.author = commit.get('author', {})
+        self._author_name = self.author.get('name', '')
 
-        #: :class:`User <github3.user.User>` who committed the commit.
-        self.committer = None
-        if commit.get('committer'):
-            self.committer = User(commit.get('committer'), None)
+        #: dict containing similar information to the author attribute
+        self.committer = commit.get('committer', {})
+        self._commit_name = self.committer.get('name', '')
 
         #: :class:`Tree <Tree>` the commit belongs to.
         self.tree = None
@@ -80,7 +73,21 @@ class Commit(BaseCommit):
             self.tree = Tree(commit.get('tree'), self._session)
 
     def __repr__(self):
-        return '<Commit [{0}:{1}]>'.format(self.author.name, self.sha)
+        return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
+
+    def author_as_User(self):
+        """Attempt to return the author attribute as a
+        :class:`User <github3.users.User>`. No guarantees are made about the
+        validity of this object, i.e., having a login or created_at object.
+        """
+        return User(self.author, self._session)
+
+    def committer_as_User(self):
+        """Attempt to return the committer attribute as a
+        :class:`User <github3.users.User>` object. No guarantees are made
+        about the validity of this object.
+        """
+        return User(self.committer, self._session)
 
 
 class Reference(GitHubCore):

@@ -1,9 +1,8 @@
-import base
 import github3
-from base import expect
+from .base import expect, BaseTest
 
 
-class TestAPI(base.BaseTest):
+class TestAPI(BaseTest):
     def test_gist(self):
         expect(github3.gist(3156487)).isinstance(github3.gists.Gist)
 
