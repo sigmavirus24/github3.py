@@ -35,14 +35,22 @@ if __name__ == "__main__":
 
     pool = Pool(5)
 
+    # list files in directory tests/
     names = os.listdir("tests")
     regex = re.compile("(?!_+)\w+\.py$")
     join = '.'.join
+    # Make a list of the names like 'tests.test_name'
     names = [join(['tests', f[:-3]]) for f in names if regex.match(f)]
+    # Start the pool running
     result = pool.map_async(load_test, names)
+    # Wait for the results which will be of the form:
+    #  [TestSuite(), TestSuite(), TestSuite()]
     suites = result.get(timeout=(10 * 60))  # 10 minutes
+    # Now turn the individual suites into one.
     suite = suites.pop(0)
     for s in suites:
         suite.addTests(s._tests)
 
+    pool.close()
+    # Run the tests
     unittest.TextTestRunner(verbosity=1).run(suite)
