@@ -1098,6 +1098,24 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Reference(r, self) for r in json]
 
+    def list_stargazers(self):
+        """List users who have starred this repository.
+
+        :returns: list of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('stargazers', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(u, self) for u in json]
+
+    def list_subscribers(self):
+        """List users subscribed to this repository.
+
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        """
+        url = self._build_url('subscribers', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [User(u, self) for u in json]
+
     def list_statuses(self, sha):
         """List the statuses for a specific SHA.
 
@@ -1128,13 +1146,8 @@ class Repository(GitHubCore):
         return self._json(self._get(url), 200)
 
     def list_watchers(self):
-        """List watchers of this repository.
-
-        :returns: list of :class:`User <github3.users.User>`\ s
-        """
-        url = self._build_url('watchers', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [User(u, self) for u in json]
+        """DEPRECATED: Use list_stargazers() instead."""
+        raise DeprecationWarning('Use list_stargazers() instead.')
 
     def merge(self, base, head, message=''):
         """Perform a merge from ``head`` into ``base``.

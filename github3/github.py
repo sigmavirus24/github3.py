@@ -23,14 +23,6 @@ class GitHub(GitHubCore):
     """Stores all the session information."""
     def __init__(self, login='', password=''):
         super(GitHub, self).__init__({})
-        # Only accept JSON responses
-        self._session.headers.update(
-                {'Accept': 'application/vnd.github.full+json'})
-        # Only accept UTF-8 encoded data
-        self._session.headers.update({'Accept-Charset': 'utf-8'})
-        # Identify who we are
-        self._session.config['base_headers'].update(
-                {'User-Agent': 'github3.py/pre-alpha'})
         if login and password:
             self.login(login, password)
 
@@ -270,8 +262,9 @@ class GitHub(GitHubCore):
             json = self._boolean(self._get(url), 204, 404)
         return json
 
-    def is_watching(self, login, repo):
-        """Check if the authenticated user is following login/repo.
+    @requires_auth
+    def is_starred(self, login, repo):
+        """Check if the authenticated user starred login/repo.
 
         :param login: (required), owner of repository
         :type login: str
@@ -281,9 +274,29 @@ class GitHub(GitHubCore):
         """
         json = False
         if login and repo:
-            url = self._build_url('user', 'watched', login, repo)
+            url = self._build_url('user', 'starred', login, repo)
             json = self._boolean(self._get(url), 204, 404)
         return json
+
+    @requires_auth
+    def is_subscribed(self, login, repo):
+        """Check if the authenticated user is subscribed to login/repo.
+
+        :param login: (required), owner of repository
+        :type login: str
+        :param repo: (required), name of repository
+        :type repo: str
+        :returns: bool
+        """
+        json = False
+        if login and repo:
+            url = self._build_url('user', 'subscriptions', login, repo)
+            json = self._boolean(self._get(url), 204, 404)
+        return json
+
+    def is_watching(self, login, repo):
+        """DEPRECATED: Use is_subscribed/is_starred instead."""
+        raise DeprecationWarning('Use is_subscribed/is_starred instead.')
 
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from https://github.com/:owner:/:repository:
@@ -490,21 +503,34 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return [Repository(repo, self) for repo in json]
 
-    def list_watching(self, login=None):
-        """List the repositories being watched by ``login`` if provided or the
-        repositories being watched by the authenticated user.
+    def list_starred(self, login=None):
+        """List repositories starred by ``login`` or the authenticated user.
 
-        :param login: (optional)
-        :type login: str
         :returns: list of :class:`Repository <github3.repos.Repository>`
-            objects
         """
         if login:
-            url = self._build_url('users', login, 'watched')
-        else:
-            url = self._build_url('user', 'watched')
+            return self.user(login).list_starred()
+
+        url = self._build_url('user', 'starred')
         json = self._json(self._get(url), 200)
-        return [Repository(repo, self) for repo in json]
+        return [Repository(r, self) for r in json]
+
+    def list_subscribed(self, login=None):
+        """List repositories subscribed to by ``login`` or the authenticated
+        user.
+
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        """
+        if login:
+            return self.user(login).list_subscriptions()
+
+        url = self._build_url('user', 'subscriptions')
+        json = self._json(self._get(url), 200)
+        return [Repository(r, self) for r in json]
+
+    def list_watching(self, login=None):
+        """DEPRECATED: Use list_starred() instead."""
+        raise DeprecationWarning('Use list_starred() instead.')
 
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls.
@@ -649,6 +675,32 @@ class GitHub(GitHubCore):
         u = json.get('user', {})
         return LegacyUser(u, self) if u else None
 
+    def star(self, login, repo):
+        """Star to login/repo
+
+        :param str login: (required), owner of the repo
+        :param str repo: (required), name of the repo
+        :return: bool
+        """
+        resp = False
+        if login and repo:
+            url = self._build_url('user', 'starred', login, repo)
+            resp = self._boolean(self._put(url), 204, 404)
+        return resp
+
+    def subscribe(self, login, repo):
+        """Subscribe to login/repo
+
+        :param str login: (required), owner of the repo
+        :param str repo: (required), name of the repo
+        :return: bool
+        """
+        resp = False
+        if login and repo:
+            url = self._build_url('user', 'subscriptions', login, repo)
+            resp = self._boolean(self._put(url), 204, 404)
+        return resp
+
     def unfollow(self, login):
         """Make the authenticated user stop following login
 
@@ -659,6 +711,32 @@ class GitHub(GitHubCore):
         resp = False
         if login:
             url = self._build_url('user', 'following', login)
+            resp = self._boolean(self._delete(url), 204, 404)
+        return resp
+
+    def unstar(self, login, repo):
+        """Unstar to login/repo
+
+        :param str login: (required), owner of the repo
+        :param str repo: (required), name of the repo
+        :return: bool
+        """
+        resp = False
+        if login and repo:
+            url = self._build_url('user', 'starred', login, repo)
+            resp = self._boolean(self._delete(url), 204, 404)
+        return resp
+
+    def unsubscribe(self, login, repo):
+        """Unsubscribe to login/repo
+
+        :param str login: (required), owner of the repo
+        :param str repo: (required), name of the repo
+        :return: bool
+        """
+        resp = False
+        if login and repo:
+            url = self._build_url('user', 'subscriptions', login, repo)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
@@ -708,34 +786,12 @@ class GitHub(GitHubCore):
         return User(json, self._session) if json else None
 
     def watch(self, login, repo):
-        """Make user start watching login/repo.
-
-        :param login: (required), owner of repository
-        :type login: str
-        :param repo: (required), name of repository
-        :type repo: str
-        :returns: bool
-        """
-        resp = False
-        if login and repo:
-            url = self._build_url('user', 'watched', login, repo)
-            resp = self._boolean(self._put(url), 204, 404)
-        return resp
+        """DEPRECATED: Use subscribe/star instead."""
+        raise DeprecationWarning('Use subscribe/star instead.')
 
     def unwatch(self, login, repo):
-        """Make user stop watching login/repo.
-
-        :param login: (required), owner of repository
-        :type login: str
-        :param repo: (required), name of repository
-        :type repo: str
-        :returns: bool
-        """
-        resp = False
-        if login and repo:
-            url = self._build_url('user', 'watched', login, repo)
-            resp = self._boolean(self._delete(url), 204, 404)
-        return resp
+        """DEPRECATED: Use unsubscribe/unstar instead."""
+        raise DeprecationWarning('Use unsubscribe/unstar instead.')
 
 
 class Authorization(GitHubCore):

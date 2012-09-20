@@ -34,14 +34,10 @@ class PullDestination(GitHubCore):
         if dest.get('repo'):
             self._repo_name = dest['repo'].get('name')
             self._repo_owner = dest['repo']['owner'].get('login')
+        self.repo = (self._repo_owner, self._repo_name)
 
     def __repr__(self):
         return '<{0} [{1}]>'.format(self.direction, self.label)
-
-    @property
-    def repo(self):
-        """(owner, name) representing the repository this is on"""
-        return (self._repo_owner, self._repo_name)
 
 
 class PullFile(GitHubObject):

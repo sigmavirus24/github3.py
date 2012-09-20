@@ -56,9 +56,20 @@ class GitHubCore(GitHubObject):
         if hasattr(ses, '_session'):
             # i.e. session is actually a GitHub object
             ses = ses._session
-        if ses is None:
+        elif ses is None:
             ses = session()
         self._session = ses
+
+        # Only accept JSON responses
+        self._session.headers.update(
+                {'Accept': 'application/vnd.github.v3.full+json'})
+        # Only accept UTF-8 encoded data
+        self._session.headers.update({'Accept-Charset': 'utf-8'})
+        # Identify who we are
+        self._session.config['base_headers'].update(
+                {'User-Agent': 'github3.py/pre-alpha'})
+
+        # set a sane default
         self._github_url = 'https://api.github.com'
         self._remaining = 5000
         self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '

@@ -10,7 +10,6 @@ from json import dumps
 from github3.events import Event
 from github3.models import GitHubObject, GitHubCore, BaseAccount
 from github3.decorators import requires_auth
-import warnings
 
 
 class Key(GitHubCore):
@@ -192,7 +191,7 @@ class User(BaseAccount):
     @property
     def for_hire(self):
         """DEPRECATED: Use hireable instead"""
-        warnings.warn('Use hireable instead', DeprecationWarning)
+        raise DeprecationWarning('Use hireable instead')
 
     def is_assignee_on(self, login, repository):
         """Checks if this user can be assigned to issues on login/repository.
@@ -271,12 +270,31 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
-        return self._owned_private_repos
+
+    def list_starred(self):
+        """List repositories starred by this user.
+
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        """
+        from github3.repos import Repository
+        url = self._build_url('starred', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Repository(r, self) for r in json]
+
+    def list_subscriptions(self):
+        """List repositories subscribed to by this user.
+
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        """
+        from github3.repos import Repository
+        url = self._build_url('subscriptions', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return [Repository(r, self) for r in json]
 
     @property
     def private_gists(self):
         """DEPRECATED: Use total_private_gists"""
-        warnings.warn('Use total_private_gists', DeprecationWarning)
+        raise DeprecationWarning('Use total_private_gists')
 
     @requires_auth
     def update(self, name=None, email=None, blog=None, company=None,
