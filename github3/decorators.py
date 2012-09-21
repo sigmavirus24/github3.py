@@ -9,12 +9,12 @@ This module provides decorators to the rest of the library
 from functools import wraps
 from requests.models import Response
 
-try:
+try:  # (No coverage)
     # python2
-    from StringIO import StringIO
-except ImportError:
+    from StringIO import StringIO  # (No coverage)
+except ImportError:  # (No coverage)
     # python3
-    from io import BytesIO as StringIO
+    from io import BytesIO as StringIO  # (No coverage)
 
 
 def requires_auth(func):

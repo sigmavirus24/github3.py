@@ -242,7 +242,13 @@ class TestRepository(BaseTest):
         self.expect_list_of_class(self.repo.list_tags(), RepoTag)
 
     def test_list_watchers(self):
-        self.expect_list_of_class(self.repo.list_watchers(), User)
+        self.assertRaises(DeprecationWarning, self.repo.list_watchers)
+
+    def test_list_stargazers(self):
+        expect(self.repo.list_stargazers()).list_of(User)
+
+    def test_list_subscribers(self):
+        expect(self.repo.list_subscribers()).list_of(User)
 
     def test_milestone(self):
         expect(self.requests_repo.milestone(15)).isinstance(Milestone)

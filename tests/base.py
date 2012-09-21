@@ -2,7 +2,7 @@ import os
 import sys
 import unittest
 import github3
-from expecter import expect, add_expectation
+import expecter
 
 
 class BaseTest(unittest.TestCase):
@@ -38,30 +38,48 @@ class BaseTest(unittest.TestCase):
             self.assertIsNotNone(getattr(obj, attr),
                 '{0} is None'.format(attr))
 
+    def raisesGHE(self, func, *args, **kwargs):
+        """Assert that the function, when called, raises a GitHubError."""
+        with expect.raises(github3.GitHubError):
+            func(*args, **kwargs)
+
     def expect_list_of_class(self, l, cls):
         for i in l:
             expect(i).isinstance(cls)
 
 
-def is_not_None(var):
-    return var is not None
+class CustomExpecter(expecter.expect):
+    def is_not_None(self):
+        assert self._actual is not None, (
+                'Expected anything but None but got it.'
+                )
 
+    def is_None(self):
+        assert self._actual is None, (
+                'Expected None but got %s' % repr(self._actual)
+                )
 
-def is_None(var):
-    return var is None
+    def is_True(self):
+        assert self._actual is True, (
+                'Expected True but got %s' % repr(self._actual)
+                )
 
+    def is_False(self):
+        assert self._actual is False, (
+                'Expected False but got %s' % repr(self._actual)
+                )
 
-def is_True(var):
-    return var is True
+    def list_of(self, cls):
+        expected = cls.__name__
+        for actual in self._actual:
+            actual_cls = actual.__class__.__name__
+            assert isinstance(actual, cls), (
+                    'Expected instance of %s but got %s' % (expected,
+                        actual_cls)
+                    )
 
+expect = CustomExpecter
 
-def is_False(var):
-    return var is False
-
-add_expectation(is_not_None)
-add_expectation(is_None)
-add_expectation(is_True)
-add_expectation(is_False)
 
 if sys.version_info >= (3, 0):
     str_test = (str, bytes)

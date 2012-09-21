@@ -3,7 +3,7 @@ import github3
 from .base import expect
 from github3.users import User, Plan, Key
 from github3.events import Event
-from warnings import catch_warnings, simplefilter
+from github3.repos import Repository
 
 
 class TestUser(base.BaseTest):
@@ -18,8 +18,7 @@ class TestUser(base.BaseTest):
         expect(self.user.disk_usage) >= 0
 
     def test_for_hire(self):
-        with catch_warnings():
-            simplefilter('ignore')
+        with expect.raises(DeprecationWarning):
             self.user.for_hire
 
     def test_hireable(self):
@@ -30,16 +29,22 @@ class TestUser(base.BaseTest):
         expect(self.user.is_assignee_on(self.kr, 'requests')).is_False()
 
     def test_list_events(self):
-        self.expect_list_of_class(self.user.list_events(), Event)
+        expect(self.user.list_events()).list_of(Event)
 
     def test_list_followers(self):
-        self.expect_list_of_class(self.user.list_followers(), User)
+        expect(self.user.list_followers()).list_of(User)
 
     def test_list_following(self):
-        self.expect_list_of_class(self.user.list_following(), User)
+        expect(self.user.list_following()).list_of(User)
 
     def test_list_received_events(self):
-        self.expect_list_of_class(self.user.list_received_events(), Event)
+        expect(self.user.list_received_events()).list_of(Event)
+
+    def test_list_starred(self):
+        expect(self.user.list_starred()).list_of(Repository)
+
+    def test_list_subscriptions(self):
+        expect(self.user.list_subscriptions()).list_of(Repository)
 
     def test_owned_private_repos(self):
         expect(self.user.owned_private_repos) >= 0
@@ -48,8 +53,7 @@ class TestUser(base.BaseTest):
         expect(self.user.total_private_gists) >= 0
 
     def test_private_gists(self):
-        with catch_warnings():
-            simplefilter('ignore')
+        with expect.raises(DeprecationWarning):
             self.user.private_gists
 
     def test_plan(self):
@@ -63,12 +67,11 @@ class TestUser(base.BaseTest):
         expect(self.user.total_private_repos) >= 0
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.user.add_email_addresses(['foo@example.com',
+        self.raisesGHE(self.user.add_email_addresses, ['foo@example.com',
                 'graff@colmin.gov'])
-            self.user.delete_email_addresses(['foo@example.com'])
-            self.user.list_org_events(self.gh3py)
-            self.user.update()
+        self.raisesGHE(self.user.delete_email_addresses, ['foo@example.com'])
+        self.raisesGHE(self.user.list_org_events, self.gh3py)
+        self.raisesGHE(self.user.update)
 
     def test_with_auth(self):
         if not self.auth:

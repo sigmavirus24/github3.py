@@ -688,6 +688,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
+    @requires_auth
     def subscribe(self, login, repo):
         """Subscribe to login/repo
 
@@ -701,6 +702,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
+    @requires_auth
     def unfollow(self, login):
         """Make the authenticated user stop following login
 
@@ -714,6 +716,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
+    @requires_auth
     def unstar(self, login, repo):
         """Unstar to login/repo
 
@@ -727,6 +730,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
+    @requires_auth
     def unsubscribe(self, login, repo):
         """Unsubscribe to login/repo
 
