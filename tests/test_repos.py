@@ -160,7 +160,7 @@ class TestRepository(BaseTest):
 
     def test_list_assignees(self):
         assignees = self.repo.list_assignees()
-        self.expect_list_of_class(assignees, User)
+        expect(assignees).list_of(User)
         for a in assignees:
             if a.login == 'sigmavirus24':
                 return
@@ -168,7 +168,7 @@ class TestRepository(BaseTest):
 
     def test_list_branches(self):
         branches = self.repo.list_branches()
-        self.expect_list_of_class(branches, Branch)
+        expect(branches).list_of(Branch)
         for b in branches:
             if b.name == 'master':
                 return
@@ -176,7 +176,7 @@ class TestRepository(BaseTest):
 
     def test_list_comments(self):
         comments = self.requests_repo.list_comments()
-        self.expect_list_of_class(comments, RepoComment)
+        expect(comments).list_of(RepoComment)
         for c in comments:
             if c.user.login == self.kr:
                 return
@@ -185,61 +185,60 @@ class TestRepository(BaseTest):
     def test_list_comments_on_commit(self):
         comments = self.requests_repo.list_comments_on_commit(
                 '10280c697dcfd3d334f1c9c381a11c324bb550bc')
-        self.expect_list_of_class(comments, RepoComment)
+        expect(comments).list_of(RepoComment)
         for c in comments:
             if c.user.login in 'brunobord':
                 return
         self.fail('No commenter with login brunobord')
 
     def test_list_commits(self):
-        self.expect_list_of_class(self.repo.list_commits(), RepoCommit)
+        expect(self.repo.list_commits()).list_of(RepoCommit)
 
     def test_list_contributors(self):
-        self.expect_list_of_class(self.repo.list_contributors(), User)
+        expect(self.repo.list_contributors()).list_of(User)
 
     def test_list_downloads(self):
         downloads = self.repo.list_downloads()
-        self.expect_list_of_class(downloads, Download)
+        expect(downloads).list_of(Download)
         for d in downloads:
             if d.name == 'todo.txt-python-0.3.zip':
                 return
         self.fail('No download with name todo.txt-python-0.3.zip')
 
     def test_list_events(self):
-        self.expect_list_of_class(self.repo.list_events(), Event)
+        expect(self.repo.list_events()).list_of(Event)
 
     def test_list_forks(self):
-        self.expect_list_of_class(self.repo.list_forks(), Repository)
-        self.expect_list_of_class(self.repo.list_forks('oldest'), Repository)
+        expect(self.repo.list_forks()).list_of(Repository)
+        expect(self.repo.list_forks('oldest')).list_of(Repository)
 
     def test_list_issues(self):
-        self.expect_list_of_class(self.repo.list_issues(), Issue)
+        expect(self.repo.list_issues()).list_of(Issue)
 
     def test_list_issue_events(self):
-        self.expect_list_of_class(self.repo.list_issue_events(), IssueEvent)
+        expect(self.repo.list_issue_events()).list_of(IssueEvent)
 
     def test_list_milestones(self):
-        self.expect_list_of_class(self.repo.list_milestones(), Milestone)
+        expect(self.repo.list_milestones()).list_of(Milestone)
 
     def test_list_network_events(self):
-        self.expect_list_of_class(self.repo.list_network_events(), Event)
+        expect(self.repo.list_network_events()).list_of(Event)
 
     def test_list_pulls(self):
-        self.expect_list_of_class(self.repo.list_pulls(state='closed'),
-                PullRequest)
+        expect(self.repo.list_pulls(state='closed')).list_of(PullRequest)
 
     def test_list_refs(self):
-        self.expect_list_of_class(self.repo.list_refs(), Reference)
+        expect(self.repo.list_refs()).list_of(Reference)
 
     def test_list_statuses(self):
         statuses = self.repo.list_statuses(
                 '04d55444a3ec06ca8d2aa0a5e333cdaf27113254'
                 )
         if statuses:
-            self.expect_list_of_class(statuses, Status)
+            expect(statuses).list_of(Status)
 
     def test_list_tags(self):
-        self.expect_list_of_class(self.repo.list_tags(), RepoTag)
+        expect(self.repo.list_tags()).list_of(RepoTag)
 
     def test_list_watchers(self):
         self.assertRaises(DeprecationWarning, self.repo.list_watchers)
@@ -274,46 +273,43 @@ class TestRepository(BaseTest):
 
     def test_requires_auth(self):
         repo = self.requests_repo
-        with expect.raises(github3.GitHubError):
-            # It's going to fail anyway by default so the username is
-            # unimportant
-            repo.add_collaborator(self.sigm)
-            repo.create_blob('Foo bar bogus', 'utf-8')
-            repo.create_comment('Foo bar bogus',
-                    'e8b7f5ad567faae369460f186ee0d82c90ccfbd1',
-                    'todo.py', 5, 10)
-            #repo.create_commit
-            repo.create_download('file_to_download', '/tmp/foo')
-            repo.create_fork(self.gh3py)
-            repo.create_hook('Hook', {'foo': 'bar'})
-            repo.create_issue('New issue')
-            repo.create_key('Key', 'foobarbogus')
-            repo.create_label('Foo bar', 'abc123')
-            repo.create_milestone('milestone')
-            repo.create_pull('PR',
-                    '04d55444a3ec06ca8d2aa0a5e333cdaf27113254',
-                    '731691616b71258c7ad7c141379856b5ebbab310')
-            repo.create_tag('fake_tag', 'fake tag message',
-                    '731691616b71258c7ad7c141379856b5ebbab310', 'commit',
-                    {'name': 'Ian Cordasco',
-                     'email': 'graffatcolmingov@gmail.com'})
-            repo.create_tree({'path': 'tests/test_fake.py',
-                'mode': '100644', 'type': 'blob',
-                'sha': '731691616b71258c7ad7c141379856b5ebbab310'})
-            repo.delete()
-            repo.edit('todo.py', '#', 'http://git.io/todo.py')
-            repo.hook(74859)
-            repo.key(1234)
-            repo.list_keys()
-            repo.list_teams()
-            repo.pubsubhubub(
-                    'subscribe',
-                    'https://github.com/user/repo/events/push',
-                    'https://httpbin.org/post'
-                    )
-            repo.remove_collaborator('foobarbogus')
-            repo.update_label('Foo', 'abc123')
-            repo.merge('development', 'master', 'Fails')
+        self.raisesGHE(repo.add_collaborator, self.sigm)
+        self.raisesGHE(repo.create_blob, 'Foo bar bogus', 'utf-8')
+        self.raisesGHE(repo.create_comment, 'Foo bar bogus',
+                'e8b7f5ad567faae369460f186ee0d82c90ccfbd1',
+                'todo.py', 5, 10)
+        #repo.create_commit
+        self.raisesGHE(repo.create_download, 'file_to_download', '/tmp/foo')
+        self.raisesGHE(repo.create_fork, self.gh3py)
+        self.raisesGHE(repo.create_hook, 'Hook', {'foo': 'bar'})
+        self.raisesGHE(repo.create_issue, 'New issue')
+        self.raisesGHE(repo.create_key, 'Key', 'foobarbogus')
+        self.raisesGHE(repo.create_label, 'Foo bar', 'abc123')
+        self.raisesGHE(repo.create_milestone, 'milestone')
+        self.raisesGHE(repo.create_pull, 'PR',
+                '04d55444a3ec06ca8d2aa0a5e333cdaf27113254',
+                '731691616b71258c7ad7c141379856b5ebbab310')
+        self.raisesGHE(repo.create_tag, 'fake_tag', 'fake tag message',
+                '731691616b71258c7ad7c141379856b5ebbab310', 'commit',
+                {'name': 'Ian Cordasco',
+                 'email': 'graffatcolmingov@gmail.com'})
+        self.raisesGHE(repo.create_tree, {'path': 'tests/test_fake.py',
+            'mode': '100644', 'type': 'blob',
+            'sha': '731691616b71258c7ad7c141379856b5ebbab310'})
+        self.raisesGHE(repo.delete)
+        self.raisesGHE(repo.edit, 'todo.py', '#', 'http://git.io/todo.py')
+        self.raisesGHE(repo.hook, 74859)
+        self.raisesGHE(repo.key, 1234)
+        self.raisesGHE(repo.list_keys)
+        self.raisesGHE(repo.list_teams)
+        self.raisesGHE(repo.pubsubhubub,
+                'subscribe',
+                'https://github.com/user/repo/events/push',
+                'https://httpbin.org/post'
+                )
+        self.raisesGHE(repo.remove_collaborator, 'foobarbogus')
+        self.raisesGHE(repo.update_label, 'Foo', 'abc123')
+        self.raisesGHE(repo.merge, 'development', 'master', 'Fails')
 
     # Try somethings only I should be able to do hence the try/except blocks
     def test_create_blob(self):
@@ -575,7 +571,7 @@ class TestHook(BaseTest):
         expect(self.hook.created_at).isinstance(datetime)
 
     def test_events(self):
-        self.expect_list_of_class(self.hook.events, str_test)
+        expect(self.hook.events).list_of(str_test)
 
     def test_id(self):
         expect(self.hook.id) == 424182
@@ -654,7 +650,7 @@ class TestRepoCommit(BaseTest):
     def test_files(self):
         expect(self.commit.files).isinstance(list)
         expect(self.commit.files) > []
-        self.expect_list_of_class(self.commit.files, dict)
+        expect(self.commit.files).list_of(dict)
         for fd in self.commit.files:
             __test_files__(fd, self.sha)
 
@@ -681,7 +677,7 @@ class TestComparison(BaseTest):
         expect(self.comp.behind_by) >= 0
 
     def test_commits(self):
-        self.expect_list_of_class(self.comp.commits, RepoCommit)
+        expect(self.comp.commits).list_of(RepoCommit)
 
     def test_diff_url(self):
         expect_str(self.comp.diff_url)
@@ -689,7 +685,7 @@ class TestComparison(BaseTest):
     def test_files(self):
         expect(self.comp.files).isinstance(list)
         expect(self.comp.files) > []
-        self.expect_list_of_class(self.comp.files, dict)
+        expect(self.comp.files).list_of(dict)
         for file in self.comp.files:
             __test_files__(file, '')
 

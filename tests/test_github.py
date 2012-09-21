@@ -117,7 +117,7 @@ class TestGitHub(BaseTest):
 
     def test_list_starred(self):
         self.raisesGHE(self.g.list_starred)
-        expect(self.g.list_starred, self.sigm).list_of(Repository)
+        expect(self.g.list_starred(self.sigm)).list_of(Repository)
 
         if not self.auth:
             return
@@ -126,7 +126,7 @@ class TestGitHub(BaseTest):
 
     def test_list_subscribed(self):
         self.raisesGHE(self.g.list_subscribed)
-        expect(self.g.list_subscribed, self.sigm).list_of(Repository)
+        expect(self.g.list_subscribed(self.sigm)).list_of(Repository)
 
         if not self.auth:
             return
@@ -287,8 +287,8 @@ class TestGitHub(BaseTest):
 
     def test_star_unstar(self):
         args = (self.gh3py, self.test_repo)
-        self.raiseGHE(self.g.star, *args)
-        self.raiseGHE(self.g.unstar, *args)
+        self.raisesGHE(self.g.star, *args)
+        self.raisesGHE(self.g.unstar, *args)
 
         if not self.auth:
             return
