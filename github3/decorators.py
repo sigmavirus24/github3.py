@@ -32,8 +32,8 @@ def requires_auth(func):
     def auth_wrapper(self, *args, **kwargs):
         auth = False
         if hasattr(self, '_session'):
-            auth = self._session.auth or \
-                self._session.headers.get('Authorization')
+            auth = (self._session.auth or
+                self._session.headers.get('Authorization'))
 
         if auth:
             return func(self, *args, **kwargs)

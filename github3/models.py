@@ -12,12 +12,12 @@ from requests import session
 from re import compile
 from github3.decorators import requires_auth
 
-try:
+try:  # (No coverage)
     # Python 2.x
-    from urlparse import urlparse
-except ImportError:
+    from urlparse import urlparse  # (No coverage)
+except ImportError:  # (No coverage)
     # Python 3.x
-    from urllib.parse import urlparse
+    from urllib.parse import urlparse  # (No coverage)
 
 __url_cache__ = {}
 
@@ -147,6 +147,11 @@ class GitHubCore(GitHubObject):
         json = self._json(self._get(self._github_url + '/rate_limit'), 200)
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining
+
+    @classmethod
+    def from_json(cls, json):
+        """Return an instance of ``cls`` formed from ``json``."""
+        return cls(json, None)
 
 
 class BaseComment(GitHubCore):

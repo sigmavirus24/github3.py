@@ -100,7 +100,7 @@ class TestIssue(BaseTest):
             old_body = issue.body
             issue.edit('New title', 'Monty spam spam python spam')
             issue.edit(old_title, old_body)
-            expect(issue.edit()).is_False()
+            expect(issue.edit(None)).is_False()
         except github3.GitHubError:
             pass
 
