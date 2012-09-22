@@ -213,7 +213,7 @@ class PullRequest(GitHubCore):
         return resp.json['merged']
 
     @requires_auth
-    def update(self, title='', body='', state=''):
+    def update(self, title=None, body=None, state=None):
         """Update this pull request.
 
         :param title: (optional), title of the pull
@@ -224,8 +224,15 @@ class PullRequest(GitHubCore):
         :type state: str
         :returns: bool
         """
-        data = dumps({'title': title, 'body': body, 'state': state})
-        json = self._json(self._patch(self._api, data=data), 200)
+        data = {'title': title, 'body': body, 'state': state}
+        json = None
+        for (k, v) in list(data.items()):
+            if v is None:
+                del data[k]
+
+        if data:
+            json = self._json(self._patch(self._api, data=data), 200)
+
         if json:
             self._update_(json)
             return True

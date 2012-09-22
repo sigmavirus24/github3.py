@@ -1,6 +1,5 @@
 from .base import BaseTest, expect, str_test
 from datetime import datetime
-from github3 import GitHubError
 from github3.git import Commit
 from github3.pulls import (PullRequest, PullDestination, ReviewComment,
         PullFile)
@@ -27,6 +26,7 @@ class TestPullRequest(BaseTest):
 
     def test_pull_request(self):
         expect(self.pr).isinstance(PullRequest)
+        expect(repr(self.pr)) != ''
 
     def test_base(self):
         expect(self.pr.base).is_not_None()
@@ -73,6 +73,9 @@ class TestPullRequest(BaseTest):
     def test_id(self):
         expect(self.pr.id) == 2228458
 
+    def test_is_mergeable(self):
+        expect(self.pr.is_mergeable()).is_False()
+
     def test_is_merged(self):
         expect(self.pr.is_merged()).is_True()
 
@@ -113,9 +116,8 @@ class TestPullRequest(BaseTest):
         expect(self.pr.patch_url) == self.url + '.patch'
 
     def test_requires_auth(self):
-        with expect.raises(GitHubError):
-            self.pr.merge('foo bar')
-            self.pr.update('New title')
+        self.raisesGHE(self.pr.merge, 'foo bar')
+        self.raisesGHE(self.pr.update, 'New title')
 
     def test_state(self):
         expect(self.pr.state) == 'closed'
@@ -135,6 +137,7 @@ class TestPullRequest(BaseTest):
         title, body, state = pr.title, pr.body, pr.state
         expect(pr.update('Test editing', 'New body')).is_True()
         expect(pr.update(title, body, state)).is_True()
+        expect(pr.update()).is_False()
 
 
 class TestReviewComment(BaseTest):
@@ -145,6 +148,7 @@ class TestReviewComment(BaseTest):
 
     def test_review_comment(self):
         expect(self.comment).isinstance(ReviewComment)
+        expect(repr(self.comment)) != ''
 
     def test_body(self):
         expect(self.comment.body).isinstance(str_test)
@@ -194,9 +198,8 @@ class TestReviewComment(BaseTest):
         expect(self.comment.user.login) == 'idan'
 
     def test_requires_auth(self):
-        with expect.raises(GitHubError):
-            self.comment.delete()
-            self.comment.edit('foo')
+        self.raisesGHE(self.comment.delete)
+        self.raisesGHE(self.comment.edit, 'foo')
 
 
 class TestPullDestination(BaseTest):
@@ -207,6 +210,7 @@ class TestPullDestination(BaseTest):
 
     def test_pull_destination(self):
         expect(self.dest).isinstance(PullDestination)
+        expect(repr(self.dest)) != ''
 
     def test_direction(self):
         expect(self.dest.direction) == 'Base'
@@ -235,6 +239,7 @@ class TestPullFile(BaseTest):
 
     def test_file(self):
         expect(self.pf).isinstance(PullFile)
+        expect(repr(self.pf)) != ''
 
     def test_additions(self):
         expect(self.pf.additions) == 2
