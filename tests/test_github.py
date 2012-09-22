@@ -122,7 +122,7 @@ class TestGitHub(BaseTest):
         if not self.auth:
             return
 
-        expect(self._g.list_starred).list_of(Repository)
+        expect(self._g.list_starred()).list_of(Repository)
 
     def test_list_subscribed(self):
         self.raisesGHE(self.g.list_subscribed)
@@ -131,7 +131,7 @@ class TestGitHub(BaseTest):
         if not self.auth:
             return
 
-        expect(self._g.list_subscribed).list_of(Repository)
+        expect(self._g.list_subscribed()).list_of(Repository)
 
     def test_follow_unfollow(self):
         self.raisesGHE(self.g.follow, self.sigm)

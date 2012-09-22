@@ -70,13 +70,8 @@ class CustomExpecter(expecter.expect):
                 )
 
     def list_of(self, cls):
-        expected = cls.__name__
         for actual in self._actual:
-            actual_cls = actual.__class__.__name__
-            assert isinstance(actual, cls), (
-                    'Expected instance of %s but got %s' % (expected,
-                        actual_cls)
-                    )
+            self.isinstance(cls)
 
 expect = CustomExpecter
 

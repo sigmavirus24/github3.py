@@ -302,7 +302,7 @@ class TestRepository(BaseTest):
         self.raisesGHE(repo.key, 1234)
         self.raisesGHE(repo.list_keys)
         self.raisesGHE(repo.list_teams)
-        self.raisesGHE(repo.pubsubhubub,
+        self.raisesGHE(repo.pubsubhubbub,
                 'subscribe',
                 'https://github.com/user/repo/events/push',
                 'https://httpbin.org/post'
