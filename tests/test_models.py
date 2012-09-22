@@ -74,6 +74,12 @@ class TestBaseAccount(BaseTest):
     def test_update(self):
         self.account._update_({'type': 'base'})
 
-    def test_from_json(self):
+
+class TestFromJSON(BaseTest):
+    def test_account_from_json(self):
         b = github3.models.BaseAccount.from_json({'type': 'base'})
         expect(b).isinstance(github3.models.BaseAccount)
+
+    def test_core_from_json(self):
+        c = github3.models.GitHubObject.from_json({})
+        expect(c).isinstance(github3.models.GitHubObject)
