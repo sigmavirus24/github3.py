@@ -45,14 +45,10 @@ class Key(GitHubCore):
         :type key: str
         :returns: bool
         """
-        if not title:
-            title = self.title
-        if not key:
-            key = self.key
-
-        data = dumps({'title': title, 'key': key})
-        json = self._json(self._patch(self._api, data=data), 200)
-
+        json = None
+        if title and key:
+            data = dumps({'title': title, 'key': key})
+            json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True

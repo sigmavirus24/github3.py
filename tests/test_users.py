@@ -40,6 +40,7 @@ class TestUser(base.BaseTest):
 
     def test_list_received_events(self):
         expect(self.user.list_received_events()).list_of(Event)
+        expect(self.user.list_received_events(True)).list_of(Event)
 
     def test_list_starred(self):
         expect(self.user.list_starred()).list_of(Repository)
@@ -111,6 +112,8 @@ class TestKey(base.BaseTest):
 
     def test_key(self):
         expect(self.key).isinstance(Key)
+        expect(repr(self.key)) != ''
+        self.key._update_(self.key.to_json())
 
     def test_pubkey(self):
         expect(self.key.key).isinstance(base.str_test)
@@ -122,7 +125,23 @@ class TestKey(base.BaseTest):
         expect(self.key.title).isinstance(base.str_test)
 
     def test_requires_auth(self):
+        self.raisesGHE(self.key.update, 'title', 'ssha-rsa AAAAB2...')
+        self.raisesGHE(self.key.delete)
+
+    def test_with_auth(self):
         if not self.auth:
-            with expect.raises(github3.GitHubError):
-                self.key.update('title', 'ssha-rsa AAAAB2...')
-                self.key.delete()
+            return
+        expect(self.key.update(None, None)).is_False()
+        expect(self.key.update(self.key.title, self.key.key)).is_True()
+
+
+def TestPlan(BaseTest):
+    def __init__(self, methodName='runTest'):
+        self.plan = github3.users._free
+
+    def test_plan(self):
+        expect(self.plan).isinstance(Plan)
+        expect(repr(self.plan)) != ''
+
+    def test_is_free(self):
+        expect(self.plan.is_free()).is_True()
