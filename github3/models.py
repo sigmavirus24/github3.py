@@ -291,7 +291,7 @@ class BaseAccount(GitHubCore):
 
 class GitHubError(Exception):
     def __init__(self, resp):
-        super(GitHubError, self).__init__()
+        super(GitHubError, self).__init__(resp)
         #: Response code that triggered the error
         self.response = resp
         self.code = resp.status_code
