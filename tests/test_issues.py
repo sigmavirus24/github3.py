@@ -14,13 +14,12 @@ class TestIssue(BaseTest):
         expect(self.issue).isinstance(Issue)
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.issue.close()
-            self.issue.add_labels('foo', 'bar')
-            self.issue.edit('Foo', 'Bar', self.sigm, 'closed')
-            self.issue.remove_label('Bug')
-            self.issue.remove_all_labels()
-            self.issue.repoen()
+        self.raisesGHE(self.issue.close)
+        self.raisesGHE(self.issue.add_labels, 'foo', 'bar')
+        self.raisesGHE(self.issue.edit, 'Foo', 'Bar', self.sigm, 'closed')
+        self.raisesGHE(self.issue.remove_label, 'Bug')
+        self.raisesGHE(self.issue.remove_all_labels)
+        self.raisesGHE(self.issue.repoen)
 
     def test_assignee(self):
         if self.issue.assignee:
@@ -101,6 +100,7 @@ class TestIssue(BaseTest):
             old_body = issue.body
             issue.edit('New title', 'Monty spam spam python spam')
             issue.edit(old_title, old_body)
+            expect(issue.edit()).is_False()
         except github3.GitHubError:
             pass
 

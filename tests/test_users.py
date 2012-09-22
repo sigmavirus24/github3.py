@@ -13,6 +13,7 @@ class TestUser(base.BaseTest):
 
     def test_user(self):
         expect(self.user).isinstance(User)
+        expect(repr(self.user)) != ''
 
     def test_disk_usage(self):
         expect(self.user.disk_usage) >= 0

@@ -178,9 +178,6 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
-    def __repr__(self):
-        return '<github3-comment at 0x{0:x}>'.format(id(self))
-
     def _update_(self, comment):
         self.__init__(comment, self._session)
 
