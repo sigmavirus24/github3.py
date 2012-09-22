@@ -19,7 +19,7 @@ class TestIssue(BaseTest):
         self.raisesGHE(self.issue.edit, 'Foo', 'Bar', self.sigm, 'closed')
         self.raisesGHE(self.issue.remove_label, 'Bug')
         self.raisesGHE(self.issue.remove_all_labels)
-        self.raisesGHE(self.issue.repoen)
+        self.raisesGHE(self.issue.reopen)
 
     def test_assignee(self):
         if self.issue.assignee:
