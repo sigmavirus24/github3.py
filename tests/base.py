@@ -71,7 +71,7 @@ class CustomExpecter(expecter.expect):
 
     def list_of(self, cls):
         for actual in self._actual:
-            self.isinstance(cls)
+            CustomExpecter(actual).isinstance(cls)
 
 expect = CustomExpecter
 
