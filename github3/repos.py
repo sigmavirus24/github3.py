@@ -1286,7 +1286,7 @@ class Repository(GitHubCore):
         :type new_name: str
         :returns: bool
         """
-        label = self.get_label(name)
+        label = self.label(name)
         resp = False
         if label:
             upd = label.update
