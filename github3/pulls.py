@@ -231,7 +231,7 @@ class PullRequest(GitHubCore):
                 del data[k]
 
         if data:
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)
