@@ -136,7 +136,7 @@ class TestLabel(BaseTest):
         expect(label.name) == 'Test_label'
         expect(label.update('Test_update', 'abd124')).is_True()
         expect(label.update('Test_update2', '#abd124')).is_True()
-        expect(label.update()).is_False()
+        expect(label.update(None, None)).is_False()
         expect(label.delete()).is_True()
 
 
@@ -277,7 +277,3 @@ class TestIssueEvent(BaseTest):
 
     def test_pull_request(self):
         expect(self.ev.pull_request).isinstance(dict)
-
-    def test_updated_at(self):
-        if self.ev.updated_at:
-            expect(self.ev.updated_at).isinstance(datetime)
