@@ -49,8 +49,11 @@ class Label(GitHubCore):
         if color[0] == '#':
             color = color[1:]
 
-        json = self._json(self._patch(self._api, data=dumps({'name': name,
-            'color': color})), 200)
+        json = None
+
+        if name and color:
+            json = self._json(self._patch(self._api, data=dumps({'name': name,
+                'color': color})), 200)
         if json:
             self._update_(json)
             return True
@@ -127,7 +130,10 @@ class Milestone(GitHubCore):
         """
         data = dumps({'title': title, 'state': state,
             'description': description, 'due_on': due_on})
-        json = self._json(self._patch(self._api, data=data), 200)
+        json = None
+
+        if not title:
+            json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True
@@ -387,18 +393,8 @@ class IssueEvent(GitHubCore):
         #: Number of comments
         self.comments = event.get('comments', 0)
 
-        #: datetime object representing whn the issue was closed
-        self.closed_at = None
-        if event.get('closed_at'):
-            self.closed_at = self._strptime(event.get('closed_at'))
-
         #: datetime object representing when the event was created.
         self.created_at = self._strptime(event.get('created_at'))
-
-        #: datetime object representing when the event was updated.
-        self.updated_at = None
-        if event.get('updated_at'):
-            self.updated_at = self._strptime(event.get('updated_at'))
 
         #: Dictionary of links for the pull request
         self.pull_request = {}

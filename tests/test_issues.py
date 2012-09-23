@@ -12,6 +12,7 @@ class TestIssue(BaseTest):
 
     def test_issue(self):
         expect(self.issue).isinstance(Issue)
+        expect(repr(self.issue)) != ''
 
     def test_requires_auth(self):
         self.raisesGHE(self.issue.close)
@@ -113,11 +114,11 @@ class TestLabel(BaseTest):
 
     def test_label(self):
         expect(self.label).isinstance(Label)
+        expect(repr(self.label)) != ''
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.label.delete()
-            self.label.update('foo', 'abc123')
+        self.raisesGHE(self.label.delete)
+        self.raisesGHE(self.label.update, 'foo', 'abc123')
 
     def test_name(self):
         expect(self.label.name) == 'Feature Request'
@@ -134,6 +135,8 @@ class TestLabel(BaseTest):
         expect(label.color) == 'abc123'
         expect(label.name) == 'Test_label'
         expect(label.update('Test_update', 'abd124')).is_True()
+        expect(label.update('Test_update2', '#abd124')).is_True()
+        expect(label.update()).is_False()
         expect(label.delete()).is_True()
 
 
@@ -145,11 +148,11 @@ class TestMilestone(BaseTest):
 
     def test_milestone(self):
         expect(self.milestone).isinstance(Milestone)
+        expect(repr(self.milestone)) != ''
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.milestone.delete()
-            self.milestone.update('New title', 'closed')
+        self.raisesGHE(self.milestone.delete)
+        self.raisesGHE(self.milestone.update, 'New title', 'closed')
 
     def test_closed_issues(self):
         expect(self.milestone.closed_issues) >= 6
@@ -205,6 +208,7 @@ class TestIssueComment(BaseTest):
 
     def test_comment(self):
         expect(self.comment).isinstance(IssueComment)
+        expect(repr(self.comment)) != ''
 
     def test_created_at(self):
         expect(self.comment.created_at).isinstance(datetime)
@@ -228,9 +232,8 @@ class TestIssueComment(BaseTest):
         expect(self.comment.user).isinstance(User)
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.comment.delete()
-            self.comment.edit('foo')
+        self.raisesGHE(self.comment.delete)
+        self.raisesGHE(self.comment.edit, 'foo')
 
     def test_with_auth(self):
         if not self.auth:
@@ -246,11 +249,14 @@ class TestIssueComment(BaseTest):
 class TestIssueEvent(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestIssueEvent, self).__init__(methodName)
-        issue = self.g.issue(self.kr, 'requests', 179)
+        repo = self.g.repository(self.kr, 'requests')
+        issue = repo.issue(179)
         self.ev = issue.list_events()[0]
+        self.repo_ev = repo.list_issue_events()[0]
 
     def test_issueevent(self):
         expect(self.ev).isinstance(IssueEvent)
+        expect(repr(self.ev)) != ''
 
     def test_event(self):
         expect(self.ev.event).isinstance(str_test)
@@ -264,6 +270,7 @@ class TestIssueEvent(BaseTest):
 
     def test_issue(self):
         expect(self.ev.issue).isinstance(Issue)
+        expect(self.repo_ev.issue).isinstance(Issue)
 
     def test_comments(self):
         expect(self.ev.comments) >= 0

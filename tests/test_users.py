@@ -125,6 +125,8 @@ class TestKey(base.BaseTest):
         expect(self.key.title).isinstance(base.str_test)
 
     def test_requires_auth(self):
+        if self.auth:
+            return
         self.raisesGHE(self.key.update, 'title', 'ssha-rsa AAAAB2...')
         self.raisesGHE(self.key.delete)
 
