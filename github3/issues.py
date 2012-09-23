@@ -46,14 +46,14 @@ class Label(GitHubCore):
         :param str color: (required), color code, e.g., 626262, no leading '#'
         :returns: bool
         """
-        if color[0] == '#':
-            color = color[1:]
-
         json = None
 
         if name and color:
+            if color[0] == '#':
+                color = color[1:]
             json = self._json(self._patch(self._api, data=dumps({'name': name,
                 'color': color})), 200)
+
         if json:
             self._update_(json)
             return True
