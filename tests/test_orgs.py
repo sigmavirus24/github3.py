@@ -82,7 +82,8 @@ class TestOrganization(BaseTest):
             pass
 
         try:
-            repo = org.create_repo('test_repo_creation', 'testing', 190083)
+            repo = org.create_repo('test_repo_creation', 'testing',
+                    team_id=190083)
             expect(repo).isinstance(Repository)
             repo.delete()
         except github3.GitHubError:
