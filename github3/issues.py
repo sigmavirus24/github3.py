@@ -208,7 +208,8 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        json = self._post(url, dumps(list(args)), status_code=200)
+        json = self._json(self._post(url, data=dumps(list(args))),
+                status_code=200)
         return True if json else False
 
     @requires_auth

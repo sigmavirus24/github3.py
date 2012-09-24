@@ -91,7 +91,7 @@ class TestIssue(BaseTest):
         expect(issue_params(**faulty_params)) == {}
         good_params = {'filter': 'assigned', 'sort': 'created',
                 'direction': 'asc', 'since': '2012-01-20T20:00:00Z',
-                'state': '', 'labels': 'Enhancement,bug'}
+                'state': 'open', 'labels': 'Enhancement,bug'}
         expect(issue_params(**good_params)) == good_params
 
     def test_with_auth(self):
