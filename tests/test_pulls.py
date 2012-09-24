@@ -27,6 +27,7 @@ class TestPullRequest(BaseTest):
     def test_pull_request(self):
         expect(self.pr).isinstance(PullRequest)
         expect(repr(self.pr)) != ''
+        self.pr._update_(self.pr.to_json())
 
     def test_base(self):
         expect(self.pr.base).is_not_None()
@@ -135,7 +136,7 @@ class TestPullRequest(BaseTest):
         r = self._g.repository(self.gh3py, self.test_repo)
         pr = r.pull_request(2)
         title, body, state = pr.title, pr.body, pr.state
-        expect(pr.update('Test editing', 'New body', 'open')).is_True()
+        expect(pr.update('Test editing', 'New body')).is_True()
         expect(pr.update(title, body, state)).is_True()
         expect(pr.update()).is_False()
 

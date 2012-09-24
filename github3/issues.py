@@ -132,7 +132,7 @@ class Milestone(GitHubCore):
             'description': description, 'due_on': due_on})
         json = None
 
-        if not title:
+        if title:
             json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
@@ -274,9 +274,14 @@ class Issue(GitHubCore):
         .. [1] Milestone numbering starts at 1, i.e. the first milestone you
                create is 1, the second is 2, etc.
         """
+        json = None
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        json = self._json(self._patch(self._api, data=dumps(data)), 200)
+        for (k, v) in list(data.items()):
+            if v is None:
+                del data[k]
+        if data:
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)
             return True

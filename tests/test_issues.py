@@ -1,8 +1,8 @@
-import github3
 from .base import BaseTest, expect, str_test
 from datetime import datetime
 from github3.users import User
-from github3.issues import Issue, IssueComment, IssueEvent, Label, Milestone
+from github3.issues import (Issue, IssueComment, IssueEvent, Label, Milestone,
+        issue_params)
 
 
 class TestIssue(BaseTest):
@@ -84,6 +84,16 @@ class TestIssue(BaseTest):
     def test_user(self):
         expect(self.issue.user).isinstance(User)
 
+    def test_issue_params(self):
+        faulty_params = {'filter': 'foo', 'sort': 'sorted', 'direction': 'up',
+                'since': 'yesterday', 'state': 'clopen', 'labels': ''}
+        # clopen is a real word in mathematics, check it out
+        expect(issue_params(**faulty_params)) == {}
+        good_params = {'filter': 'assigned', 'sort': 'created',
+                'direction': 'asc', 'since': '2012-01-20T20:00:00Z',
+                'state': '', 'labels': ''}
+        expect(issue_params(**good_params)) == good_params
+
     def test_with_auth(self):
         if not self.auth:
             return
@@ -94,16 +104,19 @@ class TestIssue(BaseTest):
         # (sigmavirus24) am the only person with permission on the org and
         # I am the issue creator so for others it may not work and that is
         # not a failure, just standard Github behavior
-        try:
-            issue.close()
-            issue.reopen()
-            old_title = issue.title
-            old_body = issue.body
-            issue.edit('New title', 'Monty spam spam python spam')
-            issue.edit(old_title, old_body)
-            expect(issue.edit(None)).is_False()
-        except github3.GitHubError:
-            pass
+        issue.close()
+        issue.reopen()
+        expect(issue.is_closed()).is_False()
+        old_title = issue.title
+        old_body = issue.body
+        issue.edit('New title', 'Monty spam spam python spam')
+        issue.edit(old_title, old_body)
+        expect(issue.edit(None)).is_False()
+        issue.add_labels('wontfix', 'Enhancement')
+        expect(issue.remove_label('wontfix')).is_True()
+        expect(issue.remove_label('wontfix')).is_False()
+        expect(issue.replace_labels('invalid', 'duplicate')).is_True()
+        expect(issue.remove_all_labels()).is_True()
 
 
 class TestLabel(BaseTest):
@@ -192,7 +205,8 @@ class TestMilestone(BaseTest):
         repo = self._g.repository(self.gh3py, self.test_repo)
         m = repo.create_milestone('test_creation', 'open')
         expect(m).isinstance(Milestone)
-        m.update('test_update', 'closed')
+        expect(m.update('test_update', 'closed')).is_True()
+        expect(m.update(None)).is_False()
         expect(m.delete()).is_True()
         m = None
         m = repo.create_milestone('test_creation')
