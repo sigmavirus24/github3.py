@@ -27,26 +27,10 @@ unittests
 .. links
 .. _complains: http://travis-ci.org/#!/sigmavirus24/github3.py/jobs/2487677
 
-remove ``@property`` decorated functions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+iterability
+~~~~~~~~~~~
 
-- I hadn't considered that because these were functions, they add unnecessary 
-  delay in accessing the attributes. If someone is insistent on presenting bad 
-  information to an end-user, they'll do it no matter what, so I may as well 
-  just make maintaining the code easier on myself.
-
-plan
-++++
-
-- Wherever there is a ``@property`` decorated function that just returns a 
-  value, rename that value to the name of the function everywhere in the 
-  class.
-
-pagination
-~~~~~~~~~~
-
-- Certain calls should accept a way of doing pagination. There are comments 
-  around those calls
+- Replace all of the ``list_(.*)`` methods with ``iter_\1`` functions.
 
 github3.api
 ~~~~~~~~~~~
@@ -68,35 +52,65 @@ Plan
 ====
 
 - Finish unittests
-- Brainstorm ideas on how to give access to paginated functions, e.g., 
-  ``Repository.list_issues()``.
+- Design basic generator functionality to replace the ``list_*`` functions.
 
-  Initial problems with pagination:
+    ::
 
-  * Where to store the relative links for each request.
+        def iter_issues(self, milestone=None, state=None, assignee=None,
+            mentioned=None, labels=None, sort=None, direction=None,
+            since=None, count=-1):
+            """Iterates over issues on this repo based upon parameters passed.
 
-    Ideas:
+            :param milestone: (optional), 'none', or '*'
+            :type milestone: int
+            :param state: (optional), accepted values: ('open', 'closed')
+            :type state: str
+            :param assignee: (optional), 'none', '*', or login name
+            :type assignee: str
+            :param mentioned: (optional), user's login name
+            :type mentioned: str
+            :param labels: (optional), comma-separated list of labels, e.g.
+                'bug,ui,@high' :param sort: accepted values:
+                ('created', 'updated', 'comments', 'created')
+            :type labels: str
+            :param direction: (optional), accepted values: ('open', 'closed')
+            :type direction: str
+            :param since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+            :type since: str
+            :param int count: (optional), numer of issues to iterate over, -1
+                iterates over all issues
+            """
+            def issues_left():
+                return count == -1 or count > 0
 
-    - Each function generates a URL for each call which is technically unique.  
-      We could have a global dictionary which uses the generated URL as a key 
-      and stores the relative links. Each time the call for pagination 
-      happens, e.g.,
+            url = self._build_url('issues', base_url=self._api)
 
-      ::
-        
-        repo.list_issues(rel_link='next')
+            params = {}
+            if milestone in ('*', 'none') or isinstance(milestone, int):
+                params['milestone'] = str(milestone).lower()
 
-      We replace the old set of relative links with the new set.
+            if assignee:
+                params['assignee'] = assignee
 
-  * How to have the user invoke the next link.
+            if mentioned:
+                params['mentioned'] = mentioned
 
-    Ideas:
+            params.update(issue_params(None, state, labels, sort, direction,
+                since))
 
-    - Add one more parameter to the function (or decorator if using above 
-      idea) that accepts the argument: ``rel_link``. If the call was not 
-      previously made, just return the first list of objects. We will not ever 
-      try to guess what the user wants, so this will be the standard behavior.
+            count = int(count)
 
-  What is already done for pagination:
+            while issues_left() and url:
+                response = self._get(url)
+                json = self._json(response, 200)
+                for i in json:
+                    yield Issue(i, self)
+                    count -= 1
+                    if count == 0:
+                        break
 
-  * Requests now has link parsing built into it.
+                rel_next = response.links.get('rel_next', {})
+                url = rel_next.get('url', '')
+
+    Naturally, ``issues_left()`` will not be nested into each iterator,  but 
+    for the purposes of this example, it is easier to define it there.
