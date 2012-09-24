@@ -113,9 +113,9 @@ class TestIssue(BaseTest):
         issue.edit(old_title, old_body)
         expect(issue.edit(None)).is_False()
         issue.add_labels('wontfix', 'Enhancement')
-        expect(issue.remove_label('wontfix')).is_True()
-        expect(issue.remove_label('wontfix')).is_False()
-        expect(issue.replace_labels('invalid', 'duplicate')).is_True()
+        expect(issue.remove_label('wontfix')).isinstance(list)
+        expect(issue.remove_label('wontfix')).isinstance(list)
+        expect(issue.replace_labels(['invalid', 'duplicate'])).is_True()
         expect(issue.remove_all_labels()).is_True()
 
 

@@ -120,7 +120,8 @@ class GitHubCore(GitHubObject):
     def _put(self, url, **kwargs):
         req = False
         if self._remaining > 0:
-            kwargs.update(headers={'Content-Length': '0'})
+            if 'data' not in kwargs:
+                kwargs.update(headers={'Content-Length': '0'})
             req = self._session.put(url, **kwargs)
         return req
 

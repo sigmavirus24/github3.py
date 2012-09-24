@@ -320,10 +320,10 @@ class Issue(GitHubCore):
         """Removes label ``name`` from this issue.
 
         :param str name: (required), name of the label to remove
-        :returns: bool
+        :returns: list of labels remaining
         """
         url = self._build_url('labels', name, base_url=self._api)
-        return self._boolean(self._delete(url), 200, 404)
+        return self._json(self._delete(url), 200)
 
     @requires_auth
     def remove_all_labels(self):
@@ -343,7 +343,7 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._boolean(self._put(url, dumps(labels)), 200, 404)
+        return self._boolean(self._put(url, data=dumps(labels)), 200, 404)
 
     @requires_auth
     def reopen(self):
