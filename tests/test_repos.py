@@ -588,10 +588,9 @@ class TestHook(BaseTest):
     def test_requires_auth(self):
         if self.auth:
             return
-        with expect.raises(github3.GitHubError):
-            self.hook.edit('tweeter', self.hook.config)
-            self.hook.delete()
-            self.hook.test()
+        self.raisesGHE(self.hook.edit, 'tweeter', self.hook.config)
+        self.raisesGHE(self.hook.delete)
+        self.raisesGHE(self.hook.test)
 
 
 class TestRepoTag(BaseTest):

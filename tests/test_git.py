@@ -1,5 +1,4 @@
 from .base import BaseTest, expect, expect_str
-import github3
 from github3.git import (Commit, Blob, Reference, Tag, Tree, Hash, GitObject,
         GitData)
 from github3.users import User
@@ -163,9 +162,9 @@ class TestReference(BaseTest):
         expect_str(self.ref.ref)
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.ref.delete()
-            self.ref.update('31e862095dffa60744f1ce16a431ea040381f053')
+        self.raisesGHE(self.ref.delete)
+        self.raisesGHE(self.ref.update,
+                '31e862095dffa60744f1ce16a431ea040381f053')
 
     def test_with_auth(self):
         if not self.auth:

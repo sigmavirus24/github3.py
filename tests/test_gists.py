@@ -76,14 +76,13 @@ class TestGist(BaseTest):
             expect(self.gist.user).isinstance(User)
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            for g in self.gists:
-                g.create_comment('Foo')
-                g.delete()
-                g.edit()
-                g.fork()
-                g.star()
-                g.unstar()
+        for g in self.gists:
+            self.raisesGHE(g.create_comment, 'Foo')
+            self.raisesGHE(g.delete)
+            self.raisesGHE(g.edit)
+            self.raisesGHE(g.fork)
+            self.raisesGHE(g.star)
+            self.raisesGHE(g.unstar)
 
     def test_with_auth(self):
         if not self.auth:
@@ -133,7 +132,6 @@ class TestGistFile(BaseTest):
             expect(repr(f)) != ''
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            for c in self.comments:
-                c.delete()
-                c.edit('foo')
+        for c in self.comments:
+            self.raisesGHE(c.delete)
+            self.raisesGHE(c.edit, 'foo')
