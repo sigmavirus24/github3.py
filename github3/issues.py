@@ -253,7 +253,7 @@ class Issue(GitHubCore):
 
     @requires_auth
     def edit(self, title=None, body=None, assignee=None, state=None,
-            milestone=None, labels=[]):
+            milestone=None, labels=None):
         """Edit this issue.
 
         :param title: Title of the issue
