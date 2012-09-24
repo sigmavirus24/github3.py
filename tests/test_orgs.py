@@ -129,19 +129,18 @@ class TestOrganization(BaseTest):
             pass
 
         try:
-            be = org.billing_email
             co = org.company
             em = org.email
             loc = org.location
             name = org.name
             expect(org.edit()).is_False()
-            expect(org.edit(be, 'github3.io', em, loc, name)).is_True()
-            expect(org.edit(be, co, em, loc, name)).is_True()
+            expect(org.edit(None, 'github3.io', em, loc, name)).is_True()
+            expect(org.edit(None, co, em, loc, name)).is_True()
         except github3.GitHubError:
             pass
 
         try:
-            expect(org.remove_repo(self.test_repo, 'Foo')).is_False()
+            expect(org.remove_repo(self.test_repo, 'Foo')).isinstance(bool)
         except github3.GitHubError:
             pass
 
@@ -191,6 +190,6 @@ class TestTeam(BaseTest):
 
     def test_remove_repo(self):
         if self.auth:
-            expect(self.team.remove_repo(self.test_repo)).is_True()
+            expect(self.team.remove_repo(self.test_repo)).isinstance(bool)
         else:
             self.raisesGHE(self.team.remove_repo, self.test_repo)
