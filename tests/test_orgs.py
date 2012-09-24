@@ -13,6 +13,8 @@ class TestOrganization(BaseTest):
 
     def test_organization(self):
         expect(self.org).isinstance(Organization)
+        expect(repr(self.org)) != ''
+        self.org._update_(self.org.to_json())
 
     def test_is_member(self):
         expect(self.org.is_member(self.sigm)).isinstance(bool)
@@ -46,18 +48,17 @@ class TestOrganization(BaseTest):
         expect(self.org.name) == 'github3.py'
 
     def test_requires_auth(self):
-        with expect.raises(github3.GitHubError):
-            self.org.add_member('jcordasc', 'Collaborators')
-            self.org.add_repo(self.test_repo, 'Collaborators')
-            self.org.create_repo(self.test_repo + '2')
-            self.org.conceal_member(self.sigm)
-            self.org.create_team('New Team', permissions='pull')
-            self.org.edit(name='github3[dot]py')
-            self.org.list_teams()
-            self.org.publicize_member(self.sigm)
-            self.org.remove_member(self.sigm)
-            self.org.remove_repo(self.test_repo, 'Collaborators')
-            self.org.team(190083)
+        self.raisesGHE(self.org.add_member, 'gh3test', 'Collaborators')
+        self.raisesGHE(self.org.add_repo, self.test_repo, 'Collaborators')
+        self.raisesGHE(self.org.create_repo, self.test_repo + '2')
+        self.raisesGHE(self.org.conceal_member, self.sigm)
+        self.raisesGHE(self.org.create_team, 'New Team', permissions='pull')
+        self.raisesGHE(self.org.edit, name='github3[dot]py')
+        self.raisesGHE(self.org.list_teams)
+        self.raisesGHE(self.org.publicize_member, self.sigm)
+        self.raisesGHE(self.org.remove_member, self.sigm)
+        self.raisesGHE(self.org.remove_repo, self.test_repo, 'Collaborators')
+        self.raisesGHE(self.org.team, 190083)
 
     def test_with_auth(self):
         if not self.auth:
@@ -68,8 +69,8 @@ class TestOrganization(BaseTest):
         # Might as well avoid a call to the API, right?
         org = Organization(self.org.to_json(), self._g)
         try:
-            expect(org.add_member('jcordasc', 'Collaborators')).is_True()
-            expect(org.remove_member('jcordasc')).is_True()
+            expect(org.add_member('gh3test', 'Collaborators')).is_True()
+            expect(org.remove_member('gh3test')).is_True()
         except github3.GitHubError:
             pass
 
@@ -81,7 +82,7 @@ class TestOrganization(BaseTest):
             pass
 
         try:
-            repo = org.create_repo('test_repo_creation', 'testing')
+            repo = org.create_repo('test_repo_creation', 'testing', 190083)
             expect(repo).isinstance(Repository)
             repo.delete()
         except github3.GitHubError:
@@ -117,9 +118,79 @@ class TestOrganization(BaseTest):
         except github3.GitHubError:
             pass
 
+        try:
+            expect(org.add_member(self.sigm, 'Foo')).is_False()
+        except github3.GitHubError:
+            pass
+
+        try:
+            expect(org.add_repo(self.test_repo, 'Foo')).is_False()
+        except github3.GitHubError:
+            pass
+
+        try:
+            be = org.billing_email
+            co = org.company
+            em = org.email
+            loc = org.location
+            name = org.name
+            expect(org.edit()).is_False()
+            expect(org.edit(be, 'github3.io', em, loc, name)).is_True()
+            expect(org.edit(be, co, em, loc, name)).is_True()
+        except github3.GitHubError:
+            pass
+
+        try:
+            expect(org.remove_repo(self.test_repo, 'Foo')).is_False()
+        except github3.GitHubError:
+            pass
+
 
 class TestTeam(BaseTest):
-    pass
+    def __init__(self, methodName='runTest'):
+        super(TestTeam, self).__init__(methodName)
+        if self.auth:
+            org = self._g.organization(self.gh3py)
+            self.team = org.team(190083)
+        else:
+            team = {'url': 'https://api.github.com/teams/190083',
+                    'permission': 'pull', 'name': 'Collaborators',
+                    'id': 190083}
+            self.team = Team(team)
 
-# I have to decide how to test Teams. They're all entirely dependent upon
-# being authenticated and being part of an organization.
+    def test_team(self):
+        expect(self.team).isinstance(Team)
+        expect(repr(self.team)) != ''
+        self.team._update_(self.team.to_json())
+
+    def test_edit(self):
+        if self.auth:
+            expect(self.team.edit(None)).is_False()
+            expect(self.team.edit('Collabs')).is_True()
+            expect(self.team.edit('Collaborators')).is_True()
+        else:
+            self.raisesGHE(self.team.edit, None)
+
+    def test_has_repo(self):
+        expect(self.team.has_repo('github3.py')).isinstance(bool)
+
+    def test_is_member(self):
+        expect(self.team.is_member(self.sigm)).isinstance(bool)
+
+    def test_list_members(self):
+        expect(self.team.list_members()).list_of(User)
+
+    def test_list_repos(self):
+        expect(self.team.list_repos()).list_of(Repository)
+
+    def test_remove_member(self):
+        if self.auth:
+            expect(self.team.remove_member(self.sigm)).is_True()
+        else:
+            self.raisesGHE(self.team.remove_member, self.sigm)
+
+    def test_remove_repo(self):
+        if self.auth:
+            expect(self.team.remove_repo(self.test_repo)).is_True()
+        else:
+            self.raisesGHE(self.team.remove_repo, self.test_repo)
