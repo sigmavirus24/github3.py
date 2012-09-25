@@ -9,23 +9,15 @@ High priority
 unittests
 ~~~~~~~~~
 
-- We're currently at ~87% coverage. I want to get each module close to if not 
+- We're currently at ~92% coverage. I want to get each module close to if not 
   above 90% coverage before December. 100% by next year (at the latest).
-- Make all of the objects picklable. This will allow us to load the tests in 
-  parallel. Running the current branch's test script inside a virtualenv on my 
-  machine works fine but Travis complains_. Next I need to figure out what to 
-  do to make this work in python3k. Currently in python3k I get this::
 
-    Traceback (most recent call last):
-      File "./unittests.py", line 43, in <module>
-        suites = result.get()
-      File "/usr/lib64/python3.2/multiprocessing/pool.py", line 556, in get
-        raise self._value
-    AttributeError: 'module' object has no attribute 'test_gists'
-    make: *** [alltests] Error 1
+    + The major hurtle now are github3.github and github3.repos. Both contain 
+      functions/functionality that will be very difficult to design test cases 
+      for, e.g., creating a pull request, creating a pull request from an 
+      existing issue, creating a commit object, etc.
 
 .. links
-.. _complains: http://travis-ci.org/#!/sigmavirus24/github3.py/jobs/2487677
 
 iterability
 ~~~~~~~~~~~

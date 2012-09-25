@@ -178,9 +178,13 @@ class TestTeam(BaseTest):
         expect(self.team.is_member(self.sigm)).isinstance(bool)
 
     def test_list_members(self):
+        if not self.auth:
+            return
         expect(self.team.list_members()).list_of(User)
 
     def test_list_repos(self):
+        if not self.auth:
+            return
         expect(self.team.list_repos()).list_of(Repository)
 
     def test_remove_member(self):

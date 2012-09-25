@@ -129,7 +129,7 @@ To test how much of the library is covered::
     make coverage
 
 Depending on which you run, you will see different percentages reported by 
-coverage. As of this writing (2012-09-16), ``coverage_auth`` reports 87% of 
+coverage. As of this writing (2012-09-24), ``coverage_auth`` reports 92% of 
 the library is covered and every module has coverage >= 80%.
 
 ::
