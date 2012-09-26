@@ -51,6 +51,9 @@ class TestGitHubError(BaseTest):
     def test_errors(self):
         expect(self.error.errors).list_of(str_test)
 
+    def test_str(self):
+        expect(str(self.error)) == '401 Requires authentication'
+
 
 class TestBaseComment(BaseTest):
     def __init__(self, methodName='runTest'):

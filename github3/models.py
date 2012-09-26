@@ -313,11 +313,7 @@ class GitHubError(Exception):
         return '<GitHubError [{0}]>'.format(self.msg or self.code)
 
     def __str__(self):
-        if not self.errors:
-            return '{0} {1}'.format(self.code, self.msg)
-        else:
-            return '{0} {1}: {2}'.format(self.code, self.msg,
-                ', '.join(self.errors))
+        return '{0} {1}'.format(self.code, self.msg)
 
     @property
     def message(self):
