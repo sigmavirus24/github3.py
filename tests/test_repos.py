@@ -17,6 +17,7 @@ class TestRepository(BaseTest):
         super(TestRepository, self).__init__(methodName)
         self.repo = self.g.repository(self.sigm, self.todo)
         self.requests_repo = self.g.repository(self.kr, 'requests')
+        self.fork = self.g.repository(self.sigm, 'requests')
         if self.auth:
             self.alt_repo = self._g.repository(self.gh3py, self.test_repo)
             self.auth_todo = self._g.repository(self.sigm, self.todo)
@@ -84,6 +85,18 @@ class TestRepository(BaseTest):
 
     def test_watchers(self):
         expect(self.requests_repo.watchers) >= 1
+
+    def test_source(self):
+        if self.fork.source:
+            expect(self.fork.source).isinstance(Repository)
+
+    def test_parent(self):
+        if self.fork.parent:
+            expect(self.fork.parent).isinstance(Repository)
+
+    def test_master_branch(self):
+        expect(self.repo.master_branch) == 'master'
+        expect(self.requests_repo.master_branch) == 'develop'
 
     # Methods
     def test_archive(self):

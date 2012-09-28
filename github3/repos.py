@@ -93,6 +93,19 @@ class Repository(GitHubCore):
         #: Number of users watching the repository.
         self.watchers = repo.get('watchers')
 
+        #: Parent of this fork, if it exists :class;`Repository`
+        self.source = repo.get('source', None)
+        if self.source:
+            self.source = Repository(self.source, self)
+
+        #: Parent of this fork, if it exists :class:`Repository`
+        self.parent = repo.get('parent', None)
+        if self.parent:
+            self.parent = Repository(self.parent, self)
+
+        #: default branch for the repository
+        self.master_branch = repo.get('master_branch', '')
+
     def __repr__(self):
         return '<Repository [{0}/{1}]>'.format(self.owner.login, self.name)
 
