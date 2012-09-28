@@ -167,34 +167,35 @@ class GitHub(GitHubCore):
         private=False,
         has_issues=True,
         has_wiki=True,
-        has_downloads=True):
+        has_downloads=True,
+        auto_init=False,
+        gitignore_template=''):
         """Create a repository for the authenticated user.
 
-        :param name: (required), name of the repository
-        :type name: str
-        :param description: (optional)
-        :type description: str
-        :param homepage: (optional)
-        :type homepage: str
-        :param private: (optional), If ``True``, create a
+        :param str name: (required), name of the repository
+        :param str description: (optional)
+        :param str homepage: (optional)
+        :param str private: (optional), If ``True``, create a
             private repository. API default: ``False``
-        :type private: bool
-        :param has_issues: (optional), If ``True``, enable
+        :param bool has_issues: (optional), If ``True``, enable
             issues for this repository. API default: ``True``
-        :type has_issues: bool
-        :param has_wiki: (optional), If ``True``, enable the
+        :param bool has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :type has_wiki: bool
-        :param has_downloads: (optional), If ``True``, enable
+        :param bool has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
-        :type has_downloads: bool
+        :param bool auto_init: (optional), auto initialize the repository
+        :param str gitignore_template: (optional), name of the git template to
+            use; ignored if auto_init = False.
         :returns: :class:`Repository <github3.repos.Repository>`
+
+        .. warning: ``name`` should be no longer than 100 characters
         """
         url = self._build_url('user', 'repos')
         data = dumps({'name': name, 'description': description,
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads})
+            'has_downloads': has_downloads, 'auto_init': auto_init,
+            'gitignore_template': gitignore_template})
         json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None
 
