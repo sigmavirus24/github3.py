@@ -142,6 +142,22 @@ class GitHubCore(GitHubObject):
     def _api(self, uri):
         self._uri = urlparse(uri)
 
+    def _iter(self, count, url, cls):
+        def remaining():
+            return count == -1 or count > 0
+
+        while remaining() and url:
+            response = self._get(url)
+            json = self._json(response, 200)
+            for i in json:
+                yield cls(i, self)
+                count -= 1
+                if not remaining():
+                    break
+
+            rel_next = response.links.get('rel_next', {})
+            url = rel_next.get('url', '')
+
     @property
     def ratelimit_remaining(self):
         """Number of requests before GitHub imposes a ratelimit."""
