@@ -18,15 +18,19 @@ except ImportError:  # (No coverage)
 
 
 def requires_auth(func):
-    """Decorator to note which object methods require authorization."""
-    note = """
+    """Decorator to note which object methods require authorization.
+
     .. note::
-        The signature of this function may not appear correctly in
-        documentation. Please adhere to the defined parameters and their
-        types.
+        This decorator causes the wrapped methods to lose their proper
+        signature. Please refer to the documentation for each of those.
     """
-    # Append the above note to each function this is applied to
-    func.__doc__ = '\n'.join([func.__doc__, note])
+    #note = """.. note::
+    #The signature of this function may not appear correctly in
+    #documentation. Please adhere to the defined parameters and their
+    #types.
+    #"""
+    ## Append the above note to each function this is applied to
+    #func.__doc__ = '\n\n'.join([func.__doc__, note])
 
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):

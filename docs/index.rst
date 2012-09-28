@@ -84,6 +84,7 @@ feel the need to contribute to the project.
     :maxdepth: 1
 
     models
+    decorators
 
 
 Installation
