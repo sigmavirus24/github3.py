@@ -23,7 +23,7 @@ class TestOrganization(BaseTest):
         expect(self.org.is_public_member(self.sigm)).is_True()
 
     def test_iter_events(self):
-        expect(self.org.iter_events().next()).isinstance(Event)
+        expect(next(self.org.iter_events())).isinstance(Event)
 
     def test_list_events(self):
         expect(self.org.list_events()).list_of(Event)
@@ -125,7 +125,7 @@ class TestOrganization(BaseTest):
             pass
 
         try:
-            expect(org.iter_teams().next()).isinstance(Team)
+            expect(next(org.iter_teams())).isinstance(Team)
         except github3.GitHubError:
             pass
 

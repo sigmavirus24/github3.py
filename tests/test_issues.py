@@ -58,7 +58,7 @@ class TestIssue(BaseTest):
             expect(self.issue.milestone).isinstance(Milestone)
 
     def test_iter_comments(self):
-        expect(self.issue.iter_comments().next()).isinstance(IssueComment)
+        expect(next(self.issue.iter_comments())).isinstance(IssueComment)
 
     def test_list_comments(self):
         self.expect_list_of_class(self.issue.list_comments(), IssueComment)
