@@ -101,6 +101,16 @@ class Team(GitHubCore):
         url = self._build_url('members', login, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    def iter_members(self, number=-1):
+        """Iterate over the members of this team.
+
+        :param int number: (optional), number of users to iterate over.
+            Default: -1 iterates over all values
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('members', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_members(self):
         """List the members of this team.
 
@@ -109,6 +119,17 @@ class Team(GitHubCore):
         url = self._build_url('members', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [User(m, self) for m in json]
+
+    def iter_repos(self, number=-1):
+        """Iterate over the repositories this team has access to.
+
+        :param int number: (optional), number of repos to iterate over.
+            Default: -1 iterates over all values
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+            objects
+        """
+        url = self._build_url('repos', base_url=self._api)
+        return self._iter(int(number), url, Repository)
 
     def list_repos(self):
         """List the repositories this team has access to.
@@ -329,6 +350,16 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', login, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    def iter_events(self, number=-1):
+        """Iterate over events for this org.
+
+        :param int number: (optional), number of events to return. Default: -1
+            iterates over all events available.
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        url = self._build_url('events', base_url=self._api)
+        return self._iter(int(number), url, Event)
+
     def list_events(self):
         """List events for this org.
 
@@ -338,6 +369,16 @@ class Organization(BaseAccount):
         json = self._json(self._get(url), 200)
         return [Event(e, self._session) for e in json]
 
+    def iter_members(self, number=-1):
+        """Iterate over members of this organization.
+
+        :param int number: (optional), number of members to return. Default:
+            -1 will return all available.
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('members', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_members(self):
         """List members of this organization.
 
@@ -345,12 +386,36 @@ class Organization(BaseAccount):
         """
         return self._list_members('/members')
 
+    def iter_public_members(self, number=-1):
+        """Iterate over public members of this organization.
+
+        :param int number: (optional), number of members to return. Default:
+            -1 will return all available.
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('public_members', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_public_members(self):
         """List public members of this organization.
 
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         return self._list_members('/public_members')
+
+    def iter_repos(self, type='', number=-1):
+        """Iterate over repos for this organization.
+
+        :param str type: (optional), accepted values:
+            ('all', 'public', 'member', 'private'), API default: 'all'
+        :param int number: (optional), number of members to return. Default:
+            -1 will return all available.
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        url = self._build_url('repos', base_url=self._api)
+        if type in ('all', 'public', 'member', 'private'):
+            url = '{0}?type={1}'.format(url, type)
+        return self._iter(int(number), url, Repository)
 
     def list_repos(self, type=''):
         """List repos for this organization.
@@ -367,6 +432,17 @@ class Organization(BaseAccount):
             params['type'] = type
         json = self._json(self._get(url, params=params), 200)
         return [Repository(r, self) for r in json]
+
+    @requires_auth
+    def iter_teams(self, number=-1):
+        """Iterate over teams that are part of this organization.
+
+        :param int number: (optional), number of teams to return. Default: -1
+            returns all available teams.
+        :returns: generator of :class:`Team <Team>`\ s
+        """
+        url = self._build_url('teams', base_url=self._api)
+        return self._iter(int(number), url, Team)
 
     @requires_auth
     def list_teams(self):

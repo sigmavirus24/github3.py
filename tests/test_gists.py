@@ -13,7 +13,7 @@ class TestGist(BaseTest):
 
     def test_gists_not_empty(self):
         expect(self.gists) != []
-        self.expect_list_of_class(self.gists, Gist)
+        expect(self.gists).list_of(Gist)
 
     def test_repr(self):
         expect(repr(self.gist)) != ''
@@ -60,10 +60,13 @@ class TestGist(BaseTest):
     def test_to_json(self):
         expect(self.gist.to_json()).isinstance(dict)
 
+    def test_iter_comments(self):
+        comments = [c for c in self.gist.iter_comments(1)]
+        expect(comments).list_of(GistComment)
+
     def test_list_comments(self):
         try:
-            for c in self.gist.list_comments():
-                expect(c).isinstance(GistComment)
+            expect(self.gist.list_comments()).list_of(GistComment)
         except github3.GitHubError:
             pass
 

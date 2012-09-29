@@ -22,19 +22,30 @@ class TestOrganization(BaseTest):
     def test_is_public_member(self):
         expect(self.org.is_public_member(self.sigm)).is_True()
 
+    def test_iter_events(self):
+        expect(self.org.iter_events().next()).isinstance(Event)
+
     def test_list_events(self):
-        ev = self.org.list_events()
-        self.expect_list_of_class(ev, Event)
+        expect(self.org.list_events()).list_of(Event)
+
+    def test_iter_members(self):
+        members = [m for m in self.org.iter_members()]
+        expect(members).list_of(User)
 
     def test_list_members(self):
-        members = self.org.list_members()
-        if members:
-            self.expect_list_of_class(members, User)
+        expect(self.org.list_members()).list_of(User)
+
+    def test_iter_public_members(self):
+        members = [m for m in self.org.iter_public_members()]
+        expect(members).list_of(User)
 
     def test_list_public_members(self):
-        members = self.org.list_public_members()
-        if members:
-            self.expect_list_of_class(members, User)
+        expect(self.org.list_public_members()).list_of(User)
+
+    def test_iter_repos(self):
+        expect(self.org.iter_repos().next()).isinstance(Repository)
+        with expect.raises(StopIteration):
+            self.org.iter_repos('private').next()
 
     def test_list_repos(self):
         repos = self.org.list_repos('all')
@@ -110,7 +121,12 @@ class TestOrganization(BaseTest):
 
         try:
             teams = org.list_teams()
-            self.expect_list_of_class(teams, Team)
+            expect(teams).list_of(Team)
+        except github3.GitHubError:
+            pass
+
+        try:
+            expect(org.iter_team().next()).isinstance(Team)
         except github3.GitHubError:
             pass
 
@@ -177,10 +193,20 @@ class TestTeam(BaseTest):
     def test_is_member(self):
         expect(self.team.is_member(self.sigm)).isinstance(bool)
 
+    def test_iter_members(self):
+        if not self.auth:
+            return
+        expect(self.team.iter_members().next()).isinstance(User)
+
     def test_list_members(self):
         if not self.auth:
             return
         expect(self.team.list_members()).list_of(User)
+
+    def test_iter_repos(self):
+        if not self.auth:
+            return
+        expect(self.team.iter_repos().next()).isinstance(Repository)
 
     def test_list_repos(self):
         if not self.auth:
