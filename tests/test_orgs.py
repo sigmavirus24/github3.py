@@ -206,7 +206,8 @@ class TestTeam(BaseTest):
     def test_iter_repos(self):
         if not self.auth:
             return
-        expect(self.team.iter_repos().next()).isinstance(Repository)
+        repos = [r for r in self.team.iter_repos()]
+        expect(repos).isinstance(Repository)
 
     def test_list_repos(self):
         if not self.auth:
