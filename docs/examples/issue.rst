@@ -1,7 +1,7 @@
 Issue Code Examples
 ===================
 
-Examples using :class:`Issue <github3.issue.Issue>`\ s
+Examples using ``Issue``\ s
 
 Administrating Issues
 ---------------------
@@ -26,3 +26,14 @@ of the issue you're concerned with in ``num``.
     # Assuming issue is the same as above ...
     issue.create_comment('This should be fixed in 6d4oe5. Closing as fixed.')
     issue.close()
+
+The following shows how you could use github3.py to fetch and display your
+issues in your own style and in your webbrowser.
+
+.. include:: source/browser.py
+    :code: python
+
+Or how to do the same by wrapping the lines in your terminal.
+
+.. include:: source/wrap_text.py
+    :code: python
