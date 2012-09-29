@@ -43,9 +43,8 @@ class TestOrganization(BaseTest):
         expect(self.org.list_public_members()).list_of(User)
 
     def test_iter_repos(self):
-        expect(self.org.iter_repos().next()).isinstance(Repository)
-        with expect.raises(StopIteration):
-            self.org.iter_repos('private').next()
+        repos = [r for r in self.org.iter_repos()]
+        expect(repos).list_of(Repository)
 
     def test_list_repos(self):
         repos = self.org.list_repos('all')
@@ -126,7 +125,7 @@ class TestOrganization(BaseTest):
             pass
 
         try:
-            expect(org.iter_team().next()).isinstance(Team)
+            expect(org.iter_teams().next()).isinstance(Team)
         except github3.GitHubError:
             pass
 
@@ -196,7 +195,8 @@ class TestTeam(BaseTest):
     def test_iter_members(self):
         if not self.auth:
             return
-        expect(self.team.iter_members().next()).isinstance(User)
+        members = [m for m in self.team.iter_members()]
+        expect(members).list_of(User)
 
     def test_list_members(self):
         if not self.auth:
