@@ -150,11 +150,15 @@ class Issue(GitHubCore):
         self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
         #  was assigned to.
-        self.assignee = None
-        if issue.get('assignee'):
+        self.assignee = issue.get('assignee')
+        if self.assignee:
             self.assignee = User(issue.get('assignee'), self._session)
         #: Body (description) of the issue.
-        self.body = issue.get('body')
+        self.body = issue.get('body', '')
+        #: HTML formatted body of the issue.
+        self.body_html = issue.get('body_html', '')
+        #: Plain text formatted body of the issue.
+        self.body_text = issue.get('body_text', '')
 
         # If an issue is still open, this field will be None
         #: datetime object representing when the issue was closed.

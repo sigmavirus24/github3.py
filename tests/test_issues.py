@@ -29,6 +29,12 @@ class TestIssue(BaseTest):
     def test_body(self):
         expect(self.issue.body).isinstance(str_test)
 
+    def test_body_html(self):
+        expect(self.issue.body_html).isinstance(str_test)
+
+    def test_body_text(self):
+        expect(self.issue.body_text).isinstance(str_test)
+
     def test_created_at(self):
         expect(self.issue.created_at).isinstance(datetime)
 
