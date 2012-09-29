@@ -89,17 +89,29 @@ class TestPullRequest(BaseTest):
         links = ['comments', 'html', 'issue', 'review_comments', 'self']
         expect(sorted(list(self.pr.links.keys()))) == links
 
+    def test_iter_comments(self):
+        comments = [c for c in self.pr.iter_comments(5)]
+        expect(comments).list_of(ReviewComment)
+
     def test_list_comments(self):
         comments = self.pr.list_comments()
-        self.expect_list_of_class(comments, ReviewComment)
+        expect(comments).list_of(ReviewComment)
+
+    def test_iter_commits(self):
+        commits = [c for c in self.pr.iter_commits(5)]
+        expect(commits).list_of(Commit)
 
     def test_list_commits(self):
         commits = self.pr.list_commits()
-        self.expect_list_of_class(commits, Commit)
+        expect(commits).list_of(Commit)
+
+    def test_iter_files(self):
+        files = [c for c in self.pr.iter_files(5)]
+        expect(files).list_of(PullFile)
 
     def test_list_files(self):
         files = self.pr.list_files()
-        self.expect_list_of_class(files, PullFile)
+        expect(files).list_of(PullFile)
 
     def test_merged_at(self):
         expect(self.pr.merged_at).isinstance(datetime)

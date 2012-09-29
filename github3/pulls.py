@@ -169,6 +169,16 @@ class PullRequest(GitHubCore):
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    def iter_comments(self, number=-1):
+        """Iterate over the comments on this pull request.
+
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all available comments.
+        :returns: generator of :class:`ReviewComment <ReviewComment>`\ s
+        """
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, ReviewComment)
+
     def list_comments(self):
         """List the comments on this pull request.
 
@@ -178,6 +188,16 @@ class PullRequest(GitHubCore):
         json = self._json(self._get(url), 200)
         return [ReviewComment(comment, self) for comment in json]
 
+    def iter_commits(self, number=-1):
+        """Iterates over the commits on this pull request.
+
+        :param int number: (optional), number of commits to return. Default:
+            -1 returns all available commits.
+        :returns: generator of :class:`Commit <github3.git.Commit>`\ s
+        """
+        url = self._build_url('commits', base_url=self._api)
+        return self._iter(int(number), url, Commit)
+
     def list_commits(self):
         """List the commits on this pull request.
 
@@ -186,6 +206,16 @@ class PullRequest(GitHubCore):
         url = self._build_url('commits', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Commit(commit, self) for commit in json]
+
+    def iter_files(self, number=-1):
+        """Iterate over the files associated with this pull request.
+
+        :param int number: (optional), number of files to return. Default:
+            -1 returns all available files.
+        :returns: generator of :class:`PullFile <PullFile>`\ s
+        """
+        url = self._build_url('files', base_url=self._api)
+        return self._iter(int(number), url, PullFile)
 
     def list_files(self):
         """List the files associated with this pull request.
