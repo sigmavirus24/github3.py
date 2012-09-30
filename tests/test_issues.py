@@ -54,10 +54,13 @@ class TestIssue(BaseTest):
         expect(self.issue.is_closed()).isinstance(bool)
 
     def test_labels(self):
-        self.expect_list_of_class(self.issue.labels, Label)
+        expect(self.issue.labels).list_of(Label)
+
+    def test_iter_events(self):
+        expect(next(self.issue.iter_events(1))).isinstace(IssueEvent)
 
     def test_list_events(self):
-        self.expect_list_of_class(self.issue.list_events(), IssueEvent)
+        expect(self.issue.list_events()).list_of(IssueEvent)
 
     def test_milestone(self):
         if self.issue.milestone:
@@ -192,8 +195,12 @@ class TestMilestone(BaseTest):
         if self.milestone.due_on:
             expect(self.milestone.due_on).isinstance(datetime)
 
+    def test_iter_labels(self):
+        labels = [l for l in self.milestone.iter_labels()]
+        expect(labels).list_of(Label)
+
     def test_list_labels(self):
-        self.expect_list_of_class(self.milestone.list_labels(), Label)
+        expect(self.milestone.list_labels()).list_of(Label)
 
     def test_number(self):
         expect(self.milestone.number) > 0

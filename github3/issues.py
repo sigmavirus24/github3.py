@@ -105,6 +105,17 @@ class Milestone(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
+    def iter_labels(self, number=-1):
+        """Iterate over the labels for every issue associated with this
+        milestone.
+
+        :param int number: (optional), number of labels to return. Default: -1
+            returns all available labels.
+        :returns: generator of :class:`Label <Label>`\ s
+        """
+        url = self._build_url('labels', base_url=self._api)
+        return self._iter(int(number), url, Label)
+
     def list_labels(self):
         """List the labels for every issue associated with this
         milestone.
@@ -318,6 +329,16 @@ class Issue(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [IssueComment(comment, self) for comment in json]
+
+    def iter_events(self, number=-1):
+        """Iterate over events associated with this issue only.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all events available.
+        :returns: generator of :class:`IssueEvent <IssueEvent>`\ s
+        """
+        url = self._build_url('events', base_url=self._api)
+        return self._iter(int(number), url, IssueEvent)
 
     def list_events(self):
         """List events associated with this issue only.
