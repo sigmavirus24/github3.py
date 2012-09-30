@@ -198,6 +198,21 @@ class User(BaseAccount):
                 self.login)
         return self._boolean(self._get(url), 204, 404)
 
+    def iter_events(self, public=False, number=-1):
+        """Iterate over events performed by this user.
+
+        :param bool public: (optional), only list public events for the
+            authenticated user
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events.
+        :returns: list of :class:`Event <github3.events.Event>`\ s
+        """
+        path = ['events']
+        if public:
+            path.append('public')
+        url = self._build_url(*path, base_url=self._api)
+        return self._iter(int(number), url, Event)
+
     def list_events(self, public=False):
         """Events performed by this user.
 
@@ -214,6 +229,16 @@ class User(BaseAccount):
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
 
+    def iter_followers(self, number=-1):
+        """Iterate over the followers of this user.
+
+        :param int number: (optional), number of followers to return. Default:
+            -1 returns all available
+        :returns: generator of :class:`User <User>`\ s
+        """
+        url = self._build_url('followers', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_followers(self):
         """List followers of this user.
 
@@ -224,6 +249,16 @@ class User(BaseAccount):
         json = self._json(self._get(url), 200)
         return [User(u, self) for u in json]
 
+    def iter_following(self, number=-1):
+        """Iterate over the users being followed by this user.
+
+        :param int number: (optional), number of users to return. Default: -1
+            returns all available users
+        :returns: generator of :class:`User <User>`\ s
+        """
+        url = self._build_url('following', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_following(self):
         """List users being followed by this user.
 
@@ -233,6 +268,19 @@ class User(BaseAccount):
         url = self._build_url('following', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [User(u, self) for u in json]
+
+    def iter_org_events(self, org, number=-1):
+        """Iterate over events as they appear on the user's organization
+        dashboard. You must be authenticated to view this.
+
+        :param str org: (required), name of the organization
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :returns: list of :class:`Event <github3.events.Event>`\ s
+        """
+        if org:
+            url = self._build_url('events', 'orgs', org, base_url=self._api)
+            return self._iter(int(number), url, Event)
 
     def list_org_events(self, org):
         """List events as they appear on the user's organization dashboard.
@@ -248,6 +296,24 @@ class User(BaseAccount):
             url = self._build_url('events', 'orgs', org, base_url=self._api)
             json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
+
+    def iter_received_events(self, public=False, number=-1):
+        """Iterate over events that the user has received. If the user is the
+        authenticated user, you will see private and public events, otherwise
+        you will only see public events.
+
+        :param bool public: (optional), determines if the authenticated user
+            sees both private and public or just public
+        :param int number: (optional), number of events to return. Default: -1
+            returns all events available
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        # Paginate
+        path = ['received_events']
+        if public:
+            path.append('public')
+        url = self._build_url(*path, base_url=self._api)
+        return self._iter(int(number), url, Event)
 
     def list_received_events(self, public=False):
         """List events that the user has received. If the user is the
@@ -267,6 +333,17 @@ class User(BaseAccount):
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
 
+    def iter_starred(self, number=-1):
+        """Iterate over repositories starred by this user.
+
+        :param int number: (optional), number of starred repos to return.
+            Default: -1, returns all available repos
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        from github3.repos import Repository
+        url = self._build_url('starred', base_url=self._api)
+        self._iter(int(number), url, Repository)
+
     def list_starred(self):
         """List repositories starred by this user.
 
@@ -276,6 +353,17 @@ class User(BaseAccount):
         url = self._build_url('starred', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Repository(r, self) for r in json]
+
+    def iter_subscriptions(self, number=-1):
+        """Iterate over repositories subscribed to by this user.
+
+        :param int number: (optional), number of subscriptions to return.
+            Default: -1, returns all available
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        from github3.repos import Repository
+        url = self._build_url('subscriptions', base_url=self._api)
+        return self._iter(int(number), url, Repository)
 
     def list_subscriptions(self):
         """List repositories subscribed to by this user.

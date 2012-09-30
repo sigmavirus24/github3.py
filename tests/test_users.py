@@ -29,21 +29,42 @@ class TestUser(base.BaseTest):
         expect(self.user.is_assignee_on(self.sigm, self.todo)).is_True()
         expect(self.user.is_assignee_on(self.kr, 'requests')).is_False()
 
+    def test_iter_events(self):
+        expect(next(self.user.iter_events(1))).isinstance(Event)
+
     def test_list_events(self):
         expect(self.user.list_events()).list_of(Event)
+
+    def test_iter_followers(self):
+        expect(next(self.user.iter_followers(1))).isinstance(User)
 
     def test_list_followers(self):
         expect(self.user.list_followers()).list_of(User)
 
+    def test_iter_following(self):
+        expect(next(self.user.iter_following(1))).isinstance(User)
+
     def test_list_following(self):
         expect(self.user.list_following()).list_of(User)
+
+    def test_iter_received_events(self):
+        expect(next(self.user.iter_received_events(number=1))).isinstance(
+                Event)
+        expect(next(self.user.iter_received_events(True, 1))).isinstance(
+                Event)
 
     def test_list_received_events(self):
         expect(self.user.list_received_events()).list_of(Event)
         expect(self.user.list_received_events(True)).list_of(Event)
 
+    def test_iter_starred(self):
+        expect(next(self.user.iter_starred(1))).isinstance(Repository)
+
     def test_list_starred(self):
         expect(self.user.list_starred()).list_of(Repository)
+
+    def test_iter_subscriptions(self):
+        expect(next(self.user.iter_subscriptions(1))).isinstance(Repository)
 
     def test_list_subscriptions(self):
         expect(self.user.list_subscriptions()).list_of(Repository)
