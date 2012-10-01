@@ -115,7 +115,7 @@ class Repository(GitHubCore):
     def _create_pull(self, data):
         json = None
         if data:
-            url = self._build_url('pulls', self._api)
+            url = self._build_url('pulls', base_url=self._api)
             json = self._json(self._post(url, data), 201)
         return PullRequest(json, self._session) if json else None
 
