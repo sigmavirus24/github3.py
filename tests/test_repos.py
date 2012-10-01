@@ -243,11 +243,13 @@ class TestRepository(BaseTest):
 
     def test_iter_pulls(self):
         expect(
-              next(self.repo.iter_pulls(state='closed'))
+              next(self.requests_repo.iter_pulls(state='closed'))
               ).isinstance(PullRequest)
 
     def test_list_pulls(self):
-        expect(self.repo.list_pulls(state='closed')).list_of(PullRequest)
+        expect(
+              self.requests_repo.list_pulls(state='closed')
+              ).list_of(PullRequest)
 
     def test_iter_refs(self):
         expect(next(self.repo.iter_refs())).isinstance(Reference)
