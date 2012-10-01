@@ -437,9 +437,7 @@ class IssueEvent(GitHubCore):
         self.created_at = self._strptime(event.get('created_at'))
 
         #: Dictionary of links for the pull request
-        self.pull_request = {}
-        if event.get('pull_request'):
-            self.pull_request = event.get('pull_request')
+        self.pull_request = event.get('pull_request', {})
 
     def __repr__(self):
         return '<Issue Event [#{0} - {1}]>'.format(self.issue.number,

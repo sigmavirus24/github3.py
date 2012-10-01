@@ -43,8 +43,9 @@ class TestOrganization(BaseTest):
         expect(self.org.list_public_members()).list_of(User)
 
     def test_iter_repos(self):
-        repos = [r for r in self.org.iter_repos()]
+        repos = [r for r in self.org.iter_repos(number=2)]
         expect(repos).list_of(Repository)
+        repos = [r for r in self.org.iter_repos('all', 2)]
 
     def test_list_repos(self):
         repos = self.org.list_repos('all')

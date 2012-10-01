@@ -411,4 +411,4 @@ class User(BaseAccount):
         if json:
             self._update_(json)
             return True
-        return False
+        return False  # (No coverage)
