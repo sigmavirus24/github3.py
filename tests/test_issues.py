@@ -57,7 +57,7 @@ class TestIssue(BaseTest):
         expect(self.issue.labels).list_of(Label)
 
     def test_iter_events(self):
-        expect(next(self.issue.iter_events(1))).isinstace(IssueEvent)
+        expect(next(self.issue.iter_events(1))).isinstance(IssueEvent)
 
     def test_list_events(self):
         expect(self.issue.list_events()).list_of(IssueEvent)

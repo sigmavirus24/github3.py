@@ -342,7 +342,7 @@ class User(BaseAccount):
         """
         from github3.repos import Repository
         url = self._build_url('starred', base_url=self._api)
-        self._iter(int(number), url, Repository)
+        return self._iter(int(number), url, Repository)
 
     def list_starred(self):
         """List repositories starred by this user.
