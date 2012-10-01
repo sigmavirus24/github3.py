@@ -10,6 +10,7 @@ from github3.git import Commit, Reference, Tag, Tree, Blob
 from github3.issues import (Issue, IssueEvent, Label, Milestone)
 from github3.events import Event
 from github3.pulls import PullRequest
+from github3.orgs import Team
 
 
 class TestRepository(BaseTest):
@@ -234,14 +235,44 @@ class TestRepository(BaseTest):
     def test_list_milestones(self):
         expect(self.repo.list_milestones()).list_of(Milestone)
 
+    def test_iter_network_events(self):
+        expect(next(self.repo.iter_network_events())).isinstance(Event)
+
     def test_list_network_events(self):
         expect(self.repo.list_network_events()).list_of(Event)
+
+    def test_iter_pulls(self):
+        expect(
+              next(self.repo.list_pulls(state='closed'))
+              ).isinstance(PullRequest)
 
     def test_list_pulls(self):
         expect(self.repo.list_pulls(state='closed')).list_of(PullRequest)
 
+    def test_iter_refs(self):
+        expect(next(self.repo.iter_refs())).isinstance(Reference)
+
     def test_list_refs(self):
         expect(self.repo.list_refs()).list_of(Reference)
+
+    def test_iter_stargazers(self):
+        expect(next(self.repo.iter_stargazers())).isinstance(User)
+
+    def test_list_stargazers(self):
+        expect(self.repo.list_stargazers()).list_of(User)
+
+    def test_iter_subscribers(self):
+        expect(next(self.repo.iter_subscribers())).isinstance(User)
+
+    def test_list_subscribers(self):
+        expect(self.repo.list_subscribers()).list_of(User)
+
+    def test_iter_statuses(self):
+        expect(next(self.repo.iter_statuses(
+            '04d55444a3ec06ca8d2aa0a5e333cdaf27113254', 1
+            ))).isinstance(Status)
+        with expect.raises(StopIteration):
+            next(self.repo.iter_statuses('', 1))
 
     def test_list_statuses(self):
         statuses = self.repo.list_statuses(
@@ -250,17 +281,24 @@ class TestRepository(BaseTest):
         if statuses:
             expect(statuses).list_of(Status)
 
+    def test_iter_tags(self):
+        expect(next(self.repo.iter_tags())).isinstance(RepoTag)
+
     def test_list_tags(self):
         expect(self.repo.list_tags()).list_of(RepoTag)
 
+    def test_list_teams(self):
+        if not self.auth:
+            return
+        expect(self.alt_repo.list_teams()).list_of(Team)
+
+    def test_iter_teams(self):
+        if not self.auth:
+            return
+        expect(next(self.alt_repo.iter_teams(1))).isinstance(Team)
+
     def test_list_watchers(self):
         self.assertRaises(DeprecationWarning, self.repo.list_watchers)
-
-    def test_list_stargazers(self):
-        expect(self.repo.list_stargazers()).list_of(User)
-
-    def test_list_subscribers(self):
-        expect(self.repo.list_subscribers()).list_of(User)
 
     def test_milestone(self):
         expect(self.requests_repo.milestone(15)).isinstance(Milestone)
@@ -315,6 +353,7 @@ class TestRepository(BaseTest):
         self.raisesGHE(repo.key, 1234)
         self.raisesGHE(repo.list_keys)
         self.raisesGHE(repo.list_teams)
+        self.raisesGHE(next, repo.iter_teams(1))
         self.raisesGHE(repo.pubsubhubbub,
                 'subscribe',
                 'https://github.com/user/repo/events/push',

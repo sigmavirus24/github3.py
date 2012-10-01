@@ -108,12 +108,21 @@ class TestUser(base.BaseTest):
         expect(addresses).isinstance(list)
         expect(user.delete_email_address(email)).is_True()
         try:
-            ev = user.list_org_events(self.gh3py)
-            self.expect_list_of_class(ev, Event)
+            expect(user.list_org_events(self.gh3py)).list_of(Event)
         except github3.GitHubError:
             pass
         expect(user.update(user.name, user.email, user.blog, user.company,
             user.location, user.hireable, user.bio)).isinstance(bool)
+
+        try:
+            expect(next(user.iter_org_events(self.gh3py))).isinstance(Event)
+        except github3.GitHubError:
+            pass
+
+        try:
+            expect(next(user.iter_org_events(None)))
+        except (github3.GitHubError, StopIteration):
+            pass
 
 
 class TestKey(base.BaseTest):

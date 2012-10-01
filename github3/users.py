@@ -278,9 +278,10 @@ class User(BaseAccount):
             returns all available events
         :returns: list of :class:`Event <github3.events.Event>`\ s
         """
+        url = ''
         if org:
             url = self._build_url('events', 'orgs', org, base_url=self._api)
-            return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event)
 
     def list_org_events(self, org):
         """List events as they appear on the user's organization dashboard.

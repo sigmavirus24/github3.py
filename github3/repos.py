@@ -1069,6 +1069,17 @@ class Repository(GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return [Milestone(mile, self) for mile in json]
 
+    def iter_network_events(self, number=-1):
+        """Iterates over events on a network of repositories.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        base = self._api.replace('repos', 'networks', 1)
+        url = self._build_url('events', base_url=base)
+        return self._iter(int(number), url, Event)
+
     def list_network_events(self):
         """Lists events on a network of repositories.
 
@@ -1079,6 +1090,20 @@ class Repository(GitHubCore):
         url = self._build_url('events', base_url=base)
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
+
+    def iter_pulls(self, state=None, number=-1):
+        """List pull requests on repository.
+
+        :param str state: (optional), accepted values: ('open', 'closed')
+        :param int number: (optional), number of pulls to return. Default: -1
+            returns all available pull requests
+        :returns: generator of
+            :class:`PullRequest <github3.pulls.PullRequest>`\ s
+        """
+        url = self._build_url('pulls', base_url=self._api)
+        if state in ('open', 'closed'):
+            url = '{0}?{1}={2}'.format(url, 'state', state)
+        return self._iter(int(number), url, PullRequest)
 
     def list_pulls(self, state=None):
         """List pull requests on repository.
@@ -1094,6 +1119,21 @@ class Repository(GitHubCore):
             params['state'] = state
         json = self._json(self._get(url, params=params), 200)
         return [PullRequest(pull, self) for pull in json]
+
+    def iter_refs(self, subspace='', number=-1):
+        """Iterates over references for this repository.
+
+        :param str subspace: (optional), e.g. 'tags', 'stashes', 'notes'
+        :param int number: (optional), number of refs to return. Default: -1
+            returns all available refs
+        :returns: generator of :class:`Reference <github3.git.Reference>`\ s
+        """
+        if subspace:
+            args = ('git', 'refs', subspace)
+        else:
+            args = ('git', 'refs')
+        url = self._build_url(*args, base_url=self._api)
+        return self._iter(int(number), url, Reference)
 
     def list_refs(self, subspace=''):
         """List references for this repository.
@@ -1111,6 +1151,14 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Reference(r, self) for r in json]
 
+    def iter_stargazers(self, number=-1):
+        """List users who have starred this repository.
+
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('stargazers', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_stargazers(self):
         """List users who have starred this repository.
 
@@ -1120,14 +1168,37 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [User(u, self) for u in json]
 
+    def iter_subscribers(self, number=-1):
+        """Iterates over users subscribed to this repository.
+
+        :param int number: (optional), number of subscribers to return.
+            Default: -1 returns all subscribers available
+        :returns: generator of :class:`User <github3.users.User>`
+        """
+        url = self._build_url('subscribers', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_subscribers(self):
         """List users subscribed to this repository.
 
-        :returns: list of :class:`Repository <github3.repos.Repository>`
+        :returns: list of :class:`User <github3.users.User>`
         """
         url = self._build_url('subscribers', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [User(u, self) for u in json]
+
+    def iter_statuses(self, sha, number=-1):
+        """Iterates over the statuses for a specific SHA.
+
+        :param str sha: SHA of the commit to list the statuses of
+        :param int number: (optional), return up to number statuses. Default:
+            -1 returns all available statuses.
+        :returns: generator of :class:`Status <Status>`
+        """
+        url = ''
+        if sha:
+            url = self._build_url('statuses', sha, base_url=self._api)
+        return self._iter(int(number), url, Status, False)
 
     def list_statuses(self, sha):
         """List the statuses for a specific SHA.
@@ -1141,6 +1212,16 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return [Status(s) for s in json]
 
+    def iter_tags(self, number=-1):
+        """Iterates over tags on this repository.
+
+        :param int number: (optional), return up to at most number tags.
+            Default: -1 returns all available tags.
+        :returns: generator of :class:`RepoTag <RepoTag>`\ s
+        """
+        url = self._build_url('tags', base_url=self._api)
+        return self._iter(int(number), url, RepoTag, False)
+
     def list_tags(self):
         """List tags on this repository.
 
@@ -1150,13 +1231,25 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [RepoTag(tag) for tag in json]
 
+    def iter_teams(self, number=-1):
+        """Iterates over teams with access to this repository.
+
+        :param int number: (optional), return up to number Teams. Default: -1
+            returns all Teams.
+        :returns: generator of :class:`Team <github3.orgs.Team>`\ s
+        """
+        from github3.orgs import Team
+        url = self._build_url('teams', base_url=self._api)
+        return self._iter(int(number), url, Team)
+
     def list_teams(self):
         """List teams with access to this repository.
 
-        :returns: list of dicts
+        :returns: list of :class:`Team <github3.orgs.Team>`\ s
         """
+        from github3.orgs import Team
         url = self._build_url('teams', base_url=self._api)
-        return self._json(self._get(url), 200)
+        return [Team(t, self) for t in self._json(self._get(url), 200)]
 
     def list_watchers(self):
         """DEPRECATED: Use list_stargazers() instead."""
