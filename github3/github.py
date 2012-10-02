@@ -333,9 +333,9 @@ class GitHub(GitHubCore):
     def iter_authorizations(self, number=-1):
         """Iterate over authorizations for the authenticated user.
 
-        :param int number: (optional), number of authorizations to return. Default: -1
-            returns all available authorizations
-        :returns: list of :class:`Authorization <Authorization>`\ s
+        :param int number: (optional), number of authorizations to return.
+            Default: -1 returns all available authorizations
+        :returns: generator of :class:`Authorization <Authorization>`\ s
         """
         url = self._build_url('authorizations')
         return self._iter(int(number), url, Authorization)
@@ -354,9 +354,9 @@ class GitHub(GitHubCore):
     def iter_emails(self, number=-1):
         """Iterate over email addresses for the authenticated user.
 
-        :param int number: (optional), number of email addresses to return. Default: -1
-            returns all available email addresses
-        :returns: list of dicts
+        :param int number: (optional), number of email addresses to return.
+            Default: -1 returns all available email addresses
+        :returns: generator of dicts
         """
         url = self._build_url('user', 'emails')
         return self._iter(int(number), url, str)
@@ -375,7 +375,7 @@ class GitHub(GitHubCore):
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
-        :returns: list of :class:`Event <github3.events.Event>`\ s
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         url = self._build_url('events')
         return self._iter(int(number), url, Event)
@@ -400,8 +400,8 @@ class GitHub(GitHubCore):
 
         :param login: (optional), login of the user to check
         :type login: str
-        :param int number: (optional), number of followers to return. Default: -1
-            returns all followers
+        :param int number: (optional), number of followers to return. Default:
+            -1 returns all followers
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         if login:
@@ -419,7 +419,7 @@ class GitHub(GitHubCore):
         """
         if login:
             return self.user(login).iter_following()
-        return self._iter_follow('followers', int(number))
+        return self._list_follow('following')
 
     def iter_following(self, login=None, number=-1):
         """If login is provided, iterate over a list of users being followed
@@ -434,7 +434,7 @@ class GitHub(GitHubCore):
         """
         if login:
             return self.user(login).list_following()
-        return self._list_follow('following')
+        return self._iter_follow('followers', int(number))
 
     def list_gists(self, username=None):
         """If no username is specified, GET /gists, otherwise GET
@@ -566,8 +566,8 @@ class GitHub(GitHubCore):
         user.
 
         :param login: (optional), user whose orgs you wish to list
-        :param int number: (optional), number of organizations to return. Default: -1
-            returns all available organizations
+        :param int number: (optional), number of organizations to return.
+            Default: -1 returns all available organizations
         :type login: str
         :returns: list of :class:`Organization <github3.orgs.Organization>`\ s
         """
@@ -630,10 +630,11 @@ class GitHub(GitHubCore):
         return [Repository(r, self) for r in json]
 
     def iter_starred(self, login=None, number=-1):
-        """Iterate over repositories starred by ``login`` or the authenticated user.
+        """Iterate over repositories starred by ``login`` or the authenticated
+        user.
 
-        :param int number: (optional), number of repositories to return. Default: -1
-            returns all repositories
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
         :returns: list of :class:`Repository <github3.repos.Repository>`
         """
         if login:
@@ -659,8 +660,8 @@ class GitHub(GitHubCore):
         """Iterate over repositories subscribed to by ``login`` or the
         authenticated user.
 
-        :param int number: (optional), number of repositories to return. Default: -1
-            returns all repositories
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
         :returns: list of :class:`Repository <github3.repos.Repository>`
         """
         if login:

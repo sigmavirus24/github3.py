@@ -1,6 +1,7 @@
 import github3
 from .base import expect, expect_str, BaseTest
 from github3.repos import Repository
+from github3.events import Event
 
 
 class TestGitHub(BaseTest):
@@ -227,8 +228,22 @@ class TestGitHub(BaseTest):
         self.raisesGHE(self.g.authorize, 'foo', 'bar', ['gist', 'user'])
 
     def test_list_emails(self):
-        with expect.raises(github3.GitHubError):
-            self.g.list_emails()
+        self.raisesGHE(self.g.list_emails())
+
+        if self.auth:
+            expect(self._g.list_emails()).list_of(dict)
+
+    def test_iter_emails(self):
+        self.raisesGHE(self.g.list_emails())
+
+        if self.auth:
+            expect(next(self._g.list_emails())).isinstance(dict)
+
+    def test_list_events(self):
+        expect(self.g.list_events()).list_of(Event)
+
+    def test_iter_events(self):
+        expect(next(self.g.iter_events())).isinstance(Event)
 
     def test_list_orgs(self):
         expect(self.g.list_orgs(self.kr)) != []
