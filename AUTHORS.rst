@@ -18,6 +18,8 @@ Contributors
 
 - Dominik Dabrowski (@doda)
 
+- Dave Lacey (@davelxmos)
+
 - James Sullivan (@jsullivanlive)
 
 - Dennis Kaarsemaker (@seveas)
