@@ -157,6 +157,9 @@ class GitHubCore(GitHubObject):
             else:
                 response = self._get(url)
             json = self._json(response, 200)
+            # languages returns a single dict. We want the items.
+            if isinstance(json, dict):
+                json = json.items()
             for i in json:
                 yield cls(i, self) if issubclass(cls,GitHubCore) else cls(i)
                 count -= 1 if count > 0 else 0
