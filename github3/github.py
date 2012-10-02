@@ -468,6 +468,33 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Gist)
 
     @requires_auth
+    def iter_user_issues(self, filter='', state='', labels='', sort='',
+        direction='', since='', number=-1):
+        """List the authenticated user's issues.
+
+        :param str filter: accepted values:
+            ('assigned', 'created', 'mentioned', 'subscribed')
+            api-default: 'assigned'
+        :param str state: accepted values: ('open', 'closed')
+            api-default: 'open'
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param str since: ISO 8601 formatted timestamp, e.g.,
+            2012-05-20T23:10:27Z
+        :param number: (optional), number of issues to return.
+            Default: -1 returns all issues
+        :type number: int
+        """
+        url = self._build_url('issues')
+        params = issue_params(filter, state, labels, sort, direction,
+                since)
+        return self._iter(int(number), url, Issue, params=params)
+
+    @requires_auth
     def list_user_issues(self, filter='', state='', labels='', sort='',
         direction='', since=''):
         """List the authenticated user's issues.
@@ -519,7 +546,40 @@ class GitHub(GitHubCore):
         if owner and repository:
             repo = self.repository(owner, repository)
             issues = repo.list_issues(milestone, state, assignee, mentioned,
-                    labels, direction, since)
+                    labels, sort, direction, since)
+        return issues
+
+    def iter_repo_issues(self, owner, repository, milestone=None,
+        state='', assignee='', mentioned='', labels='', sort='', direction='',
+        since='', number=-1):
+        """List issues on owner/repository. Only owner and repository are
+        required.
+
+        :param str owner: login of the owner of the repository
+        :param str repository: name of the repository
+        :param int milestone: None, '*', or ID of milestone
+        :param str state: accepted values: ('open', 'closed')
+            api-default: 'open'
+        :param str assignee: '*' or login of the user
+        :param str mentioned: login of the user
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param str since: ISO 8601 formatted timestamp, e.g.,
+            2012-05-20T23:10:27Z
+        :param number: (optional), number of issues to return.
+            Default: -1 returns all issues
+        :type number: int
+        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
+        """
+        issues = None
+        if owner and repository:
+            repo = self.repository(owner, repository)
+            issues = repo.iter_issues(milestone, state, assignee, mentioned,
+                    labels, sort, direction, since, number)
         return issues
 
     @requires_auth
@@ -616,6 +676,47 @@ class GitHub(GitHubCore):
 
         json = self._json(self._get(url, params=params), 200)
         return [Repository(repo, self) for repo in json]
+
+    def iter_repos(self, login=None, type='', sort='', direction='', number=-1):
+        """List public repositories for the specified ``login`` or all
+        repositories for the authenticated user if ``login`` is not
+        provided.
+
+        :param login: (optional)
+        :type login: str
+        :param type: (optional), accepted values:
+            ('all', 'owner', 'public', 'private', 'member')
+            API default: 'all'
+        :type type: str
+        :param sort: (optional), accepted values:
+            ('created', 'updated', 'pushed', 'full_name')
+            API default: 'created'
+        :type sort: str
+        :param direction: (optional), accepted values:
+            ('asc', 'desc'), API default: 'asc' when using 'full_name',
+            'desc' otherwise
+        :type direction: str
+        :param number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :type number: int
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+            objects
+        """
+        if login:
+            url = self._build_url('users', login, 'repos')
+        else:
+            url = self._build_url('user', 'repos')
+
+        params = {}
+        if type in ('all', 'owner', 'public', 'private', 'member'):
+            params.update(type=type)
+        if not login:
+            if sort in ('created', 'updated', 'pushed', 'full_name'):
+                params.update(sort=sort)
+            if direction in ('asc', 'desc'):
+                params.update(direction=direction)
+
+        return self._iter(int(number), url, Repository, params=params)
 
     def list_starred(self, login=None):
         """List repositories starred by ``login`` or the authenticated user.
