@@ -142,21 +142,18 @@ class GitHubCore(GitHubObject):
     def _api(self, uri):
         self._uri = urlparse(uri)
 
-    def _iter(self, count, url, cls, core_obj=True):
+    def _iter(self, count, url, cls):
         """Generic iterator for this project.
 
         :param int count: How many items to return.
         :param int url: First URL to start with
         :param class cls: cls to return an object of
-        :param bool core_obj: whether this class derives from GitHubCore
-            object or not. If not it derives from GitHubObject and has no
-            second parameter.
         """
         while (count == -1 or count > 0) and url:
             response = self._get(url)
             json = self._json(response, 200)
             for i in json:
-                yield cls(i, self) if core_obj else cls(i)
+                yield cls(i, self) if issubclass(cls,GitHubCore) else cls(i)
                 count -= 1 if count > 0 else 0
                 if count == 0:
                     break

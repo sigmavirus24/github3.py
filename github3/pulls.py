@@ -215,7 +215,7 @@ class PullRequest(GitHubCore):
         :returns: generator of :class:`PullFile <PullFile>`\ s
         """
         url = self._build_url('files', base_url=self._api)
-        return self._iter(int(number), url, PullFile, False)
+        return self._iter(int(number), url, PullFile)
 
     def list_files(self):
         """List the files associated with this pull request.
