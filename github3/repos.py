@@ -1471,7 +1471,7 @@ class Branch(GitHubCore):
         #  ``None``.
         self.commit = None
         if branch.get('commit'):
-            self.commit = Commit(branch.get('commit'), self._session)
+            self.commit = Commit(branch['commit']['commit'], self._session)
         #: Returns '_links' attribute.
         self.links = branch.get('_links', {})
 
