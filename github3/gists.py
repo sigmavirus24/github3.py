@@ -201,9 +201,18 @@ class Gist(GitHubCore):
         stored in this gist."""
         return self._files
 
+    def iter_files(self):
+        """List of :class:`GistFile <GistFile>` objects representing the files
+        stored in this gist."""
+        return iter(self._files)
+
     def list_forks(self):
         """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
         return self._forks
+
+    def iter_forks(self):
+        """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
+        return iter(self._forks)
 
     def refresh(self):
         """Updates this gist by getting the information from the API again.

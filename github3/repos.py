@@ -823,6 +823,16 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Label(json, self) if json else None
 
+    def iter_assignees(self, number=-1):
+        """Iterate over all available assignees to which an issue may be assigned.
+
+        :param int number: (optional), number of assignees to return. Default: -1
+            returns all available assignees
+        :returns: list of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('assignees', base_url=self._api)
+        return self._iter(int(number), url, User)
+
     def list_assignees(self):
         """List all available assignees to which an issue may be assigned.
 
@@ -831,6 +841,17 @@ class Repository(GitHubCore):
         url = self._build_url('assignees', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [User(u, self) for u in json]
+
+    def iter_branches(self, number=-1):
+        """Iterate over the branches in this repository.
+
+        :param int number: (optional), number of branches to return. Default: -1
+            returns all branches
+        :returns: list of :class:`Branch <Branch>`\ es
+        """
+        # Paginate?
+        url = self._build_url('branches', base_url=self._api)
+        return self._iter(int(number), url, Branch)
 
     def list_branches(self):
         """List the branches in this repository.
@@ -842,6 +863,17 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Branch(b, self) for b in json]
 
+    def iter_comments(self, number=-1):
+        """Iterate over comments on all commits in the repository.
+
+        :param int number: (optional), number of comments to return. Default: -1
+            returns all comments
+        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        """
+        # Paginate?
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, RepoComment)
+
     def list_comments(self):
         """List comments on all commits in the repository.
 
@@ -852,6 +884,18 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [RepoComment(comment, self) for comment in json]
 
+    def iter_comments_on_commit(self, sha, number=1):
+        """Iterate over comments for a single commit.
+
+        :param sha: (required), sha of the commit to list comments on
+        :type sha: str
+        :param int number: (optional), number of comments to return. Default: -1
+            returns all comments
+        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        """
+        url = self._build_url('commits', sha, 'comments', base_url=self._api)
+        return self._iter(int(number), url, RepoComment)
+
     def list_comments_on_commit(self, sha):
         """List comments for a single commit.
 
@@ -859,13 +903,33 @@ class Repository(GitHubCore):
         :type sha: str
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
-        # Paginate?
-        json = []
-        if sha:
-            url = self._build_url('commits', sha, 'comments',
-                    base_url=self._api)
-            json = self._json(self._get(url), 200)
+        url = self._build_url('commits', sha, 'comments', base_url=self._api)
+        json = self._json(self._get(url), 200)
         return [RepoComment(comm, self) for comm in json]
+
+    def iter_commits(self, sha='', path='', author='', number=-1):
+        """Iterate over commits in this repository.
+
+        :param str sha: (optional), sha or branch to start listing commits
+            from
+        :param str path: (optional), commits containing this path will be
+            listed
+        :param str author: (optional), GitHub login, real name, or email to
+            filter commits by (using commit author)
+        :param int number: (optional), number of comments to return. Default: -1
+            returns all comments
+
+        :returns: list of :class:`RepoCommit <RepoCommit>`\ s
+        """
+        params={}
+        if sha:
+            params['sha'] = sha
+        if path:
+            params['path'] = path
+        if author:
+            params['author'] = author
+        url = self._build_url('commits', base_url=self._api)
+        return self._iter(int(number), url, RepoCommit, params=params)
 
     def list_commits(self, sha='', path='', author=''):
         """List commits in this repository.
@@ -879,10 +943,33 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
-        # Paginate
+        params={}
+        if sha:
+            params['sha'] = sha
+        if path:
+            params['path'] = path
+        if author:
+            params['author'] = author
         url = self._build_url('commits', base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(url, params=params), 200)
         return [RepoCommit(commit, self) for commit in json]
+
+    def iter_contributors(self, anon=False, number=-1):
+        """Iterate over the contributors to this repository.
+
+        :param anon: (optional), True lists anonymous contributors as well
+        :type anon: bool
+        :param number: (optional), number of contributors to return. Default: -1
+            returns all contributors
+        :type number: int
+        :returns: list of :class:`User <github3.users.User>`\ s
+        """
+        # Paginate
+        url = self._build_url('contributors', base_url=self._api)
+        params = {}
+        if anon:
+            params = {'anon': anon}
+        return self._iter(int(number), url, User, params=params)
 
     def list_contributors(self, anon=False):
         """List the contributors to this repository.
@@ -899,25 +986,60 @@ class Repository(GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return [User(c, self) for c in json]
 
+    def iter_downloads(self, number=-1):
+        """Iterate over available downloads for this repository.
+
+        :param int number: (optional), number of downloads to return. Default: -1
+            returns all available downloads
+        :returns: list of :class:`Download <Download>`\ s
+        """
+        url = self._build_url('downloads', base_url=self._api)
+        return self._iter(int(number), url, Download)
+
     def list_downloads(self):
         """List available downloads for this repository.
 
         :returns: list of :class:`Download <Download>`\ s
         """
-        # Paginate?
         url = self._build_url('downloads', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Download(dl, self) for dl in json]
+
+    def iter_events(self, number=-1):
+        """Iterate over events on this repository.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :returns: list of :class:`Event <github3.events.Event>`\ s
+        """
+        url = self._build_url('events', base_url=self._api)
+        return self._iter(int(number), url, Event)
 
     def list_events(self):
         """List events on this repository.
 
         :returns: list of :class:`Event <github3.events.Event>`\ s
         """
-        # Paginate
         url = self._build_url('events', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
+
+    def iter_forks(self, sort='', number=-1):
+        """Iterate over forks of this repository.
+
+        :param sort: (optional), accepted values:
+            ('newest', 'oldest', 'watchers'), API default: 'newest'
+        :type sort: str
+        :param number: (optional), number of forks to return. Default: -1
+            returns all forks
+        :type number: int
+        :returns: list of :class:`Repository <Repository>`
+        """
+        url = self._build_url('forks', base_url=self._api)
+        params = {}
+        if sort in ('newest', 'oldest', 'watchers'):
+            params = {'sort': sort}
+        return self._iter(int(number), url, Repository, params=params)
 
     def list_forks(self, sort=''):
         """List forks of this repository.
@@ -927,7 +1049,6 @@ class Repository(GitHubCore):
         :type sort: str
         :returns: list of :class:`Repository <Repository>`
         """
-        # Paginate?
         url = self._build_url('forks', base_url=self._api)
         params = {}
         if sort in ('newest', 'oldest', 'watchers'):
@@ -936,15 +1057,78 @@ class Repository(GitHubCore):
         return [Repository(r, self) for r in json]
 
     @requires_auth
+    def iter_hooks(self):
+        """Iterate over hooks registered on this repository.
+
+        :param int number: (optional), number of hoks to return. Default: -1
+            returns all hooks
+        :returns: list of :class:`Hook <Hook>`\ s
+        """
+        url = self._build_url('hooks', base_url=self._api)
+        return self._iter(int(number), url, Hook)
+
+    @requires_auth
     def list_hooks(self):
         """List hooks registered on this repository.
 
         :returns: list of :class:`Hook <Hook>`\ s
         """
-        # Paginate?
         url = self._build_url('hooks', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Hook(h, self) for h in json]
+
+    def iter_issues(self,
+        milestone=None,
+        state=None,
+        assignee=None,
+        mentioned=None,
+        labels=None,
+        sort=None,
+        direction=None,
+        since=None,
+        number=-1):
+        """Iterate over issues on this repo based upon parameters passed.
+
+        :param milestone: (optional), 'none', or '*'
+        :type milestone: int
+        :param state: (optional), accepted values: ('open', 'closed')
+        :type state: str
+        :param assignee: (optional), 'none', '*', or login name
+        :type assignee: str
+        :param mentioned: (optional), user's login name
+        :type mentioned: str
+        :param labels: (optional), comma-separated list of labels, e.g.
+            'bug,ui,@high' :param sort: accepted values:
+            ('created', 'updated', 'comments', 'created')
+        :type labels: str
+        :param direction: (optional), accepted values: ('open', 'closed')
+        :type direction: str
+        :param since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+        :type since: str
+        :param number: (optional), Number of issues to return.
+            By default all issues are returned
+        :type since: int
+        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
+        """
+        # Paginate
+        url = self._build_url('issues', base_url=self._api)
+
+        params = {}
+        if milestone in ('*', 'none') or isinstance(milestone, int):
+            params['milestone'] = str(milestone).lower()
+            # str(None) = 'None' which is invalid, so .lower() it to make it
+            # work.
+
+        if assignee:
+            params['assignee'] = assignee
+
+        if mentioned:
+            params['mentioned'] = mentioned
+
+        params.update(issue_params(None, state, labels, sort, direction,
+            since))
+
+        return self._iter(int(number), url, Issue, params=params)
 
     def list_issues(self,
         milestone=None,
@@ -1056,17 +1240,25 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`Label <github3.issues.Label>`\ s
         """
-        # Paginate?
         url = self._build_url('labels', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [Label(label, self) for label in json]
+
+    def iter_languages(self, number=-1):
+        """Iterate over the programming languages used in the repository.
+
+        :param int number: (optional), number of languages to return. Default: -1
+            returns all used languages
+        :returns: list of tuples
+        """
+        url = self._build_url('languages', base_url=self._api)
+        return self._iter(int(number), url, tuple)
 
     def list_languages(self):
         """List the programming languages used in the repository.
 
         :returns: list of tuples
         """
-        # Paginate?
         url = self._build_url('languages', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [(k, v) for k, v in json.items()]
@@ -1721,7 +1913,7 @@ class RepoComment(BaseComment):
             self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Repository Comment [{0}]>'.format(self.user.login or '')
+        return '<Repository Comment [{0}/{1}]>'.format(self.commit_id[:7], self.user.login or '')
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
@@ -1772,6 +1964,7 @@ class RepoCommit(BaseCommit):
         #: :class:`Commit <github3.git.Commit>`.
         self.commit = Commit(commit.get('commit'), self._session)
 
+        self.sha = commit.get('sha')
         #: The number of additions made in the commit.
         self.additions = 0
         #: The number of deletions made in the commit.
@@ -1788,7 +1981,7 @@ class RepoCommit(BaseCommit):
 
     def __repr__(self):
         # TODO(Ian) come back to this after models.py
-        return '<Repository Commit [{0}]>'.format(self.sha)
+        return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
 
 class Comparison(GitHubObject):
