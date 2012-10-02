@@ -531,7 +531,7 @@ class TestBranch(BaseTest):
         self.branch = repo.branch('master')
 
     def test_commit(self):
-        expect(self.branch.commit).isinstance(Commit)
+        expect(self.branch.commit).isinstance(RepoCommit)
 
     def test_links(self):
         expect(self.branch.links).isinstance(dict)

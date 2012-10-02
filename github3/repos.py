@@ -1467,16 +1467,16 @@ class Branch(GitHubCore):
         super(Branch, self).__init__(branch, session)
         #: Name of the branch.
         self.name = branch.get('name')
-        #: Returns the branch :class:`Commit <github3.git.Commit>` or
+        #: Returns the branch's :class:`RepoCommit <RepoCommit>` or
         #  ``None``.
-        self.commit = None
-        if branch.get('commit'):
-            self.commit = Commit(branch.get('commit'), self._session)
+        self.commit = branch.get('commit')
+        if self.commit:
+            self.commit = RepoCommit(self.commit, self._session)
         #: Returns '_links' attribute.
         self.links = branch.get('_links', {})
 
     def __repr__(self):
-        return '<Repository Branch [{0}]>'.format(self._name)
+        return '<Repository Branch [{0}]>'.format(self.name)
 
 
 class Contents(GitHubObject):
@@ -1788,7 +1788,7 @@ class RepoCommit(BaseCommit):
 
     def __repr__(self):
         # TODO(Ian) come back to this after models.py
-        return '<Repository Commit [{0}]>'.format(self._sha)
+        return '<Repository Commit [{0}]>'.format(self.sha)
 
 
 class Comparison(GitHubObject):
