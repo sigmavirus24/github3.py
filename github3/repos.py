@@ -998,6 +998,17 @@ class Repository(GitHubCore):
         json = self._json(request, 200)
         return [Issue(i, self) for i in json]
 
+    def iter_issue_events(self, number=-1):
+        """Iterates over issue events on this repository.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :returns: generator of
+            :class:`IssueEvent <github3.issues.IssueEvent>`\ s
+        """
+        url = self._build_url('issues', 'events', base_url=self._api)
+        return self._iter(int(number), url, IssueEvent)
+
     def list_issue_events(self):
         """List issue events on this repository.
 
@@ -1009,6 +1020,17 @@ class Repository(GitHubCore):
         return [IssueEvent(e, self) for e in json]
 
     @requires_auth
+    def iter_keys(self, number=-1):
+        """Iterates over deploy keys on this repository.
+
+        :param int number: (optional), number of keys to return. Default: -1
+            returns all available keys
+        :returns: generator of :class:`Key <github3.users.Key>`\ s
+        """
+        url = self._build_url('keys', base_url=self._api)
+        return self._iter(int(number), url, Key)
+
+    @requires_auth
     def list_keys(self):
         """List deploy keys on this repository.
 
@@ -1017,7 +1039,17 @@ class Repository(GitHubCore):
         # Paginate?
         url = self._build_url('keys', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return [Key(k, self._session) for k in json]
+        return [Key(k, self) for k in json]
+
+    def iter_labels(self, number=-1):
+        """Iterates over labels on this repository.
+
+        :param int number: (optional), number of labels to return. Default: -1
+            returns all available labels
+        :returns: generator of :class:`Label <github3.issues.Label>`\ s
+        """
+        url = self._build_url('labels', base_url=self._api)
+        return self._iter(int(number), url, Label)
 
     def list_labels(self):
         """List labels on this repository.
@@ -1038,6 +1070,31 @@ class Repository(GitHubCore):
         url = self._build_url('languages', base_url=self._api)
         json = self._json(self._get(url), 200)
         return [(k, v) for k, v in json.items()]
+
+    def iter_milestones(self, state=None, sort=None, direction=None,
+            number=-1):
+        """Iterates over the milestones on this repository.
+
+        :param str state: (optional), state of the milestones, accepted
+            values: ('open', 'closed')
+        :param str sort: (optional), how to sort the milestones, accepted
+            values: ('due_date', 'completeness')
+        :param str direction: (optional), direction to sort the milestones,
+            accepted values: ('asc', 'desc')
+        :param int number: (optional), number of milestones to return.
+            Default: -1 returns all milestones
+        :returns: generator of
+            :class:`Milestone <github3.issues.Milestone>`\ s
+        """
+        url = self._build_url('milestones', base_url=self._api)
+        params = {'state': state, 'sort': sort, 'direction': direction}
+        for (k, v) in list(params.items()):
+            if not v:  # e.g., '' or None
+                del params[k]
+        params = '&'.join('='.join(tup) for tup in list(params.items()))
+        if params:
+            url = '{0}?{1}'.format(url, params)
+        return self._iter(int(number), url, Milestone)
 
     def list_milestones(self, state=None, sort=None, direction=None):
         """List the milestones on this repository.

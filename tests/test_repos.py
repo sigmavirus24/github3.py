@@ -229,8 +229,35 @@ class TestRepository(BaseTest):
     def test_list_issues(self):
         expect(self.repo.list_issues()).list_of(Issue)
 
+    def test_iter_issue_events(self):
+        expect(next(self.repo.iter_issue_events())).isinstance(IssueEvent)
+
     def test_list_issue_events(self):
         expect(self.repo.list_issue_events()).list_of(IssueEvent)
+
+    def test_iter_keys(self):
+        if not self.auth:
+            return
+        expect([k for k in self.alt_repo.iter_keys()]).list_of(Key)
+
+    def test_list_keys(self):
+        if not self.auth:
+            return
+        expect(self.alt_repo.list_keys()).list_of(Key)
+
+    def test_iter_labels(self):
+        expect(next(self.repo.iter_labels(1))).isinstance(Label)
+
+    def test_list_labels(self):
+        expect(self.repo.list_labels()).list_of(Label)
+
+    def test_list_languages(self):
+        expect(self.repo.list_languages()).list_of(tuple)
+
+    def test_iter_milestones(self):
+        expect(next(
+            self.requests_repo.iter_milestones(
+                'open', '', ''))).isinstance(Milestone)
 
     def test_list_milestones(self):
         expect(self.repo.list_milestones()).list_of(Milestone)
@@ -354,6 +381,7 @@ class TestRepository(BaseTest):
         self.raisesGHE(repo.hook, 74859)
         self.raisesGHE(repo.key, 1234)
         self.raisesGHE(repo.list_keys)
+        self.raisesGHE(next, repo.iter_keys(1))
         self.raisesGHE(repo.list_teams)
         self.raisesGHE(next, repo.iter_teams(1))
         self.raisesGHE(repo.pubsubhubbub,
