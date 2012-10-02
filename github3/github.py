@@ -35,6 +35,10 @@ class GitHub(GitHubCore):
         json = self._json(resp, 200)
         return [User(f, self) for f in json]
 
+    def _iter_follow(self, which, number):
+        url = self._build_url('user', which)
+        return self._iter(number, url, User)
+
     @requires_auth
     def authorization(self, id_num):
         """Get information about authorization ``id``.
@@ -315,6 +319,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
+    @requires_auth
     def list_authorizations(self):
         """List authorizations for the authenticated user.
 
@@ -324,6 +329,18 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Authorization(a, self) for a in json]
 
+    @requires_auth
+    def iter_authorizations(self, number=-1):
+        """Iterate over authorizations for the authenticated user.
+
+        :param int number: (optional), number of authorizations to return. Default: -1
+            returns all available authorizations
+        :returns: list of :class:`Authorization <Authorization>`\ s
+        """
+        url = self._build_url('authorizations')
+        return self._iter(int(number), url, Authorization)
+
+    @requires_auth
     def list_emails(self):
         """List email addresses for the authenticated user.
 
@@ -333,6 +350,17 @@ class GitHub(GitHubCore):
         req = self._get(url)
         return self._json(req, 200) or []
 
+    @requires_auth
+    def iter_emails(self, number=-1):
+        """Iterate over email addresses for the authenticated user.
+
+        :param int number: (optional), number of email addresses to return. Default: -1
+            returns all available email addresses
+        :returns: list of dicts
+        """
+        url = self._build_url('user', 'emails')
+        return self._iter(int(number), url, str)
+
     def list_events(self):
         """List public events.
 
@@ -341,6 +369,16 @@ class GitHub(GitHubCore):
         url = self._build_url('events')
         json = self._json(self._get(url), 200)
         return [Event(ev, self) for ev in json]
+
+    def iter_events(self, number=-1):
+        """Iterate over public events.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :returns: list of :class:`Event <github3.events.Event>`\ s
+        """
+        url = self._build_url('events')
+        return self._iter(int(number), url, Event)
 
     def list_followers(self, login=None):
         """If login is provided, return a list of followers of that
@@ -355,6 +393,21 @@ class GitHub(GitHubCore):
             return self.user(login).list_followers()
         return self._list_follow('followers')
 
+    def iter_followers(self, login=None, number=-1):
+        """If login is provided, iterate over a list of followers of that
+        login name; otherwise return a list of followers of the
+        authenticated user.
+
+        :param login: (optional), login of the user to check
+        :type login: str
+        :param int number: (optional), number of followers to return. Default: -1
+            returns all followers
+        :returns: list of :class:`User <github3.users.User>`\ s
+        """
+        if login:
+            return self.user(login).iter_followers()
+        return self._iter_follow('followers', int(number))
+
     def list_following(self, login=None):
         """If login is provided, return a list of users being followed
         by login; otherwise return a list of people followed by the
@@ -362,6 +415,21 @@ class GitHub(GitHubCore):
 
         :param login: (optional), login of the user to check
         :type login: str
+        :returns: list of :class:`User <github3.users.User>`\ s
+        """
+        if login:
+            return self.user(login).iter_following()
+        return self._iter_follow('followers', int(number))
+
+    def iter_following(self, login=None, number=-1):
+        """If login is provided, iterate over a list of users being followed
+        by login; otherwise return a list of people followed by the
+        authenticated user.
+
+        :param login: (optional), login of the user to check
+        :type login: str
+        :param int number: (optional), number of people to return. Default: -1
+            returns all people you follow
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         if login:
@@ -382,6 +450,22 @@ class GitHub(GitHubCore):
             url = self._build_url('gists')
         json = self._json(self._get(url), 200)
         return [Gist(gist, self) for gist in json]
+
+    def iter_gists(self, username=None, number=-1):
+        """If no username is specified, GET /gists, otherwise GET
+        /users/:username/gists
+
+        :param login: (optional), login of the user to check
+        :type login: str
+        :param int number: (optional), number of gists to return. Default: -1
+            returns all available gists
+        :returns: list of :class:`Gist <github3.gists.Gist>`\ s
+        """
+        if username:
+            url = self._build_url('users', username, 'gists')
+        else:
+            url = self._build_url('gists')
+        return self._iter(int(number), url, Gist)
 
     @requires_auth
     def list_user_issues(self, filter='', state='', labels='', sort='',
@@ -448,6 +532,17 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Key(key, self) for key in json]
 
+    @requires_auth
+    def iter_keys(self, number=-1):
+        """Iterate over public keys for the authenticated user.
+
+        :param int number: (optional), number of keys to return. Default: -1
+            returns all your keys
+        :returns: list of :class:`Key <github3.users.Key>`\ s
+        """
+        url = self._build_url('user', 'keys')
+        return self._iter(int(number), url, Key)
+
     def list_orgs(self, login=None):
         """List public organizations for login if provided; otherwise
         list public and private organizations for the authenticated
@@ -464,6 +559,24 @@ class GitHub(GitHubCore):
 
         json = self._json(self._get(url), 200)
         return [Organization(org, self) for org in json]
+
+    def iter_orgs(self, login=None, number=-1):
+        """Iterate over public organizations for login if provided; otherwise
+        iterate over public and private organizations for the authenticated
+        user.
+
+        :param login: (optional), user whose orgs you wish to list
+        :param int number: (optional), number of organizations to return. Default: -1
+            returns all available organizations
+        :type login: str
+        :returns: list of :class:`Organization <github3.orgs.Organization>`\ s
+        """
+        if login:
+            url = self._build_url('users', login, 'orgs')
+        else:
+            url = self._build_url('usr', 'orgs')
+
+        return self._iter(int(number), url, Organization)
 
     def list_repos(self, login=None, type='', sort='', direction=''):
         """List public repositories for the specified ``login`` or all
@@ -516,6 +629,19 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Repository(r, self) for r in json]
 
+    def iter_starred(self, login=None, number=-1):
+        """Iterate over repositories starred by ``login`` or the authenticated user.
+
+        :param int number: (optional), number of repositories to return. Default: -1
+            returns all repositories
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        """
+        if login:
+            return self.user(login).list_starred()
+
+        url = self._build_url('user', 'starred')
+        return self._iter(int(number), url, Repository)
+
     def list_subscribed(self, login=None):
         """List repositories subscribed to by ``login`` or the authenticated
         user.
@@ -528,6 +654,20 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'subscriptions')
         json = self._json(self._get(url), 200)
         return [Repository(r, self) for r in json]
+
+    def iter_subscribed(self, login=None, number=-1):
+        """Iterate over repositories subscribed to by ``login`` or the
+        authenticated user.
+
+        :param int number: (optional), number of repositories to return. Default: -1
+            returns all repositories
+        :returns: list of :class:`Repository <github3.repos.Repository>`
+        """
+        if login:
+            return self.user(login).list_subscriptions()
+
+        url = self._build_url('user', 'subscriptions')
+        return self._iter(int(number), url, Repository)
 
     def list_watching(self, login=None):
         """DEPRECATED: Use list_starred() instead."""

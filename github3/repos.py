@@ -1255,7 +1255,7 @@ class Repository(GitHubCore):
         url = ''
         if sha:
             url = self._build_url('statuses', sha, base_url=self._api)
-        return self._iter(int(number), url, Status, False)
+        return self._iter(int(number), url, Status)
 
     def list_statuses(self, sha):
         """List the statuses for a specific SHA.
@@ -1277,7 +1277,7 @@ class Repository(GitHubCore):
         :returns: generator of :class:`RepoTag <RepoTag>`\ s
         """
         url = self._build_url('tags', base_url=self._api)
-        return self._iter(int(number), url, RepoTag, False)
+        return self._iter(int(number), url, RepoTag)
 
     def list_tags(self):
         """List tags on this repository.
