@@ -1111,14 +1111,11 @@ class Repository(GitHubCore):
         :type since: int
         :returns: list of :class:`Issue <github3.issues.Issue>`\ s
         """
-        # Paginate
         url = self._build_url('issues', base_url=self._api)
 
         params = {}
         if milestone in ('*', 'none') or isinstance(milestone, int):
-            params['milestone'] = str(milestone).lower()
-            # str(None) = 'None' which is invalid, so .lower() it to make it
-            # work.
+            params['milestone'] = milestone
 
         if assignee:
             params['assignee'] = assignee

@@ -207,6 +207,9 @@ class TestRepository(BaseTest):
                 return
         self.fail('No commenter with login kennethreitz')
 
+    def test_iter_comments(self):
+        expect(next(self.repo.iter_comments())).isinstance(RepoComment)
+
     def test_list_comments_on_commit(self):
         comments = self.requests_repo.list_comments_on_commit(
                 '10280c697dcfd3d334f1c9c381a11c324bb550bc')
@@ -216,11 +219,23 @@ class TestRepository(BaseTest):
                 return
         self.fail('No commenter with login brunobord')
 
+    def test_iter_comments_on_commit(self):
+        comment = next(self.requests_repo.iter_comments_on_commit(
+            '10280c697dcfd3d334f1c9c381a11c324bb550bc'
+            ))
+        expect(comment).isinstance(RepoComment)
+
     def test_list_commits(self):
         expect(self.repo.list_commits()).list_of(RepoCommit)
 
+    def test_iter_commits(self):
+        expect(next(self.repo.iter_commits())).isinstance(RepoCommit)
+
     def test_list_contributors(self):
         expect(self.repo.list_contributors()).list_of(User)
+
+    def test_iter_contributors(self):
+        expect(next(self.repo.iter_contributors())).isinstance(User)
 
     def test_list_downloads(self):
         downloads = self.repo.list_downloads()
@@ -230,12 +245,27 @@ class TestRepository(BaseTest):
                 return
         self.fail('No download with name todo.txt-python-0.3.zip')
 
+    def test_iter_downloads(self):
+        expect(next(self.repo.iter_downloads())).isinstance(Download)
+
     def test_list_events(self):
         expect(self.repo.list_events()).list_of(Event)
+
+    def test_iter_events(self):
+        expect(next(self.repo.iter_events())).isinstance(Event)
 
     def test_list_forks(self):
         expect(self.repo.list_forks()).list_of(Repository)
         expect(self.repo.list_forks('oldest')).list_of(Repository)
+
+    def test_iter_forks(self):
+        expect(next(self.repo.list_forks())).isinstance(Repository)
+        expect(next(self.repo.list_forks('oldest'))).isinstance(Repository)
+
+    def test_iter_issues(self):
+        expect(next(self.repo.iter_issues())).isinstance(Issue)
+        expect(next(self.requests_repo.iter_issues(milestone='*'))).isinstance(
+                Issue)
 
     def test_list_issues(self):
         expect(self.repo.list_issues()).list_of(Issue)
