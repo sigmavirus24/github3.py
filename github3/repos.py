@@ -1288,6 +1288,7 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [RepoTag(tag) for tag in json]
 
+    @requires_auth
     def iter_teams(self, number=-1):
         """Iterates over teams with access to this repository.
 
@@ -1299,6 +1300,7 @@ class Repository(GitHubCore):
         url = self._build_url('teams', base_url=self._api)
         return self._iter(int(number), url, Team)
 
+    @requires_auth
     def list_teams(self):
         """List teams with access to this repository.
 

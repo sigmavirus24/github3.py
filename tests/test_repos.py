@@ -381,9 +381,9 @@ class TestRepository(BaseTest):
         self.raisesGHE(repo.hook, 74859)
         self.raisesGHE(repo.key, 1234)
         self.raisesGHE(repo.list_keys)
-        self.raisesGHE(next, repo.iter_keys(1))
+        self.raisesGHE(repo.iter_keys, 1)
         self.raisesGHE(repo.list_teams)
-        self.raisesGHE(next, repo.iter_teams(1))
+        self.raisesGHE(repo.iter_teams, 1)
         self.raisesGHE(repo.pubsubhubbub,
                 'subscribe',
                 'https://github.com/user/repo/events/push',
