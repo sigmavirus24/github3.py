@@ -824,10 +824,11 @@ class Repository(GitHubCore):
         return Label(json, self) if json else None
 
     def iter_assignees(self, number=-1):
-        """Iterate over all available assignees to which an issue may be assigned.
+        """Iterate over all available assignees to which an issue may be
+        assigned.
 
-        :param int number: (optional), number of assignees to return. Default: -1
-            returns all available assignees
+        :param int number: (optional), number of assignees to return. Default:
+            -1 returns all available assignees
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('assignees', base_url=self._api)
@@ -845,8 +846,8 @@ class Repository(GitHubCore):
     def iter_branches(self, number=-1):
         """Iterate over the branches in this repository.
 
-        :param int number: (optional), number of branches to return. Default: -1
-            returns all branches
+        :param int number: (optional), number of branches to return. Default:
+            -1 returns all branches
         :returns: list of :class:`Branch <Branch>`\ es
         """
         # Paginate?
@@ -866,8 +867,8 @@ class Repository(GitHubCore):
     def iter_comments(self, number=-1):
         """Iterate over comments on all commits in the repository.
 
-        :param int number: (optional), number of comments to return. Default: -1
-            returns all comments
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all comments
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
         # Paginate?
@@ -889,8 +890,8 @@ class Repository(GitHubCore):
 
         :param sha: (required), sha of the commit to list comments on
         :type sha: str
-        :param int number: (optional), number of comments to return. Default: -1
-            returns all comments
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all comments
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
@@ -916,12 +917,12 @@ class Repository(GitHubCore):
             listed
         :param str author: (optional), GitHub login, real name, or email to
             filter commits by (using commit author)
-        :param int number: (optional), number of comments to return. Default: -1
-            returns all comments
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all comments
 
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
-        params={}
+        params = {}
         if sha:
             params['sha'] = sha
         if path:
@@ -943,7 +944,7 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
-        params={}
+        params = {}
         if sha:
             params['sha'] = sha
         if path:
@@ -959,8 +960,8 @@ class Repository(GitHubCore):
 
         :param anon: (optional), True lists anonymous contributors as well
         :type anon: bool
-        :param number: (optional), number of contributors to return. Default: -1
-            returns all contributors
+        :param number: (optional), number of contributors to return. Default:
+            -1 returns all contributors
         :type number: int
         :returns: list of :class:`User <github3.users.User>`\ s
         """
@@ -989,8 +990,8 @@ class Repository(GitHubCore):
     def iter_downloads(self, number=-1):
         """Iterate over available downloads for this repository.
 
-        :param int number: (optional), number of downloads to return. Default: -1
-            returns all available downloads
+        :param int number: (optional), number of downloads to return. Default:
+            -1 returns all available downloads
         :returns: list of :class:`Download <Download>`\ s
         """
         url = self._build_url('downloads', base_url=self._api)
@@ -1057,7 +1058,7 @@ class Repository(GitHubCore):
         return [Repository(r, self) for r in json]
 
     @requires_auth
-    def iter_hooks(self):
+    def iter_hooks(self, number=-1):
         """Iterate over hooks registered on this repository.
 
         :param int number: (optional), number of hoks to return. Default: -1
@@ -1247,8 +1248,8 @@ class Repository(GitHubCore):
     def iter_languages(self, number=-1):
         """Iterate over the programming languages used in the repository.
 
-        :param int number: (optional), number of languages to return. Default: -1
-            returns all used languages
+        :param int number: (optional), number of languages to return. Default:
+            -1 returns all used languages
         :returns: list of tuples
         """
         url = self._build_url('languages', base_url=self._api)
@@ -1888,7 +1889,6 @@ class RepoTag(GitHubObject):
         return '<Repository Tag [{0}]>'.format(self.name)
 
 
-# TODO(Ian) Come back to this after doing models.py
 class RepoComment(BaseComment):
     """The :class:`RepoComment <RepoComment>` object. This stores the
     information about a comment on a file in a repository.
@@ -1913,7 +1913,8 @@ class RepoComment(BaseComment):
             self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Repository Comment [{0}/{1}]>'.format(self.commit_id[:7], self.user.login or '')
+        return '<Repository Comment [{0}/{1}]>'.format(self.commit_id[:7],
+                self.user.login or '')
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
@@ -1948,7 +1949,6 @@ class RepoComment(BaseComment):
         return False
 
 
-# TODO(Ian) Come back to this after doing models.py
 class RepoCommit(BaseCommit):
     """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
     viewed by a :class:`Repository`. This is different from a Commit object
@@ -1958,9 +1958,9 @@ class RepoCommit(BaseCommit):
     def __init__(self, commit, session=None):
         super(RepoCommit, self).__init__(commit, session)
         #: :class:`User <github3.users.User>` who authored the commit.
-        self.author = User(commit.get('author'), self._session)
+        self.author = User(commit.get('author', {}), self._session)
         #: :class:`User <github3.users.User>` who committed the commit.
-        self.committer = User(commit.get('committer'), self._session)
+        self.committer = User(commit.get('committer', {}), self._session)
         #: :class:`Commit <github3.git.Commit>`.
         self.commit = Commit(commit.get('commit'), self._session)
 
@@ -1980,7 +1980,6 @@ class RepoCommit(BaseCommit):
         self.files = commit.get('files', [])
 
     def __repr__(self):
-        # TODO(Ian) come back to this after models.py
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
 

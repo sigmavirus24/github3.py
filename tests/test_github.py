@@ -228,16 +228,16 @@ class TestGitHub(BaseTest):
         self.raisesGHE(self.g.authorize, 'foo', 'bar', ['gist', 'user'])
 
     def test_list_emails(self):
-        self.raisesGHE(self.g.list_emails())
+        self.raisesGHE(self.g.list_emails)
 
         if self.auth:
             expect(self._g.list_emails()).list_of(dict)
 
     def test_iter_emails(self):
-        self.raisesGHE(self.g.list_emails())
+        self.raisesGHE(self.g.iter_emails)
 
         if self.auth:
-            expect(next(self._g.list_emails())).isinstance(dict)
+            expect(next(self._g.iter_emails())).isinstance(dict)
 
     def test_list_events(self):
         expect(self.g.list_events()).list_of(Event)

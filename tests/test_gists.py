@@ -18,8 +18,12 @@ class TestGist(BaseTest):
     def test_repr(self):
         expect(repr(self.gist)) != ''
 
+    def test_iter_forks(self):
+        expect(next(self.gist.iter_forks())).isinstance(Gist)
+
     def test_list_forks(self):
         expect(self.gist.list_forks()).isinstance(list)
+        expect(self.gist.list_forks()).list_of(Gist)
 
     def test_updated_at(self):
         expect(self.gist.updated_at).isinstance(datetime)
@@ -27,8 +31,12 @@ class TestGist(BaseTest):
     def test_files(self):
         expect(self.gist.files) >= 0
 
+    def test_iter_files(self):
+        expect(next(self.gist.iter_files())).isinstance(GistFile)
+
     def test_list_files(self):
         expect(self.gist.list_files()).isinstance(list)
+        expect(self.gist.list_files()).list_of(GistFile)
 
     def test_forks(self):
         expect(self.gist.forks) >= 0

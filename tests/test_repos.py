@@ -180,6 +180,14 @@ class TestRepository(BaseTest):
                 return
         self.fail('No user with login sigmavirus24')
 
+    def test_iter_assignees(self):
+        assignees = [a for a in self.repo.iter_assignees()]
+        expect(assignees).list_of(User)
+        for a in assignees:
+            if a.login == 'sigmavirus24':
+                return
+        self.fail('No user with login sigmavirus24')
+
     def test_list_branches(self):
         branches = self.repo.list_branches()
         expect(branches).list_of(Branch)
@@ -187,6 +195,9 @@ class TestRepository(BaseTest):
             if b.name == 'master':
                 return
         self.fail('No branch named master')
+
+    def test_iter_branches(self):
+        expect(next(self.repo.iter_branches())).isinstance(Branch)
 
     def test_list_comments(self):
         comments = self.requests_repo.list_comments()
