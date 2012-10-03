@@ -672,6 +672,17 @@ class TestDownload(BaseTest):
         with expect.raises(github3.GitHubError):
             self.dl.delete()
 
+    def test_saveas(self):
+        filename = mkstemp()
+        expect(self.dl.saveas(filename)).is_True()
+        with open(filename, 'rb') as fp:
+            content = fp.read()
+        unlink(filename)
+        expect(len(content)) > 0
+        expect(self.dl.saveas()).is_True()
+        with open(self.dl.name, 'rb') as fp:
+            expect(fp.read()) == content
+
 
 class TestHook(BaseTest):
     def __init__(self, methodName='runTest'):
