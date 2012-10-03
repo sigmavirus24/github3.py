@@ -1,8 +1,10 @@
 import github3
+import io
 import re
 from .base import expect, BaseTest, str_test, expect_str
 from datetime import datetime
 from os import unlink, listdir
+from tempfile import mkstemp
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
         Comparison, Contents, Download, Hook, RepoTag, Status)
 from github3.users import User, Key
@@ -101,13 +103,22 @@ class TestRepository(BaseTest):
 
     # Methods
     def test_archive(self):
-        expect(self.repo.archive('tarball', 'archive.tar.gz')).is_True()
-        unlink('archive.tar.gz')
+        filename = mkstemp()
+        expect(self.repo.archive('tarball', filename)).is_True()
+        with open(filename, 'rb') as fp:
+            content = fp.read()
+        unlink(filename)
         expect(self.repo.archive('tarball')).is_True()
         reg = re.compile('{0}-{1}-.*\.tar\.gz'.format(self.sigm, self.todo))
         for f in listdir('.'):
             if reg.match(f):
+                with open(f, 'rb') as fp:
+                    expect(fp.read()) == content
                 unlink(f)
+        fp = io.BytesIO()
+        expect(self.repo.archive('tarball', fp)).is_True()
+        expect(fp.getvalue()) == content
+        fp.close()
 
     def test_blob(self):
         expect(self.repo.blob(
@@ -660,6 +671,21 @@ class TestDownload(BaseTest):
     def test_requires_auth(self):
         with expect.raises(github3.GitHubError):
             self.dl.delete()
+
+    def test_saveas(self):
+        filename = mkstemp()
+        expect(self.dl.saveas(filename)).is_True()
+        with open(filename, 'rb') as fp:
+            content = fp.read()
+        unlink(filename)
+        expect(len(content)) > 0
+        expect(self.dl.saveas()).is_True()
+        with open(self.dl.name, 'rb') as fp:
+            expect(fp.read()) == content
+        fp = io.BytesIO()
+        expect(self.dl.saveas(fp)).is_True()
+        expect(fp.getvalue()) == content
+        fp.close()
 
 
 class TestHook(BaseTest):
