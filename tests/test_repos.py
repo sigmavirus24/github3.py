@@ -110,7 +110,8 @@ class TestRepository(BaseTest):
             if reg.match(f):
                 unlink(f)
         fp = io.BytesIO()
-        expect(self.repo.archive('tarball', fp).tell()) > 0
+        expect(self.repo.archive('tarball', fp)).is_True()
+        expect(fp.tell()) > 0
         fp.close()
 
     def test_blob(self):
