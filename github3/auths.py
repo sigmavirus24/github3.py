@@ -12,7 +12,7 @@ from json import dumps
 
 class Authorization(GitHubCore):
     """The :class:`Authorization <Authorization>` object."""
-    def __init__(self, auth, session):
+    def __init__(self, auth, session=None):
         super(Authorization, self).__init__(auth, session)
         #: Details about the application (name, url)
         self.app = auth.get('app', {})

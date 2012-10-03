@@ -17,7 +17,7 @@ class TestAuthorization(BaseTest):
                     'token': 'upupdowndownleftrightba',
                     'created_at': '2012-02-28T01:45:49Z',
                     }
-            self.authorization = Authorization(json)
+            self.authorization = Authorization(json, None)
         else:
             self.authorization = self.g.authorize(self.user, self.pw, [])
         self.deleted = False
