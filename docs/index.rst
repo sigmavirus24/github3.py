@@ -62,6 +62,7 @@ Modules
     :maxdepth: 1
 
     api
+    auths
     events
     gists
     git
@@ -205,7 +206,7 @@ To run the tests as they would be run by Travis CI::
 
     CI=true ./unittests.py
 
-To test functions that require proper authorization::
+To test functions that require proper authentication::
 
     ./unittests.py
 
@@ -214,7 +215,9 @@ The latter will prompt you for your username and password, e.g.::
     [ sigma: ~/sandbox/github3.py ] ./unittests.py
     Enter GitHub username: sigmavirus24
     Password for sigmavirus24:
-    === Starting unittest suite ===
+
+This will generally fail until we can generalize the authenticated tests via a 
+config file.
 
 
 Contact

@@ -2,6 +2,7 @@ import github3
 from .base import expect, expect_str, BaseTest
 from github3.repos import Repository
 from github3.events import Event
+from github3.auths import Authorization
 
 
 class TestGitHub(BaseTest):
@@ -223,9 +224,24 @@ class TestGitHub(BaseTest):
         r.delete()
 
     def test_authorizations_requires_auth(self):
-        self.raisesGHE(self.g.list_authorizations)
         self.raisesGHE(self.g.authorization, -1)
         self.raisesGHE(self.g.authorize, 'foo', 'bar', ['gist', 'user'])
+
+    def test_iter_authorizations(self):
+        self.raisesGHE(self.g.iter_authorizations)
+
+        if not self.auth:
+            return
+
+        expect(next(self._g.iter_authorizations())).isinstance(Authorization)
+
+    def test_list_authorizations(self):
+        self.raisesGHE(self.g.list_authorizations)
+
+        if not self.auth:
+            return
+
+        expect(self._g.list_authorizations()).list_of(Authorization)
 
     def test_list_emails(self):
         self.raisesGHE(self.g.list_emails)
