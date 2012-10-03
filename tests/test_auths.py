@@ -5,6 +5,7 @@ from github3.auths import Authorization
 
 class TestAuthorization(BaseTest):
     def __init__(self, methodName='runTest'):
+        super(TestAuthorization, self).__init__(methodName)
         if not self.auth:
             json = {'scopes': ['public_repo'],
                     'url': 'https://api.github.com',
