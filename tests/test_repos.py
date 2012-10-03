@@ -1,4 +1,5 @@
 import github3
+import io
 import re
 from .base import expect, BaseTest, str_test, expect_str
 from datetime import datetime
@@ -108,6 +109,9 @@ class TestRepository(BaseTest):
         for f in listdir('.'):
             if reg.match(f):
                 unlink(f)
+        fp = io.BytesIO()
+        expect(self.repo.archive('tarball', fp).tell()) > 0
+        fp.close()
 
     def test_blob(self):
         expect(self.repo.blob(

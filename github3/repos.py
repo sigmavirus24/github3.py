@@ -141,8 +141,9 @@ class Repository(GitHubCore):
         :type format: str
         :param path: (optional), path where the file should be saved
             to, default is the filename provided in the headers and will be
-            written in the current directory
-        :type path: str
+            written in the current directory.
+            it can take a file-like object as well
+        :type path: str, file
         :param ref: (optional)
         :type ref: str
         :returns: bool -- True if successful, False otherwise
@@ -154,9 +155,13 @@ class Repository(GitHubCore):
             resp = self._get(url, allow_redirects=True)
 
         if resp.ok and path:
-            with open(path, 'wb') as fd:
-                fd.write(resp.content)
+            if callable(getattr(path, 'write', None)):
+                path.write(resp.content)
                 written = True
+            else:
+                with open(path, 'wb') as fd:
+                    fd.write(resp.content)
+                    written = True
         elif resp:
             header = resp.headers['content-disposition']
             i = header.find('filename=') + len('filename=')
