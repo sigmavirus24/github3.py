@@ -1959,7 +1959,9 @@ class RepoCommit(BaseCommit):
         #: :class:`User <github3.users.User>` who committed the commit.
         self.committer = User(commit.get('committer', {}), self._session)
         #: :class:`Commit <github3.git.Commit>`.
-        self.commit = Commit(commit.get('commit'), self._session)
+        self.commit = commit.get('commit')
+        if self.commit:
+            self.commit = Commit(self.commit, self._session)
 
         self.sha = commit.get('sha')
         #: The number of additions made in the commit.

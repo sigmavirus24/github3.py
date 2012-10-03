@@ -61,7 +61,8 @@ class TestAuthorization(BaseTest):
         if self.deleted:
             self.authorization.delete()
 
-    def test_delelte(self):
+    def test_delete(self):
         if not self.auth:
             return
         expect(self.authorization.delete()).is_True()
+        self.deleted = True

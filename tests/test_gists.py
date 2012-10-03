@@ -19,7 +19,8 @@ class TestGist(BaseTest):
         expect(repr(self.gist)) != ''
 
     def test_iter_forks(self):
-        expect(next(self.gist.iter_forks())).isinstance(Gist)
+        forks = [f for f in self.gist.iter_forks()]
+        expect(forks).list_of(Gist)
 
     def test_list_forks(self):
         expect(self.gist.list_forks()).isinstance(list)

@@ -1,5 +1,5 @@
 import github3
-from .base import expect, expect_str, BaseTest
+from .base import expect, expect_str, BaseTest, str_test
 from github3.repos import Repository
 from github3.events import Event
 from github3.auths import Authorization
@@ -247,13 +247,13 @@ class TestGitHub(BaseTest):
         self.raisesGHE(self.g.list_emails)
 
         if self.auth:
-            expect(self._g.list_emails()).list_of(dict)
+            expect(self._g.list_emails()).list_of(str_test)
 
     def test_iter_emails(self):
         self.raisesGHE(self.g.iter_emails)
 
         if self.auth:
-            expect(next(self._g.iter_emails())).isinstance(dict)
+            expect_str(next(self._g.iter_emails()))
 
     def test_list_events(self):
         expect(self.g.list_events()).list_of(Event)

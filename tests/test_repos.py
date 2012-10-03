@@ -208,7 +208,8 @@ class TestRepository(BaseTest):
         self.fail('No commenter with login kennethreitz')
 
     def test_iter_comments(self):
-        expect(next(self.repo.iter_comments())).isinstance(RepoComment)
+        expect(next(self.requests_repo.iter_comments())
+                ).isinstance(RepoComment)
 
     def test_list_comments_on_commit(self):
         comments = self.requests_repo.list_comments_on_commit(
@@ -259,8 +260,8 @@ class TestRepository(BaseTest):
         expect(self.repo.list_forks('oldest')).list_of(Repository)
 
     def test_iter_forks(self):
-        expect(next(self.repo.list_forks())).isinstance(Repository)
-        expect(next(self.repo.list_forks('oldest'))).isinstance(Repository)
+        expect(next(self.repo.iter_forks())).isinstance(Repository)
+        expect(next(self.repo.iter_forks('oldest'))).isinstance(Repository)
 
     def test_iter_issues(self):
         expect(next(self.repo.iter_issues())).isinstance(Issue)
