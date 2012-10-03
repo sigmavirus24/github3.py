@@ -19,9 +19,9 @@ class Authorization(GitHubCore):
         #: Returns the Authorization token
         self.token = auth.get('token', '')
         #: App name
-        self.name = self.app.get('name', '')
+        self.name = self.app.get('name') or ''
         #: URL about the note
-        self.note_url = auth.get('note_url', '')
+        self.note_url = auth.get('note_url') or ''
         #: Note about the authorization
         self.note = auth.get('note', '')
         #: List of scopes this applies to
