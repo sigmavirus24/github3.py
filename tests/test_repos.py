@@ -682,6 +682,10 @@ class TestDownload(BaseTest):
         expect(self.dl.saveas()).is_True()
         with open(self.dl.name, 'rb') as fp:
             expect(fp.read()) == content
+        fp = io.BytesIO()
+        expect(self.dl.saveas(fp)).is_True()
+        expect(fp.getvalue()) == content
+        fp.close()
 
 
 class TestHook(BaseTest):
