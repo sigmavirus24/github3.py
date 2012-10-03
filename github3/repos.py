@@ -1763,6 +1763,7 @@ class Download(GitHubCore):
 
         :param path: (optional), if no path is specified, it will be
             saved in the current directory with the name specified by GitHub.
+            it can take a file-like object as well
         :type path: str
         :returns: bool
         """
@@ -1771,9 +1772,13 @@ class Download(GitHubCore):
 
         resp = self._get(self.html_url, allow_redirects=True)
         if self._boolean(resp, 200, 404):
-            with open(path, 'wb') as fd:
-                fd.write(resp.content)
+            if callable(getattr(path, 'write', None)):
+                path.write(resp.content)
                 return True
+            else:
+                with open(path, 'wb') as fd:
+                    fd.write(resp.content)
+                    return True
         return False
 
 

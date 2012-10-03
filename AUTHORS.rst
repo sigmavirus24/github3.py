@@ -23,3 +23,5 @@ Contributors
 - James Sullivan (@jsullivanlive)
 
 - Dennis Kaarsemaker (@seveas)
+
+- Hong Minhee (@dahlia)
