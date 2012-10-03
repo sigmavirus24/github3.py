@@ -103,7 +103,7 @@ class TestRepository(BaseTest):
 
     # Methods
     def test_archive(self):
-        filename = mkstemp()
+        filename = mkstemp()[1]
         expect(self.repo.archive('tarball', filename)).is_True()
         with open(filename, 'rb') as fp:
             content = fp.read()
@@ -673,7 +673,7 @@ class TestDownload(BaseTest):
             self.dl.delete()
 
     def test_saveas(self):
-        filename = mkstemp()
+        filename = mkstemp()[1]
         expect(self.dl.saveas(filename)).is_True()
         with open(filename, 'rb') as fp:
             content = fp.read()
