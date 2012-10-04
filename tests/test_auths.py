@@ -1,4 +1,4 @@
-from .base import expect, BaseTest
+from .base import expect, expect_str, BaseTest
 from datetime import datetime
 from github3.auths import Authorization
 
@@ -43,10 +43,10 @@ class TestAuthorization(BaseTest):
         expect(self.authorization.created_at).isinstance(datetime)
 
     def test_note(self):
-        expect(self.authorization.note) >= ''
+        expect_str(self.authorization.note)
 
     def test_note_url(self):
-        expect(self.authorization.note_url) >= ''
+        expect_str(self.authorization.note_url)
 
     def test_scopes(self):
         expect(self.authorization.scopes).isinstance(list)
