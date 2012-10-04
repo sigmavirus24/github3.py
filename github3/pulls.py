@@ -75,17 +75,17 @@ class PullRequest(GitHubCore):
         #: Base of the merge
         self.base = PullDestination(pull.get('base'), 'Base')
         #: Body of the pull request message
-        self.body = pull.get('body')
+        self.body = pull.get('body', '')
         #: Body of the pull request as HTML
-        self.body_html = pull.get('body_html')
+        self.body_html = pull.get('body_html', '')
         #: Body of the pull request as plain text
-        self.body_text = pull.get('body_text')
+        self.body_text = pull.get('body_text', '')
 
-        #: datetime object representing when the pull was closed
-        self.closed_at = None
         # If the pull request has been closed
-        if pull.get('closed_at'):
-            self.closed_at = self._strptime(pull.get('closed_at'))
+        #: datetime object representing when the pull was closed
+        self.closed_at = pull.get('closed_at')
+        if self.closed_at:
+            self.closed_at = self._strptime(self.closed_at)
 
         #: datetime object representing when the pull was created
         self.created_at = self._strptime(pull.get('created_at'))
@@ -122,16 +122,18 @@ class PullRequest(GitHubCore):
                 'review_comments': self._api + '/comments'
                 }
 
+        #: SHA of the merge commit
+        self.merge_commit_sha = pull.get('merge_commit_sha', '')
         #: datetime object representing when the pull was merged
-        self.merged_at = None
+        self.merged_at = pull.get('merged_at')
         # If the pull request has been merged
-        if pull.get('merged_at'):
-            self.merged_at = self._strptime(pull.get('merged_at'))
+        if self.merged_at:
+            self.merged_at = self._strptime(self.merged_at)
         self._mergeable = pull.get('mergeable')
         #: :class:`User <github3.users.User>` who merged this pull
-        self.merged_by = None
-        if pull.get('merged_by'):
-            self.merged_by = User(pull.get('merged_by'), self)
+        self.merged_by = pull.get('merged_by')
+        if self.merged_by:
+            self.merged_by = User(self.merged_by, self)
         #: Number of the pull/issue on the repository
         self.number = pull.get('number')
         #: The URL of the patch
@@ -144,9 +146,9 @@ class PullRequest(GitHubCore):
         self.updated_at = self._strptime(pull.get('updated_at'))
         #: :class:`User <github3.users.User>` object representing the creator
         #  of the pull request
-        self.user = None
-        if pull.get('user'):
-            self.user = User(pull.get('user'), self)
+        self.user = pull.get('user')
+        if self.user:
+            self.user = User(self.user, self)
 
     def __repr__(self):
         return '<Pull Request [#{0}]>'.format(self.number)
