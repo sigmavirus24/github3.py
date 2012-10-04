@@ -3,7 +3,7 @@ import io
 import re
 from .base import expect, BaseTest, str_test, expect_str
 from datetime import datetime
-from os import unlink, listdir
+from os import close, unlink, listdir
 from tempfile import mkstemp
 from github3.repos import (Repository, Branch, RepoCommit, RepoComment,
         Comparison, Contents, Download, Hook, RepoTag, Status)
@@ -103,7 +103,8 @@ class TestRepository(BaseTest):
 
     # Methods
     def test_archive(self):
-        filename = mkstemp()[1]
+        fd, filename = mkstemp()
+        close(fd)
         expect(self.repo.archive('tarball', filename)).is_True()
         with open(filename, 'rb') as fp:
             content = fp.read()
@@ -673,7 +674,8 @@ class TestDownload(BaseTest):
             self.dl.delete()
 
     def test_saveas(self):
-        filename = mkstemp()[1]
+        fd, filename = mkstemp()
+        close(fd)
         expect(self.dl.saveas(filename)).is_True()
         with open(filename, 'rb') as fp:
             content = fp.read()
