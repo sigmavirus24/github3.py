@@ -634,7 +634,7 @@ class GitHub(GitHubCore):
         if login:
             url = self._build_url('users', login, 'orgs')
         else:
-            url = self._build_url('usr', 'orgs')
+            url = self._build_url('user', 'orgs')
 
         return self._iter(int(number), url, Organization)
 

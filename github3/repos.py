@@ -697,7 +697,7 @@ class Repository(GitHubCore):
         if json:
             self._update_(json)
             return True
-        return False
+        return False  # (No coverage)
 
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository.
@@ -1277,14 +1277,16 @@ class Repository(GitHubCore):
             :class:`Milestone <github3.issues.Milestone>`\ s
         """
         url = self._build_url('milestones', base_url=self._api)
+        accepted = {'state': ('open', 'closed'),
+                'sort': ('due_date', 'completeness'),
+                'direction': ('asc', 'desc')}
         params = {'state': state, 'sort': sort, 'direction': direction}
         for (k, v) in list(params.items()):
-            if not v:  # e.g., '' or None
+            if not (v and (v in accepted[k])):  # e.g., '' or None
                 del params[k]
-        params = '&'.join('='.join(tup) for tup in list(params.items()))
-        if params:
-            url = '{0}?{1}'.format(url, params)
-        return self._iter(int(number), url, Milestone)
+        if not params:
+            params = None
+        return self._iter(int(number), url, Milestone, params)
 
     def list_milestones(self, state=None, sort=None, direction=None):
         """List the milestones on this repository.
@@ -1551,7 +1553,7 @@ class Repository(GitHubCore):
             data = {'hub.mode': mode, 'hub.topic': topic,
                     'hub.callback': callback, 'hub.secret': secret}
             url = self._build_url('hub')
-            status = self._boolean(self._post(url, data), 201, 404)
+            status = self._boolean(self._post(url, dumps(data)), 201, 404)
         return status
 
     def pull_request(self, number):
@@ -1774,7 +1776,7 @@ class Download(GitHubCore):
                 with open(path, 'wb') as fd:
                     fd.write(resp.content)
                     return True
-        return False
+        return False  # (No coverage)
 
 
 class Hook(GitHubCore):

@@ -240,15 +240,21 @@ class TestRepository(BaseTest):
 
     def test_list_commits(self):
         expect(self.repo.list_commits()).list_of(RepoCommit)
+        params = {'sha': 'rewrite', 'path': 'tests', 'author': 'sigmavirus24'}
+        expect(self.repo.list_commits(**params)).list_of(RepoCommit)
 
     def test_iter_commits(self):
         expect(next(self.repo.iter_commits())).isinstance(RepoCommit)
+        params = {'sha': 'rewrite', 'path': 'tests', 'author': 'sigmavirus24'}
+        expect(next(self.repo.iter_commits(**params))).isinstance(RepoCommit)
 
     def test_list_contributors(self):
         expect(self.repo.list_contributors()).list_of(User)
+        expect(self.repo.list_contributors(True)).list_of(User)
 
     def test_iter_contributors(self):
         expect(next(self.repo.iter_contributors())).isinstance(User)
+        expect(next(self.repo.iter_contributors(True))).isinstance(User)
 
     def test_list_downloads(self):
         downloads = self.repo.list_downloads()
@@ -275,13 +281,33 @@ class TestRepository(BaseTest):
         expect(next(self.repo.iter_forks())).isinstance(Repository)
         expect(next(self.repo.iter_forks('oldest'))).isinstance(Repository)
 
+    def test_iter_hooks(self):
+        self.raisesGHE(self.repo.iter_hooks)
+        if not self.auth:
+            return
+
+        expect(next(self.auth_todo.iter_hooks())).isinstance(Hook)
+
+    def test_list_hooks(self):
+        self.raisesGHE(self.repo.list_hooks)
+        if not self.auth:
+            return
+
+        expect(self.auth_todo.list_hooks()).list_of(Hook)
+
     def test_iter_issues(self):
         expect(next(self.repo.iter_issues())).isinstance(Issue)
         expect(next(self.requests_repo.iter_issues(milestone='*'))).isinstance(
                 Issue)
+        expect(next(self.requests_repo.iter_issues(assignee=self.kr))
+                ).isinstance(Issue)
+        expect(next(self.requests_repo.iter_issues(mentioned=self.kr))
+                ).isinstance(Issue)
 
     def test_list_issues(self):
         expect(self.repo.list_issues()).list_of(Issue)
+        expect(self.repo.list_issues(milestone='*', mentioned=self.sigm,
+            assignee=self.kr)).list_of(Issue)
 
     def test_iter_issue_events(self):
         expect(next(self.repo.iter_issue_events())).isinstance(IssueEvent)
@@ -305,16 +331,23 @@ class TestRepository(BaseTest):
     def test_list_labels(self):
         expect(self.repo.list_labels()).list_of(Label)
 
+    def test_iter_languages(self):
+        expect(next(self.repo.iter_languages())).isinstance(tuple)
+
     def test_list_languages(self):
         expect(self.repo.list_languages()).list_of(tuple)
 
     def test_iter_milestones(self):
+        expect(next(self.requests_repo.iter_milestones())).isinstance(
+                Milestone)
         expect(next(
             self.requests_repo.iter_milestones(
-                'open', '', ''))).isinstance(Milestone)
+                'open', 'due_date', 'asc'))).isinstance(Milestone)
 
     def test_list_milestones(self):
-        expect(self.repo.list_milestones()).list_of(Milestone)
+        expect(self.repo.list_milestones(
+            'open', 'due_date', 'asc'
+            )).list_of(Milestone)
 
     def test_iter_network_events(self):
         expect(next(self.repo.iter_network_events())).isinstance(Event)
@@ -334,9 +367,11 @@ class TestRepository(BaseTest):
 
     def test_iter_refs(self):
         expect(next(self.repo.iter_refs())).isinstance(Reference)
+        expect(next(self.repo.iter_refs('tags'))).isinstance(Reference)
 
     def test_list_refs(self):
         expect(self.repo.list_refs()).list_of(Reference)
+        expect(self.repo.list_refs('tags')).list_of(Reference)
 
     def test_iter_stargazers(self):
         expect(next(self.repo.iter_stargazers())).isinstance(User)
@@ -444,7 +479,6 @@ class TestRepository(BaseTest):
                 'https://httpbin.org/post'
                 )
         self.raisesGHE(repo.remove_collaborator, 'foobarbogus')
-        self.raisesGHE(repo.update_label, 'Foo', 'abc123')
         self.raisesGHE(repo.merge, 'development', 'master', 'Fails')
 
     # Try somethings only I should be able to do hence the try/except blocks
@@ -521,6 +555,24 @@ class TestRepository(BaseTest):
         except github3.GitHubError:
             pass
 
+    def test_delete_key(self):
+        self.raisesGHE(self.repo.delete_key, 0)
+        if not self.auth:
+            return
+
+        expect(self.alt_repo.delete_key(-1)).is_False()
+
+    def test_create_status(self):
+        self.raisesGHE(self.repo.create_status, 'fakesha', 'pending')
+        if not self.auth:
+            return
+
+        s = self.alt_repo.create_status(
+                '499faa66a0f56235ee55bf295bac2f2f3c3f0a04',
+                'pending'
+                )
+        expect(s).isinstance(Status)
+
     def test_edit(self):
         if not self.auth:
             return
@@ -544,6 +596,10 @@ class TestRepository(BaseTest):
                 'https://github.com/sigmavirus24/github3.py/events',
                 'https://httpbin.org/post'
                 )).is_False()
+            expect(self.auth_todo.pubsubhubbub('subscribe',
+                'https://github.com/sigmavirus24/github3.py/events/push',
+                'https://httpbin.org/post'
+                )).is_True()
         except github3.GitHubError:
             pass
 
@@ -577,12 +633,23 @@ class TestRepository(BaseTest):
         except github3.GitHubError:
             pass
 
+    def test_update_label(self):
+        self.raisesGHE(self.requests_repo.update_label, 'Foo', 'abc123')
+        if not self.auth:
+            return
+
+        expect(self.alt_repo.update_label('invalid', 'abc123')).is_True()
+
 
 class TestBranch(BaseTest):
     def __init__(self, methodName='runTest'):
         super(TestBranch, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
         self.branch = repo.branch('master')
+
+    def test_branch(self):
+        expect(self.branch).isinstance(Branch)
+        expect_str(repr(self.branch))
 
     def test_commit(self):
         expect(self.branch.commit).isinstance(RepoCommit)
@@ -608,6 +675,7 @@ class TestContents(BaseTest):
     def test_content(self):
         expect(len(self.contents.content)) > 0
         self._test_str_(self.contents.content)
+        expect_str(repr(self.contents))
 
     def test_decoded(self):
         expect(len(self.contents.decoded)) > 0
@@ -643,6 +711,10 @@ class TestDownload(BaseTest):
         super(TestDownload, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
         self.dl = repo.download(316176)
+
+    def test_download(self):
+        expect(self.dl).isinstance(Download)
+        expect_str(repr(self.dl))
 
     def test_content_type(self):
         expect(self.dl.content_type) == 'application/zip'

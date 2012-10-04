@@ -130,7 +130,7 @@ To test how much of the library is covered::
 
 Depending on which you run, you will see different percentages reported by 
 coverage. As of this writing (2012-10-04), ``coverage_auth`` reports 95% of 
-the library is covered and every module has coverage >= 80%.
+the library is covered and every module has coverage >= 90%.
 
 ::
 
@@ -150,7 +150,7 @@ the library is covered and every module has coverage >= 80%.
     github3/models         187      1    99%
     github3/orgs           177      0   100%
     github3/pulls          134      6    96%
-    github3/repos          782    107    86%
+    github3/repos          782    107    92%
     github3/users          162      3    98%
     ----------------------------------------
     TOTAL                 2504    132    95%

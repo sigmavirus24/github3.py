@@ -151,17 +151,17 @@ class GitHubCore(GitHubObject):
         :param params dict: (optional) Parameters for the request
         """
         while (count == -1 or count > 0) and url:
+            response = self._get(url, params=params)
             if params:
-                response = self._get(url, params=params)
-                params = None # rel_next contains the params
-            else:
-                response = self._get(url)
+                params = None  # rel_next contains the params
             json = self._json(response, 200)
+
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):
                 json = json.items()
+
             for i in json:
-                yield cls(i, self) if issubclass(cls,GitHubCore) else cls(i)
+                yield cls(i, self) if issubclass(cls, GitHubCore) else cls(i)
                 count -= 1 if count > 0 else 0
                 if count == 0:
                     break
