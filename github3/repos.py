@@ -1964,10 +1964,13 @@ class RepoCommit(BaseCommit):
 
     def __init__(self, commit, session=None):
         super(RepoCommit, self).__init__(commit, session)
+        self.author = self.committer = None
         #: :class:`User <github3.users.User>` who authored the commit.
-        self.author = User(commit.get('author', {}), self._session)
+        if commit.get('author'):
+            self.author = User(commit.get('author'), self._session)
         #: :class:`User <github3.users.User>` who committed the commit.
-        self.committer = User(commit.get('committer', {}), self._session)
+        if commit.get('committer'):
+            self.committer = User(commit.get('committer'), self._session)
         #: :class:`Commit <github3.git.Commit>`.
         self.commit = commit.get('commit')
         if self.commit:
