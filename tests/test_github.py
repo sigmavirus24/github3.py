@@ -3,6 +3,9 @@ from .base import expect, expect_str, BaseTest, str_test
 from github3.repos import Repository
 from github3.events import Event
 from github3.auths import Authorization
+from github3.users import Key, User
+from github3.gists import Gist
+from github3.issues import Issue
 
 
 class TestGitHub(BaseTest):
@@ -44,14 +47,13 @@ class TestGitHub(BaseTest):
 
         self.raisesGHE(self.g.gist, -1)
 
-    def test_list_gists(self):
-        gist_lists = []
-        for i in None, self.sigm:
-            gist_lists.append(self.g.list_gists(i))
+    def test_iter_gists(self):
+        for user in None, self.sigm:
+            expect(next(self.g.list_gists(user))).isinstance(Gist)
 
-        for l in gist_lists:
-            expect(l) != []
-            self.expect_list_of_class(l, github3.gists.Gist)
+    def test_list_gists(self):
+        for i in None, self.sigm:
+            expect(self.g.list_gists(i)).list_of(Gist)
 
     def test_create_gist(self):
         if not self.auth:
@@ -94,6 +96,14 @@ class TestGitHub(BaseTest):
 
         expect(self._g.is_subscribed(*args)).isinstance(bool)
 
+    def test_iter_following(self):
+        expect(next(self.g.iter_following(self.kr))).isinstance(User)
+        self.raisesGHE(self.g.iter_following)
+        if not self.auth:
+            return
+
+        expect(next(self._g.iter_following())).isinstance(User)
+
     def test_list_following(self):
         expect(self.g.list_following(self.kr)) != []
         self.raisesGHE(self.g.list_following)
@@ -101,9 +111,15 @@ class TestGitHub(BaseTest):
         if not self.auth:
             return
 
-        f = self._g.list_following()
-        expect(f) != []
-        self.expect_list_of_class(f, github3.users.User)
+        expect(self._g.list_following()).list_of(User)
+
+    def test_iter_followers(self):
+        expect(next(self.g.iter_followers(self.kr))).isinstance(User)
+        self.raisesGHE(self.g.iter_followers)
+        if not self.auth:
+            return
+
+        expect(next(self._g.iter_followers())).isinstance(User)
 
     def test_list_followers(self):
         expect(self.g.list_followers(self.kr)) != []
@@ -113,9 +129,7 @@ class TestGitHub(BaseTest):
         if not self.auth:
             return
 
-        f = self._g.list_following()
-        expect(f) != []
-        self.expect_list_of_class(f, github3.users.User)
+        expect(self._g.list_followers()).list_of(User)
 
     def test_list_starred(self):
         self.raisesGHE(self.g.list_starred)
@@ -155,7 +169,6 @@ class TestGitHub(BaseTest):
     def test_create_issue(self):
         title = 'Test issue for github3.py'
         self.raisesGHE(self.g.create_issue, self.sigm, self.todo, title)
-        self.raisesGHE(self.g.list_user_issues)
 
         expect(self.g.create_issue(None, None, None)).is_None()
 
@@ -194,16 +207,29 @@ class TestGitHub(BaseTest):
         expect(list_issues(self.sigm, self.todo,
             since='2011-01-01T00:00:01Z')).is_not_None()
 
-    def test_list_user_issues(self):
+    def test_iter_user_issues(self):
+        self.raisesGHE(self.g.iter_user_issues)
         if not self.auth:
             return
-        i = self._g.list_user_issues(state='closed')
-        self.expect_list_of_class(i, github3.issues.Issue)
+
+        expect(next(self._g.iter_user_issues())).isinstance(Issue)
+
+    def test_list_user_issues(self):
+        self.raisesGHE(self.g.list_user_issues)
+        if not self.auth:
+            return
+        expect(self._g.list_user_issues(state='closed')).list_of(Issue)
+
+    def test_key(self):
+        self.raisesGHE(self.g.key, 2000)
+        if not self.auth:
+            return
+        k = next(self._g.iter_keys())
+        expect(self._g.key(k.id)).isinstance(Key)
 
     def test_keys_requires_auth(self):
         self.raisesGHE(self.g.create_key, 'Foo bar', 'bogus')
         self.raisesGHE(self.g.delete_key, 2000)
-        self.raisesGHE(self.g.key, 2000)
         self.raisesGHE(self.g.list_keys)
 
     def test_repos_requires_auth(self):
@@ -223,8 +249,15 @@ class TestGitHub(BaseTest):
         expect(r).isinstance(Repository)
         r.delete()
 
-    def test_authorizations_requires_auth(self):
-        self.raisesGHE(self.g.authorization, -1)
+    def test_authorization(self):
+        self.raisesGHE(self.g.authorization, 1)
+        if not self.auth:
+            return
+
+        a = next(self._g.iter_authorizations())
+        expect(self._g.authorization(a.id)).isinstance(Authorization)
+
+    def test_authorize(self):
         self.raisesGHE(self.g.authorize, 'foo', 'bar', ['gist', 'user'])
 
     def test_iter_authorizations(self):
