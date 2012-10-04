@@ -543,7 +543,7 @@ class GitHub(GitHubCore):
             2012-05-20T23:10:27Z
         :returns: list of :class:`Issue <github3.issues.Issue>`\ s
         """
-        issues = None
+        issues = []
         if owner and repository:
             repo = self.repository(owner, repository)
             issues = repo.list_issues(milestone, state, assignee, mentioned,
@@ -576,12 +576,11 @@ class GitHub(GitHubCore):
         :type number: int
         :returns: list of :class:`Issue <github3.issues.Issue>`\ s
         """
-        issues = None
         if owner and repository:
             repo = self.repository(owner, repository)
-            issues = repo.iter_issues(milestone, state, assignee, mentioned,
+            return repo.iter_issues(milestone, state, assignee, mentioned,
                     labels, sort, direction, since, number)
-        return issues
+        return self._iter(0, '', type)
 
     @requires_auth
     def list_keys(self):
@@ -989,6 +988,7 @@ class GitHub(GitHubCore):
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
+    @requires_auth
     def update_user(self, name=None, email=None, blog=None,
             company=None, location=None, hireable=False, bio=None):
         """If authenticated as this user, update the information with
@@ -1012,10 +1012,8 @@ class GitHub(GitHubCore):
         :returns: bool
         """
         user = self.user()
-        if user:
-            return user.update(name, email, blog, company, location, hireable,
+        return user.update(name, email, blog, company, location, hireable,
                     bio)
-        return False
 
     def user(self, login=None):
         """Returns a User object for the specified login name if

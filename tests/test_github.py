@@ -6,6 +6,7 @@ from github3.auths import Authorization
 from github3.users import Key, User
 from github3.gists import Gist
 from github3.issues import Issue
+from github3.orgs import Organization
 
 
 class TestGitHub(BaseTest):
@@ -131,6 +132,14 @@ class TestGitHub(BaseTest):
 
         expect(self._g.list_followers()).list_of(User)
 
+    def test_iter_starred(self):
+        self.raisesGHE(self.g.iter_starred)
+        expect(next(self.g.iter_starred(self.sigm))).isinstance(Repository)
+        if not self.auth:
+            return
+
+        expect(next(self._g.list_starred())).isinstance(Repository)
+
     def test_list_starred(self):
         self.raisesGHE(self.g.list_starred)
         expect(self.g.list_starred(self.sigm)).list_of(Repository)
@@ -139,6 +148,14 @@ class TestGitHub(BaseTest):
             return
 
         expect(self._g.list_starred()).list_of(Repository)
+
+    def test_iter_subscribed(self):
+        self.raisesGHE(self.g.iter_subscribed)
+        expect(self.g.iter_subscribed(self.sigm)).list_of(Repository)
+        if not self.auth:
+            return
+
+        expect(self._g.iter_subscribed()).list_of(Repository)
 
     def test_list_subscribed(self):
         self.raisesGHE(self.g.list_subscribed)
@@ -188,24 +205,20 @@ class TestGitHub(BaseTest):
         expect(i).isinstance(github3.issues.Issue)
         expect(self.g.issue(None, None, None)).is_None()
 
+    def test_iter_repo_issues(self):
+        with expect.raises(StopIteration):
+            self.g.iter_repo_issues('', '')
+
+        expect(next(self.g.iter_repo_issues(self.kr, 'requests'))).isintance(
+                Issue
+                )
+
     def test_list_repo_issues(self):
         # Test listing issues
         list_issues = self.g.list_repo_issues
         expect(list_issues(self.kr, 'requests')) != []
         expect(list_issues(self.sigm, self.todo)).isinstance(list)
-        for f in ('assigned', 'created', 'mentioned'):
-            self.assertIsNotNone(list_issues(self.sigm, self.todo, f))
-        for s in ('open', 'closed'):
-            self.assertIsNotNone(list_issues(self.sigm, self.todo, state=s))
-        self.assertIsNotNone(list_issues(self.sigm, self.todo, state='closed',
-            labels='Bug,Enhancement'))
-        for s in ('created', 'updated', 'comments'):
-            self.assertIsNotNone(list_issues(self.sigm, self.todo, sort=s))
-        for d in ('asc', 'desc'):
-            self.assertIsNotNone(list_issues(self.sigm, self.todo,
-                state='closed', direction=d))
-        expect(list_issues(self.sigm, self.todo,
-            since='2011-01-01T00:00:01Z')).is_not_None()
+        expect(list_issues('', '')) == []
 
     def test_iter_user_issues(self):
         self.raisesGHE(self.g.iter_user_issues)
@@ -232,17 +245,31 @@ class TestGitHub(BaseTest):
         self.raisesGHE(self.g.delete_key, 2000)
         self.raisesGHE(self.g.list_keys)
 
-    def test_repos_requires_auth(self):
-        self.raisesGHE(self.g.create_repo, 'test_github3.py')
-        self.raisesGHE(self.g.list_repos)
+    def test_iter_repos(self):
+        self.raisesGHE(self.g.iter_repos)
+        expect(next(self.g.iter_repos(self.sigm))).isinstance(Repository)
+        expect(next(self.g.iter_repos(self.sigm,
+            'all'))).isinstance(Repository)
+        if not self.auth:
+            return
+
+        expect(
+               next(self._g.iter_repos(sort='pushed', direction='asc'))
+               ).isinstance(Repository)
 
     def test_list_repos(self):
-        expect(self.g.list_repos(self.sigm)) != []
+        self.raisesGHE(self.g.list_repos)
+        expect(self.g.list_repos(self.sigm)).list_of(Repository)
+        expect(self.g.list_repos(self.sigm, 'all')).list_of(Repository)
+        if not self.auth:
+            return
+        expect(self._g.list_repos(sort='pushed', direction='asc')) != []
 
     def test_repository(self):
         expect(self.g.repository(self.sigm, self.todo)).isinstance(Repository)
 
     def test_create_repo(self):
+        self.raisesGHE(self.g.create_repo, 'test_github3.py')
         if not self.auth:
             return
         r = self._g.create_repo('test.repo.creation')
@@ -294,10 +321,21 @@ class TestGitHub(BaseTest):
     def test_iter_events(self):
         expect(next(self.g.iter_events())).isinstance(Event)
 
+    def test_iter_orgs(self):
+        expect(next(self.g.iter_orgs(self.kr))).isinstance(Organization)
+        self.raisesGHE(self.g.iter_orgs)
+        if not self.auth:
+            return
+
+        expect(next(self._g.iter_orgs())).isinstance(Organization)
+
     def test_list_orgs(self):
         expect(self.g.list_orgs(self.kr)) != []
-        with expect.raises(github3.GitHubError):
-            self.g.list_orgs()
+        self.g.raisesGHE(self.g.list_orgs)
+        if not self.auth:
+            return
+
+        expect(self._g.list_orgs()) != []
 
     def test_organization(self):
         expect(self.g.organization(self.gh3py)).is_not_None()
@@ -307,6 +345,9 @@ class TestGitHub(BaseTest):
         reg = self.g.markdown(md)
         raw = self.g.markdown(md, raw=True)
         self.assertEqual(reg, raw)
+        gfm = self.g.markdown(md, mode='gfm',
+                context='sigmavirus24/github3.py')
+        self.assertEqual(reg, gfm)
 
     def test_search(self):
         expect(self.g.search_issues(self.sigm, self.todo, 'closed',
@@ -314,8 +355,15 @@ class TestGitHub(BaseTest):
         expect(self.g.search_users(self.sigm)).is_not_None()
         expect(self.g.search_email('wynn@github.com')).is_not_None()
 
-    def test_user(self):
+    def test_update_user(self):
         self.raisesGHE(self.g.update_user)
+        if not self.auth:
+            return
+        u = self._g.user()
+        expect(self._g.update_user(u.name, u.email, u.blog, u.company,
+            u.location, u.hireable, u.bio)).is_True()
+
+    def test_user(self):
         self.raisesGHE(self.g.user)
         expect(self.g.user(self.sigm)).is_not_None()
 
