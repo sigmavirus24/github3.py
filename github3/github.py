@@ -615,7 +615,7 @@ class GitHub(GitHubCore):
         if login:
             url = self._build_url('users', login, 'orgs')
         else:
-            url = self._build_url('usr', 'orgs')
+            url = self._build_url('user', 'orgs')
 
         json = self._json(self._get(url), 200)
         return [Organization(org, self) for org in json]
@@ -740,7 +740,7 @@ class GitHub(GitHubCore):
         :returns: list of :class:`Repository <github3.repos.Repository>`
         """
         if login:
-            return self.user(login).list_starred()
+            return self.user(login).iter_starred()
 
         url = self._build_url('user', 'starred')
         return self._iter(int(number), url, Repository)
@@ -767,7 +767,7 @@ class GitHub(GitHubCore):
         :returns: list of :class:`Repository <github3.repos.Repository>`
         """
         if login:
-            return self.user(login).list_subscriptions()
+            return self.user(login).iter_subscriptions()
 
         url = self._build_url('user', 'subscriptions')
         return self._iter(int(number), url, Repository)

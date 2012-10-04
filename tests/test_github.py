@@ -209,7 +209,7 @@ class TestGitHub(BaseTest):
         with expect.raises(StopIteration):
             next(self.g.iter_repo_issues('', ''))
 
-        expect(next(self.g.iter_repo_issues(self.kr, 'requests'))).isintance(
+        expect(next(self.g.iter_repo_issues(self.kr, 'requests'))).isinstance(
                 Issue
                 )
 
@@ -323,7 +323,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_orgs(self):
         expect(next(self.g.iter_orgs(self.kr))).isinstance(Organization)
-        self.raisesGHE(next, self.g.iter_orgs())
+        self.raisesGHE(self.g.iter_orgs())
         if not self.auth:
             return
 
