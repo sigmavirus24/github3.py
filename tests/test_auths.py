@@ -1,4 +1,4 @@
-from .base import expect, expect_str, BaseTest
+from .base import expect, BaseTest
 from datetime import datetime
 from github3.auths import Authorization
 
@@ -19,7 +19,7 @@ class TestAuthorization(BaseTest):
                     }
             self.authorization = Authorization(json, None)
         else:
-            self.authorization = self.g.authorize(self.user, self.pw, [])
+            self.authorization = self._g.authorize(None, None, [])
         self.deleted = False
 
     def test_authorization(self):
@@ -43,10 +43,10 @@ class TestAuthorization(BaseTest):
         expect(self.authorization.created_at).isinstance(datetime)
 
     def test_note(self):
-        expect_str(self.authorization.note)
+        expect(self.authorization.note) >= ''
 
     def test_note_url(self):
-        expect_str(self.authorization.note_url)
+        expect(self.authorization.note_url) >= ''
 
     def test_scopes(self):
         expect(self.authorization.scopes).isinstance(list)
@@ -56,6 +56,7 @@ class TestAuthorization(BaseTest):
             return
 
         if self.deleted:
+            self.deleted = True
             self.authorization = self._g.authorize(None, None, [])
 
         self.authorization.update(['repo', 'repo:status'], ['user'],
@@ -68,5 +69,5 @@ class TestAuthorization(BaseTest):
         if not self.auth:
             return
 
-        self.authorization.delete()
+        expect(self.authorization.delete()).is_True()
         self.deleted = True
