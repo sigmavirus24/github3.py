@@ -138,7 +138,7 @@ class TestGitHub(BaseTest):
         if not self.auth:
             return
 
-        expect(next(self._g.list_starred())).isinstance(Repository)
+        expect(next(self._g.iter_starred())).isinstance(Repository)
 
     def test_list_starred(self):
         self.raisesGHE(self.g.list_starred)
@@ -323,7 +323,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_orgs(self):
         expect(next(self.g.iter_orgs(self.kr))).isinstance(Organization)
-        self.raisesGHE(self.g.iter_orgs())
+        self.raisesGHE(next, self.g.iter_orgs())
         if not self.auth:
             return
 
