@@ -291,20 +291,6 @@ class TestGitHub(BaseTest):
 
         expect(self._g.user()).isinstance(github3.users.User)
 
-    def test_authorization(self):
-        if not self.auth:
-            return
-
-        auth = self.g.authorize(self.user, self.pw, [])
-        expect(auth).isinstance(github3.github.Authorization)
-        auth_g = self._g.authorization(auth.id)
-        expect(auth_g).isinstance(github3.github.Authorization)
-        auth.delete()
-        del auth
-        auth = self._g.authorize(None, None, [])
-        expect(auth).isinstance(github3.github.Authorization)
-        auth.delete()
-
     def test_subscribe_unsub(self):
         args = (self.gh3py, self.test_repo)
         self.raisesGHE(self.g.subscribe, *args)

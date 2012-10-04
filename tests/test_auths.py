@@ -54,15 +54,19 @@ class TestAuthorization(BaseTest):
     def test_update(self):
         if not self.auth:
             return
+
         if self.deleted:
             self.authorization = self._g.authorize(None, None, [])
+
         self.authorization.update(['repo', 'repo:status'], ['user'],
                 ['repo:status'], 'https://github.com/sigmavirus24/github3.py')
+
         if self.deleted:
             self.authorization.delete()
 
     def test_delete(self):
         if not self.auth:
             return
+
         self.authorization.delete()
         self.deleted = True
