@@ -133,7 +133,7 @@ class TestGitHub(BaseTest):
         expect(self._g.list_followers()).list_of(User)
 
     def test_iter_starred(self):
-        self.raisesGHE(self.g.iter_starred)
+        self.raisesGHE(next, self.g.iter_starred())
         expect(next(self.g.iter_starred(self.sigm))).isinstance(Repository)
         if not self.auth:
             return
@@ -150,7 +150,7 @@ class TestGitHub(BaseTest):
         expect(self._g.list_starred()).list_of(Repository)
 
     def test_iter_subscribed(self):
-        self.raisesGHE(self.g.iter_subscribed)
+        self.raisesGHE(next, self.g.iter_subscribed())
         expect(self.g.iter_subscribed(self.sigm)).list_of(Repository)
         if not self.auth:
             return
@@ -207,7 +207,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_repo_issues(self):
         with expect.raises(StopIteration):
-            self.g.iter_repo_issues('', '')
+            next(self.g.iter_repo_issues('', ''))
 
         expect(next(self.g.iter_repo_issues(self.kr, 'requests'))).isintance(
                 Issue
@@ -246,7 +246,7 @@ class TestGitHub(BaseTest):
         self.raisesGHE(self.g.list_keys)
 
     def test_iter_repos(self):
-        self.raisesGHE(self.g.iter_repos)
+        self.raisesGHE(next, self.g.iter_repos())
         expect(next(self.g.iter_repos(self.sigm))).isinstance(Repository)
         expect(next(self.g.iter_repos(self.sigm,
             'all'))).isinstance(Repository)
@@ -323,7 +323,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_orgs(self):
         expect(next(self.g.iter_orgs(self.kr))).isinstance(Organization)
-        self.raisesGHE(self.g.iter_orgs)
+        self.raisesGHE(next, self.g.iter_orgs())
         if not self.auth:
             return
 
@@ -331,7 +331,7 @@ class TestGitHub(BaseTest):
 
     def test_list_orgs(self):
         expect(self.g.list_orgs(self.kr)) != []
-        self.g.raisesGHE(self.g.list_orgs)
+        self.raisesGHE(self.g.list_orgs)
         if not self.auth:
             return
 
@@ -347,7 +347,7 @@ class TestGitHub(BaseTest):
         self.assertEqual(reg, raw)
         gfm = self.g.markdown(md, mode='gfm',
                 context='sigmavirus24/github3.py')
-        self.assertEqual(reg, gfm)
+        self.assertNotEqual(reg, gfm)
 
     def test_search(self):
         expect(self.g.search_issues(self.sigm, self.todo, 'closed',

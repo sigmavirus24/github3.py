@@ -420,7 +420,7 @@ class GitHub(GitHubCore):
         """
         if login:
             return self.user(login).iter_following()
-        return self._iter_follow('following')
+        return self._list_follow('following')
 
     def iter_following(self, login=None, number=-1):
         """If login is provided, iterate over a list of users being followed
@@ -434,7 +434,7 @@ class GitHub(GitHubCore):
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         if login:
-            return self.user(login).list_following()
+            return self.user(login).iter_following()
         return self._iter_follow('followers', int(number))
 
     def list_gists(self, username=None):
