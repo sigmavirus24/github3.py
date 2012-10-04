@@ -266,27 +266,22 @@ class Repository(GitHubCore):
         return sha
 
     @requires_auth
-    def create_comment(self, body, sha, path, position, line=1):
+    def create_comment(self, body, sha, path='', position=1, line=1):
         """Create a comment on a commit.
 
-        :param body: (required), body of the message
-        :type body: str
-        :param sha: (required), commit id
-        :type sha: str
-        :param path: (required), relative path of the file to comment
+        :param str body: (required), body of the message
+        :param str sha: (required), commit id
+        :param str path: (optional), relative path of the file to comment
             on
-        :type path: str
-        :param position: (required), line index in the diff to comment on
-        :type position: int
-        :param line: (optional), line number of the file to comment on,
+        :param str position: (optional), line index in the diff to comment on
+        :param int line: (optional), line number of the file to comment on,
             default: 1
-        :type line: int
         :returns: :class:`RepoComment <RepoComment>` if successful else None
         """
         line = int(line)
         position = int(position)
         json = None
-        if body and sha and line > 0 and path and position > 0:
+        if body and sha and line > 0:
             data = dumps({'body': body, 'commit_id': sha, 'line': line,
                 'path': path, 'position': position})
             url = self._build_url('commits', sha, 'comments',
