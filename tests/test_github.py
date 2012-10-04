@@ -50,7 +50,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_gists(self):
         for user in None, self.sigm:
-            expect(next(self.g.list_gists(user))).isinstance(Gist)
+            expect(next(self.g.iter_gists(user))).isinstance(Gist)
 
     def test_list_gists(self):
         for i in None, self.sigm:
@@ -99,7 +99,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_following(self):
         expect(next(self.g.iter_following(self.kr))).isinstance(User)
-        self.raisesGHE(self.g.iter_following)
+        self.raisesGHE(next, self.g.iter_following())
         if not self.auth:
             return
 
@@ -116,7 +116,7 @@ class TestGitHub(BaseTest):
 
     def test_iter_followers(self):
         expect(next(self.g.iter_followers(self.kr))).isinstance(User)
-        self.raisesGHE(self.g.iter_followers)
+        self.raisesGHE(next, self.g.iter_followers())
         if not self.auth:
             return
 
