@@ -600,6 +600,10 @@ class TestRepository(BaseTest):
                 'https://github.com/sigmavirus24/github3.py/events/push',
                 'https://httpbin.org/post'
                 )).is_True()
+            expect(self.auth_todo.pubsubhubbub('unsubscribe',
+                'https://github.com/sigmavirus24/github3.py/events/push',
+                'https://httpbin.org/post'
+                )).is_True()
         except github3.GitHubError:
             pass
 

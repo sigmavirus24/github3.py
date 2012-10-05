@@ -150,10 +150,10 @@ the library is covered and every module has coverage >= 90%.
     github3/models         187      1    99%
     github3/orgs           177      0   100%
     github3/pulls          134      6    96%
-    github3/repos          782    107    92%
+    github3/repos          782     65    92%
     github3/users          162      3    98%
     ----------------------------------------
-    TOTAL                 2504    132    95%
+    TOTAL                 2504     89    95%
 
 .. links
 .. _section: http://github3py.readthedocs.org/en/latest/index.html#contributing

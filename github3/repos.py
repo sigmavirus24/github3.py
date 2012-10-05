@@ -1547,13 +1547,13 @@ class Repository(GitHubCore):
         :returns: bool
         """
         from re import match
-        m = match('https://github\.com/\w+/\w+/events/\w+', topic)
+        m = match('https://github\.com/\w+/[\w\._-]+/events/\w+', topic)
         status = False
         if mode and topic and callback and m:
-            data = {'hub.mode': mode, 'hub.topic': topic,
-                    'hub.callback': callback, 'hub.secret': secret}
+            data = [('hub.mode', mode), ('hub.topic', topic),
+                    ('hub.callback', callback), ('hub.secret', secret)]
             url = self._build_url('hub')
-            status = self._boolean(self._post(url, dumps(data)), 201, 404)
+            status = self._boolean(self._post(url, data=data), 204, 404)
         return status
 
     def pull_request(self, number):
