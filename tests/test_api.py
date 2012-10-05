@@ -94,3 +94,6 @@ class TestAPI(BaseTest):
         expect(authorization).isinstance(github3.github.Authorization)
         authorization._session.auth = (self.user, self.pw)
         expect(authorization.delete()).is_True()
+
+    def test_octocat(self):
+        expect(github3.octocat()) >= ''

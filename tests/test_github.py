@@ -337,6 +337,9 @@ class TestGitHub(BaseTest):
 
         expect(self._g.list_orgs()) != []
 
+    def test_octocat(self):
+        expect(self.g.octocat()) >= ''
+
     def test_organization(self):
         expect(self.g.organization(self.gh3py)).is_not_None()
 

@@ -137,6 +137,11 @@ def markdown(text, mode='', context='', raw=False):
     return gh.markdown(text, mode, context, raw)
 
 
+def octocat():
+    """Returns an easter egg from the API."""
+    return gh.octocat()
+
+
 def organization(login):
     """See :func:`organization <github3.github.GitHub.organization>`."""
     return gh.organization(login)

@@ -835,6 +835,12 @@ class GitHub(GitHubCore):
                 return req.content
         return ''
 
+    def octocat(self):
+        """Returns an easter egg of the API."""
+        url = self._build_url('octocat')
+        req = self._get(url)
+        return req.content if req.ok else ''
+
     def organization(self, login):
         """Returns a Organization object for the login name
 
