@@ -6,6 +6,7 @@ This module contains the Authorization object.
 
 """
 
+from github3.decorators import requires_basic_auth
 from github3.models import GitHubCore
 from json import dumps
 
@@ -44,10 +45,12 @@ class Authorization(GitHubCore):
     def _update_(self, auth):
         self.__init__(auth, self._session)
 
+    @requires_basic_auth
     def delete(self):
         """delete this authorization"""
         return self._boolean(self._delete(self._api), 204, 404)
 
+    @requires_basic_auth
     def update(self, scopes=[], add_scopes=[], rm_scopes=[], note='',
             note_url=''):
         """Update this authorization.

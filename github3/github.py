@@ -17,7 +17,7 @@ from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
 from github3.users import User, Key
-from github3.decorators import requires_auth
+from github3.decorators import requires_auth, requires_basic_auth
 
 
 class GitHub(GitHubCore):
@@ -40,7 +40,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', which)
         return self._iter(number, url, User)
 
-    @requires_auth
+    @requires_basic_auth
     def authorization(self, id_num):
         """Get information about authorization ``id``.
 
@@ -320,7 +320,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    @requires_auth
+    @requires_basic_auth
     def list_authorizations(self):
         """List authorizations for the authenticated user.
 
@@ -330,7 +330,7 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Authorization(a, self) for a in json]
 
-    @requires_auth
+    @requires_basic_auth
     def iter_authorizations(self, number=-1):
         """Iterate over authorizations for the authenticated user.
 
