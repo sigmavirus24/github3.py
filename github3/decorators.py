@@ -50,3 +50,33 @@ def requires_auth(func):
             r.raw = StringIO('{"message": "Requires authentication"}'.encode())
             raise GitHubError(r)
     return auth_wrapper
+
+def requires_basic_auth(func):
+    """Decorator to note which object methods require username/password
+    authorization and won't work with token based authorization.
+
+    .. note::
+        This decorator causes the wrapped methods to lose their proper
+        signature. Please refer to the documentation for each of those.
+    """
+    #note = """.. note::
+    #The signature of this function may not appear correctly in
+    #documentation. Please adhere to the defined parameters and their
+    #types.
+    #"""
+    ## Append the above note to each function this is applied to
+    #func.__doc__ = '\n\n'.join([func.__doc__, note])
+
+    @wraps(func)
+    def auth_wrapper(self, *args, **kwargs):
+        if hasattr(self, '_session') and self._session.auth:
+            return func(self, *args, **kwargs)
+        else:
+            from github3.models import GitHubError
+            # Mock a 401 response
+            r = Response()
+            r.status_code = 401
+            r.encoding = 'utf-8'
+            r.raw = StringIO('{"message": "Requires username/password authentication"}'.encode())
+            raise GitHubError(r)
+    return auth_wrapper
