@@ -255,7 +255,7 @@ class TestGitHub(BaseTest):
               '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
               )
         expect(key).isinstance(Key)
-        self.alt_repo.delete_key(key.id)
+        self._g.delete_key(key.id)
 
     def test_delete_key(self):
         self.raisesGHE(self.g.delete_key, 10)
