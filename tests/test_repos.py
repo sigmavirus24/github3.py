@@ -585,10 +585,10 @@ class TestRepository(BaseTest):
         tagger = {'name': 'github3.py', 'email': 'github3.py@librelist.com',
                 'date': '2012-06-07T20:00:00-05:00'}
         r = self._g.repository('sigmavirus24', 'github3.py_test')
-        tag = r.create_tag(tag, msg, sha, obj_type, tagger)
-        expect(tag).isinstance(Tag)
+        t = r.create_tag(tag, msg, sha, obj_type, tagger)
+        expect(t).isinstance(Tag)
         r.ref('tags/{0}'.format(tag)).delete()
-        tag = r.create_tag(tag, msg, sha, obj_type, tagger, True)
+        t = r.create_tag(tag, msg, sha, obj_type, tagger, True)
         r.ref('tags/{0}'.format(tag)).delete()
 
     def test_edit(self):
