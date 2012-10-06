@@ -71,14 +71,14 @@ class Plan(GitHubObject):
         self.space = plan.get('space')
 
     def __repr__(self):
-        return '<Plan [{0}]>'.format(self.name)
+        return '<Plan [{0}]>'.format(self.name)  # (No coverage)
 
     def is_free(self):
         """Checks if this is a free plan.
 
         :returns: bool
         """
-        return self.name == 'free'
+        return self.name == 'free'  # (No coverage)
 
 
 _large = Plan({'name': 'large', 'private_repos': 50,

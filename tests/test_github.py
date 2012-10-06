@@ -255,7 +255,17 @@ class TestGitHub(BaseTest):
               '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
               )
         expect(key).isinstance(Key)
-        self._g.delete_key(key.id)
+        expect(self._g.delete_key(key.id)).is_True()
+        key = self._g.create_key('test_key', (
+              'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxGTCJTMYmsBhLL0PQ2RwLp3'
+              'sgcJ8uz6RqOrlB/6lKzIXYOcvdaHqEEF9G+1xlJck7kA8pSNR9AkEWP2uoy'
+              '1tJVp4nUVzPYKSrkoMppzA34vT+iqW/H4rRCADxIRillvpXZB2CWQ8fbRlD'
+              '9Mjreh0L2A4NPKSmGxs5XfZXD9lWPb1+U6oQrZYG2h1ulyI7rt+adWOhfP2'
+              'UYq6V5JSdNDi4r1nGxBccZgguiL7XNjl9TSsgr8QKmAacubyNEwIrmQIS9h'
+              'ipKg3k10VcqfVmSzF1GuzDUKFfIHU/zyd6aJ0emAqgft/fho+BkrXBihhxf'
+              '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
+              )
+        expect(key.delete()).is_True()
 
     def test_delete_key(self):
         self.raisesGHE(self.g.delete_key, 10)
