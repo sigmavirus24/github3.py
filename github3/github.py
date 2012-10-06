@@ -204,6 +204,7 @@ class GitHub(GitHubCore):
         json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None
 
+    @requires_auth
     def delete_key(self, key_id):
         """Delete user key pointed to by ``key_id``.
 
@@ -322,7 +323,8 @@ class GitHub(GitHubCore):
 
     @requires_basic_auth
     def list_authorizations(self):
-        """List authorizations for the authenticated user.
+        """List authorizations for the authenticated user. This will return a
+        404 if you are using a token for authentication.
 
         :returns: list of :class:`Authorization <Authorization>`\ s
         """
@@ -332,7 +334,8 @@ class GitHub(GitHubCore):
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1):
-        """Iterate over authorizations for the authenticated user.
+        """Iterate over authorizations for the authenticated user. This will
+        return a 404 if you are using a token for authentication.
 
         :param int number: (optional), number of authorizations to return.
             Default: -1 returns all available authorizations
@@ -833,7 +836,7 @@ class GitHub(GitHubCore):
             req = self._post(url, data=data, headers=headers)
             if req.ok:
                 return req.content
-        return ''
+        return ''  # (No coverage)
 
     def octocat(self):
         """Returns an easter egg of the API."""

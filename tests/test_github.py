@@ -240,10 +240,35 @@ class TestGitHub(BaseTest):
         k = next(self._g.iter_keys())
         expect(self._g.key(k.id)).isinstance(Key)
 
-    def test_keys_requires_auth(self):
+    def test_create_key(self):
         self.raisesGHE(self.g.create_key, 'Foo bar', 'bogus')
-        self.raisesGHE(self.g.delete_key, 2000)
+        if not self.auth:
+            return
+
+        key = self._g.create_key('test_key', (
+              'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxGTCJTMYmsBhLL0PQ2RwLp3'
+              'sgcJ8uz6RqOrlB/6lKzIXYOcvdaHqEEF9G+1xlJck7kA8pSNR9AkEWP2uoy'
+              '1tJVp4nUVzPYKSrkoMppzA34vT+iqW/H4rRCADxIRillvpXZB2CWQ8fbRlD'
+              '9Mjreh0L2A4NPKSmGxs5XfZXD9lWPb1+U6oQrZYG2h1ulyI7rt+adWOhfP2'
+              'UYq6V5JSdNDi4r1nGxBccZgguiL7XNjl9TSsgr8QKmAacubyNEwIrmQIS9h'
+              'ipKg3k10VcqfVmSzF1GuzDUKFfIHU/zyd6aJ0emAqgft/fho+BkrXBihhxf'
+              '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
+              )
+        expect(key).isinstance(Key)
+        self.alt_repo.delete_key(key.id)
+
+    def test_delete_key(self):
+        self.raisesGHE(self.g.delete_key, 10)
+
+    def test_list_keys(self):
         self.raisesGHE(self.g.list_keys)
+        if not self.auth:
+            return
+
+        expect(self._g.list_keys()).list_of(Key)
+
+    def test_keys_requires_auth(self):
+        self.raisesGHE(self.g.delete_key, 2000)
 
     def test_iter_repos(self):
         self.raisesGHE(next, self.g.iter_repos())
