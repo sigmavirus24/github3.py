@@ -573,6 +573,24 @@ class TestRepository(BaseTest):
                 )
         expect(s).isinstance(Status)
 
+    def test_create_tag(self):
+        self.raisesGHE(self.repo.create_tag, '', '', '', '', '')
+        if not self.auth:
+            return
+
+        tag = 'spellcheck'
+        msg = 'Meaningless message for a test'
+        sha = '111f7d39f3bca349e180a1ce2d1136ea4250858f'
+        obj_type = 'commit'
+        tagger = {'name': 'github3.py', 'email': 'github3.py@librelist.com',
+                'date': '2012-06-07T20:00:00-05:00'}
+        r = self._g.repository('sigmavirus24', 'github3.py_test')
+        tag = r.create_tag(tag, msg, sha, obj_type, tagger)
+        expect(tag).isinstance(Tag)
+        r.ref('tags/{0}'.format(tag)).delete()
+        tag = r.create_tag(tag, msg, sha, obj_type, tagger, True)
+        r.ref('tags/{0}'.format(tag)).delete()
+
     def test_edit(self):
         if not self.auth:
             return

@@ -215,7 +215,7 @@ class GitHub(GitHubCore):
         key = self.key(key_id)
         if key:
             return key.delete()
-        return False
+        return False  # (No coverage)
 
     def follow(self, login):
         """Make the authenticated user follow login.
