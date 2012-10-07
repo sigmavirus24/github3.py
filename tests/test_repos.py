@@ -838,10 +838,14 @@ class TestHook(BaseTest):
         if not self.auth:
             self.raisesGHE(self.hook.edit, 'tweeter', self.hook.config)
         else:
+            expect(self.hook.edit('', {})).is_False()
             expect(self.hook.edit(self.hook.name, self.hook.config,
-                    not self.hook._active)).is_True()
+                    active=not self.hook._active)).is_True()
             expect(self.hook.edit(self.hook.name, self.hook.config,
-                    not self.hook._active)).is_True()
+                    active=not self.hook._active)).is_True()
+            expect(self.hook.edit(self.hook.name, self.hook.config,
+                ['push'], ['gollum', 'issues'],
+                ['gollum', 'issuues'])).is_True()
 
     def test_test(self):
         if not self.auth:

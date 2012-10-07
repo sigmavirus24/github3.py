@@ -1830,7 +1830,7 @@ class Hook(GitHubCore):
             for
         :type events: list
         :param add_events: (optional), events to be added to the list of
-            events that this hook triggers for
+           events that this hook triggers for
         :type add_events: list
         :param rm_events: (optional), events to be remvoed from the list
             of events that this hook triggers for
@@ -1839,6 +1839,7 @@ class Hook(GitHubCore):
         :type active: bool
         :returns: bool
         """
+        json = None
         if name and config and isinstance(config, dict):
             data = {'name': name, 'config': config, 'active': active}
             if events:
