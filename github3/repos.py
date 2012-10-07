@@ -1911,6 +1911,8 @@ class RepoComment(BaseComment):
         self.position = comment.get('position')
         #: datetime object representing when the comment was updated.
         self.updated_at = comment.get('updated_at')
+        if self.updated_at:
+            self.updated_at = self._strptime(self.updated_at)
         #: Login of the user who left the comment.
         self.user = None
         if comment.get('user'):

@@ -806,6 +806,9 @@ class TestHook(BaseTest):
                 }
             self.hook = Hook(json)
 
+    def test_repr(self):
+        expect(repr(self.hook)) != ''
+
     def test_config(self):
         expect(self.hook.config).isinstance(dict)
         assert 'token' in self.hook.config, (
@@ -831,12 +834,25 @@ class TestHook(BaseTest):
     def test_updated_at(self):
         expect(self.hook.updated_at).isinstance(datetime)
 
+    def test_edit(self):
+        if not self.auth:
+            self.raisesGHE(self.hook.edit, 'tweeter', self.hook.config)
+        else:
+            expect(self.hook.edit(self.hook.name, self.hook.config,
+                    not self.hook._active)).is_True()
+            expect(self.hook.edit(self.hook.name, self.hook.config,
+                    not self.hook._active)).is_True()
+
+    def test_test(self):
+        if not self.auth:
+            self.raisesGHE(self.hook.test)
+        else:
+            self.hook.test()
+
     def test_requires_auth(self):
         if self.auth:
             return
-        self.raisesGHE(self.hook.edit, 'tweeter', self.hook.config)
         self.raisesGHE(self.hook.delete)
-        self.raisesGHE(self.hook.test)
 
 
 class TestRepoTag(BaseTest):
@@ -844,6 +860,9 @@ class TestRepoTag(BaseTest):
         super(TestRepoTag, self).__init__(methodName)
         repo = self.g.repository(self.sigm, self.todo)
         self.tag = repo.list_tags()[0]
+
+    def test_repr(self):
+        expect(repr(self.tag)) != ''
 
     def test_commit(self):
         expect(self.tag.commit).isinstance(dict)
@@ -876,6 +895,9 @@ class TestRepoCommit(BaseTest):
         repo = self.g.repository(self.sigm, self.todo)
         self.commit = repo.commit('04d55444a3ec06ca8d2aa0a5e333cdaf27113254')
         self.sha = self.commit.sha
+
+    def test_repr(self):
+        expect(repr(self.commit)) != ''
 
     def test_additions(self):
         expect(self.commit.additions) == 12
@@ -911,6 +933,9 @@ class TestComparison(BaseTest):
                 '04d55444a3ec06ca8d2aa0a5e333cdaf27113254',
                 '731691616b71258c7ad7c141379856b5ebbab310'
                 )
+
+    def test_repr(self):
+        expect(repr(self.comp)) != ''
 
     def test_ahead_by(self):
         expect(self.comp.ahead_by) > 0
@@ -989,3 +1014,28 @@ class TestStatus(BaseTest):
 
     def test_updated_at(self):
         expect(self.status.updated_at).isinstance(datetime)
+
+
+class TestRepoComment(BaseTest):
+    def __init__(self, methodName='runTest'):
+        super(TestRepoComment, self).__init__(methodName)
+        r = self.g.repository(self.kr, 'requests')
+        self.comment = next(r.iter_comments())
+        if self.auth:
+            r = self._g.repository(self.sigm, 'github3.py')
+            sha = '28dccb84fdc2dfd30a3fdf5cb6cc6f3dff322307'
+            for c in r.iter_comments_on_commit(sha):
+                if c.user.login == self.sigm:
+                    self._comment = c
+                    break
+
+    def test_repr(self):
+        expect(repr(self.comment)) != ''
+
+    def test_update(self):
+        self.raisesGHE(self.comment.update, '', '', 0, '', 0)
+        if self.auth:
+            expect(self._comment.update('', '', 0, '', 0)).is_False()
+            expect(self._comment.update(self._comment.body,
+                self._comment.commit_id, self._comment.line,
+                self._comment.path, self._comment.position)).is_True()
