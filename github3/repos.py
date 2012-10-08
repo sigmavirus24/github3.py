@@ -422,16 +422,13 @@ class Repository(GitHubCore):
         labels=[]):
         """Creates an issue on this repository.
 
-        :param title: (required), title of the issue
-        :type title: str
-        :param body: (optional), body of the issue
-        :type body: str
-        :param assignee: (optional), login of the user to assign the
+        :param str title: (required), title of the issue
+        :param str body: (optional), body of the issue
+        :param str assignee: (optional), login of the user to assign the
             issue to
-        :type assignee: str
-        :param milestone: (optional), milestone to attribute this issue
-            to
-        :type milestone: str
+        :param int milestone: (optional), number of the milestone to attribute
+            this issue to (e.g. ``m`` is a Milestone object, ``m.number`` is
+            what you pass here.)
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
