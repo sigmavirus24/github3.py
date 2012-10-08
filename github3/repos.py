@@ -152,22 +152,28 @@ class Repository(GitHubCore):
         written = False
         if format in ('tarball', 'zipball'):
             url = self._build_url(format, ref, base_url=self._api)
-            resp = self._get(url, allow_redirects=True)
+            resp = self._get(url, allow_redirects=True, prefetch=False)
 
-        if resp.ok and path:
-            if callable(getattr(path, 'write', None)):
-                path.write(resp.content)
-                written = True
+        fd = None
+        file_like = False
+        if resp and resp.ok:
+            if path:
+                if callable(getattr(path, 'write', None)):
+                    file_like = True
+                    fd = path
+                else:
+                    fd = open(path, 'wb')
             else:
-                with open(path, 'wb') as fd:
-                    fd.write(resp.content)
-                    written = True
-        elif resp:
-            header = resp.headers['content-disposition']
-            i = header.find('filename=') + len('filename=')
-            with open(header[i:], 'wb') as fd:
-                fd.write(resp.content)
-                written = True
+                header = resp.headers['content-disposition']
+                i = header.find('filename=') + len('filename=')
+                fd = open(header[i:], 'wb')
+            for chunk in resp.iter_chunks():
+                fd.write(chunk)
+
+            if not file_like:
+                fd.close()
+
+            written = True
         return written
 
     def blob(self, sha):
@@ -1767,15 +1773,19 @@ class Download(GitHubCore):
         if not path:
             path = self.name
 
-        resp = self._get(self.html_url, allow_redirects=True)
+        resp = self._get(self.html_url, allow_redirects=True, prefetch=False)
         if self._boolean(resp, 200, 404):
             if callable(getattr(path, 'write', None)):
-                path.write(resp.content)
-                return True
+                file_like = True
+                fd = path
             else:
-                with open(path, 'wb') as fd:
-                    fd.write(resp.content)
-                    return True
+                file_like = False
+                fd = open(path, 'wb')
+            for chunk in resp.iter_chunks():
+                fd.write(chunk)
+            if not file_like:
+                fd.close()
+            return True
         return False  # (No coverage)
 
 

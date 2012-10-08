@@ -15,6 +15,6 @@ __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012 Ian Cordasco'
 __version__ = '0.1b0'
 
-from .api import *
-from .github import GitHub
-from .models import GitHubError
+from github3.api import *
+from github3.github import GitHub
+from github3.models import GitHubError
