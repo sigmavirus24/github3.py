@@ -167,7 +167,7 @@ class Repository(GitHubCore):
                 header = resp.headers['content-disposition']
                 i = header.find('filename=') + len('filename=')
                 fd = open(header[i:], 'wb')
-            for chunk in resp.iter_chunks():
+            for chunk in resp.iter_content():
                 fd.write(chunk)
 
             if not file_like:
@@ -1778,7 +1778,7 @@ class Download(GitHubCore):
             else:
                 file_like = False
                 fd = open(path, 'wb')
-            for chunk in resp.iter_chunks():
+            for chunk in resp.iter_content():
                 fd.write(chunk)
             if not file_like:
                 fd.close()
