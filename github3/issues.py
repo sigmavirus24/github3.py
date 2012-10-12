@@ -228,13 +228,35 @@ class Issue(GitHubCore):
         return True if json else False
 
     @requires_auth
+    def assign(self, login):
+        """Assigns user ``login`` to this issue. This is a short cut for
+        ``issue.edit``.
+
+        :param str login: username of the person to assign this issue to
+        :returns: bool
+        """
+        if not login:
+            return False
+        number = None
+        if self.milestone:
+            number = self.milestone.number
+        return self.edit(self.title, self.body, login, self.state, number,
+                self.labels)
+
+    @requires_auth
     def close(self):
-        """Close this issue."""
+        """Close this issue.
+
+        :returns: bool
+        """
         assignee = ''
         if self.assignee:
             assignee = self.assignee.login
+        number = None
+        if self.milestone:
+            number = self.milestone.number
         return self.edit(self.title, self.body, assignee, 'closed',
-                self.milestone, self.labels)
+                number, self.labels)
 
     def comment(self, id_num):
         """Get a single comment by its id.
@@ -388,8 +410,11 @@ class Issue(GitHubCore):
         assignee = ''
         if self.assignee:
             assignee = self.assignee.login
+        number = None
+        if self.milestone:
+            number = self.milestone.number
         return self.edit(self.title, self.body, assignee, 'open',
-                self.milestone, self.labels)
+                number, self.labels)
 
 
 class IssueComment(BaseComment):

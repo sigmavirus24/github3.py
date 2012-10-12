@@ -22,6 +22,18 @@ class TestIssue(BaseTest):
         self.raisesGHE(self.issue.remove_all_labels)
         self.raisesGHE(self.issue.reopen)
 
+    def test_assign(self):
+        self.raisesGHE(self.issue.assign, 'foo')
+
+        if not self.auth:
+            return
+
+        issue = self._g.issue(self.gh3py, self.test_repo, '1')
+        expect(issue.assign(None)).is_False()
+        expect(issue.assign('sigmavirus24')).is_True()
+        issue.edit(issue.title, issue.body, '', issue.state,
+                issue.milestone.number, issue.labels)
+
     def test_assignee(self):
         if self.issue.assignee:
             expect(self.issue.assignee).isinstance(User)
