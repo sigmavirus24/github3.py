@@ -96,6 +96,10 @@ class TestUser(base.BaseTest):
         self.raisesGHE(self.user.list_org_events, self.gh3py)
         self.raisesGHE(self.user.update)
 
+    def test_refresh(self):
+        self.user.refresh()
+        expect(self.user.html_url) != ''
+
     def test_with_auth(self):
         if not self.auth:
             return

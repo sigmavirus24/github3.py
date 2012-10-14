@@ -176,6 +176,11 @@ class GitHubCore(GitHubObject):
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining
 
+    def refresh(self):
+        """Re-retrieve the information for this object."""
+        json = self._json(self._get(self._api), 200)
+        self.__init__(json, self._session)
+
     @classmethod
     def from_json(cls, json):
         """Return an instance of ``cls`` formed from ``json``."""
