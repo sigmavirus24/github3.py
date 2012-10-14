@@ -221,12 +221,26 @@ class TestGitHub(BaseTest):
         expect(list_issues(self.sigm, self.todo)).isinstance(list)
         expect(list_issues('', '')) == []
 
+    def test_iter_issues(self):
+        self.raisesGHE(self.g.iter_issues)
+        if not self.auth:
+            return
+
+        expect(next(self._g.iter_issues())).isinstance(Issue)
+
     def test_iter_user_issues(self):
         self.raisesGHE(self.g.iter_user_issues)
         if not self.auth:
             return
 
         expect(next(self._g.iter_user_issues())).isinstance(Issue)
+
+    def test_iter_org_issues(self):
+        self.raisesGHE(self.g.iter_issues, 'github3py')
+        if not self.auth:
+            return
+
+        expect(next(self._g.iter_issues('github3py'))).isinstance(Issue)
 
     def test_list_user_issues(self):
         self.raisesGHE(self.g.list_user_issues)

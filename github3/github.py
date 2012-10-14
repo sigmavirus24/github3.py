@@ -472,9 +472,37 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Gist)
 
     @requires_auth
-    def iter_user_issues(self, filter='', state='', labels='', sort='',
+    def iter_org_issues(self, name, filter='', state='', labels='', sort='',
+            direction='', since='', number=-1):
+        """Iterate over the organnization's issues if the authenticated user
+        belongs to it.
+
+        :param str name: (required), name of the organization
+        :param str filter: accepted values:
+            ('assigned', 'created', 'mentioned', 'subscribed')
+            api-default: 'assigned'
+        :param str state: accepted values: ('open', 'closed')
+            api-default: 'open'
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param str since: ISO 8601 formatted timestamp, e.g.,
+            2012-05-20T23:10:27Z
+        :param int number: (optional), number of issues to return. Default:
+            -1, returns all available issues
+        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        """
+        url = self._build_url('orgs', name, 'issues')
+        params = issue_params(filter, state, labels, sort, direction, since)
+        return self._iter(int(number), url, Issue, params)
+
+    @requires_auth
+    def iter_issues(self, filter='', state='', labels='', sort='',
         direction='', since='', number=-1):
-        """List the authenticated user's issues.
+        """List all of the authenticated user's (and organization's) issues.
 
         :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
@@ -489,17 +517,43 @@ class GitHub(GitHubCore):
             api-default: desc
         :param str since: ISO 8601 formatted timestamp, e.g.,
             2012-05-20T23:10:27Z
-        :param number: (optional), number of issues to return.
+        :param int number: (optional), number of issues to return.
             Default: -1 returns all issues
-        :type number: int
+        :returns: generator of :class:`Issue <github3.issues.Issue>`
         """
         url = self._build_url('issues')
-        params = issue_params(filter, state, labels, sort, direction,
-                since)
+        params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params=params)
 
     @requires_auth
-    def list_user_issues(self, filter='', state='', labels='', sort='',
+    def iter_user_issues(self, filter='', state='', labels='', sort='',
+        direction='', since='', number=-1):
+        """List only the authenticated user's issues. Will not list
+        organization's issues
+
+        :param str filter: accepted values:
+            ('assigned', 'created', 'mentioned', 'subscribed')
+            api-default: 'assigned'
+        :param str state: accepted values: ('open', 'closed')
+            api-default: 'open'
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param str since: ISO 8601 formatted timestamp, e.g.,
+            2012-05-20T23:10:27Z
+        :param int number: (optional), number of issues to return.
+            Default: -1 returns all issues
+        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        """
+        url = self._build_url('user', 'issues')
+        params = issue_params(filter, state, labels, sort, direction, since)
+        return self._iter(int(number), url, Issue, params=params)
+
+    @requires_auth
+    def list_issues(self, filter='', state='', labels='', sort='',
         direction='', since=''):
         """List the authenticated user's issues.
 
