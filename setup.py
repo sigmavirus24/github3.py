@@ -43,7 +43,7 @@ setup(
     include_package_data=True,
     install_requires=requires,
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
