@@ -7,6 +7,7 @@ from github3.users import Key, User
 from github3.gists import Gist
 from github3.issues import Issue
 from github3.orgs import Organization
+from github3.pulls import PullRequest
 
 
 class TestGitHub(BaseTest):
@@ -372,12 +373,6 @@ class TestGitHub(BaseTest):
 
         expect(self._g.list_orgs()) != []
 
-    def test_octocat(self):
-        expect(self.g.octocat()) >= ''
-
-    def test_organization(self):
-        expect(self.g.organization(self.gh3py)).is_not_None()
-
     def test_markdown(self):
         md = "# Header\n\nParagraph\n\n## Header 2\n\nParagraph"
         reg = self.g.markdown(md)
@@ -386,6 +381,16 @@ class TestGitHub(BaseTest):
         gfm = self.g.markdown(md, mode='gfm',
                 context='sigmavirus24/github3.py')
         self.assertNotEqual(reg, gfm)
+
+    def test_pull_request(self):
+        expect(self.g.pull_request(self.kr, 'requests',
+            700)).isinstance(PullRequest)
+
+    def test_octocat(self):
+        expect(self.g.octocat()) >= ''
+
+    def test_organization(self):
+        expect(self.g.organization(self.gh3py)).is_not_None()
 
     def test_search(self):
         expect(self.g.search_issues(self.sigm, self.todo, 'closed',

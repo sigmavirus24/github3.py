@@ -147,6 +147,17 @@ def organization(login):
     return gh.organization(login)
 
 
+def pull_request(owner, repository, number):
+    """Anonymously retrieve pull request :number on :owner/:repository
+
+    :param str owner: (required), repository owner
+    :param str repository: (required), repository name
+    :param int number: (required), pull request number
+    :returns: :class:`PullRequest <github3.pulls.PullRequest>`
+    """
+    return gh.pull_request(owner, repository, number)
+
+
 def repository(owner, repository):
     """See :func:`repository <github3.github.GitHub.repository>`."""
     return gh.repository(owner, repository)

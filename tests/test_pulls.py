@@ -49,6 +49,12 @@ class TestPullRequest(BaseTest):
         body = '\n'.join(self.body)
         expect(self.pr.body_text) == body
 
+    def test_close(self):
+        self.raiseGHE(self.pr.close)
+
+    def test_reopen(self):
+        self.raiseGHE(self.pr.reopen)
+
     def test_closed_at(self):
         expect(self.pr.closed_at).isinstance(datetime)
 
@@ -151,6 +157,8 @@ class TestPullRequest(BaseTest):
         expect(pr.update('Test editing', 'New body')).is_True()
         expect(pr.update(title, body, state)).is_True()
         expect(pr.update()).is_False()
+        expect(pr.close()).is_True()
+        expect(pr.reopen()).is_True()
 
 
 class TestReviewComment(BaseTest):

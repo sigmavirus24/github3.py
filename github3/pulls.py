@@ -156,6 +156,14 @@ class PullRequest(GitHubCore):
     def _update_(self, pull):
         self.__init__(pull, self._session)
 
+    @requires_auth
+    def close(self):
+        """Closes this Pull Request without merging.
+
+        :returns: bool
+        """
+        return self.update(self.title, self.body, 'closed')
+
     def is_mergeable(self):
         """Checks to see if the pull request can be merged by GitHub.
 
@@ -243,6 +251,14 @@ class PullRequest(GitHubCore):
         url = self._build_url('merge', base_url=self._api)
         resp = self._put(url, data)
         return resp.json['merged']
+
+    @requires_auth
+    def reopen(self):
+        """Re-open a closed Pull Request.
+
+        :param: bool
+        """
+        return self.update(self.title, self.body, 'open')
 
     @requires_auth
     def update(self, title=None, body=None, state=None):

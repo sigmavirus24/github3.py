@@ -52,6 +52,10 @@ class TestAPI(BaseTest):
                 )
         expect(s.decode()) == f
 
+    def test_pull_request(self):
+        expect(self.g.pull_request(self.kr, 'requests',
+            700)).isinstance(github3.pulls.PullRequest)
+
     def test_organization(self):
         expect(github3.organization(self.gh3py)).isinstance(
                 github3.orgs.Organization

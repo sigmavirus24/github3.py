@@ -838,6 +838,19 @@ class GitHub(GitHubCore):
                 return req.content
         return ''  # (No coverage)
 
+    def pull_request(self, owner, repository, number):
+        """Fetch pull_request #:number: from :owner:/:repository
+
+        :param str owner: (required), owner of the repository
+        :param str repository: (required), name of the repository
+        :param int number: (required), issue number
+        :return: :class:`Issue <github3.issues.Issue>`
+        """
+        r = self.repository(owner, repository)
+        if r:
+            return r.pull_request(number)
+        return None
+
     def octocat(self):
         """Returns an easter egg of the API."""
         url = self._build_url('octocat')
