@@ -1105,7 +1105,7 @@ class Repository(GitHubCore):
             'bug,ui,@high' :param sort: accepted values:
             ('created', 'updated', 'comments', 'created')
         :type labels: str
-        :param direction: (optional), accepted values: ('open', 'closed')
+        :param direction: (optional), accepted values: ('asc', 'desc')
         :type direction: str
         :param since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
         :type since: str
