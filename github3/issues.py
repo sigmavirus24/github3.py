@@ -237,9 +237,7 @@ class Issue(GitHubCore):
         """
         if not login:
             return False
-        number = None
-        if self.milestone:
-            number = self.milestone.number
+        number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, login, self.state, number,
                 self.labels)
 
@@ -252,9 +250,7 @@ class Issue(GitHubCore):
         assignee = ''
         if self.assignee:
             assignee = self.assignee.login
-        number = None
-        if self.milestone:
-            number = self.milestone.number
+        number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, assignee, 'closed',
                 number, self.labels)
 
@@ -410,9 +406,7 @@ class Issue(GitHubCore):
         assignee = ''
         if self.assignee:
             assignee = self.assignee.login
-        number = None
-        if self.milestone:
-            number = self.milestone.number
+        number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, assignee, 'open',
                 number, self.labels)
 

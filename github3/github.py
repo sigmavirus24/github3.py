@@ -901,9 +901,7 @@ class GitHub(GitHubCore):
         :return: :class:`Issue <github3.issues.Issue>`
         """
         r = self.repository(owner, repository)
-        if r:
-            return r.pull_request(number)
-        return None
+        return r.pull_request(number) if r else None
 
     def octocat(self):
         """Returns an easter egg of the API."""
