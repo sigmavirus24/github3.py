@@ -444,6 +444,11 @@ class TestGitHub(BaseTest):
         expect(self._g.subscribe(*args)).isinstance(bool)
         expect(self._g.unsubscribe(*args)).isinstance(bool)
 
+    def test_set_user_agent(self):
+        ua = 'Foo Bar Bogus'
+        self.g.set_user_agent(ua)
+        expect(self.g._session.config['base_headers']['User-Agent']) == ua
+
     def test_star_unstar(self):
         args = (self.gh3py, self.test_repo)
         self.raisesGHE(self.g.star, *args)

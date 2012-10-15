@@ -67,7 +67,7 @@ class GitHubCore(GitHubObject):
         self._session.headers.update({'Accept-Charset': 'utf-8'})
         # Identify who we are
         self._session.config['base_headers'].update(
-                {'User-Agent': 'github3.py/pre-alpha'})
+                {'User-Agent': 'github3.py/0.1b0'})
 
         # set a sane default
         self._github_url = 'https://api.github.com'

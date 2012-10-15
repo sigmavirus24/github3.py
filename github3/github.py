@@ -993,6 +993,13 @@ class GitHub(GitHubCore):
         u = json.get('user', {})
         return LegacyUser(u, self) if u else None
 
+    def set_user_agent(self, user_agent):
+        """Allows the user to set their own user agent string to identify with
+        the API."""
+        if not user_agent:
+            return
+        self._session.config['base_headers']['User-Agent'] = user_agent
+
     def star(self, login, repo):
         """Star to login/repo
 
