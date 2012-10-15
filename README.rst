@@ -25,7 +25,7 @@ Every-day Use
 ~~~~~~~~~~~~~
 
 - requests_  by Kenneth Reitz
-  
+
 .. _requests: https://github.com/kennethreitz/requests
 
 Testing
@@ -134,26 +134,29 @@ the library is covered and every module has coverage >= 93%.
 
 ::
 
-    coverage report
     Name                 Stmts   Miss  Cover
     ----------------------------------------
     github3/__init__         8      0   100%
-    github3/api             52      0   100%
+    github3/api             54      1    98%
     github3/auths           50      0   100%
     github3/decorators      27      0   100%
     github3/events          89      0   100%
     github3/gists          101      0   100%
     github3/git             93      0   100%
-    github3/github         361      0   100%
-    github3/issues         201      0   100%
+    github3/github         374      0   100%
+    github3/issues         204      0   100%
     github3/legacy          97      0   100%
-    github3/models         186      0   100%
+    github3/models         189      0   100%
     github3/orgs           177      0   100%
-    github3/pulls          134      6    96%
-    github3/repos          780     52    93%
+    github3/pulls          138      6    96%
+    github3/repos          790     22    97%
     github3/users          160      0   100%
     ----------------------------------------
-    TOTAL                 2516     58    98%
+    TOTAL                 2551     29    99%
+
+That one miss from ``github3/api`` is bizarre since I know for a fact that 
+there's a test for it in ``tests/test_api``. I wouldn't know how to reproduce 
+it, so I won't report it to nedbat.
 
 .. links
 .. _section: http://github3py.readthedocs.org/en/latest/index.html#contributing
