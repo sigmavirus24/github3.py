@@ -31,8 +31,11 @@ class TestIssue(BaseTest):
         issue = self._g.issue(self.gh3py, self.test_repo, '1')
         expect(issue.assign(None)).is_False()
         expect(issue.assign('sigmavirus24')).is_True()
+        number = None
+        if issue.milestone:
+            number = issue.milestone.number
         issue.edit(issue.title, issue.body, '', issue.state,
-                issue.milestone.number, issue.labels)
+                number, issue.labels)
 
     def test_assignee(self):
         if self.issue.assignee:
