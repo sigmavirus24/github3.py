@@ -240,7 +240,11 @@ class TestGitHub(BaseTest):
         if not self.auth:
             return
 
-        expect(next(self._g.iter_org_issues('github3py'))).isinstance(Issue)
+        try:
+            expect(next(self._g.iter_org_issues('github3py'))
+                    ).isinstance(Issue)
+        except StopIteration:
+            pass
 
     def test_list_issues(self):
         self.raisesGHE(self.g.list_issues)
