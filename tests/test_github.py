@@ -448,6 +448,7 @@ class TestGitHub(BaseTest):
         ua = 'Foo Bar Bogus'
         self.g.set_user_agent(ua)
         expect(self.g._session.config['base_headers']['User-Agent']) == ua
+        expect(self.g._session.headers['User-Agent']) == ua
 
     def test_star_unstar(self):
         args = (self.gh3py, self.test_repo)

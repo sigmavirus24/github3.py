@@ -998,7 +998,9 @@ class GitHub(GitHubCore):
         the API."""
         if not user_agent:
             return
-        self._session.config['base_headers']['User-Agent'] = user_agent
+        ua = {'User-Agent': user_agent}
+        self._session.config['base_headers'].update(ua)
+        self._session.headers.update(ua)
 
     def star(self, login, repo):
         """Star to login/repo
