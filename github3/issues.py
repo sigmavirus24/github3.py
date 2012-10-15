@@ -247,9 +247,7 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        assignee = ''
-        if self.assignee:
-            assignee = self.assignee.login
+        assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, assignee, 'closed',
                 number, self.labels)
@@ -403,9 +401,7 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        assignee = ''
-        if self.assignee:
-            assignee = self.assignee.login
+        assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, assignee, 'open',
                 number, self.labels)
