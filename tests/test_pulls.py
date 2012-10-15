@@ -50,10 +50,10 @@ class TestPullRequest(BaseTest):
         expect(self.pr.body_text) == body
 
     def test_close(self):
-        self.raiseGHE(self.pr.close)
+        self.raisesGHE(self.pr.close)
 
     def test_reopen(self):
-        self.raiseGHE(self.pr.reopen)
+        self.raisesGHE(self.pr.reopen)
 
     def test_closed_at(self):
         expect(self.pr.closed_at).isinstance(datetime)

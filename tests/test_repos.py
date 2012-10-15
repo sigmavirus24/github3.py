@@ -826,7 +826,7 @@ class TestHook(BaseTest):
         expect(self.hook.id) == 424182
 
     def test_is_active(self):
-        expect(self.hook.is_active()).is_False()
+        expect(self.hook.is_active()).isinstance(bool)
 
     def test_name(self):
         expect(self.hook.name) == 'twitter'

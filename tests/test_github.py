@@ -242,11 +242,11 @@ class TestGitHub(BaseTest):
 
         expect(next(self._g.iter_issues('github3py'))).isinstance(Issue)
 
-    def test_list_user_issues(self):
-        self.raisesGHE(self.g.list_user_issues)
+    def test_list_issues(self):
+        self.raisesGHE(self.g.list_issues)
         if not self.auth:
             return
-        expect(self._g.list_user_issues(state='closed')).list_of(Issue)
+        expect(self._g.list_issues(state='closed')).list_of(Issue)
 
     def test_key(self):
         self.raisesGHE(self.g.key, 2000)
