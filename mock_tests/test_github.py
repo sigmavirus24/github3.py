@@ -8,15 +8,18 @@ from expecter import expect
 class TestGitHub(TestCase):
     def setUp(self):
         self.g_anon = github3.GitHub()
-        self.mock_anon = self.g._session = MagicMock(name='anon')
+        self.mock_anon = self.g_anon._session = MagicMock(name='anon')
         self.mock_anon.auth = ()
-        self.sess_mock = github3.session = MagicMock(name='auth')
-        self.mock_auth = self.g_auth = github3.GitHub()
+        self.sess_mock = github3.github.session = MagicMock(name='session')
+        self.g_auth = github3.GitHub()
+        self.mock_auth = self.g_auth._session = MagicMock(name='auth')
         self.mock_auth.auth = ('user', 'password')
 
     def test_authorization(self):
         url = 'https://api.github.com/authorizations/10'
-        expect(self.g_anon.authorization(10)).raises(github3.GitHubError)
+        with expect.raises(github3.GitHubError):
+            self.g_anon.authorization(10)
+
         self.g_auth.authorization(10)
         self.mock_auth.get.assert_called_with(url)
 
