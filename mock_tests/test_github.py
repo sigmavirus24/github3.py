@@ -4,7 +4,7 @@ from json import dumps
 from mock import patch
 from unittest import TestCase
 from expecter import expect
-from utils import generate_response, path
+from mock_tests.utils import generate_response, path
 
 
 class TestGitHub(TestCase):
