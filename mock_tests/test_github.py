@@ -30,17 +30,17 @@ class TestGitHub(TestCase):
 
         def assertions(args):
             assert url in args
-            assert json_scopes in args
-            assert '"note": ""' in args
-            assert '"note_url": ""' in args
+            assert json_scopes in args[1]
+            assert '"note": ""' in args[1]
+            assert '"note_url": ""' in args[1]
 
         self.g_anon.authorize(None, None, scopes)
         assert self.mock_anon.post.call_count == 0
 
         self.g_anon.authorize('user', 'password', scopes)
-        assertions(self.mock_anon.post.call_args[0])
+        calls = self.sess_mock.mock_calls
+        expect(len(calls)) == 4
 
-        self.g.auth = ('user', 'password')
-        self.g_anon.authorize(None, None, scopes)
-        assert self.sess_mock.post.call_count == 1
-        assertions(self.sess_mock.post.call_args[0])
+        self.g_auth.authorize(None, None, scopes)
+        assert self.mock_auth.post.call_count == 1
+        assertions(self.mock_auth.post.call_args[0])
