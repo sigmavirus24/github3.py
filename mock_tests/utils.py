@@ -8,8 +8,11 @@ def generate_response(path_name, status_code=200, encoding='utf-8'):
     r = requests.Response()
     r.status_code = status_code
     r.encoding = encoding
-    content = path(path_name)
-    r.raw = BytesIO(content.read().encode())
+    if path_name:
+        content = path(path_name)
+        r.raw = BytesIO(content.read().encode())
+    else:
+        r.raw = BytesIO()
     return r
 
 

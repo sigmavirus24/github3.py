@@ -102,6 +102,7 @@ class GitHub(GitHubCore):
         json = self._json(self._post(url, dumps(new_gist)), 201)
         return Gist(json, self) if json else None
 
+    @requires_auth
     def create_issue(self,
         owner,
         repository,
@@ -165,6 +166,7 @@ class GitHub(GitHubCore):
                 created = Key(json, self)
         return created
 
+    @requires_auth
     def create_repo(self,
         name,
         description='',
@@ -217,6 +219,7 @@ class GitHub(GitHubCore):
             return key.delete()
         return False  # (No coverage)
 
+    @requires_auth
     def follow(self, login):
         """Make the authenticated user follow login.
 
