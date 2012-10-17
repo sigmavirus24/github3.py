@@ -11,19 +11,23 @@ class TestGitHub(TestCase):
 
     def setUp(self):
         self.g = github3.GitHub()
+        self.conf = {'allow_redirects': True}
+
+    def login(self):
+        self.g.login('user', 'password')
 
     @patch_request
     def test_authorization(self, request):
         request.return_value = generate_response('authorization')
-        url = 'https://api.github.com/authorizations/10'
-        with expect.raises(github3.GitHubError):
+        args = ('get', 'https://api.github.com/authorizations/10')
+        with expect.githuberror():
             self.g.authorization(10)
 
-        self.g.login('user', 'password')
+        self.login()
         a = self.g.authorization(10)
         expect(a).isinstance(github3.auths.Authorization)
         assert request.called is True
-        assert call('get', url, allow_redirects=True) in request.mock_calls
+        assert call(*args, **self.conf) in request.mock_calls
 
     @patch_request
     def test_authorize(self, request):
@@ -49,7 +53,7 @@ class TestGitHub(TestCase):
     def test_create_issue(self, request):
         request.return_value = generate_response('issue', 201)
 
-        self.g.login('user', 'password')
+        self.login()
         i = self.g.create_issue(None, None, None)
         assert i is None
         assert request.called is False
@@ -74,7 +78,7 @@ class TestGitHub(TestCase):
         assert k is None
         assert request.called is False
 
-        self.g.login('user', 'password')
+        self.login()
         k = self.g.create_key('Name', 'Key')
         expect(k).isinstance(github3.users.Key)
         assert request.called is True
@@ -82,7 +86,7 @@ class TestGitHub(TestCase):
     @patch_request
     def test_create_repo(self, request):
         request.return_value = generate_response('repository', 201)
-        self.g.login('user', 'password')
+        self.login()
         r = self.g.create_repo('Repository')
         expect(r).isinstance(github3.repos.Repository)
         assert request.called is True
@@ -90,36 +94,97 @@ class TestGitHub(TestCase):
     @patch_request
     def test_delete_key(self, request):
         request.return_value = generate_response(None, 204)
+        args = ('delete', 'https://api.github.com/user/keys/10')
 
-        self.g.login('user', 'password')
+        self.login()
         with patch.object(github3.github.GitHub, 'key') as key:
             key.return_value = github3.users.Key(load(path('key')), self.g)
             assert self.g.delete_key(10) is True
 
         assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls
 
     @patch_request
     def test_follow(self, request):
         request.return_value = generate_response(None, 204)
+        args = ('post', 'https://api.github.com/user/following/sigmavirus24')
 
-        with expect.raises(github3.GitHubError):
+        with expect.githuberror():
             self.g.follow('sigmavirus24')
 
-        self.g.login('user', 'password')
+        self.login()
         assert self.g.follow(None) is False
         assert self.g.follow('sigmavirus24') is True
         assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls
+
+    @patch_request
+    def test_gist(self, request):
+        request.return_value = generate_response('gist', 200)
+        args = ('get', 'https://api.github.com/gists/10')
+
+        expect(self.g.gist(10)).isinstance(github3.gists.Gist)
+        assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls
+
+    @patch_request
+    def test_is_starred(self, request):
+        request.return_value = generate_response(None, 204)
+        args = ('get', 'https://api.github.com/user/starred/user/repo')
+
+        with expect.githuberror():
+            self.g.is_starred('user', 'repo')
+
+        self.login()
+        expect(self.g.is_starred(None, None)).is_False()
+        assert request.called is False
+
+        expect(self.g.is_starred('user', 'repo')).is_True()
+        assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls
+
+    @patch_request
+    def test_is_subscribed(self, request):
+        request.return_value = generate_response(None, 204)
+        args = ('get', 'https://api.github.com/user/subscriptions/user/repo')
+
+        with expect.githuberror():
+            self.g.is_subscribed('user', 'repo')
+
+        self.login()
+        expect(self.g.is_subscribed(None, None)).is_False()
+        assert request.called is False
+
+        expect(self.g.is_subscribed('user', 'repo')).is_True()
+        assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls
+
+    @patch_request
+    def test_issue(self, request):
+        request.return_value = generate_response('issue', 200)
+        args = ('get', 'https://api.github.com/repos/user/repo/issues/1')
+
+        assert self.g.issue(None, None) is None
+        with patch.object(github3.github.GitHub, 'repository') as repo:
+            repo.return_value = github3.repos.Repository(load(path('repo')))
+            i = self.g.issue(1)
+
+        expect(i).isinstance(github3.issues.Issue)
+        assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls
 
     @patch_request
     def test_key(self, request):
         request.return_value = generate_response('key')
+        args = ('get', 'https://api.github.com/user/keys/10')
 
-        with expect.raises(github3.GitHubError):
+        with expect.githuberror():
             self.g.key(10)
 
-        self.g.login('user', 'password')
+        self.login()
         assert self.g.key(-1) is None
         assert request.called is False
 
         expect(self.g.key(10)).isinstance(github3.users.Key)
         assert request.called is True
+        assert call(*args, **self.conf) in request.mock_calls

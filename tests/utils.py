@@ -2,6 +2,7 @@ import requests
 from mock import patch
 from io import BytesIO
 import expecter
+from github3 import GitHubError
 
 
 def generate_response(path_name, status_code=200, encoding='utf-8'):
@@ -50,5 +51,8 @@ class CustomExpecter(expecter.expect):
     def list_of(self, cls):
         for actual in self._actual:
             CustomExpecter(actual).isinstance(cls)
+
+    def githuberror(self):
+        return self.raises(GitHubError)
 
 expect = CustomExpecter

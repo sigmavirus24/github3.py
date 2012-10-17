@@ -10,7 +10,8 @@ History/Changelog
 -----------------
 
 - unit tests implemented using mock instead of hitting the GitHub API (#37)
-- Notifications API coverage
+- removed ``list_*`` functions from GitHub object
+- Notifications API coverage (?)
 
 0.1b0: 2012-10-06
 -----------------
