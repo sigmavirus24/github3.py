@@ -3,12 +3,13 @@
 # Copyright 2012, Ian Cordasco
 
 COVERAGE_INCLUDE := github3/*.py
+TEST_RUNNER := run_tests.py
 
 clean:
 	git clean -Xdf
 
 travis:
-	python mocktests.py
+	python $(TEST_RUNNER)
 
 tests: travis
 

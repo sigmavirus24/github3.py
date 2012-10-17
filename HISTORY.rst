@@ -1,8 +1,19 @@
 History/Changelog
 =================
 
-0.1: 2012-11-xx
+0.1: 2012-xx-xx
 ---------------
+
+- 100% unit test coverage
+
+0.1b1: 2012-10-31
+-----------------
+
+- unit tests implemented using mock instead of hitting the GitHub API (#37)
+- Notifications API coverage
+
+0.1b0: 2012-10-06
+-----------------
 
 - Support for the complete GitHub API (accomplished)
   
@@ -11,4 +22,4 @@ History/Changelog
     methodology
   - Limited implementation of iterators in the place of list functions.
 
-- 92% coverage by unit tests
+- 98% coverage by unit tests

@@ -4,7 +4,7 @@ import unittest
 import os
 import re
 
-TEST_DIR = 'mock_tests'
+TEST_DIR = 'tests'
 
 if __name__ == "__main__":
     # list files in directory tests/

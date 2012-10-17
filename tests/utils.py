@@ -17,7 +17,7 @@ def generate_response(path_name, status_code=200, encoding='utf-8'):
 
 
 def path(name, mode='r'):
-    return open('mock_tests/json/{0}'.format(name), mode)
+    return open('tests/json/{0}'.format(name), mode)
 
 
 def patch_request(method='request'):
