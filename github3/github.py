@@ -21,10 +21,37 @@ from github3.decorators import requires_auth, requires_basic_auth
 
 
 class GitHub(GitHubCore):
-    """Stores all the session information."""
-    def __init__(self, login='', password=''):
+    """Stores all the session information.
+
+    Logging In
+    ----------
+
+    There are two ways to log into the GitHub API
+
+    ::
+
+        from github3 import login
+        g = login(user, password)
+        g = login(token=token)
+        g = login(user, token=token)
+
+    or
+
+    ::
+
+        from github3 import GitHub
+        g = GitHub(user, password)
+        g = GitHub(token=token)
+        g = GitHub(user, token=token)
+
+    This is simple backward compatibility since originally there was no way to
+    call the GitHub object with authentication parameters.
+    """
+    def __init__(self, login='', password='', token=''):
         super(GitHub, self).__init__({})
-        if login and password:
+        if token:
+            self.login(login, token=token)
+        elif login and password:
             self.login(login, password)
 
     def __repr__(self):
