@@ -2,7 +2,7 @@ github3.py
 ==========
 
 .. image::
-    https://secure.travis-ci.org/sigmavirus24/github3.py.png?branch=master
+    https://secure.travis-ci.org/sigmavirus24/github3.py.png?branch=mock
     :alt: Build Status
     :target: http://travis-ci.org/sigmavirus24/github3.py
 
