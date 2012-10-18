@@ -53,8 +53,9 @@ class CustomExpecter(expecter.expect):
         for actual in self._actual:
             CustomExpecter(actual).isinstance(cls)
 
-    def githuberror(self):
-        return self.raises(github3.GitHubError)
+    @classmethod
+    def githuberror(cls):
+        return cls.raises(github3.GitHubError)
 
 expect = CustomExpecter
 
