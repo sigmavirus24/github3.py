@@ -11,7 +11,7 @@ def generate_response(path_name, status_code=200, enc='utf-8', _iter=False):
     r.status_code = status_code
     r.encoding = enc
     if path_name:
-        content = path(path_name).read()
+        content = path(path_name).read().strip()
         if _iter:
             content = '[{0}]'.format(content)
         r.raw = BytesIO(content.encode())
@@ -63,15 +63,15 @@ expect = CustomExpecter
 class BaseCase(TestCase):
     def setUp(self):
         self.g = github3.GitHub()
-        self.request = patch_request()
-        self.request.start()
+        self.conf = {'allow_redirects': True}
+        self.mock = patch.object(requests.sessions.Session, 'request')
+        self.request = self.mock.start()
 
     def tearDown(self):
-        self.request.stop()
+        self.mock.stop()
 
     def login(self):
         self.g.login('user', 'password')
-        self.conf = {'allow_redirects': True}
 
     def mock_assertions(self, *args, **kwargs):
         assert self.request.called is True

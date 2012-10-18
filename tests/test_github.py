@@ -13,6 +13,7 @@ class TestGitHub(BaseCase):
         args = ('get', 'https://api.github.com/authorizations/10')
         with expect.githuberror():
             self.g.authorization(10)
+        assert self.request.called is False
 
         self.login()
         a = self.g.authorization(10)
@@ -60,8 +61,9 @@ class TestGitHub(BaseCase):
     def test_create_key(self):
         self.request.return_value = generate_response('key', 201)
 
-        k = self.g.create_key(None, None)
-        assert k is None
+        with expect.githuberror():
+            k = self.g.create_key(None, None)
+            assert k is None
         assert self.request.called is False
 
         self.login()
@@ -70,7 +72,7 @@ class TestGitHub(BaseCase):
         assert self.request.called is True
 
     def test_create_repo(self):
-        self.request.return_value = generate_response('repository', 201)
+        self.request.return_value = generate_response('repo', 201)
         self.login()
         r = self.g.create_repo('Repository')
         expect(r).isinstance(github3.repos.Repository)
@@ -138,7 +140,7 @@ class TestGitHub(BaseCase):
         self.request.return_value = generate_response('issue', 200)
         args = ('get', 'https://api.github.com/repos/user/repo/issues/1')
 
-        assert self.g.issue(None, None) is None
+        assert self.g.issue(None, None, 0) is None
         with patch.object(github3.github.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(load(path('repo')))
             i = self.g.issue(1)
