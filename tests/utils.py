@@ -1,17 +1,20 @@
 import requests
-from mock import patch
-from io import BytesIO
+import github3
 import expecter
-from github3 import GitHubError
+from mock import patch, call
+from io import BytesIO
+from unittest import TestCase
 
 
-def generate_response(path_name, status_code=200, encoding='utf-8'):
+def generate_response(path_name, status_code=200, enc='utf-8', _iter=False):
     r = requests.Response()
     r.status_code = status_code
-    r.encoding = encoding
+    r.encoding = enc
     if path_name:
-        content = path(path_name)
-        r.raw = BytesIO(content.read().encode())
+        content = path(path_name).read()
+        if _iter:
+            content = '[{0}]'.format(content)
+        r.raw = BytesIO(content.encode())
     else:
         r.raw = BytesIO()
     return r
@@ -22,9 +25,7 @@ def path(name, mode='r'):
 
 
 def patch_request(method='request'):
-    def decorator(func):
-        return patch.object(requests.sessions.Session, method)(func)
-    return decorator
+    return patch.object(requests.sessions.Session, method)
 
 
 class CustomExpecter(expecter.expect):
@@ -53,6 +54,24 @@ class CustomExpecter(expecter.expect):
             CustomExpecter(actual).isinstance(cls)
 
     def githuberror(self):
-        return self.raises(GitHubError)
+        return self.raises(github3.GitHubError)
 
 expect = CustomExpecter
+
+
+class BaseCase(TestCase):
+    def setUp(self):
+        self.g = github3.GitHub()
+        self.request = patch_request()
+        self.request.start()
+
+    def tearDown(self):
+        self.request.stop()
+
+    def login(self):
+        self.g.login('user', 'password')
+        self.conf = {'allow_redirects': True}
+
+    def mock_assertions(self, *args, **kwargs):
+        assert self.request.called is True
+        assert call(*args, **kwargs) in self.request.mock_calls

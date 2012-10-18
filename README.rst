@@ -30,7 +30,7 @@ Testing
 
 - expecter_ by Gary Bernhardt
 - mock_ by Michael Foord
-- (optional) coverage_ by Ned Batchelder
+- coverage_ by Ned Batchelder
 
 .. _expecter: https://github.com/garybernhardt/expecter
 .. _coverage: http://nedbatchelder.com/code/coverage/

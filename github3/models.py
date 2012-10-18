@@ -136,13 +136,14 @@ class GitHubCore(GitHubObject):
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 
-    @property
-    def _api(self):
+    def _api_getter(self):
         return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
 
-    @_api.setter
-    def _api(self, uri):
+    def _api_setter(self, uri):
         self._uri = urlparse(uri)
+
+    _api = property(_api_getter, _api_setter)
+    del(_api_getter, _api_setter)
 
     def _iter(self, count, url, cls, params=None):
         """Generic iterator for this project.
@@ -182,11 +183,6 @@ class GitHubCore(GitHubObject):
         """Re-retrieve the information for this object."""
         json = self._json(self._get(self._api), 200)
         self.__init__(json, self._session)
-
-    @classmethod
-    def from_json(cls, json):
-        """Return an instance of ``cls`` formed from ``json``."""
-        return cls(json, None)
 
 
 class BaseComment(GitHubCore):
