@@ -57,6 +57,7 @@ class GitHub(GitHubCore):
     def __repr__(self):
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
+    @requires_auth
     def _iter_follow(self, which, number):
         url = self._build_url('user', which)
         return self._iter(number, url, User)
@@ -402,7 +403,7 @@ class GitHub(GitHubCore):
         """
         if login:
             return self.user(login).iter_following()
-        return self._iter_follow('followers', int(number))
+        return self._iter_follow('following', int(number))
 
     def iter_gists(self, username=None, number=-1):
         """If no username is specified, GET /gists, otherwise GET

@@ -75,4 +75,6 @@ class BaseCase(TestCase):
 
     def mock_assertions(self, *args, **kwargs):
         assert self.request.called is True
-        assert call(*args, **kwargs) in self.request.mock_calls
+        c = call(*args, **kwargs)
+        assert c in self.request.mock_calls, '{0} not in {1}'.format(c,
+            self.request.mock_calls)

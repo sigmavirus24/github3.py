@@ -80,18 +80,18 @@ class TestGitHub(BaseCase):
 
     def test_delete_key(self):
         self.request.return_value = generate_response(None, 204)
-        args = ('delete', 'https://api.github.com/user/keys/10')
 
         self.login()
         with patch.object(github3.github.GitHub, 'key') as key:
             key.return_value = github3.users.Key(load(path('key')), self.g)
             assert self.g.delete_key(10) is True
 
-        self.mock_assertions(*args, **self.conf)
+        assert self.request.called is True
 
     def test_follow(self):
         self.request.return_value = generate_response(None, 204)
-        args = ('post', 'https://api.github.com/user/following/sigmavirus24')
+        args = ('put', 'https://api.github.com/user/following/sigmavirus24')
+        conf = dict(headers={'Content-Length': '0'}, data=None)
 
         with expect.githuberror():
             self.g.follow('sigmavirus24')
@@ -99,7 +99,7 @@ class TestGitHub(BaseCase):
         self.login()
         assert self.g.follow(None) is False
         assert self.g.follow('sigmavirus24') is True
-        self.mock_assertions(*args, **self.conf)
+        self.mock_assertions(*args, **conf)
 
     def test_gist(self):
         self.request.return_value = generate_response('gist', 200)
@@ -138,12 +138,14 @@ class TestGitHub(BaseCase):
 
     def test_issue(self):
         self.request.return_value = generate_response('issue', 200)
-        args = ('get', 'https://api.github.com/repos/user/repo/issues/1')
+        args = ('get',
+                'https://api.github.com/repos/sigmavirus24/github3.py/issues/1'
+               )
 
         assert self.g.issue(None, None, 0) is None
         with patch.object(github3.github.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(load(path('repo')))
-            i = self.g.issue(1)
+            i = self.g.issue('user', 'repo', 1)
 
         expect(i).isinstance(github3.issues.Issue)
         self.mock_assertions(*args, **self.conf)
@@ -166,7 +168,8 @@ class TestGitHub(BaseCase):
     def test_iter_authorizations(self):
         self.request.return_value = generate_response('authorization',
                 _iter=True)
-        args = ('get', 'https://api.github.com/user/authorizations')
+        args = ('get', 'https://api.github.com/authorizations')
+        self.conf.update(params=None)
 
         with expect.githuberror():
             self.g.iter_authorizations()
@@ -180,6 +183,7 @@ class TestGitHub(BaseCase):
     def test_iter_emails(self):
         self.request.return_value = generate_response('emails')
         args = ('get', 'https://api.github.com/user/emails')
+        self.conf.update(params=None)
 
         with expect.githuberror():
             self.g.iter_emails()
@@ -193,6 +197,7 @@ class TestGitHub(BaseCase):
     def test_iter_events(self):
         self.request.return_value = generate_response('event', _iter=True)
         args = ('get', 'https://api.github.com/events')
+        self.conf.update(params=None)
 
         event = next(self.g.iter_events())
         expect(event).isinstance(github3.events.Event)
@@ -201,44 +206,50 @@ class TestGitHub(BaseCase):
     def test_iter_followers(self):
         self.request.return_value = generate_response('user', _iter=True)
         args = ('get', 'https://api.github.com/users/sigmavirus24/followers')
-
-        u = next(self.g.iter_followers('sigmavirus24'))
-        expect(u).isinstance(github3.users.User)
-        assert self.request.called is True
-        self.mock_assertions(*args, **self.conf)
+        self.conf.update(params=None)
 
         with expect.githuberror():
-            next(self.g.iter_followers())
+            self.g.iter_followers()
 
-        self.login()
-        v = next(self.g.iter_followers())
-        expect(v).isinstance(github3.users.User)
-        args = (args[0], 'https://api.github.com/user/followers')
-        assert self.request.called is True
-        self.mock_assertions(*args, **self.conf)
+        with patch.object(github3.github.GitHub, 'user') as ghuser:
+            ghuser.return_value = github3.users.User(load(path('user')))
+            u = next(self.g.iter_followers('sigmavirus24'))
+            expect(u).isinstance(github3.users.User)
+            assert self.request.called is True
+            self.mock_assertions(*args, **self.conf)
+
+            self.login()
+            v = next(self.g.iter_followers())
+            expect(v).isinstance(github3.users.User)
+            args = (args[0], 'https://api.github.com/user/followers')
+            assert self.request.called is True
+            self.mock_assertions(*args, **self.conf)
 
     def test_iter_following(self):
         self.request.return_value = generate_response('user', _iter=True)
-        args = ('get',
-                'https://api.github.com/users/sigmavirus24/followering')
+        args = ('get', 'https://api.github.com/users/sigmavirus24/following')
+        self.conf.update(params=None)
 
         with expect.githuberror():
             next(self.g.iter_following())
         assert self.request.called is False
 
-        u = next(self.g.iter_following('sigmavirus24'))
-        expect(u).isinstance(github3.users.User)
-        self.mock_assertions(*args, **self.conf)
+        with patch.object(github3.github.GitHub, 'user') as ghuser:
+            ghuser.return_value = github3.users.User(load(path('user')))
+            u = next(self.g.iter_following('sigmavirus24'))
+            expect(u).isinstance(github3.users.User)
+            self.mock_assertions(*args, **self.conf)
 
-        self.login()
-        v = next(self.g.iter_following())
-        expect(v).isinstance(github3.users.User)
-        args = (args[0], 'https://api.github.com/user/following')
-        self.mock_assertions(*args, **self.conf)
+            self.login()
+            v = next(self.g.iter_following())
+            expect(v).isinstance(github3.users.User)
+            args = (args[0], 'https://api.github.com/user/following')
+            self.mock_assertions(*args, **self.conf)
 
     def test_iter_gists(self):
         self.request.return_value = generate_response('gist', _iter=True)
         args = ('get', 'https://api.github.com/users/sigmavirus24/gists')
+        self.conf.update(params=None)
 
         g = next(self.g.iter_gists('sigmavirus24'))
         expect(g).isinstance(github3.gists.Gist)

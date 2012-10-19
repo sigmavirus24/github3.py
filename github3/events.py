@@ -14,8 +14,8 @@ class Event(GitHubObject):
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
     """
-    def __init__(self, event, session=None):
-        super(Event, self).__init__(event, session)
+    def __init__(self, event):
+        super(Event, self).__init__(event)
         from github3.users import User
         from github3.orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
