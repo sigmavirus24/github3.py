@@ -259,3 +259,109 @@ class TestGitHub(BaseCase):
         h = next(self.g.iter_gists())
         expect(h).isinstance(github3.gists.Gist)
         self.mock_assertions(*args, **self.conf)
+
+    def test_iter_org_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        args = ('get', 'https://api.github.com/orgs/github3py/issues')
+        self.conf.update(params={})
+
+        with expect.githuberror():
+            self.g.iter_org_issues('github3py')
+
+        self.login()
+        i = next(self.g.iter_org_issues('github3py'))
+        expect(i).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                'sort': 'created', 'direction': 'asc',
+                'since': '2012-05-20T23:10:27Z'}
+        self.conf.update(params=params)
+        j = next(self.g.iter_org_issues('github3py', **params))
+        expect(j).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        args = ('get', 'https://api.github.com/issues')
+        self.conf.update(params={})
+
+        with expect.githuberror():
+            self.g.iter_issues()
+
+        self.login()
+        expect(next(self.g.iter_issues())).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                'sort': 'created', 'direction': 'asc',
+                'since': '2012-05-20T23:10:27Z'}
+        self.conf.update(params=params)
+        expect(next(self.g.iter_issues(**params))).isinstance(
+                github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_user_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        args = ('get', 'https://api.github.com/user/issues')
+        self.conf.update(params={})
+
+        with expect.githuberror():
+            self.g.iter_user_issues()
+
+        self.login()
+        expect(next(self.g.iter_user_issues())).isinstance(
+                github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                'sort': 'created', 'direction': 'asc',
+                'since': '2012-05-20T23:10:27Z'}
+        self.conf.update(params=params)
+        expect(next(self.g.iter_user_issues(**params))).isinstance(
+                github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_keys(self):
+        self.request.return_value = generate_response('key', _iter=True)
+        args = ('get', 'https://api.github.com/user/keys')
+        self.conf.update(params=None)
+
+        with expect.githuberror():
+            self.g.iter_keys()
+
+        self.login()
+        expect(next(self.g.iter_keys())).isinstance(github3.users.Key)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_repos(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        args = ('get', 'https://api.github.com/user/repos')
+        self.conf.update(params={})
+
+        self.login()
+        expect(next(self.g.iter_repos())).isinstance(github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+        args = ('get', 'https://api.github.com/users/sigmavirus24/repos')
+        expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
+                github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_starred(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        args = ('get', 'https://api.github.com/user/starred')
+        self.conf.update(params=None)
+
+        self.login()
+        expect(next(self.g.iter_starred())).isinstance(
+                github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+        with patch.object(github3.github.GitHub, 'user') as user:
+            user.return_value = github3.users.User(load(path('user')))
+            args = ('get',
+                    'https://api.github.com/users/sigmavirus24/starred')
+            expect(next(self.g.iter_starred('sigmavirus24'))).isinstance(
+                    github3.repos.Repository)
+            self.mock_assertions(*args, **self.conf)
