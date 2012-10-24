@@ -669,33 +669,29 @@ class Repository(GitHubCore):
         private=False,
         has_issues=True,
         has_wiki=True,
-        has_downloads=True):
+        has_downloads=True,
+        default_branch=''):
         """Edit this repository.
 
-        :param name: (required), name of the repository
-        :type name: str
-        :param description: (optional)
-        :type description: str
-        :param homepage: (optional)
-        :type homepage: str
-        :param private: (optional), If ``True``, create a
+        :param str name: (required), name of the repository
+        :param str description: (optional)
+        :param str homepage: (optional)
+        :param bool private: (optional), If ``True``, create a
             private repository. API default: ``False``
-        :type private: bool
-        :param has_issues: (optional), If ``True``, enable
+        :param bool has_issues: (optional), If ``True``, enable
             issues for this repository. API default: ``True``
-        :type has_issues: bool
-        :param has_wiki: (optional), If ``True``, enable the
+        :param bool has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :type has_wiki: bool
-        :param has_downloads: (optional), If ``True``, enable
+        :param bool has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
-        :type has_downloads: bool
+        :param str default_branch: (optional), Update the default branch for
+            this repository
         :returns: bool -- True if successful, False otherwise
         """
         data = dumps({'name': name, 'description': description,
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads})
+            'has_downloads': has_downloads, 'default_branch': default_branch})
         json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
