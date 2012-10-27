@@ -11,6 +11,7 @@ from json import dumps
 from requests import session
 from re import compile
 from github3.decorators import requires_auth
+from github3.packages.PySO8601 import parse
 
 try:  # (No coverage)
     # Python 2.x
@@ -36,10 +37,7 @@ class GitHubObject(object):
 
     def _strptime(self, time_str):
         """Converts an ISO 8601 formatted string into a datetime object."""
-        if time_str:
-            return datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%SZ')
-        else:
-            return None
+        return parse(time_str) if time_str else None
 
     @classmethod
     def from_json(cls, json):

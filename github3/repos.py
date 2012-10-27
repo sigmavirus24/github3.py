@@ -2,7 +2,7 @@
 github3.repos
 =============
 
-This module contains the class relating to repositories.
+This module contains the classes relating to repositories.
 
 """
 
@@ -15,6 +15,7 @@ from github3.models import GitHubObject, GitHubCore, BaseComment, BaseCommit
 from github3.pulls import PullRequest
 from github3.users import User, Key
 from github3.decorators import requires_auth
+from github3.notifications import Subscription, Thread
 
 
 class Repository(GitHubCore):
@@ -1340,6 +1341,27 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
 
+    def iter_notifications(self, all=False, participating=False, since='',
+            number=-1):
+        """Iterates over the notifications for this repository.
+
+        :param bool all: (optional), show all notifications, including ones
+            marked as read
+        :param bool participating: (optional), show only the notifications the
+            user is participating in directly
+        :param str since: (optional), filters out any notifications updated
+            before the given time. The time should be passed in as UTC in the
+            ISO 8601 format: ``YYYY-MM-DDTHH:MM:SSZ``. Example:
+            "2012-10-09T23:39:01Z".
+        :returns: generator of :class:`Thread <github3.notifications.Thread>`
+        """
+        url = self._build_url('notifications', base_url=self._api)
+        params = {'all': all, 'participating': participating, 'since': since}
+        for (k, v) in list(params.items()):
+            if not v:
+                del params[k]
+        return self._iter(int(number), url, Thread, params=params)
+
     def iter_pulls(self, state=None, number=-1):
         """List pull requests on repository.
 
@@ -1608,6 +1630,31 @@ class Repository(GitHubCore):
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
+    @requires_auth
+    def set_subscription(self, subscribed, ignored):
+        """Set the user's subscription for this repository
+
+        :param bool subscribed: (required), determines if notifications should
+            be received from this repository.
+        :param bool ignored: (required), determines if notifications should be
+            ignored from this repository.
+        :returns: :class;`Subscription <Subscription>`
+        """
+        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
+        url = self._build_url('subscription', base_url=self._api)
+        json = self._json(self._put(url, data=sub), 200)
+        return Subscription(json, self) if json else None
+
+    @requires_auth
+    def subscription(self):
+        """Return subscription for this Repository.
+
+        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Subscription(json, self) if json else None
+
     def tag(self, sha):
         """Get an annotated tag.
 
@@ -1815,6 +1862,15 @@ class Hook(GitHubCore):
         :returns: bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
+
+    @requires_auth
+    def delete_subscription(self):
+        """Delete the user's subscription to this repository.
+
+        :returns: bool
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def edit(self, name, config, events=[], add_events=[], rm_events=[],

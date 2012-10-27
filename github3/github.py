@@ -18,7 +18,7 @@ from github3.orgs import Organization
 from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
-from github3.notifications import Notification
+from github3.notifications import Thread
 
 
 class GitHub(GitHubCore):
@@ -481,7 +481,7 @@ class GitHub(GitHubCore):
             in which the user is participating
         :param int number: (optional), how many notifications to return
         :returns: generator of
-            :class:`Notification <github3.notifications.Notification`
+            :class:`Thread <github3.notifications.Thread>`
         """
         params = None
         if all:
@@ -490,7 +490,7 @@ class GitHub(GitHubCore):
             params = {'participating': participating}
 
         url = self._build_url('notifications')
-        return self._iter(int(number), url, Notification, params)
+        return self._iter(int(number), url, Thread, params)
 
     @requires_auth
     def iter_user_issues(self, filter='', state='', labels='', sort='',
