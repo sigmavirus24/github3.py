@@ -8,6 +8,7 @@ This module provides decorators to the rest of the library
 
 from functools import wraps
 from requests.models import Response
+import os
 
 try:  # (No coverage)
     # python2
@@ -18,20 +19,7 @@ except ImportError:  # (No coverage)
 
 
 def requires_auth(func):
-    """Decorator to note which object methods require authorization.
-
-    .. note::
-        This decorator causes the wrapped methods to lose their proper
-        signature. Please refer to the documentation for each of those.
-    """
-    #note = """.. note::
-    #The signature of this function may not appear correctly in
-    #documentation. Please adhere to the defined parameters and their
-    #types.
-    #"""
-    ## Append the above note to each function this is applied to
-    #func.__doc__ = '\n\n'.join([func.__doc__, note])
-
+    """Decorator to note which object methods require authorization."""
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         auth = False
@@ -53,20 +41,7 @@ def requires_auth(func):
 
 def requires_basic_auth(func):
     """Decorator to note which object methods require username/password
-    authorization and won't work with token based authorization.
-
-    .. note::
-        This decorator causes the wrapped methods to lose their proper
-        signature. Please refer to the documentation for each of those.
-    """
-    #note = """.. note::
-    #The signature of this function may not appear correctly in
-    #documentation. Please adhere to the defined parameters and their
-    #types.
-    #"""
-    ## Append the above note to each function this is applied to
-    #func.__doc__ = '\n\n'.join([func.__doc__, note])
-
+    authorization and won't work with token based authorization."""
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         if hasattr(self, '_session') and self._session.auth:
@@ -80,3 +55,8 @@ def requires_basic_auth(func):
             r.raw = StringIO('{"message": "Requires username/password authentication"}'.encode())
             raise GitHubError(r)
     return auth_wrapper
+
+# Use mock decorators when generating documentation, so all functino signatures
+# are displayed correctly
+if os.environ.get('GENERATING_DOCUMENTATION', None) == 'github3':
+    requires_auth = requires_basic_auth = lambda x: x

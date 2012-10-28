@@ -13,6 +13,10 @@
 
 import sys, os
 
+# This environment variable makes decorators not decorate functions, so their
+# signatures in the generated documentation are still correct
+os.environ['GENERATING_DOCUMENTATION'] = "github3"
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
