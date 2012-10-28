@@ -59,7 +59,9 @@ class Thread(GitHubCore):
 
         :returns: bool
         """
-        return self._boolean(self._patch(self._api), 205, 404)
+        mark = {'read': True}
+        return self._boolean(self._patch(self._api, data=dumps(mark)), 205,
+                404)
 
     def set_subscription(self, subscribed, ignored):
         """Set the user's subscription for this thread
