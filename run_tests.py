@@ -3,14 +3,18 @@
 import unittest
 import os
 import re
-import coverage
+try:
+    import coverage
+except ImportError:
+    coverage = None
 
 
 TEST_DIR = 'tests'
 
 if __name__ == "__main__":
-    cov = coverage.coverage(source=['github3'])
-    cov.start()
+    if coverage:
+        cov = coverage.coverage(source=['github3'])
+        cov.start()
 
     # list files in directory tests/
     names = os.listdir(TEST_DIR)
@@ -21,6 +25,7 @@ if __name__ == "__main__":
     suite = unittest.defaultTestLoader.loadTestsFromNames(names)
     unittest.TextTestRunner(verbosity=1).run(suite)
 
-    cov.stop()
-    cov.save()
-    cov.report(show_missing=False)
+    if coverage:
+        cov.stop()
+        cov.save()
+        cov.report(show_missing=False)
