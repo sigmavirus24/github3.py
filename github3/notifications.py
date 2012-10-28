@@ -1,0 +1,127 @@
+"""
+github3.notifications
+=====================
+
+This module contains the classes relating to notifications.
+
+"""
+
+from json import dumps
+from github3.models import GitHubCore
+
+
+class Thread(GitHubCore):
+    def __init__(self, notif, session=None):
+        super(Thread, self).__init__(notif, session)
+        self._api = notif.get('url')
+        #: Comment responsible for the notification
+        self.comment = notif.get('comment', {})
+        #: Thread information
+        self.thread = notif.get('thread', {})
+
+        from github3.repos import Repository
+        #: Repository the comment was made on
+        self.repository = Repository(notif.get('repository', {}), self)
+        #: When the thread was last updated
+        self.updated_at = self._strptime(notif.get('updated_at'))
+        #: Id of the thread
+        self.id = notif.get('id')
+        #: Dictionary of urls for the thread
+        self.urls = notif.get('urls')
+        #: datetime object representing the last time the user read the thread
+        self.last_read_at = notif.get('last_read_at')
+        if self.last_read_at:
+            self.last_read_at = self._strptime(self.last_read_at)
+        #: The reason you're receiving the notification
+        self.reason = notif.get('reason')
+        #: Subject of the Notification, e.g., which issue/pull/diff is this in
+        #: relation to. This is a dictionary
+        self.subject = notif.get('subject')
+        self._unread = notif.get('unread')
+
+    def __repr__(self):
+        return '<Thread [{0}]>'.format(self.subject.get('title'))
+
+    def delete_subscription(self):
+        """Delete subscription for this thread.
+
+        :returns: bool
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    def is_unread(self):
+        """Tells you if the thread is unread or not."""
+        return self._unread
+
+    def mark(self):
+        """Mark the thread as read.
+
+        :returns: bool
+        """
+        mark = {'read': True}
+        return self._boolean(self._patch(self._api, data=dumps(mark)), 205,
+                404)
+
+    def set_subscription(self, subscribed, ignored):
+        """Set the user's subscription for this thread
+
+        :param bool subscribed: (required), determines if notifications should
+            be received from this thread.
+        :param bool ignored: (required), determines if notifications should be
+            ignored from this thread.
+        :returns: :class;`Subscription <Subscription>`
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
+        json = self._json(self._put(url, data=sub), 200)
+        return Subscription(json, self) if json else None
+
+    def subscription(self):
+        """Checks the status of the user's subscription to this thread.
+
+        :returns: :class:`Subscription <Subscription>`
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Subscription(json, self) if json else None
+
+
+class Subscription(GitHubCore):
+    def __init__(self, sub, session=None):
+        super(Subscription, self).__init__(sub, session)
+        self._api = sub.get('url')
+        #: reason user is subscribed to this thread/repository
+        self.reason = sub.get('reason')
+        #: datetime representation of when the subscription was created
+        self.created_at = self._strptime(sub.get('created_at'))
+        #: API url of the thread if it exists
+        self.thread_url = sub.get('thread_url')
+        #: API url of the repository if it exists
+        self.repository_url = sub.get('repository_url')
+        self._ignored = sub.get('ignored', False)
+        self._subscribed = sub.get('subscribed', False)
+
+    def __repr__(self):
+        return '<Subscription [{0}]>'.format(self._subscribed)
+
+    def delete(self):
+        return self._boolean(self._delete(self._api), 204, 404)
+
+    def is_ignored(self):
+        return self._ignored
+
+    def is_subscribed(self):
+        return self._subscribed
+
+    def set(self, subscribed, ignored):
+        """Set the user's subscription for this subscription
+
+        :param bool subscribed: (required), determines if notifications should
+            be received from this thread.
+        :param bool ignored: (required), determines if notifications should be
+            ignored from this thread.
+        """
+        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
+        json = self._json(self._put(self._api, data=sub), 200)
+        self.__init__(json, self._session)
