@@ -25,3 +25,5 @@ Contributors
 - Dennis Kaarsemaker (@seveas)
 
 - Hong Minhee (@dahlia)
+
+- Paul Swartz (@paulswartz)
