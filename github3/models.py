@@ -331,10 +331,10 @@ class GitHubError(Exception):
         self.code = resp.status_code
         error = resp.json
         #: Message associated with the error
-        self.msg = error.get('message')
+        self.msg = error.get('message') if error is not None else "[No Message]"
         #: List of errors provided by GitHub
         self.errors = []
-        if error.get('errors'):
+        if error is not None and error.get('errors'):
             self.errors = error.get('errors')
 
     def __repr__(self):
