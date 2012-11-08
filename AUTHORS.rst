@@ -27,3 +27,5 @@ Contributors
 - Hong Minhee (@dahlia)
 
 - Paul Swartz (@paulswartz)
+
+- Kristian Glass (@doismellburning)
