@@ -6,7 +6,6 @@ This module provides the basic models used in github3.py
 
 """
 
-from datetime import datetime
 from json import dumps
 from requests import session
 from re import compile
@@ -18,7 +17,7 @@ try:  # (No coverage)
     from urlparse import urlparse  # (No coverage)
 except ImportError:  # (No coverage)
     # Python 3.x
-    from urllib.parse import urlparse  # (No coverage)
+    from urllib.parse import urlparse  # NOQA
 
 __url_cache__ = {}
 
@@ -340,7 +339,7 @@ class GitHubError(Exception):
             if error.get('errors'):
                 self.errors = error.get('errors')
         else:  # Amazon S3 error
-            self.msg = resp.content
+            self.msg = resp.content or '[No message]'
 
     def __repr__(self):
         return '<GitHubError [{0}]>'.format(self.msg or self.code)
