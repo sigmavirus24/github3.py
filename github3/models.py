@@ -331,13 +331,16 @@ class GitHubError(Exception):
         #: Response code that triggered the error
         self.response = resp
         self.code = resp.status_code
-        error = resp.json
-        #: Message associated with the error
-        self.msg = error.get('message')
-        #: List of errors provided by GitHub
         self.errors = []
-        if error.get('errors'):
-            self.errors = error.get('errors')
+        if resp.json:  # GitHub Error
+            error = resp.json
+            #: Message associated with the error
+            self.msg = error.get('message')
+            #: List of errors provided by GitHub
+            if error.get('errors'):
+                self.errors = error.get('errors')
+        else:  # Amazon S3 error
+            self.msg = resp.content
 
     def __repr__(self):
         return '<GitHubError [{0}]>'.format(self.msg or self.code)

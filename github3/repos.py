@@ -8,6 +8,7 @@ This module contains the classes relating to repositories.
 
 from base64 import b64decode
 from json import dumps
+from requests import post
 from github3.events import Event
 from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -367,8 +368,8 @@ class Repository(GitHubCore):
             ('Signature', json.get('signature')),
             ('Content-Type', json.get('mime_type'))]
         file = [('file', open(path, 'rb').read())]
-        resp = self._post(json.get('s3_url'), data=form, files=file,
-                auth=tuple())
+        resp = post(json.get('s3_url'), data=form, files=file,
+                headers={'Accept-Charset': 'utf-8'})
 
         return Download(json, self) if self._boolean(resp, 201, 404) else None
 
