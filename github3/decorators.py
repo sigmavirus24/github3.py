@@ -15,7 +15,7 @@ try:  # (No coverage)
     from StringIO import StringIO  # (No coverage)
 except ImportError:  # (No coverage)
     # python3
-    from io import BytesIO as StringIO  # (No coverage)
+    from io import BytesIO as StringIO  # NOQA
 
 
 def requires_auth(func):
@@ -39,6 +39,7 @@ def requires_auth(func):
             raise GitHubError(r)
     return auth_wrapper
 
+
 def requires_basic_auth(func):
     """Decorator to note which object methods require username/password
     authorization and won't work with token based authorization."""
@@ -52,7 +53,9 @@ def requires_basic_auth(func):
             r = Response()
             r.status_code = 401
             r.encoding = 'utf-8'
-            r.raw = StringIO('{"message": "Requires username/password authentication"}'.encode())
+            msg = ('{"message": "Requires username/password '
+                    'authentication"}').encode()
+            r.raw = StringIO(msg)
             raise GitHubError(r)
     return auth_wrapper
 
