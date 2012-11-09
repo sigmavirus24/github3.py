@@ -1,7 +1,6 @@
 import github3
-from json import load
 from mock import patch
-from tests.utils import (generate_response, expect, path, BaseCase)
+from tests.utils import (generate_response, expect, BaseCase, load)
 
 
 class TestGitHub(BaseCase):
@@ -51,7 +50,7 @@ class TestGitHub(BaseCase):
         assert self.request.called is False
 
         with patch.object(github3.GitHub, 'repository') as repo:
-            repo.return_value = github3.repos.Repository(load(path('repo')),
+            repo.return_value = github3.repos.Repository(load('repo'),
                     self.g)
             i = self.g.create_issue('user', 'repo', 'Title')
 
@@ -83,7 +82,7 @@ class TestGitHub(BaseCase):
 
         self.login()
         with patch.object(github3.github.GitHub, 'key') as key:
-            key.return_value = github3.users.Key(load(path('key')), self.g)
+            key.return_value = github3.users.Key(load('key'), self.g)
             assert self.g.delete_key(10) is True
 
         assert self.request.called is True
@@ -144,7 +143,7 @@ class TestGitHub(BaseCase):
 
         assert self.g.issue(None, None, 0) is None
         with patch.object(github3.github.GitHub, 'repository') as repo:
-            repo.return_value = github3.repos.Repository(load(path('repo')))
+            repo.return_value = github3.repos.Repository(load('repo'))
             i = self.g.issue('user', 'repo', 1)
 
         expect(i).isinstance(github3.issues.Issue)
@@ -212,7 +211,7 @@ class TestGitHub(BaseCase):
             self.g.iter_followers()
 
         with patch.object(github3.github.GitHub, 'user') as ghuser:
-            ghuser.return_value = github3.users.User(load(path('user')))
+            ghuser.return_value = github3.users.User(load('user'))
             u = next(self.g.iter_followers('sigmavirus24'))
             expect(u).isinstance(github3.users.User)
             assert self.request.called is True
@@ -235,7 +234,7 @@ class TestGitHub(BaseCase):
         assert self.request.called is False
 
         with patch.object(github3.github.GitHub, 'user') as ghuser:
-            ghuser.return_value = github3.users.User(load(path('user')))
+            ghuser.return_value = github3.users.User(load('user'))
             u = next(self.g.iter_following('sigmavirus24'))
             expect(u).isinstance(github3.users.User)
             self.mock_assertions(*args, **self.conf)
@@ -359,9 +358,54 @@ class TestGitHub(BaseCase):
         self.mock_assertions(*args, **self.conf)
 
         with patch.object(github3.github.GitHub, 'user') as user:
-            user.return_value = github3.users.User(load(path('user')))
+            user.return_value = github3.users.User(load('user'))
             args = ('get',
                     'https://api.github.com/users/sigmavirus24/starred')
             expect(next(self.g.iter_starred('sigmavirus24'))).isinstance(
                     github3.repos.Repository)
             self.mock_assertions(*args, **self.conf)
+
+    def test_iter_subscribed(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        args = ('get', 'https://api.github.com/user/subscriptions')
+        self.conf.update(params=None)
+
+        self.login()
+        expect(next(self.g.iter_subscribed())).isinstance(
+                github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+        with patch.object(github3.github.GitHub, 'user') as user:
+            user.return_value = github3.users.User(load('user'))
+            args = ('get',
+                    'https://api.github.com/users/sigmavirus24/subscriptions')
+            expect(next(self.g.iter_subscribed('sigmavirus24'))).isinstance(
+                    github3.repos.Repository)
+            self.mock_assertions(*args, **self.conf)
+
+    def test_login(self):
+        self.g.login('user', 'password')
+        expect(self.g._session.auth) == ('user', 'password')
+
+        self.g.login(token='FakeOAuthToken')
+        auth = self.g._session.headers.get('Authorization')
+        expect(auth) == 'token FakeOAuthToken'
+
+    # Unwritten test, not entirely sure how to mock this
+    def test_markdown(self):
+        pass
+
+    def test_pull_request(self):
+        self.request.return_value = generate_response('pull')
+        args = ('get',
+                'https://api.github.com/repos/sigmavirus24/github3.py/pulls/18'
+               )
+        pr = None
+
+        with patch.object(github3.github.GitHub, 'repository') as repo:
+            repo.return_value = github3.repos.Repository(load('repo'))
+            pr = self.g.pull_request('sigmavirus24', 'github3.py', 18)
+
+        expect(pr).isinstance(github3.pulls.PullRequest)
+
+        self.mock_assertions(*args, **self.conf)

@@ -1,6 +1,7 @@
 import requests
 import github3
 import expecter
+import json
 from mock import patch, call
 from io import BytesIO
 from unittest import TestCase
@@ -18,6 +19,10 @@ def generate_response(path_name, status_code=200, enc='utf-8', _iter=False):
     else:
         r.raw = BytesIO()
     return r
+
+
+def load(name):
+    return json.load(path(name))
 
 
 def path(name, mode='r'):

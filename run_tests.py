@@ -13,7 +13,8 @@ TEST_DIR = 'tests'
 
 if __name__ == "__main__":
     if coverage:
-        cov = coverage.coverage(source=['github3'])
+        cov = coverage.coverage(source=['github3'],
+                omit=['github3/packages/*'])
         cov.start()
 
     # list files in directory tests/
