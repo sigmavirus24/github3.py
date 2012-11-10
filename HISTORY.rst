@@ -6,6 +6,15 @@ History/Changelog
 
 - 100% unit test coverage
 
+0.1b2: 2012-11-10
+-----------------
+
+- Handle 500 errors better, courtesy of Kristian Glass (@doismellburning)
+- Handle sending json with `%` symbols better, courtesy of Kristian Glass
+- Correctly handle non-GitHub committers and authors courtesy of Paul Swartz 
+  (@paulswartz)
+- Correctly display method signatures in documentatio
+
 0.1b1: 2012-10-31
 -----------------
 

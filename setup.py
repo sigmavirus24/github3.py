@@ -7,7 +7,7 @@ import re
 try:
     from setuptools import setup
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup  # NOQA
 
 if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py sdist upload")
@@ -18,7 +18,7 @@ packages = [
     "github3.packages",
     "github3.packages.PySO8601",
 ]
-requires = ["requests>=0.14.2"]
+requires = ["requests==0.14.1"]
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
