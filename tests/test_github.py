@@ -409,3 +409,21 @@ class TestGitHub(BaseCase):
         expect(pr).isinstance(github3.pulls.PullRequest)
 
         self.mock_assertions(*args, **self.conf)
+
+    def test_organization(self):
+        self.request.return_value = generate_response('org')
+        args = ('get', 'https://api.github.com/orgs/github3py')
+        org = self.g.organization('github3py')
+        expect(org).isinstance(github3.orgs.Organization)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_repository(self):
+        self.request.return_value = generate_response('repo')
+        repo = self.g.repository(None, None)
+        expect(repo).is_None()
+        expect(self.request.called).is_False()
+
+        args = ('get', 'https://api.github.com/repos/sigmavirus24/github3.py')
+        repo = self.g.repository('sigmavirus24', 'github3.py')
+        expect(repo).isinstance(github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
