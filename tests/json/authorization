@@ -1,0 +1,1 @@
+{"scopes": ["public_repo"], "url": "https://api.github.com/authorizations/10", "app": {"url": "https://travis-ci.org", "name": "Travis"}, "updated_at": "2012-10-13T19:18:29Z", "id": 10, "note": null, "token": "...", "note_url": null, "created_at": "2012-02-28T01:45:49Z"}

@@ -6,16 +6,16 @@ This module contains the class(es) related to Events
 
 """
 
-from github3.models import GitHubCore
+from github3.models import GitHubObject
 
 
-class Event(GitHubCore):
+class Event(GitHubObject):
     """The :class:`Event <Event>` object. It structures and handles the data
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
     """
-    def __init__(self, event, session=None):
-        super(Event, self).__init__(event, session)
+    def __init__(self, event):
+        super(Event, self).__init__(event)
         from github3.users import User
         from github3.orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.

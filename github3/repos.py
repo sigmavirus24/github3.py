@@ -2,12 +2,13 @@
 github3.repos
 =============
 
-This module contains the class relating to repositories.
+This module contains the classes relating to repositories.
 
 """
 
 from base64 import b64decode
 from json import dumps
+from requests import post
 from github3.events import Event
 from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -15,6 +16,7 @@ from github3.models import GitHubObject, GitHubCore, BaseComment, BaseCommit
 from github3.pulls import PullRequest
 from github3.users import User, Key
 from github3.decorators import requires_auth
+from github3.notifications import Subscription, Thread
 
 
 class Repository(GitHubCore):
@@ -366,8 +368,8 @@ class Repository(GitHubCore):
             ('Signature', json.get('signature')),
             ('Content-Type', json.get('mime_type'))]
         file = [('file', open(path, 'rb').read())]
-        resp = self._post(json.get('s3_url'), data=form, files=file,
-                auth=tuple())
+        resp = post(json.get('s3_url'), data=form, files=file,
+                headers={'Accept-Charset': 'utf-8'})
 
         return Download(json, self) if self._boolean(resp, 201, 404) else None
 
@@ -669,33 +671,29 @@ class Repository(GitHubCore):
         private=False,
         has_issues=True,
         has_wiki=True,
-        has_downloads=True):
+        has_downloads=True,
+        default_branch=''):
         """Edit this repository.
 
-        :param name: (required), name of the repository
-        :type name: str
-        :param description: (optional)
-        :type description: str
-        :param homepage: (optional)
-        :type homepage: str
-        :param private: (optional), If ``True``, create a
+        :param str name: (required), name of the repository
+        :param str description: (optional)
+        :param str homepage: (optional)
+        :param bool private: (optional), If ``True``, create a
             private repository. API default: ``False``
-        :type private: bool
-        :param has_issues: (optional), If ``True``, enable
+        :param bool has_issues: (optional), If ``True``, enable
             issues for this repository. API default: ``True``
-        :type has_issues: bool
-        :param has_wiki: (optional), If ``True``, enable the
+        :param bool has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :type has_wiki: bool
-        :param has_downloads: (optional), If ``True``, enable
+        :param bool has_downloads: (optional), If ``True``, enable
             downloads for this repository. API default: ``True``
-        :type has_downloads: bool
+        :param str default_branch: (optional), Update the default branch for
+            this repository
         :returns: bool -- True if successful, False otherwise
         """
         data = dumps({'name': name, 'description': description,
             'homepage': homepage, 'private': private,
             'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads})
+            'has_downloads': has_downloads, 'default_branch': default_branch})
         json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
@@ -1343,6 +1341,27 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return [Event(e, self) for e in json]
 
+    def iter_notifications(self, all=False, participating=False, since='',
+            number=-1):
+        """Iterates over the notifications for this repository.
+
+        :param bool all: (optional), show all notifications, including ones
+            marked as read
+        :param bool participating: (optional), show only the notifications the
+            user is participating in directly
+        :param str since: (optional), filters out any notifications updated
+            before the given time. The time should be passed in as UTC in the
+            ISO 8601 format: ``YYYY-MM-DDTHH:MM:SSZ``. Example:
+            "2012-10-09T23:39:01Z".
+        :returns: generator of :class:`Thread <github3.notifications.Thread>`
+        """
+        url = self._build_url('notifications', base_url=self._api)
+        params = {'all': all, 'participating': participating, 'since': since}
+        for (k, v) in list(params.items()):
+            if not v:
+                del params[k]
+        return self._iter(int(number), url, Thread, params=params)
+
     def iter_pulls(self, state=None, number=-1):
         """List pull requests on repository.
 
@@ -1509,6 +1528,22 @@ class Repository(GitHubCore):
         """DEPRECATED: Use list_stargazers() instead."""
         raise DeprecationWarning('Use list_stargazers() instead.')
 
+    def mark_notifications(self, last_read=''):
+        """Mark all notifications in this repository as read.
+
+        :param str last_read: (optional), Describes the last point that
+            notifications were checked. Anything updated since this time will
+            not be updated. Default: Now. Expected in ISO 8601 format:
+            ``YYYY-MM-DDTHH:MM:SSZ``. Example: "2012-10-09T23:39:01Z".
+        :returns: bool
+        """
+        url = self._build_url('notifications', base_url=self._api)
+        mark = {'read': True}
+        if last_read:
+            mark['last_read_at'] = last_read
+        return self._boolean(self._put(url, data=dumps(mark)),
+                205, 404)
+
     def merge(self, base, head, message=''):
         """Perform a merge from ``head`` into ``base``.
 
@@ -1610,6 +1645,31 @@ class Repository(GitHubCore):
             url = self._build_url('collaborators', login, base_url=self._api)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
+
+    @requires_auth
+    def set_subscription(self, subscribed, ignored):
+        """Set the user's subscription for this repository
+
+        :param bool subscribed: (required), determines if notifications should
+            be received from this repository.
+        :param bool ignored: (required), determines if notifications should be
+            ignored from this repository.
+        :returns: :class;`Subscription <Subscription>`
+        """
+        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
+        url = self._build_url('subscription', base_url=self._api)
+        json = self._json(self._put(url, data=sub), 200)
+        return Subscription(json, self) if json else None
+
+    @requires_auth
+    def subscription(self):
+        """Return subscription for this Repository.
+
+        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return Subscription(json, self) if json else None
 
     def tag(self, sha):
         """Get an annotated tag.
@@ -1822,6 +1882,15 @@ class Hook(GitHubCore):
         :returns: bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
+
+    @requires_auth
+    def delete_subscription(self):
+        """Delete the user's subscription to this repository.
+
+        :returns: bool
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def edit(self, name, config, events=[], add_events=[], rm_events=[],

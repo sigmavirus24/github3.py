@@ -1,462 +1,442 @@
 import github3
-from .base import expect, expect_str, BaseTest, str_test
-from github3.repos import Repository
-from github3.events import Event
-from github3.auths import Authorization
-from github3.users import Key, User
-from github3.gists import Gist
-from github3.issues import Issue
-from github3.orgs import Organization
-from github3.pulls import PullRequest
+from mock import patch
+from tests.utils import (generate_response, expect, BaseCase, load)
 
 
-class TestGitHub(BaseTest):
-    def __init__(self, methodName='runTest'):
-        super(TestGitHub, self).__init__(methodName)
-        self.fake_auth = ('fake_user', 'fake_password')
-        self.fake_oauth = 'foobarbogusoauth'
-
-    def setUp(self):
-        self.g = github3.GitHub()
-
-    def test_github(self):
-        expect(self.g).isinstance(github3.GitHub)
-        expect_str(repr(self.g))
-
-    def test_login(self):
-        # Test "regular" auth
-        self.g.login(*self.fake_auth)
-        h = github3.login(*self.fake_auth)
-        l = github3.GitHub(*self.fake_auth)
-        for i in [self.g, h, l]:
-            expect(self.fake_auth) == i._session.auth
-
-    def test_oauth(self):
-        # Test "oauth" auth
-        self.g.login(token=self.fake_oauth)
-        h = github3.login('', '', token=self.fake_oauth)
-        for i in [self.g, h]:
-            expect(i._session.headers['Authorization']) == 'token ' +\
-                self.fake_oauth
-
-    def test_gists(self):
-        # My gcd example
-        gist_id = 2648112
-        g = self.g.gist(gist_id)
-        if not g:
-            self.fail('Check gcd gist')
-        expect(g).isinstance(github3.gists.Gist)
-
-        self.raisesGHE(self.g.gist, -1)
-
-    def test_iter_gists(self):
-        for user in None, self.sigm:
-            expect(next(self.g.iter_gists(user))).isinstance(Gist)
-
-    def test_list_gists(self):
-        for i in None, self.sigm:
-            expect(self.g.list_gists(i)).list_of(Gist)
-
-    def test_create_gist(self):
-        if not self.auth:
-            return
-        desc = 'Testing gist creation'
-        files = {'test.txt': {'content': 'Test contents'}}
-        gist = self._g.create_gist(desc, files, False)
-        expect(gist).is_not_None()
-        expect(gist.description) == desc
-        expect(gist.is_public()).is_False()
-        for g in gist.list_files():
-            expect(g.content) == files[g.name]['content']
-        expect(gist.delete()).is_True()
-
-    def test_is_following(self):
-        self.raisesGHE(self.g.is_following, self.sigm)
-
-        if not self.auth:
-            return
-
-        expect(self._g.is_following(self.sigm)).isinstance(bool)
-
-    def test_is_starred(self):
-        args = (self.sigm, self.todo)
-
-        self.raisesGHE(self.g.is_starred, *args)
-
-        if not self.auth:
-            return
-
-        expect(self._g.is_starred(*args)).isinstance(bool)
-
-    def test_is_subscribed(self):
-        args = (self.sigm, 'github3.py')
-
-        self.raisesGHE(self.g.is_subscribed, *args)
-
-        if not self.auth:
-            return
-
-        expect(self._g.is_subscribed(*args)).isinstance(bool)
-
-    def test_iter_following(self):
-        expect(next(self.g.iter_following(self.kr))).isinstance(User)
-        self.raisesGHE(next, self.g.iter_following())
-        if not self.auth:
-            return
-
-        expect(next(self._g.iter_following())).isinstance(User)
-
-    def test_list_following(self):
-        expect(self.g.list_following(self.kr)) != []
-        self.raisesGHE(self.g.list_following)
-
-        if not self.auth:
-            return
-
-        expect(self._g.list_following()).list_of(User)
-
-    def test_iter_followers(self):
-        expect(next(self.g.iter_followers(self.kr))).isinstance(User)
-        self.raisesGHE(next, self.g.iter_followers())
-        if not self.auth:
-            return
-
-        expect(next(self._g.iter_followers())).isinstance(User)
-
-    def test_list_followers(self):
-        expect(self.g.list_followers(self.kr)) != []
-        with expect.raises(github3.GitHubError):
-            self.g.list_followers()
-
-        if not self.auth:
-            return
-
-        expect(self._g.list_followers()).list_of(User)
-
-    def test_iter_starred(self):
-        self.raisesGHE(next, self.g.iter_starred())
-        expect(next(self.g.iter_starred(self.sigm))).isinstance(Repository)
-        if not self.auth:
-            return
-
-        expect(next(self._g.iter_starred())).isinstance(Repository)
-
-    def test_list_starred(self):
-        self.raisesGHE(self.g.list_starred)
-        expect(self.g.list_starred(self.sigm)).list_of(Repository)
-
-        if not self.auth:
-            return
-
-        expect(self._g.list_starred()).list_of(Repository)
-
-    def test_iter_subscribed(self):
-        self.raisesGHE(next, self.g.iter_subscribed())
-        expect(self.g.iter_subscribed(self.sigm)).list_of(Repository)
-        if not self.auth:
-            return
-
-        expect(self._g.iter_subscribed()).list_of(Repository)
-
-    def test_list_subscribed(self):
-        self.raisesGHE(self.g.list_subscribed)
-        expect(self.g.list_subscribed(self.sigm)).list_of(Repository)
-
-        if not self.auth:
-            return
-
-        expect(self._g.list_subscribed()).list_of(Repository)
-
-    def test_follow_unfollow(self):
-        self.raisesGHE(self.g.follow, self.sigm)
-        self.raisesGHE(self.g.unfollow, self.sigm)
-
-        if not self.auth:
-            return
-
-        expect(self._g.follow(self.sigm)).isinstance(bool)
-        expect(self._g.unfollow(self.sigm)).isinstance(bool)
-
-    def test_watching(self):
-        args = (self.sigm, self.todo)
-        self.assertRaises(DeprecationWarning, self.g.watch, *args)
-        self.assertRaises(DeprecationWarning, self.g.unwatch, *args)
-        self.assertRaises(DeprecationWarning, self.g.list_watching)
-        self.assertRaises(DeprecationWarning, self.g.is_watching, *args)
-
-    def test_create_issue(self):
-        title = 'Test issue for github3.py'
-        self.raisesGHE(self.g.create_issue, self.sigm, self.todo, title)
-
-        expect(self.g.create_issue(None, None, None)).is_None()
-
-        if not self.auth:
-            return
-
-        i = self._g.create_issue(self.gh3py, self.test_repo, title,
-                'Ignore this.')
-        expect(i).isinstance(github3.issues.Issue)
-        expect(i.close()).is_True()
-
-    def test_issue(self):
-        self.raisesGHE(self.g.issue, self.sigm, self.todo, 2000)
-
-        i = self.g.issue(self.kr, 'requests', 1)
-        self.assertIsNotNone(i)
-        expect(i).isinstance(github3.issues.Issue)
-        expect(self.g.issue(None, None, None)).is_None()
-
-    def test_iter_repo_issues(self):
-        with expect.raises(StopIteration):
-            next(self.g.iter_repo_issues('', ''))
-
-        expect(next(self.g.iter_repo_issues(self.kr, 'requests'))).isinstance(
-                Issue
-                )
-
-    def test_list_repo_issues(self):
-        # Test listing issues
-        list_issues = self.g.list_repo_issues
-        expect(list_issues(self.kr, 'requests')) != []
-        expect(list_issues(self.sigm, self.todo)).isinstance(list)
-        expect(list_issues('', '')) == []
-
-    def test_iter_issues(self):
-        self.raisesGHE(self.g.iter_issues)
-        if not self.auth:
-            return
-
-        expect(next(self._g.iter_issues())).isinstance(Issue)
-
-    def test_iter_user_issues(self):
-        self.raisesGHE(self.g.iter_user_issues)
-        if not self.auth:
-            return
-
-        expect(next(self._g.iter_user_issues())).isinstance(Issue)
-
-    def test_iter_org_issues(self):
-        self.raisesGHE(self.g.iter_issues, 'github3py')
-        if not self.auth:
-            return
-
-        try:
-            expect(next(self._g.iter_org_issues('github3py'))
-                    ).isinstance(Issue)
-        except StopIteration:
-            pass
-
-    def test_list_issues(self):
-        self.raisesGHE(self.g.list_issues)
-        if not self.auth:
-            return
-        expect(self._g.list_issues(state='closed')).list_of(Issue)
-
-    def test_key(self):
-        self.raisesGHE(self.g.key, 2000)
-        if not self.auth:
-            return
-        k = next(self._g.iter_keys())
-        expect(self._g.key(k.id)).isinstance(Key)
-
-    def test_create_key(self):
-        self.raisesGHE(self.g.create_key, 'Foo bar', 'bogus')
-        if not self.auth:
-            return
-
-        key = self._g.create_key('test_key', (
-              'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxGTCJTMYmsBhLL0PQ2RwLp3'
-              'sgcJ8uz6RqOrlB/6lKzIXYOcvdaHqEEF9G+1xlJck7kA8pSNR9AkEWP2uoy'
-              '1tJVp4nUVzPYKSrkoMppzA34vT+iqW/H4rRCADxIRillvpXZB2CWQ8fbRlD'
-              '9Mjreh0L2A4NPKSmGxs5XfZXD9lWPb1+U6oQrZYG2h1ulyI7rt+adWOhfP2'
-              'UYq6V5JSdNDi4r1nGxBccZgguiL7XNjl9TSsgr8QKmAacubyNEwIrmQIS9h'
-              'ipKg3k10VcqfVmSzF1GuzDUKFfIHU/zyd6aJ0emAqgft/fho+BkrXBihhxf'
-              '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
-              )
-        expect(key).isinstance(Key)
-        expect(self._g.delete_key(key.id)).is_True()
-        key = self._g.create_key('test_key', (
-              'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAxGTCJTMYmsBhLL0PQ2RwLp3'
-              'sgcJ8uz6RqOrlB/6lKzIXYOcvdaHqEEF9G+1xlJck7kA8pSNR9AkEWP2uoy'
-              '1tJVp4nUVzPYKSrkoMppzA34vT+iqW/H4rRCADxIRillvpXZB2CWQ8fbRlD'
-              '9Mjreh0L2A4NPKSmGxs5XfZXD9lWPb1+U6oQrZYG2h1ulyI7rt+adWOhfP2'
-              'UYq6V5JSdNDi4r1nGxBccZgguiL7XNjl9TSsgr8QKmAacubyNEwIrmQIS9h'
-              'ipKg3k10VcqfVmSzF1GuzDUKFfIHU/zyd6aJ0emAqgft/fho+BkrXBihhxf'
-              '/Qbi5fi4Ipx3VFcLrdiOBbOQ==')
-              )
-        expect(key.delete()).is_True()
-
-    def test_delete_key(self):
-        self.raisesGHE(self.g.delete_key, 10)
-
-    def test_list_keys(self):
-        self.raisesGHE(self.g.list_keys)
-        if not self.auth:
-            return
-
-        expect(self._g.list_keys()).list_of(Key)
-
-    def test_keys_requires_auth(self):
-        self.raisesGHE(self.g.delete_key, 2000)
-
-    def test_iter_repos(self):
-        self.raisesGHE(next, self.g.iter_repos())
-        expect(next(self.g.iter_repos(self.sigm))).isinstance(Repository)
-        expect(next(self.g.iter_repos(self.sigm,
-            'all'))).isinstance(Repository)
-        if not self.auth:
-            return
-
-        expect(
-               next(self._g.iter_repos(sort='pushed', direction='asc'))
-               ).isinstance(Repository)
-
-    def test_list_repos(self):
-        self.raisesGHE(self.g.list_repos)
-        expect(self.g.list_repos(self.sigm)).list_of(Repository)
-        expect(self.g.list_repos(self.sigm, 'all')).list_of(Repository)
-        if not self.auth:
-            return
-        expect(self._g.list_repos(sort='pushed', direction='asc')) != []
-
-    def test_repository(self):
-        expect(self.g.repository(self.sigm, self.todo)).isinstance(Repository)
-
-    def test_create_repo(self):
-        self.raisesGHE(self.g.create_repo, 'test_github3.py')
-        if not self.auth:
-            return
-        r = self._g.create_repo('test.repo.creation')
-        expect(r).isinstance(Repository)
-        r.delete()
+class TestGitHub(BaseCase):
+    # This is needed due to the structure of @patch_request
+    __name__ = 'TestGitHub'
 
     def test_authorization(self):
-        self.raisesGHE(self.g.authorization, 1)
-        if not self.auth:
-            return
+        self.request.return_value = generate_response('authorization')
+        args = ('get', 'https://api.github.com/authorizations/10')
+        with expect.githuberror():
+            self.g.authorization(10)
+        assert self.request.called is False
 
-        a = next(self._g.iter_authorizations())
-        expect(self._g.authorization(a.id)).isinstance(Authorization)
+        self.login()
+        a = self.g.authorization(10)
+        expect(a).isinstance(github3.auths.Authorization)
+        self.mock_assertions(*args, **self.conf)
 
     def test_authorize(self):
-        self.raisesGHE(self.g.authorize, 'foo', 'bar', ['gist', 'user'])
+        self.request.return_value = generate_response('authorization', 201)
+        scopes = ['scope1', 'scope2']
+
+        self.g.authorize(None, None, scopes)
+        assert self.request.called is False
+
+        a = self.g.authorize('user', 'password', scopes)
+        expect(a).isinstance(github3.auths.Authorization)
+        assert self.request.called is True
+
+    def test_create_gist(self):
+        self.request.return_value = generate_response('gist', 201)
+
+        g = self.g.create_gist('description', 'files')
+        expect(g).isinstance(github3.gists.Gist)
+        assert self.request.called is True
+
+    def test_create_issue(self):
+        self.request.return_value = generate_response('issue', 201)
+
+        self.login()
+        i = self.g.create_issue(None, None, None)
+        assert i is None
+        assert self.request.called is False
+
+        i = self.g.create_issue('user', 'repo', '')
+        assert i is None
+        assert self.request.called is False
+
+        with patch.object(github3.GitHub, 'repository') as repo:
+            repo.return_value = github3.repos.Repository(load('repo'),
+                    self.g)
+            i = self.g.create_issue('user', 'repo', 'Title')
+
+        expect(i).isinstance(github3.issues.Issue)
+        assert self.request.called is True
+
+    def test_create_key(self):
+        self.request.return_value = generate_response('key', 201)
+
+        with expect.githuberror():
+            k = self.g.create_key(None, None)
+            assert k is None
+        assert self.request.called is False
+
+        self.login()
+        k = self.g.create_key('Name', 'Key')
+        expect(k).isinstance(github3.users.Key)
+        assert self.request.called is True
+
+    def test_create_repo(self):
+        self.request.return_value = generate_response('repo', 201)
+        self.login()
+        r = self.g.create_repo('Repository')
+        expect(r).isinstance(github3.repos.Repository)
+        assert self.request.called is True
+
+    def test_delete_key(self):
+        self.request.return_value = generate_response(None, 204)
+
+        self.login()
+        with patch.object(github3.github.GitHub, 'key') as key:
+            key.return_value = github3.users.Key(load('key'), self.g)
+            assert self.g.delete_key(10) is True
+
+        assert self.request.called is True
+
+    def test_follow(self):
+        self.request.return_value = generate_response(None, 204)
+        args = ('put', 'https://api.github.com/user/following/sigmavirus24')
+        conf = dict(headers={'Content-Length': '0'}, data=None)
+
+        with expect.githuberror():
+            self.g.follow('sigmavirus24')
+
+        self.login()
+        assert self.g.follow(None) is False
+        assert self.g.follow('sigmavirus24') is True
+        self.mock_assertions(*args, **conf)
+
+    def test_gist(self):
+        self.request.return_value = generate_response('gist', 200)
+        args = ('get', 'https://api.github.com/gists/10')
+
+        expect(self.g.gist(10)).isinstance(github3.gists.Gist)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_is_starred(self):
+        self.request.return_value = generate_response(None, 204)
+        args = ('get', 'https://api.github.com/user/starred/user/repo')
+
+        with expect.githuberror():
+            self.g.is_starred('user', 'repo')
+
+        self.login()
+        expect(self.g.is_starred(None, None)).is_False()
+        assert self.request.called is False
+
+        expect(self.g.is_starred('user', 'repo')).is_True()
+        self.mock_assertions(*args, **self.conf)
+
+    def test_is_subscribed(self):
+        self.request.return_value = generate_response(None, 204)
+        args = ('get', 'https://api.github.com/user/subscriptions/user/repo')
+
+        with expect.githuberror():
+            self.g.is_subscribed('user', 'repo')
+
+        self.login()
+        expect(self.g.is_subscribed(None, None)).is_False()
+        assert self.request.called is False
+
+        expect(self.g.is_subscribed('user', 'repo')).is_True()
+        self.mock_assertions(*args, **self.conf)
+
+    def test_issue(self):
+        self.request.return_value = generate_response('issue', 200)
+        args = ('get',
+                'https://api.github.com/repos/sigmavirus24/github3.py/issues/1'
+               )
+
+        assert self.g.issue(None, None, 0) is None
+        with patch.object(github3.github.GitHub, 'repository') as repo:
+            repo.return_value = github3.repos.Repository(load('repo'))
+            i = self.g.issue('user', 'repo', 1)
+
+        expect(i).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_key(self):
+        self.request.return_value = generate_response('key')
+        args = ('get', 'https://api.github.com/user/keys/10')
+
+        with expect.githuberror():
+            self.g.key(10)
+        assert self.request.called is False
+
+        self.login()
+        assert self.g.key(-1) is None
+        assert self.request.called is False
+
+        expect(self.g.key(10)).isinstance(github3.users.Key)
+        self.mock_assertions(*args, **self.conf)
 
     def test_iter_authorizations(self):
-        self.raisesGHE(self.g.iter_authorizations)
+        self.request.return_value = generate_response('authorization',
+                _iter=True)
+        args = ('get', 'https://api.github.com/authorizations')
+        self.conf.update(params=None)
 
-        if not self.auth:
-            return
+        with expect.githuberror():
+            self.g.iter_authorizations()
+        assert self.request.called is False
 
-        expect(next(self._g.iter_authorizations())).isinstance(Authorization)
-
-    def test_list_authorizations(self):
-        self.raisesGHE(self.g.list_authorizations)
-
-        if not self.auth:
-            return
-
-        expect(self._g.list_authorizations()).list_of(Authorization)
-
-    def test_list_emails(self):
-        self.raisesGHE(self.g.list_emails)
-
-        if self.auth:
-            expect(self._g.list_emails()).list_of(str_test)
+        self.login()
+        auth = next(self.g.iter_authorizations())
+        expect(auth).isinstance(github3.auths.Authorization)
+        self.mock_assertions(*args, **self.conf)
 
     def test_iter_emails(self):
-        self.raisesGHE(self.g.iter_emails)
+        self.request.return_value = generate_response('emails')
+        args = ('get', 'https://api.github.com/user/emails')
+        self.conf.update(params=None)
 
-        if self.auth:
-            expect_str(next(self._g.iter_emails()))
+        with expect.githuberror():
+            self.g.iter_emails()
+        assert self.request.called is False
 
-    def test_list_events(self):
-        expect(self.g.list_events()).list_of(Event)
+        self.login()
+        email = next(self.g.iter_emails())
+        expect(email) == 'user@example.com'
+        self.mock_assertions(*args, **self.conf)
 
     def test_iter_events(self):
-        expect(next(self.g.iter_events())).isinstance(Event)
+        self.request.return_value = generate_response('event', _iter=True)
+        args = ('get', 'https://api.github.com/events')
+        self.conf.update(params=None)
 
-    def test_iter_orgs(self):
-        expect(next(self.g.iter_orgs(self.kr))).isinstance(Organization)
-        self.raisesGHE(next, self.g.iter_orgs())
-        if not self.auth:
-            return
+        event = next(self.g.iter_events())
+        expect(event).isinstance(github3.events.Event)
+        self.mock_assertions(*args, **self.conf)
 
-        expect(next(self._g.iter_orgs())).isinstance(Organization)
+    def test_iter_followers(self):
+        self.request.return_value = generate_response('user', _iter=True)
+        args = ('get', 'https://api.github.com/users/sigmavirus24/followers')
+        self.conf.update(params=None)
 
-    def test_list_orgs(self):
-        expect(self.g.list_orgs(self.kr)) != []
-        self.raisesGHE(self.g.list_orgs)
-        if not self.auth:
-            return
+        with expect.githuberror():
+            self.g.iter_followers()
 
-        expect(self._g.list_orgs()) != []
+        with patch.object(github3.github.GitHub, 'user') as ghuser:
+            ghuser.return_value = github3.users.User(load('user'))
+            u = next(self.g.iter_followers('sigmavirus24'))
+            expect(u).isinstance(github3.users.User)
+            assert self.request.called is True
+            self.mock_assertions(*args, **self.conf)
 
+            self.login()
+            v = next(self.g.iter_followers())
+            expect(v).isinstance(github3.users.User)
+            args = (args[0], 'https://api.github.com/user/followers')
+            assert self.request.called is True
+            self.mock_assertions(*args, **self.conf)
+
+    def test_iter_following(self):
+        self.request.return_value = generate_response('user', _iter=True)
+        args = ('get', 'https://api.github.com/users/sigmavirus24/following')
+        self.conf.update(params=None)
+
+        with expect.githuberror():
+            next(self.g.iter_following())
+        assert self.request.called is False
+
+        with patch.object(github3.github.GitHub, 'user') as ghuser:
+            ghuser.return_value = github3.users.User(load('user'))
+            u = next(self.g.iter_following('sigmavirus24'))
+            expect(u).isinstance(github3.users.User)
+            self.mock_assertions(*args, **self.conf)
+
+            self.login()
+            v = next(self.g.iter_following())
+            expect(v).isinstance(github3.users.User)
+            args = (args[0], 'https://api.github.com/user/following')
+            self.mock_assertions(*args, **self.conf)
+
+    def test_iter_gists(self):
+        self.request.return_value = generate_response('gist', _iter=True)
+        args = ('get', 'https://api.github.com/users/sigmavirus24/gists')
+        self.conf.update(params=None)
+
+        g = next(self.g.iter_gists('sigmavirus24'))
+        expect(g).isinstance(github3.gists.Gist)
+        self.mock_assertions(*args, **self.conf)
+
+        self.login()
+        h = next(self.g.iter_gists())
+        expect(h).isinstance(github3.gists.Gist)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_org_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        args = ('get', 'https://api.github.com/orgs/github3py/issues')
+        self.conf.update(params={})
+
+        with expect.githuberror():
+            self.g.iter_org_issues('github3py')
+
+        self.login()
+        i = next(self.g.iter_org_issues('github3py'))
+        expect(i).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                'sort': 'created', 'direction': 'asc',
+                'since': '2012-05-20T23:10:27Z'}
+        self.conf.update(params=params)
+        j = next(self.g.iter_org_issues('github3py', **params))
+        expect(j).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        args = ('get', 'https://api.github.com/issues')
+        self.conf.update(params={})
+
+        with expect.githuberror():
+            self.g.iter_issues()
+
+        self.login()
+        expect(next(self.g.iter_issues())).isinstance(github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                'sort': 'created', 'direction': 'asc',
+                'since': '2012-05-20T23:10:27Z'}
+        self.conf.update(params=params)
+        expect(next(self.g.iter_issues(**params))).isinstance(
+                github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_user_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        args = ('get', 'https://api.github.com/user/issues')
+        self.conf.update(params={})
+
+        with expect.githuberror():
+            self.g.iter_user_issues()
+
+        self.login()
+        expect(next(self.g.iter_user_issues())).isinstance(
+                github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                'sort': 'created', 'direction': 'asc',
+                'since': '2012-05-20T23:10:27Z'}
+        self.conf.update(params=params)
+        expect(next(self.g.iter_user_issues(**params))).isinstance(
+                github3.issues.Issue)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_keys(self):
+        self.request.return_value = generate_response('key', _iter=True)
+        args = ('get', 'https://api.github.com/user/keys')
+        self.conf.update(params=None)
+
+        with expect.githuberror():
+            self.g.iter_keys()
+
+        self.login()
+        expect(next(self.g.iter_keys())).isinstance(github3.users.Key)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_repos(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        args = ('get', 'https://api.github.com/user/repos')
+        self.conf.update(params={})
+
+        self.login()
+        expect(next(self.g.iter_repos())).isinstance(github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+        args = ('get', 'https://api.github.com/users/sigmavirus24/repos')
+        expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
+                github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+    def test_iter_starred(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        args = ('get', 'https://api.github.com/user/starred')
+        self.conf.update(params=None)
+
+        self.login()
+        expect(next(self.g.iter_starred())).isinstance(
+                github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+        with patch.object(github3.github.GitHub, 'user') as user:
+            user.return_value = github3.users.User(load('user'))
+            args = ('get',
+                    'https://api.github.com/users/sigmavirus24/starred')
+            expect(next(self.g.iter_starred('sigmavirus24'))).isinstance(
+                    github3.repos.Repository)
+            self.mock_assertions(*args, **self.conf)
+
+    def test_iter_subscribed(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        args = ('get', 'https://api.github.com/user/subscriptions')
+        self.conf.update(params=None)
+
+        self.login()
+        expect(next(self.g.iter_subscribed())).isinstance(
+                github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
+
+        with patch.object(github3.github.GitHub, 'user') as user:
+            user.return_value = github3.users.User(load('user'))
+            args = ('get',
+                    'https://api.github.com/users/sigmavirus24/subscriptions')
+            expect(next(self.g.iter_subscribed('sigmavirus24'))).isinstance(
+                    github3.repos.Repository)
+            self.mock_assertions(*args, **self.conf)
+
+    def test_login(self):
+        self.g.login('user', 'password')
+        expect(self.g._session.auth) == ('user', 'password')
+
+        self.g.login(token='FakeOAuthToken')
+        auth = self.g._session.headers.get('Authorization')
+        expect(auth) == 'token FakeOAuthToken'
+
+    # Unwritten test, not entirely sure how to mock this
     def test_markdown(self):
-        md = "# Header\n\nParagraph\n\n## Header 2\n\nParagraph"
-        reg = self.g.markdown(md)
-        raw = self.g.markdown(md, raw=True)
-        self.assertEqual(reg, raw)
-        gfm = self.g.markdown(md, mode='gfm',
-                context='sigmavirus24/github3.py')
-        self.assertNotEqual(reg, gfm)
+        pass
 
     def test_pull_request(self):
-        expect(self.g.pull_request(self.kr, 'requests',
-            700)).isinstance(PullRequest)
+        self.request.return_value = generate_response('pull')
+        args = ('get',
+                'https://api.github.com/repos/sigmavirus24/github3.py/pulls/18'
+               )
+        pr = None
 
-    def test_octocat(self):
-        expect(self.g.octocat()) >= ''
+        with patch.object(github3.github.GitHub, 'repository') as repo:
+            repo.return_value = github3.repos.Repository(load('repo'))
+            pr = self.g.pull_request('sigmavirus24', 'github3.py', 18)
+
+        expect(pr).isinstance(github3.pulls.PullRequest)
+
+        self.mock_assertions(*args, **self.conf)
 
     def test_organization(self):
-        expect(self.g.organization(self.gh3py)).is_not_None()
+        self.request.return_value = generate_response('org')
+        args = ('get', 'https://api.github.com/orgs/github3py')
+        org = self.g.organization('github3py')
+        expect(org).isinstance(github3.orgs.Organization)
+        self.mock_assertions(*args, **self.conf)
 
-    def test_search(self):
-        expect(self.g.search_issues(self.sigm, self.todo, 'closed',
-                'todo')).is_not_None()
-        expect(self.g.search_users(self.sigm)).is_not_None()
-        expect(self.g.search_email('wynn@github.com')).is_not_None()
+    def test_repository(self):
+        self.request.return_value = generate_response('repo')
+        repo = self.g.repository(None, None)
+        expect(repo).is_None()
+        expect(self.request.called).is_False()
 
-    def test_update_user(self):
-        self.raisesGHE(self.g.update_user)
-        if not self.auth:
-            return
-        u = self._g.user()
-        expect(self._g.update_user(u.name, u.email, u.blog, u.company,
-            u.location, u.hireable, u.bio)).is_True()
+        args = ('get', 'https://api.github.com/repos/sigmavirus24/github3.py')
+        repo = self.g.repository('sigmavirus24', 'github3.py')
+        expect(repo).isinstance(github3.repos.Repository)
+        self.mock_assertions(*args, **self.conf)
 
-    def test_user(self):
-        self.raisesGHE(self.g.user)
-        expect(self.g.user(self.sigm)).is_not_None()
+    def test_search_issues(self):
+        self.request.return_value = generate_response('legacy_issue')
+        args = ('get',
+                'https://api.github.com/legacy/{0}/{1}/{2}/{3}/{4}/{5}'.format(
+                    'issues', 'search', 'sigmavirus24', 'github3.py',
+                    'closed', 'requests'
+                    ))
+        issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
+                'requests')
 
-        if not self.auth:
-            return
-
-        expect(self._g.user()).isinstance(github3.users.User)
-
-    def test_subscribe_unsub(self):
-        args = (self.gh3py, self.test_repo)
-        self.raisesGHE(self.g.subscribe, *args)
-        self.raisesGHE(self.g.unsubscribe, *args)
-
-        if not self.auth:
-            return
-
-        expect(self._g.subscribe(*args)).isinstance(bool)
-        expect(self._g.unsubscribe(*args)).isinstance(bool)
-
-    def test_set_user_agent(self):
-        ua = 'Foo Bar Bogus'
-        self.g.set_user_agent(ua)
-        expect(self.g._session.config['base_headers']['User-Agent']) == ua
-        expect(self.g._session.headers['User-Agent']) == ua
-
-    def test_star_unstar(self):
-        args = (self.gh3py, self.test_repo)
-        self.raisesGHE(self.g.star, *args)
-        self.raisesGHE(self.g.unstar, *args)
-
-        if not self.auth:
-            return
-
-        expect(self._g.star(*args)).isinstance(bool)
-        expect(self._g.unstar(*args)).isinstance(bool)
+        expect(issues[0]).isinstance(github3.legacy.LegacyIssue)
+        self.mock_assertions(*args, **self.conf)

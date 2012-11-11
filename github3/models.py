@@ -6,18 +6,18 @@ This module provides the basic models used in github3.py
 
 """
 
-from datetime import datetime
 from json import dumps
 from requests import session
 from re import compile
 from github3.decorators import requires_auth
+from github3.packages.PySO8601 import parse
 
 try:  # (No coverage)
     # Python 2.x
     from urlparse import urlparse  # (No coverage)
 except ImportError:  # (No coverage)
     # Python 3.x
-    from urllib.parse import urlparse  # (No coverage)
+    from urllib.parse import urlparse  # NOQA
 
 __url_cache__ = {}
 
@@ -36,10 +36,7 @@ class GitHubObject(object):
 
     def _strptime(self, time_str):
         """Converts an ISO 8601 formatted string into a datetime object."""
-        if time_str:
-            return datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%SZ')
-        else:
-            return None
+        return parse(time_str) if time_str else None
 
     @classmethod
     def from_json(cls, json):
@@ -64,6 +61,8 @@ class GitHubCore(GitHubObject):
                 'Accept': 'application/vnd.github.v3.full+json',
                 # Only accept UTF-8 encoded data
                 'Accept-Charset': 'utf-8',
+                # Always sending JSON
+                'Content-Type': "application/json",
                 # Set our own custom User-Agent string
                 'User-Agent': 'github3.py/0.1b0',
                 }
@@ -136,13 +135,14 @@ class GitHubCore(GitHubObject):
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 
-    @property
-    def _api(self):
+    def _api_getter(self):
         return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
 
-    @_api.setter
-    def _api(self, uri):
+    def _api_setter(self, uri):
         self._uri = urlparse(uri)
+
+    _api = property(_api_getter, _api_setter)
+    del(_api_getter, _api_setter)
 
     def _iter(self, count, url, cls, params=None):
         """Generic iterator for this project.
@@ -182,11 +182,6 @@ class GitHubCore(GitHubObject):
         """Re-retrieve the information for this object."""
         json = self._json(self._get(self._api), 200)
         self.__init__(json, self._session)
-
-    @classmethod
-    def from_json(cls, json):
-        """Return an instance of ``cls`` formed from ``json``."""
-        return cls(json, None)
 
 
 class BaseComment(GitHubCore):
@@ -335,13 +330,16 @@ class GitHubError(Exception):
         #: Response code that triggered the error
         self.response = resp
         self.code = resp.status_code
-        error = resp.json
-        #: Message associated with the error
-        self.msg = error.get('message')
-        #: List of errors provided by GitHub
         self.errors = []
-        if error.get('errors'):
-            self.errors = error.get('errors')
+        if resp.json:  # GitHub Error
+            error = resp.json
+            #: Message associated with the error
+            self.msg = error.get('message')
+            #: List of errors provided by GitHub
+            if error.get('errors'):
+                self.errors = error.get('errors')
+        else:  # Amazon S3 error
+            self.msg = resp.content or '[No message]'
 
     def __repr__(self):
         return '<GitHubError [{0}]>'.format(self.msg or self.code)

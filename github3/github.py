@@ -18,24 +18,47 @@ from github3.orgs import Organization
 from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
+from github3.notifications import Thread
 
 
 class GitHub(GitHubCore):
-    """Stores all the session information."""
-    def __init__(self, login='', password=''):
+    """Stores all the session information.
+
+    Logging In
+    ----------
+
+    There are two ways to log into the GitHub API
+
+    ::
+
+        from github3 import login
+        g = login(user, password)
+        g = login(token=token)
+        g = login(user, token=token)
+
+    or
+
+    ::
+
+        from github3 import GitHub
+        g = GitHub(user, password)
+        g = GitHub(token=token)
+        g = GitHub(user, token=token)
+
+    This is simple backward compatibility since originally there was no way to
+    call the GitHub object with authentication parameters.
+    """
+    def __init__(self, login='', password='', token=''):
         super(GitHub, self).__init__({})
-        if login and password:
+        if token:
+            self.login(login, token=token)
+        elif login and password:
             self.login(login, password)
 
     def __repr__(self):
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
-    def _list_follow(self, which):
-        url = self._build_url('user', which)
-        resp = self._get(url)
-        json = self._json(resp, 200)
-        return [User(f, self) for f in json]
-
+    @requires_auth
     def _iter_follow(self, which, number):
         url = self._build_url('user', which)
         return self._iter(number, url, User)
@@ -102,6 +125,7 @@ class GitHub(GitHubCore):
         json = self._json(self._post(url, dumps(new_gist)), 201)
         return Gist(json, self) if json else None
 
+    @requires_auth
     def create_issue(self,
         owner,
         repository,
@@ -165,6 +189,7 @@ class GitHub(GitHubCore):
                 created = Key(json, self)
         return created
 
+    @requires_auth
     def create_repo(self,
         name,
         description='',
@@ -217,6 +242,7 @@ class GitHub(GitHubCore):
             return key.delete()
         return False  # (No coverage)
 
+    @requires_auth
     def follow(self, login):
         """Make the authenticated user follow login.
 
@@ -229,20 +255,6 @@ class GitHub(GitHubCore):
             url = self._build_url('user', 'following', login)
             resp = self._boolean(self._put(url), 204, 404)
         return resp
-
-    @requires_auth
-    def key(self, id_num):
-        """Gets the authenticated user's key specified by id_num.
-
-        :param id_num: (required), unique id of the key
-        :type id_num: int
-        :returns: :class:`Key <github3.users.Key>`
-        """
-        json = None
-        if int(id_num) > 0:
-            url = self._build_url('user', 'keys', str(id_num))
-            json = self._json(self._get(url), 200)
-        return Key(json, self) if json else None
 
     def gist(self, id_num):
         """Gets the gist using the specified id number.
@@ -301,10 +313,6 @@ class GitHub(GitHubCore):
             json = self._boolean(self._get(url), 204, 404)
         return json
 
-    def is_watching(self, login, repo):
-        """DEPRECATED: Use is_subscribed/is_starred instead."""
-        raise DeprecationWarning('Use is_subscribed/is_starred instead.')
-
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from https://github.com/:owner:/:repository:
 
@@ -321,16 +329,19 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    @requires_basic_auth
-    def list_authorizations(self):
-        """List authorizations for the authenticated user. This will return a
-        404 if you are using a token for authentication.
+    @requires_auth
+    def key(self, id_num):
+        """Gets the authenticated user's key specified by id_num.
 
-        :returns: list of :class:`Authorization <Authorization>`\ s
+        :param id_num: (required), unique id of the key
+        :type id_num: int
+        :returns: :class:`Key <github3.users.Key>`
         """
-        url = self._build_url('authorizations')
-        json = self._json(self._get(url), 200)
-        return [Authorization(a, self) for a in json]
+        json = None
+        if int(id_num) > 0:
+            url = self._build_url('user', 'keys', str(id_num))
+            json = self._json(self._get(url), 200)
+        return Key(json, self) if json else None
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1):
@@ -345,16 +356,6 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Authorization)
 
     @requires_auth
-    def list_emails(self):
-        """List email addresses for the authenticated user.
-
-        :returns: list of dicts
-        """
-        url = self._build_url('user', 'emails')
-        req = self._get(url)
-        return self._json(req, 200) or []
-
-    @requires_auth
     def iter_emails(self, number=-1):
         """Iterate over email addresses for the authenticated user.
 
@@ -365,15 +366,6 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'emails')
         return self._iter(int(number), url, str)
 
-    def list_events(self):
-        """List public events.
-
-        :returns: list of :class:`Event <github3.events.Event>`\ s
-        """
-        url = self._build_url('events')
-        json = self._json(self._get(url), 200)
-        return [Event(ev, self) for ev in json]
-
     def iter_events(self, number=-1):
         """Iterate over public events.
 
@@ -383,19 +375,6 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('events')
         return self._iter(int(number), url, Event)
-
-    def list_followers(self, login=None):
-        """If login is provided, return a list of followers of that
-        login name; otherwise return a list of followers of the
-        authenticated user.
-
-        :param login: (optional), login of the user to check
-        :type login: str
-        :returns: list of :class:`User <github3.users.User>`\ s
-        """
-        if login:
-            return self.user(login).list_followers()
-        return self._list_follow('followers')
 
     def iter_followers(self, login=None, number=-1):
         """If login is provided, iterate over a list of followers of that
@@ -412,19 +391,6 @@ class GitHub(GitHubCore):
             return self.user(login).iter_followers()
         return self._iter_follow('followers', int(number))
 
-    def list_following(self, login=None):
-        """If login is provided, return a list of users being followed
-        by login; otherwise return a list of people followed by the
-        authenticated user.
-
-        :param login: (optional), login of the user to check
-        :type login: str
-        :returns: list of :class:`User <github3.users.User>`\ s
-        """
-        if login:
-            return self.user(login).iter_following()
-        return self._list_follow('following')
-
     def iter_following(self, login=None, number=-1):
         """If login is provided, iterate over a list of users being followed
         by login; otherwise return a list of people followed by the
@@ -438,22 +404,7 @@ class GitHub(GitHubCore):
         """
         if login:
             return self.user(login).iter_following()
-        return self._iter_follow('followers', int(number))
-
-    def list_gists(self, username=None):
-        """If no username is specified, GET /gists, otherwise GET
-        /users/:username/gists
-
-        :param login: (optional), login of the user to check
-        :type login: str
-        :returns: list of :class:`Gist <github3.gists.Gist>`\ s
-        """
-        if username:
-            url = self._build_url('users', username, 'gists')
-        else:
-            url = self._build_url('gists')
-        json = self._json(self._get(url), 200)
-        return [Gist(gist, self) for gist in json]
+        return self._iter_follow('following', int(number))
 
     def iter_gists(self, username=None, number=-1):
         """If no username is specified, GET /gists, otherwise GET
@@ -470,6 +421,26 @@ class GitHub(GitHubCore):
         else:
             url = self._build_url('gists')
         return self._iter(int(number), url, Gist)
+
+    @requires_auth
+    def iter_notifications(self, all=False, participating=False, number=-1):
+        """Iterate over the user's notification.
+
+        :param bool all: (optional), iterate over all notifications
+        :param bool participating: (optional), only iterate over notifications
+            in which the user is participating
+        :param int number: (optional), how many notifications to return
+        :returns: generator of
+            :class:`Thread <github3.notifications.Thread>`
+        """
+        params = None
+        if all:
+            params = {'all': all}
+        elif participating:
+            params = {'participating': participating}
+
+        url = self._build_url('notifications')
+        return self._iter(int(number), url, Thread, params)
 
     @requires_auth
     def iter_org_issues(self, name, filter='', state='', labels='', sort='',
@@ -552,61 +523,6 @@ class GitHub(GitHubCore):
         params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params=params)
 
-    @requires_auth
-    def list_issues(self, filter='', state='', labels='', sort='',
-        direction='', since=''):
-        """List the authenticated user's issues.
-
-        :param str filter: accepted values:
-            ('assigned', 'created', 'mentioned', 'subscribed')
-            api-default: 'assigned'
-        :param str state: accepted values: ('open', 'closed')
-            api-default: 'open'
-        :param str labels: comma-separated list of label names, e.g.,
-            'bug,ui,@high'
-        :param str sort: accepted values: ('created', 'updated', 'comments')
-            api-default: created
-        :param str direction: accepted values: ('asc', 'desc')
-            api-default: desc
-        :param str since: ISO 8601 formatted timestamp, e.g.,
-            2012-05-20T23:10:27Z
-        """
-        url = self._build_url('issues')
-        params = issue_params(filter, state, labels, sort, direction,
-                since)
-        json = self._json(self._get(url, params=params), 200)
-        return [Issue(issue, self) for issue in json]
-
-    def list_repo_issues(self, owner, repository, milestone=None,
-        state='', assignee='', mentioned='', labels='', sort='', direction='',
-        since=''):
-        """List issues on owner/repository. Only owner and repository are
-        required.
-
-        :param str owner: login of the owner of the repository
-        :param str repository: name of the repository
-        :param int milestone: None, '*', or ID of milestone
-        :param str state: accepted values: ('open', 'closed')
-            api-default: 'open'
-        :param str assignee: '*' or login of the user
-        :param str mentioned: login of the user
-        :param str labels: comma-separated list of label names, e.g.,
-            'bug,ui,@high'
-        :param str sort: accepted values: ('created', 'updated', 'comments')
-            api-default: created
-        :param str direction: accepted values: ('asc', 'desc')
-            api-default: desc
-        :param str since: ISO 8601 formatted timestamp, e.g.,
-            2012-05-20T23:10:27Z
-        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
-        """
-        issues = []
-        if owner and repository:
-            repo = self.repository(owner, repository)
-            issues = repo.list_issues(milestone, state, assignee, mentioned,
-                    labels, sort, direction, since)
-        return issues
-
     def iter_repo_issues(self, owner, repository, milestone=None,
         state='', assignee='', mentioned='', labels='', sort='', direction='',
         since='', number=-1):
@@ -640,16 +556,6 @@ class GitHub(GitHubCore):
         return self._iter(0, '', type)
 
     @requires_auth
-    def list_keys(self):
-        """List public keys for the authenticated user.
-
-        :returns: list of :class:`Key <github3.users.Key>`\ s
-        """
-        url = self._build_url('user', 'keys')
-        json = self._json(self._get(url), 200)
-        return [Key(key, self) for key in json]
-
-    @requires_auth
     def iter_keys(self, number=-1):
         """Iterate over public keys for the authenticated user.
 
@@ -659,23 +565,6 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'keys')
         return self._iter(int(number), url, Key)
-
-    def list_orgs(self, login=None):
-        """List public organizations for login if provided; otherwise
-        list public and private organizations for the authenticated
-        user.
-
-        :param login: (optional), user whose orgs you wish to list
-        :type login: str
-        :returns: list of :class:`Organization <github3.orgs.Organization>`\ s
-        """
-        if login:
-            url = self._build_url('users', login, 'orgs')
-        else:
-            url = self._build_url('user', 'orgs')
-
-        json = self._json(self._get(url), 200)
-        return [Organization(org, self) for org in json]
 
     def iter_orgs(self, login=None, number=-1):
         """Iterate over public organizations for login if provided; otherwise
@@ -694,45 +583,6 @@ class GitHub(GitHubCore):
             url = self._build_url('user', 'orgs')
 
         return self._iter(int(number), url, Organization)
-
-    def list_repos(self, login=None, type='', sort='', direction=''):
-        """List public repositories for the specified ``login`` or all
-        repositories for the authenticated user if ``login`` is not
-        provided.
-
-        :param login: (optional)
-        :type login: str
-        :param type: (optional), accepted values:
-            ('all', 'owner', 'public', 'private', 'member')
-            API default: 'all'
-        :type type: str
-        :param sort: (optional), accepted values:
-            ('created', 'updated', 'pushed', 'full_name')
-            API default: 'created'
-        :type sort: str
-        :param direction: (optional), accepted values:
-            ('asc', 'desc'), API default: 'asc' when using 'full_name',
-            'desc' otherwise
-        :type direction: str
-        :returns: list of :class:`Repository <github3.repos.Repository>`
-            objects
-        """
-        if login:
-            url = self._build_url('users', login, 'repos')
-        else:
-            url = self._build_url('user', 'repos')
-
-        params = {}
-        if type in ('all', 'owner', 'public', 'private', 'member'):
-            params.update(type=type)
-        if not login:
-            if sort in ('created', 'updated', 'pushed', 'full_name'):
-                params.update(sort=sort)
-            if direction in ('asc', 'desc'):
-                params.update(direction=direction)
-
-        json = self._json(self._get(url, params=params), 200)
-        return [Repository(repo, self) for repo in json]
 
     def iter_repos(self, login=None, type='', sort='', direction='',
             number=-1):
@@ -776,18 +626,6 @@ class GitHub(GitHubCore):
 
         return self._iter(int(number), url, Repository, params=params)
 
-    def list_starred(self, login=None):
-        """List repositories starred by ``login`` or the authenticated user.
-
-        :returns: list of :class:`Repository <github3.repos.Repository>`
-        """
-        if login:
-            return self.user(login).list_starred()
-
-        url = self._build_url('user', 'starred')
-        json = self._json(self._get(url), 200)
-        return [Repository(r, self) for r in json]
-
     def iter_starred(self, login=None, number=-1):
         """Iterate over repositories starred by ``login`` or the authenticated
         user.
@@ -802,19 +640,6 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'starred')
         return self._iter(int(number), url, Repository)
 
-    def list_subscribed(self, login=None):
-        """List repositories subscribed to by ``login`` or the authenticated
-        user.
-
-        :returns: list of :class:`Repository <github3.repos.Repository>`
-        """
-        if login:
-            return self.user(login).list_subscriptions()
-
-        url = self._build_url('user', 'subscriptions')
-        json = self._json(self._get(url), 200)
-        return [Repository(r, self) for r in json]
-
     def iter_subscribed(self, login=None, number=-1):
         """Iterate over repositories subscribed to by ``login`` or the
         authenticated user.
@@ -828,10 +653,6 @@ class GitHub(GitHubCore):
 
         url = self._build_url('user', 'subscriptions')
         return self._iter(int(number), url, Repository)
-
-    def list_watching(self, login=None):
-        """DEPRECATED: Use list_starred() instead."""
-        raise DeprecationWarning('Use list_starred() instead.')
 
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls.
@@ -992,6 +813,11 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         u = json.get('user', {})
         return LegacyUser(u, self) if u else None
+
+    def set_client_id(self, id, secret):
+        """Allows the developer to set their client_id and client_secret for
+        their OAuth application."""
+        self._session.params = {'client_id': id, 'client_secret': secret}
 
     def set_user_agent(self, user_agent):
         """Allows the user to set their own user agent string to identify with
