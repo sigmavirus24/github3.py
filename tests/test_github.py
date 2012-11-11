@@ -427,3 +427,16 @@ class TestGitHub(BaseCase):
         repo = self.g.repository('sigmavirus24', 'github3.py')
         expect(repo).isinstance(github3.repos.Repository)
         self.mock_assertions(*args, **self.conf)
+
+    def test_search_issues(self):
+        self.request.return_value = generate_response('legacy_issue')
+        args = ('get',
+                'https://api.github.com/legacy/{0}/{1}/{2}/{3}/{4}/{5}'.format(
+                    'issues', 'search', 'sigmavirus24', 'github3.py',
+                    'closed', 'requests'
+                    ))
+        issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
+                'requests')
+
+        expect(issues[0]).isinstance(github3.legacy.LegacyIssue)
+        self.mock_assertions(*args, **self.conf)
