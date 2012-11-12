@@ -74,7 +74,7 @@ class GitHubCore(GitHubObject):
         self._github_url = 'https://api.github.com'
         self._remaining = 5000
         self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '
-                'rel="(\w+)"')
+                                'rel="(\w+)"')
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
@@ -234,7 +234,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                data=dumps({'body': body})), 200)
+                              data=dumps({'body': body})), 200)
             if json:
                 self._update_(json)
                 return True
