@@ -7,6 +7,7 @@ TEST_RUNNER := run_tests.py
 
 clean:
 	git clean -Xdf
+	rm -rf build/ dist/
 
 travis:
 	python $(TEST_RUNNER)
