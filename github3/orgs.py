@@ -217,16 +217,16 @@ class Organization(BaseAccount):
 
     @requires_auth
     def create_repo(self,
-        name,
-        description='',
-        homepage='',
-        private=False,
-        has_issues=True,
-        has_wiki=True,
-        has_downloads=True,
-        team_id=0,
-        auto_init=False,
-        gitignore_template=''):
+                    name,
+                    description='',
+                    homepage='',
+                    private=False,
+                    has_issues=True,
+                    has_wiki=True,
+                    has_downloads=True,
+                    team_id=0,
+                    auto_init=False,
+                    gitignore_template=''):
         """Create a repository for this organization if the authenticated user
         is a member.
 
@@ -252,10 +252,10 @@ class Organization(BaseAccount):
         """
         url = self._build_url('repos', base_url=self._api)
         data = {'name': name, 'description': description,
-            'homepage': homepage, 'private': private,
-            'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads, 'auto_init': auto_init,
-            'gitignore_template': gitignore_template}
+                'homepage': homepage, 'private': private,
+                'has_issues': has_issues, 'has_wiki': has_wiki,
+                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'gitignore_template': gitignore_template}
         if team_id > 0:
             data.update({'team_id': team_id})
         json = self._json(self._post(url, dumps(data)), 201)
@@ -293,18 +293,18 @@ class Organization(BaseAccount):
         :returns: :class:`Team <Team>`
         """
         data = dumps({'name': name, 'repo_names': repo_names,
-            'permissions': permissions})
+                      'permissions': permissions})
         url = self._build_url('teams', base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return Team(json, self._session) if json else None
 
     @requires_auth
     def edit(self,
-        billing_email=None,
-        company=None,
-        email=None,
-        location=None,
-        name=None):
+             billing_email=None,
+             company=None,
+             email=None,
+             location=None,
+             name=None):
         """Edit this organization.
 
         :param billing_email: (optional) Billing email address (private)
@@ -321,7 +321,7 @@ class Organization(BaseAccount):
         """
         json = None
         data = {'billing_email': billing_email, 'company': company,
-            'email': email, 'location': location, 'name': name}
+                'email': email, 'location': location, 'name': name}
         for (k, v) in data.items():
             if v is None:
                 del data[k]

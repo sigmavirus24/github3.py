@@ -57,15 +57,15 @@ class GitHubCore(GitHubObject):
             ses = session()
         self._session = ses
         headers = {
-                # Only accept JSON responses
-                'Accept': 'application/vnd.github.v3.full+json',
-                # Only accept UTF-8 encoded data
-                'Accept-Charset': 'utf-8',
-                # Always sending JSON
-                'Content-Type': "application/json",
-                # Set our own custom User-Agent string
-                'User-Agent': 'github3.py/0.1b0',
-                }
+            # Only accept JSON responses
+            'Accept': 'application/vnd.github.v3.full+json',
+            # Only accept UTF-8 encoded data
+            'Accept-Charset': 'utf-8',
+            # Always sending JSON
+            'Content-Type': "application/json",
+            # Set our own custom User-Agent string
+            'User-Agent': 'github3.py/0.1b0',
+        }
 
         self._session.headers.update(headers)
         self._session.config['base_headers'].update(headers)

@@ -52,7 +52,7 @@ class Label(GitHubCore):
             if color[0] == '#':
                 color = color[1:]
             json = self._json(self._patch(self._api, data=dumps({'name': name,
-                'color': color})), 200)
+                              'color': color})), 200)
 
         if json:
             self._update_(json)
@@ -140,7 +140,7 @@ class Milestone(GitHubCore):
         :returns: bool
         """
         data = dumps({'title': title, 'state': state,
-            'description': description, 'due_on': due_on})
+                      'description': description, 'due_on': due_on})
         json = None
 
         if title:
@@ -210,7 +210,7 @@ class Issue(GitHubCore):
 
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
-                n=self.number)
+                n=self.number)  # nopep8
 
     def _update_(self, issue):
         self.__init__(issue, self._session)
@@ -224,7 +224,7 @@ class Issue(GitHubCore):
         """
         url = self._build_url('labels', base_url=self._api)
         json = self._json(self._post(url, data=dumps(list(args))),
-                status_code=200)
+                          status_code=200)
         return True if json else False
 
     @requires_auth
@@ -239,7 +239,7 @@ class Issue(GitHubCore):
             return False
         number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, login, self.state, number,
-                self.labels)
+                         self.labels)
 
     @requires_auth
     def close(self):
@@ -250,7 +250,7 @@ class Issue(GitHubCore):
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, assignee, 'closed',
-                number, self.labels)
+                         number, self.labels)
 
     def comment(self, id_num):
         """Get a single comment by its id.
@@ -266,7 +266,7 @@ class Issue(GitHubCore):
         if int(id_num) > 0:  # Might as well check that it's positive
             owner, repo = self.repository
             url = self._build_url('repos', owner, repo, 'issues', 'comments',
-                    str(id_num))
+                                  str(id_num))
             json = self._json(self._get(url), 200)
         return IssueComment(json) if json else None
 
@@ -285,7 +285,7 @@ class Issue(GitHubCore):
 
     @requires_auth
     def edit(self, title=None, body=None, assignee=None, state=None,
-            milestone=None, labels=None):
+             milestone=None, labels=None):
         """Edit this issue.
 
         :param title: Title of the issue
@@ -404,7 +404,7 @@ class Issue(GitHubCore):
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
         return self.edit(self.title, self.body, assignee, 'open',
-                number, self.labels)
+                         number, self.labels)
 
 
 class IssueComment(BaseComment):
@@ -456,7 +456,7 @@ class IssueEvent(GitHubCore):
 
     def __repr__(self):
         return '<Issue Event [#{0} - {1}]>'.format(self.issue.number,
-                self.event)
+                self.event)  # nopep8
 
 
 def issue_params(filter, state, labels, sort, direction, since):

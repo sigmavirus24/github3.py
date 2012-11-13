@@ -114,13 +114,13 @@ class PullRequest(GitHubCore):
         #    https://api.github.com/repos/:user/:repo/pulls/:number/comments
         #: Dictionary of _links
         self.links = {
-                'self': self._api,
-                'comments': '/'.join([self._api.replace('pulls', 'issues'),
-                    'comments']),
-                'issue': self._api.replace('pulls', 'issues'),
-                'html': self.html_url,
-                'review_comments': self._api + '/comments'
-                }
+            'self': self._api,
+            'comments': '/'.join([self._api.replace('pulls', 'issues'),
+                                  'comments']),
+            'issue': self._api.replace('pulls', 'issues'),
+            'html': self.html_url,
+            'review_comments': self._api + '/comments'
+        }
 
         #: SHA of the merge commit
         self.merge_commit_sha = pull.get('merge_commit_sha', '')

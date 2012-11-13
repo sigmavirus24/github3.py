@@ -238,7 +238,7 @@ class Repository(GitHubCore):
         :returns: :class:`Comparison <Comparison>` if successful, else None
         """
         url = self._build_url('compare', base + '...' + head,
-                base_url=self._api)
+                              base_url=self._api)
         json = self._json(self._get(url), 200)
         return Comparison(json) if json else None
 
@@ -291,9 +291,9 @@ class Repository(GitHubCore):
         json = None
         if body and sha and line > 0:
             data = dumps({'body': body, 'commit_id': sha, 'line': line,
-                'path': path, 'position': position})
+                          'path': path, 'position': position})
             url = self._build_url('commits', sha, 'comments',
-                    base_url=self._api)
+                                  base_url=self._api)
             json = self._json(self._post(url, data), 201)
         return RepoComment(json, self) if json else None
 
@@ -326,13 +326,13 @@ class Repository(GitHubCore):
         if message and tree and isinstance(parents, list):
             url = self._build_url('git', 'commits', base_url=self._api)
             data = dumps({'message': message, 'tree': tree, 'parents': parents,
-                'author': author, 'committer': committer})
+                          'author': author, 'committer': committer})
             json = self._json(self._post(url, data), 201)
         return Commit(json, self) if json else None
 
     @requires_auth
     def create_download(self, name, path, description='',
-            content_type='text/plain'):
+                        content_type='text/plain'):
         """Create a new download on this repository.
 
         I do not require you provide the size in bytes because it can be
@@ -353,23 +353,24 @@ class Repository(GitHubCore):
             from os import stat
             info = stat(path)
             data = dumps({'name': name, 'size': info.st_size,
-                'description': description, 'content_type': content_type})
+                          'description': description,
+                          'content_type': content_type})
             json = self._json(self._post(url, data), 201)
 
         if not json:
             return None
 
         form = [('key', json.get('path')),
-            ('acl', json.get('acl')),
-            ('success_action_status', '201'),
-            ('Filename', json.get('name')),
-            ('AWSAccessKeyId', json.get('accesskeyid')),
-            ('Policy', json.get('policy')),
-            ('Signature', json.get('signature')),
-            ('Content-Type', json.get('mime_type'))]
+                ('acl', json.get('acl')),
+                ('success_action_status', '201'),
+                ('Filename', json.get('name')),
+                ('AWSAccessKeyId', json.get('accesskeyid')),
+                ('Policy', json.get('policy')),
+                ('Signature', json.get('signature')),
+                ('Content-Type', json.get('mime_type'))]
         file = [('file', open(path, 'rb').read())]
         resp = post(json.get('s3_url'), data=form, files=file,
-                headers={'Accept-Charset': 'utf-8'})
+                    headers={'Accept-Charset': 'utf-8'})
 
         return Download(json, self) if self._boolean(resp, 201, 404) else None
 
@@ -411,17 +412,17 @@ class Repository(GitHubCore):
         if name and config and isinstance(config, dict):
             url = self._build_url('hooks', base_url=self._api)
             data = dumps({'name': name, 'config': config, 'events': events,
-                'active': active})
+                          'active': active})
             json = self._json(self._post(url, data), 201)
         return Hook(json, self) if json else None
 
     @requires_auth
     def create_issue(self,
-        title,
-        body=None,
-        assignee=None,
-        milestone=None,
-        labels=[]):
+                     title,
+                     body=None,
+                     assignee=None,
+                     milestone=None,
+                     labels=[]):
         """Creates an issue on this repository.
 
         :param str title: (required), title of the issue
@@ -438,7 +439,7 @@ class Repository(GitHubCore):
             None
         """
         issue = dumps({'title': title, 'body': body, 'assignee': assignee,
-            'milestone': milestone, 'labels': labels})
+                       'milestone': milestone, 'labels': labels})
         url = self._build_url('issues', base_url=self._api)
 
         json = self._json(self._post(url, issue), 201)
@@ -478,7 +479,7 @@ class Repository(GitHubCore):
 
     @requires_auth
     def create_milestone(self, title, state=None, description=None,
-            due_on=None):
+                         due_on=None):
         """Create a milestone for this repository.
 
         :param title: (required), title of the milestone
@@ -497,7 +498,7 @@ class Repository(GitHubCore):
         if state not in ('open', 'closed'):
             state = 'open'
         data = dumps({'title': title, 'state': state,
-            'description': description, 'due_on': due_on})
+                      'description': description, 'due_on': due_on})
         json = self._json(self._post(url, data), 201)
         return Milestone(json, self) if json else None
 
@@ -518,7 +519,7 @@ class Repository(GitHubCore):
             successful, else None
         """
         data = dumps({'title': title, 'body': body, 'base': base,
-            'head': head})
+                      'head': head})
         return self._create_pull(data)
 
     @requires_auth
@@ -568,14 +569,14 @@ class Repository(GitHubCore):
         json = {}
         if sha and state:
             data = dumps({'state': state, 'target_url': target_url,
-                    'description': description})
+                          'description': description})
             url = self._build_url('statuses', sha, base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return Status(json) if json else None
 
     @requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
-            lightweight=False):
+                   lightweight=False):
         """Create a tag in this repository.
 
         :param tag: (required), name of the tag
@@ -603,7 +604,7 @@ class Repository(GitHubCore):
         json = None
         if tag and message and sha and obj_type and len(tagger) == 3:
             data = dumps({'tag': tag, 'message': message, 'object': sha,
-                'type': obj_type, 'tagger': tagger})
+                          'type': obj_type, 'tagger': tagger})
             url = self._build_url('git', 'tags', base_url=self._api)
             json = self._json(self._post(url, data), 201)
             if json:
@@ -659,20 +660,20 @@ class Repository(GitHubCore):
         json = None
         if int(id_num) > 0:
             url = self._build_url('downloads', str(id_num),
-                    base_url=self._api)
+                                  base_url=self._api)
             json = self._json(self._get(url), 200)
         return Download(json, self) if json else None
 
     @requires_auth
     def edit(self,
-        name,
-        description='',
-        homepage='',
-        private=False,
-        has_issues=True,
-        has_wiki=True,
-        has_downloads=True,
-        default_branch=''):
+             name,
+             description='',
+             homepage='',
+             private=False,
+             has_issues=True,
+             has_wiki=True,
+             has_downloads=True,
+             default_branch=''):
         """Edit this repository.
 
         :param str name: (required), name of the repository
@@ -691,9 +692,10 @@ class Repository(GitHubCore):
         :returns: bool -- True if successful, False otherwise
         """
         data = dumps({'name': name, 'description': description,
-            'homepage': homepage, 'private': private,
-            'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads, 'default_branch': default_branch})
+                      'homepage': homepage, 'private': private,
+                      'has_issues': has_issues, 'has_wiki': has_wiki,
+                      'has_downloads': has_downloads,
+                      'default_branch': default_branch})
         json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
@@ -1080,15 +1082,15 @@ class Repository(GitHubCore):
         return [Hook(h, self) for h in json]
 
     def iter_issues(self,
-        milestone=None,
-        state=None,
-        assignee=None,
-        mentioned=None,
-        labels=None,
-        sort=None,
-        direction=None,
-        since=None,
-        number=-1):
+                    milestone=None,
+                    state=None,
+                    assignee=None,
+                    mentioned=None,
+                    labels=None,
+                    sort=None,
+                    direction=None,
+                    since=None,
+                    number=-1):
         """Iterate over issues on this repo based upon parameters passed.
 
         :param milestone: (optional), 'none', or '*'
@@ -1125,19 +1127,19 @@ class Repository(GitHubCore):
             params['mentioned'] = mentioned
 
         params.update(issue_params(None, state, labels, sort, direction,
-            since))
+            since))  # nopep8
 
         return self._iter(int(number), url, Issue, params=params)
 
     def list_issues(self,
-        milestone=None,
-        state=None,
-        assignee=None,
-        mentioned=None,
-        labels=None,
-        sort=None,
-        direction=None,
-        since=None):
+                    milestone=None,
+                    state=None,
+                    assignee=None,
+                    mentioned=None,
+                    labels=None,
+                    sort=None,
+                    direction=None,
+                    since=None):
         """List issues on this repo based upon parameters passed.
 
         :param milestone: (optional), 'none', or '*'
@@ -1174,7 +1176,7 @@ class Repository(GitHubCore):
             params['mentioned'] = mentioned
 
         params.update(issue_params(None, state, labels, sort, direction,
-            since))
+            since))  # nopep8
 
         request = self._get(url, params=params)
 
@@ -1263,7 +1265,7 @@ class Repository(GitHubCore):
         return [(k, v) for k, v in json.items()]
 
     def iter_milestones(self, state=None, sort=None, direction=None,
-            number=-1):
+                        number=-1):
         """Iterates over the milestones on this repository.
 
         :param str state: (optional), state of the milestones, accepted
@@ -1279,8 +1281,8 @@ class Repository(GitHubCore):
         """
         url = self._build_url('milestones', base_url=self._api)
         accepted = {'state': ('open', 'closed'),
-                'sort': ('due_date', 'completeness'),
-                'direction': ('asc', 'desc')}
+                    'sort': ('due_date', 'completeness'),
+                    'direction': ('asc', 'desc')}
         params = {'state': state, 'sort': sort, 'direction': direction}
         for (k, v) in list(params.items()):
             if not (v and (v in accepted[k])):  # e.g., '' or None
@@ -1342,7 +1344,7 @@ class Repository(GitHubCore):
         return [Event(e, self) for e in json]
 
     def iter_notifications(self, all=False, participating=False, since='',
-            number=-1):
+                           number=-1):
         """Iterates over the notifications for this repository.
 
         :param bool all: (optional), show all notifications, including ones
@@ -1542,7 +1544,7 @@ class Repository(GitHubCore):
         if last_read:
             mark['last_read_at'] = last_read
         return self._boolean(self._put(url, data=dumps(mark)),
-                205, 404)
+                             205, 404)
 
     def merge(self, base, head, message=''):
         """Perform a merge from ``head`` into ``base``.
@@ -1894,7 +1896,7 @@ class Hook(GitHubCore):
 
     @requires_auth
     def edit(self, name, config, events=[], add_events=[], rm_events=[],
-            active=True):
+             active=True):
         """Edit this hook.
 
         :param name: (required), name of the service being called
@@ -1997,7 +1999,7 @@ class RepoComment(BaseComment):
 
     def __repr__(self):
         return '<Repository Comment [{0}/{1}]>'.format(self.commit_id[:7],
-                self.user.login or '')
+                self.user.login or '')  # nopep8
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
@@ -2023,7 +2025,7 @@ class RepoComment(BaseComment):
         json = None
         if body and sha and path and line > 0 and position > 0:
             data = dumps({'body': body, 'commit_id': sha, 'line': line,
-                'path': path, 'position': position})
+                          'path': path, 'position': position})
             json = self._json(self._post(self._api, data), 200)
 
         if json:
