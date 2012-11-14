@@ -213,3 +213,8 @@ def user(login):
 def ratelimit_remaining():
     """Get the remaining number of requests allowed."""
     return gh.ratelimit_remaining
+
+
+def zen():
+    """Returns a quote from the Zen of GitHub. Yet another API Easter Egg"""
+    return gh.zen()

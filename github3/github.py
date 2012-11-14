@@ -67,8 +67,7 @@ class GitHub(GitHubCore):
     def authorization(self, id_num):
         """Get information about authorization ``id``.
 
-        :param id_num: (required), unique id of the authorization
-        :type id_num: int
+        :param int id_num: (required), unique id of the authorization
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
@@ -81,14 +80,12 @@ class GitHub(GitHubCore):
         """Obtain an authorization token from the GitHub API for the GitHub
         API.
 
-        :param login: (required)
-        :type login: str
-        :param password: (required)
-        :type password: str
-        :param scopes: (required), areas you want this token to apply to,
+        :param str login: (required)
+        :param str password: (required)
+        :param list scopes: (required), areas you want this token to apply to,
             i.e., 'gist', 'user'
-        :type scopes: list of strings
-        :param note: (optional), note about the authorization
+        :param str note: (optional), note about the authorization
+        :param str note_url: (optional), url for the application
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
@@ -110,13 +107,11 @@ class GitHub(GitHubCore):
 
         If no login was provided, it will be anonymous.
 
-        :param description: (required), description of gist
-        :type description: str
-        :param files: (required), file names with associated dictionaries for
-            content, e.g. ``{'spam.txt': {'content': 'File contents ...'}}``
-        :type files: dict
-        :param public: (optional), make the gist public if True
-        :type public: bool
+        :param str description: (required), description of gist
+        :param dict files: (required), file names with associated dictionaries
+            for content, e.g. ``{'spam.txt': {'content': 'File contents
+            ...'}}``
+        :param bool public: (optional), make the gist public if True
         :returns: :class:`Gist <github3.gists.Gist>`
         """
         new_gist = {'description': description, 'public': public,
@@ -139,23 +134,16 @@ class GitHub(GitHubCore):
 
         body, assignee, milestone, labels are all optional.
 
-        :param owner: (required), login of the owner
-        :type owner: str
-        :param repository: (required), repository name
-        :type repository: str
-        :param title: (required), Title of issue to be created
-        :type title: str
-        :param body: (optional), The text of the issue, markdown
+        :param str owner: (required), login of the owner
+        :param str repository: (required), repository name
+        :param str title: (required), Title of issue to be created
+        :param str body: (optional), The text of the issue, markdown
             formatted
-        :type body: str
-        :param assignee: (optional), Login of person to assign
+        :param str assignee: (optional), Login of person to assign
             the issue to
-        :type assignee: str
-        :param milestone: (optional), Which milestone to assign
+        :param str milestone: (optional), Which milestone to assign
             the issue to
-        :type milestone: str
-        :param labels: (optional), List of label names.
-        :type labels: list
+        :param list labels: (optional), List of label names.
         :returns: :class:`Issue <github3.issues.Issue>`
         """
         repo = None
@@ -173,10 +161,9 @@ class GitHub(GitHubCore):
     def create_key(self, title, key):
         """Create a new key for the authenticated user.
 
-        :param title: (required), key title
-        :type title: str
-        :param key: (required), actual key contents
-        :type key: str or file
+        :param str title: (required), key title
+        :param key: (required), actual key contents, accepts path as a string
+            or file-like object
         :returns: :class:`Key <github3.users.Key>`
         """
         created = None
@@ -233,8 +220,7 @@ class GitHub(GitHubCore):
     def delete_key(self, key_id):
         """Delete user key pointed to by ``key_id``.
 
-        :param key_id: (required), unique id used by Github
-        :type: int
+        :param int key_id: (required), unique id used by Github
         :returns: bool
         """
         key = self.key(key_id)
@@ -246,8 +232,7 @@ class GitHub(GitHubCore):
     def follow(self, login):
         """Make the authenticated user follow login.
 
-        :param login: (required), user to follow
-        :type login: str
+        :param str login: (required), user to follow
         :returns: bool
         """
         resp = False
@@ -259,8 +244,7 @@ class GitHub(GitHubCore):
     def gist(self, id_num):
         """Gets the gist using the specified id number.
 
-        :param id_num: (required), unique id of the gist
-        :type id_num: int
+        :param int id_num: (required), unique id of the gist
         :returns: :class:`Gist <github3.gists.Gist>`
         """
         url = self._build_url('gists', str(id_num))
@@ -270,9 +254,8 @@ class GitHub(GitHubCore):
     def is_following(self, login):
         """Check if the authenticated user is following login.
 
-        :param login: (required), login of the user to check if the
+        :param str login: (required), login of the user to check if the
             authenticated user is checking
-        :type login: str
         :returns: bool
         """
         json = False
@@ -285,10 +268,8 @@ class GitHub(GitHubCore):
     def is_starred(self, login, repo):
         """Check if the authenticated user starred login/repo.
 
-        :param login: (required), owner of repository
-        :type login: str
-        :param repo: (required), name of repository
-        :type repo: str
+        :param str login: (required), owner of repository
+        :param str repo: (required), name of repository
         :returns: bool
         """
         json = False
@@ -301,10 +282,8 @@ class GitHub(GitHubCore):
     def is_subscribed(self, login, repo):
         """Check if the authenticated user is subscribed to login/repo.
 
-        :param login: (required), owner of repository
-        :type login: str
-        :param repo: (required), name of repository
-        :type repo: str
+        :param str login: (required), owner of repository
+        :param str repo: (required), name of repository
         :returns: bool
         """
         json = False
@@ -316,12 +295,9 @@ class GitHub(GitHubCore):
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from https://github.com/:owner:/:repository:
 
-        :param owner: (required), owner of the repository
-        :type owner: str
-        :param repository: (required), name of the repository
-        :type repository: str
-        :param number: (required), issue number
-        :type number: int
+        :param str owner: (required), owner of the repository
+        :param str repository: (required), name of the repository
+        :param int number: (required), issue number
         :return: :class:`Issue <github3.issues.Issue>`
         """
         repo = self.repository(owner, repository)
@@ -333,8 +309,7 @@ class GitHub(GitHubCore):
     def key(self, id_num):
         """Gets the authenticated user's key specified by id_num.
 
-        :param id_num: (required), unique id of the key
-        :type id_num: int
+        :param int id_num: (required), unique id of the key
         :returns: :class:`Key <github3.users.Key>`
         """
         json = None
@@ -381,8 +356,7 @@ class GitHub(GitHubCore):
         login name; otherwise return a list of followers of the
         authenticated user.
 
-        :param login: (optional), login of the user to check
-        :type login: str
+        :param str login: (optional), login of the user to check
         :param int number: (optional), number of followers to return. Default:
             -1 returns all followers
         :returns: list of :class:`User <github3.users.User>`\ s
@@ -396,8 +370,7 @@ class GitHub(GitHubCore):
         by login; otherwise return a list of people followed by the
         authenticated user.
 
-        :param login: (optional), login of the user to check
-        :type login: str
+        :param str login: (optional), login of the user to check
         :param int number: (optional), number of people to return. Default: -1
             returns all people you follow
         :returns: list of :class:`User <github3.users.User>`\ s
@@ -410,8 +383,7 @@ class GitHub(GitHubCore):
         """If no username is specified, GET /gists, otherwise GET
         /users/:username/gists
 
-        :param login: (optional), login of the user to check
-        :type login: str
+        :param str login: (optional), login of the user to check
         :param int number: (optional), number of gists to return. Default: -1
             returns all available gists
         :returns: list of :class:`Gist <github3.gists.Gist>`\ s
@@ -544,9 +516,8 @@ class GitHub(GitHubCore):
             api-default: desc
         :param str since: ISO 8601 formatted timestamp, e.g.,
             2012-05-20T23:10:27Z
-        :param number: (optional), number of issues to return.
+        :param int number: (optional), number of issues to return.
             Default: -1 returns all issues
-        :type number: int
         :returns: list of :class:`Issue <github3.issues.Issue>`\ s
         """
         if owner and repository:
@@ -571,10 +542,9 @@ class GitHub(GitHubCore):
         iterate over public and private organizations for the authenticated
         user.
 
-        :param login: (optional), user whose orgs you wish to list
+        :param str login: (optional), user whose orgs you wish to list
         :param int number: (optional), number of organizations to return.
             Default: -1 returns all available organizations
-        :type login: str
         :returns: list of :class:`Organization <github3.orgs.Organization>`\ s
         """
         if login:
@@ -590,23 +560,18 @@ class GitHub(GitHubCore):
         repositories for the authenticated user if ``login`` is not
         provided.
 
-        :param login: (optional)
-        :type login: str
-        :param type: (optional), accepted values:
+        :param str login: (optional)
+        :param str type: (optional), accepted values:
             ('all', 'owner', 'public', 'private', 'member')
             API default: 'all'
-        :type type: str
-        :param sort: (optional), accepted values:
+        :param str sort: (optional), accepted values:
             ('created', 'updated', 'pushed', 'full_name')
             API default: 'created'
-        :type sort: str
-        :param direction: (optional), accepted values:
+        :param str direction: (optional), accepted values:
             ('asc', 'desc'), API default: 'asc' when using 'full_name',
             'desc' otherwise
-        :type direction: str
-        :param number: (optional), number of repositories to return.
+        :param int number: (optional), number of repositories to return.
             Default: -1 returns all repositories
-        :type number: int
         :returns: list of :class:`Repository <github3.repos.Repository>`
             objects
         """
@@ -657,12 +622,9 @@ class GitHub(GitHubCore):
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls.
 
-        :param username: (optional)
-        :type username: str
-        :param password: (optional)
-        :type password: str
-        :param token: (optional)
-        :type token: str
+        :param str username: (optional)
+        :param str password: (optional)
+        :param str token: (optional)
         """
         if username and password:
             self._session.auth = (username, password)
@@ -673,16 +635,12 @@ class GitHub(GitHubCore):
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.
 
-        :param text: (required), the text of the document to render
-        :type text: str
-        :param mode: (optional), 'markdown' or 'gfm'
-        :type mode: str
-        :param context: (optional), only important when using mode 'gfm',
+        :param str text: (required), the text of the document to render
+        :param str mode: (optional), 'markdown' or 'gfm'
+        :param str context: (optional), only important when using mode 'gfm',
             this is the repository to use as the context for the rendering
-        :type context: str
-        :param raw: (optional), renders a document like a README.md, no gfm, no
-            context
-        :type raw: bool
+        :param bool raw: (optional), renders a document like a README.md, no
+            gfm, no context
         :returns: str -- HTML formatted text
         """
         data = None
@@ -732,8 +690,7 @@ class GitHub(GitHubCore):
     def organization(self, login):
         """Returns a Organization object for the login name
 
-        :param login: (required), login name of the org
-        :type login: str
+        :param str login: (required), login name of the org
         :returns: :class:`Organization <github3.orgs.Organization>`
         """
         url = self._build_url('orgs', login)
@@ -744,10 +701,8 @@ class GitHub(GitHubCore):
         """Returns a Repository object for the specified combination of
         owner and repository
 
-        :param owner: (required)
-        :type owner: str
-        :param repository: (required)
-        :type repository: str
+        :param str owner: (required)
+        :param str repository: (required)
         :returns: :class:`Repository <github3.repos.Repository>`
         """
         json = None
@@ -759,14 +714,10 @@ class GitHub(GitHubCore):
     def search_issues(self, owner, repo, state, keyword):
         """Find issues by state and keyword.
 
-        :param owner: (required)
-        :type owner: str
-        :param repo: (required)
-        :type repo: str
-        :param state: (required), accepted values: ('open', 'closed')
-        :type state: str
-        :param keyword: (required), what to search for
-        :type keyword: str
+        :param str owner: (required)
+        :param str repo: (required)
+        :param str state: (required), accepted values: ('open', 'closed')
+        :param str keyword: (required), what to search for
         :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
         url = self._build_url('legacy', 'issues', 'search', owner, repo,
@@ -778,10 +729,8 @@ class GitHub(GitHubCore):
     def search_repos(self, keyword, **params):
         """Search all repositories by keyword.
 
-        :param keyword: (required)
-        :type keyword: str
-        :param params: (optional), filter by language and/or start_page
-        :type params: dict
+        :param str keyword: (required)
+        :param dict params: (optional), filter by language and/or start_page
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
         url = self._build_url('legacy', 'repos', 'search', keyword)
@@ -792,8 +741,7 @@ class GitHub(GitHubCore):
     def search_users(self, keyword):
         """Search all users by keyword.
 
-        :param keyword: (required)
-        :type keyword: str
+        :param str keyword: (required)
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
         url = self._build_url('legacy', 'user', 'search', str(keyword))
@@ -804,8 +752,7 @@ class GitHub(GitHubCore):
     def search_email(self, email):
         """Search users by email.
 
-        :param email: (required)
-        :type keyword: str
+        :param str email: (required)
         :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
         """
         url = self._build_url('legacy', 'user', 'email', email)
@@ -858,8 +805,7 @@ class GitHub(GitHubCore):
     def unfollow(self, login):
         """Make the authenticated user stop following login
 
-        :param login: (required)
-        :type login: str
+        :param str login: (required)
         :returns: bool
         """
         resp = False
@@ -903,20 +849,13 @@ class GitHub(GitHubCore):
         the information provided in the parameters. All parameters are
         optional.
 
-        :param name: e.g., 'John Smith', not login name
-        :type name: str
-        :param email: e.g., 'john.smith@example.com'
-        :type email: str
-        :param blog: e.g., 'http://www.example.com/jsmith/blog'
-        :type blog: str
-        :param company: company name
-        :type company: str
-        :param location: where you are located
-        :type location: str
-        :param hireable: defaults to False
-        :type hireable: bool
-        :param bio: GitHub flavored markdown
-        :type bio: str
+        :param str name: e.g., 'John Smith', not login name
+        :param str email: e.g., 'john.smith@example.com'
+        :param str blog: e.g., 'http://www.example.com/jsmith/blog'
+        :param str company: company name
+        :param str location: where you are located
+        :param bool hireable: defaults to False
+        :param str bio: GitHub flavored markdown
         :returns: bool
         """
         user = self.user()
@@ -928,8 +867,7 @@ class GitHub(GitHubCore):
         provided. If no login name is provided, this will return a User
         object for the authenticated user.
 
-        :param login: (optional)
-        :type login: str
+        :param str login: (optional)
         :returns: :class:`User <github3.users.User>`
         """
         if login:
@@ -947,6 +885,15 @@ class GitHub(GitHubCore):
     def unwatch(self, login, repo):
         """DEPRECATED: Use unsubscribe/unstar instead."""
         raise DeprecationWarning('Use unsubscribe/unstar instead.')
+
+    def zen(self):
+        """Returns a quote from the Zen of GitHub. Yet another API Easter Egg
+
+        :returns: str
+        """
+        url = self._build_url('zen')
+        resp = self._get(url)
+        return resp.content if resp.status_code == 200 else ''
 
 
 class GitHubEnterprise(GitHub):

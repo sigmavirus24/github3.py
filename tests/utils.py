@@ -68,6 +68,7 @@ expect = CustomExpecter
 class BaseCase(TestCase):
     def setUp(self):
         self.g = github3.GitHub()
+        self.args = ()
         self.conf = {'allow_redirects': True}
         self.mock = patch.object(requests.sessions.Session, 'request')
         self.request = self.mock.start()
@@ -78,8 +79,8 @@ class BaseCase(TestCase):
     def login(self):
         self.g.login('user', 'password')
 
-    def mock_assertions(self, *args, **kwargs):
+    def mock_assertions(self):
         assert self.request.called is True
-        c = call(*args, **kwargs)
+        c = call(*self.args, **self.conf)
         assert c in self.request.mock_calls, '{0} not in {1}'.format(c,
-            self.request.mock_calls)
+            self.request.mock_calls)  # nopep8
