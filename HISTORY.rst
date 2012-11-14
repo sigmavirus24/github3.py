@@ -1,10 +1,10 @@
 History/Changelog
 =================
 
-0.1: 2012-xx-xx
+0.1: 2012-11-13
 ---------------
 
-- 100% unit test coverage
+- Add API for GitHub Enterprise customers.
 
 0.1b2: 2012-11-10
 -----------------
@@ -26,7 +26,7 @@ History/Changelog
 -----------------
 
 - Support for the complete GitHub API (accomplished)
-  
+
   - Now also includes the Statuses API
   - Also covers the auto_init parameters to the Repository creation 
     methodology
