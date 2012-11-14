@@ -386,7 +386,7 @@ class TestGitHub(BaseCase):
                          'subscriptions'
                          )
             expect(next(self.g.iter_subscribed('sigmavirus24'))).isinstance(
-                    github3.repos.Repository) # nopep8
+                    github3.repos.Repository)  # nopep8
             self.mock_assertions()
 
     def test_login(self):
@@ -458,4 +458,28 @@ class TestGitHub(BaseCase):
         self.conf.update(params={})
         repos = self.g.search_repos('github3.py')
         expect(repos[0]).isinstance(github3.legacy.LegacyRepo)
+        self.mock_assertions()
+
+        self.conf.update(params={'language': 'python'})
+        repos = self.g.search_repos('github3.py', language='python')
+        self.mock_assertions()
+
+    def test_search_users(self):
+        self.request.return_value = generate_response('legacy_user')
+        self.args = ('get',
+                     'https://api.github.com/{0}/{1}/{2}/{3}'.format(
+                     'legacy', 'user', 'search', 'sigmavirus24')
+                     )
+        users = self.g.search_users('sigmavirus24')
+        expect(users[0]).isinstance(github3.legacy.LegacyUser)
+        self.mock_assertions()
+
+    def test_search_email(self):
+        self.request.return_value = generate_response('legacy_email')
+        self.args = ('get',
+                     'https://api.github.com/{0}/{1}/{2}/{3}'.format(
+                     'legacy', 'user', 'email', 'graffatcolmingov@gmail.com')
+                     )
+        user = self.g.search_email('graffatcolmingov@gmail.com')
+        expect(user).isinstance(github3.legacy.LegacyUser)
         self.mock_assertions()
