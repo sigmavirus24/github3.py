@@ -82,18 +82,18 @@ class Plan(GitHubObject):
 
 
 _large = Plan({'name': 'large', 'private_repos': 50,
-    'collaborators': 25, 'space': 0})
+               'collaborators': 25, 'space': 0})
 _medium = Plan({'name': 'medium', 'private_repos': 20,
-    'collaborators': 10, 'space': 0})
+                'collaborators': 10, 'space': 0})
 _small = Plan({'name': 'small', 'private_repos': 10,
-    'collaborators': 5, 'space': 0})
+               'collaborators': 5, 'space': 0})
 _micro = Plan({'name': 'micro', 'private_repos': 5,
-    'collaborators': 1, 'space': 0})
+               'collaborators': 1, 'space': 0})
 _free = Plan({'name': 'free', 'private_repos': 0,
-    'collaborators': 0, 'space': 0})
+              'collaborators': 0, 'space': 0})
 
 plans = {'large': _large, 'medium': _medium, 'small': _small,
-        'micro': _micro, 'free': _free}
+         'micro': _micro, 'free': _free}
 
 
 class User(BaseAccount):
@@ -182,7 +182,7 @@ class User(BaseAccount):
         """
         url = self._build_url('user', 'emails')
         return self._boolean(self._delete(url, data=dumps(addresses)),
-                204, 404)
+                             204, 404)
 
     @property
     def for_hire(self):
@@ -195,7 +195,7 @@ class User(BaseAccount):
         :returns: :class:`bool`
         """
         url = self._build_url('repos', login, repository, 'assignees',
-                self.login)
+                              self.login)
         return self._boolean(self._get(url), 204, 404)
 
     def iter_events(self, public=False, number=-1):
@@ -383,7 +383,7 @@ class User(BaseAccount):
 
     @requires_auth
     def update(self, name=None, email=None, blog=None, company=None,
-            location=None, hireable=False, bio=None):
+               location=None, hireable=False, bio=None):
         """If authenticated as this user, update the information with
         the information provided in the parameters.
 
@@ -404,8 +404,8 @@ class User(BaseAccount):
         :returns: bool
         """
         user = dumps({'name': name, 'email': email, 'blog': blog,
-            'company': company, 'location': location,
-            'hireable': hireable, 'bio': bio})
+                      'company': company, 'location': location,
+                      'hireable': hireable, 'bio': bio})
         url = self._build_url('user')
         json = self._json(self._patch(url, data=user), 200)
         if json:

@@ -52,7 +52,7 @@ class Authorization(GitHubCore):
 
     @requires_basic_auth
     def update(self, scopes=[], add_scopes=[], rm_scopes=[], note='',
-            note_url=''):
+               note_url=''):
         """Update this authorization.
 
         :param scopes: (optional), replaces the authorization scopes with these

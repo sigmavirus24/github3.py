@@ -7,7 +7,7 @@ github3.api
 
 """
 
-from .github import GitHub
+from .github import GitHub, GitHubEnterprise  # NOQA
 
 gh = GitHub()
 
@@ -70,12 +70,12 @@ def list_following(username):
 
 
 def list_repo_issues(owner, repository, filter='', state='', labels='',
-        sort='', direction='', since=''):
+                     sort='', direction='', since=''):
     """See :func:`github3.github.GitHub.list_issues`"""
     issues = []
     if owner and repository:
         issues = gh.list_repo_issues(owner, repository, filter, state, labels,
-                sort, direction, since)
+                                     sort, direction, since)
     return issues
 
 

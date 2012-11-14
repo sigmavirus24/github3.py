@@ -82,3 +82,23 @@ Or you can simply use the following functions
 ------
 
 .. autofunction:: github3.ratelimit_remaining
+
+------
+
+Enterprise Use
+--------------
+
+If you're using github3.py to interact with an enterprise installation of 
+GitHub, you must use the
+:class:`GitHubEnterprise <github3.github.GitHubEnterprise>` object. Upon 
+initialization, the only parameter you must supply is the URL of your 
+enterprise installation, e.g.
+
+::
+
+    from github import GitHubEnterprise
+
+    g = GitHubEnterprise('https://github.examplesintl.com')
+    stats = g.admin_stats('all')
+    assert 'issues' in stats, ('Key issues is not included in the admin'
+                               'statistics')

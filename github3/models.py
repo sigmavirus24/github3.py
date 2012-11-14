@@ -57,15 +57,15 @@ class GitHubCore(GitHubObject):
             ses = session()
         self._session = ses
         headers = {
-                # Only accept JSON responses
-                'Accept': 'application/vnd.github.v3.full+json',
-                # Only accept UTF-8 encoded data
-                'Accept-Charset': 'utf-8',
-                # Always sending JSON
-                'Content-Type': "application/json",
-                # Set our own custom User-Agent string
-                'User-Agent': 'github3.py/0.1b0',
-                }
+            # Only accept JSON responses
+            'Accept': 'application/vnd.github.v3.full+json',
+            # Only accept UTF-8 encoded data
+            'Accept-Charset': 'utf-8',
+            # Always sending JSON
+            'Content-Type': "application/json",
+            # Set our own custom User-Agent string
+            'User-Agent': 'github3.py/0.1b0',
+        }
 
         self._session.headers.update(headers)
         self._session.config['base_headers'].update(headers)
@@ -74,7 +74,7 @@ class GitHubCore(GitHubObject):
         self._github_url = 'https://api.github.com'
         self._remaining = 5000
         self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '
-                'rel="(\w+)"')
+                                'rel="(\w+)"')
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
@@ -234,7 +234,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                data=dumps({'body': body})), 200)
+                              data=dumps({'body': body})), 200)
             if json:
                 self._update_(json)
                 return True

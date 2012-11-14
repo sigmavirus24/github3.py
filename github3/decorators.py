@@ -25,7 +25,7 @@ def requires_auth(func):
         auth = False
         if hasattr(self, '_session'):
             auth = (self._session.auth or
-                self._session.headers.get('Authorization'))
+                    self._session.headers.get('Authorization'))
 
         if auth:
             return func(self, *args, **kwargs)
@@ -54,7 +54,7 @@ def requires_basic_auth(func):
             r.status_code = 401
             r.encoding = 'utf-8'
             msg = ('{"message": "Requires username/password '
-                    'authentication"}').encode()
+                   'authentication"}').encode()
             r.raw = StringIO(msg)
             raise GitHubError(r)
     return auth_wrapper

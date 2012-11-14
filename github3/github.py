@@ -96,7 +96,7 @@ class GitHub(GitHubCore):
         if isinstance(scopes, list) and auth:
             url = self._build_url('authorizations')
             data = dumps({'scopes': scopes, 'note': note,
-                'note_url': note_url})
+                          'note_url': note_url})
             if self._session.auth:
                 json = self._json(self._post(url, data=data), 201)
             else:
@@ -120,20 +120,20 @@ class GitHub(GitHubCore):
         :returns: :class:`Gist <github3.gists.Gist>`
         """
         new_gist = {'description': description, 'public': public,
-                'files': files}
+                    'files': files}
         url = self._build_url('gists')
         json = self._json(self._post(url, dumps(new_gist)), 201)
         return Gist(json, self) if json else None
 
     @requires_auth
     def create_issue(self,
-        owner,
-        repository,
-        title,
-        body=None,
-        assignee=None,
-        milestone=None,
-        labels=[]):
+                     owner,
+                     repository,
+                     title,
+                     body=None,
+                     assignee=None,
+                     milestone=None,
+                     labels=[]):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
@@ -191,15 +191,15 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def create_repo(self,
-        name,
-        description='',
-        homepage='',
-        private=False,
-        has_issues=True,
-        has_wiki=True,
-        has_downloads=True,
-        auto_init=False,
-        gitignore_template=''):
+                    name,
+                    description='',
+                    homepage='',
+                    private=False,
+                    has_issues=True,
+                    has_wiki=True,
+                    has_downloads=True,
+                    auto_init=False,
+                    gitignore_template=''):
         """Create a repository for the authenticated user.
 
         :param str name: (required), name of the repository
@@ -222,10 +222,10 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'repos')
         data = dumps({'name': name, 'description': description,
-            'homepage': homepage, 'private': private,
-            'has_issues': has_issues, 'has_wiki': has_wiki,
-            'has_downloads': has_downloads, 'auto_init': auto_init,
-            'gitignore_template': gitignore_template})
+                      'homepage': homepage, 'private': private,
+                      'has_issues': has_issues, 'has_wiki': has_wiki,
+                      'has_downloads': has_downloads, 'auto_init': auto_init,
+                      'gitignore_template': gitignore_template})
         json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None
 
@@ -444,7 +444,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def iter_org_issues(self, name, filter='', state='', labels='', sort='',
-            direction='', since='', number=-1):
+                        direction='', since='', number=-1):
         """Iterate over the organnization's issues if the authenticated user
         belongs to it.
 
@@ -472,7 +472,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def iter_issues(self, filter='', state='', labels='', sort='',
-        direction='', since='', number=-1):
+                    direction='', since='', number=-1):
         """List all of the authenticated user's (and organization's) issues.
 
         :param str filter: accepted values:
@@ -498,7 +498,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def iter_user_issues(self, filter='', state='', labels='', sort='',
-        direction='', since='', number=-1):
+                         direction='', since='', number=-1):
         """List only the authenticated user's issues. Will not list
         organization's issues
 
@@ -524,8 +524,8 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Issue, params=params)
 
     def iter_repo_issues(self, owner, repository, milestone=None,
-        state='', assignee='', mentioned='', labels='', sort='', direction='',
-        since='', number=-1):
+                         state='', assignee='', mentioned='', labels='',
+                         sort='', direction='', since='', number=-1):
         """List issues on owner/repository. Only owner and repository are
         required.
 
@@ -552,7 +552,7 @@ class GitHub(GitHubCore):
         if owner and repository:
             repo = self.repository(owner, repository)
             return repo.iter_issues(milestone, state, assignee, mentioned,
-                    labels, sort, direction, since, number)
+                                    labels, sort, direction, since, number)
         return self._iter(0, '', type)
 
     @requires_auth
@@ -585,7 +585,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Organization)
 
     def iter_repos(self, login=None, type='', sort='', direction='',
-            number=-1):
+                   number=-1):
         """List public repositories for the specified ``login`` or all
         repositories for the authenticated user if ``login`` is not
         provided.
@@ -668,8 +668,7 @@ class GitHub(GitHubCore):
             self._session.auth = (username, password)
         elif token:
             self._session.headers.update({
-                'Authorization': 'token ' + token
-                })
+                'Authorization': 'token ' + token})
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.
@@ -771,7 +770,7 @@ class GitHub(GitHubCore):
         :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
         url = self._build_url('legacy', 'issues', 'search', owner, repo,
-                state, keyword)
+                              state, keyword)
         json = self._json(self._get(url), 200)
         issues = json.get('issues', [])
         return [LegacyIssue(l, self) for l in issues]
@@ -899,7 +898,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def update_user(self, name=None, email=None, blog=None,
-            company=None, location=None, hireable=False, bio=None):
+                    company=None, location=None, hireable=False, bio=None):
         """If authenticated as this user, update the information with
         the information provided in the parameters. All parameters are
         optional.
@@ -922,7 +921,7 @@ class GitHub(GitHubCore):
         """
         user = self.user()
         return user.update(name, email, blog, company, location, hireable,
-                    bio)
+                           bio)
 
     def user(self, login=None):
         """Returns a User object for the specified login name if
@@ -948,3 +947,34 @@ class GitHub(GitHubCore):
     def unwatch(self, login, repo):
         """DEPRECATED: Use unsubscribe/unstar instead."""
         raise DeprecationWarning('Use unsubscribe/unstar instead.')
+
+
+class GitHubEnterprise(GitHub):
+    """For GitHub Enterprise users, this object will act as the public API to
+    your instance. You must provide the URL to your instance upon
+    initializaiton and can provide the rest of the login details just like in
+    the :class:`GitHub <GitHub>` object.
+
+    There is no need to provide the end of the url (e.g., /api/v3/), that will
+    be taken care of by us.
+    """
+    def __init__(self, url, login='', password='', token=''):
+        super(GitHubEnterprise, self).__init__(login, password, token)
+        self._github_url = url.rstrip('/') + '/api/v3'
+
+    @requires_auth
+    def admin_stats(self, option):
+        """This is a simple way to get statistics about your system.
+
+        :param str option: (required), accepted values: ('all', 'repos',
+            'hooks', 'pages', 'orgs', 'users', 'pulls', 'issues',
+            'milestones', 'gists', 'comments')
+        :returns: dict
+        """
+        stats = {}
+        if option.lower() in ('all', 'repos', 'hooks', 'pages', 'orgs',
+                              'users', 'pulls', 'issues', 'milestones',
+                              'gists', 'comments'):
+            url = self._build_url('enterprise', 'stats', option.lower())
+            stats = self._json(self._get(url), 200)
+        return stats
