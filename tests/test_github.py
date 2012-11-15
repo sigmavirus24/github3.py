@@ -483,3 +483,18 @@ class TestGitHub(BaseCase):
         user = self.g.search_email('graffatcolmingov@gmail.com')
         expect(user).isinstance(github3.legacy.LegacyUser)
         self.mock_assertions()
+
+    def test_set_client_id(self):
+        auth = ('idXXXXXXXXXXXX', 'secretXXXXXXXXXXXXXXXX')
+        self.g.set_client_id(*auth)
+        expect(self.g._session.params['client_id']) == auth[0]
+        expect(self.g._session.params['client_secret']) == auth[1]
+
+    def test_set_user_agent(self):
+        ua = 'Fake User Agents'
+        self.g.set_user_agent(ua)
+        expect(self.g._session.headers['User-Agent']) == ua
+        expect(self.g._session.config['base_headers']['User-Agent']) == ua
+
+    #def test_star(self):
+    #    self.request.return_value = generate_response('', 204)
