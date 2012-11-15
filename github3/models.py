@@ -8,16 +8,10 @@ This module provides the basic models used in github3.py
 
 from json import dumps
 from requests import session
+from requests.compat import urlparse
 from re import compile
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
-
-try:  # (No coverage)
-    # Python 2.x
-    from urlparse import urlparse  # (No coverage)
-except ImportError:  # (No coverage)
-    # Python 3.x
-    from urllib.parse import urlparse  # NOQA
 
 __url_cache__ = {}
 
