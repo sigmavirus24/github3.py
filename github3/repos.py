@@ -106,7 +106,7 @@ class Repository(GitHubCore):
             self.parent = Repository(self.parent, self)
 
         #: default branch for the repository
-        self.master_branch = repo.get('master_branch', '')
+        self.master_branch = repo.get('master_branch')
 
     def __repr__(self):
         return '<Repository [{0}/{1}]>'.format(self.owner.login, self.name)
