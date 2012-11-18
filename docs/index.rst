@@ -46,6 +46,7 @@ More Examples
 
     examples/oauth
     examples/gist
+    examples/git
     examples/github
     examples/issue
 

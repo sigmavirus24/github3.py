@@ -16,6 +16,13 @@ github3.api
 
 - Add anonymous functionality for more areas of the API
 
+github3.*
+~~~~~~~~~
+
+- Add sensible defaults to all attributes instead of just using None, e.g.,
+  if the user is expecting a string but there is no data to provide, return 
+  ``''``.
+
 Low priority
 ------------
 
