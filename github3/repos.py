@@ -251,8 +251,11 @@ class Repository(GitHubCore):
         :returns: :class:`Contents <Contents>` if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return Contents(json) if json else None
+        resp = self._get(url)
+        if self._boolean(resp, 200, 404):
+            return Contents(self._json(resp, 200))
+        else:
+            return None
 
     @requires_auth
     def create_blob(self, content, encoding):
