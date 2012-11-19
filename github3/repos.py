@@ -667,35 +667,55 @@ class Repository(GitHubCore):
     @requires_auth
     def edit(self,
              name,
-             description='',
-             homepage='',
-             private=False,
-             has_issues=True,
-             has_wiki=True,
-             has_downloads=True,
-             default_branch=''):
+             description=None,
+             homepage=None,
+             private=None,
+             has_issues=None,
+             has_wiki=None,
+             has_downloads=None,
+             default_branch=None):
         """Edit this repository.
 
         :param str name: (required), name of the repository
-        :param str description: (optional)
-        :param str homepage: (optional)
-        :param bool private: (optional), If ``True``, create a
-            private repository. API default: ``False``
-        :param bool has_issues: (optional), If ``True``, enable
-            issues for this repository. API default: ``True``
-        :param bool has_wiki: (optional), If ``True``, enable the
-            wiki for this repository. API default: ``True``
-        :param bool has_downloads: (optional), If ``True``, enable
-            downloads for this repository. API default: ``True``
-        :param str default_branch: (optional), Update the default branch for
-            this repository
+        :param str description: (optional), If not ``None``, change the
+            description for this repository. API default: ``None`` - leave
+            value unchanged.
+        :param str homepage: (optional), If not ``None``, change the homepage
+            for this repository. API default: ``None`` - leave value unchanged.
+        :param bool private: (optional), If ``True``, make the repository
+            private. If ``False``, make the repository public. API default:
+            ``None`` - leave value unchanged.
+        :param bool has_issues: (optional), If ``True``, enable issues for
+            this repository. If ``False``, disable issues for this repository.
+            API default: ``None`` - leave value unchanged.
+        :param bool has_wiki: (optional), If ``True``, enable the wiki for
+            this repository. If ``False``, disable the wiki for this
+            repository. API default: ``None`` - leave value unchanged.
+        :param bool has_downloads: (optional), If ``True``, enable downloads
+            for this repository. If ``False``, disable downloads for this
+            repository. API default: ``None`` - leave value unchanged.
+        :param str default_branch: (optional), If not ``None``, change the
+            default branch for this repository. API default: ``None`` - leave
+            value unchanged.
         :returns: bool -- True if successful, False otherwise
         """
-        data = dumps({'name': name, 'description': description,
-                      'homepage': homepage, 'private': private,
-                      'has_issues': has_issues, 'has_wiki': has_wiki,
-                      'has_downloads': has_downloads,
-                      'default_branch': default_branch})
+        edit = {'name': name}
+        if description is not None:
+            edit['description'] = description
+        if homepage is not None:
+            edit['homepage'] = homepage
+        if private is not None:
+            edit['private'] = private
+        if has_issues is not None:
+            edit['has_issues'] = has_issues
+        if has_wiki is not None:
+            edit['has_wiki'] = has_wiki
+        if has_downloads is not None:
+            edit['has_downloads'] = has_downloads
+        if default_branch is not None:
+            edit['default_branch'] = default_branch
+
+        data = dumps(edit)
         json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
