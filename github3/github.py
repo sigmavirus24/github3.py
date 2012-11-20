@@ -774,6 +774,7 @@ class GitHub(GitHubCore):
         self._session.config['base_headers'].update(ua)
         self._session.headers.update(ua)
 
+    @requires_auth
     def star(self, login, repo):
         """Star to login/repo
 

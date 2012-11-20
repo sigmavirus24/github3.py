@@ -496,5 +496,17 @@ class TestGitHub(BaseCase):
         expect(self.g._session.headers['User-Agent']) == ua
         expect(self.g._session.config['base_headers']['User-Agent']) == ua
 
-    #def test_star(self):
-    #    self.request.return_value = generate_response('', 204)
+    def test_star(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('put',
+                     'https://api.github.com/user/starred/'
+                     'sigmavirus24/github3.py')
+        self.conf = dict(headers={'Content-Length': '0'}, data=None)
+
+        with expect.githuberror():
+            self.g.star('foo', 'bar')
+
+        self.login()
+        expect(self.g.star(None, None)).is_False()
+        expect(self.g.star('sigmavirus24', 'github3.py')).is_True()
+        self.mock_assertions()
