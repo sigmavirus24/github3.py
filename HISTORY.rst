@@ -7,9 +7,10 @@ History/Changelog
 MAJOR API CHANGES:
 
  - ``GitHub.iter_subscribed`` --> ``GitHub.iter_subscriptions``
-
- - Broken ``list_*`` functions in github3.api have been renamed to the correct 
+ - Broken ``list_*`` functions in github3.api have been renamed to the correct
    ``iter_*`` methods on ``GitHub``.
+ - Removed ``list_*`` functions from ``Repository``, ``Gist``,
+   ``Organization``, and ``User`` objects
 
 - Added zen of GitHub method.
 - More tests
