@@ -39,10 +39,8 @@ class Key(GitHubCore):
     def update(self, title, key):
         """Update this key.
 
-        :param title: (required), title of the key
-        :type title: str
-        :param key: (required), text of the key file
-        :type key: str
+        :param str title: (required), title of the key
+        :param str key: (required), text of the key file
         :returns: bool
         """
         json = None
@@ -152,8 +150,7 @@ class User(BaseAccount):
         """Add the email addresses in ``addresses`` to the authenticated
         user's account.
 
-        :param addresses: (optional), email addresses to be added
-        :type addresses: list
+        :param list addresses: (optional), email addresses to be added
         :returns: list of email addresses
         """
         json = []
@@ -176,8 +173,7 @@ class User(BaseAccount):
         """Delete the email addresses in ``addresses`` from the
         authenticated user's account.
 
-        :param addresses: (optional), email addresses to be removed
-        :type addresses: list
+        :param list addresses: (optional), email addresses to be removed
         :returns: bool
         """
         url = self._build_url('user', 'emails')
@@ -293,20 +289,13 @@ class User(BaseAccount):
         """If authenticated as this user, update the information with
         the information provided in the parameters.
 
-        :param name: e.g., 'John Smith', not login name
-        :type name: str
-        :param email: e.g., 'john.smith@example.com'
-        :type email: str
-        :param blog: e.g., 'http://www.example.com/jsmith/blog'
-        :type blog: str
-        :param company:
-        :type company: str
-        :param location:
-        :type location: str
-        :param hireable: defaults to False
-        :type hireable: bool
-        :param bio: GitHub flavored markdown
-        :type bio: str
+        :param str name: e.g., 'John Smith', not login name
+        :param str email: e.g., 'john.smith@example.com'
+        :param str blog: e.g., 'http://www.example.com/jsmith/blog'
+        :param str company:
+        :param str location:
+        :param bool hireable: defaults to False
+        :param str bio: GitHub flavored markdown
         :returns: bool
         """
         user = dumps({'name': name, 'email': email, 'blog': blog,
