@@ -251,6 +251,7 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return Gist(json, self) if json else None
 
+    @requires_auth
     def is_following(self, login):
         """Check if the authenticated user is following login.
 
@@ -352,28 +353,28 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Event)
 
     def iter_followers(self, login=None, number=-1):
-        """If login is provided, iterate over a list of followers of that
-        login name; otherwise return a list of followers of the
+        """If login is provided, iterate over a generator of followers of that
+        login name; otherwise return a generator of followers of the
         authenticated user.
 
         :param str login: (optional), login of the user to check
         :param int number: (optional), number of followers to return. Default:
             -1 returns all followers
-        :returns: list of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`User <github3.users.User>`\ s
         """
         if login:
             return self.user(login).iter_followers()
         return self._iter_follow('followers', int(number))
 
     def iter_following(self, login=None, number=-1):
-        """If login is provided, iterate over a list of users being followed
-        by login; otherwise return a list of people followed by the
-        authenticated user.
+        """If login is provided, iterate over a generator of users being
+        followed by login; otherwise return a generator of people followed by
+        the authenticated user.
 
         :param str login: (optional), login of the user to check
         :param int number: (optional), number of people to return. Default: -1
             returns all people you follow
-        :returns: list of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`User <github3.users.User>`\ s
         """
         if login:
             return self.user(login).iter_following()
@@ -386,7 +387,7 @@ class GitHub(GitHubCore):
         :param str login: (optional), login of the user to check
         :param int number: (optional), number of gists to return. Default: -1
             returns all available gists
-        :returns: list of :class:`Gist <github3.gists.Gist>`\ s
+        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
         """
         if username:
             url = self._build_url('users', username, 'gists')
@@ -518,7 +519,7 @@ class GitHub(GitHubCore):
             2012-05-20T23:10:27Z
         :param int number: (optional), number of issues to return.
             Default: -1 returns all issues
-        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
         """
         if owner and repository:
             repo = self.repository(owner, repository)
@@ -532,7 +533,7 @@ class GitHub(GitHubCore):
 
         :param int number: (optional), number of keys to return. Default: -1
             returns all your keys
-        :returns: list of :class:`Key <github3.users.Key>`\ s
+        :returns: generator of :class:`Key <github3.users.Key>`\ s
         """
         url = self._build_url('user', 'keys')
         return self._iter(int(number), url, Key)
@@ -545,7 +546,8 @@ class GitHub(GitHubCore):
         :param str login: (optional), user whose orgs you wish to list
         :param int number: (optional), number of organizations to return.
             Default: -1 returns all available organizations
-        :returns: list of :class:`Organization <github3.orgs.Organization>`\ s
+        :returns: generator of
+            :class:`Organization <github3.orgs.Organization>`\ s
         """
         if login:
             url = self._build_url('users', login, 'orgs')
@@ -572,7 +574,7 @@ class GitHub(GitHubCore):
             'desc' otherwise
         :param int number: (optional), number of repositories to return.
             Default: -1 returns all repositories
-        :returns: list of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
             objects
         """
         if login:
@@ -595,9 +597,10 @@ class GitHub(GitHubCore):
         """Iterate over repositories starred by ``login`` or the authenticated
         user.
 
+        :param str login: (optional), name of user whose stars you want to see
         :param int number: (optional), number of repositories to return.
             Default: -1 returns all repositories
-        :returns: list of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         if login:
             return self.user(login).iter_starred()
@@ -605,13 +608,15 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'starred')
         return self._iter(int(number), url, Repository)
 
-    def iter_subscribed(self, login=None, number=-1):
+    def iter_subscriptions(self, login=None, number=-1):
         """Iterate over repositories subscribed to by ``login`` or the
         authenticated user.
 
+        :param str login: (optional), name of user whose subscriptions you want
+            to see
         :param int number: (optional), number of repositories to return.
             Default: -1 returns all repositories
-        :returns: list of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         if login:
             return self.user(login).iter_subscriptions()
@@ -878,14 +883,6 @@ class GitHub(GitHubCore):
 
         json = self._json(self._get(url), 200)
         return User(json, self._session) if json else None
-
-    def watch(self, login, repo):
-        """DEPRECATED: Use subscribe/star instead."""
-        raise DeprecationWarning('Use subscribe/star instead.')
-
-    def unwatch(self, login, repo):
-        """DEPRECATED: Use unsubscribe/unstar instead."""
-        raise DeprecationWarning('Use unsubscribe/unstar instead.')
 
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg

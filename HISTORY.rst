@@ -1,6 +1,22 @@
 History/Changelog
 =================
 
+0.2: xxxx-xx-xx
+---------------
+
+MAJOR API CHANGES:
+
+ - ``GitHub.iter_subscribed`` --> ``GitHub.iter_subscriptions``
+
+ - Broken ``list_*`` functions in github3.api have been renamed to the correct 
+   ``iter_*`` methods on ``GitHub``.
+
+- Added zen of GitHub method.
+- More tests
+- Changed the way ``Repository.edit`` works courtesy of Kristian Glass
+  (@doismellburning)
+- Changed ``Repository.contents`` behaviour when acting on a 404.
+
 0.1: 2012-11-13
 ---------------
 

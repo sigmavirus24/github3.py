@@ -42,54 +42,137 @@ def gist(id_num):
     return gh.gist(id_num)
 
 
-def list_gists(username=None):
-    """Get public gists or gists for the provided username.
+def iter_events(number=-1):
+    """Iterate over public events.
 
-    :param str username: (optional), if provided, get the gists for this user
-        instead of the authenticated user.
-    :returns: list of :class:`Gist <github3.gists.Gist>`\ s
+    :param int number: (optional), number of events to return. Default: -1
+        returns all available events
+    :returns: generator of :class:`Event <github3.events.Event>`\ s
     """
-    return gh.list_gists(username)
+    return gh.iter_events(number)
 
 
-def list_followers(username):
+def iter_followers(username, number=-1):
     """List the followers of ``username``.
 
     :param str username: (required), login of the person to list the followers
         of
+    :param int number: (optional), number of followers to return, Default: -1,
+        return all of them
+    :returns: generator of :class:`User <github3.users.User>`
     """
-    return gh.list_followers(username) if username else []
+    return gh.iter_followers(username, number) if username else []
 
 
-def list_following(username):
+def iter_following(username, number=-1):
     """List the people ``username`` follows.
 
     :param str username: (required), login of the user
+    :param int number: (optional), number of users being followed by username
+        to return. Default: -1, return all of them
+    :returns: generator of :class:`User <github3.users.User>`
     """
-    return gh.list_following(username) if username else []
+    return gh.iter_following(username, number) if username else []
 
 
-def list_repo_issues(owner, repository, filter='', state='', labels='',
-                     sort='', direction='', since=''):
-    """See :func:`github3.github.GitHub.list_issues`"""
-    issues = []
+def iter_gists(username=None, number=-1):
+    """Get public gists or gists for the provided username.
+
+    :param str username: (optional), if provided, get the gists for this user
+        instead of the authenticated user.
+    :param int number: (optional), number of gists to return. Default: -1,
+        return all of them
+    :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+    """
+    return gh.iter_gists(username, number)
+
+
+def iter_repo_issues(owner, repository, filter='', state='', labels='',
+                     sort='', direction='', since='', number=-1):
+    """List issues on owner/repository. Only owner and repository are
+    required.
+
+    :param str owner: login of the owner of the repository
+    :param str repository: name of the repository
+    :param int milestone: None, '*', or ID of milestone
+    :param str state: accepted values: ('open', 'closed')
+        api-default: 'open'
+    :param str assignee: '*' or login of the user
+    :param str mentioned: login of the user
+    :param str labels: comma-separated list of label names, e.g.,
+        'bug,ui,@high'
+    :param str sort: accepted values: ('created', 'updated', 'comments')
+        api-default: created
+    :param str direction: accepted values: ('asc', 'desc')
+        api-default: desc
+    :param str since: ISO 8601 formatted timestamp, e.g.,
+        2012-05-20T23:10:27Z
+    :param int number: (optional), number of issues to return.
+        Default: -1 returns all issues
+    :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+    """
     if owner and repository:
-        issues = gh.list_repo_issues(owner, repository, filter, state, labels,
-                                     sort, direction, since)
-    return issues
+        return gh.iter_repo_issues(owner, repository, filter, state, labels,
+                                     sort, direction, since, number)
+    return iter([])
 
 
-def list_orgs(username):
+def iter_orgs(username, number=-1):
     """List the organizations associated with ``username``.
 
     :param str username: (required), login of the user
+    :param int number: (optional), number of orgs to return. Default: -1,
+        return all of the issues
     """
-    return gh.list_orgs(username) if username else []
+    return gh.iter_orgs(username, number) if username else []
 
 
-def list_repos(login, type='', sort='', direction=''):
-    """See :func:`github3.github.GitHub.list_repos`"""
-    return gh.list_repos(login, type, sort, direction) if login else []
+def iter_repos(login, type='', sort='', direction='', number=-1):
+    """List public repositories for the specified ``login`` or all
+    repositories for the authenticated user if ``login`` is not
+    provided.
+
+    :param str login: (required)
+    :param str type: (optional), accepted values:
+        ('all', 'owner', 'public', 'private', 'member')
+        API default: 'all'
+    :param str sort: (optional), accepted values:
+        ('created', 'updated', 'pushed', 'full_name')
+        API default: 'created'
+    :param str direction: (optional), accepted values:
+        ('asc', 'desc'), API default: 'asc' when using 'full_name',
+        'desc' otherwise
+    :param int number: (optional), number of repositories to return.
+        Default: -1 returns all repositories
+    :returns: generator of :class:`Repository <github3.repos.Repository>`
+        objects
+    """
+    if login:
+        return gh.iter_repos(login, type, sort, direction, number)
+    return iter([])
+
+
+def iter_starred(username, number=-1):
+    """Iterate over repositories starred by ``username``.
+
+    :param str username: (optional), name of user whose stars you want to see
+    :param int number: (optional), number of repositories to return.
+        Default: -1 returns all repositories
+    :returns: generator of :class:`Repository <github3.repos.Repository>`
+    """
+    return gh.iter_starred(username, number)
+
+
+def iter_subscriptions(username, number=-1):
+    """Iterate over repositories subscribed to by ``username``.
+
+    :param str username: (optional), name of user whose subscriptions you want
+        to see
+    :param int number: (optional), number of repositories to return.
+        Default: -1 returns all repositories
+    :returns: generator of :class:`Repository <github3.repos.Repository>`
+    """
+    return gh.iter_subscriptions(username, number)
 
 
 def create_gist(description, files):
@@ -113,14 +196,6 @@ def issue(owner, repository, number):
     :returns: :class:`Issue <github3.issues.Issue>`
     """
     return gh.issue(owner, repository, number)
-
-
-def list_events():
-    """List all recent public events from GitHub.
-
-    :returns: list of :class:`Event <github3.events.Event>`\ s
-    """
-    return gh.list_events()
 
 
 def markdown(text, mode='', context='', raw=False):
