@@ -1,5 +1,6 @@
 import github3
 from mock import patch
+from contextlib import nested
 from tests.utils import (generate_response, expect, BaseCase, load)
 
 
@@ -369,13 +370,13 @@ class TestGitHub(BaseCase):
                     github3.repos.Repository)  # nopep8
             self.mock_assertions()
 
-    def test_iter_subscribed(self):
+    def test_iter_subscriptions(self):
         self.request.return_value = generate_response('repo', _iter=True)
         self.args = ('get', 'https://api.github.com/user/subscriptions')
         self.conf.update(params=None)
 
         self.login()
-        expect(next(self.g.iter_subscribed())).isinstance(
+        expect(next(self.g.iter_subscriptions())).isinstance(
                 github3.repos.Repository)  # nopep8
         self.mock_assertions()
 
@@ -385,7 +386,7 @@ class TestGitHub(BaseCase):
                          'https://api.github.com/users/sigmavirus24/'
                          'subscriptions'
                          )
-            expect(next(self.g.iter_subscribed('sigmavirus24'))).isinstance(
+            expect(next(self.g.iter_subscriptions('sigmavirus24'))).isinstance(
                     github3.repos.Repository)  # nopep8
             self.mock_assertions()
 
@@ -501,7 +502,7 @@ class TestGitHub(BaseCase):
         self.args = ('put',
                      'https://api.github.com/user/starred/'
                      'sigmavirus24/github3.py')
-        self.conf = dict(headers={'Content-Length': '0'}, data=None)
+        self.conf = {'headers': {'Content-Length': '0'}, 'data': None}
 
         with expect.githuberror():
             self.g.star('foo', 'bar')
@@ -510,3 +511,91 @@ class TestGitHub(BaseCase):
         expect(self.g.star(None, None)).is_False()
         expect(self.g.star('sigmavirus24', 'github3.py')).is_True()
         self.mock_assertions()
+
+    def test_subscribe(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('put',
+                     'https://api.github.com/user/subscriptions/'
+                     'sigmavirus24/github3.py')
+        self.conf = {'headers': {'Content-Length': '0'}, 'data': None}
+
+        with expect.githuberror():
+            self.g.subscribe('foo', 'bar')
+
+        self.login()
+        expect(self.g.subscribe(None, None)).is_False()
+        expect(self.g.subscribe('sigmavirus24', 'github3.py')).is_True()
+        self.mock_assertions()
+
+    def test_unfollow(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('delete',
+                     'https://api.github.com/user/following/'
+                     'sigmavirus24')
+        self.conf = {}
+
+        with expect.githuberror():
+            self.g.unfollow('foo')
+
+        self.login()
+        expect(self.g.unfollow(None)).is_False()
+        expect(self.g.unfollow('sigmavirus24')).is_True()
+        self.mock_assertions()
+
+    def test_unstar(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('delete',
+                     'https://api.github.com/user/starred/'
+                     'sigmavirus24/github3.py')
+        self.conf = {}
+
+        with expect.githuberror():
+            self.g.unstar('foo', 'bar')
+
+        self.login()
+        expect(self.g.unstar(None, None)).is_False()
+        expect(self.g.unstar('sigmavirus24', 'github3.py')).is_True()
+        self.mock_assertions()
+
+    def test_unsubscribe(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('delete',
+                     'https://api.github.com/user/subscriptions/'
+                     'sigmavirus24/github3.py')
+        self.conf = {}
+
+        with expect.githuberror():
+            self.g.unsubscribe('foo', 'bar')
+
+        self.login()
+        expect(self.g.unsubscribe(None, None)).is_False()
+        expect(self.g.unsubscribe('sigmavirus24', 'github3.py')).is_True()
+        self.mock_assertions()
+
+    def test_update_user(self):
+        self.login()
+        args = ('Ian Cordasco', 'example@mail.com', 'www.blog.com', 'company',
+                'loc', True, 'bio')
+
+        with nested(patch.object(github3.github.GitHub, 'user'),
+                    patch.object(github3.users.User, 'update')) as (user, upd):
+            user.return_value = github3.users.User(load('user'), self.g)
+            upd.return_value = True
+            expect(self.g.update_user(*args)).is_True()
+            expect(user.called).is_True()
+            expect(upd.called).is_True()
+            upd.assert_called_with(*args)
+
+    def test_user(self):
+        self.request.return_value = generate_response('user')
+        self.args = ('get', 'https://api.github.com/users/sigmavirus24')
+
+        expect(self.g.user('sigmavirus24')).isinstance(github3.users.User)
+        self.mock_assertions()
+
+        self.args = ('get', 'https://api.github.com/user')
+        self.login()
+        expect(self.g.user()).isinstance(github3.users.User)
+        self.mock_assertions()
+
+    # no test_zen
