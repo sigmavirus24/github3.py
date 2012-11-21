@@ -45,7 +45,7 @@ class Event(GitHubObject):
 
     @staticmethod
     def list_types():
-        """"""
+        """List available payload types"""
         return sorted(_payload_handlers.keys())
 
     def is_public(self):

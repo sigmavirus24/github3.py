@@ -288,19 +288,14 @@ class Issue(GitHubCore):
              milestone=None, labels=None):
         """Edit this issue.
 
-        :param title: Title of the issue
-        :type title: str
-        :param body: markdown formatted body (description) of the issue
-        :type body: str
-        :param assignee: login name of user the issue should be assigned to
-        :type assignee: str
-        :param state: accepted values: ('open', 'closed')
-        :type state: str
-        :param milestone: the NUMBER (not title) of the milestone to assign
-            this to [1]_
-        :type milestone: int
-        :param labels: list of labels to apply this to
-        :type labels: list of str's
+        :param str title: Title of the issue
+        :param str body: markdown formatted body (description) of the issue
+        :param str assignee: login name of user the issue should be assigned
+            to
+        :param str state: accepted values: ('open', 'closed')
+        :param int milestone: the NUMBER (not title) of the milestone to
+            assign this to [1]_
+        :param list labels: list of labels to apply this to
         :returns: bool
 
         .. [1] Milestone numbering starts at 1, i.e. the first milestone you
@@ -388,8 +383,7 @@ class Issue(GitHubCore):
     def replace_labels(self, labels):
         """Replace all labels on this issue with ``labels``.
 
-        :param labels: label names
-        :type: list of str's
+        :param list labels: label names
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)

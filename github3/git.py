@@ -123,10 +123,8 @@ class Reference(GitHubCore):
     def update(self, sha, force=False):
         """Update this reference.
 
-        :param sha: (required), sha of the reference
-        :type sha: str
-        :param force: (optional), force the update or not
-        :type force: bool
+        :param str sha: (required), sha of the reference
+        :param bool force: (optional), force the update or not
         :returns: bool
         """
         data = dumps({'sha': sha, 'force': force})

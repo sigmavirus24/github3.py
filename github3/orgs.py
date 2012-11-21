@@ -48,8 +48,7 @@ class Team(GitHubCore):
     def add_repo(self, repo):
         """Add ``repo`` to this team.
 
-        :param repo: (required), form: 'user/repo'
-        :type repo: str
+        :param str repo: (required), form: 'user/repo'
         :returns: bool
         """
         url = self._build_url('repos', repo, base_url=self._api)
@@ -67,10 +66,8 @@ class Team(GitHubCore):
     def edit(self, name, permission=''):
         """Edit this team.
 
-        :param name: (required)
-        :type name: str
-        :param permission: (optional), ('pull', 'push', 'admin')
-        :type permission: str
+        :param str name: (required)
+        :param str permission: (optional), ('pull', 'push', 'admin')
         :returns: bool
         """
         if name:
@@ -84,8 +81,7 @@ class Team(GitHubCore):
     def has_repo(self, repo):
         """Checks if this team has access to ``repo``
 
-        :param repo: (required), form: 'user/repo'
-        :type repo: str
+        :param str repo: (required), form: 'user/repo'
         :returns: bool
         """
         url = self._build_url('repos', repo, base_url=self._api)
@@ -94,8 +90,7 @@ class Team(GitHubCore):
     def is_member(self, login):
         """Check if ``login`` is a member of this team.
 
-        :param login: (required), login name of the user
-        :type login: str
+        :param str login: (required), login name of the user
         :returns: bool
         """
         url = self._build_url('members', login, base_url=self._api)
@@ -145,8 +140,7 @@ class Team(GitHubCore):
     def remove_member(self, login):
         """Remove ``login`` from this team.
 
-        :param login: (required), login of the member to remove
-        :type login: str
+        :param str login: (required), login of the member to remove
         :returns: bool
         """
         url = self._build_url('members', login, base_url=self._api)
@@ -156,8 +150,7 @@ class Team(GitHubCore):
     def remove_repo(self, repo):
         """Remove ``repo`` from this team.
 
-        :param repo: (required), form: 'user/repo'
-        :type repo: str
+        :param str repo: (required), form: 'user/repo'
         :returns: bool
         """
         url = self._build_url('repos', repo, base_url=self._api)
@@ -190,10 +183,8 @@ class Organization(BaseAccount):
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
 
-        :param login: (required), login name of the user to be added
-        :type login: str
-        :param team: (required), team name
-        :type team: str
+        :param str login: (required), login name of the user to be added
+        :param str team: (required), team name
         :returns: bool
         """
         teams = self.list_teams()
@@ -206,8 +197,8 @@ class Organization(BaseAccount):
     def add_repo(self, repo, team):
         """Add ``repo`` to ``team``.
 
-        :param repo: (required), string, form: 'user/repo'
-        :param team: (required), string
+        :param str repo: (required), form: 'user/repo'
+        :param str team: (required)
         """
         teams = self.list_teams()
         for t in teams:
@@ -275,12 +266,10 @@ class Organization(BaseAccount):
         """Assuming the authenticated user owns this organization,
         create and return a new team.
 
-        :param name: (required), name to be given to the team
-        :type name: str
-        :param repo_names: (optional) repositories, e.g.
+        :param str name: (required), name to be given to the team
+        :param list repo_names: (optional) repositories, e.g.
             ['github/dotfiles']
-        :type repo_names: list
-        :param permissions: (optional), options:
+        :param str permissions: (optional), options:
 
             - ``pull`` -- (default) members can not push or administer
                 repositories accessible by this team
@@ -289,7 +278,6 @@ class Organization(BaseAccount):
             - ``admin`` -- members can push, pull and administer
                 repositories accessible by this team
 
-        :type permissions: str
         :returns: :class:`Team <Team>`
         """
         data = dumps({'name': name, 'repo_names': repo_names,
@@ -307,16 +295,11 @@ class Organization(BaseAccount):
              name=None):
         """Edit this organization.
 
-        :param billing_email: (optional) Billing email address (private)
-        :type billing_email: str
-        :param company: (optional)
-        :type company: str
-        :param email: (optional) Public email address
-        :type email: str
-        :param location: (optional)
-        :type location: str
-        :param name: (optional)
-        :type name: str
+        :param str billing_email: (optional) Billing email address (private)
+        :param str company: (optional)
+        :param str email: (optional) Public email address
+        :param str location: (optional)
+        :param str name: (optional)
         :returns: bool
         """
         json = None
@@ -420,9 +403,8 @@ class Organization(BaseAccount):
     def list_repos(self, type=''):
         """List repos for this organization.
 
-        :param type: (optional), accepted values:
+        :param str type: (optional), accepted values:
             ('all', 'public', 'member', 'private'), API default: 'all'
-        :type type: str
         :returns: list of :class:`Repository <github3.repos.Repository>`
             objects
         """
@@ -477,10 +459,8 @@ class Organization(BaseAccount):
     def remove_repo(self, repo, team):
         """Remove ``repo`` from ``team``.
 
-        :param repo: (required), form: 'user/repo'
-        :type repo: str
-        :param team: (required)
-        :type team: str
+        :param str repo: (required), form: 'user/repo'
+        :param str team: (required)
         :returns: bool
         """
         teams = self.list_teams()
@@ -494,8 +474,7 @@ class Organization(BaseAccount):
         """Returns Team object with information about team specified by
         ``team_id``.
 
-        :param team_id: (required), unique id for the team
-        :type team_id: int
+        :param int team_id: (required), unique id for the team
         :returns: :class:`Team <Team>`
         """
         json = None

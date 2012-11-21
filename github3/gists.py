@@ -110,8 +110,7 @@ class Gist(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this gist.
 
-        :param body: (required), body of the comment
-        :type body: str
+        :param str body: (required), body of the comment
         :returns: :class:`GistComment <GistComment>`
         """
         url = self._build_url('comments', base_url=self._api)
@@ -129,14 +128,12 @@ class Gist(GitHubCore):
     def edit(self, description='', files={}):
         """Edit this gist.
 
-        :param description: (optional), description of the gist
-        :type description: str
-        :param files: (optional), files that make up this gist; the key(s)
-            should be the file name(s) and the values should be another
+        :param str description: (optional), description of the gist
+        :param dict files: (optional), files that make up this gist; the
+            key(s) should be the file name(s) and the values should be another
             (optional) dictionary with (optional) keys: 'content' and
             'filename' where the former is the content of the file and the
             latter is the new name of the file.
-        :type files: dict
         :returns: bool -- whether the edit was successful
         """
         data = {}
@@ -187,28 +184,10 @@ class Gist(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment)
 
-    def list_comments(self):
-        """List comments on this gist.
-
-        :returns: list of :class:`GistComment <GistComment>`\ s
-        """
-        url = self._build_url('comments', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [GistComment(c, self) for c in json]
-
-    def list_files(self):
-        """List of :class:`GistFile <GistFile>` objects representing the files
-        stored in this gist."""
-        return self._files
-
     def iter_files(self):
         """List of :class:`GistFile <GistFile>` objects representing the files
         stored in this gist."""
         return iter(self._files)
-
-    def list_forks(self):
-        """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
-        return self._forks
 
     def iter_forks(self):
         """List of :class:`Gist <Gist>`\ s representing forks of this gist."""

@@ -240,9 +240,8 @@ class PullRequest(GitHubCore):
     def merge(self, commit_message=''):
         """Merge this pull request.
 
-        :param commit_message: (optional), message to be used for the merge
-            commit
-        :type commit_message: str
+        :param str commit_message: (optional), message to be used for the
+            merge commit
         :returns: bool
         """
         data = None
@@ -256,7 +255,7 @@ class PullRequest(GitHubCore):
     def reopen(self):
         """Re-open a closed Pull Request.
 
-        :param: bool
+        :returns: bool
         """
         return self.update(self.title, self.body, 'open')
 
@@ -264,12 +263,9 @@ class PullRequest(GitHubCore):
     def update(self, title=None, body=None, state=None):
         """Update this pull request.
 
-        :param title: (optional), title of the pull
-        :type title: str
-        :param body: (optional), body of the pull request
-        :type body: str
-        :param state: (optional), ('open', 'closed')
-        :type state: str
+        :param str title: (optional), title of the pull
+        :param str body: (optional), body of the pull request
+        :param str state: (optional), ('open', 'closed')
         :returns: bool
         """
         data = {'title': title, 'body': body, 'state': state}

@@ -55,16 +55,12 @@ class Authorization(GitHubCore):
                note_url=''):
         """Update this authorization.
 
-        :param scopes: (optional), replaces the authorization scopes with these
-        :type scopes: list
-        :param add_scopes: (optional), scopes to be added
-        :type add_scopes: list
-        :param rm_scopes: (optional), scopes to be removed
-        :type rm_scopes: list
-        :param note: (optional), new note about authorization
-        :type note: str
-        :param note_url: (optional), new note URL about this authorization
-        :type note_url: str
+        :param list scopes: (optional), replaces the authorization scopes with
+            these
+        :param list add_scopes: (optional), scopes to be added
+        :param list rm_scopes: (optional), scopes to be removed
+        :param str note: (optional), new note about authorization
+        :param str note_url: (optional), new note URL about this authorization
         :returns: bool
         """
         success = False
