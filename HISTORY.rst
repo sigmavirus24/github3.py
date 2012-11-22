@@ -1,7 +1,7 @@
 History/Changelog
 =================
 
-0.2: xxxx-xx-xx
+0.2: 2012-11-21
 ---------------
 
 MAJOR API CHANGES:
@@ -17,6 +17,7 @@ MAJOR API CHANGES:
 - Changed the way ``Repository.edit`` works courtesy of Kristian Glass
   (@doismellburning)
 - Changed ``Repository.contents`` behaviour when acting on a 404.
+- 50% test coverage via mock tests
 
 0.1: 2012-11-13
 ---------------
