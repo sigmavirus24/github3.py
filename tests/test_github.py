@@ -1,6 +1,5 @@
 import github3
 from mock import patch
-from contextlib import nested
 from tests.utils import (generate_response, expect, BaseCase, load)
 
 
@@ -577,14 +576,14 @@ class TestGitHub(BaseCase):
         args = ('Ian Cordasco', 'example@mail.com', 'www.blog.com', 'company',
                 'loc', True, 'bio')
 
-        with nested(patch.object(github3.github.GitHub, 'user'),
-                    patch.object(github3.users.User, 'update')) as (user, upd):
-            user.return_value = github3.users.User(load('user'), self.g)
-            upd.return_value = True
-            expect(self.g.update_user(*args)).is_True()
-            expect(user.called).is_True()
-            expect(upd.called).is_True()
-            upd.assert_called_with(*args)
+        with patch.object(github3.github.GitHub, 'user') as user:
+            with patch.object(github3.users.User, 'update') as upd:
+                user.return_value = github3.users.User(load('user'), self.g)
+                upd.return_value = True
+                expect(self.g.update_user(*args)).is_True()
+                expect(user.called).is_True()
+                expect(upd.called).is_True()
+                upd.assert_called_with(*args)
 
     def test_user(self):
         self.request.return_value = generate_response('user')
