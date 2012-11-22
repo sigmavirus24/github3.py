@@ -762,11 +762,12 @@ class Repository(GitHubCore):
         :returns: :class:`Issue <github3.issues.Issue>` if successful, else
             None
         """
-        json = None
-        if int(number) > 0:
-            url = self._build_url('issues', str(number), base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return Issue(json, self) if json else None
+        url = self._build_url('issues', str(number), base_url=self._api)
+        resp = self._get(url)
+        if self._boolean(resp, 200, 404):
+            return Issue(self._json(resp, 200))
+        else:
+            return None
 
     @requires_auth
     def key(self, id_num):
