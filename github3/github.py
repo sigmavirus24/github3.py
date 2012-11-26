@@ -56,6 +56,8 @@ class GitHub(GitHubCore):
             self.login(login, password)
 
     def __repr__(self):
+        if self._session.auth:
+            return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
     @requires_auth
