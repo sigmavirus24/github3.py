@@ -9,7 +9,6 @@ This module provides the basic models used in github3.py
 from json import dumps
 from requests import session
 from requests.compat import urlparse
-from re import compile
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
 
@@ -67,8 +66,6 @@ class GitHubCore(GitHubObject):
         # set a sane default
         self._github_url = 'https://api.github.com'
         self._remaining = 5000
-        self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '
-                                'rel="(\w+)"')
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
