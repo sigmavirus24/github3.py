@@ -1,16 +1,29 @@
 History/Changelog
 =================
 
+0.3: xxxx-xx-xx
+---------------
+
+- In github3.repos.Repository
+
+  - is_fork() and fork return the same thing
+  - is_private() and private return the same thing as well
+  - has_downloads, has_issues, has_wiki are now straight attributes
+
+- In github3.repos.Hook
+
+  - is_active() and active return the same value
+
 0.2: 2012-11-21
 ---------------
 
-MAJOR API CHANGES:
+- MAJOR API CHANGES:
 
- - ``GitHub.iter_subscribed`` --> ``GitHub.iter_subscriptions``
- - Broken ``list_*`` functions in github3.api have been renamed to the correct
-   ``iter_*`` methods on ``GitHub``.
- - Removed ``list_*`` functions from ``Repository``, ``Gist``,
-   ``Organization``, and ``User`` objects
+  - ``GitHub.iter_subscribed`` --> ``GitHub.iter_subscriptions``
+  - Broken ``list_*`` functions in github3.api have been renamed to the correct
+    ``iter_*`` methods on ``GitHub``.
+  - Removed ``list_*`` functions from ``Repository``, ``Gist``,
+    ``Organization``, and ``User`` objects
 
 - Added zen of GitHub method.
 - More tests

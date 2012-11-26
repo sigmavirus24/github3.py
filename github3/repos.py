@@ -26,66 +26,69 @@ class Repository(GitHubCore):
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(repo, session)
         #: URL used to clone via HTTPS.
-        self.clone_url = repo.get('clone_url')
+        self.clone_url = repo.get('clone_url', '')
         #: ``datetime`` object representing when the Repository was created.
         self.created_at = self._strptime(repo.get('created_at'))
         #: Description of the repository.
-        self.description = repo.get('description')
+        self.description = repo.get('description', '')
 
         # The number of forks
         #: The number of forks made of this repository.
-        self.forks = repo.get('forks')
+        self.forks = repo.get('forks', 0)
 
-        # Is this repository a fork?
-        self._is_fork = repo.get('fork')
+        #: Is this repository a fork?
+        self.fork = repo.get('fork')
 
         # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
         #: Plain git url for an anonymous clone.
-        self.git_url = repo.get('git_url')
-        self._has_dl = repo.get('has_downloads')
-        self._has_issues = repo.get('has_issues')
-        self._has_wiki = repo.get('has_wiki')
+        self.git_url = repo.get('git_url', '')
+        #: Whether or not this repository has downloads enabled
+        self.has_downloads = repo.get('has_downloads')
+        #: Whether or not this repository has an issue tracker
+        self.has_issues = repo.get('has_issues')
+        #: Whether or not this repository has the wiki enabled
+        self.has_wiki = repo.get('has_wiki')
 
         # e.g. https://sigmavirus24.github.com/github3.py
         #: URL of the home page for the project.
-        self.homepage = repo.get('homepage')
+        self.homepage = repo.get('homepage', '')
 
         # e.g. https://github.com/sigmavirus24/github3.py
         #: URL of the project at GitHub.
-        self.html_url = repo.get('html_url')
+        self.html_url = repo.get('html_url', '')
         #: Unique id of the repository.
-        self.id = repo.get('id')
+        self.id = repo.get('id', 0)
         #: Language property.
-        self.language = repo.get('language')
+        self.language = repo.get('language', '')
         #: Mirror property.
-        self.mirror_url = repo.get('mirror_url')
+        self.mirror_url = repo.get('mirror_url', '')
 
         # Repository name, e.g. github3.py
         #: Name of the repository.
-        self.name = repo.get('name')
+        self.name = repo.get('name', '')
 
         # Number of open issues
         #: Number of open issues on the repository.
-        self.open_issues = repo.get('open_issues')
+        self.open_issues = repo.get('open_issues', 0)
 
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
         #  repository owner.
-        self.owner = User(repo.get('owner'), self._session)
+        self.owner = User(repo.get('owner', {}), self._session)
 
-        # Is this repository private?
-        self._priv = repo.get('private')
+        #: Is this repository private?
+        self.private = repo.get('private')
         #: ``datetime`` object representing the last time commits were pushed
         #  to the repository.
         self.pushed_at = self._strptime(repo.get('pushed_at'))
         #: Size of the repository.
-        self.size = repo.get('size')
+        self.size = repo.get('size', 0)
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
-        self.ssh_url = repo.get('ssh_url')
+        self.ssh_url = repo.get('ssh_url', '')
         #: If it exists, url to clone the repository via SVN.
-        self.svn_url = repo.get('svn_url')
+        self.svn_url = repo.get('svn_url', '')
         #: ``datetime`` object representing the last time the repository was
         #  updated.
         self.updated_at = self._strptime(repo.get('updated_at'))
@@ -93,20 +96,20 @@ class Repository(GitHubCore):
 
         # The number of watchers
         #: Number of users watching the repository.
-        self.watchers = repo.get('watchers')
+        self.watchers = repo.get('watchers', 0)
 
         #: Parent of this fork, if it exists :class;`Repository`
-        self.source = repo.get('source', None)
+        self.source = repo.get('source')
         if self.source:
             self.source = Repository(self.source, self)
 
         #: Parent of this fork, if it exists :class:`Repository`
-        self.parent = repo.get('parent', None)
+        self.parent = repo.get('parent')
         if self.parent:
             self.parent = Repository(self.parent, self)
 
         #: default branch for the repository
-        self.master_branch = repo.get('master_branch')
+        self.master_branch = repo.get('master_branch', '')
 
     def __repr__(self):
         return '<Repository [{0}/{1}]>'.format(self.owner.login, self.name)
@@ -692,14 +695,14 @@ class Repository(GitHubCore):
 
         :returns: bool
         """
-        return self._is_fork
+        return self.fork
 
     def is_private(self):
         """Checks if this repository is private.
 
         :returns: bool
         """
-        return self._priv
+        return self.private
 
     def git_commit(self, sha):
         """Get a single (git) commit.
@@ -711,27 +714,6 @@ class Repository(GitHubCore):
         url = self._build_url('git', 'commits', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
         return Commit(json, self) if json else None
-
-    def has_downloads(self):
-        """Checks if this repository has downloads.
-
-        :returns: bool
-        """
-        return self._has_dl
-
-    def has_issues(self):
-        """Checks if this repository has issues enabled.
-
-        :returns: bool
-        """
-        return self._has_issues
-
-    def has_wiki(self):
-        """Checks if this repository has a wiki.
-
-        :returns: bool
-        """
-        return self._has_wiki
 
     @requires_auth
     def hook(self, id_num):
@@ -1359,11 +1341,11 @@ class Contents(GitHubObject):
 
         # should always be 'base64'
         #: Returns encoding used on the content.
-        self.encoding = content.get('encoding')
+        self.encoding = content.get('encoding', '')
 
         # content, base64 encoded and decoded
         #: Base64-encoded content of the file.
-        self.content = content.get('content')
+        self.content = content.get('content', '')
 
         #: Decoded content of the file.
         self.decoded = self.content
@@ -1372,17 +1354,17 @@ class Contents(GitHubObject):
 
         # file name, path, and size
         #: Name of the content.
-        self.name = content.get('name')
+        self.name = content.get('name', '')
         #: Path to the content.
-        self.path = content.get('path')
+        self.path = content.get('path', '')
         #: Size of the content
-        self.size = content.get('size')
+        self.size = content.get('size', 0)
         #: SHA string.
-        self.sha = content.get('sha')
+        self.sha = content.get('sha', '')
 
         # should always be 'file'
         #: Type of content.
-        self.type = content.get('type')
+        self.type = content.get('type', '')
 
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
@@ -1407,19 +1389,19 @@ class Download(GitHubCore):
         super(Download, self).__init__(download, session)
         self._api = download.get('url', '')
         #: URL of the download at GitHub.
-        self.html_url = download.get('html_url')
+        self.html_url = download.get('html_url', '')
         #: Unique id of the download on GitHub.
-        self.id = download.get('id')
+        self.id = download.get('id', 0)
         #: Name of the download.
-        self.name = download.get('name')
+        self.name = download.get('name', '')
         #: Description of the download.
-        self.description = download.get('description')
+        self.description = download.get('description', '')
         #: Size of the download.
-        self.size = download.get('size')
+        self.size = download.get('size', 0)
         #: How many times this particular file has been downloaded.
-        self.download_count = download.get('download_count')
+        self.download_count = download.get('download_count', 0)
         #: Content type of the download.
-        self.content_type = download.get('content_type')
+        self.content_type = download.get('content_type', '')
 
     def __repr__(self):
         return '<Download [{0}]>'.format(self.name)
@@ -1473,7 +1455,8 @@ class Hook(GitHubCore):
         self.name = hook.get('name')
         #: Events which trigger the hook.
         self.events = hook.get('events')
-        self._active = hook.get('active')
+        #: Whether or not this Hook is marked as active on GitHub
+        self.active = hook.get('active')
         #: Dictionary containing the configuration for the Hook.
         self.config = hook.get('config')
         #: Unique id of the hook.
@@ -1543,7 +1526,7 @@ class Hook(GitHubCore):
 
         :returns: bool
         """
-        return self._active
+        return self.active
 
     @requires_auth
     def test(self):
