@@ -422,6 +422,7 @@ class Repository(GitHubCore):
         """
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels}
+        self._remove_none(issue)
         url = self._build_url('issues', base_url=self._api)
 
         json = self._json(self._post(url, issue), 201)
@@ -473,6 +474,7 @@ class Repository(GitHubCore):
             state = 'open'
         data = {'title': title, 'state': state,
                 'description': description, 'due_on': due_on}
+        self._remove_none(data)
         json = self._json(self._post(url, data), 201)
         return Milestone(json, self) if json else None
 
@@ -655,24 +657,12 @@ class Repository(GitHubCore):
             value unchanged.
         :returns: bool -- True if successful, False otherwise
         """
-        edit = {'name': name}
-        if description is not None:
-            edit['description'] = description
-        if homepage is not None:
-            edit['homepage'] = homepage
-        if private is not None:
-            edit['private'] = private
-        if has_issues is not None:
-            edit['has_issues'] = has_issues
-        if has_wiki is not None:
-            edit['has_wiki'] = has_wiki
-        if has_downloads is not None:
-            edit['has_downloads'] = has_downloads
-        if default_branch is not None:
-            edit['default_branch'] = default_branch
-
-        data = edit
-        json = self._json(self._patch(self._api, data=data), 200)
+        edit = {'name': name, 'description': description, 'homepage': homepage,
+                'private': private, 'has_issues': has_issues,
+                'has_wiki': has_wiki, 'has_downloads': has_downloads,
+                'default_branch': default_branch}
+        self._remove_none(edit)
+        json = self._json(self._patch(self._api, data=edit), 200)
         if json:
             self._update_(json)
             return True
@@ -793,7 +783,6 @@ class Repository(GitHubCore):
             -1 returns all branches
         :returns: list of :class:`Branch <Branch>`\ es
         """
-        # Paginate?
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch)
 
@@ -804,7 +793,6 @@ class Repository(GitHubCore):
             -1 returns all comments
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
-        # Paginate?
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment)
 
@@ -853,7 +841,6 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :returns: list of :class:`User <github3.users.User>`\ s
         """
-        # Paginate
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
@@ -933,16 +920,10 @@ class Repository(GitHubCore):
         """
         url = self._build_url('issues', base_url=self._api)
 
-        params = {}
+        params = {'assignee': assignee, 'mentioned': mentioned}
         if milestone in ('*', 'none') or isinstance(milestone, int):
             params['milestone'] = milestone
-
-        if assignee:
-            params['assignee'] = assignee
-
-        if mentioned:
-            params['mentioned'] = mentioned
-
+        self._remove_none(params)
         params.update(issue_params(None, state, labels, sort, direction,
             since))  # nopep8
 
@@ -1059,9 +1040,10 @@ class Repository(GitHubCore):
             :class:`PullRequest <github3.pulls.PullRequest>`\ s
         """
         url = self._build_url('pulls', base_url=self._api)
+        params = {}
         if state in ('open', 'closed'):
-            url = '{0}?{1}={2}'.format(url, 'state', state)
-        return self._iter(int(number), url, PullRequest)
+            params['state'] = state
+        return self._iter(int(number), url, PullRequest, params=params)
 
     def iter_refs(self, subspace='', number=-1):
         """Iterates over references for this repository.

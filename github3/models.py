@@ -67,7 +67,7 @@ class GitHubCore(GitHubObject):
 
         self._session.headers.update(headers)
         self._session.config['base_headers'].update(headers)
-        self._session.hooks = {'args': [json_hook]}
+        self._session.hooks.update({'args': [json_hook]})
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -75,6 +75,11 @@ class GitHubCore(GitHubObject):
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
+
+    def _remove_none(self, data):
+        for (k, v) in list(data.items()):
+            if v is None:
+                del(data[k])
 
     def _json(self, request, status_code):
         ret = None

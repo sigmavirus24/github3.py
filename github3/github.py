@@ -498,8 +498,9 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Issue, params=params)
 
     def iter_repo_issues(self, owner, repository, milestone=None,
-                         state='', assignee='', mentioned='', labels='',
-                         sort='', direction='', since='', number=-1):
+                         state=None, assignee=None, mentioned=None,
+                         labels=None, sort=None, direction=None, since=None,
+                         number=-1):
         """List issues on owner/repository. Only owner and repository are
         required.
 

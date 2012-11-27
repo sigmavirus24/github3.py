@@ -253,7 +253,6 @@ class User(BaseAccount):
             returns all events available
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
-        # Paginate
         path = ['received_events']
         if public:
             path.append('public')
@@ -300,6 +299,7 @@ class User(BaseAccount):
         user = {'name': name, 'email': email, 'blog': blog,
                 'company': company, 'location': location,
                 'hireable': hireable, 'bio': bio}
+        self._remove_none(user)
         url = self._build_url('user')
         json = self._json(self._patch(url, data=user), 200)
         if json:
