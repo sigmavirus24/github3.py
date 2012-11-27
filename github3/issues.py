@@ -6,7 +6,6 @@ This module contains the classes related to issues.
 
 """
 
-from json import dumps
 from re import match
 from github3.models import GitHubCore, BaseComment
 from github3.users import User
@@ -51,8 +50,8 @@ class Label(GitHubCore):
         if name and color:
             if color[0] == '#':
                 color = color[1:]
-            json = self._json(self._patch(self._api, data=dumps({'name': name,
-                              'color': color})), 200)
+            json = self._json(self._patch(self._api, data={'name': name,
+                              'color': color}), 200)
 
         if json:
             self._update_(json)
@@ -139,8 +138,8 @@ class Milestone(GitHubCore):
             YYYY-MM-DDTHH:MM:SSZ
         :returns: bool
         """
-        data = dumps({'title': title, 'state': state,
-                      'description': description, 'due_on': due_on})
+        data = {'title': title, 'state': state,
+                'description': description, 'due_on': due_on}
         json = None
 
         if title:
@@ -223,7 +222,7 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(list(args))),
+        json = self._json(self._post(url, data=list(args)),
                           status_code=200)
         return True if json else False
 
@@ -280,7 +279,7 @@ class Issue(GitHubCore):
         json = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, dumps({'body': body})), 201)
+            json = self._json(self._post(url, {'body': body}), 201)
         return IssueComment(json, self) if json else None
 
     @requires_auth
@@ -308,7 +307,7 @@ class Issue(GitHubCore):
             if v is None:
                 del data[k]
         if data:
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+            json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True
@@ -387,7 +386,7 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._boolean(self._put(url, data=dumps(labels)), 200, 404)
+        return self._boolean(self._put(url, data=labels), 200, 404)
 
     @requires_auth
     def reopen(self):

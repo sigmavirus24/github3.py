@@ -37,6 +37,11 @@ class GitHubObject(object):
         return cls(json)
 
 
+def json_hook(args):
+    if args.get('data') and not args.get('files'):
+        args['data'] = dumps(args['data'])
+
+
 class GitHubCore(GitHubObject):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
@@ -62,6 +67,7 @@ class GitHubCore(GitHubObject):
 
         self._session.headers.update(headers)
         self._session.config['base_headers'].update(headers)
+        self._session.hooks = {'args': [json_hook]}
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -225,7 +231,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                              data=dumps({'body': body})), 200)
+                              data={'body': body}), 200)
             if json:
                 self._update_(json)
                 return True

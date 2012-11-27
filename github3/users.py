@@ -6,7 +6,6 @@ This module contains everything relating to Users.
 
 """
 
-from json import dumps
 from github3.events import Event
 from github3.models import GitHubObject, GitHubCore, BaseAccount
 from github3.decorators import requires_auth
@@ -45,7 +44,7 @@ class Key(GitHubCore):
         """
         json = None
         if title and key:
-            data = dumps({'title': title, 'key': key})
+            data = {'title': title, 'key': key}
             json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
@@ -156,7 +155,7 @@ class User(BaseAccount):
         json = []
         if addresses:
             url = self._build_url('user', 'emails')
-            json = self._json(self._post(url, dumps(addresses)), 201)
+            json = self._json(self._post(url, addresses), 201)
         return json
 
     @requires_auth
@@ -177,7 +176,7 @@ class User(BaseAccount):
         :returns: bool
         """
         url = self._build_url('user', 'emails')
-        return self._boolean(self._delete(url, data=dumps(addresses)),
+        return self._boolean(self._delete(url, data=addresses),
                              204, 404)
 
     @property
@@ -298,9 +297,9 @@ class User(BaseAccount):
         :param str bio: GitHub flavored markdown
         :returns: bool
         """
-        user = dumps({'name': name, 'email': email, 'blog': blog,
-                      'company': company, 'location': location,
-                      'hireable': hireable, 'bio': bio})
+        user = {'name': name, 'email': email, 'blog': blog,
+                'company': company, 'location': location,
+                'hireable': hireable, 'bio': bio}
         url = self._build_url('user')
         json = self._json(self._patch(url, data=user), 200)
         if json:

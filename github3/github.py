@@ -7,7 +7,6 @@ This module contains the main GitHub session object.
 """
 
 from requests import session
-from json import dumps
 from github3.auths import Authorization
 from github3.events import Event
 from github3.gists import Gist
@@ -94,8 +93,8 @@ class GitHub(GitHubCore):
         auth = self._session.auth or (login and password)
         if isinstance(scopes, list) and auth:
             url = self._build_url('authorizations')
-            data = dumps({'scopes': scopes, 'note': note,
-                          'note_url': note_url})
+            data = {'scopes': scopes, 'note': note,
+                    'note_url': note_url}
             if self._session.auth:
                 json = self._json(self._post(url, data=data), 201)
             else:
@@ -119,7 +118,7 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                     'files': files}
         url = self._build_url('gists')
-        json = self._json(self._post(url, dumps(new_gist)), 201)
+        json = self._json(self._post(url, new_gist), 201)
         return Gist(json, self) if json else None
 
     @requires_auth
@@ -172,7 +171,7 @@ class GitHub(GitHubCore):
 
         if title and key:
             url = self._build_url('user', 'keys')
-            req = self._post(url, dumps({'title': title, 'key': key}))
+            req = self._post(url, {'title': title, 'key': key})
             json = self._json(req, 201)
             if json:
                 created = Key(json, self)
@@ -210,11 +209,11 @@ class GitHub(GitHubCore):
         .. warning: ``name`` should be no longer than 100 characters
         """
         url = self._build_url('user', 'repos')
-        data = dumps({'name': name, 'description': description,
-                      'homepage': homepage, 'private': private,
-                      'has_issues': has_issues, 'has_wiki': has_wiki,
-                      'has_downloads': has_downloads, 'auto_init': auto_init,
-                      'gitignore_template': gitignore_template})
+        data = {'name': name, 'description': description,
+                'homepage': homepage, 'private': private,
+                'has_issues': has_issues, 'has_wiki': has_wiki,
+                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'gitignore_template': gitignore_template}
         json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None
 
@@ -669,7 +668,7 @@ class GitHub(GitHubCore):
             if context:
                 data['context'] = context
 
-            data = dumps(data)
+            data = data
 
         if data:
             req = self._post(url, data=data, headers=headers)

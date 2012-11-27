@@ -6,7 +6,6 @@ This module contains all of the classes related to organizations.
 
 """
 
-from json import dumps
 from github3.events import Event
 from github3.models import BaseAccount, GitHubCore
 from github3.repos import Repository
@@ -71,7 +70,7 @@ class Team(GitHubCore):
         :returns: bool
         """
         if name:
-            data = dumps({'name': name, 'permission': permission})
+            data = {'name': name, 'permission': permission}
             json = self._json(self._patch(self._api, data=data), 200)
             if json:
                 self._update_(json)
@@ -249,7 +248,7 @@ class Organization(BaseAccount):
                 'gitignore_template': gitignore_template}
         if team_id > 0:
             data.update({'team_id': team_id})
-        json = self._json(self._post(url, dumps(data)), 201)
+        json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None
 
     @requires_auth
@@ -280,8 +279,8 @@ class Organization(BaseAccount):
 
         :returns: :class:`Team <Team>`
         """
-        data = dumps({'name': name, 'repo_names': repo_names,
-                      'permissions': permissions})
+        data = {'name': name, 'repo_names': repo_names,
+                'permissions': permissions}
         url = self._build_url('teams', base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return Team(json, self._session) if json else None
@@ -310,7 +309,7 @@ class Organization(BaseAccount):
                 del data[k]
 
         if data:
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+            json = self._json(self._patch(self._api, data=data), 200)
 
         if json:
             self._update_(json)
