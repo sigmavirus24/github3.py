@@ -27,6 +27,9 @@ Guidelines for Contributing to github3.py
    please open an issue reqeust first and of course add tests to cover the 
    functionality in the event it is accepted.
 
+   Also, please be certain to add docstrings_ to these functions. Follow the 
+   example of other docstrings.
+
 5. In case you haven't caught on, for anything you add, write tests.
 
 6. Be cordial_.
@@ -35,5 +38,10 @@ Guidelines for Contributing to github3.py
    request. This makes my life easier. If you honestly have no idea what I'm 
    talking about, don't worry, I'll take care of it.
 
+8. Please follow pep-0008_. Feel free to also use flake8_ to help.
+
 .. links
 .. _cordial: http://kennethreitz.com/be-cordial-or-be-on-your-way.html
+.. _pep-0008: http://www.python.org/dev/peps/pep-0008/
+.. _docstrings: http://www.python.org/dev/peps/pep-0257/
+.. _flake8: http://pypi.python.org/pypi/flake8
