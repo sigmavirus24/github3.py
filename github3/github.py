@@ -77,7 +77,8 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Authorization(json, self) if json else None
 
-    def authorize(self, login, password, scopes, note='', note_url=''):
+    def authorize(self, login, password, scopes, note='', note_url='',
+                  client_id='', client_secret=''):
         """Obtain an authorization token from the GitHub API for the GitHub
         API.
 
@@ -87,14 +88,18 @@ class GitHub(GitHubCore):
             i.e., 'gist', 'user'
         :param str note: (optional), note about the authorization
         :param str note_url: (optional), url for the application
+        :param str client_id: (optional), 20 character OAuth client key for
+            which to create a token
+        :param str client_secret: (optional), 40 character OAuth client secret
+            for which to create the token
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
         auth = self._session.auth or (login and password)
         if isinstance(scopes, list) and auth:
             url = self._build_url('authorizations')
-            data = {'scopes': scopes, 'note': note,
-                    'note_url': note_url}
+            data = {'scopes': scopes, 'note': note, 'note_url': note_url,
+                    'client_id': client_id, 'client_secret': client_secret}
             if self._session.auth:
                 json = self._json(self._post(url, data=data), 201)
             else:

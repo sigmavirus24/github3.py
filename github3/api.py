@@ -12,7 +12,8 @@ from .github import GitHub, GitHubEnterprise  # NOQA
 gh = GitHub()
 
 
-def authorize(login, password, scopes, note='', note_url=''):
+def authorize(login, password, scopes, note='', note_url='', client_id='',
+              client_secret=''):
     """Obtain an authorization token from the GitHub API for the GitHub
     API.
 
@@ -22,6 +23,10 @@ def authorize(login, password, scopes, note='', note_url=''):
         i.e., 'gist', 'user'
     :param str note: (optional), note about the authorization
     :param str note_url: (optional), url for the application
+    :param str client_id: (optional), 20 character OAuth client key for which
+        to create a token
+    :param str client_secret: (optional), 40 character OAuth client secret for
+        which to create the token
     :returns: :class:`Authorization <Authorization>`
     """
     return gh.authorize(login, password, scopes, note, note_url)

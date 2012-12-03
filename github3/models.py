@@ -11,6 +11,7 @@ from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
+from github3 import __version__
 
 __url_cache__ = {}
 
@@ -37,11 +38,6 @@ class GitHubObject(object):
         return cls(json)
 
 
-def json_hook(args):
-    if args.get('data') and not args.get('files'):
-        args['data'] = dumps(args['data'])
-
-
 class GitHubCore(GitHubObject):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
@@ -62,8 +58,13 @@ class GitHubCore(GitHubObject):
             # Always sending JSON
             'Content-Type': "application/json",
             # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/0.1b0',
+            'User-Agent': 'github3.py/{0}'.format(__version__),
         }
+
+        # Requests hook
+        def json_hook(args):
+            if args.get('data') and not args.get('files'):
+                args['data'] = dumps(args['data'])
 
         self._session.headers.update(headers)
         self._session.config['base_headers'].update(headers)
