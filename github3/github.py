@@ -257,6 +257,23 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         return Gist(json, self) if json else None
 
+    def gitignore_template(self, language):
+        """Returns the template for language.
+
+        :returns: str
+        """
+        url = self._build_url('gitignore', 'templates', language)
+        json = self._json(self._get(url), 200)
+        return json.get('source', '')
+
+    def gitignore_templates(self):
+        """Returns the list of available templates.
+
+        :returns: list of template names
+        """
+        url = self._build_url('gitignore', 'templates')
+        return self._json(self._get(url), 200) or []
+
     @requires_auth
     def is_following(self, login):
         """Check if the authenticated user is following login.
@@ -311,19 +328,6 @@ class GitHub(GitHubCore):
         if repo:
             return repo.issue(number)
         return None
-
-    @requires_auth
-    def key(self, id_num):
-        """Gets the authenticated user's key specified by id_num.
-
-        :param int id_num: (required), unique id of the key
-        :returns: :class:`Key <github3.users.Key>`
-        """
-        json = None
-        if int(id_num) > 0:
-            url = self._build_url('user', 'keys', str(id_num))
-            json = self._json(self._get(url), 200)
-        return Key(json, self) if json else None
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1):
@@ -630,6 +634,19 @@ class GitHub(GitHubCore):
 
         url = self._build_url('user', 'subscriptions')
         return self._iter(int(number), url, Repository)
+
+    @requires_auth
+    def key(self, id_num):
+        """Gets the authenticated user's key specified by id_num.
+
+        :param int id_num: (required), unique id of the key
+        :returns: :class:`Key <github3.users.Key>`
+        """
+        json = None
+        if int(id_num) > 0:
+            url = self._build_url('user', 'keys', str(id_num))
+            json = self._json(self._get(url), 200)
+        return Key(json, self) if json else None
 
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls.

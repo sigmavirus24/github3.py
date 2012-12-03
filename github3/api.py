@@ -57,6 +57,22 @@ def gist(id_num):
     return gh.gist(id_num)
 
 
+def gitignore_template(language):
+    """Returns the template for language.
+
+    :returns: str
+    """
+    return gh.gitignore_template(language)
+
+
+def gitignore_templates():
+    """Returns the list of available templates.
+
+    :returns: list of template names
+    """
+    return gh.gitignore_templates()
+
+
 def iter_events(number=-1):
     """Iterate over public events.
 

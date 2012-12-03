@@ -49,6 +49,14 @@ Or you can simply use the following functions
 
 ------
 
+.. autofunction:: github3.gitignore_template
+
+------
+
+.. autofunction:: github3.gitignore_templates
+
+------
+
 .. autofunction:: github3.issue
 
 ------
