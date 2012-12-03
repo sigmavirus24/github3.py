@@ -7,10 +7,12 @@ from io import BytesIO
 from unittest import TestCase
 
 
-def generate_response(path_name, status_code=200, enc='utf-8', _iter=False):
+def generate_response(path_name, status_code=200, enc='utf-8', _iter=False,
+                      **headers):
     r = requests.Response()
     r.status_code = status_code
     r.encoding = enc
+
     if path_name:
         content = path(path_name).read().strip()
         if _iter:
@@ -18,6 +20,10 @@ def generate_response(path_name, status_code=200, enc='utf-8', _iter=False):
         r.raw = BytesIO(content.encode())
     else:
         r.raw = BytesIO()
+
+    if headers:
+        r.headers = headers
+
     return r
 
 

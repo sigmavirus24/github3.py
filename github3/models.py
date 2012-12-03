@@ -11,6 +11,7 @@ from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
+from github3 import __version__
 
 __url_cache__ = {}
 
@@ -57,11 +58,17 @@ class GitHubCore(GitHubObject):
             # Always sending JSON
             'Content-Type': "application/json",
             # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/0.1b0',
+            'User-Agent': 'github3.py/{0}'.format(__version__),
         }
+
+        # Requests hook
+        def json_hook(args):
+            if args.get('data') and not args.get('files'):
+                args['data'] = dumps(args['data'])
 
         self._session.headers.update(headers)
         self._session.config['base_headers'].update(headers)
+        self._session.hooks.update({'args': [json_hook]})
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -69,6 +76,11 @@ class GitHubCore(GitHubObject):
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
+
+    def _remove_none(self, data):
+        for (k, v) in list(data.items()):
+            if v is None:
+                del(data[k])
 
     def _json(self, request, status_code):
         ret = None
@@ -225,7 +237,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                              data=dumps({'body': body})), 200)
+                              data={'body': body}), 200)
             if json:
                 self._update_(json)
                 return True

@@ -6,7 +6,6 @@ Module which contains all the gist related material.
 
 """
 
-from json import dumps
 from github3.models import GitHubObject, GitHubCore, BaseComment
 from github3.users import User
 from github3.decorators import requires_auth
@@ -114,7 +113,7 @@ class Gist(GitHubCore):
         :returns: :class:`GistComment <GistComment>`
         """
         url = self._build_url('comments', base_url=self._api)
-        json = self._json(self._post(url, dumps({'body': body})), 201)
+        json = self._json(self._post(url, {'body': body}), 201)
         return GistComment(json, self) if json else None
 
     @requires_auth
@@ -143,7 +142,7 @@ class Gist(GitHubCore):
         if files:
             data['files'] = files
         if data:
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+            json = self._json(self._patch(self._api, data=data), 200)
         if json:
             self._update_(json)
             return True

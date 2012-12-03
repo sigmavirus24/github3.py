@@ -7,7 +7,6 @@ This module contains the classes relating to repositories.
 """
 
 from base64 import b64decode
-from json import dumps
 from requests import post
 from github3.events import Event
 from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
@@ -262,7 +261,7 @@ class Repository(GitHubCore):
         sha = ''
         if encoding in ('base64', 'utf-8') and content:
             url = self._build_url('git', 'blobs', base_url=self._api)
-            data = dumps({'content': content, 'encoding': encoding})
+            data = {'content': content, 'encoding': encoding}
             json = self._json(self._post(url, data), 201)
             if json:
                 sha = json.get('sha')
@@ -285,8 +284,8 @@ class Repository(GitHubCore):
         position = int(position)
         json = None
         if body and sha and line > 0:
-            data = dumps({'body': body, 'commit_id': sha, 'line': line,
-                          'path': path, 'position': position})
+            data = {'body': body, 'commit_id': sha, 'line': line,
+                    'path': path, 'position': position}
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
             json = self._json(self._post(url, data), 201)
@@ -316,8 +315,8 @@ class Repository(GitHubCore):
         json = None
         if message and tree and isinstance(parents, list):
             url = self._build_url('git', 'commits', base_url=self._api)
-            data = dumps({'message': message, 'tree': tree, 'parents': parents,
-                          'author': author, 'committer': committer})
+            data = {'message': message, 'tree': tree, 'parents': parents,
+                    'author': author, 'committer': committer}
             json = self._json(self._post(url, data), 201)
         return Commit(json, self) if json else None
 
@@ -340,9 +339,9 @@ class Repository(GitHubCore):
             url = self._build_url('downloads', base_url=self._api)
             from os import stat
             info = stat(path)
-            data = dumps({'name': name, 'size': info.st_size,
-                          'description': description,
-                          'content_type': content_type})
+            data = {'name': name, 'size': info.st_size,
+                    'description': description,
+                    'content_type': content_type}
             json = self._json(self._post(url, data), 201)
 
         if not json:
@@ -372,7 +371,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
-            resp = self._post(url, data=dumps({'organization': organization}))
+            resp = self._post(url, data={'organization': organization})
         else:
             resp = self._post(url)
         json = self._json(resp, 202)
@@ -394,8 +393,8 @@ class Repository(GitHubCore):
         json = None
         if name and config and isinstance(config, dict):
             url = self._build_url('hooks', base_url=self._api)
-            data = dumps({'name': name, 'config': config, 'events': events,
-                          'active': active})
+            data = {'name': name, 'config': config, 'events': events,
+                    'active': active}
             json = self._json(self._post(url, data), 201)
         return Hook(json, self) if json else None
 
@@ -421,8 +420,9 @@ class Repository(GitHubCore):
         :returns: :class:`Issue <github3.issues.Issue>` if successful, else
             None
         """
-        issue = dumps({'title': title, 'body': body, 'assignee': assignee,
-                       'milestone': milestone, 'labels': labels})
+        issue = {'title': title, 'body': body, 'assignee': assignee,
+                 'milestone': milestone, 'labels': labels}
+        self._remove_none(issue)
         url = self._build_url('issues', base_url=self._api)
 
         json = self._json(self._post(url, issue), 201)
@@ -436,7 +436,7 @@ class Repository(GitHubCore):
         :param str key: (required), key text
         :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
-        data = dumps({'title': title, 'key': key})
+        data = {'title': title, 'key': key}
         url = self._build_url('keys', base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return Key(json, self) if json else None
@@ -451,7 +451,7 @@ class Repository(GitHubCore):
         :returns: :class:`Label <github3.issues.Label>` if successful, else
             None
         """
-        data = dumps({'name': name, 'color': color.strip('#')})
+        data = {'name': name, 'color': color.strip('#')}
         url = self._build_url('labels', base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return Label(json, self) if json else None
@@ -472,8 +472,9 @@ class Repository(GitHubCore):
         url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
             state = 'open'
-        data = dumps({'title': title, 'state': state,
-                      'description': description, 'due_on': due_on})
+        data = {'title': title, 'state': state,
+                'description': description, 'due_on': due_on}
+        self._remove_none(data)
         json = self._json(self._post(url, data), 201)
         return Milestone(json, self) if json else None
 
@@ -489,8 +490,8 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        data = dumps({'title': title, 'body': body, 'base': base,
-                      'head': head})
+        data = {'title': title, 'body': body, 'base': base,
+                'head': head}
         return self._create_pull(data)
 
     @requires_auth
@@ -503,7 +504,7 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        data = dumps({'issue': issue, 'base': base, 'head': head})
+        data = {'issue': issue, 'base': base, 'head': head}
         return self._create_pull(data)
 
     @requires_auth
@@ -517,7 +518,7 @@ class Repository(GitHubCore):
         :returns: :class:`Reference <github3.git.Reference>` if successful
             else None
         """
-        data = dumps({'ref': ref, 'sha': sha})
+        data = {'ref': ref, 'sha': sha}
         url = self._build_url('git', 'refs', base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return Reference(json, self) if json else None
@@ -534,8 +535,8 @@ class Repository(GitHubCore):
         """
         json = {}
         if sha and state:
-            data = dumps({'state': state, 'target_url': target_url,
-                          'description': description})
+            data = {'state': state, 'target_url': target_url,
+                    'description': description}
             url = self._build_url('statuses', sha, base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return Status(json) if json else None
@@ -563,8 +564,8 @@ class Repository(GitHubCore):
 
         json = None
         if tag and message and sha and obj_type and len(tagger) == 3:
-            data = dumps({'tag': tag, 'message': message, 'object': sha,
-                          'type': obj_type, 'tagger': tagger})
+            data = {'tag': tag, 'message': message, 'object': sha,
+                    'type': obj_type, 'tagger': tagger}
             url = self._build_url('git', 'tags', base_url=self._api)
             json = self._json(self._post(url, data), 201)
             if json:
@@ -584,7 +585,7 @@ class Repository(GitHubCore):
         """
         json = None
         if tree and isinstance(tree, list):
-            data = dumps({'tree': tree, 'base_tree': base_tree})
+            data = {'tree': tree, 'base_tree': base_tree}
             url = self._build_url('git', 'trees', base_url=self._api)
             json = self._json(self._post(url, data), 201)
         return Tree(json) if json else None
@@ -656,24 +657,12 @@ class Repository(GitHubCore):
             value unchanged.
         :returns: bool -- True if successful, False otherwise
         """
-        edit = {'name': name}
-        if description is not None:
-            edit['description'] = description
-        if homepage is not None:
-            edit['homepage'] = homepage
-        if private is not None:
-            edit['private'] = private
-        if has_issues is not None:
-            edit['has_issues'] = has_issues
-        if has_wiki is not None:
-            edit['has_wiki'] = has_wiki
-        if has_downloads is not None:
-            edit['has_downloads'] = has_downloads
-        if default_branch is not None:
-            edit['default_branch'] = default_branch
-
-        data = dumps(edit)
-        json = self._json(self._patch(self._api, data=data), 200)
+        edit = {'name': name, 'description': description, 'homepage': homepage,
+                'private': private, 'has_issues': has_issues,
+                'has_wiki': has_wiki, 'has_downloads': has_downloads,
+                'default_branch': default_branch}
+        self._remove_none(edit)
+        json = self._json(self._patch(self._api, data=edit), 200)
         if json:
             self._update_(json)
             return True
@@ -794,7 +783,6 @@ class Repository(GitHubCore):
             -1 returns all branches
         :returns: list of :class:`Branch <Branch>`\ es
         """
-        # Paginate?
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch)
 
@@ -805,7 +793,6 @@ class Repository(GitHubCore):
             -1 returns all comments
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
-        # Paginate?
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment)
 
@@ -854,7 +841,6 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :returns: list of :class:`User <github3.users.User>`\ s
         """
-        # Paginate
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
@@ -934,16 +920,10 @@ class Repository(GitHubCore):
         """
         url = self._build_url('issues', base_url=self._api)
 
-        params = {}
+        params = {'assignee': assignee, 'mentioned': mentioned}
         if milestone in ('*', 'none') or isinstance(milestone, int):
             params['milestone'] = milestone
-
-        if assignee:
-            params['assignee'] = assignee
-
-        if mentioned:
-            params['mentioned'] = mentioned
-
+        self._remove_none(params)
         params.update(issue_params(None, state, labels, sort, direction,
             since))  # nopep8
 
@@ -1060,9 +1040,10 @@ class Repository(GitHubCore):
             :class:`PullRequest <github3.pulls.PullRequest>`\ s
         """
         url = self._build_url('pulls', base_url=self._api)
+        params = {}
         if state in ('open', 'closed'):
-            url = '{0}?{1}={2}'.format(url, 'state', state)
-        return self._iter(int(number), url, PullRequest)
+            params['state'] = state
+        return self._iter(int(number), url, PullRequest, params=params)
 
     def iter_refs(self, subspace='', number=-1):
         """Iterates over references for this repository.
@@ -1145,7 +1126,7 @@ class Repository(GitHubCore):
         mark = {'read': True}
         if last_read:
             mark['last_read_at'] = last_read
-        return self._boolean(self._put(url, data=dumps(mark)),
+        return self._boolean(self._put(url, data=mark),
                              205, 404)
 
     def merge(self, base, head, message=''):
@@ -1157,7 +1138,7 @@ class Repository(GitHubCore):
         :returns: :class:`RepoCommit <RepoCommit>`
         """
         url = self._build_url('merges', base_url=self._api)
-        data = dumps({'base': base, 'head': head, 'commit_message': message})
+        data = {'base': base, 'head': head, 'commit_message': message}
         json = self._json(self._post(url, data=data), 201)
         return RepoCommit(json, self) if json else None
 
@@ -1254,7 +1235,7 @@ class Repository(GitHubCore):
             ignored from this repository.
         :returns: :class;`Subscription <Subscription>`
         """
-        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
+        sub = {'subscribed': subscribed, 'ignored': ignored}
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._put(url, data=sub), 200)
         return Subscription(json, self) if json else None
@@ -1514,7 +1495,7 @@ class Hook(GitHubCore):
             if rm_events:
                 data['remove_events'] = rm_events
 
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+            json = self._json(self._patch(self._api, data=data), 200)
 
         if json:
             self._update_(json)
@@ -1604,8 +1585,8 @@ class RepoComment(BaseComment):
         """
         json = None
         if body and sha and path and line > 0 and position > 0:
-            data = dumps({'body': body, 'commit_id': sha, 'line': line,
-                          'path': path, 'position': position})
+            data = {'body': body, 'commit_id': sha, 'line': line,
+                    'path': path, 'position': position}
             json = self._json(self._post(self._api, data), 200)
 
         if json:

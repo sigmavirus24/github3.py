@@ -12,8 +12,23 @@ from .github import GitHub, GitHubEnterprise  # NOQA
 gh = GitHub()
 
 
-def authorize(login, password, scopes, note='', note_url=''):
-    """See :func:`authorize <github3.github.GitHub.authorize>`"""
+def authorize(login, password, scopes, note='', note_url='', client_id='',
+              client_secret=''):
+    """Obtain an authorization token from the GitHub API for the GitHub
+    API.
+
+    :param str login: (required)
+    :param str password: (required)
+    :param list scopes: (required), areas you want this token to apply to,
+        i.e., 'gist', 'user'
+    :param str note: (optional), note about the authorization
+    :param str note_url: (optional), url for the application
+    :param str client_id: (optional), 20 character OAuth client key for which
+        to create a token
+    :param str client_secret: (optional), 40 character OAuth client secret for
+        which to create the token
+    :returns: :class:`Authorization <Authorization>`
+    """
     return gh.authorize(login, password, scopes, note, note_url)
 
 
@@ -40,6 +55,42 @@ def gist(id_num):
     :returns: :class:`Gist <github3.gists.Gist>`
     """
     return gh.gist(id_num)
+
+
+def gitignore_template(language):
+    """Returns the template for language.
+
+    :returns: str
+    """
+    return gh.gitignore_template(language)
+
+
+def gitignore_templates():
+    """Returns the list of available templates.
+
+    :returns: list of template names
+    """
+    return gh.gitignore_templates()
+
+
+def iter_all_repos(number=-1):
+    """Iterate over every repository in the order they were created.
+
+    :param int number: (optional), number of repositories to return.
+        Default: -1, returns all of them
+    :returns: generator of :class:`Repository <github3.repos.Repository>`
+    """
+    return gh.iter_all_repos(number)
+
+
+def iter_all_users(number=-1):
+    """Iterate over every user in the order they signed up for GitHub.
+
+    :param int number: (optional), number of users to return. Default: -1,
+        returns all of them
+    :returns: generator of :class:`User <github3.users.User>`
+    """
+    return gh.iter_all_users(number)
 
 
 def iter_events(number=-1):
@@ -113,7 +164,7 @@ def iter_repo_issues(owner, repository, filter='', state='', labels='',
     """
     if owner and repository:
         return gh.iter_repo_issues(owner, repository, filter, state, labels,
-                                     sort, direction, since, number)
+                                   sort, direction, since, number)
     return iter([])
 
 
