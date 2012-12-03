@@ -37,6 +37,10 @@ Or you can simply use the following functions
 
 ------
 
+.. autofunction:: github3.authorize
+
+------
+
 .. autofunction:: github3.create_gist
 
 ------
@@ -49,15 +53,63 @@ Or you can simply use the following functions
 
 ------
 
-.. autofunction:: github3.list_events
+.. autofunction:: github3.iter_events
 
 ------
 
-.. autofunction:: github3.list_gists
+.. autofunction:: github3.iter_followers
+
+------
+
+.. autofunction:: github3.iter_following
+
+------
+
+.. autofunction:: github3.iter_gists
+
+------
+
+.. autofunction:: github3.iter_orgs
+
+------
+
+.. autofunction:: github3.iter_repos
+
+------
+
+.. autofunction:: github3.iter_repo_issues
+
+------
+
+.. autofunction:: github3.iter_starred
+
+------
+
+.. autofunction:: github3.iter_subscriptions
 
 ------
 
 .. autofunction:: github3.markdown
+
+------
+
+.. autofunction:: github3.octocat
+
+------
+
+.. autofunction:: github3.organization
+
+------
+
+.. autofunction:: github3.pull_request
+
+------
+
+.. autofunction:: github3.ratelimit_remaining
+
+------
+
+.. autofunction:: github3.repository
 
 ------
 
@@ -81,7 +133,7 @@ Or you can simply use the following functions
 
 ------
 
-.. autofunction:: github3.ratelimit_remaining
+.. autofunction:: github3.zen
 
 ------
 

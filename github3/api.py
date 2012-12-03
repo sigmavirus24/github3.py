@@ -13,7 +13,17 @@ gh = GitHub()
 
 
 def authorize(login, password, scopes, note='', note_url=''):
-    """See :func:`authorize <github3.github.GitHub.authorize>`"""
+    """Obtain an authorization token from the GitHub API for the GitHub
+    API.
+
+    :param str login: (required)
+    :param str password: (required)
+    :param list scopes: (required), areas you want this token to apply to,
+        i.e., 'gist', 'user'
+    :param str note: (optional), note about the authorization
+    :param str note_url: (optional), url for the application
+    :returns: :class:`Authorization <Authorization>`
+    """
     return gh.authorize(login, password, scopes, note, note_url)
 
 
@@ -113,7 +123,7 @@ def iter_repo_issues(owner, repository, filter='', state='', labels='',
     """
     if owner and repository:
         return gh.iter_repo_issues(owner, repository, filter, state, labels,
-                                     sort, direction, since, number)
+                                   sort, direction, since, number)
     return iter([])
 
 
