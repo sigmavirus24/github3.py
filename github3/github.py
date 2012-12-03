@@ -329,6 +329,26 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
+    def iter_all_repos(self, number=-1):
+        """Iterate over every repository in the order they were created.
+
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all of them
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        url = self._build_url('repositories')
+        return self._iter(int(number), url, Repository)
+
+    def iter_all_users(self, number=-1):
+        """Iterate over every user in the order they signed up for GitHub.
+
+        :param int number: (optional), number of users to return. Default: -1,
+            returns all of them
+        :returns: generator of :class:`User <github3.users.User>`
+        """
+        url = self._build_url('users')
+        return self._iter(int(number), url, User)
+
     @requires_basic_auth
     def iter_authorizations(self, number=-1):
         """Iterate over authorizations for the authenticated user. This will

@@ -73,6 +73,26 @@ def gitignore_templates():
     return gh.gitignore_templates()
 
 
+def iter_all_repos(number=-1):
+    """Iterate over every repository in the order they were created.
+
+    :param int number: (optional), number of repositories to return.
+        Default: -1, returns all of them
+    :returns: generator of :class:`Repository <github3.repos.Repository>`
+    """
+    return gh.iter_all_repos(number)
+
+
+def iter_all_users(number=-1):
+    """Iterate over every user in the order they signed up for GitHub.
+
+    :param int number: (optional), number of users to return. Default: -1,
+        returns all of them
+    :returns: generator of :class:`User <github3.users.User>`
+    """
+    return gh.iter_all_users(number)
+
+
 def iter_events(number=-1):
     """Iterate over public events.
 

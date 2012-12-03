@@ -61,6 +61,14 @@ Or you can simply use the following functions
 
 ------
 
+.. autofunction:: github3.iter_all_repos
+
+------
+
+.. autofunction:: github3.iter_all_users
+
+------
+
 .. autofunction:: github3.iter_events
 
 ------

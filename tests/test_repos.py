@@ -93,3 +93,28 @@ class TestRepository(BaseCase):
         expect(self.repo.create_blob(None, None)) == ''
         expect(self.repo.create_blob(content, encoding)) == sha
         self.mock_assertions()
+
+    def test_create_comment(self):
+        self.request.return_value = generate_response('commit_comment', 201)
+        body = ('Late night commits are never a good idea. I refactored a '
+                'bit. `User` objects and `Organization` objects share a lot '
+                'of common attributes. I turned those common attributes into '
+                'one `BaseAccount` class to make things simpler. ')
+        sha = 'd41566090114a752eb3a87dbcf2473eb427ef0f3'
+        self.args = ('post', self.api + 'commits/{0}/comments'.format(sha))
+        self.conf = {
+            'data': {
+                'body': body, 'commit_id': sha, 'line': 1, 'path': '',
+                'position': 1
+            }
+        }
+
+        with expect.githuberror():
+            self.repo.create_comment(body, sha)
+
+        self.login()
+        expect(self.repo.create_comment(None, None)).is_None()
+        expect(self.repo.create_comment(body, sha, line=0)).is_None()
+        expect(self.repo.create_comment(body, sha)
+               ).isinstance(github3.repos.RepoComment)
+        self.mock_assertions()
