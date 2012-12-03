@@ -36,5 +36,12 @@ class TestRepository(BaseCase):
                      )
 
         expect(self.repo.blob('3ceb856e2f14e9669fed6384e58c9a1590a2314f')
-                ).isinstance(github3.git.Blob)
+               ).isinstance(github3.git.Blob)
+        self.mock_assertions()
+
+    def test_branch(self):
+        self.request.return_value = generate_response('branch', 200)
+        self.args = ('get', self.api + 'branches/master')
+
+        expect(self.repo.branch('master')).isinstance(github3.repos.Branch)
         self.mock_assertions()
