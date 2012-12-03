@@ -26,6 +26,9 @@ class Key(GitHubCore):
     def __repr__(self):
         return '<User Key [{0}]>'.format(self.title)
 
+    def __str__(self):
+        return self.key
+
     def _update_(self, key):
         self.__init__(key, self._session)
 
@@ -69,6 +72,9 @@ class Plan(GitHubObject):
 
     def __repr__(self):
         return '<Plan [{0}]>'.format(self.name)  # (No coverage)
+
+    def __str__(self):
+        return self.name
 
     def is_free(self):
         """Checks if this is a free plan.
@@ -130,6 +136,9 @@ class User(BaseAccount):
 
     def __repr__(self):
         return '<User [{0}:{1}]>'.format(self.login, self.name)
+
+    def __str__(self):
+        return self.login
 
     def _update_(self, user):
         self.__init__(user, self._session)

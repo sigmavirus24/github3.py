@@ -111,7 +111,10 @@ class Repository(GitHubCore):
         self.master_branch = repo.get('master_branch', '')
 
     def __repr__(self):
-        return '<Repository [{0}/{1}]>'.format(self.owner.login, self.name)
+        return '<Repository [{0}]>'.format(self)
+
+    def __str__(self):
+        return '{0}/{1}'.format(self.owner, self.name)
 
     def _update_(self, repo):
         self.__init__(repo, self._session)
@@ -1350,6 +1353,9 @@ class Contents(GitHubObject):
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
 
+    def __str__(self):
+        return self.decoded
+
     @property
     def git_url(self):
         """API URL for this blob"""
@@ -1535,7 +1541,10 @@ class RepoTag(GitHubObject):
         self.commit = tag.get('commit', {})
 
     def __repr__(self):
-        return '<Repository Tag [{0}]>'.format(self.name)
+        return '<Repository Tag [{0}]>'.format(self)
+
+    def __str__(self):
+        return self.name
 
 
 class RepoComment(BaseComment):
