@@ -14,6 +14,37 @@ History/Changelog
 
   - is_active() and active return the same value
 
+- Some objects now have ``__str__`` methods. You can now do things like:
+
+  ::
+
+    import github3
+    u = github3.user('sigmavirus24')
+    r = github3.repository(u, 'github3.py')
+
+  And
+
+  ::
+
+    import github3
+
+    r = github3.repository('sigmavirus24', 'github3.py')
+
+    template = """Some kind of template where you mention this repository 
+    {0}"""
+
+    print(template.format(r))
+    # Some kind of template where you mention this repository
+    # sigmavirus24/github3.py
+
+  Current list of objects with this feature:
+
+  - github3.users.User (uses the login name)
+  - github3.users.Key (uses the key text)
+  - github3.users.Repository (uses the login/name pair)
+  - github3.users.RepoTag (uses the tag name)
+  - github3.users.Contents (uses the decoded content)
+
 0.2: 2012-11-21
 ---------------
 
@@ -44,7 +75,7 @@ History/Changelog
 - Handle sending json with `%` symbols better, courtesy of Kristian Glass
 - Correctly handle non-GitHub committers and authors courtesy of Paul Swartz 
   (@paulswartz)
-- Correctly display method signatures in documentatio
+- Correctly display method signatures in documentation courtesy of (@seveas)
 
 0.1b1: 2012-10-31
 -----------------
