@@ -118,3 +118,48 @@ class TestRepository(BaseCase):
         expect(self.repo.create_comment(body, sha)
                ).isinstance(github3.repos.RepoComment)
         self.mock_assertions()
+
+    def test_create_commit(self):
+        self.request.return_value = generate_response('commit', 201)
+        data = {'message': 'My commit message',
+                'author': {
+                    'name': 'Ian Cordasco',
+                    'email': 'foo@example.com',
+                    'date': '2008-07-09T16:13:30+12:00',
+                },
+                'committer': {},
+                'parents': [
+                    '7d1b31e74ee336d15cbd21741bc88a537ed063a0'
+                ],
+                'tree': '827efc6d56897b048c772eb4087f854f46256132',
+                }
+        self.conf = {'data': data}
+        self.args = ('post', self.api + 'git/commits')
+
+        with expect.githuberror():
+            self.repo.create_commit(**data)
+
+        self.login()
+        expect(self.repo.create_commit(None, None, None)).is_None()
+        expect(self.repo.create_commit(**data)).isinstance(github3.git.Commit)
+        self.mock_assertions()
+
+    def test_create_download(self):
+        pass
+
+    def test_create_fork(self):
+        self.request.return_value = generate_response('repo', 202)
+        self.conf = {'data': None}
+        self.args = ('post', self.api + 'forks')
+
+        with expect.githuberror():
+            self.repo.create_fork()
+
+        self.login()
+        expect(self.repo.create_fork()).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
+        self.conf['data'] = {'organization': 'github3py'}
+        expect(self.repo.create_fork('github3py')
+               ).isinstance(github3.repos.Repository)
+        self.mock_assertions()
