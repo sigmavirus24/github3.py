@@ -24,7 +24,10 @@ class Label(GitHubCore):
         self.name = label.get('name')
 
     def __repr__(self):
-        return '<Label [{0}]>'.format(self.name)
+        return '<Label [{0}]>'.format(self)
+
+    def __str__(self):
+        return self.name
 
     def _update_(self, label):
         self.__init__(label, self._session)
@@ -91,7 +94,10 @@ class Milestone(GitHubCore):
             self.due_on = self._strptime(mile.get('due_on'))
 
     def __repr__(self):
-        return '<Milestone [{0}]>'.format(self.title)
+        return '<Milestone [{0}]>'.format(self)
+
+    def __str__(self):
+        return self.title
 
     def _update_(self, mile):
         self.__init__(mile, self._session)
@@ -209,7 +215,7 @@ class Issue(GitHubCore):
 
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
-                n=self.number)  # nopep8
+                                                     n=self.number)
 
     def _update_(self, issue):
         self.__init__(issue, self._session)
