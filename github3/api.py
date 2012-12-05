@@ -296,6 +296,7 @@ def search_issues(owner, repo, state, keyword):
     :param str repo: (required)
     :param str state: (required), accepted values: ('open', 'closed')
     :param str keyword: (required), what to search for
+    :param int start_page: (optional), page to get (results come 100/page)
     :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
     """
     return gh.search_issues(owner, repo, state, keyword)
@@ -304,10 +305,9 @@ def search_issues(owner, repo, state, keyword):
 def search_repos(keyword, **params):
     """Search all repositories by keyword.
 
-    :param keyword: (required)
-    :type keyword: str
-    :param params: (optional), filter by language and/or start_page
-    :type params: dict
+    :param str keyword: (required)
+    :param str language: (optional), language to filter by
+    :param int start_page: (optional), page to get (results come 100/page)
     :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
     """
     return gh.search_repos(keyword, **params)
@@ -317,6 +317,7 @@ def search_users(keyword):
     """Search all users by keyword.
 
     :param str keyword: (required)
+    :param int start_page: (optional), page to get (results come 100/page)
     :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
     """
     return gh.search_users(keyword)

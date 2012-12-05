@@ -760,41 +760,51 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
-    def search_issues(self, owner, repo, state, keyword):
+    def search_issues(self, owner, repo, state, keyword, start_page=0):
         """Find issues by state and keyword.
 
         :param str owner: (required)
         :param str repo: (required)
         :param str state: (required), accepted values: ('open', 'closed')
         :param str keyword: (required), what to search for
+        :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
+        params = {} if int(start_page) > 0 else {'start_page': int(start_page)}
         url = self._build_url('legacy', 'issues', 'search', owner, repo,
                               state, keyword)
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(url, params=params), 200)
         issues = json.get('issues', [])
         return [LegacyIssue(l, self) for l in issues]
 
-    def search_repos(self, keyword, **params):
+    def search_repos(self, keyword, language='', start_page=0):
         """Search all repositories by keyword.
 
         :param str keyword: (required)
-        :param dict params: (optional), filter by language and/or start_page
+        :param str language: (optional), language to filter by
+        :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
         url = self._build_url('legacy', 'repos', 'search', keyword)
+        params = {}
+        if language:
+            params['language'] = language
+        if start_page > 0:
+            params['start_page'] = start_page
         json = self._json(self._get(url, params=params), 200)
         repos = json.get('repositories', [])
         return [LegacyRepo(r, self) for r in repos]
 
-    def search_users(self, keyword):
+    def search_users(self, keyword, start_page=0):
         """Search all users by keyword.
 
         :param str keyword: (required)
+        :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
+        params = {} if int(start_page) > 0 else {'start_page': int(start_page)}
         url = self._build_url('legacy', 'user', 'search', str(keyword))
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(url, params=params), 200)
         users = json.get('users', [])
         return [LegacyUser(u, self) for u in users]
 
