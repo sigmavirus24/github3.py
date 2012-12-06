@@ -308,7 +308,7 @@ class BaseAccount(GitHubCore):
 
         ## e.g. first_name last_name
         #: Real name of the user/org
-        self.name = acct.get('name', '')
+        self.name = acct.get('name', '').encode('utf-8')
 
         ## The number of public_repos
         #: Number of public repos owned by the user/org
