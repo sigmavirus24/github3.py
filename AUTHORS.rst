@@ -29,3 +29,5 @@ Contributors
 - Paul Swartz (@paulswartz)
 
 - Kristian Glass (@doismellburning)
+
+- Alejandro Gómez (@alejandrogomez)
