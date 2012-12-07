@@ -2,6 +2,7 @@ import requests
 import github3
 import expecter
 import json
+import sys
 from mock import patch, call
 from io import BytesIO
 from unittest import TestCase
@@ -17,7 +18,10 @@ def generate_response(path_name, status_code=200, enc='utf-8', _iter=False,
         if _iter:
             content = path(path_name).read().strip()
             content = '[{0}]'.format(content)
-            r.raw = BytesIO(content.encode('utf-8'))
+            r.raw = BytesIO(content.encode())
+        elif sys.version_info > (3, 0):
+            content = path(path_name).read().strip()
+            r.raw = BytesIO(content.encode())
         else:
             r.raw = path(path_name)
     else:

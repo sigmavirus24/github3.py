@@ -1,3 +1,4 @@
+import os
 import github3
 from tests.utils import (generate_response, expect, BaseCase, load)
 
@@ -26,7 +27,34 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_archive(self):
-        pass
+        headers = {'content-disposition': 'filename=foo'}
+        self.request.return_value = generate_response('archive', 200,
+                                                      **headers)
+        self.args = ('get', self.api + 'tarball/master')
+        self.conf.update({'prefetch': False})
+
+        expect(self.repo.archive(None)).is_False()
+
+        expect(os.path.isfile('foo')).is_False()
+        expect(self.repo.archive('tarball')).is_True()
+        expect(os.path.isfile('foo')).is_True()
+        os.unlink('foo')
+        self.mock_assertions()
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        expect(os.path.isfile('path_to_file')).is_False()
+        expect(self.repo.archive('tarball', 'path_to_file')).is_True()
+        expect(os.path.isfile('path_to_file')).is_True()
+        os.unlink('path_to_file')
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        self.args = ('get', self.api + 'zipball/randomref')
+        expect(self.repo.archive('zipball', ref='randomref')).is_True()
+        os.unlink('foo')
 
     def test_blob(self):
         self.request.return_value = generate_response('blob')

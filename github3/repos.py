@@ -8,6 +8,7 @@ This module contains the classes relating to repositories.
 
 from base64 import b64decode
 from requests import post
+from collections import Callable
 from github3.events import Event
 from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -158,12 +159,12 @@ class Repository(GitHubCore):
             url = self._build_url(format, ref, base_url=self._api)
             resp = self._get(url, allow_redirects=True, prefetch=False)
 
-        fd = None
-        file_like = False
-        if resp and resp.ok:
+        pre_opened = False
+        if resp and self._boolean(resp, 200, 404):
+            fd = None
             if path:
-                if callable(getattr(path, 'write', None)):
-                    file_like = True
+                if isinstance(getattr(path, 'write', None), Callable):
+                    pre_opened = True
                     fd = path
                 else:
                     fd = open(path, 'wb')
@@ -174,7 +175,7 @@ class Repository(GitHubCore):
             for chunk in resp.iter_content():
                 fd.write(chunk)
 
-            if not file_like:
+            if not pre_opened:
                 fd.close()
 
             written = True
@@ -1411,7 +1412,7 @@ class Download(GitHubCore):
 
         resp = self._get(self.html_url, allow_redirects=True, prefetch=False)
         if self._boolean(resp, 200, 404):
-            if callable(getattr(path, 'write', None)):
+            if isinstance(getattr(path, 'write', None), Callable):
                 file_like = True
                 fd = path
             else:
