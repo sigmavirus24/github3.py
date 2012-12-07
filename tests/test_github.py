@@ -164,6 +164,24 @@ class TestGitHub(BaseCase):
         expect(self.g.key(10)).isinstance(github3.users.Key)
         self.mock_assertions()
 
+    def test_iter_all_repos(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        self.args = ('get', 'https://api.github.com/repositories')
+        self.conf.update(params=None)
+
+        repo = next(self.g.iter_all_repos())
+        expect(repo).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
+    def test_iter_all_users(self):
+        self.request.return_value = generate_response('user', _iter=True)
+        self.args = ('get', 'https://api.github.com/users')
+        self.conf.update(params=None)
+
+        repo = next(self.g.iter_all_users())
+        expect(repo).isinstance(github3.users.User)
+        self.mock_assertions()
+
     def test_iter_authorizations(self):
         self.request.return_value = generate_response('authorization',
                 _iter=True)  # nopep8
@@ -443,10 +461,16 @@ class TestGitHub(BaseCase):
                      '{3}/{4}/{5}'.format(
                      'issues', 'search', 'sigmavirus24', 'github3.py',
                      'closed', 'requests'))
+        self.conf.update({'params': {}})
         issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
-                'requests')  # nopep8
+                                      'requests')
 
         expect(issues[0]).isinstance(github3.legacy.LegacyIssue)
+        self.mock_assertions()
+
+        self.conf.update({'params': {'start_page': 2}})
+        issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
+                                      'requests', 2)
         self.mock_assertions()
 
     def test_search_repos(self):
@@ -470,8 +494,13 @@ class TestGitHub(BaseCase):
                      'https://api.github.com/{0}/{1}/{2}/{3}'.format(
                      'legacy', 'user', 'search', 'sigmavirus24')
                      )
+        self.conf.update({'params': {}})
         users = self.g.search_users('sigmavirus24')
         expect(users[0]).isinstance(github3.legacy.LegacyUser)
+        self.mock_assertions()
+
+        self.conf.update({'params': {'start_page': 2}})
+        self.g.search_users('sigmavirus24', 2)
         self.mock_assertions()
 
     def test_search_email(self):
@@ -596,5 +625,17 @@ class TestGitHub(BaseCase):
         self.login()
         expect(self.g.user()).isinstance(github3.users.User)
         self.mock_assertions()
+
+    def test_utf8_user(self):
+        self.request.return_value = generate_response('utf8_user')
+        self.args = ('get', 'https://api.github.com/users/alejandrogomez')
+
+        u = self.g.user('alejandrogomez')
+
+        try:
+            repr(u)
+        except UnicodeEncodeError:
+            self.fail('Regression caught. See PR #52. Names must be utf-8'
+                      ' encoded')
 
     # no test_zen

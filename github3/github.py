@@ -770,7 +770,7 @@ class GitHub(GitHubCore):
         :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
-        params = {} if int(start_page) > 0 else {'start_page': int(start_page)}
+        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
         url = self._build_url('legacy', 'issues', 'search', owner, repo,
                               state, keyword)
         json = self._json(self._get(url, params=params), 200)
@@ -802,7 +802,7 @@ class GitHub(GitHubCore):
         :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
-        params = {} if int(start_page) > 0 else {'start_page': int(start_page)}
+        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
         url = self._build_url('legacy', 'user', 'search', str(keyword))
         json = self._json(self._get(url, params=params), 200)
         users = json.get('users', [])

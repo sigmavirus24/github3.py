@@ -14,10 +14,12 @@ def generate_response(path_name, status_code=200, enc='utf-8', _iter=False,
     r.encoding = enc
 
     if path_name:
-        content = path(path_name).read().strip()
         if _iter:
+            content = path(path_name).read().strip()
             content = '[{0}]'.format(content)
-        r.raw = BytesIO(content.encode())
+            r.raw = BytesIO(content.encode('utf-8'))
+        else:
+            r.raw = path(path_name)
     else:
         r.raw = BytesIO()
 
@@ -42,23 +44,23 @@ def patch_request(method='request'):
 class CustomExpecter(expecter.expect):
     def is_not_None(self):
         assert self._actual is not None, (
-                'Expected anything but None but got it.'
-                )
+                'Expected anything but None but got it.'  # nopep8
+                )  # nopep8
 
     def is_None(self):
         assert self._actual is None, (
-                'Expected None but got %s' % repr(self._actual)
-                )
+                'Expected None but got %s' % repr(self._actual)  # nopep8
+                )  # nopep8
 
     def is_True(self):
         assert self._actual is True, (
-                'Expected True but got %s' % repr(self._actual)
-                )
+                'Expected True but got %s' % repr(self._actual)  # nopep8
+                )  # nopep8
 
     def is_False(self):
         assert self._actual is False, (
-                'Expected False but got %s' % repr(self._actual)
-                )
+                'Expected False but got %s' % repr(self._actual)  # nopep8
+                )  # nopep8
 
     def list_of(self, cls):
         for actual in self._actual:
