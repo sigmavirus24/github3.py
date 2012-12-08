@@ -191,3 +191,30 @@ class TestRepository(BaseCase):
         expect(self.repo.create_fork('github3py')
                ).isinstance(github3.repos.Repository)
         self.mock_assertions()
+
+    def test_create_issue(self):
+        self.request.return_value = generate_response('issue', 201)
+        title = 'Construct _api attribute on our own'
+        self.args = ('post', self.api + 'issues')
+        self.conf = {'data': {'title': title}}
+
+        with expect.githuberror():
+            self.repo.create_issue(title)
+
+        self.login()
+        expect(self.repo.create_issue(None)).is_None()
+        expect(self.repo.create_issue(title)).isinstance(github3.issues.Issue)
+        self.mock_assertions()
+
+        body = 'Fake body'
+        self.conf['data'].update(body=body)
+        expect(self.repo.create_issue(title, body)
+               ).isinstance(github3.issues.Issue)
+        self.mock_assertions()
+
+        assignee, mile, labels = 'sigmavirus24', 1, ['bug', 'enhancement']
+        self.conf['data'].update({'assignee': assignee, 'milestone': mile,
+                                  'labels': labels})
+        expect(self.repo.create_issue(title, body, assignee, mile, labels)
+               ).isinstance(github3.issues.Issue)
+        self.mock_assertions()

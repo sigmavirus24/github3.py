@@ -408,7 +408,7 @@ class Repository(GitHubCore):
                      body=None,
                      assignee=None,
                      milestone=None,
-                     labels=[]):
+                     labels=None):
         """Creates an issue on this repository.
 
         :param str title: (required), title of the issue
@@ -427,9 +427,12 @@ class Repository(GitHubCore):
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels}
         self._remove_none(issue)
-        url = self._build_url('issues', base_url=self._api)
+        json = None
 
-        json = self._json(self._post(url, issue), 201)
+        if issue:
+            url = self._build_url('issues', base_url=self._api)
+            json = self._json(self._post(url, issue), 201)
+
         return Issue(json, self) if json else None
 
     @requires_auth
