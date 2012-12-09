@@ -183,9 +183,11 @@ class GitHubCore(GitHubObject):
         return self._remaining
 
     def refresh(self):
-        """Re-retrieve the information for this object."""
+        """Re-retrieve the information for this object and returns the refreshed
+        instance."""
         json = self._json(self._get(self._api), 200)
         self.__init__(json, self._session)
+        return self
 
 
 class BaseComment(GitHubCore):
