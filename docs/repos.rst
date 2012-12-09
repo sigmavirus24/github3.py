@@ -20,6 +20,11 @@ This part of the documentation covers:
 None of these objects should be instantiated directly by the user (developer).
 These are here for reference only.
 
+**When listing repositories in any context, GitHub refuses to return a number 
+of attributes, e.g., source and parent. If you require these, call the refresh 
+method on the repository object to make a second call to the API and retrieve 
+those attributes.**
+
 More information for about this class can be found in the official
 `documentation <http://developer.github.com/v3/repos>`_ and in various other
 sections of the GitHub documentation.

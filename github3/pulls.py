@@ -6,6 +6,7 @@ This module contains all the classes relating to pull requests.
 
 """
 
+from re import match
 from github3.git import Commit
 from github3.models import GitHubObject, GitHubCore, BaseComment
 from github3.users import User
@@ -137,6 +138,11 @@ class PullRequest(GitHubCore):
         self.number = pull.get('number')
         #: The URL of the patch
         self.patch_url = pull.get('patch_url')
+
+        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+',
+                  self.issue_url)
+        #: Returns ('owner', 'repository') this issue was filed on.
+        self.repository = m.groups()
         #: The state of the pull
         self.state = pull.get('state')
         #: The title of the request
