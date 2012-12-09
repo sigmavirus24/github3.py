@@ -128,7 +128,7 @@ class PullRequest(GitHubCore):
         # If the pull request has been merged
         if self.merged_at:
             self.merged_at = self._strptime(self.merged_at)
-        self._mergeable = pull.get('mergeable')
+        self.mergeable = pull.get('mergeable', False)
         #: :class:`User <github3.users.User>` who merged this pull
         self.merged_by = pull.get('merged_by')
         if self.merged_by:
@@ -168,7 +168,7 @@ class PullRequest(GitHubCore):
 
         :returns: bool
         """
-        return False if self._mergeable is None else self._mergeable
+        return self.mergeable
 
     def is_merged(self):
         """Checks to see if the pull request was merged.
@@ -248,6 +248,7 @@ class PullRequest(GitHubCore):
             data = {'commit_message': commit_message}
         url = self._build_url('merge', base_url=self._api)
         resp = self._put(url, data)
+        self.merge_commit_sha = resp['merge_commit_sha']
         return resp.json['merged']
 
     @requires_auth

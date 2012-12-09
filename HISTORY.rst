@@ -14,6 +14,10 @@ History/Changelog
 
   - is_active() and active return the same value
 
+- In github3.pulls.PullRequest
+
+  - is_mergeable() and mergeable are now the same
+
 - Some objects now have ``__str__`` methods. You can now do things like:
 
   ::
