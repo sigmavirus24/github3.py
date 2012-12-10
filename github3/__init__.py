@@ -16,7 +16,7 @@ __copyright__ = 'Copyright 2012 Ian Cordasco'
 __version__ = '0.3.b'
 
 from github3.api import *
-from github3.github import GitHub
+from github3.github import GitHub, GitHubEnterprise, GitHubStatus
 from github3.models import GitHubError
 
 # flake8: noqa

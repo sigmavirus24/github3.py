@@ -108,64 +108,6 @@ Dependencies
 
 .. _requests: https://github.com/kennethreitz/requests
 
-
-API Coverage
-------------
-
-- Gists
-
-  - Comments
-
-- Git Data
-
-  - Blobs
-  - Commits
-  - References
-  - Tags
-  - Trees
-
-- Issues
-
-  - Comments
-  - Events
-  - Labels
-  - Milestones
-
-- Orgs
-
-  - Members
-  - Teams
-
-- Pull Requests
-
-  - Review Comments
-
-- Repos
-
-  - Collaborators
-  - Comments
-  - Commits
-  - Contents
-  - Downloads
-  - Forks
-  - Keys
-  - Watching
-  - Hooks
-
-- Users
-
-  - Emails
-  - Followers
-  - Keys
-
-- Events
-
-  - Types
-
-- Search
-
-- Markdown
-
 Contributing
 ------------
 
@@ -229,3 +171,5 @@ Contact
 - Mailing list: github3.py [at] librelist.com
 
 .. _sigmavirus24: https://twitter.com/sigmavirus24
+
+.. include:: ../HISTORY.rst

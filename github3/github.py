@@ -23,9 +23,6 @@ from github3.notifications import Thread
 class GitHub(GitHubCore):
     """Stores all the session information.
 
-    Logging In
-    ----------
-
     There are two ways to log into the GitHub API
 
     ::
@@ -994,16 +991,20 @@ class GitHubStatus(GitHubCore):
 
     @classmethod
     def api(self):
+        """GET /api.json"""
         return self._recipe('api.json')
 
     @classmethod
     def status(self):
+        """GET /api/status.json"""
         return self._recipe('api', 'status.json')
 
     @classmethod
     def last_message(self):
+        """GET /api/last-message.json"""
         return self._recipe('api', 'last-message.json')
 
     @classmethod
     def messages(self):
+        """GET /api/messages.json"""
         return self._recipe('api', 'messages.json')

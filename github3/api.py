@@ -7,7 +7,7 @@ github3.api
 
 """
 
-from .github import GitHub, GitHubEnterprise  # NOQA
+from .github import GitHub
 
 gh = GitHub()
 
