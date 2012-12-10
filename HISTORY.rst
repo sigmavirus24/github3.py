@@ -24,6 +24,10 @@ History/Changelog
 
   - is_unread() and unread are now the same
 
+- In github3.gists.GistFile
+
+  - filename and name return the same information
+
 - github3.orgs.Organization.iter_repos now accepts all types_
 
 - list_* methods on Organization objects that were missed are now deleted

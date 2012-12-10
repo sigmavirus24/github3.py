@@ -21,6 +21,8 @@ class GistFile(GitHubObject):
         #: The raw URL for the file at GitHub.
         self.raw_url = attributes.get('raw_url')
         #: The name of the file.
+        self.filename = attributes.get('filename')
+        #: The name of the file.
         self.name = attributes.get('filename')
         #: The language associated with the file.
         self.language = attributes.get('language')
