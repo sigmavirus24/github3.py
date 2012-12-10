@@ -977,3 +977,33 @@ class GitHubEnterprise(GitHub):
             url = self._build_url('enterprise', 'stats', option.lower())
             stats = self._json(self._get(url), 200)
         return stats
+
+
+class GitHubStatus(GitHubCore):
+    """A sleek interface to the GitHub System Status API. This will only ever
+    return the JSON objects returned by the API.
+    """
+    def __init__(self):
+        super(GitHubStatus, self).__init__({})
+        self._github_url = 'https://status.github.com/'
+
+    def _recipe(self, *args):
+        url = self._build_url(*args)
+        resp = self._get(url)
+        return resp.json if self._boolean(resp, 200, 404) else {}
+
+    @classmethod
+    def api(self):
+        return self._recipe('api.json')
+
+    @classmethod
+    def status(self):
+        return self._recipe('api', 'status.json')
+
+    @classmethod
+    def last_message(self):
+        return self._recipe('api', 'last-message.json')
+
+    @classmethod
+    def messages(self):
+        return self._recipe('api', 'messages.json')
