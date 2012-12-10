@@ -20,6 +20,14 @@ History/Changelog
   - repository now returns a tuple of the login and name of the repository it 
     belongs to
 
+- In github3.notifications.Thread
+
+  - is_unread() and unread are now the same
+
+- github3.orgs.Organization.iter_repos now accepts all types_
+
+- list_* methods on Organization objects that were missed are now deleted
+
 - Some objects now have ``__str__`` methods. You can now do things like:
 
   ::
@@ -50,6 +58,8 @@ History/Changelog
   - github3.users.Repository (uses the login/name pair)
   - github3.users.RepoTag (uses the tag name)
   - github3.users.Contents (uses the decoded content)
+
+.. _types: http://developer.github.com/v3/repos/#list-organization-repositories
 
 0.2: 2012-11-21
 ---------------

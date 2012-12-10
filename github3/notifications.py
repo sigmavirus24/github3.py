@@ -36,7 +36,7 @@ class Thread(GitHubCore):
         #: Subject of the Notification, e.g., which issue/pull/diff is this in
         #: relation to. This is a dictionary
         self.subject = notif.get('subject')
-        self._unread = notif.get('unread')
+        self.unread = notif.get('unread')
 
     def __repr__(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
@@ -51,7 +51,7 @@ class Thread(GitHubCore):
 
     def is_unread(self):
         """Tells you if the thread is unread or not."""
-        return self._unread
+        return self.unread
 
     def mark(self):
         """Mark the thread as read.

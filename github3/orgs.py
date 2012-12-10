@@ -105,15 +105,6 @@ class Team(GitHubCore):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User)
 
-    def list_members(self):
-        """List the members of this team.
-
-        :returns: list of :class:`User <github3.users.User>`\ s
-        """
-        url = self._build_url('members', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [User(m, self) for m in json]
-
     def iter_repos(self, number=-1):
         """Iterate over the repositories this team has access to.
 
@@ -124,16 +115,6 @@ class Team(GitHubCore):
         """
         url = self._build_url('repos', base_url=self._api)
         return self._iter(int(number), url, Repository)
-
-    def list_repos(self):
-        """List the repositories this team has access to.
-
-        :returns: list of :class:`Repository <github3.repos.Repository>`
-            objects
-        """
-        url = self._build_url('repos', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [Repository(r, self) for r in json]
 
     @requires_auth
     def remove_member(self, login):
@@ -169,12 +150,6 @@ class Organization(BaseAccount):
     def __repr__(self):
         return '<Organization [{0}:{1}]>'.format(self.login, self.name)
 
-    def _list_members(self, tail):
-        """List members of this organization."""
-        url = self._api + tail
-        json = self._json(self._get(url), 200)
-        return [User(memb, self) for memb in json]
-
     @requires_auth
     def add_member(self, login, team):
         """Add ``login`` to ``team`` and thereby to this organization.
@@ -186,8 +161,7 @@ class Organization(BaseAccount):
         :param str team: (required), team name
         :returns: bool
         """
-        teams = self.list_teams()
-        for t in teams:
+        for t in self.iter_teams():
             if team == t.name:
                 return t.add_member(login)
         return False
@@ -199,8 +173,7 @@ class Organization(BaseAccount):
         :param str repo: (required), form: 'user/repo'
         :param str team: (required)
         """
-        teams = self.list_teams()
-        for t in teams:
+        for t in self.iter_teams():
             if team == t.name:
                 return t.add_repo(repo)
         return False
@@ -342,15 +315,6 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event)
 
-    def list_events(self):
-        """List events for this org.
-
-        :returns: list of :class:`Event <github3.events.Event>`\ s
-        """
-        url = self._build_url('events', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [Event(e, self._session) for e in json]
-
     def iter_members(self, number=-1):
         """Iterate over members of this organization.
 
@@ -360,13 +324,6 @@ class Organization(BaseAccount):
         """
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User)
-
-    def list_members(self):
-        """List members of this organization.
-
-        :returns: list of :class:`User <github3.users.User>`\ s
-        """
-        return self._list_members('/members')
 
     def iter_public_members(self, number=-1):
         """Iterate over public members of this organization.
@@ -378,41 +335,21 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', base_url=self._api)
         return self._iter(int(number), url, User)
 
-    def list_public_members(self):
-        """List public members of this organization.
-
-        :returns: list of :class:`User <github3.users.User>`\ s
-        """
-        return self._list_members('/public_members')
-
     def iter_repos(self, type='', number=-1):
         """Iterate over repos for this organization.
 
         :param str type: (optional), accepted values:
-            ('all', 'public', 'member', 'private'), API default: 'all'
+            ('all', 'public', 'member', 'private', 'forks', 'sources'), API
+            default: 'all'
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repos', base_url=self._api)
-        if type in ('all', 'public', 'member', 'private'):
-            url = '{0}?type={1}'.format(url, type)
-        return self._iter(int(number), url, Repository)
-
-    def list_repos(self, type=''):
-        """List repos for this organization.
-
-        :param str type: (optional), accepted values:
-            ('all', 'public', 'member', 'private'), API default: 'all'
-        :returns: list of :class:`Repository <github3.repos.Repository>`
-            objects
-        """
-        url = self._build_url('repos', base_url=self._api)
         params = {}
-        if type in ('all', 'public', 'member', 'private'):
+        if type in ('all', 'public', 'member', 'private', 'forks', 'sources'):
             params['type'] = type
-        json = self._json(self._get(url, params=params), 200)
-        return [Repository(r, self) for r in json]
+        return self._iter(int(number), url, Repository, params)
 
     @requires_auth
     def iter_teams(self, number=-1):
@@ -424,16 +361,6 @@ class Organization(BaseAccount):
         """
         url = self._build_url('teams', base_url=self._api)
         return self._iter(int(number), url, Team)
-
-    @requires_auth
-    def list_teams(self):
-        """List teams that are part of this organization.
-
-        :returns: list of :class:`Team <Team>`\ s
-        """
-        url = self._build_url('teams', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [Team(team, self) for team in json]
 
     @requires_auth
     def publicize_member(self, login):
@@ -462,8 +389,7 @@ class Organization(BaseAccount):
         :param str team: (required)
         :returns: bool
         """
-        teams = self.list_teams()
-        for t in teams:
+        for t in self.iter_teams():
             if team == t.name:
                 return t.remove_repo(repo)
         return False
