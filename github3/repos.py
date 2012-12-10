@@ -1648,15 +1648,27 @@ class RepoCommit(BaseCommit):
     def __repr__(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
+    def diff(self):
+        """Return the diff"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.diff'})
+        return resp.content if self._boolean(resp, 200, 404) else None
 
-class Comparison(GitHubObject):
+    def patch(self):
+        """Return the patch"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.patch'})
+        return resp.content if self._boolean(resp, 200, 404) else None
+
+
+class Comparison(GitHubCore):
     """The :class:`Comparison <Comparison>` object. This encapsulates the
     information returned by GitHub comparing two commit objects in a
     repository."""
 
     def __init__(self, compare):
         super(Comparison, self).__init__(compare)
-        self._api = compare.get('api', '')
+        self._api = compare.get('url', '')
         #: URL to view the comparison at GitHub
         self.html_url = compare.get('html_url')
         #: Permanent link to this comparison.
@@ -1683,6 +1695,18 @@ class Comparison(GitHubObject):
 
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
+
+    def diff(self):
+        """Return the diff"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.diff'})
+        return resp.content if self._boolean(resp, 200, 404) else None
+
+    def patch(self):
+        """Return the patch"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.patch'})
+        return resp.content if self._boolean(resp, 200, 404) else None
 
 
 class Status(GitHubObject):

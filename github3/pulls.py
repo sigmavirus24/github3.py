@@ -169,6 +169,12 @@ class PullRequest(GitHubCore):
         """
         return self.update(self.title, self.body, 'closed')
 
+    def diff(self):
+        """Return the diff"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.diff'})
+        return resp.content if self._boolean(resp, 200, 404) else None
+
     def is_mergeable(self):
         """Checks to see if the pull request can be merged by GitHub.
 
@@ -256,6 +262,12 @@ class PullRequest(GitHubCore):
         resp = self._put(url, data)
         self.merge_commit_sha = resp['merge_commit_sha']
         return resp.json['merged']
+
+    def patch(self):
+        """Return the patch"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.patch'})
+        return resp.content if self._boolean(resp, 200, 404) else None
 
     @requires_auth
     def reopen(self):
