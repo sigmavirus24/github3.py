@@ -332,7 +332,7 @@ class Repository(GitHubCore):
         I do not require you provide the size in bytes because it can be
         determined by the operating system.
 
-        .. warning:
+        .. warning::
 
             On 2012-03-11, GitHub will be deprecating the Downloads API. This
             method will no longer work.
@@ -624,7 +624,7 @@ class Repository(GitHubCore):
     def download(self, id_num):
         """Get a single download object by its id.
 
-        .. warning:
+        .. warning::
 
             On 2012-03-11, GitHub will be deprecating the Downloads API. This
             method will no longer work.
@@ -867,7 +867,7 @@ class Repository(GitHubCore):
     def iter_downloads(self, number=-1):
         """Iterate over available downloads for this repository.
 
-        .. warning:
+        .. warning::
 
             On 2012-03-11, GitHub will be deprecating the Downloads API. This
             method will no longer work.
