@@ -332,6 +332,11 @@ class Repository(GitHubCore):
         I do not require you provide the size in bytes because it can be
         determined by the operating system.
 
+        .. warning:
+
+            On 2012-03-11, GitHub will be deprecating the Downloads API. This
+            method will no longer work.
+
         :param str name: (required), name of the file as it will appear
         :param str path: (required), path to the file
         :param str description: (optional), description of the file
@@ -619,6 +624,11 @@ class Repository(GitHubCore):
     def download(self, id_num):
         """Get a single download object by its id.
 
+        .. warning:
+
+            On 2012-03-11, GitHub will be deprecating the Downloads API. This
+            method will no longer work.
+
         :param int id_num: (required), id of the download
         :returns: :class:`Download <Download>` if successful, else None
         """
@@ -856,6 +866,11 @@ class Repository(GitHubCore):
 
     def iter_downloads(self, number=-1):
         """Iterate over available downloads for this repository.
+
+        .. warning:
+
+            On 2012-03-11, GitHub will be deprecating the Downloads API. This
+            method will no longer work.
 
         :param int number: (optional), number of downloads to return. Default:
             -1 returns all available downloads
@@ -1377,9 +1392,8 @@ class Download(GitHubCore):
 
     .. warning::
 
-        90 days from 2012-12-11, this API will be deprecated by GitHub. There
-        will also be a new version of github3.py to accompany this at that
-        date.
+        On 2013-03-11, this API will be deprecated by GitHub. There will also
+        be a new version of github3.py to accompany this at that date.
     """
 
     def __init__(self, download, session=None):
