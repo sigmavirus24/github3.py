@@ -1374,6 +1374,12 @@ class Contents(GitHubObject):
 class Download(GitHubCore):
     """The :class:`Download <Download>` object. It represents how GitHub sends
     information about files uploaded to the downloads section of a repository.
+
+    .. warning::
+
+        90 days from 2012-12-11, this API will be deprecated by GitHub. There
+        will also be a new version of github3.py to accompany this at that
+        date.
     """
 
     def __init__(self, download, session=None):
