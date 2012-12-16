@@ -29,3 +29,8 @@ Gist Objects
 
 .. autoclass:: GistFile
     :inherited-members:
+
+------
+
+.. autoclass:: GistHistory
+    :inherited-members:

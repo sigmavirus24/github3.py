@@ -24,9 +24,12 @@ History/Changelog
 
   - is_unread() and unread are now the same
 
-- In github3.gists.GistFile
+- In github3.gists
 
-  - filename and name return the same information
+  - GistFile.filename and GistFile.name return the same information
+  - Gist.history now lists the history of the gist
+  - GistHistory is an object representing one commit or version of the history
+  - You can retrieve gists at a specific version with GistHistory.get_gist()
 
 - github3.orgs.Organization.iter_repos now accepts all types_
 
