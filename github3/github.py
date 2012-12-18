@@ -367,7 +367,7 @@ class GitHub(GitHubCore):
         :returns: generator of dicts
         """
         url = self._build_url('user', 'emails')
-        return self._iter(int(number), url, str)
+        return self._iter(int(number), url, dict)
 
     def iter_events(self, number=-1):
         """Iterate over public events.
