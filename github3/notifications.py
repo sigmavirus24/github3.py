@@ -6,6 +6,7 @@ This module contains the classes relating to notifications.
 
 """
 
+from json import dumps
 from github3.models import GitHubCore
 
 
@@ -59,7 +60,7 @@ class Thread(GitHubCore):
         :returns: bool
         """
         mark = {'read': True}
-        return self._boolean(self._patch(self._api, data=mark), 205,
+        return self._boolean(self._patch(self._api, data=dumps(mark)), 205,
                              404)
 
     def set_subscription(self, subscribed, ignored):
@@ -73,7 +74,7 @@ class Thread(GitHubCore):
         """
         url = self._build_url('subscription', base_url=self._api)
         sub = {'subscribed': subscribed, 'ignored': ignored}
-        json = self._json(self._put(url, data=sub), 200)
+        json = self._json(self._put(url, data=dumps(sub)), 200)
         return Subscription(json, self) if json else None
 
     def subscription(self):
@@ -122,5 +123,5 @@ class Subscription(GitHubCore):
             ignored from this thread.
         """
         sub = {'subscribed': subscribed, 'ignored': ignored}
-        json = self._json(self._put(self._api, data=sub), 200)
+        json = self._json(self._put(self._api, data=dumps(sub)), 200)
         self.__init__(json, self._session)

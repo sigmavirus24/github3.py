@@ -6,6 +6,7 @@ This module contains all of the classes related to organizations.
 
 """
 
+from json import dumps
 from github3.events import Event
 from github3.models import BaseAccount, GitHubCore
 from github3.repos import Repository
@@ -71,7 +72,7 @@ class Team(GitHubCore):
         """
         if name:
             data = {'name': name, 'permission': permission}
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
             if json:
                 self._update_(json)
                 return True
@@ -282,7 +283,7 @@ class Organization(BaseAccount):
                 del data[k]
 
         if data:
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)

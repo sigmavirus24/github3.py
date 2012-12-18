@@ -8,6 +8,7 @@ This module contains the Authorization object.
 
 from github3.decorators import requires_basic_auth
 from github3.models import GitHubCore
+from json import dumps
 
 
 class Authorization(GitHubCore):
@@ -65,22 +66,22 @@ class Authorization(GitHubCore):
         success = False
         if scopes:
             d = {'scopes': scopes}
-            json = self._json(self._post(self._api, data=d), 200)
+            json = self._json(self._post(self._api, data=dumps(d)), 200)
             self._update_(json)
             success = True
         if add_scopes:
             d = {'add_scopes': add_scopes}
-            json = self._json(self._post(self._api, data=d), 200)
+            json = self._json(self._post(self._api, data=dumps(d)), 200)
             self._update_(json)
             success = True
         if rm_scopes:
             d = {'remove_scopes': rm_scopes}
-            json = self._json(self._post(self._api, data=d), 200)
+            json = self._json(self._post(self._api, data=dumps(d)), 200)
             self._update_(json)
             success = True
         if note or note_url:
             d = {'note': note, 'note_url': note_url}
-            json = self._json(self._post(self._api, data=d), 200)
+            json = self._json(self._post(self._api, data=dumps(d)), 200)
             self._update_(json)
             success = True
         return success

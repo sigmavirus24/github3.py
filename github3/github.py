@@ -6,6 +6,7 @@ This module contains the main GitHub session object.
 
 """
 
+from json import dumps
 from requests import session
 from github3.auths import Authorization
 from github3.events import Event
@@ -98,7 +99,7 @@ class GitHub(GitHubCore):
             data = {'scopes': scopes, 'note': note, 'note_url': note_url,
                     'client_id': client_id, 'client_secret': client_secret}
             if self._session.auth:
-                json = self._json(self._post(url, data=data), 201)
+                json = self._json(self._post(url, data=dumps(data)), 201)
             else:
                 ses = session()
                 ses.auth = (login, password)
@@ -120,7 +121,7 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                     'files': files}
         url = self._build_url('gists')
-        json = self._json(self._post(url, new_gist), 201)
+        json = self._json(self._post(url, data=dumps(new_gist)), 201)
         return Gist(json, self) if json else None
 
     @requires_auth
@@ -173,7 +174,7 @@ class GitHub(GitHubCore):
 
         if title and key:
             url = self._build_url('user', 'keys')
-            req = self._post(url, {'title': title, 'key': key})
+            req = self._post(url, data=dumps({'title': title, 'key': key}))
             json = self._json(req, 201)
             if json:
                 created = Key(json, self)
@@ -216,7 +217,7 @@ class GitHub(GitHubCore):
                 'has_issues': has_issues, 'has_wiki': has_wiki,
                 'has_downloads': has_downloads, 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return Repository(json, self) if json else None
 
     @requires_auth
@@ -711,7 +712,7 @@ class GitHub(GitHubCore):
             data = data
 
         if data:
-            req = self._post(url, data=data, headers=headers)
+            req = self._post(url, data=dumps(data), headers=headers)
             if req.ok:
                 return req.content
         return ''  # (No coverage)

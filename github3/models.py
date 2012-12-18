@@ -61,18 +61,10 @@ class GitHubCore(GitHubObject):
             'User-Agent': 'github3.py/{0}'.format(__version__),
         }
 
-        # Requests hook
-        def json_hook(args):
-            if args.get('data') and not args.get('files'):
-                args['data'] = dumps(args['data'])
-
         self._session.headers.update(headers)
-        self._session.config['base_headers'].update(headers)
-        self._session.hooks.update({'args': [json_hook]})
 
         # set a sane default
         self._github_url = 'https://api.github.com'
-        self._remaining = 5000
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
@@ -82,12 +74,12 @@ class GitHubCore(GitHubObject):
             if v is None:
                 del(data[k])
 
-    def _json(self, request, status_code):
+    def _json(self, response, status_code):
         ret = None
-        if request.status_code == status_code and request.content:
-            ret = request.json
-        if request.status_code >= 400:
-            raise GitHubError(request)
+        if response.status_code == status_code and response.content:
+            ret = response.json()
+        if response.status_code >= 400:
+            raise GitHubError(response)
         return ret
 
     def _boolean(self, request, true_code, false_code):
@@ -98,36 +90,19 @@ class GitHubCore(GitHubObject):
         return False
 
     def _delete(self, url, **kwargs):
-        req = False
-        if self._remaining > 0:
-            req = self._session.delete(url, **kwargs)
-        return req
+        return self._session.delete(url, **kwargs)
 
     def _get(self, url, **kwargs):
-        req = None
-        if self._remaining > 0:
-            req = self._session.get(url, **kwargs)
-        return req
+        return self._session.get(url, **kwargs)
 
     def _patch(self, url, **kwargs):
-        req = None
-        if self._remaining > 0:
-            req = self._session.patch(url, **kwargs)
-        return req
+        return self._session.patch(url, **kwargs)
 
     def _post(self, url, data=None, **kwargs):
-        req = None
-        if self._remaining > 0:
-            req = self._session.post(url, data, **kwargs)
-        return req
+        return self._session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
-        req = False
-        if self._remaining > 0:
-            if 'data' not in kwargs:
-                kwargs.update(headers={'Content-Length': '0'})
-            req = self._session.put(url, **kwargs)
-        return req
+        return self._session.put(url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
@@ -183,8 +158,8 @@ class GitHubCore(GitHubObject):
         return self._remaining
 
     def refresh(self):
-        """Re-retrieve the information for this object and returns the refreshed
-        instance."""
+        """Re-retrieve the information for this object and returns the
+        refreshed instance."""
         json = self._json(self._get(self._api), 200)
         self.__init__(json, self._session)
         return self
@@ -240,7 +215,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                              data={'body': body}), 200)
+                              data=dumps({'body': body})), 200)
             if json:
                 self._update_(json)
                 return True

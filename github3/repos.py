@@ -124,7 +124,7 @@ class Repository(GitHubCore):
         json = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return PullRequest(json, self._session) if json else None
 
     @requires_auth
@@ -266,7 +266,7 @@ class Repository(GitHubCore):
         if encoding in ('base64', 'utf-8') and content:
             url = self._build_url('git', 'blobs', base_url=self._api)
             data = {'content': content, 'encoding': encoding}
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
             if json:
                 sha = json.get('sha')
         return sha
@@ -292,7 +292,7 @@ class Repository(GitHubCore):
                     'path': path, 'position': position}
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return RepoComment(json, self) if json else None
 
     @requires_auth
@@ -321,7 +321,7 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'commits', base_url=self._api)
             data = {'message': message, 'tree': tree, 'parents': parents,
                     'author': author, 'committer': committer}
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Commit(json, self) if json else None
 
     @requires_auth
@@ -351,7 +351,7 @@ class Repository(GitHubCore):
             data = {'name': name, 'size': info.st_size,
                     'description': description,
                     'content_type': content_type}
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
 
         if not json:
             return None
@@ -380,7 +380,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
-            resp = self._post(url, data={'organization': organization})
+            resp = self._post(url, data=dumps({'organization': organization}))
         else:
             resp = self._post(url)
         json = self._json(resp, 202)

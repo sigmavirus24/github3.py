@@ -7,6 +7,7 @@ This module contains all the classes relating to pull requests.
 """
 
 from re import match
+from json import dumps
 from github3.git import Commit
 from github3.models import GitHubObject, GitHubCore, BaseComment
 from github3.users import User
@@ -259,7 +260,7 @@ class PullRequest(GitHubCore):
         if commit_message:
             data = {'commit_message': commit_message}
         url = self._build_url('merge', base_url=self._api)
-        resp = self._put(url, data)
+        resp = self._put(url, data=dumps(data))
         self.merge_commit_sha = resp['merge_commit_sha']
         return resp.json['merged']
 
@@ -293,7 +294,7 @@ class PullRequest(GitHubCore):
                 del data[k]
 
         if data:
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)
