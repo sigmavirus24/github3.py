@@ -6,6 +6,7 @@ This module contains the classes relating to repositories.
 
 """
 
+from json import dumps
 from base64 import b64decode
 from requests import post
 from collections import Callable
@@ -404,7 +405,7 @@ class Repository(GitHubCore):
             url = self._build_url('hooks', base_url=self._api)
             data = {'name': name, 'config': config, 'events': events,
                     'active': active}
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Hook(json, self) if json else None
 
     @requires_auth
@@ -436,7 +437,7 @@ class Repository(GitHubCore):
 
         if issue:
             url = self._build_url('issues', base_url=self._api)
-            json = self._json(self._post(url, issue), 201)
+            json = self._json(self._post(url, data=dumps(issue)), 201)
 
         return Issue(json, self) if json else None
 
@@ -450,7 +451,7 @@ class Repository(GitHubCore):
         """
         data = {'title': title, 'key': key}
         url = self._build_url('keys', base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return Key(json, self) if json else None
 
     @requires_auth
@@ -465,7 +466,7 @@ class Repository(GitHubCore):
         """
         data = {'name': name, 'color': color.strip('#')}
         url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return Label(json, self) if json else None
 
     @requires_auth
@@ -487,7 +488,7 @@ class Repository(GitHubCore):
         data = {'title': title, 'state': state,
                 'description': description, 'due_on': due_on}
         self._remove_none(data)
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return Milestone(json, self) if json else None
 
     @requires_auth
@@ -550,7 +551,7 @@ class Repository(GitHubCore):
             data = {'state': state, 'target_url': target_url,
                     'description': description}
             url = self._build_url('statuses', sha, base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Status(json) if json else None
 
     @requires_auth
@@ -679,7 +680,7 @@ class Repository(GitHubCore):
                 'has_wiki': has_wiki, 'has_downloads': has_downloads,
                 'default_branch': default_branch}
         self._remove_none(edit)
-        json = self._json(self._patch(self._api, data=edit), 200)
+        json = self._json(self._patch(self._api, data=dumps(edit)), 200)
         if json:
             self._update_(json)
             return True
@@ -1148,7 +1149,7 @@ class Repository(GitHubCore):
         mark = {'read': True}
         if last_read:
             mark['last_read_at'] = last_read
-        return self._boolean(self._put(url, data=mark),
+        return self._boolean(self._put(url, data=dumps(mark)),
                              205, 404)
 
     def merge(self, base, head, message=''):
@@ -1161,7 +1162,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('merges', base_url=self._api)
         data = {'base': base, 'head': head, 'commit_message': message}
-        json = self._json(self._post(url, data=data), 201)
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return RepoCommit(json, self) if json else None
 
     def milestone(self, number):
@@ -1194,7 +1195,8 @@ class Repository(GitHubCore):
             data = [('hub.mode', mode), ('hub.topic', topic),
                     ('hub.callback', callback), ('hub.secret', secret)]
             url = self._build_url('hub')
-            status = self._boolean(self._post(url, data=data), 204, 404)
+            status = self._boolean(self._post(url, data=dumps(data)), 204,
+                                   404)
         return status
 
     def pull_request(self, number):
@@ -1259,7 +1261,7 @@ class Repository(GitHubCore):
         """
         sub = {'subscribed': subscribed, 'ignored': ignored}
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=sub), 200)
+        json = self._json(self._put(url, data=dumps(sub)), 200)
         return Subscription(json, self) if json else None
 
     @requires_auth
@@ -1525,7 +1527,7 @@ class Hook(GitHubCore):
             if rm_events:
                 data['remove_events'] = rm_events
 
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)
@@ -1621,7 +1623,7 @@ class RepoComment(BaseComment):
         if body and sha and path and line > 0 and position > 0:
             data = {'body': body, 'commit_id': sha, 'line': line,
                     'path': path, 'position': position}
-            json = self._json(self._post(self._api, data), 200)
+            json = self._json(self._post(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)
