@@ -48,7 +48,7 @@ class Key(GitHubCore):
         json = None
         if title and key:
             data = {'title': title, 'key': key}
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)
             return True
@@ -164,7 +164,7 @@ class User(BaseAccount):
         json = []
         if addresses:
             url = self._build_url('user', 'emails')
-            json = self._json(self._post(url, addresses), 201)
+            json = self._json(self._post(url, dumps(addresses)), 201)
         return json
 
     @requires_auth
@@ -185,7 +185,7 @@ class User(BaseAccount):
         :returns: bool
         """
         url = self._build_url('user', 'emails')
-        return self._boolean(self._delete(url, data=addresses),
+        return self._boolean(self._delete(url, data=dumps(addresses)),
                              204, 404)
 
     @property
@@ -310,7 +310,7 @@ class User(BaseAccount):
                 'hireable': hireable, 'bio': bio}
         self._remove_none(user)
         url = self._build_url('user')
-        json = self._json(self._patch(url, data=user), 200)
+        json = self._json(self._patch(url, data=dumps(user)), 200)
         if json:
             self._update_(json)
             return True
