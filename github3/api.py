@@ -29,7 +29,8 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
         which to create the token
     :returns: :class:`Authorization <Authorization>`
     """
-    return gh.authorize(login, password, scopes, note, note_url)
+    return gh.authorize(login, password, scopes, note, note_url, client_id,
+                        client_secret)
 
 
 def login(username=None, password=None, token=None):

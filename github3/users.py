@@ -6,6 +6,7 @@ This module contains everything relating to Users.
 
 """
 
+from json import dumps
 from github3.events import Event
 from github3.models import GitHubObject, GitHubCore, BaseAccount
 from github3.decorators import requires_auth

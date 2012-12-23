@@ -6,6 +6,7 @@ Module which contains all the gist related material.
 
 """
 
+from json import dumps
 from github3.models import GitHubObject, GitHubCore, BaseComment
 from github3.users import User
 from github3.decorators import requires_auth
