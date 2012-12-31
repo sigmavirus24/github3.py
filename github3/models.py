@@ -312,8 +312,8 @@ class GitHubError(Exception):
         self.response = resp
         self.code = resp.status_code
         self.errors = []
-        if resp.json:  # GitHub Error
-            error = resp.json
+        if resp.json():  # GitHub Error
+            error = resp.json()
             #: Message associated with the error
             self.msg = error.get('message')
             #: List of errors provided by GitHub

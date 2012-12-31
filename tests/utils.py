@@ -3,7 +3,7 @@ import github3
 import expecter
 import json
 import sys
-from mock import patch, call
+from mock import patch
 from io import BytesIO
 from unittest import TestCase
 
@@ -48,23 +48,30 @@ def patch_request(method='request'):
 class CustomExpecter(expecter.expect):
     def is_not_None(self):
         assert self._actual is not None, (
-                'Expected anything but None but got it.'  # nopep8
-                )  # nopep8
+            'Expected anything but None but got it.'
+        )
 
     def is_None(self):
         assert self._actual is None, (
-                'Expected None but got %s' % repr(self._actual)  # nopep8
-                )  # nopep8
+            'Expected None but got %s' % repr(self._actual)  # nopep8
+        )
 
     def is_True(self):
         assert self._actual is True, (
-                'Expected True but got %s' % repr(self._actual)  # nopep8
-                )  # nopep8
+            'Expected True but got %s' % repr(self._actual)  # nopep8
+        )
 
     def is_False(self):
         assert self._actual is False, (
-                'Expected False but got %s' % repr(self._actual)  # nopep8
-                )  # nopep8
+            'Expected False but got %s' % repr(self._actual)  # nopep8
+        )
+
+    def is_in(self, iterable):
+        assert self._actual in iterable, (
+            "Expected %s in %s but it wasn't" % (
+                repr(self._actual), repr(iterable)
+            )
+        )
 
     def list_of(self, cls):
         for actual in self._actual:
@@ -93,6 +100,17 @@ class BaseCase(TestCase):
 
     def mock_assertions(self):
         assert self.request.called is True
-        c = call(*self.args, **self.conf)
-        assert c in self.request.mock_calls, '{0} not in {1}'.format(c,
-            self.request.mock_calls)  # nopep8
+        args, kwargs = self.request.call_args
+
+        expect(self.args) == args
+
+        if 'data' in self.conf and isinstance(self.conf['data'], dict):
+            for k, v in list(self.conf['data'].items()):
+                s = json.dumps({k: v})[1:-1]
+                expect(s).is_in(kwargs['data'])
+
+            del self.conf['data']
+
+        for k in self.conf:
+            expect(k).is_in(kwargs)
+            expect(self.conf[k]) == kwargs[k]

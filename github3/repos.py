@@ -158,7 +158,7 @@ class Repository(GitHubCore):
         written = False
         if format in ('tarball', 'zipball'):
             url = self._build_url(format, ref, base_url=self._api)
-            resp = self._get(url, allow_redirects=True, prefetch=False)
+            resp = self._get(url, allow_redirects=True, stream=True)
 
         pre_opened = False
         if resp and self._boolean(resp, 200, 404):
@@ -1435,7 +1435,7 @@ class Download(GitHubCore):
         if not path:
             path = self.name
 
-        resp = self._get(self.html_url, allow_redirects=True, prefetch=False)
+        resp = self._get(self.html_url, allow_redirects=True, stream=True)
         if self._boolean(resp, 200, 404):
             if isinstance(getattr(path, 'write', None), Callable):
                 file_like = True

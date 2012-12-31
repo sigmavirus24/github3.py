@@ -15,8 +15,8 @@ class TestRepository(BaseCase):
 
     def test_add_collaborator(self):
         self.request.return_value = generate_response('', 204)
-        self.args = ('put', self.api + 'collaborators/sigmavirus24')
-        self.conf = {'headers': {'Content-Length': '0'}, 'data': None}
+        self.args = ('PUT', self.api + 'collaborators/sigmavirus24')
+        self.conf = {'data': None}
 
         with expect.githuberror():
             self.repo.add_collaborator('foo')
@@ -30,8 +30,8 @@ class TestRepository(BaseCase):
         headers = {'content-disposition': 'filename=foo'}
         self.request.return_value = generate_response('archive', 200,
                                                       **headers)
-        self.args = ('get', self.api + 'tarball/master')
-        self.conf.update({'prefetch': False})
+        self.args = ('GET', self.api + 'tarball/master')
+        self.conf.update({'stream': True})
 
         expect(self.repo.archive(None)).is_False()
 
@@ -52,21 +52,21 @@ class TestRepository(BaseCase):
         self.request.return_value.raw.seek(0)
         self.request.return_value._content_consumed = False
 
-        self.args = ('get', self.api + 'zipball/randomref')
+        self.args = ('GET', self.api + 'zipball/randomref')
         expect(self.repo.archive('zipball', ref='randomref')).is_True()
         os.unlink('foo')
 
     def test_blob(self):
         self.request.return_value = generate_response('blob')
         sha = '3ceb856e2f14e9669fed6384e58c9a1590a2314f'
-        self.args = ('get', self.api + 'git/blobs/' + sha)
+        self.args = ('GET', self.api + 'git/blobs/' + sha)
 
         expect(self.repo.blob(sha)).isinstance(github3.git.Blob)
         self.mock_assertions()
 
     def test_branch(self):
         self.request.return_value = generate_response('branch')
-        self.args = ('get', self.api + 'branches/master')
+        self.args = ('GET', self.api + 'branches/master')
 
         expect(self.repo.branch('master')).isinstance(github3.repos.Branch)
         self.mock_assertions()
@@ -74,7 +74,7 @@ class TestRepository(BaseCase):
     def test_commit(self):
         self.request.return_value = generate_response('commit')
         sha = '76dcc6cb4b9860034be81b7e58adc286a115aa97'
-        self.args = ('get', self.api + 'commits/' + sha)
+        self.args = ('GET', self.api + 'commits/' + sha)
 
         expect(self.repo.commit(sha)).isinstance(github3.repos.RepoCommit)
         self.mock_assertions()
@@ -82,7 +82,7 @@ class TestRepository(BaseCase):
     def test_commit_comment(self):
         self.request.return_value = generate_response('commit_comment')
         comment_id = 1380832
-        self.args = ('get', self.api + 'comments/{0}'.format(comment_id))
+        self.args = ('GET', self.api + 'comments/{0}'.format(comment_id))
 
         expect(self.repo.commit_comment(comment_id)
                ).isinstance(github3.repos.RepoComment)
@@ -92,7 +92,7 @@ class TestRepository(BaseCase):
         self.request.return_value = generate_response('comparison')
         base = 'a811e1a270f65eecb65755eca38d888cbefcb0a7'
         head = '76dcc6cb4b9860034be81b7e58adc286a115aa97'
-        self.args = ('get', self.api + 'compare/{0}...{1}'.format(base, head))
+        self.args = ('GET', self.api + 'compare/{0}...{1}'.format(base, head))
 
         expect(self.repo.compare_commits(base, head)
                ).isinstance(github3.repos.Comparison)
@@ -101,7 +101,7 @@ class TestRepository(BaseCase):
     def test_contents(self):
         self.request.return_value = generate_response('contents')
         filename = 'setup.py'
-        self.args = ('get', self.api + 'contents/' + filename)
+        self.args = ('GET', self.api + 'contents/' + filename)
 
         expect(self.repo.contents(filename)).isinstance(github3.repos.Contents)
         self.mock_assertions()
@@ -111,7 +111,7 @@ class TestRepository(BaseCase):
         content = 'VGVzdCBibG9i\n'
         encoding = 'base64'
         sha = '30f2c645388832f70d37ab2b47eb9ea527e5ae7c'
-        self.args = ('post', self.api + 'git/blobs')
+        self.args = ('POST', self.api + 'git/blobs')
         self.conf = {'data': {'content': content, 'encoding': encoding}}
 
         with expect.githuberror():
@@ -129,7 +129,7 @@ class TestRepository(BaseCase):
                 'of common attributes. I turned those common attributes into '
                 'one `BaseAccount` class to make things simpler. ')
         sha = 'd41566090114a752eb3a87dbcf2473eb427ef0f3'
-        self.args = ('post', self.api + 'commits/{0}/comments'.format(sha))
+        self.args = ('POST', self.api + 'commits/{0}/comments'.format(sha))
         self.conf = {
             'data': {
                 'body': body, 'commit_id': sha, 'line': 1, 'path': '',
@@ -162,7 +162,7 @@ class TestRepository(BaseCase):
                 'tree': '827efc6d56897b048c772eb4087f854f46256132',
                 }
         self.conf = {'data': data}
-        self.args = ('post', self.api + 'git/commits')
+        self.args = ('POST', self.api + 'git/commits')
 
         with expect.githuberror():
             self.repo.create_commit(**data)
@@ -178,7 +178,7 @@ class TestRepository(BaseCase):
     def test_create_fork(self):
         self.request.return_value = generate_response('repo', 202)
         self.conf = {'data': None}
-        self.args = ('post', self.api + 'forks')
+        self.args = ('POST', self.api + 'forks')
 
         with expect.githuberror():
             self.repo.create_fork()
@@ -195,7 +195,7 @@ class TestRepository(BaseCase):
     def test_create_issue(self):
         self.request.return_value = generate_response('issue', 201)
         title = 'Construct _api attribute on our own'
-        self.args = ('post', self.api + 'issues')
+        self.args = ('POST', self.api + 'issues')
         self.conf = {'data': {'title': title}}
 
         with expect.githuberror():
@@ -207,14 +207,14 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
         body = 'Fake body'
-        self.conf['data'].update(body=body)
+        #self.conf['data'].update(body=body)
         expect(self.repo.create_issue(title, body)
                ).isinstance(github3.issues.Issue)
         self.mock_assertions()
 
         assignee, mile, labels = 'sigmavirus24', 1, ['bug', 'enhancement']
-        self.conf['data'].update({'assignee': assignee, 'milestone': mile,
-                                  'labels': labels})
+        #self.conf['data'].update({'assignee': assignee, 'milestone': mile,
+        #                          'labels': labels})
         expect(self.repo.create_issue(title, body, assignee, mile, labels)
                ).isinstance(github3.issues.Issue)
         self.mock_assertions()
