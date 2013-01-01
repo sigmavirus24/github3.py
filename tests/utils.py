@@ -114,3 +114,5 @@ class BaseCase(TestCase):
         for k in self.conf:
             expect(k).is_in(kwargs)
             expect(self.conf[k]) == kwargs[k]
+
+        self.request.reset_mock()

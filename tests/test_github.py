@@ -47,8 +47,8 @@ class TestGitHub(BaseCase):
         assert self.request.called is False
 
         with patch.object(github3.GitHub, 'repository') as repo:
-            repo.return_value = github3.repos.Repository(load('repo'),
-                    self.g)  # nopep8
+            repo.return_value = github3.repos.Repository(
+                load('repo'), self.g)
             i = self.g.create_issue('user', 'repo', 'Title')
 
         expect(i).isinstance(github3.issues.Issue)
@@ -213,8 +213,8 @@ class TestGitHub(BaseCase):
         self.mock_assertions()
 
     def test_iter_authorizations(self):
-        self.request.return_value = generate_response('authorization',
-                _iter=True)  # nopep8
+        self.request.return_value = generate_response(
+            'authorization', _iter=True)
         self.args = ('GET', 'https://api.github.com/authorizations')
         self.conf.update(params=None)
 
@@ -350,7 +350,7 @@ class TestGitHub(BaseCase):
                   'since': '2012-05-20T23:10:27Z'}
         self.conf.update(params=params)
         expect(next(self.g.iter_issues(**params))).isinstance(
-                github3.issues.Issue)  # nopep8
+            github3.issues.Issue)
         self.mock_assertions()
 
     def test_iter_user_issues(self):
@@ -363,7 +363,7 @@ class TestGitHub(BaseCase):
 
         self.login()
         expect(next(self.g.iter_user_issues())).isinstance(
-                github3.issues.Issue)  # nopep8
+            github3.issues.Issue)
         self.mock_assertions()
 
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
@@ -371,7 +371,7 @@ class TestGitHub(BaseCase):
                   'since': '2012-05-20T23:10:27Z'}
         self.conf.update(params=params)
         expect(next(self.g.iter_user_issues(**params))).isinstance(
-                github3.issues.Issue)  # nopep8
+            github3.issues.Issue)
         self.mock_assertions()
 
     def test_iter_repo_issues(self):
@@ -401,7 +401,17 @@ class TestGitHub(BaseCase):
         self.mock_assertions()
 
     def test_iter_orgs(self):
-        pass
+        self.request.return_value = generate_response('org', _iter=True)
+        self.args = ('GET', 'https://api.github.com/users/login/orgs')
+
+        expect(next(self.g.iter_orgs('login'))).isinstance(
+            github3.orgs.Organization)
+        self.mock_assertions()
+
+        self.args = ('GET', 'https://api.github.com/user/orgs')
+        self.login()
+        expect(next(self.g.iter_orgs())).isinstance(github3.orgs.Organization)
+        self.mock_assertions()
 
     def test_iter_repos(self):
         self.request.return_value = generate_response('repo', _iter=True)
@@ -414,7 +424,7 @@ class TestGitHub(BaseCase):
 
         self.args = ('GET', 'https://api.github.com/users/sigmavirus24/repos')
         expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
-                github3.repos.Repository)  # nopep8
+            github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_starred(self):
@@ -424,7 +434,7 @@ class TestGitHub(BaseCase):
 
         self.login()
         expect(next(self.g.iter_starred())).isinstance(
-                github3.repos.Repository)  # nopep8
+            github3.repos.Repository)
         self.mock_assertions()
 
         with patch.object(github3.github.GitHub, 'user') as user:
@@ -432,7 +442,7 @@ class TestGitHub(BaseCase):
             self.args = ('GET',
                          'https://api.github.com/users/sigmavirus24/starred')
             expect(next(self.g.iter_starred('sigmavirus24'))).isinstance(
-                    github3.repos.Repository)  # nopep8
+                github3.repos.Repository)
             self.mock_assertions()
 
     def test_iter_subscriptions(self):
@@ -442,7 +452,7 @@ class TestGitHub(BaseCase):
 
         self.login()
         expect(next(self.g.iter_subscriptions())).isinstance(
-                github3.repos.Repository)  # nopep8
+            github3.repos.Repository)
         self.mock_assertions()
 
         with patch.object(github3.github.GitHub, 'user') as user:
@@ -452,7 +462,7 @@ class TestGitHub(BaseCase):
                          'subscriptions'
                          )
             expect(next(self.g.iter_subscriptions('sigmavirus24'))).isinstance(
-                    github3.repos.Repository)  # nopep8
+                github3.repos.Repository)
             self.mock_assertions()
 
     def test_login(self):
