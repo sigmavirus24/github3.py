@@ -4,7 +4,7 @@ github3
 
 See http://github3py.rtfd.org/ for documentation.
 
-:copyright: (c) 2012 by Ian Cordasco
+:copyright: (c) 2012-2013 by Ian Cordasco
 :license: Modified BSD, see LICENSE for more details
 
 """
@@ -12,7 +12,7 @@ See http://github3py.rtfd.org/ for documentation.
 __title__ = 'github3'
 __author__ = 'Ian Cordasco'
 __license__ = 'Modified BSD'
-__copyright__ = 'Copyright 2012 Ian Cordasco'
+__copyright__ = 'Copyright 2012-2013 Ian Cordasco'
 __version__ = '0.3.b'
 
 from github3.api import *

@@ -105,6 +105,36 @@ class TestGitHub(BaseCase):
         expect(self.g.gist(10)).isinstance(github3.gists.Gist)
         self.mock_assertions()
 
+    def test_gitignore_template(self):
+        self.request.return_value = generate_response('template')
+        self.args = ('GET',
+                     'https://api.github.com/gitignore/templates/Python')
+
+        template = self.g.gitignore_template('Python')
+        expect(template.startswith('*.py[cod]')).is_True()
+        self.mock_assertions()
+
+    def test_gitignore_templates(self):
+        self.request.return_value = generate_response('templates')
+        self.args = ('GET', 'https://api.github.com/gitignore/templates')
+
+        expect(self.g.gitignore_templates()).isinstance(list)
+        self.mock_assertions()
+
+    def test_is_following(self):
+        self.request.return_value = generate_response(None, 204)
+        self.args = ('GET', 'https://api.github.com/user/following/login')
+
+        with expect.githuberror():
+            expect(self.g.is_following('login'))
+
+        self.login()
+        expect(self.g.is_following(None)).is_False()
+        assert self.request.called is False
+
+        expect(self.g.is_following('login')).is_True()
+        self.mock_assertions()
+
     def test_is_starred(self):
         self.request.return_value = generate_response(None, 204)
         self.args = ('GET', 'https://api.github.com/user/starred/user/repo')
@@ -344,6 +374,20 @@ class TestGitHub(BaseCase):
                 github3.issues.Issue)  # nopep8
         self.mock_assertions()
 
+    def test_iter_repo_issues(self):
+        self.request.return_value = generate_response('issue', _iter=True)
+        self.args = ('GET',
+                     'https://api.github.com/repos/sigmavirus24/github3.py/'
+                     'issues')
+
+        with patch.object(github3.GitHub, 'repository') as repo:
+            repo.return_value = github3.repos.Repository(load('repo'),
+                                                         self.g)
+            i = next(self.g.iter_repo_issues('sigmavirus24', 'github3.py'))
+
+        expect(i).isinstance(github3.issues.Issue)
+        self.mock_assertions()
+
     def test_iter_keys(self):
         self.request.return_value = generate_response('key', _iter=True)
         self.args = ('GET', 'https://api.github.com/user/keys')
@@ -355,6 +399,9 @@ class TestGitHub(BaseCase):
         self.login()
         expect(next(self.g.iter_keys())).isinstance(github3.users.Key)
         self.mock_assertions()
+
+    def test_iter_orgs(self):
+        pass
 
     def test_iter_repos(self):
         self.request.return_value = generate_response('repo', _iter=True)
