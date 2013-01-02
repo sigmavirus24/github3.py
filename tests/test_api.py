@@ -1,5 +1,6 @@
 import github3
 from tests.utils import APITestMixin
+from mock import patch
 
 
 class TestAPI(APITestMixin):
@@ -10,7 +11,11 @@ class TestAPI(APITestMixin):
         self.gh.authorize.assert_called_with(*args)
 
     def test_login(self):
-        pass
+        args = ('login', 'password', None)
+        with patch.object(github3.api.GitHub, 'login') as login:
+            g = github3.login(*args)
+            assert isinstance(g, github3.github.GitHub)
+            login.assert_called_with(*args)
 
     def test_gist(self):
         args = (123,)
@@ -55,6 +60,8 @@ class TestAPI(APITestMixin):
         github3.iter_repo_issues(*args)
         self.gh.iter_repo_issues.assert_called_with(*args)
 
+        github3.iter_repo_issues(None, None)
+
     def test_iter_orgs(self):
         args = ('login', -1)
         github3.iter_orgs(*args)
@@ -64,6 +71,8 @@ class TestAPI(APITestMixin):
         args = ('login', '', '', '', -1)
         github3.iter_repos(*args)
         self.gh.iter_repos.assert_called_with(*args)
+
+        github3.iter_repos(None)
 
     def test_iter_starred(self):
         github3.iter_starred('login')
@@ -111,9 +120,29 @@ class TestAPI(APITestMixin):
         github3.search_issues(*args)
         self.gh.search_issues.assert_called_with(*args)
 
-#def search_repos(keyword, **params):
-#def search_users(keyword):
-#def search_email(email):
-#def user(login):
-#def ratelimit_remaining():
-#def zen():
+    def test_search_repos(self):
+        args = ('keyword',)
+        github3.search_repos(*args)
+        self.gh.search_repos.assert_called_with(*args)
+
+    def test_search_users(self):
+        args = ('login',)
+        github3.search_users(*args)
+        self.gh.search_users.assert_called_with(*args)
+
+    def test_search_email(self):
+        args = ('email',)
+        github3.search_email(*args)
+        self.gh.search_email.assert_called_with(*args)
+
+    def test_user(self):
+        github3.user('login')
+        self.gh.user.assert_called_with('login')
+
+    def test_ratelimit_remaining(self):
+        github3.ratelimit_remaining()
+        assert self.gh.ratelimit_remaining.called is True
+
+    def test_zen(self):
+        github3.zen()
+        assert self.gh.zen.called is True

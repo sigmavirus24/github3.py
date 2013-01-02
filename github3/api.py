@@ -340,7 +340,7 @@ def user(login):
 
 def ratelimit_remaining():
     """Get the remaining number of requests allowed."""
-    return gh.ratelimit_remaining
+    return gh.ratelimit_remaining()
 
 
 def zen():
