@@ -59,3 +59,61 @@ class TestAPI(APITestMixin):
         args = ('login', -1)
         github3.iter_orgs(*args)
         self.gh.iter_orgs.assert_called_with(*args)
+
+    def test_iter_repos(self):
+        args = ('login', '', '', '', -1)
+        github3.iter_repos(*args)
+        self.gh.iter_repos.assert_called_with(*args)
+
+    def test_iter_starred(self):
+        github3.iter_starred('login')
+        self.gh.iter_starred.assert_called_with('login', -1)
+
+    def test_iter_subcriptions(self):
+        github3.iter_subscriptions('login')
+        self.gh.iter_subscriptions.assert_called_with('login', -1)
+
+    def test_create_gist(self):
+        args = ('description', {'files': ['files']})
+        github3.create_gist(*args)
+        self.gh.create_gist.assert_called_with(*args)
+
+    def test_issue(self):
+        args = ('owner', 'repo', 1)
+        github3.issue(*args)
+        self.gh.issue.assert_called_with(*args)
+
+    def test_markdown(self):
+        args = ('text', '', '', False)
+        github3.markdown(*args)
+        self.gh.markdown.assert_called_with(*args)
+
+    def test_octocat(self):
+        github3.octocat()
+        assert self.gh.octocat.called is True
+
+    def test_organization(self):
+        github3.organization('login')
+        self.gh.organization.assert_called_with('login')
+
+    def test_pull_request(self):
+        args = ('owner', 'repo', 1)
+        github3.pull_request(*args)
+        self.gh.pull_request.assert_called_with(*args)
+
+    def test_repository(self):
+        args = ('owner', 'repo')
+        github3.repository(*args)
+        self.gh.repository.assert_called_with(*args)
+
+    def test_search_issues(self):
+        args = ('owner', 'repo', 'state', 'keyword')
+        github3.search_issues(*args)
+        self.gh.search_issues.assert_called_with(*args)
+
+#def search_repos(keyword, **params):
+#def search_users(keyword):
+#def search_email(email):
+#def user(login):
+#def ratelimit_remaining():
+#def zen():
