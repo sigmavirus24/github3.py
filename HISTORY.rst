@@ -1,7 +1,7 @@
 History/Changelog
 =================
 
-0.3: xxxx-xx-xx
+0.3: 2013-01-01
 ---------------
 
 - In github3.repos.Repository
@@ -65,6 +65,9 @@ History/Changelog
   - github3.users.Repository (uses the login/name pair)
   - github3.users.RepoTag (uses the tag name)
   - github3.users.Contents (uses the decoded content)
+
+- 60% test coverage with mock
+- Upgrade to requests 1.0.x
 
 .. _types: http://developer.github.com/v3/repos/#list-organization-repositories
 
