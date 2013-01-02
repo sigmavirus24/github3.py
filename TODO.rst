@@ -6,6 +6,11 @@ High priority
 
 (In order of priority)
 
+requests 1.x
+~~~~~~~~~~~~
+
+Upgrade to requests 1.x
+
 unittests
 ~~~~~~~~~
 
@@ -28,8 +33,8 @@ Low priority
 
 (In order of priority)
 
-logging
-~~~~~~~
+logging -- Planned
+~~~~~~~~~~~~~~~~~~
 
 I need to determine if there is a desire for logging and where it would be 
 most useful. I would probably take a cue from urllib3 in this instance.

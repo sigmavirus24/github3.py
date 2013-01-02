@@ -2,22 +2,34 @@ import requests
 import github3
 import expecter
 import json
-from mock import patch, call
+import sys
+from mock import patch
 from io import BytesIO
 from unittest import TestCase
 
 
-def generate_response(path_name, status_code=200, enc='utf-8', _iter=False):
+def generate_response(path_name, status_code=200, enc='utf-8', _iter=False,
+                      **headers):
     r = requests.Response()
     r.status_code = status_code
     r.encoding = enc
+
     if path_name:
-        content = path(path_name).read().strip()
         if _iter:
+            content = path(path_name).read().strip()
             content = '[{0}]'.format(content)
-        r.raw = BytesIO(content.encode())
+            r.raw = BytesIO(content.encode())
+        elif sys.version_info > (3, 0):
+            content = path(path_name).read().strip()
+            r.raw = BytesIO(content.encode())
+        else:
+            r.raw = path(path_name)
     else:
         r.raw = BytesIO()
+
+    if headers:
+        r.headers = headers
+
     return r
 
 
@@ -36,23 +48,30 @@ def patch_request(method='request'):
 class CustomExpecter(expecter.expect):
     def is_not_None(self):
         assert self._actual is not None, (
-                'Expected anything but None but got it.'
-                )
+            'Expected anything but None but got it.'
+        )
 
     def is_None(self):
         assert self._actual is None, (
-                'Expected None but got %s' % repr(self._actual)
-                )
+            'Expected None but got %s' % repr(self._actual)  # nopep8
+        )
 
     def is_True(self):
         assert self._actual is True, (
-                'Expected True but got %s' % repr(self._actual)
-                )
+            'Expected True but got %s' % repr(self._actual)  # nopep8
+        )
 
     def is_False(self):
         assert self._actual is False, (
-                'Expected False but got %s' % repr(self._actual)
-                )
+            'Expected False but got %s' % repr(self._actual)  # nopep8
+        )
+
+    def is_in(self, iterable):
+        assert self._actual in iterable, (
+            "Expected %s in %s but it wasn't" % (
+                repr(self._actual), repr(iterable)
+            )
+        )
 
     def list_of(self, cls):
         for actual in self._actual:
@@ -81,6 +100,28 @@ class BaseCase(TestCase):
 
     def mock_assertions(self):
         assert self.request.called is True
-        c = call(*self.args, **self.conf)
-        assert c in self.request.mock_calls, '{0} not in {1}'.format(c,
-            self.request.mock_calls)  # nopep8
+        args, kwargs = self.request.call_args
+
+        expect(self.args) == args
+
+        if 'data' in self.conf and isinstance(self.conf['data'], dict):
+            for k, v in list(self.conf['data'].items()):
+                s = json.dumps({k: v})[1:-1]
+                expect(s).is_in(kwargs['data'])
+
+            del self.conf['data']
+
+        for k in self.conf:
+            expect(k).is_in(kwargs)
+            expect(self.conf[k]) == kwargs[k]
+
+        self.request.reset_mock()
+
+
+class APITestMixin(TestCase):
+    def setUp(self):
+        self.mock = patch('github3.api.gh', autospec=github3.GitHub)
+        self.gh = self.mock.start()
+
+    def tearDown(self):
+        self.mock.stop()

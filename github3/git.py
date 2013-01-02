@@ -6,8 +6,8 @@ This module contains all the classes relating to Git Data.
 
 """
 
-from base64 import b64decode
 from json import dumps
+from base64 import b64decode
 from github3.models import GitHubObject, GitHubCore, BaseCommit
 from github3.users import User
 from github3.decorators import requires_auth
@@ -127,8 +127,8 @@ class Reference(GitHubCore):
         :param bool force: (optional), force the update or not
         :returns: bool
         """
-        data = dumps({'sha': sha, 'force': force})
-        json = self._json(self._patch(self._api, data=data), 200)
+        data = {'sha': sha, 'force': force}
+        json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)
             return True

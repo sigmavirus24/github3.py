@@ -6,9 +6,10 @@ This module contains the classes relating to repositories.
 
 """
 
-from base64 import b64decode
 from json import dumps
+from base64 import b64decode
 from requests import post
+from collections import Callable
 from github3.events import Event
 from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -26,66 +27,69 @@ class Repository(GitHubCore):
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(repo, session)
         #: URL used to clone via HTTPS.
-        self.clone_url = repo.get('clone_url')
+        self.clone_url = repo.get('clone_url', '')
         #: ``datetime`` object representing when the Repository was created.
         self.created_at = self._strptime(repo.get('created_at'))
         #: Description of the repository.
-        self.description = repo.get('description')
+        self.description = repo.get('description', '')
 
         # The number of forks
         #: The number of forks made of this repository.
-        self.forks = repo.get('forks')
+        self.forks = repo.get('forks', 0)
 
-        # Is this repository a fork?
-        self._is_fork = repo.get('fork')
+        #: Is this repository a fork?
+        self.fork = repo.get('fork')
 
         # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
         #: Plain git url for an anonymous clone.
-        self.git_url = repo.get('git_url')
-        self._has_dl = repo.get('has_downloads')
-        self._has_issues = repo.get('has_issues')
-        self._has_wiki = repo.get('has_wiki')
+        self.git_url = repo.get('git_url', '')
+        #: Whether or not this repository has downloads enabled
+        self.has_downloads = repo.get('has_downloads')
+        #: Whether or not this repository has an issue tracker
+        self.has_issues = repo.get('has_issues')
+        #: Whether or not this repository has the wiki enabled
+        self.has_wiki = repo.get('has_wiki')
 
         # e.g. https://sigmavirus24.github.com/github3.py
         #: URL of the home page for the project.
-        self.homepage = repo.get('homepage')
+        self.homepage = repo.get('homepage', '')
 
         # e.g. https://github.com/sigmavirus24/github3.py
         #: URL of the project at GitHub.
-        self.html_url = repo.get('html_url')
+        self.html_url = repo.get('html_url', '')
         #: Unique id of the repository.
-        self.id = repo.get('id')
+        self.id = repo.get('id', 0)
         #: Language property.
-        self.language = repo.get('language')
+        self.language = repo.get('language', '')
         #: Mirror property.
-        self.mirror_url = repo.get('mirror_url')
+        self.mirror_url = repo.get('mirror_url', '')
 
         # Repository name, e.g. github3.py
         #: Name of the repository.
-        self.name = repo.get('name')
+        self.name = repo.get('name', '')
 
         # Number of open issues
         #: Number of open issues on the repository.
-        self.open_issues = repo.get('open_issues')
+        self.open_issues = repo.get('open_issues', 0)
 
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
         #  repository owner.
-        self.owner = User(repo.get('owner'), self._session)
+        self.owner = User(repo.get('owner', {}), self._session)
 
-        # Is this repository private?
-        self._priv = repo.get('private')
+        #: Is this repository private?
+        self.private = repo.get('private')
         #: ``datetime`` object representing the last time commits were pushed
         #  to the repository.
         self.pushed_at = self._strptime(repo.get('pushed_at'))
         #: Size of the repository.
-        self.size = repo.get('size')
+        self.size = repo.get('size', 0)
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
-        self.ssh_url = repo.get('ssh_url')
+        self.ssh_url = repo.get('ssh_url', '')
         #: If it exists, url to clone the repository via SVN.
-        self.svn_url = repo.get('svn_url')
+        self.svn_url = repo.get('svn_url', '')
         #: ``datetime`` object representing the last time the repository was
         #  updated.
         self.updated_at = self._strptime(repo.get('updated_at'))
@@ -93,23 +97,26 @@ class Repository(GitHubCore):
 
         # The number of watchers
         #: Number of users watching the repository.
-        self.watchers = repo.get('watchers')
+        self.watchers = repo.get('watchers', 0)
 
         #: Parent of this fork, if it exists :class;`Repository`
-        self.source = repo.get('source', None)
+        self.source = repo.get('source')
         if self.source:
             self.source = Repository(self.source, self)
 
         #: Parent of this fork, if it exists :class:`Repository`
-        self.parent = repo.get('parent', None)
+        self.parent = repo.get('parent')
         if self.parent:
             self.parent = Repository(self.parent, self)
 
         #: default branch for the repository
-        self.master_branch = repo.get('master_branch')
+        self.master_branch = repo.get('master_branch', '')
 
     def __repr__(self):
-        return '<Repository [{0}/{1}]>'.format(self.owner.login, self.name)
+        return '<Repository [{0}]>'.format(self)
+
+    def __str__(self):
+        return '{0}/{1}'.format(self.owner, self.name)
 
     def _update_(self, repo):
         self.__init__(repo, self._session)
@@ -118,7 +125,7 @@ class Repository(GitHubCore):
         json = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return PullRequest(json, self._session) if json else None
 
     @requires_auth
@@ -151,14 +158,14 @@ class Repository(GitHubCore):
         written = False
         if format in ('tarball', 'zipball'):
             url = self._build_url(format, ref, base_url=self._api)
-            resp = self._get(url, allow_redirects=True, prefetch=False)
+            resp = self._get(url, allow_redirects=True, stream=True)
 
-        fd = None
-        file_like = False
-        if resp and resp.ok:
+        pre_opened = False
+        if resp and self._boolean(resp, 200, 404):
+            fd = None
             if path:
-                if callable(getattr(path, 'write', None)):
-                    file_like = True
+                if isinstance(getattr(path, 'write', None), Callable):
+                    pre_opened = True
                     fd = path
                 else:
                     fd = open(path, 'wb')
@@ -169,7 +176,7 @@ class Repository(GitHubCore):
             for chunk in resp.iter_content():
                 fd.write(chunk)
 
-            if not file_like:
+            if not pre_opened:
                 fd.close()
 
             written = True
@@ -259,8 +266,8 @@ class Repository(GitHubCore):
         sha = ''
         if encoding in ('base64', 'utf-8') and content:
             url = self._build_url('git', 'blobs', base_url=self._api)
-            data = dumps({'content': content, 'encoding': encoding})
-            json = self._json(self._post(url, data), 201)
+            data = {'content': content, 'encoding': encoding}
+            json = self._json(self._post(url, data=dumps(data)), 201)
             if json:
                 sha = json.get('sha')
         return sha
@@ -282,11 +289,11 @@ class Repository(GitHubCore):
         position = int(position)
         json = None
         if body and sha and line > 0:
-            data = dumps({'body': body, 'commit_id': sha, 'line': line,
-                          'path': path, 'position': position})
+            data = {'body': body, 'commit_id': sha, 'line': line,
+                    'path': path, 'position': position}
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
-            json = self._json(self._post(url, data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return RepoComment(json, self) if json else None
 
     @requires_auth
@@ -313,9 +320,9 @@ class Repository(GitHubCore):
         json = None
         if message and tree and isinstance(parents, list):
             url = self._build_url('git', 'commits', base_url=self._api)
-            data = dumps({'message': message, 'tree': tree, 'parents': parents,
-                          'author': author, 'committer': committer})
-            json = self._json(self._post(url, data), 201)
+            data = {'message': message, 'tree': tree, 'parents': parents,
+                    'author': author, 'committer': committer}
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Commit(json, self) if json else None
 
     @requires_auth
@@ -325,6 +332,11 @@ class Repository(GitHubCore):
 
         I do not require you provide the size in bytes because it can be
         determined by the operating system.
+
+        .. warning::
+
+            On 2012-03-11, GitHub will be deprecating the Downloads API. This
+            method will no longer work.
 
         :param str name: (required), name of the file as it will appear
         :param str path: (required), path to the file
@@ -337,10 +349,10 @@ class Repository(GitHubCore):
             url = self._build_url('downloads', base_url=self._api)
             from os import stat
             info = stat(path)
-            data = dumps({'name': name, 'size': info.st_size,
-                          'description': description,
-                          'content_type': content_type})
-            json = self._json(self._post(url, data), 201)
+            data = {'name': name, 'size': info.st_size,
+                    'description': description,
+                    'content_type': content_type}
+            json = self._json(self._post(url, data=dumps(data)), 201)
 
         if not json:
             return None
@@ -369,7 +381,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
-            resp = self._post(url, params={'org': organization})
+            resp = self._post(url, data=dumps({'organization': organization}))
         else:
             resp = self._post(url)
         json = self._json(resp, 202)
@@ -391,9 +403,9 @@ class Repository(GitHubCore):
         json = None
         if name and config and isinstance(config, dict):
             url = self._build_url('hooks', base_url=self._api)
-            data = dumps({'name': name, 'config': config, 'events': events,
-                          'active': active})
-            json = self._json(self._post(url, data), 201)
+            data = {'name': name, 'config': config, 'events': events,
+                    'active': active}
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Hook(json, self) if json else None
 
     @requires_auth
@@ -402,7 +414,7 @@ class Repository(GitHubCore):
                      body=None,
                      assignee=None,
                      milestone=None,
-                     labels=[]):
+                     labels=None):
         """Creates an issue on this repository.
 
         :param str title: (required), title of the issue
@@ -418,11 +430,15 @@ class Repository(GitHubCore):
         :returns: :class:`Issue <github3.issues.Issue>` if successful, else
             None
         """
-        issue = dumps({'title': title, 'body': body, 'assignee': assignee,
-                       'milestone': milestone, 'labels': labels})
-        url = self._build_url('issues', base_url=self._api)
+        issue = {'title': title, 'body': body, 'assignee': assignee,
+                 'milestone': milestone, 'labels': labels}
+        self._remove_none(issue)
+        json = None
 
-        json = self._json(self._post(url, issue), 201)
+        if issue:
+            url = self._build_url('issues', base_url=self._api)
+            json = self._json(self._post(url, data=dumps(issue)), 201)
+
         return Issue(json, self) if json else None
 
     @requires_auth
@@ -433,9 +449,11 @@ class Repository(GitHubCore):
         :param str key: (required), key text
         :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
-        data = dumps({'title': title, 'key': key})
-        url = self._build_url('keys', base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = None
+        if title and key:
+            data = {'title': title, 'key': key}
+            url = self._build_url('keys', base_url=self._api)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Key(json, self) if json else None
 
     @requires_auth
@@ -448,9 +466,11 @@ class Repository(GitHubCore):
         :returns: :class:`Label <github3.issues.Label>` if successful, else
             None
         """
-        data = dumps({'name': name, 'color': color.strip('#')})
-        url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = None
+        if name and color:
+            data = {'name': name, 'color': color.strip('#')}
+            url = self._build_url('labels', base_url=self._api)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Label(json, self) if json else None
 
     @requires_auth
@@ -469,9 +489,12 @@ class Repository(GitHubCore):
         url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
             state = 'open'
-        data = dumps({'title': title, 'state': state,
-                      'description': description, 'due_on': due_on})
-        json = self._json(self._post(url, data), 201)
+        data = {'title': title, 'state': state,
+                'description': description, 'due_on': due_on}
+        self._remove_none(data)
+        json = None
+        if data:
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Milestone(json, self) if json else None
 
     @requires_auth
@@ -486,8 +509,8 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        data = dumps({'title': title, 'body': body, 'base': base,
-                      'head': head})
+        data = {'title': title, 'body': body, 'base': base,
+                'head': head}
         return self._create_pull(data)
 
     @requires_auth
@@ -500,7 +523,7 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        data = dumps({'issue': issue, 'base': base, 'head': head})
+        data = {'issue': issue, 'base': base, 'head': head}
         return self._create_pull(data)
 
     @requires_auth
@@ -514,7 +537,7 @@ class Repository(GitHubCore):
         :returns: :class:`Reference <github3.git.Reference>` if successful
             else None
         """
-        data = dumps({'ref': ref, 'sha': sha})
+        data = {'ref': ref, 'sha': sha}
         url = self._build_url('git', 'refs', base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return Reference(json, self) if json else None
@@ -531,10 +554,10 @@ class Repository(GitHubCore):
         """
         json = {}
         if sha and state:
-            data = dumps({'state': state, 'target_url': target_url,
-                          'description': description})
+            data = {'state': state, 'target_url': target_url,
+                    'description': description}
             url = self._build_url('statuses', sha, base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Status(json) if json else None
 
     @requires_auth
@@ -560,8 +583,8 @@ class Repository(GitHubCore):
 
         json = None
         if tag and message and sha and obj_type and len(tagger) == 3:
-            data = dumps({'tag': tag, 'message': message, 'object': sha,
-                          'type': obj_type, 'tagger': tagger})
+            data = {'tag': tag, 'message': message, 'object': sha,
+                    'type': obj_type, 'tagger': tagger}
             url = self._build_url('git', 'tags', base_url=self._api)
             json = self._json(self._post(url, data), 201)
             if json:
@@ -581,7 +604,7 @@ class Repository(GitHubCore):
         """
         json = None
         if tree and isinstance(tree, list):
-            data = dumps({'tree': tree, 'base_tree': base_tree})
+            data = {'tree': tree, 'base_tree': base_tree}
             url = self._build_url('git', 'trees', base_url=self._api)
             json = self._json(self._post(url, data), 201)
         return Tree(json) if json else None
@@ -607,6 +630,11 @@ class Repository(GitHubCore):
 
     def download(self, id_num):
         """Get a single download object by its id.
+
+        .. warning::
+
+            On 2012-03-11, GitHub will be deprecating the Downloads API. This
+            method will no longer work.
 
         :param int id_num: (required), id of the download
         :returns: :class:`Download <Download>` if successful, else None
@@ -653,24 +681,12 @@ class Repository(GitHubCore):
             value unchanged.
         :returns: bool -- True if successful, False otherwise
         """
-        edit = {'name': name}
-        if description is not None:
-            edit['description'] = description
-        if homepage is not None:
-            edit['homepage'] = homepage
-        if private is not None:
-            edit['private'] = private
-        if has_issues is not None:
-            edit['has_issues'] = has_issues
-        if has_wiki is not None:
-            edit['has_wiki'] = has_wiki
-        if has_downloads is not None:
-            edit['has_downloads'] = has_downloads
-        if default_branch is not None:
-            edit['default_branch'] = default_branch
-
-        data = dumps(edit)
-        json = self._json(self._patch(self._api, data=data), 200)
+        edit = {'name': name, 'description': description, 'homepage': homepage,
+                'private': private, 'has_issues': has_issues,
+                'has_wiki': has_wiki, 'has_downloads': has_downloads,
+                'default_branch': default_branch}
+        self._remove_none(edit)
+        json = self._json(self._patch(self._api, data=dumps(edit)), 200)
         if json:
             self._update_(json)
             return True
@@ -692,14 +708,14 @@ class Repository(GitHubCore):
 
         :returns: bool
         """
-        return self._is_fork
+        return self.fork
 
     def is_private(self):
         """Checks if this repository is private.
 
         :returns: bool
         """
-        return self._priv
+        return self.private
 
     def git_commit(self, sha):
         """Get a single (git) commit.
@@ -711,27 +727,6 @@ class Repository(GitHubCore):
         url = self._build_url('git', 'commits', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
         return Commit(json, self) if json else None
-
-    def has_downloads(self):
-        """Checks if this repository has downloads.
-
-        :returns: bool
-        """
-        return self._has_dl
-
-    def has_issues(self):
-        """Checks if this repository has issues enabled.
-
-        :returns: bool
-        """
-        return self._has_issues
-
-    def has_wiki(self):
-        """Checks if this repository has a wiki.
-
-        :returns: bool
-        """
-        return self._has_wiki
 
     @requires_auth
     def hook(self, id_num):
@@ -812,7 +807,6 @@ class Repository(GitHubCore):
             -1 returns all branches
         :returns: list of :class:`Branch <Branch>`\ es
         """
-        # Paginate?
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch)
 
@@ -823,7 +817,6 @@ class Repository(GitHubCore):
             -1 returns all comments
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
-        # Paginate?
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment)
 
@@ -872,7 +865,6 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :returns: list of :class:`User <github3.users.User>`\ s
         """
-        # Paginate
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
@@ -881,6 +873,11 @@ class Repository(GitHubCore):
 
     def iter_downloads(self, number=-1):
         """Iterate over available downloads for this repository.
+
+        .. warning::
+
+            On 2012-03-11, GitHub will be deprecating the Downloads API. This
+            method will no longer work.
 
         :param int number: (optional), number of downloads to return. Default:
             -1 returns all available downloads
@@ -952,16 +949,10 @@ class Repository(GitHubCore):
         """
         url = self._build_url('issues', base_url=self._api)
 
-        params = {}
+        params = {'assignee': assignee, 'mentioned': mentioned}
         if milestone in ('*', 'none') or isinstance(milestone, int):
             params['milestone'] = milestone
-
-        if assignee:
-            params['assignee'] = assignee
-
-        if mentioned:
-            params['mentioned'] = mentioned
-
+        self._remove_none(params)
         params.update(issue_params(None, state, labels, sort, direction,
             since))  # nopep8
 
@@ -1078,9 +1069,10 @@ class Repository(GitHubCore):
             :class:`PullRequest <github3.pulls.PullRequest>`\ s
         """
         url = self._build_url('pulls', base_url=self._api)
+        params = {}
         if state in ('open', 'closed'):
-            url = '{0}?{1}={2}'.format(url, 'state', state)
-        return self._iter(int(number), url, PullRequest)
+            params['state'] = state
+        return self._iter(int(number), url, PullRequest, params=params)
 
     def iter_refs(self, subspace='', number=-1):
         """Iterates over references for this repository.
@@ -1175,8 +1167,8 @@ class Repository(GitHubCore):
         :returns: :class:`RepoCommit <RepoCommit>`
         """
         url = self._build_url('merges', base_url=self._api)
-        data = dumps({'base': base, 'head': head, 'commit_message': message})
-        json = self._json(self._post(url, data=data), 201)
+        data = {'base': base, 'head': head, 'commit_message': message}
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return RepoCommit(json, self) if json else None
 
     def milestone(self, number):
@@ -1209,7 +1201,8 @@ class Repository(GitHubCore):
             data = [('hub.mode', mode), ('hub.topic', topic),
                     ('hub.callback', callback), ('hub.secret', secret)]
             url = self._build_url('hub')
-            status = self._boolean(self._post(url, data=data), 204, 404)
+            status = self._boolean(self._post(url, data=dumps(data)), 204,
+                                   404)
         return status
 
     def pull_request(self, number):
@@ -1272,9 +1265,9 @@ class Repository(GitHubCore):
             ignored from this repository.
         :returns: :class;`Subscription <Subscription>`
         """
-        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
+        sub = {'subscribed': subscribed, 'ignored': ignored}
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=sub), 200)
+        json = self._json(self._put(url, data=dumps(sub)), 200)
         return Subscription(json, self) if json else None
 
     @requires_auth
@@ -1359,11 +1352,11 @@ class Contents(GitHubObject):
 
         # should always be 'base64'
         #: Returns encoding used on the content.
-        self.encoding = content.get('encoding')
+        self.encoding = content.get('encoding', '')
 
         # content, base64 encoded and decoded
         #: Base64-encoded content of the file.
-        self.content = content.get('content')
+        self.content = content.get('content', '')
 
         #: Decoded content of the file.
         self.decoded = self.content
@@ -1372,20 +1365,23 @@ class Contents(GitHubObject):
 
         # file name, path, and size
         #: Name of the content.
-        self.name = content.get('name')
+        self.name = content.get('name', '')
         #: Path to the content.
-        self.path = content.get('path')
+        self.path = content.get('path', '')
         #: Size of the content
-        self.size = content.get('size')
+        self.size = content.get('size', 0)
         #: SHA string.
-        self.sha = content.get('sha')
+        self.sha = content.get('sha', '')
 
         # should always be 'file'
         #: Type of content.
-        self.type = content.get('type')
+        self.type = content.get('type', '')
 
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
+
+    def __str__(self):
+        return self.decoded
 
     @property
     def git_url(self):
@@ -1401,25 +1397,30 @@ class Contents(GitHubObject):
 class Download(GitHubCore):
     """The :class:`Download <Download>` object. It represents how GitHub sends
     information about files uploaded to the downloads section of a repository.
+
+    .. warning::
+
+        On 2013-03-11, this API will be deprecated by GitHub. There will also
+        be a new version of github3.py to accompany this at that date.
     """
 
     def __init__(self, download, session=None):
         super(Download, self).__init__(download, session)
         self._api = download.get('url', '')
         #: URL of the download at GitHub.
-        self.html_url = download.get('html_url')
+        self.html_url = download.get('html_url', '')
         #: Unique id of the download on GitHub.
-        self.id = download.get('id')
+        self.id = download.get('id', 0)
         #: Name of the download.
-        self.name = download.get('name')
+        self.name = download.get('name', '')
         #: Description of the download.
-        self.description = download.get('description')
+        self.description = download.get('description', '')
         #: Size of the download.
-        self.size = download.get('size')
+        self.size = download.get('size', 0)
         #: How many times this particular file has been downloaded.
-        self.download_count = download.get('download_count')
+        self.download_count = download.get('download_count', 0)
         #: Content type of the download.
-        self.content_type = download.get('content_type')
+        self.content_type = download.get('content_type', '')
 
     def __repr__(self):
         return '<Download [{0}]>'.format(self.name)
@@ -1440,9 +1441,9 @@ class Download(GitHubCore):
         if not path:
             path = self.name
 
-        resp = self._get(self.html_url, allow_redirects=True, prefetch=False)
+        resp = self._get(self.html_url, allow_redirects=True, stream=True)
         if self._boolean(resp, 200, 404):
-            if callable(getattr(path, 'write', None)):
+            if isinstance(getattr(path, 'write', None), Callable):
                 file_like = True
                 fd = path
             else:
@@ -1473,7 +1474,8 @@ class Hook(GitHubCore):
         self.name = hook.get('name')
         #: Events which trigger the hook.
         self.events = hook.get('events')
-        self._active = hook.get('active')
+        #: Whether or not this Hook is marked as active on GitHub
+        self.active = hook.get('active')
         #: Dictionary containing the configuration for the Hook.
         self.config = hook.get('config')
         #: Unique id of the hook.
@@ -1543,7 +1545,7 @@ class Hook(GitHubCore):
 
         :returns: bool
         """
-        return self._active
+        return self.active
 
     @requires_auth
     def test(self):
@@ -1551,7 +1553,8 @@ class Hook(GitHubCore):
 
         :returns: bool
         """
-        return self._boolean(self._post(self._api + '/test'), 204, 404)
+        url = self._build_url('tests', base_url=self._api)
+        return self._boolean(self._post(url), 204, 404)
 
 
 class RepoTag(GitHubObject):
@@ -1571,7 +1574,10 @@ class RepoTag(GitHubObject):
         self.commit = tag.get('commit', {})
 
     def __repr__(self):
-        return '<Repository Tag [{0}]>'.format(self.name)
+        return '<Repository Tag [{0}]>'.format(self)
+
+    def __str__(self):
+        return self.name
 
 
 class RepoComment(BaseComment):
@@ -1621,9 +1627,9 @@ class RepoComment(BaseComment):
         """
         json = None
         if body and sha and path and line > 0 and position > 0:
-            data = dumps({'body': body, 'commit_id': sha, 'line': line,
-                          'path': path, 'position': position})
-            json = self._json(self._post(self._api, data), 200)
+            data = {'body': body, 'commit_id': sha, 'line': line,
+                    'path': path, 'position': position}
+            json = self._json(self._post(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)
@@ -1670,15 +1676,27 @@ class RepoCommit(BaseCommit):
     def __repr__(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
+    def diff(self):
+        """Return the diff"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.diff'})
+        return resp.content if self._boolean(resp, 200, 404) else None
 
-class Comparison(GitHubObject):
+    def patch(self):
+        """Return the patch"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.patch'})
+        return resp.content if self._boolean(resp, 200, 404) else None
+
+
+class Comparison(GitHubCore):
     """The :class:`Comparison <Comparison>` object. This encapsulates the
     information returned by GitHub comparing two commit objects in a
     repository."""
 
     def __init__(self, compare):
         super(Comparison, self).__init__(compare)
-        self._api = compare.get('api', '')
+        self._api = compare.get('url', '')
         #: URL to view the comparison at GitHub
         self.html_url = compare.get('html_url')
         #: Permanent link to this comparison.
@@ -1705,6 +1723,18 @@ class Comparison(GitHubObject):
 
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
+
+    def diff(self):
+        """Return the diff"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.diff'})
+        return resp.content if self._boolean(resp, 200, 404) else None
+
+    def patch(self):
+        """Return the patch"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.patch'})
+        return resp.content if self._boolean(resp, 200, 404) else None
 
 
 class Status(GitHubObject):

@@ -12,44 +12,6 @@ from github3.users import User
 from github3.decorators import requires_auth
 
 
-class GistFile(GitHubObject):
-    """The :class:`GistFile <GistFile>` object. This is used to represent a
-    file object returned by GitHub while interacting with gists.
-    """
-    def __init__(self, attributes):
-        super(GistFile, self).__init__(attributes)
-
-        #: The raw URL for the file at GitHub.
-        self.raw_url = attributes.get('raw_url')
-        #: The name of the file.
-        self.name = attributes.get('filename')
-        #: The language associated with the file.
-        self.language = attributes.get('language')
-        #: The size of the file.
-        self.size = attributes.get('size')
-        #: The content of the file.
-        self.content = attributes.get('content')
-
-    def __repr__(self):
-        return '<Gist File [{0}]>'.format(self.name)
-
-
-class GistComment(BaseComment):
-    """The :class:`GistComment <GistComment>` object. This represents a comment
-    on a gist.
-    """
-    def __init__(self, comment, session=None):
-        super(GistComment, self).__init__(comment, session)
-
-        #: :class:`User <github3.users.User>` who made the comment
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)
-
-    def __repr__(self):
-        return '<Gist Comment [{0}]>'.format(self.user.login)
-
-
 class Gist(GitHubCore):
     """The :class:`Gist <Gist>` object. This object holds all the information
     returned by Github about a gist. With it you can comment on or fork the
@@ -98,6 +60,9 @@ class Gist(GitHubCore):
         self._files = [GistFile(data['files'][f]) for f in data['files']]
         #: Number of files in this gist.
         self.files = len(self._files)
+
+        #: History of this gist, list of :class:`GistHistory <GistHistory>`
+        self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
     def __repr__(self):
         return '<Gist [{0}]>'.format(self.id)
@@ -155,7 +120,7 @@ class Gist(GitHubCore):
 
         :returns: :class:`Gist <Gist>` if successful, ``None`` otherwise
         """
-        url = self._api + '/fork'
+        url = self._build_url('forks', base_url=self._api)
         json = self._json(self._post(url), 201)
         return Gist(json, self) if json else None
 
@@ -219,3 +184,84 @@ class Gist(GitHubCore):
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
+
+
+class GistComment(BaseComment):
+    """The :class:`GistComment <GistComment>` object. This represents a comment
+    on a gist.
+    """
+    def __init__(self, comment, session=None):
+        super(GistComment, self).__init__(comment, session)
+
+        #: :class:`User <github3.users.User>` who made the comment
+        self.user = None
+        if comment.get('user'):
+            self.user = User(comment.get('user'), self)
+
+    def __repr__(self):
+        return '<Gist Comment [{0}]>'.format(self.user.login)
+
+
+class GistFile(GitHubObject):
+    """The :class:`GistFile <GistFile>` object. This is used to represent a
+    file object returned by GitHub while interacting with gists.
+    """
+    def __init__(self, attributes):
+        super(GistFile, self).__init__(attributes)
+
+        #: The raw URL for the file at GitHub.
+        self.raw_url = attributes.get('raw_url')
+        #: The name of the file.
+        self.filename = attributes.get('filename')
+        #: The name of the file.
+        self.name = attributes.get('filename')
+        #: The language associated with the file.
+        self.language = attributes.get('language')
+        #: The size of the file.
+        self.size = attributes.get('size')
+        #: The content of the file.
+        self.content = attributes.get('content')
+
+    def __repr__(self):
+        return '<Gist File [{0}]>'.format(self.name)
+
+
+class GistHistory(GitHubCore):
+    """The :class:`GistHistory <GistHistory>` object represents one version
+    (or revision) of a gist."""
+    def __init__(self, history, session=None):
+        super(GistHistory, self).__init__(history, session)
+        self._api = history.get('url', '')
+
+        #: SHA of the commit associated with this version
+        self.version = history.get('version', '')
+
+        #: user who made these changes
+        self.user = User(history.get('user') or {}, session)
+
+        #: dict containing the change status; see also: deletions, additions,
+        #: total
+        self.change_status = history.get('change_status', {})
+
+        #: number of additions made
+        self.additions = self.change_status.get('additions', 0)
+
+        #: number of deletions made
+        self.deletions = self.change_status.get('deletions', 0)
+
+        #: total number of changes made
+        self.total = self.change_status.get('total', 0)
+
+        #: datetime representation of when the commit was made
+        self.committed_at = self._strptime(history.get('committed_at'))
+
+    def __repr__(self):
+        return '<Gist History [{0}]>'.format(self.version)
+
+    def get_gist(self):
+        """Retrieves the gist at this version.
+
+        :returns: :class:`Gist <Gist>`
+        """
+        json = self._json(self._get(self._api), 200)
+        return Gist(json, self)

@@ -9,9 +9,9 @@ This module provides the basic models used in github3.py
 from json import dumps
 from requests import session
 from requests.compat import urlparse
-from re import compile
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
+from github3 import __version__
 
 __url_cache__ = {}
 
@@ -58,27 +58,28 @@ class GitHubCore(GitHubObject):
             # Always sending JSON
             'Content-Type': "application/json",
             # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/0.1b0',
+            'User-Agent': 'github3.py/{0}'.format(__version__),
         }
 
         self._session.headers.update(headers)
-        self._session.config['base_headers'].update(headers)
 
         # set a sane default
         self._github_url = 'https://api.github.com'
-        self._remaining = 5000
-        self._rel_reg = compile(r'<(https://[0-9a-zA-Z\./\?=&]+)>; '
-                                'rel="(\w+)"')
 
     def __repr__(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
-    def _json(self, request, status_code):
+    def _remove_none(self, data):
+        for (k, v) in list(data.items()):
+            if v is None:
+                del(data[k])
+
+    def _json(self, response, status_code):
         ret = None
-        if request.status_code == status_code and request.content:
-            ret = request.json
-        if request.status_code >= 400:
-            raise GitHubError(request)
+        if response.status_code == status_code and response.content:
+            ret = response.json()
+        if response.status_code >= 400:
+            raise GitHubError(response)
         return ret
 
     def _boolean(self, request, true_code, false_code):
@@ -89,41 +90,25 @@ class GitHubCore(GitHubObject):
         return False
 
     def _delete(self, url, **kwargs):
-        req = False
-        if self._remaining > 0:
-            req = self._session.delete(url, **kwargs)
-        return req
+        return self._session.delete(url, **kwargs)
 
     def _get(self, url, **kwargs):
-        req = None
-        if self._remaining > 0:
-            req = self._session.get(url, **kwargs)
-        return req
+        return self._session.get(url, **kwargs)
 
     def _patch(self, url, **kwargs):
-        req = None
-        if self._remaining > 0:
-            req = self._session.patch(url, **kwargs)
-        return req
+        return self._session.patch(url, **kwargs)
 
     def _post(self, url, data=None, **kwargs):
-        req = None
-        if self._remaining > 0:
-            req = self._session.post(url, data, **kwargs)
-        return req
+        return self._session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
-        req = False
-        if self._remaining > 0:
-            if 'data' not in kwargs:
-                kwargs.update(headers={'Content-Length': '0'})
-            req = self._session.put(url, **kwargs)
-        return req
+        return self._session.put(url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
         parts = [kwargs.get('base_url') or self._github_url]
         parts.extend(args)
+        parts = [str(p) for p in parts]
         key = tuple(parts)
         if not key in __url_cache__:
             __url_cache__[key] = '/'.join(parts)
@@ -173,9 +158,11 @@ class GitHubCore(GitHubObject):
         return self._remaining
 
     def refresh(self):
-        """Re-retrieve the information for this object."""
+        """Re-retrieve the information for this object and returns the
+        refreshed instance."""
         json = self._json(self._get(self._api), 200)
         self.__init__(json, self._session)
+        return self
 
 
 class BaseComment(GitHubCore):
@@ -298,7 +285,7 @@ class BaseAccount(GitHubCore):
 
         ## e.g. first_name last_name
         #: Real name of the user/org
-        self.name = acct.get('name', '')
+        self.name = acct.get('name', '').encode('utf-8')
 
         ## The number of public_repos
         #: Number of public repos owned by the user/org
@@ -325,8 +312,8 @@ class GitHubError(Exception):
         self.response = resp
         self.code = resp.status_code
         self.errors = []
-        if resp.json:  # GitHub Error
-            error = resp.json
+        if resp.json():  # GitHub Error
+            error = resp.json()
             #: Message associated with the error
             self.msg = error.get('message')
             #: List of errors provided by GitHub

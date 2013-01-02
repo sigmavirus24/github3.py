@@ -6,6 +6,7 @@ This module contains all the classes relating to pull requests.
 
 """
 
+from re import match
 from json import dumps
 from github3.git import Commit
 from github3.models import GitHubObject, GitHubCore, BaseComment
@@ -129,7 +130,7 @@ class PullRequest(GitHubCore):
         # If the pull request has been merged
         if self.merged_at:
             self.merged_at = self._strptime(self.merged_at)
-        self._mergeable = pull.get('mergeable')
+        self.mergeable = pull.get('mergeable', False)
         #: :class:`User <github3.users.User>` who merged this pull
         self.merged_by = pull.get('merged_by')
         if self.merged_by:
@@ -138,6 +139,11 @@ class PullRequest(GitHubCore):
         self.number = pull.get('number')
         #: The URL of the patch
         self.patch_url = pull.get('patch_url')
+
+        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+',
+                  self.issue_url)
+        #: Returns ('owner', 'repository') this issue was filed on.
+        self.repository = m.groups()
         #: The state of the pull
         self.state = pull.get('state')
         #: The title of the request
@@ -164,12 +170,18 @@ class PullRequest(GitHubCore):
         """
         return self.update(self.title, self.body, 'closed')
 
+    def diff(self):
+        """Return the diff"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.diff'})
+        return resp.content if self._boolean(resp, 200, 404) else None
+
     def is_mergeable(self):
         """Checks to see if the pull request can be merged by GitHub.
 
         :returns: bool
         """
-        return False if self._mergeable is None else self._mergeable
+        return self.mergeable
 
     def is_merged(self):
         """Checks to see if the pull request was merged.
@@ -246,10 +258,17 @@ class PullRequest(GitHubCore):
         """
         data = None
         if commit_message:
-            data = dumps({'commit_message': commit_message})
+            data = {'commit_message': commit_message}
         url = self._build_url('merge', base_url=self._api)
-        resp = self._put(url, data)
+        resp = self._put(url, data=dumps(data))
+        self.merge_commit_sha = resp['merge_commit_sha']
         return resp.json['merged']
+
+    def patch(self):
+        """Return the patch"""
+        resp = self._get(self._api,
+                         headers={'Accept': 'application/vnd.github.patch'})
+        return resp.content if self._boolean(resp, 200, 404) else None
 
     @requires_auth
     def reopen(self):

@@ -24,3 +24,18 @@ GitHub Object
 
 .. links
 .. _here: examples/githubex.html
+
+GitHubEnterprise Object
+-----------------------
+
+This has all of the same attributes ass the :class:`GitHub <GitHub>` object so 
+for brevity's sake, I'm not listing all of it's inherited members.
+
+.. autoclass:: GitHubEnterprise
+    :members:
+
+GitHubStatus Object
+-------------------
+
+.. autoclass:: GitHubStatus
+    :members:

@@ -6,8 +6,8 @@ This module contains the classes related to issues.
 
 """
 
-from json import dumps
 from re import match
+from json import dumps
 from github3.models import GitHubCore, BaseComment
 from github3.users import User
 from github3.decorators import requires_auth
@@ -25,7 +25,10 @@ class Label(GitHubCore):
         self.name = label.get('name')
 
     def __repr__(self):
-        return '<Label [{0}]>'.format(self.name)
+        return '<Label [{0}]>'.format(self)
+
+    def __str__(self):
+        return self.name
 
     def _update_(self, label):
         self.__init__(label, self._session)
@@ -51,8 +54,8 @@ class Label(GitHubCore):
         if name and color:
             if color[0] == '#':
                 color = color[1:]
-            json = self._json(self._patch(self._api, data=dumps({'name': name,
-                              'color': color})), 200)
+            json = self._json(self._patch(self._api, data=dumps({
+                'name': name, 'color': color})), 200)
 
         if json:
             self._update_(json)
@@ -92,7 +95,10 @@ class Milestone(GitHubCore):
             self.due_on = self._strptime(mile.get('due_on'))
 
     def __repr__(self):
-        return '<Milestone [{0}]>'.format(self.title)
+        return '<Milestone [{0}]>'.format(self)
+
+    def __str__(self):
+        return self.title
 
     def _update_(self, mile):
         self.__init__(mile, self._session)
@@ -139,12 +145,12 @@ class Milestone(GitHubCore):
             YYYY-MM-DDTHH:MM:SSZ
         :returns: bool
         """
-        data = dumps({'title': title, 'state': state,
-                      'description': description, 'due_on': due_on})
+        data = {'title': title, 'state': state,
+                'description': description, 'due_on': due_on}
         json = None
 
         if title:
-            json = self._json(self._patch(self._api, data=data), 200)
+            json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)
             return True
@@ -210,7 +216,7 @@ class Issue(GitHubCore):
 
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
-                n=self.number)  # nopep8
+                                                     n=self.number)
 
     def _update_(self, issue):
         self.__init__(issue, self._session)
@@ -223,7 +229,7 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(list(args))),
+        json = self._json(self._post(url, data=dumps(args)),
                           status_code=200)
         return True if json else False
 
@@ -280,7 +286,8 @@ class Issue(GitHubCore):
         json = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, dumps({'body': body})), 201)
+            json = self._json(self._post(url, data=dumps({'body': body})),
+                              201)
         return IssueComment(json, self) if json else None
 
     @requires_auth

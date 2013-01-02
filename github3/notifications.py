@@ -37,7 +37,7 @@ class Thread(GitHubCore):
         #: Subject of the Notification, e.g., which issue/pull/diff is this in
         #: relation to. This is a dictionary
         self.subject = notif.get('subject')
-        self._unread = notif.get('unread')
+        self.unread = notif.get('unread')
 
     def __repr__(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
@@ -52,7 +52,7 @@ class Thread(GitHubCore):
 
     def is_unread(self):
         """Tells you if the thread is unread or not."""
-        return self._unread
+        return self.unread
 
     def mark(self):
         """Mark the thread as read.
@@ -73,8 +73,8 @@ class Thread(GitHubCore):
         :returns: :class;`Subscription <Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)
-        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
-        json = self._json(self._put(url, data=sub), 200)
+        sub = {'subscribed': subscribed, 'ignored': ignored}
+        json = self._json(self._put(url, data=dumps(sub)), 200)
         return Subscription(json, self) if json else None
 
     def subscription(self):
@@ -122,6 +122,6 @@ class Subscription(GitHubCore):
         :param bool ignored: (required), determines if notifications should be
             ignored from this thread.
         """
-        sub = dumps({'subscribed': subscribed, 'ignored': ignored})
-        json = self._json(self._put(self._api, data=sub), 200)
+        sub = {'subscribed': subscribed, 'ignored': ignored}
+        json = self._json(self._put(self._api, data=dumps(sub)), 200)
         self.__init__(json, self._session)

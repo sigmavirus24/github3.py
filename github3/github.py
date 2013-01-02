@@ -6,8 +6,8 @@ This module contains the main GitHub session object.
 
 """
 
-from requests import session
 from json import dumps
+from requests import session
 from github3.auths import Authorization
 from github3.events import Event
 from github3.gists import Gist
@@ -23,9 +23,6 @@ from github3.notifications import Thread
 
 class GitHub(GitHubCore):
     """Stores all the session information.
-
-    Logging In
-    ----------
 
     There are two ways to log into the GitHub API
 
@@ -56,6 +53,8 @@ class GitHub(GitHubCore):
             self.login(login, password)
 
     def __repr__(self):
+        if self._session.auth:
+            return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
     @requires_auth
@@ -76,7 +75,8 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Authorization(json, self) if json else None
 
-    def authorize(self, login, password, scopes, note='', note_url=''):
+    def authorize(self, login, password, scopes, note='', note_url='',
+                  client_id='', client_secret=''):
         """Obtain an authorization token from the GitHub API for the GitHub
         API.
 
@@ -86,16 +86,20 @@ class GitHub(GitHubCore):
             i.e., 'gist', 'user'
         :param str note: (optional), note about the authorization
         :param str note_url: (optional), url for the application
+        :param str client_id: (optional), 20 character OAuth client key for
+            which to create a token
+        :param str client_secret: (optional), 40 character OAuth client secret
+            for which to create the token
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
         auth = self._session.auth or (login and password)
         if isinstance(scopes, list) and auth:
             url = self._build_url('authorizations')
-            data = dumps({'scopes': scopes, 'note': note,
-                          'note_url': note_url})
+            data = {'scopes': scopes, 'note': note, 'note_url': note_url,
+                    'client_id': client_id, 'client_secret': client_secret}
             if self._session.auth:
-                json = self._json(self._post(url, data=data), 201)
+                json = self._json(self._post(url, data=dumps(data)), 201)
             else:
                 ses = session()
                 ses.auth = (login, password)
@@ -117,7 +121,7 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                     'files': files}
         url = self._build_url('gists')
-        json = self._json(self._post(url, dumps(new_gist)), 201)
+        json = self._json(self._post(url, data=dumps(new_gist)), 201)
         return Gist(json, self) if json else None
 
     @requires_auth
@@ -170,7 +174,7 @@ class GitHub(GitHubCore):
 
         if title and key:
             url = self._build_url('user', 'keys')
-            req = self._post(url, dumps({'title': title, 'key': key}))
+            req = self._post(url, data=dumps({'title': title, 'key': key}))
             json = self._json(req, 201)
             if json:
                 created = Key(json, self)
@@ -208,12 +212,12 @@ class GitHub(GitHubCore):
         .. warning: ``name`` should be no longer than 100 characters
         """
         url = self._build_url('user', 'repos')
-        data = dumps({'name': name, 'description': description,
-                      'homepage': homepage, 'private': private,
-                      'has_issues': has_issues, 'has_wiki': has_wiki,
-                      'has_downloads': has_downloads, 'auto_init': auto_init,
-                      'gitignore_template': gitignore_template})
-        json = self._json(self._post(url, data), 201)
+        data = {'name': name, 'description': description,
+                'homepage': homepage, 'private': private,
+                'has_issues': has_issues, 'has_wiki': has_wiki,
+                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'gitignore_template': gitignore_template}
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return Repository(json, self) if json else None
 
     @requires_auth
@@ -250,6 +254,23 @@ class GitHub(GitHubCore):
         url = self._build_url('gists', str(id_num))
         json = self._json(self._get(url), 200)
         return Gist(json, self) if json else None
+
+    def gitignore_template(self, language):
+        """Returns the template for language.
+
+        :returns: str
+        """
+        url = self._build_url('gitignore', 'templates', language)
+        json = self._json(self._get(url), 200)
+        return json.get('source', '')
+
+    def gitignore_templates(self):
+        """Returns the list of available templates.
+
+        :returns: list of template names
+        """
+        url = self._build_url('gitignore', 'templates')
+        return self._json(self._get(url), 200) or []
 
     @requires_auth
     def is_following(self, login):
@@ -306,18 +327,25 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    @requires_auth
-    def key(self, id_num):
-        """Gets the authenticated user's key specified by id_num.
+    def iter_all_repos(self, number=-1):
+        """Iterate over every repository in the order they were created.
 
-        :param int id_num: (required), unique id of the key
-        :returns: :class:`Key <github3.users.Key>`
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all of them
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
-        json = None
-        if int(id_num) > 0:
-            url = self._build_url('user', 'keys', str(id_num))
-            json = self._json(self._get(url), 200)
-        return Key(json, self) if json else None
+        url = self._build_url('repositories')
+        return self._iter(int(number), url, Repository)
+
+    def iter_all_users(self, number=-1):
+        """Iterate over every user in the order they signed up for GitHub.
+
+        :param int number: (optional), number of users to return. Default: -1,
+            returns all of them
+        :returns: generator of :class:`User <github3.users.User>`
+        """
+        url = self._build_url('users')
+        return self._iter(int(number), url, User)
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1):
@@ -340,7 +368,7 @@ class GitHub(GitHubCore):
         :returns: generator of dicts
         """
         url = self._build_url('user', 'emails')
-        return self._iter(int(number), url, str)
+        return self._iter(int(number), url, dict)
 
     def iter_events(self, number=-1):
         """Iterate over public events.
@@ -497,8 +525,9 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Issue, params=params)
 
     def iter_repo_issues(self, owner, repository, milestone=None,
-                         state='', assignee='', mentioned='', labels='',
-                         sort='', direction='', since='', number=-1):
+                         state=None, assignee=None, mentioned=None,
+                         labels=None, sort=None, direction=None, since=None,
+                         number=-1):
         """List issues on owner/repository. Only owner and repository are
         required.
 
@@ -624,6 +653,19 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'subscriptions')
         return self._iter(int(number), url, Repository)
 
+    @requires_auth
+    def key(self, id_num):
+        """Gets the authenticated user's key specified by id_num.
+
+        :param int id_num: (required), unique id of the key
+        :returns: :class:`Key <github3.users.Key>`
+        """
+        json = None
+        if int(id_num) > 0:
+            url = self._build_url('user', 'keys', str(id_num))
+            json = self._json(self._get(url), 200)
+        return Key(json, self) if json else None
+
     def login(self, username=None, password=None, token=None):
         """Logs the user into GitHub for protected API calls.
 
@@ -667,10 +709,10 @@ class GitHub(GitHubCore):
             if context:
                 data['context'] = context
 
-            data = dumps(data)
+            data = data
 
         if data:
-            req = self._post(url, data=data, headers=headers)
+            req = self._post(url, data=dumps(data), headers=headers)
             if req.ok:
                 return req.content
         return ''  # (No coverage)
@@ -716,41 +758,51 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
-    def search_issues(self, owner, repo, state, keyword):
+    def search_issues(self, owner, repo, state, keyword, start_page=0):
         """Find issues by state and keyword.
 
         :param str owner: (required)
         :param str repo: (required)
         :param str state: (required), accepted values: ('open', 'closed')
         :param str keyword: (required), what to search for
+        :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
         """
+        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
         url = self._build_url('legacy', 'issues', 'search', owner, repo,
                               state, keyword)
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(url, params=params), 200)
         issues = json.get('issues', [])
         return [LegacyIssue(l, self) for l in issues]
 
-    def search_repos(self, keyword, **params):
+    def search_repos(self, keyword, language='', start_page=0):
         """Search all repositories by keyword.
 
         :param str keyword: (required)
-        :param dict params: (optional), filter by language and/or start_page
+        :param str language: (optional), language to filter by
+        :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
         url = self._build_url('legacy', 'repos', 'search', keyword)
+        params = {}
+        if language:
+            params['language'] = language
+        if start_page > 0:
+            params['start_page'] = start_page
         json = self._json(self._get(url, params=params), 200)
         repos = json.get('repositories', [])
         return [LegacyRepo(r, self) for r in repos]
 
-    def search_users(self, keyword):
+    def search_users(self, keyword, start_page=0):
         """Search all users by keyword.
 
         :param str keyword: (required)
+        :param int start_page: (optional), page to get (results come 100/page)
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
+        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
         url = self._build_url('legacy', 'user', 'search', str(keyword))
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(url, params=params), 200)
         users = json.get('users', [])
         return [LegacyUser(u, self) for u in users]
 
@@ -775,9 +827,7 @@ class GitHub(GitHubCore):
         the API."""
         if not user_agent:
             return
-        ua = {'User-Agent': user_agent}
-        self._session.config['base_headers'].update(ua)
-        self._session.headers.update(ua)
+        self._session.headers.update({'User-Agent': user_agent})
 
     @requires_auth
     def star(self, login, repo):
@@ -923,3 +973,37 @@ class GitHubEnterprise(GitHub):
             url = self._build_url('enterprise', 'stats', option.lower())
             stats = self._json(self._get(url), 200)
         return stats
+
+
+class GitHubStatus(GitHubCore):
+    """A sleek interface to the GitHub System Status API. This will only ever
+    return the JSON objects returned by the API.
+    """
+    def __init__(self):
+        super(GitHubStatus, self).__init__({})
+        self._github_url = 'https://status.github.com/'
+
+    def _recipe(self, *args):
+        url = self._build_url(*args)
+        resp = self._get(url)
+        return resp.json if self._boolean(resp, 200, 404) else {}
+
+    @classmethod
+    def api(self):
+        """GET /api.json"""
+        return self._recipe('api.json')
+
+    @classmethod
+    def status(self):
+        """GET /api/status.json"""
+        return self._recipe('api', 'status.json')
+
+    @classmethod
+    def last_message(self):
+        """GET /api/last-message.json"""
+        return self._recipe('api', 'last-message.json')
+
+    @classmethod
+    def messages(self):
+        """GET /api/messages.json"""
+        return self._recipe('api', 'messages.json')
