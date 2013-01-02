@@ -449,9 +449,11 @@ class Repository(GitHubCore):
         :param str key: (required), key text
         :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
-        data = {'title': title, 'key': key}
-        url = self._build_url('keys', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(data)), 201)
+        json = None
+        if title and key:
+            data = {'title': title, 'key': key}
+            url = self._build_url('keys', base_url=self._api)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Key(json, self) if json else None
 
     @requires_auth
@@ -464,9 +466,11 @@ class Repository(GitHubCore):
         :returns: :class:`Label <github3.issues.Label>` if successful, else
             None
         """
-        data = {'name': name, 'color': color.strip('#')}
-        url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(data)), 201)
+        json = None
+        if name and color:
+            data = {'name': name, 'color': color.strip('#')}
+            url = self._build_url('labels', base_url=self._api)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Label(json, self) if json else None
 
     @requires_auth
@@ -488,7 +492,9 @@ class Repository(GitHubCore):
         data = {'title': title, 'state': state,
                 'description': description, 'due_on': due_on}
         self._remove_none(data)
-        json = self._json(self._post(url, data=dumps(data)), 201)
+        json = None
+        if data:
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Milestone(json, self) if json else None
 
     @requires_auth

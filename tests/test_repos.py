@@ -218,3 +218,33 @@ class TestRepository(BaseCase):
         expect(self.repo.create_issue(title, body, assignee, mile, labels)
                ).isinstance(github3.issues.Issue)
         self.mock_assertions()
+
+    def test_create_key(self):
+        self.request.return_value = generate_response('key', 201)
+        self.args = ('POST', self.api + 'keys')
+        self.conf = {'data': {'key': 'ssh-rsa foobarbogus',
+                              'title': 'Fake key'}}
+
+        with expect.githuberror():
+            self.repo.create_key(**self.conf['data'])
+
+        self.login()
+        expect(self.repo.create_key(None, None)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.create_key(**self.conf['data'])).isinstance(
+            github3.users.Key)
+
+    def test_create_label(self):
+        self.request.return_value = generate_response('label', 201)
+        self.args = ('POST', self.api + 'labels')
+        self.conf = {'data': {'name': 'foo', 'color': '#f00f00'}}
+
+        with expect.githuberror():
+            self.repo.create_label(**self.conf['data'])
+
+        self.login()
+        expect(self.repo.create_label(None, None)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.create_label(**self.conf['data'])).isinstance(
+            github3.issues.Label
+        )

@@ -116,3 +116,12 @@ class BaseCase(TestCase):
             expect(self.conf[k]) == kwargs[k]
 
         self.request.reset_mock()
+
+
+class APITestMixin(TestCase):
+    def setUp(self):
+        self.mock = patch('github3.api.gh', autospec=github3.GitHub)
+        self.gh = self.mock.start()
+
+    def tearDown(self):
+        self.mock.stop()
