@@ -233,11 +233,12 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.create_key(**self.conf['data'])).isinstance(
             github3.users.Key)
+        self.mock_assertions()
 
     def test_create_label(self):
         self.request.return_value = generate_response('label', 201)
         self.args = ('POST', self.api + 'labels')
-        self.conf = {'data': {'name': 'foo', 'color': '#f00f00'}}
+        self.conf = {'data': {'name': 'foo', 'color': 'f00f00'}}
 
         with expect.githuberror():
             self.repo.create_label(**self.conf['data'])
@@ -246,5 +247,20 @@ class TestRepository(BaseCase):
         expect(self.repo.create_label(None, None)).is_None()
         expect(self.request.called).is_False()
         expect(self.repo.create_label(**self.conf['data'])).isinstance(
-            github3.issues.Label
-        )
+            github3.issues.Label)
+        self.mock_assertions()
+
+    def test_create_milestone(self):
+        self.request.return_value = generate_response('milestone', 201)
+        self.args = ('POST', self.api + 'milestones')
+        self.conf = {'data': {'title': 'foo'}}
+
+        with expect.githuberror():
+            self.repo.create_milestone(**self.conf['data'])
+
+        self.login()
+        expect(self.repo.create_milestone(None)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.create_milestone('foo')).isinstance(
+            github3.issues.Milestone)
+        self.mock_assertions()

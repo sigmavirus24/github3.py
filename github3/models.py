@@ -114,14 +114,13 @@ class GitHubCore(GitHubObject):
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 
-    def _api_getter(self):
+    @property
+    def api(self):
         return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
 
-    def _api_setter(self, uri):
+    @api.setter
+    def api(self, uri):
         self._uri = urlparse(uri)
-
-    _api = property(_api_getter, _api_setter)
-    del(_api_getter, _api_setter)
 
     def _iter(self, count, url, cls, params=None):
         """Generic iterator for this project.

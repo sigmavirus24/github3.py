@@ -488,7 +488,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
-            state = 'open'
+            state = None
         data = {'title': title, 'state': state,
                 'description': description, 'due_on': due_on}
         self._remove_none(data)
