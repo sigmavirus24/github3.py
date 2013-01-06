@@ -40,6 +40,9 @@ class Repository(GitHubCore):
         #: Is this repository a fork?
         self.fork = repo.get('fork')
 
+        #: Full name as login/name
+        self.full_name = repo.get('full_name', '')
+
         # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
         #: Plain git url for an anonymous clone.
         self.git_url = repo.get('git_url', '')
@@ -116,12 +119,13 @@ class Repository(GitHubCore):
         return '<Repository [{0}]>'.format(self)
 
     def __str__(self):
-        return '{0}/{1}'.format(self.owner, self.name)
+        return self.full_name
 
     def _update_(self, repo):
         self.__init__(repo, self._session)
 
     def _create_pull(self, data):
+        self._remove_none(data)
         json = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
@@ -498,7 +502,7 @@ class Repository(GitHubCore):
         return Milestone(json, self) if json else None
 
     @requires_auth
-    def create_pull(self, title, base, head, body=''):
+    def create_pull(self, title, base, head, body=None):
         """Create a pull request using commits from ``head`` and comparing
         against ``base``.
 

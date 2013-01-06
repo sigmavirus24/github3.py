@@ -264,3 +264,19 @@ class TestRepository(BaseCase):
         expect(self.repo.create_milestone('foo')).isinstance(
             github3.issues.Milestone)
         self.mock_assertions()
+
+    def test_create_pull(self):
+        self.request.return_value = generate_response('pull', 201)
+        self.args = ('POST', self.api + 'pulls')
+        self.conf = {'data': {'title': 'Fake title', 'base': 'master',
+                              'head': 'feature_branch'}}
+
+        with expect.githuberror():
+            self.repo.create_pull(**self.conf['data'])
+
+        self.login()
+        expect(self.repo.create_pull(None, None, None)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.create_pull(**self.conf['data'])).isinstance(
+            github3.pulls.PullRequest)
+        self.mock_assertions()
