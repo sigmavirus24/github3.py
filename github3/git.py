@@ -103,7 +103,7 @@ class Reference(GitHubCore):
         #: The reference path, e.g., refs/heads/sc/featureA
         self.ref = ref.get('ref')
         #: :class:`GitObject <GitObject>` the reference points to
-        self.object = GitObject(ref.get('object'))
+        self.object = GitObject(ref.get('object', {}))
 
     def __repr__(self):
         return '<Reference [{0}]>'.format(self.ref)
@@ -156,7 +156,7 @@ class Tag(GitData):
         #: dict containing the name and email of the person
         self.tagger = tag.get('tagger')
         #: :class:`GitObject <GitObject>` for the tag
-        self.object = GitObject(tag.get('object'))
+        self.object = GitObject(tag.get('object', {}))
 
     def __repr__(self):
         return '<Tag [{0}]>'.format(self.tag)

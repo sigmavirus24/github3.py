@@ -1,6 +1,7 @@
 import os
 import github3
 from tests.utils import (generate_response, expect, BaseCase, load)
+from mock import patch
 
 
 class TestRepository(BaseCase):
@@ -323,4 +324,29 @@ class TestRepository(BaseCase):
         expect(self.repo.create_status(None, None)).is_None()
         expect(self.repo.create_status('fakesha', 'success')).isinstance(
             github3.repos.Status)
+        self.mock_assertions()
+
+    def test_create_tag(self):
+        self.request.return_value = generate_response('tag', 201)
+        self.args = ('POST', self.api + 'git/tags')
+        data = {
+            'tag': '0.3', 'message': 'Fake message', 'object': 'fakesha',
+            'type': 'commit', 'tagger': {
+                'name': 'Ian Cordasco', 'date': 'Not a UTC date',
+                'email': 'graffatcolmingov@gmail.com'
+            }
+        }
+        self.conf = {'data': data.copy()}
+        data['obj_type'] = data['type']
+        data['sha'] = data['object']
+        del(data['type'], data['object'])
+
+        with expect.githuberror():
+            self.repo.create_tag(None, None, None, None, None)
+
+        self.login()
+        with patch.object(github3.repos.Repository, 'create_ref'):
+            expect(self.repo.create_tag(None, None, None, None,
+                                        None)).is_None()
+            expect(self.repo.create_tag(**data)).isinstance(github3.git.Tag)
         self.mock_assertions()
