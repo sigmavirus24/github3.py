@@ -543,9 +543,11 @@ class Repository(GitHubCore):
         :returns: :class:`Reference <github3.git.Reference>` if successful
             else None
         """
-        data = {'ref': ref, 'sha': sha}
-        url = self._build_url('git', 'refs', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(data)), 201)
+        json = None
+        if ref and ref.count('/') >= 2 and sha:
+            data = {'ref': ref, 'sha': sha}
+            url = self._build_url('git', 'refs', base_url=self._api)
+            json = self._json(self._post(url, data=dumps(data)), 201)
         return Reference(json, self) if json else None
 
     @requires_auth

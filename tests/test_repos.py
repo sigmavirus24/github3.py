@@ -306,6 +306,21 @@ class TestRepository(BaseCase):
             self.repo.create_ref('foo', 'bar')
 
         self.login()
+        expect(self.repo.create_ref('foo/bar', None)).is_None()
         expect(self.repo.create_ref(**self.conf['data'])).isinstance(
             github3.git.Reference)
+        self.mock_assertions()
+
+    def test_create_status(self):
+        self.request.return_value = generate_response('status', 201)
+        self.args = ('POST', self.api + 'statuses/fakesha')
+        self.conf = {'data': {'state': 'success'}}
+
+        with expect.githuberror():
+            self.repo.create_status('fakesha', 'success')
+
+        self.login()
+        expect(self.repo.create_status(None, None)).is_None()
+        expect(self.repo.create_status('fakesha', 'success')).isinstance(
+            github3.repos.Status)
         self.mock_assertions()
