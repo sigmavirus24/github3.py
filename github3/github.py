@@ -614,11 +614,10 @@ class GitHub(GitHubCore):
         params = {}
         if type in ('all', 'owner', 'public', 'private', 'member'):
             params.update(type=type)
-        if not login:
-            if sort in ('created', 'updated', 'pushed', 'full_name'):
-                params.update(sort=sort)
-            if direction in ('asc', 'desc'):
-                params.update(direction=direction)
+        if sort in ('created', 'updated', 'pushed', 'full_name'):
+            params.update(sort=sort)
+        if direction in ('asc', 'desc'):
+            params.update(direction=direction)
 
         return self._iter(int(number), url, Repository, params=params)
 
