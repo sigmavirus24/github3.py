@@ -145,22 +145,14 @@ Examples
 Running the Unittests
 ~~~~~~~~~~~~~~~~~~~~~
 
-To run the tests as they would be run by Travis CI::
+::
 
-    CI=true ./unittests.py
-
-To test functions that require proper authentication::
-
-    ./unittests.py
-
-The latter will prompt you for your username and password, e.g.::
-
-    [ sigma: ~/sandbox/github3.py ] ./unittests.py
-    Enter GitHub username: sigmavirus24
-    Password for sigmavirus24:
-
-This will generally fail until we can generalize the authenticated tests via a 
-config file.
+    mkdir -p /path/to/virtualenv/github3.py
+    cd /path/to/virtualenv/github3.py
+    virtualenv .
+    cd /path/to/github3.py_repo/requirements.txt
+    pip install -r requirements.txt
+    make tests
 
 
 Contact
