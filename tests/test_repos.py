@@ -292,6 +292,20 @@ class TestRepository(BaseCase):
 
         self.login()
         expect(self.repo.create_pull_from_issue(0, 'foo', 'bar')).is_None()
+        expect(self.request.called).is_False()
         expect(self.repo.create_pull_from_issue(**self.conf['data'])
                ).isinstance(github3.pulls.PullRequest)
+        self.mock_assertions()
+
+    def test_create_ref(self):
+        self.request.return_value = generate_response('ref', 201)
+        self.args = ('POST', self.api + 'git/refs')
+        self.conf = {'data': {'ref': 'refs/heads/master', 'sha': 'fakesha'}}
+
+        with expect.githuberror():
+            self.repo.create_ref('foo', 'bar')
+
+        self.login()
+        expect(self.repo.create_ref(**self.conf['data'])).isinstance(
+            github3.git.Reference)
         self.mock_assertions()

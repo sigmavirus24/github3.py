@@ -545,7 +545,7 @@ class Repository(GitHubCore):
         """
         data = {'ref': ref, 'sha': sha}
         url = self._build_url('git', 'refs', base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data=dumps(data)), 201)
         return Reference(json, self) if json else None
 
     @requires_auth
