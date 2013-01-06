@@ -527,8 +527,10 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        data = {'issue': issue, 'base': base, 'head': head}
-        return self._create_pull(data)
+        if issue > 0:
+            data = {'issue': issue, 'base': base, 'head': head}
+            return self._create_pull(data)
+        return None
 
     @requires_auth
     def create_ref(self, ref, sha):
