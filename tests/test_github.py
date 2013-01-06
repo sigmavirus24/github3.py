@@ -427,6 +427,20 @@ class TestGitHub(BaseCase):
             github3.repos.Repository)
         self.mock_assertions()
 
+    def test_iter_repos_sort(self):
+        self.request.return_value = generate_response('repo', _iter=True)
+        self.conf.update(params = {"sort":"created"})
+
+        self.login()
+        self.args = ('GET', 'https://api.github.com/user/repos')
+        expect(next(self.g.iter_repos(sort = "created"))).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
+        self.args = ('GET', 'https://api.github.com/users/sigmavirus24/repos')
+        expect(next(self.g.iter_repos('sigmavirus24', sort="created"))).isinstance(
+            github3.repos.Repository)
+        self.mock_assertions()
+
     def test_iter_starred(self):
         self.request.return_value = generate_response('repo', _iter=True)
         self.args = ('GET', 'https://api.github.com/user/starred')
