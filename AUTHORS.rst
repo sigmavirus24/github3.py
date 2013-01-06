@@ -31,3 +31,5 @@ Contributors
 - Kristian Glass (@doismellburning)
 
 - Alejandro Gómez (@alejandrogomez)
+
+- Tom Parker (@palfrey)
