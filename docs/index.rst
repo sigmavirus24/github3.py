@@ -26,7 +26,8 @@ Let's get information about a user::
     print(sigmavirus24.followers)
     # 4
 
-    gh.list_followers()
+    for f in gh.iter_followers():
+        print(str(f))
 
     kennethreitz = gh.user('kennethreitz')
     # <User [kennethreitz:Kenneth Reitz]>
