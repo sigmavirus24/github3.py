@@ -8,7 +8,6 @@ This module contains the classes relating to repositories.
 
 from json import dumps
 from base64 import b64decode
-from requests import post
 from collections import Callable
 from github3.events import Event
 from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
@@ -328,52 +327,6 @@ class Repository(GitHubCore):
                     'author': author, 'committer': committer}
             json = self._json(self._post(url, data=dumps(data)), 201)
         return Commit(json, self) if json else None
-
-    @requires_auth
-    def create_download(self, name, path, description='',
-                        content_type='text/plain'):
-        """Create a new download on this repository.
-
-        I do not require you provide the size in bytes because it can be
-        determined by the operating system.
-
-        .. warning::
-
-            On 2012-03-11, GitHub will be deprecating the Downloads API. This
-            method will no longer work.
-
-        :param str name: (required), name of the file as it will appear
-        :param str path: (required), path to the file
-        :param str description: (optional), description of the file
-        :param str content_type: (optional), e.g. 'text/plain'
-        :returns: :class:`Download <Download>` if successful, else None
-        """
-        json = None
-        if name and path:
-            url = self._build_url('downloads', base_url=self._api)
-            from os import stat
-            info = stat(path)
-            data = {'name': name, 'size': info.st_size,
-                    'description': description,
-                    'content_type': content_type}
-            json = self._json(self._post(url, data=dumps(data)), 201)
-
-        if not json:
-            return None
-
-        form = [('key', json.get('path')),
-                ('acl', json.get('acl')),
-                ('success_action_status', '201'),
-                ('Filename', json.get('name')),
-                ('AWSAccessKeyId', json.get('accesskeyid')),
-                ('Policy', json.get('policy')),
-                ('Signature', json.get('signature')),
-                ('Content-Type', json.get('mime_type'))]
-        file = [('file', open(path, 'rb').read())]
-        resp = post(json.get('s3_url'), data=form, files=file,
-                    headers={'Accept-Charset': 'utf-8'})
-
-        return Download(json, self) if self._boolean(resp, 201, 404) else None
 
     @requires_auth
     def create_fork(self, organization=None):

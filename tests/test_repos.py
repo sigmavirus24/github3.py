@@ -173,9 +173,6 @@ class TestRepository(BaseCase):
         expect(self.repo.create_commit(**data)).isinstance(github3.git.Commit)
         self.mock_assertions()
 
-    def test_create_download(self):
-        pass
-
     def test_create_fork(self):
         self.request.return_value = generate_response('repo', 202)
         self.conf = {'data': None}
@@ -350,3 +347,6 @@ class TestRepository(BaseCase):
                                         None)).is_None()
             expect(self.repo.create_tag(**data)).isinstance(github3.git.Tag)
         self.mock_assertions()
+
+    def test_create_tree(self):
+        pass
