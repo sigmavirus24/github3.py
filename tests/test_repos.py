@@ -378,3 +378,17 @@ class TestRepository(BaseCase):
         self.login()
         expect(self.repo.delete()).is_True()
         self.mock_assertions()
+
+    def test_delete_key(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('DELETE', self.api + 'keys/2')
+        self.conf = {}
+
+        with expect.githuberror():
+            self.repo.delete_key(2)
+
+        self.login()
+        expect(self.repo.delete_key(-2)).is_False()
+        expect(self.request.called).is_False()
+        expect(self.repo.delete_key(2)).is_True()
+        self.mock_assertions()
