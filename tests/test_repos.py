@@ -366,3 +366,15 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.create_tree(**data)).isinstance(github3.git.Tree)
         self.mock_assertions()
+
+    def test_delete(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('DELETE', self.api[:-1])
+        self.conf = {}
+
+        with expect.githuberror():
+            self.repo.delete()
+
+        self.login()
+        expect(self.repo.delete()).is_True()
+        self.mock_assertions()
