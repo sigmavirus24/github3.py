@@ -392,3 +392,12 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.delete_key(2)).is_True()
         self.mock_assertions()
+
+    def test_download(self):
+        self.request.return_value = generate_response('download')
+        self.args = ('GET', self.api + 'downloads/2')
+
+        expect(self.repo.download(-2)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.download(2)).isinstance(github3.repos.Download)
+        self.mock_assertions()
