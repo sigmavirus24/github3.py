@@ -349,4 +349,20 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_create_tree(self):
-        pass
+        self.request.return_value = generate_response('tree', 201)
+        self.args = ('POST', self.api + 'git/trees')
+        data = {'tree': [{'path': 'file1', 'mode': '100755',
+                          'type': 'tree',
+                          'sha': '75b347329e3fc87ac78895ca1be58daff78872a1'}],
+                'base_tree': ''}
+        self.conf = {'data': data}
+
+        with expect.githuberror():
+            self.repo.create_tree(**data)
+
+        self.login()
+        expect(self.repo.create_tree(None)).is_None()
+        expect(self.repo.create_tree({'foo': 'bar'})).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.create_tree(**data)).isinstance(github3.git.Tree)
+        self.mock_assertions()
