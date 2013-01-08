@@ -419,3 +419,12 @@ class TestRepository(BaseCase):
         self.conf['data']['description'] = 'bar'
         expect(self.repo.edit(**self.conf['data'])).is_True()
         self.mock_assertions()
+
+    def test_is_collaborator(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('GET', self.api + 'collaborators/user')
+
+        expect(self.repo.is_collaborator(None)).is_False()
+        expect(self.request.called).is_False()
+        expect(self.repo.is_collaborator('user')).is_True()
+        self.mock_assertions()

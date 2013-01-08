@@ -100,6 +100,7 @@ class BaseCase(TestCase):
 
     def mock_assertions(self):
         assert self.request.called is True
+        conf = self.conf.copy()
         args, kwargs = self.request.call_args
 
         expect(self.args) == args
@@ -116,6 +117,7 @@ class BaseCase(TestCase):
             expect(self.conf[k]) == kwargs[k]
 
         self.request.reset_mock()
+        self.conf = conf
 
 
 class APITestMixin(TestCase):
