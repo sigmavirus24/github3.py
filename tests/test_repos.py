@@ -443,3 +443,16 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.git_commit('fakesha')).isinstance(github3.git.Commit)
         self.mock_assertions()
+
+    def test_hook(self):
+        self.request.return_value = generate_response('hook')
+        self.args = ('GET', self.api + 'hooks/2')
+
+        with expect.githuberror():
+            self.repo.hook(2)
+
+        self.login()
+        expect(self.repo.hook(-2)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.hook(2)).isinstance(github3.repos.Hook)
+        self.mock_assertions()
