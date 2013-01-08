@@ -103,7 +103,7 @@ class GitHub(GitHubCore):
             else:
                 ses = session()
                 ses.auth = (login, password)
-                json = self._json(ses.post(url, data=data), 201)
+                json = self._json(ses.post(url, data=dumps(data)), 201)
         return Authorization(json, self) if json else None
 
     def create_gist(self, description, files, public=True):
