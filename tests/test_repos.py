@@ -431,3 +431,6 @@ class TestRepository(BaseCase):
 
     def test_is_fork(self):
         expect(self.is_fork()) == self.fork
+
+    def test_is_private(self):
+        expect(self.is_private()) == self.private
