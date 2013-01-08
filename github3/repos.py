@@ -647,11 +647,12 @@ class Repository(GitHubCore):
                 'has_wiki': has_wiki, 'has_downloads': has_downloads,
                 'default_branch': default_branch}
         self._remove_none(edit)
-        json = self._json(self._patch(self._api, data=dumps(edit)), 200)
-        if json:
+        json = None
+        if edit:
+            json = self._json(self._patch(self._api, data=dumps(edit)), 200)
             self._update_(json)
             return True
-        return False  # (No coverage)
+        return False
 
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository.

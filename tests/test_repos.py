@@ -401,3 +401,21 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.download(2)).isinstance(github3.repos.Download)
         self.mock_assertions()
+
+    def test_edit(self):
+        self.request.return_value = generate_response('repo')
+        self.args = ('PATCH', self.api[:-1])
+        self.conf = {'data': {'name': 'foo'}}
+
+        with expect.githuberror():
+            self.repo.edit('Foo')
+
+        self.login()
+        expect(self.repo.edit(None)).is_False()
+        expect(self.request.called).is_False()
+        expect(self.repo.edit('foo')).is_True()
+        self.mock_assertions()
+
+        self.conf['data']['description'] = 'bar'
+        expect(self.repo.edit(**self.conf['data'])).is_True()
+        self.mock_assertions()
