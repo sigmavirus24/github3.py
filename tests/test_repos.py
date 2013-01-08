@@ -456,3 +456,12 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.hook(2)).isinstance(github3.repos.Hook)
         self.mock_assertions()
+
+    def test_is_assignee(self):
+        self.request.return_value = generate_response('', 204)
+        self.args = ('GET', self.api + 'assignees/login')
+
+        expect(self.repo.is_assignee(None)).is_False()
+        expect(self.request.called).is_False()
+        expect(self.repo.is_assignee('login')).is_True()
+        self.mock_assertions()

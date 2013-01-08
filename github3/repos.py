@@ -711,6 +711,8 @@ class Repository(GitHubCore):
 
         :returns: :class:`bool`
         """
+        if not login:
+            return False
         url = self._build_url('assignees', login, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
