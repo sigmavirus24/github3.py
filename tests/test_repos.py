@@ -428,3 +428,6 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.is_collaborator('user')).is_True()
         self.mock_assertions()
+
+    def test_is_fork(self):
+        expect(self.is_fork()) == self.fork
