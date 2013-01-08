@@ -430,7 +430,16 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_is_fork(self):
-        expect(self.is_fork()) == self.fork
+        expect(self.repo.is_fork()) == self.repo.fork
 
     def test_is_private(self):
-        expect(self.is_private()) == self.private
+        expect(self.repo.is_private()) == self.repo.private
+
+    def test_git_commit(self):
+        self.request.return_value = generate_response('git_commit')
+        self.args = ('GET', self.api + 'git/commits/fakesha')
+
+        expect(self.repo.git_commit(None)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.git_commit('fakesha')).isinstance(github3.git.Commit)
+        self.mock_assertions()
