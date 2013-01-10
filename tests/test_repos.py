@@ -474,3 +474,16 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.issue(2)).isinstance(github3.issues.Issue)
         self.mock_assertions()
+
+    def test_key(self):
+        self.request.return_value = generate_response('key', 200)
+        self.args = ('GET', self.api + 'keys/2')
+
+        with expect.githuberror():
+            self.repo.key(2)
+
+        self.login()
+        expect(self.repo.key(-2)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.key(2)).isinstance(github3.users.Key)
+        self.mock_assertions()
