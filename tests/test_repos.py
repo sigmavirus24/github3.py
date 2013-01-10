@@ -465,3 +465,12 @@ class TestRepository(BaseCase):
         expect(self.request.called).is_False()
         expect(self.repo.is_assignee('login')).is_True()
         self.mock_assertions()
+
+    def test_issue(self):
+        self.request.return_value = generate_response('issue', 200)
+        self.args = ('GET', self.api + 'issues/2')
+
+        expect(self.repo.issue(-2)).is_None()
+        expect(self.request.called).is_False()
+        expect(self.repo.issue(2)).isinstance(github3.issues.Issue)
+        self.mock_assertions()
