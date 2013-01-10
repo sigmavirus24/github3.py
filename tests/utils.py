@@ -119,6 +119,48 @@ class BaseCase(TestCase):
         self.request.reset_mock()
         self.conf = conf
 
+    def response(self, path_name, status_code=200, enc='utf-8',
+                 _iter=False, **headers):
+        r = requests.Response()
+        r.status_code = status_code
+        r.encoding = enc
+
+        if path_name:
+            if _iter:
+                content = path(path_name).read().strip()
+                content = '[{0}]'.format(content)
+                r.raw = BytesIO(content.encode())
+            elif sys.version_info > (3, 0):
+                content = path(path_name).read().strip()
+                r.raw = BytesIO(content.encode())
+            else:
+                r.raw = path(path_name)
+        else:
+            r.raw = BytesIO()
+
+        if headers:
+            r.headers = headers
+
+        self.request.return_value = r
+
+    def delete(self, url):
+        self.args = ('DELETE', url)
+
+    def get(self, url):
+        self.args = ('GET', url)
+
+    def patch(self, url):
+        self.args = ('PATCH', url)
+
+    def post(self, url):
+        self.args = ('POST', url)
+
+    def put(self, url):
+        self.args = ('PUT', url)
+
+    def not_called(self):
+        expect(self.request.called).is_False()
+
 
 class APITestMixin(TestCase):
     def setUp(self):

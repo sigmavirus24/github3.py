@@ -467,7 +467,7 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_issue(self):
-        self.request.return_value = generate_response('issue', 200)
+        self.request.return_value = generate_response('issue')
         self.args = ('GET', self.api + 'issues/2')
 
         expect(self.repo.issue(-2)).is_None()
@@ -476,8 +476,8 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_key(self):
-        self.request.return_value = generate_response('key', 200)
-        self.args = ('GET', self.api + 'keys/2')
+        self.response('key')
+        self.get(self.api + 'keys/2')
 
         with expect.githuberror():
             self.repo.key(2)
@@ -486,4 +486,13 @@ class TestRepository(BaseCase):
         expect(self.repo.key(-2)).is_None()
         expect(self.request.called).is_False()
         expect(self.repo.key(2)).isinstance(github3.users.Key)
+        self.mock_assertions()
+
+    def test_label(self):
+        self.response('label', 2)
+        self.get(self.api + 'labels/name')
+
+        expect(self.repo.label(None)).is_None()
+        self.not_called()
+        expect(self.repo.label('name')).isinstance(github3.issues.Label)
         self.mock_assertions()
