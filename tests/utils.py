@@ -8,41 +8,12 @@ from io import BytesIO
 from unittest import TestCase
 
 
-def generate_response(path_name, status_code=200, enc='utf-8', _iter=False,
-                      **headers):
-    r = requests.Response()
-    r.status_code = status_code
-    r.encoding = enc
-
-    if path_name:
-        if _iter:
-            content = path(path_name).read().strip()
-            content = '[{0}]'.format(content)
-            r.raw = BytesIO(content.encode())
-        elif sys.version_info > (3, 0):
-            content = path(path_name).read().strip()
-            r.raw = BytesIO(content.encode())
-        else:
-            r.raw = path(path_name)
-    else:
-        r.raw = BytesIO()
-
-    if headers:
-        r.headers = headers
-
-    return r
-
-
 def load(name):
     return json.load(path(name))
 
 
 def path(name, mode='r'):
     return open('tests/json/{0}'.format(name), mode)
-
-
-def patch_request(method='request'):
-    return patch.object(requests.sessions.Session, method)
 
 
 class CustomExpecter(expecter.expect):
