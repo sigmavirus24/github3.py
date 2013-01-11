@@ -495,3 +495,12 @@ class TestRepository(BaseCase):
         self.not_called()
         expect(self.repo.label('name')).isinstance(github3.issues.Label)
         self.mock_assertions()
+
+    def test_iter_assignees(self):
+        self.response('user', _iter=True)
+        self.get(self.api + 'assignees')
+        self.conf = {'params': None}
+
+        u = next(self.repo.iter_assignees())
+        expect(u).isinstance(github3.users.User)
+        self.mock_assertions()
