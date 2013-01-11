@@ -6,7 +6,7 @@ from tests.utils import (expect, BaseCase, load)
 class TestGitHub(BaseCase):
     def test_authorization(self):
         self.response('authorization')
-        self.args = ('GET', 'https://api.github.com/authorizations/10')
+        self.get('https://api.github.com/authorizations/10')
         with expect.githuberror():
             self.g.authorization(10)
         assert self.request.called is False
@@ -86,8 +86,7 @@ class TestGitHub(BaseCase):
 
     def test_follow(self):
         self.response(None, 204)
-        self.args = ('PUT',
-                     'https://api.github.com/user/following/sigmavirus24')
+        self.put('https://api.github.com/user/following/sigmavirus24')
         self.conf = {'data': None}
 
         with expect.githuberror():
@@ -100,15 +99,14 @@ class TestGitHub(BaseCase):
 
     def test_gist(self):
         self.response('gist', 200)
-        self.args = ('GET', 'https://api.github.com/gists/10')
+        self.get('https://api.github.com/gists/10')
 
         expect(self.g.gist(10)).isinstance(github3.gists.Gist)
         self.mock_assertions()
 
     def test_gitignore_template(self):
         self.response('template')
-        self.args = ('GET',
-                     'https://api.github.com/gitignore/templates/Python')
+        self.get('https://api.github.com/gitignore/templates/Python')
 
         template = self.g.gitignore_template('Python')
         expect(template.startswith('*.py[cod]')).is_True()
@@ -116,14 +114,14 @@ class TestGitHub(BaseCase):
 
     def test_gitignore_templates(self):
         self.response('templates')
-        self.args = ('GET', 'https://api.github.com/gitignore/templates')
+        self.get('https://api.github.com/gitignore/templates')
 
         expect(self.g.gitignore_templates()).isinstance(list)
         self.mock_assertions()
 
     def test_is_following(self):
         self.response(None, 204)
-        self.args = ('GET', 'https://api.github.com/user/following/login')
+        self.get('https://api.github.com/user/following/login')
 
         with expect.githuberror():
             expect(self.g.is_following('login'))
@@ -137,7 +135,7 @@ class TestGitHub(BaseCase):
 
     def test_is_starred(self):
         self.response(None, 204)
-        self.args = ('GET', 'https://api.github.com/user/starred/user/repo')
+        self.get('https://api.github.com/user/starred/user/repo')
 
         with expect.githuberror():
             self.g.is_starred('user', 'repo')
@@ -151,8 +149,7 @@ class TestGitHub(BaseCase):
 
     def test_is_subscribed(self):
         self.response(None, 204)
-        self.args = ('GET',
-                     'https://api.github.com/user/subscriptions/user/repo')
+        self.get('https://api.github.com/user/subscriptions/user/repo')
 
         with expect.githuberror():
             self.g.is_subscribed('user', 'repo')
@@ -166,10 +163,8 @@ class TestGitHub(BaseCase):
 
     def test_issue(self):
         self.response('issue', 200)
-        self.args = ('GET',
-                     'https://api.github.com/repos/sigmavirus24/github3.py/'
-                     'issues/1'
-                     )
+        self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
+                 'issues/1')
 
         assert self.g.issue(None, None, 0) is None
         with patch.object(github3.github.GitHub, 'repository') as repo:
@@ -181,7 +176,7 @@ class TestGitHub(BaseCase):
 
     def test_key(self):
         self.response('key')
-        self.args = ('GET', 'https://api.github.com/user/keys/10')
+        self.get('https://api.github.com/user/keys/10')
 
         with expect.githuberror():
             self.g.key(10)
@@ -196,7 +191,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_all_repos(self):
         self.response('repo', _iter=True)
-        self.args = ('GET', 'https://api.github.com/repositories')
+        self.get('https://api.github.com/repositories')
         self.conf.update(params=None)
 
         repo = next(self.g.iter_all_repos())
@@ -205,7 +200,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_all_users(self):
         self.response('user', _iter=True)
-        self.args = ('GET', 'https://api.github.com/users')
+        self.get('https://api.github.com/users')
         self.conf.update(params=None)
 
         repo = next(self.g.iter_all_users())
@@ -214,7 +209,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_authorizations(self):
         self.response('authorization', _iter=True)
-        self.args = ('GET', 'https://api.github.com/authorizations')
+        self.get('https://api.github.com/authorizations')
         self.conf.update(params=None)
 
         with expect.githuberror():
@@ -228,7 +223,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_emails(self):
         self.response('emails', _iter=True)
-        self.args = ('GET', 'https://api.github.com/user/emails')
+        self.get('https://api.github.com/user/emails')
         self.conf.update(params=None)
 
         with expect.githuberror():
@@ -242,7 +237,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_events(self):
         self.response('event', _iter=True)
-        self.args = ('GET', 'https://api.github.com/events')
+        self.get('https://api.github.com/events')
         self.conf.update(params=None)
 
         event = next(self.g.iter_events())
@@ -251,8 +246,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_followers(self):
         self.response('user', _iter=True)
-        self.args = ('GET',
-                     'https://api.github.com/users/sigmavirus24/followers')
+        self.get('https://api.github.com/users/sigmavirus24/followers')
         self.conf.update(params=None)
 
         with expect.githuberror():
@@ -268,15 +262,13 @@ class TestGitHub(BaseCase):
             self.login()
             v = next(self.g.iter_followers())
             expect(v).isinstance(github3.users.User)
-            self.args = (self.args[0],
-                         'https://api.github.com/user/followers')
+            self.get('https://api.github.com/user/followers')
             assert self.request.called is True
             self.mock_assertions()
 
     def test_iter_following(self):
         self.response('user', _iter=True)
-        self.args = ('GET',
-                     'https://api.github.com/users/sigmavirus24/following')
+        self.get('https://api.github.com/users/sigmavirus24/following')
         self.conf.update(params=None)
 
         with expect.githuberror():
@@ -292,13 +284,12 @@ class TestGitHub(BaseCase):
             self.login()
             v = next(self.g.iter_following())
             expect(v).isinstance(github3.users.User)
-            self.args = (self.args[0],
-                         'https://api.github.com/user/following')
+            self.get('https://api.github.com/user/following')
             self.mock_assertions()
 
     def test_iter_gists(self):
         self.response('gist', _iter=True)
-        self.args = ('GET', 'https://api.github.com/users/sigmavirus24/gists')
+        self.get('https://api.github.com/users/sigmavirus24/gists')
         self.conf.update(params=None)
 
         g = next(self.g.iter_gists('sigmavirus24'))
@@ -308,12 +299,12 @@ class TestGitHub(BaseCase):
         self.login()
         h = next(self.g.iter_gists())
         expect(h).isinstance(github3.gists.Gist)
-        self.args = ('GET', 'https://api.github.com/gists')
+        self.get('https://api.github.com/gists')
         self.mock_assertions()
 
     def test_iter_org_issues(self):
         self.response('issue', _iter=True)
-        self.args = ('GET', 'https://api.github.com/orgs/github3py/issues')
+        self.get('https://api.github.com/orgs/github3py/issues')
         self.conf.update(params={})
 
         with expect.githuberror():
@@ -334,7 +325,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_issues(self):
         self.response('issue', _iter=True)
-        self.args = ('GET', 'https://api.github.com/issues')
+        self.get('https://api.github.com/issues')
         self.conf.update(params={})
 
         with expect.githuberror():
@@ -354,7 +345,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_user_issues(self):
         self.response('issue', _iter=True)
-        self.args = ('GET', 'https://api.github.com/user/issues')
+        self.get('https://api.github.com/user/issues')
         self.conf.update(params={})
 
         with expect.githuberror():
@@ -375,9 +366,8 @@ class TestGitHub(BaseCase):
 
     def test_iter_repo_issues(self):
         self.response('issue', _iter=True)
-        self.args = ('GET',
-                     'https://api.github.com/repos/sigmavirus24/github3.py/'
-                     'issues')
+        self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
+                 'issues')
 
         with patch.object(github3.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(load('repo'),
@@ -389,7 +379,7 @@ class TestGitHub(BaseCase):
 
     def test_iter_keys(self):
         self.response('key', _iter=True)
-        self.args = ('GET', 'https://api.github.com/user/keys')
+        self.get('https://api.github.com/user/keys')
         self.conf.update(params=None)
 
         with expect.githuberror():
@@ -401,27 +391,27 @@ class TestGitHub(BaseCase):
 
     def test_iter_orgs(self):
         self.response('org', _iter=True)
-        self.args = ('GET', 'https://api.github.com/users/login/orgs')
+        self.get('https://api.github.com/users/login/orgs')
 
         expect(next(self.g.iter_orgs('login'))).isinstance(
             github3.orgs.Organization)
         self.mock_assertions()
 
-        self.args = ('GET', 'https://api.github.com/user/orgs')
+        self.get('https://api.github.com/user/orgs')
         self.login()
         expect(next(self.g.iter_orgs())).isinstance(github3.orgs.Organization)
         self.mock_assertions()
 
     def test_iter_repos(self):
         self.response('repo', _iter=True)
-        self.args = ('GET', 'https://api.github.com/user/repos')
+        self.get('https://api.github.com/user/repos')
         self.conf.update(params={})
 
         self.login()
         expect(next(self.g.iter_repos())).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
-        self.args = ('GET', 'https://api.github.com/users/sigmavirus24/repos')
+        self.get('https://api.github.com/users/sigmavirus24/repos')
         expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
             github3.repos.Repository)
         self.mock_assertions()
@@ -431,19 +421,19 @@ class TestGitHub(BaseCase):
         self.conf.update(params={"sort": "created"})
 
         self.login()
-        self.args = ('GET', 'https://api.github.com/user/repos')
+        self.get('https://api.github.com/user/repos')
         expect(next(self.g.iter_repos(sort="created"))
                ).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
-        self.args = ('GET', 'https://api.github.com/users/sigmavirus24/repos')
+        self.get('https://api.github.com/users/sigmavirus24/repos')
         expect(next(self.g.iter_repos('sigmavirus24', sort="created"))
                ).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_starred(self):
         self.response('repo', _iter=True)
-        self.args = ('GET', 'https://api.github.com/user/starred')
+        self.get('https://api.github.com/user/starred')
         self.conf.update(params=None)
 
         self.login()
@@ -453,15 +443,14 @@ class TestGitHub(BaseCase):
 
         with patch.object(github3.github.GitHub, 'user') as user:
             user.return_value = github3.users.User(load('user'))
-            self.args = ('GET',
-                         'https://api.github.com/users/sigmavirus24/starred')
+            self.get('https://api.github.com/users/sigmavirus24/starred')
             expect(next(self.g.iter_starred('sigmavirus24'))).isinstance(
                 github3.repos.Repository)
             self.mock_assertions()
 
     def test_iter_subscriptions(self):
         self.response('repo', _iter=True)
-        self.args = ('GET', 'https://api.github.com/user/subscriptions')
+        self.get('https://api.github.com/user/subscriptions')
         self.conf.update(params=None)
 
         self.login()
@@ -471,10 +460,8 @@ class TestGitHub(BaseCase):
 
         with patch.object(github3.github.GitHub, 'user') as user:
             user.return_value = github3.users.User(load('user'))
-            self.args = ('GET',
-                         'https://api.github.com/users/sigmavirus24/'
-                         'subscriptions'
-                         )
+            self.get('https://api.github.com/users/sigmavirus24/'
+                     'subscriptions')
             expect(next(self.g.iter_subscriptions('sigmavirus24'))).isinstance(
                 github3.repos.Repository)
             self.mock_assertions()
@@ -493,10 +480,8 @@ class TestGitHub(BaseCase):
 
     def test_pull_request(self):
         self.response('pull')
-        self.args = ('GET',
-                     'https://api.github.com/repos/sigmavirus24/'
-                     'github3.py/pulls/18'
-                     )
+        self.get('https://api.github.com/repos/sigmavirus24/'
+                 'github3.py/pulls/18')
         pr = None
 
         with patch.object(github3.github.GitHub, 'repository') as repo:
@@ -509,7 +494,7 @@ class TestGitHub(BaseCase):
 
     def test_organization(self):
         self.response('org')
-        self.args = ('GET', 'https://api.github.com/orgs/github3py')
+        self.get('https://api.github.com/orgs/github3py')
         org = self.g.organization('github3py')
         expect(org).isinstance(github3.orgs.Organization)
         self.mock_assertions()
@@ -520,19 +505,16 @@ class TestGitHub(BaseCase):
         expect(repo).is_None()
         self.not_called()
 
-        self.args = ('GET',
-                     'https://api.github.com/repos/sigmavirus24/github3.py')
+        self.get('https://api.github.com/repos/sigmavirus24/github3.py')
         repo = self.g.repository('sigmavirus24', 'github3.py')
         expect(repo).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
     def test_search_issues(self):
         self.response('legacy_issue')
-        self.args = ('GET',
-                     'https://api.github.com/legacy/{0}/{1}/{2}/'
-                     '{3}/{4}/{5}'.format(
-                     'issues', 'search', 'sigmavirus24', 'github3.py',
-                     'closed', 'requests'))
+        self.get('https://api.github.com/legacy/{0}/{1}/{2}/{3}/{4}/'
+                 '{5}'.format('issues', 'search', 'sigmavirus24',
+                              'github3.py', 'closed', 'requests'))
         self.conf.update({'params': {}})
         issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
                                       'requests')
@@ -547,10 +529,8 @@ class TestGitHub(BaseCase):
 
     def test_search_repos(self):
         self.response('legacy_repo')
-        self.args = ('GET',
-                     'https://api.github.com/{0}/{1}/{2}/{3}'.format(
-                         'legacy', 'repos', 'search', 'github3.py')
-                     )
+        self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
+                 'legacy', 'repos', 'search', 'github3.py'))
         self.conf.update(params={})
         repos = self.g.search_repos('github3.py')
         expect(repos[0]).isinstance(github3.legacy.LegacyRepo)
@@ -562,10 +542,8 @@ class TestGitHub(BaseCase):
 
     def test_search_users(self):
         self.response('legacy_user')
-        self.args = ('GET',
-                     'https://api.github.com/{0}/{1}/{2}/{3}'.format(
-                     'legacy', 'user', 'search', 'sigmavirus24')
-                     )
+        self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
+                 'legacy', 'user', 'search', 'sigmavirus24'))
         self.conf.update({'params': {}})
         users = self.g.search_users('sigmavirus24')
         expect(users[0]).isinstance(github3.legacy.LegacyUser)
@@ -577,10 +555,8 @@ class TestGitHub(BaseCase):
 
     def test_search_email(self):
         self.response('legacy_email')
-        self.args = ('GET',
-                     'https://api.github.com/{0}/{1}/{2}/{3}'.format(
-                     'legacy', 'user', 'email', 'graffatcolmingov@gmail.com')
-                     )
+        self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
+                 'legacy', 'user', 'email', 'graffatcolmingov@gmail.com'))
         user = self.g.search_email('graffatcolmingov@gmail.com')
         expect(user).isinstance(github3.legacy.LegacyUser)
         self.mock_assertions()
@@ -598,9 +574,7 @@ class TestGitHub(BaseCase):
 
     def test_star(self):
         self.response('', 204)
-        self.args = ('PUT',
-                     'https://api.github.com/user/starred/'
-                     'sigmavirus24/github3.py')
+        self.put('https://api.github.com/user/starred/sigmavirus24/github3.py')
         self.conf = {'data': None}
 
         with expect.githuberror():
@@ -613,9 +587,8 @@ class TestGitHub(BaseCase):
 
     def test_subscribe(self):
         self.response('', 204)
-        self.args = ('PUT',
-                     'https://api.github.com/user/subscriptions/'
-                     'sigmavirus24/github3.py')
+        self.put('https://api.github.com/user/subscriptions/'
+                 'sigmavirus24/github3.py')
         self.conf = {'data': None}
 
         with expect.githuberror():
@@ -628,9 +601,8 @@ class TestGitHub(BaseCase):
 
     def test_unfollow(self):
         self.response('', 204)
-        self.args = ('DELETE',
-                     'https://api.github.com/user/following/'
-                     'sigmavirus24')
+        self.delete('https://api.github.com/user/following/'
+                    'sigmavirus24')
         self.conf = {}
 
         with expect.githuberror():
@@ -643,9 +615,8 @@ class TestGitHub(BaseCase):
 
     def test_unstar(self):
         self.response('', 204)
-        self.args = ('DELETE',
-                     'https://api.github.com/user/starred/'
-                     'sigmavirus24/github3.py')
+        self.delete('https://api.github.com/user/starred/'
+                    'sigmavirus24/github3.py')
         self.conf = {}
 
         with expect.githuberror():
@@ -658,9 +629,8 @@ class TestGitHub(BaseCase):
 
     def test_unsubscribe(self):
         self.response('', 204)
-        self.args = ('DELETE',
-                     'https://api.github.com/user/subscriptions/'
-                     'sigmavirus24/github3.py')
+        self.delete('https://api.github.com/user/subscriptions/'
+                    'sigmavirus24/github3.py')
         self.conf = {}
 
         with expect.githuberror():
@@ -687,19 +657,19 @@ class TestGitHub(BaseCase):
 
     def test_user(self):
         self.response('user')
-        self.args = ('GET', 'https://api.github.com/users/sigmavirus24')
+        self.get('https://api.github.com/users/sigmavirus24')
 
         expect(self.g.user('sigmavirus24')).isinstance(github3.users.User)
         self.mock_assertions()
 
-        self.args = ('GET', 'https://api.github.com/user')
+        self.get('https://api.github.com/user')
         self.login()
         expect(self.g.user()).isinstance(github3.users.User)
         self.mock_assertions()
 
     def test_utf8_user(self):
         self.response('utf8_user')
-        self.args = ('GET', 'https://api.github.com/users/alejandrogomez')
+        self.get('https://api.github.com/users/alejandrogomez')
 
         u = self.g.user('alejandrogomez')
 
