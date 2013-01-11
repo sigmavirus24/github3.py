@@ -513,3 +513,12 @@ class TestRepository(BaseCase):
         b = next(self.repo.iter_branches())
         expect(b).isinstance(github3.repos.Branch)
         self.mock_assertions()
+
+    def test_iter_comments(self):
+        self.response('repo_comment', _iter=True)
+        self.get(self.api + 'comments')
+        self.conf = {'params': None}
+
+        c = next(self.repo.iter_comments())
+        expect(c).isinstance(github3.repos.RepoComment)
+        self.mock_assertions()
