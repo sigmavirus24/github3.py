@@ -815,7 +815,7 @@ class Repository(GitHubCore):
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
-            params = {'anon': anon}
+            params = {'anon': True}
         return self._iter(int(number), url, User, params=params)
 
     def iter_downloads(self, number=-1):
