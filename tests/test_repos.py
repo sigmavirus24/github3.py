@@ -583,3 +583,43 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
         self.conf['params']['sort'] = 'newest'
+
+    def test_iter_hooks(self):
+        self.response('hook', _iter=True)
+        self.get(self.api + 'hooks')
+        self.conf = {'params': None}
+
+        with expect.githuberror():
+            self.repo.iter_hooks()
+
+        self.login()
+        h = next(self.repo.iter_hooks())
+        expect(h).isinstance(github3.repos.Hook)
+        self.mock_assertions()
+
+    def test_iter_issues(self):
+        self.response('issue', _iter=True)
+        self.get(self.api + 'issues')
+        params = {}
+        self.conf = {'params': params}
+
+        i = next(self.repo.iter_issues())
+        expect(i).isinstance(github3.issues.Issue)
+        self.mock_assertions()
+
+        params['milestone'] = 'none'
+        next(self.repo.iter_issues('none'))
+        self.mock_assertions()
+
+        params['state'] = 'open'
+        next(self.repo.iter_issues(**params))
+        self.mock_assertions()
+
+    def test_iter_issue_events(self):
+        self.response('issue_event', _iter=True)
+        self.get(self.api + 'issues/events')
+        self.conf = {'params': None}
+
+        e = next(self.repo.iter_issue_events())
+        expect(e).isinstance(github3.issues.IssueEvent)
+        self.mock_assertions()
