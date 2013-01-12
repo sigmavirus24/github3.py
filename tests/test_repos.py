@@ -531,3 +531,16 @@ class TestRepository(BaseCase):
         c = next(self.repo.iter_comments_on_commit('fakesha'))
         expect(c).isinstance(github3.repos.RepoComment)
         self.mock_assertions()
+
+    def test_iter_commits(self):
+        self.response('commit', _iter=True)
+        self.get(self.api + 'commits')
+        self.conf = {'params': {}}
+
+        c = next(self.repo.iter_commits())
+        expect(c).isinstance(github3.repos.RepoCommit)
+        self.mock_assertions()
+
+        self.conf = {'params': {'sha': 'fakesha', 'path': '/'}}
+        c = next(self.repo.iter_commits('fakesha', '/'))
+        self.mock_assertions()

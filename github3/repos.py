@@ -798,7 +798,7 @@ class Repository(GitHubCore):
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment)
 
-    def iter_commits(self, sha='', path='', author='', number=-1):
+    def iter_commits(self, sha=None, path=None, author=None, number=-1):
         """Iterate over commits in this repository.
 
         :param str sha: (optional), sha or branch to start listing commits
@@ -812,13 +812,8 @@ class Repository(GitHubCore):
 
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
-        params = {}
-        if sha:
-            params['sha'] = sha
-        if path:
-            params['path'] = path
-        if author:
-            params['author'] = author
+        params = {'sha': sha, 'path': path, 'author': author}
+        self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, RepoCommit, params=params)
 
