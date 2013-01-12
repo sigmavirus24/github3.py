@@ -428,12 +428,6 @@ class TestRepository(BaseCase):
         expect(self.repo.is_collaborator('user')).is_True()
         self.mock_assertions()
 
-    def test_is_fork(self):
-        expect(self.repo.is_fork()) == self.repo.fork
-
-    def test_is_private(self):
-        expect(self.repo.is_private()) == self.repo.private
-
     def test_git_commit(self):
         self.response('git_commit')
         self.get(self.api + 'git/commits/fakesha')

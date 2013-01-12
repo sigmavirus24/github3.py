@@ -665,20 +665,6 @@ class Repository(GitHubCore):
             return self._boolean(self._get(url), 204, 404)
         return False
 
-    def is_fork(self):
-        """Checks if this repository is a fork.
-
-        :returns: bool
-        """
-        return self.fork
-
-    def is_private(self):
-        """Checks if this repository is private.
-
-        :returns: bool
-        """
-        return self.private
-
     def git_commit(self, sha):
         """Get a single (git) commit.
 
@@ -1500,13 +1486,6 @@ class Hook(GitHubCore):
             self._update_(json)
             return True
         return False
-
-    def is_active(self):
-        """Checks whether the hook is marked as active on GitHub or not.
-
-        :returns: bool
-        """
-        return self.active
 
     @requires_auth
     def test(self):

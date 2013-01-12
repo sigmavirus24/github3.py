@@ -15,6 +15,8 @@ if __name__ == "__main__":
     if coverage:
         cov = coverage.coverage(source=['github3'],
                 omit=['github3/packages/*'])
+        cov.exclude('(No coverage)')
+        cov.exclude('def __repr__')
         cov.start()
 
     # list files in directory tests/

@@ -78,9 +78,12 @@ class LegacyRepo(GitHubCore):
         self._fork = repo.get('fork', False)
         #: Number of forks of this repository
         self.forks = repo.get('forks', 0)
-        self._has_dl = repo.get('has_downloads', False)
-        self._has_is = repo.get('has_issues', False)
-        self._has_w = repo.get('has_wiki', False)
+        #: Boolean - whether the repository has downloads or not
+        self.has_downloads = repo.get('has_downloads', False)
+        #: Boolean - whether the repository has issues or not
+        self.has_issues = repo.get('has_issues', False)
+        #: Boolean - whether the repository has a wiki or not
+        self.has_wiki = repo.get('has_wiki', False)
         #: URL of the website for this repository
         self.homepage = repo.get('homepage', '')
         #: Language used in this repository
@@ -91,7 +94,8 @@ class LegacyRepo(GitHubCore):
         self.open_issues = repo.get('open_issues', 0)
         #: Owner of this repository
         self.owner = repo.get('owner', '')
-        self._priv = repo.get('private', False)
+        #: Whether the repository is private or not
+        self.private = repo.get('private', False)
         #: datetime object representing the last time the repo was pushed to
         self.pushed = None
         if repo.get('pushed_at'):
@@ -115,25 +119,9 @@ class LegacyRepo(GitHubCore):
     def __repr__(self):
         return '<Legacy Repo [{0}/{1}]>'.format(self.owner, self.name)
 
-    def has_downloads(self):
-        """Checks if this repository has downloads"""
-        return self._has_dl
-
-    def has_issues(self):
-        """Checks if this repository has issues"""
-        return self._has_is
-
-    def has_wiki(self):
-        """Checks if this repository has a wiki"""
-        return self._has_w
-
-    def is_fork(self):
-        """Checks if this repository is a fork"""
-        return self._fork
-
     def is_private(self):
         """Checks if this repository is private"""
-        return self._priv
+        return self.private
 
 
 class LegacyUser(GitHubCore):

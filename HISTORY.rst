@@ -1,6 +1,33 @@
 History/Changelog
 =================
 
+0.4: 2013-xx-yy
+---------------
+
+- In github3.legacy.LegacyRepo
+
+  - ``has_{downloads,issues,wiki}`` are now attributes.
+  - ``is_private()`` and the ``private`` attribute return the same thing 
+    ``is_private()`` will be deprecated in the next release.
+
+- In github3.repos.Repository
+
+  - ``is_fork()`` is now deprecated in favor of the ``fork`` attribute
+  - ``is_private()`` is now deprecated in favor of the ``private`` attribute
+
+- In github3.repos.Hook
+
+  - ``is_active()`` is now deprecated in favor of the ``active`` attribute
+
+- In github3.pulls.PullRequest
+
+  - ``is_mergeable()`` is now deprecated in favor of the ``mergeable`` 
+    attribute
+
+- In github3.notifications.Thread
+
+  - ``is_unread()`` is now deprecated in favor of the ``unread``
+
 0.3: 2013-01-01
 ---------------
 

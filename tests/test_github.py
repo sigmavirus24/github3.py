@@ -520,6 +520,7 @@ class TestGitHub(BaseCase):
                                       'requests')
 
         expect(issues[0]).isinstance(github3.legacy.LegacyIssue)
+        expect(repr(issues[0]).startswith('<Legacy Issue')).is_True()
         self.mock_assertions()
 
         self.conf.update({'params': {'start_page': 2}})
@@ -534,6 +535,8 @@ class TestGitHub(BaseCase):
         self.conf.update(params={})
         repos = self.g.search_repos('github3.py')
         expect(repos[0]).isinstance(github3.legacy.LegacyRepo)
+        expect(repr(repos[0]).startswith('<Legacy Repo')).is_True()
+        expect(repos[0].is_private()) == repos[0].private
         self.mock_assertions()
 
         self.conf.update(params={'language': 'python'})
@@ -547,6 +550,7 @@ class TestGitHub(BaseCase):
         self.conf.update({'params': {}})
         users = self.g.search_users('sigmavirus24')
         expect(users[0]).isinstance(github3.legacy.LegacyUser)
+        expect(repr(users[0]).startswith('<Legacy User')).is_True()
         self.mock_assertions()
 
         self.conf.update({'params': {'start_page': 2}})
