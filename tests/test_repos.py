@@ -554,3 +554,32 @@ class TestRepository(BaseCase):
 
         next(self.repo.iter_contributors('true value'))
         self.mock_assertions()
+
+    def test_iter_downloads(self):
+        self.response('download', _iter=True)
+        self.get(self.api + 'downloads')
+        self.conf = {'params': None}
+
+        d = next(self.repo.iter_downloads())
+        expect(d).isinstance(github3.repos.Download)
+        self.mock_assertions()
+
+    def test_iter_events(self):
+        self.response('event', _iter=True)
+        self.get(self.api + 'events')
+        self.conf = {'params': None}
+
+        e = next(self.repo.iter_events())
+        expect(e).isinstance(github3.repos.Event)
+        self.mock_assertions()
+
+    def test_iter_forks(self):
+        self.response('repo', _iter=True)
+        self.get(self.api + 'forks')
+        self.conf = {'params': {}}
+
+        r = next(self.repo.iter_forks())
+        expect(r).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
+        self.conf['params']['sort'] = 'newest'
