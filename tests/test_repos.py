@@ -583,6 +583,8 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
         self.conf['params']['sort'] = 'newest'
+        next(self.repo.iter_forks(**self.conf['params']))
+        self.mock_assertions()
 
     def test_iter_hooks(self):
         self.response('hook', _iter=True)
@@ -634,4 +636,12 @@ class TestRepository(BaseCase):
         self.login()
         k = next(self.repo.iter_keys())
         expect(k).isinstance(github3.users.Key)
+        self.mock_assertions()
+
+    def test_iter_labels(self):
+        self.response('label', _iter=True)
+        self.get(self.api + 'labels')
+
+        l = next(self.repo.iter_labels())
+        expect(l).isinstance(github3.repos.Label)
         self.mock_assertions()
