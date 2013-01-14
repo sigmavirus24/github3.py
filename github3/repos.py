@@ -1146,9 +1146,12 @@ class Repository(GitHubCore):
         status = False
         if mode and topic and callback and m:
             data = [('hub.mode', mode), ('hub.topic', topic),
-                    ('hub.callback', callback), ('hub.secret', secret)]
+                    ('hub.callback', callback)]
+            if secret:
+                data.append(('hub.secret', secret))
             url = self._build_url('hub')
-            status = self._boolean(self._post(url, data=dumps(data)), 204,
+            h = {'Content-Type': 'application/x-www-form-urlencoded'}
+            status = self._boolean(self._post(url, data=data, headers=h), 204,
                                    404)
         return status
 
