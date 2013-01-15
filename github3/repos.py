@@ -1150,7 +1150,7 @@ class Repository(GitHubCore):
             if secret:
                 data.append(('hub.secret', secret))
             url = self._build_url('hub')
-            h = {'Content-Type': 'application/x-www-form-urlencoded'}
+            h = {'Content-Type': None}
             status = self._boolean(self._post(url, data=data, headers=h), 204,
                                    404)
         return status

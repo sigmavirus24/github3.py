@@ -28,6 +28,9 @@ History/Changelog
 
   - ``is_unread()`` is now deprecated in favor of the ``unread``
 
+- ``pubsubhubbub()`` is now present on the ``GitHub`` object and will be 
+  removed from the ``Repository`` object in the next release
+
 0.3: 2013-01-01
 ---------------
 
