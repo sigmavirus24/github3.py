@@ -755,6 +755,9 @@ class GitHub(GitHubCore):
                 data.append(('hub.secret', secret))
             url = self._build_url('hub')
             h = {'Content-Type': None}
+            # This is not JSON data. It is meant to be form data
+            # application/x-www-form-urlencoded works fine here, no need for
+            # multipart/form-data
             status = self._boolean(self._post(url, data=data, headers=h), 204,
                                    404)
         return status
