@@ -1,6 +1,7 @@
 import github3
 from mock import patch
 from tests.utils import (expect, BaseCase, load)
+from requests.compat import urlencode
 
 
 class TestGitHub(BaseCase):
@@ -478,6 +479,39 @@ class TestGitHub(BaseCase):
     def test_markdown(self):
         pass
 
+    def test_organization(self):
+        self.response('org')
+        self.get('https://api.github.com/orgs/github3py')
+        org = self.g.organization('github3py')
+        expect(org).isinstance(github3.orgs.Organization)
+        self.mock_assertions()
+
+    def test_pubsubhubbub(self):
+        self.response('', 204)
+        self.post('https://api.github.com/hub')
+        body = [('hub.mode', 'subscribe'),
+                ('hub.topic', 'https://github.com/foo/bar/events/push'),
+                ('hub.callback', 'https://localhost/post')]
+        self.conf = {}
+
+        with expect.githuberror():
+            self.g.pubsubhubbub('', '', '')
+
+        self.login()
+        expect(self.g.pubsubhubbub('', '', '')).is_False()
+        self.not_called()
+
+        expect(self.g.pubsubhubbub('foo', 'https://example.com', 'foo')
+               ).is_False()
+        self.not_called()
+
+        d = dict([(k[4:], v) for k, v in body])
+        expect(self.g.pubsubhubbub(**d)).is_True()
+        _, kwargs = self.request.call_args
+        expect('data').is_in(kwargs)
+        expect(body) == kwargs['data']
+        self.mock_assertions()
+
     def test_pull_request(self):
         self.response('pull')
         self.get('https://api.github.com/repos/sigmavirus24/'
@@ -490,13 +524,6 @@ class TestGitHub(BaseCase):
 
         expect(pr).isinstance(github3.pulls.PullRequest)
 
-        self.mock_assertions()
-
-    def test_organization(self):
-        self.response('org')
-        self.get('https://api.github.com/orgs/github3py')
-        org = self.g.organization('github3py')
-        expect(org).isinstance(github3.orgs.Organization)
         self.mock_assertions()
 
     def test_repository(self):
