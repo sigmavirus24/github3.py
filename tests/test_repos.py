@@ -645,3 +645,11 @@ class TestRepository(BaseCase):
         l = next(self.repo.iter_labels())
         expect(l).isinstance(github3.repos.Label)
         self.mock_assertions()
+
+    def test_iter_languages(self):
+        self.response('language')
+        self.get(self.api + 'languages')
+
+        l = next(self.repo.iter_languages())
+        expect(l).isinstance(tuple)
+        self.mock_assertions()
