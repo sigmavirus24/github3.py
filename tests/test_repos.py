@@ -647,9 +647,18 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_iter_languages(self):
+        #: repos/:login/:repo/languages is just a dictionary, so _iter=False
         self.response('language')
         self.get(self.api + 'languages')
 
         l = next(self.repo.iter_languages())
         expect(l).isinstance(tuple)
+        self.mock_assertions()
+
+    def test_iter_milestones(self):
+        self.response('milestone', _iter=True)
+        self.get(self.api + 'milestones')
+
+        m = next(self.repo.iter_milestones())
+        expect(m).isinstance(github3.issues.Milestone)
         self.mock_assertions()
