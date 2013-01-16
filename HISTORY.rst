@@ -1,7 +1,7 @@
 History/Changelog
 =================
 
-0.4: 2013-xx-yy
+0.4: 2013-01-16
 ---------------
 
 - In github3.legacy.LegacyRepo
@@ -30,6 +30,8 @@ History/Changelog
 
 - ``pubsubhubbub()`` is now present on the ``GitHub`` object and will be 
   removed from the ``Repository`` object in the next release
+
+- 70% test coverage
 
 0.3: 2013-01-01
 ---------------
