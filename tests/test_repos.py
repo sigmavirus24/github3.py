@@ -723,3 +723,15 @@ class TestRepository(BaseCase):
         u = next(self.repo.iter_subscribers())
         expect(u).isinstance(github3.users.User)
         self.mock_assertions()
+
+    def test_iter_statuses(self):
+        self.response('status', _iter=True)
+        self.get(self.api + 'statuses/fakesha')
+
+        with expect.raises(StopIteration):
+            next(self.repo.iter_statuses(None))
+            self.not_called()
+
+        s = next(self.repo.iter_statuses('fakesha'))
+        expect(s).isinstance(github3.repos.Status)
+        self.mock_assertions()
