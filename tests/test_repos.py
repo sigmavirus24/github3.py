@@ -676,6 +676,26 @@ class TestRepository(BaseCase):
         self.get(self.api + 'notifications')
         self.conf.update(params={})
 
+        with expect.githuberror():
+            self.repo.iter_notifications()
+
+        self.login()
         n = next(self.repo.iter_notifications())
         expect(n).isinstance(github3.notifications.Thread)
+        self.mock_assertions()
+
+    def test_iter_pulls(self):
+        self.response('pull', _iter=True)
+        self.get(self.api + 'pulls')
+        self.conf.update(params={})
+
+        p = next(self.repo.iter_pulls())
+        expect(p).isinstance(github3.pulls.PullRequest)
+        self.mock_assertions()
+
+        next(self.repo.iter_pulls('foo'))
+        self.mock_assertions()
+
+        self.conf.update(params={'state': 'open'})
+        next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
