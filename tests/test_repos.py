@@ -699,3 +699,11 @@ class TestRepository(BaseCase):
         self.conf.update(params={'state': 'open'})
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
+
+    def test_iter_refs(self):
+        self.response('ref', _iter=True)
+        self.get(self.api + 'git/refs')
+
+        r = next(self.repo.iter_refs())
+        expect(r).isinstance(github3.git.Reference)
+        self.mock_assertions()
