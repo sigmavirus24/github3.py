@@ -987,6 +987,7 @@ class Repository(GitHubCore):
         url = self._build_url('events', base_url=base)
         return self._iter(int(number), url, Event)
 
+    @requires_auth
     def iter_notifications(self, all=False, participating=False, since='',
                            number=-1):
         """Iterates over the notifications for this repository.
@@ -1019,8 +1020,8 @@ class Repository(GitHubCore):
         """
         url = self._build_url('pulls', base_url=self._api)
         params = {}
-        if state in ('open', 'closed'):
-            params['state'] = state
+        if state and state.lower() in ('open', 'closed'):
+            params['state'] = state.lower()
         return self._iter(int(number), url, PullRequest, params=params)
 
     def iter_refs(self, subspace='', number=-1):
