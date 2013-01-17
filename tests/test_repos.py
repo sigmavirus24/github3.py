@@ -707,3 +707,11 @@ class TestRepository(BaseCase):
         r = next(self.repo.iter_refs())
         expect(r).isinstance(github3.git.Reference)
         self.mock_assertions()
+
+    def test_iter_stargazers(self):
+        self.response('user', _iter=True)
+        self.get(self.api + 'stargazers')
+
+        u = next(self.repo.iter_stargazers())
+        expect(u).isinstance(github3.users.User)
+        self.mock_assertions()
