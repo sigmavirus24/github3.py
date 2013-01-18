@@ -756,3 +756,16 @@ class TestRepository(BaseCase):
         t = next(self.repo.iter_teams())
         expect(t).isinstance(github3.orgs.Team)
         self.mock_assertions()
+
+    def test_mark_notifications(self):
+        self.response('', 205)
+        self.put(self.api + 'notifications')
+        self.conf = {'data': {'read': True}}
+
+        with expect.githuberror():
+            self.repo.mark_notifications()
+            self.not_called()
+
+        self.login()
+        expect(self.repo.mark_notifications()).is_True()
+        self.mock_assertions()

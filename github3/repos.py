@@ -1092,6 +1092,7 @@ class Repository(GitHubCore):
         url = self._build_url('teams', base_url=self._api)
         return self._iter(int(number), url, Team)
 
+    @requires_auth
     def mark_notifications(self, last_read=''):
         """Mark all notifications in this repository as read.
 
@@ -1108,6 +1109,7 @@ class Repository(GitHubCore):
         return self._boolean(self._put(url, data=dumps(mark)),
                              205, 404)
 
+    @requires_auth
     def merge(self, base, head, message=''):
         """Perform a merge from ``head`` into ``base``.
 
