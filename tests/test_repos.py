@@ -735,3 +735,11 @@ class TestRepository(BaseCase):
         s = next(self.repo.iter_statuses('fakesha'))
         expect(s).isinstance(github3.repos.Status)
         self.mock_assertions()
+
+    def test_iter_tags(self):
+        self.response('tag', _iter=True)
+        self.get(self.api + 'tags')
+
+        t = next(self.repo.iter_tags())
+        expect(t).isinstance(github3.repos.RepoTag)
+        self.mock_assertions()
