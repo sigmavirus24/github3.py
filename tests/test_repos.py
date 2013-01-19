@@ -118,6 +118,9 @@ class TestRepository(BaseCase):
         expect(self.repo.contents(filename)).isinstance(github3.repos.Contents)
         self.mock_assertions()
 
+        self.response('', 404)
+        expect(self.repo.contents(filename)).is_None()
+
     def test_create_blob(self):
         self.response('blob', 201)
         content = 'VGVzdCBibG9i\n'
