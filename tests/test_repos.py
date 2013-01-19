@@ -764,8 +764,22 @@ class TestRepository(BaseCase):
 
         with expect.githuberror():
             self.repo.mark_notifications()
-            self.not_called()
+        self.not_called()
 
         self.login()
         expect(self.repo.mark_notifications()).is_True()
+        self.mock_assertions()
+
+    def test_merge(self):
+        self.response('commit', 201)
+        self.post(self.api + 'merges')
+        self.conf = {'data': {'base': 'master', 'head': 'sigma/feature'}}
+
+        with expect.githuberror():
+            self.repo.merge('foo', 'bar')
+        self.not_called()
+
+        self.login()
+        expect(self.repo.merge('master', 'sigma/feature')).isinstance(
+            github3.repos.RepoCommit)
         self.mock_assertions()

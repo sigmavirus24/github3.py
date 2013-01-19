@@ -1119,7 +1119,9 @@ class Repository(GitHubCore):
         :returns: :class:`RepoCommit <RepoCommit>`
         """
         url = self._build_url('merges', base_url=self._api)
-        data = {'base': base, 'head': head, 'commit_message': message}
+        data = {'base': base, 'head': head}
+        if message:
+            data['commit_message'] = message
         json = self._json(self._post(url, data=dumps(data)), 201)
         return RepoCommit(json, self) if json else None
 
