@@ -821,7 +821,7 @@ class TestRepository(BaseCase):
         expect(self.repo.ref('fakesha')).isinstance(github3.git.Reference)
         self.mock_assertions()
 
-    def remove_collaborator(self):
+    def test_remove_collaborator(self):
         self.response('', 204)
         self.delete(self.api + 'collaborators/login')
 
@@ -835,3 +835,6 @@ class TestRepository(BaseCase):
 
         expect(self.repo.remove_collaborator('login')).is_True()
         self.mock_assertions()
+
+    def test_set_subscription(self):
+        pass

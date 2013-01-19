@@ -116,6 +116,7 @@ class BaseCase(TestCase):
 
     def delete(self, url):
         self.args = ('DELETE', url)
+        self.conf = {}
 
     def get(self, url):
         self.args = ('GET', url)
