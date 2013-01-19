@@ -862,3 +862,44 @@ class TestRepository(BaseCase):
         s = self.repo.subscription()
         expect(s).isinstance(github3.notifications.Subscription)
         self.mock_assertions()
+
+    def test_tag(self):
+        self.response('tag')
+        self.get(self.api + 'git/tags/fakesha')
+
+        expect(self.repo.tag(None)).is_None()
+        self.not_called()
+
+        expect(self.repo.tag('fakesha')).isinstance(github3.git.Tag)
+        self.mock_assertions()
+
+    def test_tree(self):
+        self.response('tree')
+        self.get(self.api + 'git/trees/fakesha')
+
+        expect(self.repo.tree(None)).is_None()
+        self.not_called()
+
+        expect(self.repo.tree('fakesha')).isinstance(github3.git.Tree)
+        self.mock_assertions()
+
+    def test_update_label(self):
+        self.response('label', 200)
+        self.patch(self.api + 'labels/bug')
+        self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
+
+        with expect.githuberror():
+            self.repo.update_label('foo', 'bar')
+        self.not_called()
+
+        self.login()
+        with patch.object(github3.repos.Repository, 'label') as l:
+            l.return_value = None
+            expect(self.repo.update_label('foo', 'bar')).is_False()
+            self.not_called()
+
+        with patch.object(github3.repos.Repository, 'label') as l:
+            l.return_value = github3.issues.Label(load('label'), self.g)
+            expect(self.repo.update_label('big_bug', 'fafafa')).is_True()
+
+        self.mock_assertions()

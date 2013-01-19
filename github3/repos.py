@@ -1223,8 +1223,10 @@ class Repository(GitHubCore):
         :param str sha: (required), sha of the object for this tag
         :returns: :class:`Tag <github3.git.Tag>`
         """
-        url = self._build_url('git', 'tags', sha, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if sha:
+            url = self._build_url('git', 'tags', sha, base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Tag(json) if json else None
 
     def tree(self, sha):
@@ -1233,10 +1235,13 @@ class Repository(GitHubCore):
         :param str sha: (required), sha of the object for this tree
         :returns: :class:`Tree <github3.git.Tree>`
         """
-        url = self._build_url('git', 'trees', sha, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if sha:
+            url = self._build_url('git', 'trees', sha, base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Tree(json, self) if json else None
 
+    @requires_auth
     def update_label(self, name, color, new_name=''):
         """Update the label ``name``.
 
