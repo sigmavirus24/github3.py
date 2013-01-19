@@ -810,3 +810,13 @@ class TestRepository(BaseCase):
 
         expect(self.repo.readme()).isinstance(github3.repos.Contents)
         self.mock_assertions()
+
+    def test_ref(self):
+        self.response('ref', 200)
+        self.get(self.api + 'git/refs/fakesha')
+
+        expect(self.repo.ref(None)).is_None()
+        self.not_called()
+
+        expect(self.repo.ref('fakesha')).isinstance(github3.git.Reference)
+        self.mock_assertions()

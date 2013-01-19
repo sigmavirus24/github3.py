@@ -1171,8 +1171,10 @@ class Repository(GitHubCore):
         :type ref: str
         :returns: :class:`Reference <github3.git.Reference>`
         """
-        url = self._build_url('git', 'refs', ref, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if ref:
+            url = self._build_url('git', 'refs', ref, base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Reference(json, self) if json else None
 
     @requires_auth
