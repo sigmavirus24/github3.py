@@ -783,3 +783,13 @@ class TestRepository(BaseCase):
         expect(self.repo.merge('master', 'sigma/feature')).isinstance(
             github3.repos.RepoCommit)
         self.mock_assertions()
+
+    def test_milestone(self):
+        self.response('milestone', 200)
+        self.get(self.api + 'milestones/2')
+
+        expect(self.repo.milestone(0)).is_None()
+        self.not_called()
+
+        expect(self.repo.milestone(2)).isinstance(github3.issues.Milestone)
+        self.mock_assertions()
