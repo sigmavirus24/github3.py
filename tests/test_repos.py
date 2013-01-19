@@ -837,4 +837,15 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_set_subscription(self):
-        pass
+        self.response('subscription')
+        self.put(self.api + 'subscription')
+        self.conf = {'data': {'subscribed': True, 'ignored': False}}
+
+        with expect.githuberror():
+            self.repo.set_subscription(True, False)
+        self.not_called()
+
+        self.login()
+        s = self.repo.set_subscription(True, False)
+        expect(s).isinstance(github3.notifications.Subscription)
+        self.mock_assertions()
