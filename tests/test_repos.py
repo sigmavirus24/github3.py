@@ -849,3 +849,16 @@ class TestRepository(BaseCase):
         s = self.repo.set_subscription(True, False)
         expect(s).isinstance(github3.notifications.Subscription)
         self.mock_assertions()
+
+    def test_subscription(self):
+        self.response('subscription')
+        self.get(self.api + 'subscription')
+
+        with expect.githuberror():
+            self.repo.subscription()
+        self.not_called()
+
+        self.login()
+        s = self.repo.subscription()
+        expect(s).isinstance(github3.notifications.Subscription)
+        self.mock_assertions()
