@@ -793,3 +793,13 @@ class TestRepository(BaseCase):
 
         expect(self.repo.milestone(2)).isinstance(github3.issues.Milestone)
         self.mock_assertions()
+
+    def test_pull_request(self):
+        self.response('pull', 200)
+        self.get(self.api + 'pulls/2')
+
+        expect(self.repo.pull_request(0)).is_None()
+        self.not_called()
+
+        expect(self.repo.pull_request(2)).isinstance(github3.pulls.PullRequest)
+        self.mock_assertions()
