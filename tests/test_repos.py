@@ -1,7 +1,7 @@
 import os
 import github3
 from tests.utils import (expect, BaseCase, load)
-from mock import patch
+from mock import patch, mock_open
 
 
 class TestRepository(BaseCase):
@@ -55,6 +55,18 @@ class TestRepository(BaseCase):
         self.get(self.api + 'zipball/randomref')
         expect(self.repo.archive('zipball', ref='randomref')).is_True()
         os.unlink('foo')
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        o = mock_open()
+        with patch('{0}.open'.format(__name__), o, create=True):
+            with open('archive', 'wb+') as fd:
+                self.repo.archive('tarball', fd)
+
+        o.assert_called_once_with('archive', 'wb+')
+        fd = o()
+        fd.write.assert_called_once_with(b'archive_data')
 
     def test_blob(self):
         self.response('blob')
@@ -794,6 +806,12 @@ class TestRepository(BaseCase):
         expect(self.repo.milestone(2)).isinstance(github3.issues.Milestone)
         self.mock_assertions()
 
+    def test_parent(self):
+        json = self.repo.to_json().copy()
+        json['parent'] = json.copy()
+        r = github3.repos.Repository(json)
+        expect(r.parent).isinstance(github3.repos.Repository)
+
     def test_pull_request(self):
         self.response('pull', 200)
         self.get(self.api + 'pulls/2')
@@ -835,6 +853,15 @@ class TestRepository(BaseCase):
 
         expect(self.repo.remove_collaborator('login')).is_True()
         self.mock_assertions()
+
+    def test_repr(self):
+        expect(repr(self.repo)) == '<Repository [sigmavirus24/github3.py]>'
+
+    def test_source(self):
+        json = self.repo.to_json().copy()
+        json['source'] = json.copy()
+        r = github3.repos.Repository(json)
+        expect(r.source).isinstance(github3.repos.Repository)
 
     def test_set_subscription(self):
         self.response('subscription')

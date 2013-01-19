@@ -176,7 +176,8 @@ class Repository(GitHubCore):
                 header = resp.headers['content-disposition']
                 i = header.find('filename=') + len('filename=')
                 fd = open(header[i:], 'wb')
-            for chunk in resp.iter_content():
+
+            for chunk in resp.iter_content(chunk_size=512):
                 fd.write(chunk)
 
             if not pre_opened:
