@@ -1,6 +1,12 @@
 History/Changelog
 =================
 
+0.5: 2013-xx-xx
+---------------
+
+- In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use 
+  github3.github.Github.pubsubhubbub instead
+
 0.4: 2013-01-16
 ---------------
 
