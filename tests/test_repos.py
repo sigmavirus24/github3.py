@@ -803,3 +803,10 @@ class TestRepository(BaseCase):
 
         expect(self.repo.pull_request(2)).isinstance(github3.pulls.PullRequest)
         self.mock_assertions()
+
+    def test_readme(self):
+        self.response('readme', 200)
+        self.get(self.api + 'readme')
+
+        expect(self.repo.readme()).isinstance(github3.repos.Contents)
+        self.mock_assertions()
