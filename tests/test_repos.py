@@ -903,3 +903,18 @@ class TestRepository(BaseCase):
             expect(self.repo.update_label('big_bug', 'fafafa')).is_True()
 
         self.mock_assertions()
+
+
+class TestContents(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestContents, self).__init__(methodName)
+        self.contents = github3.repos.Contents(load('readme'))
+
+    def test_git_url(self):
+        expect(self.contents.links['git']) == self.contents.git_url
+
+    def test_html_url(self):
+        expect(self.contents.links['html']) == self.contents.html_url
+
+    def test_repr(self):
+        expect(repr(self.contents)) == '<Content [{0}]>'.format('README.rst')
