@@ -80,8 +80,11 @@ class TestRepository(BaseCase):
         self.response('branch')
         self.get(self.api + 'branches/master')
 
-        expect(self.repo.branch('master')).isinstance(github3.repos.Branch)
+        b = self.repo.branch('master')
+        expect(b).isinstance(github3.repos.Branch)
         self.mock_assertions()
+
+        expect(repr(b)) == '<Repository Branch [master]>'
 
     def test_commit(self):
         self.response('commit')
@@ -202,6 +205,31 @@ class TestRepository(BaseCase):
         self.conf['data'] = {'organization': 'github3py'}
         expect(self.repo.create_fork('github3py')
                ).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
+    def test_create_hook(self):
+        self.response('hook', 201)
+        self.post(self.api + 'hooks')
+        self.conf = {
+            'data': {
+                'name': 'Hookname',
+                'config': {
+                    'foo': 'bar'
+                }
+            }
+        }
+
+        with expect.githuberror():
+            self.repo.create_hook(None, None)
+
+        self.login()
+        expect(self.repo.create_hook(None, {'foo': 'bar'})).is_None()
+        expect(self.repo.create_hook('name', None)).is_None()
+        expect(self.repo.create_hook('name', 'bar')).is_None()
+        self.not_called()
+
+        h = self.repo.create_hook(**self.conf['data'])
+        expect(h).isinstance(github3.repos.Hook)
         self.mock_assertions()
 
     def test_create_issue(self):
@@ -361,6 +389,11 @@ class TestRepository(BaseCase):
                                         None)).is_None()
             expect(self.repo.create_tag(**data)).isinstance(github3.git.Tag)
         self.mock_assertions()
+
+        with patch.object(github3.repos.Repository, 'create_ref') as cr:
+            self.repo.create_tag('tag', '', 'fakesha', '', '',
+                                 lightweight=True)
+            cr.assert_called_once_with('refs/tags/tag', 'fakesha')
 
     def test_create_tree(self):
         self.response('tree', 201)
@@ -723,6 +756,11 @@ class TestRepository(BaseCase):
         expect(r).isinstance(github3.git.Reference)
         self.mock_assertions()
 
+        self.get(self.api + 'git/refs/subspace')
+        r = next(self.repo.iter_refs('subspace'))
+        expect(r).isinstance(github3.git.Reference)
+        self.mock_assertions()
+
     def test_iter_stargazers(self):
         self.response('user', _iter=True)
         self.get(self.api + 'stargazers')
@@ -785,6 +823,10 @@ class TestRepository(BaseCase):
         expect(self.repo.mark_notifications()).is_True()
         self.mock_assertions()
 
+        expect(self.repo.mark_notifications('2013-01-18T19:53:04Z')).is_True()
+        self.conf['data']['last_read_at'] = '2013-01-18T19:53:04Z'
+        self.mock_assertions()
+
     def test_merge(self):
         self.response('commit', 201)
         self.post(self.api + 'merges')
@@ -797,6 +839,10 @@ class TestRepository(BaseCase):
         self.login()
         expect(self.repo.merge('master', 'sigma/feature')).isinstance(
             github3.repos.RepoCommit)
+        self.mock_assertions()
+
+        self.conf['data']['commit_message'] = 'Commit message'
+        self.repo.merge('master', 'sigma/feature', 'Commit message')
         self.mock_assertions()
 
     def test_milestone(self):
@@ -948,3 +994,6 @@ class TestContents(BaseCase):
 
     def test_repr(self):
         expect(repr(self.contents)) == '<Content [{0}]>'.format('README.rst')
+
+    def test_str(self):
+        expect(str(self.contents)) == self.contents.decoded
