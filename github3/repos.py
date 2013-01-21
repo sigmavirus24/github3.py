@@ -1390,7 +1390,7 @@ class Download(GitHubCore):
             else:
                 file_like = False
                 fd = open(path, 'wb')
-            for chunk in resp.iter_content():
+            for chunk in resp.iter_content(512):
                 fd.write(chunk)
             if not file_like:
                 fd.close()

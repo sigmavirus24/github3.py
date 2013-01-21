@@ -361,8 +361,9 @@ class TestRepository(BaseCase):
 
         self.login()
         expect(self.repo.create_status(None, None)).is_None()
-        expect(self.repo.create_status('fakesha', 'success')).isinstance(
-            github3.repos.Status)
+        s = self.repo.create_status('fakesha', 'success')
+        expect(s).isinstance(github3.repos.Status)
+        expect(repr(s)) > ''
         self.mock_assertions()
 
     def test_create_tag(self):
@@ -997,3 +998,63 @@ class TestContents(BaseCase):
 
     def test_str(self):
         expect(str(self.contents)) == self.contents.decoded
+
+
+class TestDownload(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestDownload, self).__init__(methodName)
+        self.dl = github3.repos.Download(load('download'))
+        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                    "downloads/338893")
+
+    def setUp(self):
+        super(TestDownload, self).setUp()
+        self.dl = github3.repos.Download(self.dl.to_json(), self.g)
+
+    def test_repr(self):
+        expect(repr(self.dl)) == '<Download [kr.png]>'
+
+    def test_delete(self):
+        self.response('', 204)
+        self.delete(self.api)
+
+        with expect.githuberror():
+            self.dl.delete()
+        self.not_called()
+
+        self.login()
+        expect(self.dl.delete()).is_True()
+        self.mock_assertions()
+
+    def test_saveas(self):
+        self.response('archive', 200)
+        self.get(self.dl.html_url)
+
+        o = mock_open()
+        with patch('{0}.open'.format(__name__), o, create=True):
+            with open('archive', 'wb+') as fd:
+                expect(self.dl.saveas(fd)).is_True()
+
+        o.assert_called_once_with('archive', 'wb+')
+        fd = o()
+        fd.write.assert_called_once_with(b'archive_data')
+        self.mock_assertions()
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        self.dl.saveas()
+        expect(os.path.isfile(self.dl.name)).is_True()
+        os.unlink(self.dl.name)
+        expect(os.path.isfile(self.dl.name)).is_False()
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        self.dl.saveas('tmp')
+        expect(os.path.isfile('tmp')).is_True()
+        os.unlink('tmp')
+        expect(os.path.isfile('tmp')).is_False()
+
+        self.response('', 404)
+        expect(self.dl.saveas()).is_False()
