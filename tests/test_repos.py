@@ -1058,3 +1058,57 @@ class TestDownload(BaseCase):
 
         self.response('', 404)
         expect(self.dl.saveas()).is_False()
+
+
+class TestHook(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestHook, self).__init__(methodName)
+        self.hook = github3.repos.Hook(load('hook'))
+        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                    "hooks/292492")
+
+    def setUp(self):
+        super(TestHook, self).setUp()
+        self.hook = github3.repos.Hook(self.hook.to_json(), self.g)
+
+    def test_repr(self):
+        expect(repr(self.hook)) == '<Hook [readthedocs]>'
+
+    def test_delete(self):
+        self.response('', 204)
+        self.delete(self.api)
+
+        with expect.githuberror():
+            self.hook.delete()
+
+        self.login()
+        expect(self.hook.delete()).is_True()
+        self.mock_assertions()
+
+    def test_delete_subscription(self):
+        self.response('', 204)
+        self.delete(self.api + '/subscription')
+
+        with expect.githuberror():
+            self.hook.delete_subscription()
+
+        self.login()
+        expect(self.hook.delete_subscription()).is_True()
+        self.mock_assertions()
+
+    def test_edit(self):
+        # save this for later
+        pass
+
+    def test_test(self):
+        # Funny name, no?
+        self.response('', 204)
+        self.post(self.api + '/tests')
+        self.conf = {}
+
+        with expect.githuberror():
+            self.hook.test()
+
+        self.login()
+        expect(self.hook.test()).is_True()
+        self.mock_assertions()
