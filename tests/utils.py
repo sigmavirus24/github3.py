@@ -97,15 +97,14 @@ class BaseCase(TestCase):
         r.encoding = enc
 
         if path_name:
+            content = path(path_name).read().strip()
             if _iter:
-                content = path(path_name).read().strip()
                 content = '[{0}]'.format(content)
                 r.raw = BytesIO(content.encode())
             elif sys.version_info > (3, 0):
-                content = path(path_name).read().strip()
                 r.raw = BytesIO(content.encode())
             else:
-                r.raw = path(path_name)
+                r.raw = BytesIO(content)
         else:
             r.raw = BytesIO()
 
