@@ -798,6 +798,9 @@ class TestRepository(BaseCase):
         expect(t).isinstance(github3.repos.RepoTag)
         self.mock_assertions()
 
+        expect(repr(t).startswith('<Repository Tag')).is_True()
+        expect(str(t) > '').is_True()
+
     def test_iter_teams(self):
         self.response('team', _iter=True)
         self.get(self.api + 'teams')
@@ -1080,6 +1083,7 @@ class TestHook(BaseCase):
 
         with expect.githuberror():
             self.hook.delete()
+        self.not_called()
 
         self.login()
         expect(self.hook.delete()).is_True()
@@ -1091,14 +1095,46 @@ class TestHook(BaseCase):
 
         with expect.githuberror():
             self.hook.delete_subscription()
+        self.not_called()
 
         self.login()
         expect(self.hook.delete_subscription()).is_True()
         self.mock_assertions()
 
     def test_edit(self):
-        # save this for later
-        pass
+        self.response('hook', 200)
+        self.patch(self.api)
+        data = {
+            'name': 'hookname',
+            'config': {'push': 'http://example.com'},
+            'events': ['push'],
+            'add_events': ['fake_ev'],
+            'rm_events': ['fake_ev'],
+            'active': True,
+        }
+        self.conf = {'data': data.copy()}
+        self.conf['data']['remove_events'] = data['rm_events']
+        del(self.conf['data']['rm_events'])
+
+        with expect.githuberror():
+            self.hook.edit(**data)
+        self.not_called()
+
+        self.login()
+        expect(self.hook.edit(None, None, None)).is_False()
+        self.not_called()
+
+        expect(self.hook.edit('True', None, None)).is_False()
+        self.not_called()
+
+        expect(self.hook.edit(None, 'True', None)).is_False()
+        self.not_called()
+
+        expect(self.hook.edit(None, None, {})).is_False()
+        self.not_called()
+
+        expect(self.hook.edit(**data)).is_True()
+        self.mock_assertions()
 
     def test_test(self):
         # Funny name, no?
@@ -1108,6 +1144,7 @@ class TestHook(BaseCase):
 
         with expect.githuberror():
             self.hook.test()
+        self.not_called()
 
         self.login()
         expect(self.hook.test()).is_True()
