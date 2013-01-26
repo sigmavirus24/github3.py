@@ -1,2 +1,2 @@
-[pep8]
-exclude=github3/packages/
+[flake8]
+exclude=github3/packages/*

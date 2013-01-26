@@ -1118,18 +1118,11 @@ class TestHook(BaseCase):
 
         with expect.githuberror():
             self.hook.edit(**data)
-        self.not_called()
 
         self.login()
         expect(self.hook.edit(None, None, None)).is_False()
-        self.not_called()
-
         expect(self.hook.edit('True', None, None)).is_False()
-        self.not_called()
-
         expect(self.hook.edit(None, 'True', None)).is_False()
-        self.not_called()
-
         expect(self.hook.edit(None, None, {})).is_False()
         self.not_called()
 
@@ -1148,4 +1141,101 @@ class TestHook(BaseCase):
 
         self.login()
         expect(self.hook.test()).is_True()
+        self.mock_assertions()
+
+
+class TestRepoComment(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestRepoComment, self).__init__(methodName)
+        self.comment = github3.repos.RepoComment(load('repo_comment'))
+        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                    "comments/1380832")
+
+    def setUp(self):
+        super(TestRepoComment, self).setUp()
+        self.comment = github3.repos.RepoComment(self.comment.to_json(),
+                                                 self.g)
+
+    def test_repr(self):
+        expect(repr(self.comment).startswith('<Repository Comment'))
+
+    def test_update(self):
+        self.response('repo_comment', 200)
+        self.post(self.api)
+        data = {
+            'body': 'This is a comment body',
+            'sha': 'fakesha', 'line': 1, 'position': 1,
+            'path': 'github3/repos.py',
+        }
+        self.conf = {'data': data.copy()}
+        self.conf['data']['commit_id'] = self.conf['data']['sha']
+        del(self.conf['data']['sha'])
+
+        with expect.githuberror():
+            self.comment.update('foo', 'bar', 'bogus', 'jargon', 'files')
+
+        self.login()
+        expect(self.comment.update(None, 'f', 'o', 1, 1)).is_False()
+        expect(self.comment.update('f', None, 'o', 1, 1)).is_False()
+        expect(self.comment.update('f', 'o', 1, None, 1)).is_False()
+        expect(self.comment.update('f', 'o', 0, 'o', 1)).is_False()
+        expect(self.comment.update('f', 'o', 1, 'o', 0)).is_False()
+        self.not_called()
+
+        expect(self.comment.update(**data)).is_True()
+        self.mock_assertions()
+
+
+class TestRepoCommit(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestRepoCommit, self).__init__(methodName)
+        self.commit = github3.repos.RepoCommit(load('commit'))
+        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                    "commits/76dcc6cb4b9860034be81b7e58adc286a115aa97")
+
+    def test_repr(self):
+        expect(repr(self.commit).startswith('<Repository Commit')).is_True()
+
+    def test_diff(self):
+        self.response('archive', 200)
+        self.get(self.api)
+        self.conf.update(headers={'Accept': 'application/vnd.github.diff'})
+
+        expect(self.commit.diff()) == b'archive_data'
+        self.mock_assertions()
+
+    def test_patch(self):
+        self.response('archive', 200)
+        self.get(self.api)
+        self.conf.update(headers={'Accept': 'application/vnd.github.patch'})
+
+        expect(self.commit.patch()) == b'archive_data'
+        self.mock_assertions()
+
+
+class TestComparison(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestComparison, self).__init__(methodName)
+        self.comp = github3.repos.Comparison(load('comparison'))
+        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                    "compare/a811e1a270f65eecb65755eca38d888cbefcb0a7..."
+                    "76dcc6cb4b9860034be81b7e58adc286a115aa97")
+
+    def test_repr(self):
+        expect(repr(self.comp).startswith('<Comparison ')).is_True()
+
+    def test_diff(self):
+        self.response('archive', 200)
+        self.get(self.api)
+        self.conf.update(headers={'Accept': 'application/vnd.github.diff'})
+
+        expect(self.comp.diff()) == b'archive_data'
+        self.mock_assertions()
+
+    def test_patch(self):
+        self.response('archive', 200)
+        self.get(self.api)
+        self.conf.update(headers={'Accept': 'application/vnd.github.patch'})
+
+        expect(self.comp.patch()) == b'archive_data'
         self.mock_assertions()
