@@ -14,5 +14,8 @@ travis:
 
 tests: travis
 
+htmlcov:
+	coverage html --omit=github3/packages/*
+
 docs:
 	make -C docs/ html
