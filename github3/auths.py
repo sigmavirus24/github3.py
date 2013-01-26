@@ -64,24 +64,22 @@ class Authorization(GitHubCore):
         :returns: bool
         """
         success = False
+        json = None
         if scopes:
             d = {'scopes': scopes}
             json = self._json(self._post(self._api, data=dumps(d)), 200)
-            self._update_(json)
-            success = True
         if add_scopes:
             d = {'add_scopes': add_scopes}
             json = self._json(self._post(self._api, data=dumps(d)), 200)
-            self._update_(json)
-            success = True
         if rm_scopes:
             d = {'remove_scopes': rm_scopes}
             json = self._json(self._post(self._api, data=dumps(d)), 200)
-            self._update_(json)
-            success = True
         if note or note_url:
             d = {'note': note, 'note_url': note_url}
             json = self._json(self._post(self._api, data=dumps(d)), 200)
+
+        if json:
             self._update_(json)
             success = True
+
         return success
