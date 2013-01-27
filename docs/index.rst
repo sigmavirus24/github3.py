@@ -36,8 +36,7 @@ Let's get information about a user::
     print(kennethreitz.login)
     print(kennethreitz.followers)
 
-    gh.list_followers('kennethreitz')
-
+    followers = [str(f) for f in gh.iter_followers('kennethreitz')]
 
 More Examples
 ~~~~~~~~~~~~~

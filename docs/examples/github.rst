@@ -137,10 +137,10 @@ I'm cheating here and using most of the follow functions in one example
     if g.is_subscribed(sigma, todopy):
         g.unsubscribe(sigma, todopy)
 
-    for follower in g.list_followers():
+    for follower in g.iter_followers():
         print("{0} is following me.".format(follower.login))
 
-    for followee in g.list_following():
+    for followee in g.iter_following():
         print("I am following {0}.".format(followee.login))
 
     if g.is_following(sigma):

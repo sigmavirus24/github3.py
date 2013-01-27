@@ -14,7 +14,7 @@ Listing gists after authenticating
     from github3 import login
 
     gh = login(username, password)
-    gists = gh.list_gists()
+    gists = [g for g in gh.iter_gists()]
 
 Creating a gist after authenticating
 ------------------------------------
@@ -47,7 +47,7 @@ Creating an anonymous gist
             }
         }
     gist = create_gist('Answer this to cross the bridge', files, public=False)
-    gist.list_comments()
+    comments = [c for c in gist.iter_comments()]
     # []
     comment = gist.create_comment('Bogus. This will not work.')
     # Which of course it didn't, because you're not logged in
