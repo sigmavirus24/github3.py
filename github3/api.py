@@ -165,8 +165,9 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
     :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
     """
     if owner and repository:
-        return gh.iter_repo_issues(owner, repository, filter, state, labels,
-                                   sort, direction, since, number)
+        return gh.iter_repo_issues(owner, repository, milestone, state,
+                                   assignee, mentioned, labels, sort,
+                                   direction, since, number)
     return iter([])
 
 
