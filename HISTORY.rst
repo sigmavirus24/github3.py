@@ -7,6 +7,8 @@ History/Changelog
 - In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use 
   github3.github.Github.pubsubhubbub instead
 
+- In github3.api, ``iter_repo_issues``'s signature has been corrected.
+
 0.4: 2013-01-16
 ---------------
 
