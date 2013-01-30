@@ -76,17 +76,16 @@ class GitHubCore(GitHubObject):
 
     def _json(self, response, status_code):
         ret = None
-        if response.status_code == status_code and response.content:
+        if self._boolean(response, status_code, 404) and response.content:
             ret = response.json()
-        if response.status_code >= 400:
-            raise GitHubError(response)
         return ret
 
     def _boolean(self, request, true_code, false_code):
-        if request.status_code == true_code:
-            return True
-        if request.status_code != false_code and request.status_code >= 400:
-            raise GitHubError(request)
+        if request:
+            if request.status_code == true_code:
+                return True
+            if request.status_code != false_code and request.status_code >= 400:
+                raise GitHubError(request)
         return False
 
     def _delete(self, url, **kwargs):

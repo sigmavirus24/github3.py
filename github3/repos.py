@@ -253,11 +253,8 @@ class Repository(GitHubCore):
         :returns: :class:`Contents <Contents>` if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)
-        resp = self._get(url)
-        if self._boolean(resp, 200, 404):
-            return Contents(self._json(resp, 200))
-        else:
-            return None
+        json = self._json(self._get(url), 200)
+        return Contents(json) if json else None
 
     @requires_auth
     def create_blob(self, content, encoding):
@@ -481,7 +478,7 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        if issue > 0:
+        if int(issue) > 0:
             data = {'issue': issue, 'base': base, 'head': head}
             return self._create_pull(data)
         return None
@@ -713,9 +710,7 @@ class Repository(GitHubCore):
         json = None
         if int(number) > 0:
             url = self._build_url('issues', str(number), base_url=self._api)
-            resp = self._get(url)
-            if self._boolean(resp, 200, 404):
-                json = self._json(resp, 200)
+            json = self._json(self._get(url), 200)
         return Issue(json, self) if json else None
 
     @requires_auth
