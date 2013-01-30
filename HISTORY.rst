@@ -9,6 +9,11 @@ History/Changelog
 
 - In github3.api, ``iter_repo_issues``'s signature has been corrected.
 
+- Now we won't get spurious GitHubErrors on 404s, only on other expected 
+  errors whilst accessing the json in a response. All methods that return an 
+  object can now *actually* return None if it gets a 404 instead of just 
+  raising an exception. (Inspired by #49)
+
 0.4: 2013-01-16
 ---------------
 
