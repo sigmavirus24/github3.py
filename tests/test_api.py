@@ -56,7 +56,8 @@ class TestAPI(APITestMixin):
         self.gh.iter_gists.assert_called_with(None, -1)
 
     def test_iter_repo_issues(self):
-        args = ('owner', 'repository', '', '', '', '', '', '', -1)
+        args = ('owner', 'repository', None, None, None, None, None, None,
+                None, None, -1)
         github3.iter_repo_issues(*args)
         self.gh.iter_repo_issues.assert_called_with(*args)
 
