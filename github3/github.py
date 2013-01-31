@@ -848,12 +848,21 @@ class GitHub(GitHubCore):
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
-        their OAuth application."""
+        their OAuth application.
+
+        :param str id: 20-character hexidecimal client_id provided by GitHub
+        :param str secret: 40-character hexidecimal client_secret provided by
+            GitHub
+        """
         self._session.params = {'client_id': id, 'client_secret': secret}
 
     def set_user_agent(self, user_agent):
         """Allows the user to set their own user agent string to identify with
-        the API."""
+        the API.
+
+        :param str user_agent: String used to identify your application.
+            Library default: "github3.py/{version}", e.g., "github3.py/0.5"
+        """
         if not user_agent:
             return
         self._session.headers.update({'User-Agent': user_agent})
