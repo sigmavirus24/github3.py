@@ -64,6 +64,9 @@ class Gist(GitHubCore):
         #: History of this gist, list of :class:`GistHistory <GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
+    def __str__(self):
+        return self.id
+
     def __repr__(self):
         return '<Gist [{0}]>'.format(self.id)
 
