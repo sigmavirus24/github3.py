@@ -9,6 +9,21 @@ History/Changelog
 
 - In github3.api, ``iter_repo_issues``'s signature has been corrected.
 
+- In github3.gists.Gist:
+
+  - the ``user`` attribute was changed by GitHub and is now the ``owner`` 
+    attribute
+
+  - the ``public`` attribute and the ``is_public`` method return the same 
+    information. The method will be removed in the next version.
+
+  - the ``is_starred`` method now requires authentication
+
+  - the default ``refresh`` method is no longer over-ridden. In a change made 
+    in before, a generic ``refresh`` method was added to most objects. This 
+    was overridden in the Gist object and would cause otherwise unexpected 
+    results.
+
 - Now we won't get spurious GitHubErrors on 404s, only on other expected 
   errors whilst accessing the json in a response. All methods that return an 
   object can now *actually* return None if it gets a 404 instead of just 
