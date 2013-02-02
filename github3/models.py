@@ -135,6 +135,9 @@ class GitHubCore(GitHubObject):
                 params = None  # rel_next contains the params
             json = self._json(response, 200)
 
+            if json is None:
+                break
+
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):
                 json = json.items()
