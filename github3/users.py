@@ -85,21 +85,6 @@ class Plan(GitHubObject):
         return self.name == 'free'  # (No coverage)
 
 
-_large = Plan({'name': 'large', 'private_repos': 50,
-               'collaborators': 25, 'space': 0})
-_medium = Plan({'name': 'medium', 'private_repos': 20,
-                'collaborators': 10, 'space': 0})
-_small = Plan({'name': 'small', 'private_repos': 10,
-               'collaborators': 5, 'space': 0})
-_micro = Plan({'name': 'micro', 'private_repos': 5,
-               'collaborators': 1, 'space': 0})
-_free = Plan({'name': 'free', 'private_repos': 0,
-              'collaborators': 0, 'space': 0})
-
-plans = {'large': _large, 'medium': _medium, 'small': _small,
-         'micro': _micro, 'free': _free}
-
-
 class User(BaseAccount):
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
@@ -130,10 +115,7 @@ class User(BaseAccount):
         self.total_private_repos = user.get('total_private_repos', 0)
 
         #: Which plan this user is on
-        self.plan = None
-        if user.get('plan'):
-            self.plan = plans[user['plan']['name'].lower()]
-            self.plan.space = user['plan']['space']
+        self.plan = Plan(user.get('plan', {}))
 
     def __repr__(self):
         return '<User [{0}:{1}]>'.format(self.login, self.name)
@@ -188,11 +170,6 @@ class User(BaseAccount):
         url = self._build_url('user', 'emails')
         return self._boolean(self._delete(url, data=dumps(addresses)),
                              204, 404)
-
-    @property
-    def for_hire(self):
-        """DEPRECATED: Use hireable instead"""
-        raise DeprecationWarning('Use hireable instead')
 
     def is_assignee_on(self, login, repository):
         """Checks if this user can be assigned to issues on login/repository.
@@ -315,4 +292,4 @@ class User(BaseAccount):
         if json:
             self._update_(json)
             return True
-        return False  # (No coverage)
+        return False

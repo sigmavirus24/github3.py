@@ -56,6 +56,8 @@ expect = CustomExpecter
 
 
 class BaseCase(TestCase):
+    github_url = 'https://api.github.com/'
+
     def setUp(self):
         self.g = github3.GitHub()
         self.args = ()
