@@ -132,7 +132,7 @@ class Reference(GitHubCore):
         if json:
             self._update_(json)
             return True
-        return False  # (No coverage)
+        return False
 
 
 class GitObject(GitData):

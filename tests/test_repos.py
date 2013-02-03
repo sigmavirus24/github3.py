@@ -73,7 +73,9 @@ class TestRepository(BaseCase):
         sha = '3ceb856e2f14e9669fed6384e58c9a1590a2314f'
         self.get(self.api + 'git/blobs/' + sha)
 
-        expect(self.repo.blob(sha)).isinstance(github3.git.Blob)
+        blob = self.repo.blob(sha)
+        expect(blob).isinstance(github3.git.Blob)
+        expect(repr(blob).startswith('<Blob')).is_True()
         self.mock_assertions()
 
     def test_branch(self):
@@ -388,7 +390,9 @@ class TestRepository(BaseCase):
         with patch.object(github3.repos.Repository, 'create_ref'):
             expect(self.repo.create_tag(None, None, None, None,
                                         None)).is_None()
-            expect(self.repo.create_tag(**data)).isinstance(github3.git.Tag)
+            tag = self.repo.create_tag(**data)
+            expect(tag).isinstance(github3.git.Tag)
+            expect(repr(tag).startswith('<Tag')).is_True()
         self.mock_assertions()
 
         with patch.object(github3.repos.Repository, 'create_ref') as cr:
