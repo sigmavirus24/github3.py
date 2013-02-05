@@ -4,6 +4,8 @@ History/Changelog
 0.5: 2013-xx-xx
 ---------------
 
+- Add support for the announced_ meta_ endpoint.
+
 - In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use 
   github3.github.Github.pubsubhubbub instead
 
@@ -28,6 +30,9 @@ History/Changelog
   errors whilst accessing the json in a response. All methods that return an 
   object can now *actually* return None if it gets a 404 instead of just 
   raising an exception. (Inspired by #49)
+
+.. _announced: https://github.com/blog/1402-upcoming-changes-to-github-services
+.. _meta: http://developer.github.com/v3/meta/
 
 0.4: 2013-01-16
 ---------------

@@ -75,6 +75,7 @@ class TestUser(BaseCase):
     def setUp(self):
         super(TestUser, self).setUp()
         self.user = github3.users.User(self.user.to_json(), self.g)
+        self.user.name = self.user.name.decode('utf-8')
 
     def test_str(self):
         expect(str(self.user)) == 'sigmavirus24'
