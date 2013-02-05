@@ -716,6 +716,12 @@ class GitHub(GitHubCore):
                 return req.content
         return ''  # (No coverage)
 
+    def meta(self):
+        """Returns an array of addresses in CIDR format specifying the
+        addresses that the incoming service hooks will originate from."""
+        url = self._build_url('meta')
+        return self._json(self._get(url), 200)
+
     def octocat(self):
         """Returns an easter egg of the API."""
         url = self._build_url('octocat')

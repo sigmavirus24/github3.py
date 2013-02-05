@@ -1,7 +1,6 @@
 import github3
 from mock import patch
 from tests.utils import (expect, BaseCase, load)
-from requests.compat import urlencode
 
 
 class TestGitHub(BaseCase):
@@ -478,6 +477,13 @@ class TestGitHub(BaseCase):
     # Unwritten test, not entirely sure how to mock this
     def test_markdown(self):
         pass
+
+    def test_meta(self):
+        self.response('meta')
+        self.get('https://api.github.com/meta')
+        meta = self.g.meta()
+        expect(meta).isinstance(dict)
+        self.mock_assertions()
 
     def test_organization(self):
         self.response('org')
