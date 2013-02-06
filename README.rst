@@ -28,6 +28,8 @@ Dependencies
 Testing
 ~~~~~~~
 
+These need to be installed for the tests to run
+
 - expecter_ by Gary Bernhardt
 - mock_ by Michael Foord
 - coverage_ by Ned Batchelder
@@ -52,6 +54,12 @@ See the docs_ for more examples.
 
 Testing
 ~~~~~~~
+
+Install the dependencies from requirements.txt e.g.:
+
+::
+
+   pip install -r requirements.txt
 
 ::
 
