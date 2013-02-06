@@ -215,6 +215,16 @@ class User(BaseAccount):
         url = self._build_url('following', base_url=self._api)
         return self._iter(int(number), url, User)
 
+    def iter_keys(self, number=-1):
+        """Iterate over the public keys of this user.
+
+        :param int number: (optional), number of keys to return. Default: -1
+            returns all available keys
+        :returns: generator of :class:`Key <Key>`\ s
+        """
+        url = self._build_url('keys', base_url=self._api)
+        return self._iter(int(number), url, Key)
+
     def iter_org_events(self, org, number=-1):
         """Iterate over events as they appear on the user's organization
         dashboard. You must be authenticated to view this.
