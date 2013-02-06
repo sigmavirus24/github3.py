@@ -8,7 +8,6 @@ This module contains the Authorization object.
 
 from github3.decorators import requires_basic_auth
 from github3.models import GitHubCore
-from json import dumps
 
 
 class Authorization(GitHubCore):
