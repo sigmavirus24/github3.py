@@ -1,6 +1,7 @@
 import github3
 from mock import patch
 from tests.utils import (expect, BaseCase, load)
+from datetime import datetime
 
 
 class TestKey(BaseCase):
@@ -76,6 +77,38 @@ class TestUser(BaseCase):
         super(TestUser, self).setUp()
         self.user = github3.users.User(self.user.to_json(), self.g)
         self.user.name = self.user.name.decode('utf-8')
+
+    def test_refresh(self):
+        """This sort of tests all instances of refresh for good measure."""
+        self.response('', 304)
+        self.get(self.api)
+        self.user.last_modified = last_modified = datetime.now().strftime(
+            '%a, %d %b %Y %H:%M:%S GMT'
+        )
+        self.user.etag = etag = '644b5b0155e6404a9cc4bd9d8b1ae730'
+
+        expected_headers = {
+            'If-Modified-Since': last_modified,
+        }
+
+        self.user.refresh(True)
+        self.request.assert_called_with('GET', self.api,
+                                        headers=expected_headers,
+                                        allow_redirects=True)
+
+        self.user.last_modified = None
+        expected_headers = {
+            'If-None-Match': etag
+        }
+
+        self.user.refresh(True)
+        self.request.assert_called_with('GET', self.api,
+                                        headers=expected_headers,
+                                        allow_redirects=True)
+
+        self.response('user', 200)
+        self.user.refresh()
+        self.mock_assertions()
 
     def test_str(self):
         expect(str(self.user)) == 'sigmavirus24'

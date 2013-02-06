@@ -22,8 +22,9 @@ class GitHubObject(object):
     object."""
     def __init__(self, json):
         super(GitHubObject, self).__init__()
-        self.etag = json.pop('ETag', None)
-        self.last_modified = json.pop('Last-Modified', None)
+        if json is not None:
+            self.etag = json.pop('ETag', None)
+            self.last_modified = json.pop('Last-Modified', None)
         self._json_data = json
 
     def to_json(self):
@@ -80,8 +81,13 @@ class GitHubCore(GitHubObject):
         ret = None
         if self._boolean(response, status_code, 404) and response.content:
             ret = response.json()
-            ret['Last-Modified'] = response.headers.get('Last-Modified', '')
-            ret['ETag'] = response.headers.get('ETag', '')
+            headers = response.headers
+            if ((headers.get('Last-Modified') or headers.get('ETag')) and
+                    isinstance(ret, dict)):
+                ret['Last-Modified'] = response.headers.get(
+                    'Last-Modified', ''
+                )
+                ret['ETag'] = response.headers.get('ETag', '')
         return ret
 
     def _boolean(self, request, true_code, false_code):
@@ -192,8 +198,8 @@ class GitHubCore(GitHubObject):
                 headers['If-Modified-Since'] = self.last_modified
             elif self.etag:
                 headers['If-None-Match'] = self.etag
-        else:
-            headers = None
+
+        headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)
         if json is not None:
             self.__init__(json, self._session)

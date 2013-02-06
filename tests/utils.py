@@ -6,6 +6,7 @@ import sys
 from mock import patch
 from io import BytesIO
 from unittest import TestCase
+from requests.structures import CaseInsensitiveDict
 
 
 def load(name):
@@ -111,7 +112,7 @@ class BaseCase(TestCase):
             r.raw = BytesIO()
 
         if headers:
-            r.headers = headers
+            r.headers = CaseInsensitiveDict(headers)
 
         self.request.return_value = r
 
