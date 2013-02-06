@@ -217,7 +217,7 @@ class GitHub(GitHubCore):
                 'has_issues': has_issues, 'has_wiki': has_wiki,
                 'has_downloads': has_downloads, 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
-        json = self._json(self._post(url, data=data))
+        json = self._json(self._post(url, data=data), 201)
         return Repository(json, self) if json else None
 
     @requires_auth

@@ -109,7 +109,8 @@ class GitHubCore(GitHubObject):
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
-            return self._session.post(url, data=dumps(data), **kwargs)
+            data = dumps(data) if data is not None else data
+            return self._session.post(url, data=data, **kwargs)
         else:
             # Override the Content-Type header
             return self._session.post(url, data, headers={'Content-Type': None}, **kwargs)

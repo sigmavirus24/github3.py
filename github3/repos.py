@@ -128,7 +128,7 @@ class Repository(GitHubCore):
         json = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
-            json = self._json(self._post(url, data=data))
+            json = self._json(self._post(url, data=data), 201)
         return PullRequest(json, self._session) if json else None
 
     @requires_auth
