@@ -84,7 +84,7 @@ class Gist(GitHubCore):
         json = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, dumps({'body': body})), 201)
+            json = self._json(self._post(url, data={'body': body}), 201)
         return GistComment(json, self) if json else None
 
     @requires_auth

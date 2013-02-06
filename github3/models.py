@@ -107,8 +107,12 @@ class GitHubCore(GitHubObject):
     def _patch(self, url, **kwargs):
         return self._session.patch(url, **kwargs)
 
-    def _post(self, url, data=None, **kwargs):
-        return self._session.post(url, data, **kwargs)
+    def _post(self, url, data=None, json=True, **kwargs):
+        if json:
+            return self._session.post(url, data=dumps(data), **kwargs)
+        else:
+            # Override the Content-Type header
+            return self._session.post(url, data, headers={'Content-Type': None}, **kwargs)
 
     def _put(self, url, **kwargs):
         return self._session.put(url, **kwargs)
