@@ -126,12 +126,6 @@ Contributor Friendly Work
 
 In order of importance:
 
-Unittests
-
-    I really should have written these as I wrote the code. I didn't, so they 
-    need to be written now. If you want to write some, I would sincerely 
-    appreciate it.
-
 Documentation
 
     I know I'm not the best at writing documentation so if you want to clarify 
@@ -152,6 +146,7 @@ Running the Unittests
     virtualenv .
     cd /path/to/github3.py_repo/requirements.txt
     pip install -r requirements.txt
+    # Or you could run make test-deps
     make tests
 
 

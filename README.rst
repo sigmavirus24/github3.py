@@ -28,6 +28,10 @@ Dependencies
 Testing
 ~~~~~~~
 
+You can run either ``pip install -r requirements.txt`` to install the 
+following before testing or simply ``make test-deps``. It is suggested you do 
+this in a virtual enviroment.
+
 - expecter_ by Gary Bernhardt
 - mock_ by Michael Foord
 - coverage_ by Ned Batchelder

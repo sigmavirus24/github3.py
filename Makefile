@@ -14,6 +14,9 @@ travis:
 
 tests: travis
 
+test-deps:
+	pip install -r requirements.txt
+
 htmlcov: .coverage
 	coverage html --omit=github3/packages/*
 
