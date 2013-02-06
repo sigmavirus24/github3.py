@@ -1,6 +1,8 @@
 Guidelines for Contributing to github3.py
 =========================================
 
+0. Read the README_
+
 1. Regardless of the magnitude your pull request (a couple lines to a couple 
    hundred lines), please add your name to the AUTHORS.rst file under the 
    heading Contributors.
@@ -41,6 +43,7 @@ Guidelines for Contributing to github3.py
 8. Please follow pep-0008_. Feel free to also use flake8_ to help.
 
 .. links
+.. _README: ./README.rst
 .. _cordial: http://kennethreitz.com/be-cordial-or-be-on-your-way.html
 .. _pep-0008: http://www.python.org/dev/peps/pep-0008/
 .. _docstrings: http://www.python.org/dev/peps/pep-0257/

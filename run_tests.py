@@ -3,11 +3,18 @@
 import unittest
 import os
 import re
+
 try:
     import coverage
 except ImportError:
     coverage = None
 
+try:
+    import expecter
+    import mock
+except ImportError as ie:
+    print('Please install the test dependencies as documented in the README')
+    raise ie
 
 TEST_DIR = 'tests'
 
