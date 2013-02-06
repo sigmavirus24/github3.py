@@ -147,7 +147,7 @@ class User(BaseAccount):
         json = []
         if addresses:
             url = self._build_url('user', 'emails')
-            json = self._json(self._post(url, dumps(addresses)), 201)
+            json = self._json(self._post(url, data=addresses), 201)
         return json
 
     @requires_auth

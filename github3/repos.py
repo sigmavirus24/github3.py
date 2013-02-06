@@ -128,7 +128,7 @@ class Repository(GitHubCore):
         json = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return PullRequest(json, self._session) if json else None
 
     @requires_auth
@@ -268,7 +268,7 @@ class Repository(GitHubCore):
         if encoding in ('base64', 'utf-8') and content:
             url = self._build_url('git', 'blobs', base_url=self._api)
             data = {'content': content, 'encoding': encoding}
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
             if json:
                 sha = json.get('sha')
         return sha
@@ -294,7 +294,7 @@ class Repository(GitHubCore):
                     'path': path, 'position': position}
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return RepoComment(json, self) if json else None
 
     @requires_auth
@@ -323,7 +323,7 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'commits', base_url=self._api)
             data = {'message': message, 'tree': tree, 'parents': parents,
                     'author': author, 'committer': committer}
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Commit(json, self) if json else None
 
     @requires_auth
@@ -336,7 +336,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
-            resp = self._post(url, data=dumps({'organization': organization}))
+            resp = self._post(url, data={'organization': organization})
         else:
             resp = self._post(url)
         json = self._json(resp, 202)
@@ -360,7 +360,7 @@ class Repository(GitHubCore):
             url = self._build_url('hooks', base_url=self._api)
             data = {'name': name, 'config': config, 'events': events,
                     'active': active}
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Hook(json, self) if json else None
 
     @requires_auth
@@ -393,7 +393,7 @@ class Repository(GitHubCore):
 
         if issue:
             url = self._build_url('issues', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(issue)), 201)
+            json = self._json(self._post(url, data=issue), 201)
 
         return Issue(json, self) if json else None
 
@@ -409,7 +409,7 @@ class Repository(GitHubCore):
         if title and key:
             data = {'title': title, 'key': key}
             url = self._build_url('keys', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Key(json, self) if json else None
 
     @requires_auth
@@ -426,7 +426,7 @@ class Repository(GitHubCore):
         if name and color:
             data = {'name': name, 'color': color.strip('#')}
             url = self._build_url('labels', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Label(json, self) if json else None
 
     @requires_auth
@@ -450,7 +450,7 @@ class Repository(GitHubCore):
         self._remove_none(data)
         json = None
         if data:
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Milestone(json, self) if json else None
 
     @requires_auth
@@ -499,7 +499,7 @@ class Repository(GitHubCore):
         if ref and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
             url = self._build_url('git', 'refs', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Reference(json, self) if json else None
 
     @requires_auth
@@ -517,7 +517,7 @@ class Repository(GitHubCore):
             data = {'state': state, 'target_url': target_url,
                     'description': description}
             url = self._build_url('statuses', sha, base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Status(json) if json else None
 
     @requires_auth
@@ -546,7 +546,7 @@ class Repository(GitHubCore):
             data = {'tag': tag, 'message': message, 'object': sha,
                     'type': obj_type, 'tagger': tagger}
             url = self._build_url('git', 'tags', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
             if json:
                 self.create_ref('refs/tags/' + tag, sha)
         return Tag(json) if json else None
@@ -566,7 +566,7 @@ class Repository(GitHubCore):
         if tree and isinstance(tree, list):
             data = {'tree': tree, 'base_tree': base_tree}
             url = self._build_url('git', 'trees', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Tree(json) if json else None
 
     @requires_auth
@@ -1119,7 +1119,7 @@ class Repository(GitHubCore):
         data = {'base': base, 'head': head}
         if message:
             data['commit_message'] = message
-        json = self._json(self._post(url, data=dumps(data)), 201)
+        json = self._json(self._post(url, data=data), 201)
         return RepoCommit(json, self) if json else None
 
     def milestone(self, number):
@@ -1559,7 +1559,7 @@ class RepoComment(BaseComment):
         if body and sha and path and line > 0 and position > 0:
             data = {'body': body, 'commit_id': sha, 'line': line,
                     'path': path, 'position': position}
-            json = self._json(self._post(self._api, data=dumps(data)), 200)
+            json = self._json(self._post(self._api, data=data), 200)
 
         if json:
             self._update_(json)

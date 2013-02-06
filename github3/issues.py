@@ -229,7 +229,7 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(args)),
+        json = self._json(self._post(url, data=args),
                           status_code=200)
         return True if json else False
 
@@ -286,7 +286,7 @@ class Issue(GitHubCore):
         json = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, data=dumps({'body': body})),
+            json = self._json(self._post(url, data={'body': body}),
                               201)
         return IssueComment(json, self) if json else None
 
