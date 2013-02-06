@@ -6,6 +6,21 @@ History/Changelog
 
 - Add support for the announced_ meta_ endpoint.
 
+- Add support for conditional refreshing, e.g.,
+  
+  ::
+
+      import github3
+
+      u = github3.user('sigmavirus24')
+
+      # some time later
+
+      u.refresh()  # Will ALWAYS send a GET request and lower your ratelimit
+      u.refresh(True)  # Will send the GET with a header such that if nothing
+                       # has changed, it will not count against your ratelimit
+                       # otherwise you'll get the updated user object.
+
 - In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use 
   github3.github.Github.pubsubhubbub instead
 
