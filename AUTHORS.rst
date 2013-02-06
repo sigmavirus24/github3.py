@@ -33,3 +33,5 @@ Contributors
 - Alejandro Gómez (@alejandrogomez)
 
 - Tom Parker (@palfrey)
+
+- Malcolm Box (@mbox)
