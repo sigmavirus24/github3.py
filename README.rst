@@ -30,7 +30,7 @@ Testing
 
 You can run either ``pip install -r requirements.txt`` to install the 
 following before testing or simply ``make test-deps``. It is suggested you do 
-this in a virtual enviroment.
+this in a virtual enviroment. These need to be installed for the tests to run.
 
 - expecter_ by Gary Bernhardt
 - mock_ by Michael Foord
@@ -56,6 +56,13 @@ See the docs_ for more examples.
 
 Testing
 ~~~~~~~
+
+Install the dependencies from requirements.txt e.g.:
+
+::
+
+    pip install -r requirements.txt
+    # or make test-deps
 
 ::
 
