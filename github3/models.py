@@ -78,7 +78,6 @@ class GitHubCore(GitHubObject):
 
     def _json(self, response, status_code):
         ret = None
-        print(response.status_code)
         if self._boolean(response, status_code, 404) and response.content:
             ret = response.json()
             ret['Last-Modified'] = response.headers.get('Last-Modified', '')
