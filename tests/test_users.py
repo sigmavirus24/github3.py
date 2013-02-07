@@ -239,6 +239,9 @@ class TestUser(BaseCase):
             github3.repos.Repository)
         self.mock_assertions()
 
+    def test_iter_keys(self):
+        expect(next(self.user.iter_keys(1))).isinstance(Key)
+
     def test_update(self):
         self.response('user', 200)
         self.patch('https://api.github.com/user')
