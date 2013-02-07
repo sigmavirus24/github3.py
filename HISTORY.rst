@@ -21,6 +21,10 @@ History/Changelog
                        # has changed, it will not count against your ratelimit
                        # otherwise you'll get the updated user object.
 
+- In github3.users.User, ``iter_keys`` now allows you to iterate over **any** 
+  user's keys. No name is returned for each key. This is the equivalent of 
+  visiting: github.com/:user.keys
+
 - In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use 
   github3.github.Github.pubsubhubbub instead
 

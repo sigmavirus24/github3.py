@@ -193,6 +193,8 @@ class GitHubCore(GitHubObject):
             [r.refresh() for r in repos]
 
         Which is really an anti-pattern.
+        
+        .. versionchanged:: 0.5
 
         .. _Conditional Requests:
             http://developer.github.com/v3/#conditional-requests

@@ -13,7 +13,8 @@ from github3.decorators import requires_auth
 
 
 class Key(GitHubCore):
-    """The :class:`Key <Key>` object."""
+    """The :class:`Key <Key>` object. Please see GitHub's `Key Documentation 
+    <http://developer.github.com/v3/users/keys/>`_ for more information."""
     def __init__(self, key, session=None):
         super(Key, self).__init__(key, session)
         self._api = key.get('url', '')
@@ -58,7 +59,9 @@ class Key(GitHubCore):
 
 class Plan(GitHubObject):
     """The :class:`Plan <Plan>` object. This makes interacting with the plan
-    information about a user easier.
+    information about a user easier. Please see GitHub's `Authenticated User 
+    <http://developer.github.com/v3/users/#get-the-authenticated-user>`_ 
+    documentation for more specifics.
     """
     def __init__(self, plan):
         super(Plan, self).__init__(plan)
@@ -217,6 +220,8 @@ class User(BaseAccount):
 
     def iter_keys(self, number=-1):
         """Iterate over the public keys of this user.
+
+        .. versionadded:: 0.5
 
         :param int number: (optional), number of keys to return. Default: -1
             returns all available keys

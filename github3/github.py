@@ -718,7 +718,10 @@ class GitHub(GitHubCore):
 
     def meta(self):
         """Returns an array of addresses in CIDR format specifying the
-        addresses that the incoming service hooks will originate from."""
+        addresses that the incoming service hooks will originate from.
+
+        .. versionadded:: 0.5
+        """
         url = self._build_url('meta')
         return self._json(self._get(url), 200)
 
