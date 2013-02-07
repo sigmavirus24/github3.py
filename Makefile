@@ -9,7 +9,7 @@ clean:
 	git clean -Xdf
 	rm -rf build/ dist/
 
-travis: test-deps
+travis:
 	python $(TEST_RUNNER)
 
 tests: travis
