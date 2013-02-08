@@ -377,7 +377,7 @@ class Repository(GitHubCore):
         :param str assignee: (optional), login of the user to assign the
             issue to
         :param int milestone: (optional), id number of the milestone to
-            attribute this issue to (e.g. ``m`` is a :class:`Milestone 
+            attribute this issue to (e.g. ``m`` is a :class:`Milestone
             <github3.issues.Milestone>` object, ``m.number`` is what you pass
             here.)
         :param labels: (optional), labels to apply to this

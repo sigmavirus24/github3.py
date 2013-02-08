@@ -15,7 +15,7 @@ try:  # (No coverage)
     from StringIO import StringIO  # (No coverage)
 except ImportError:  # (No coverage)
     # python3
-    from io import BytesIO as StringIO  # NOQA
+    from io import BytesIO as StringIO
 
 
 def requires_auth(func):

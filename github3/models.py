@@ -92,9 +92,10 @@ class GitHubCore(GitHubObject):
 
     def _boolean(self, request, true_code, false_code):
         if request:
-            if request.status_code == true_code:
+            status_code = request.status_code
+            if status_code == true_code:
                 return True
-            if request.status_code != false_code and request.status_code >= 400:
+            if status_code != false_code and status_code >= 400:
                 raise GitHubError(request)
         return False
 
@@ -113,7 +114,9 @@ class GitHubCore(GitHubObject):
             return self._session.post(url, data=data, **kwargs)
         else:
             # Override the Content-Type header
-            return self._session.post(url, data, headers={'Content-Type': None}, **kwargs)
+            return self._session.post(
+                url, data, headers={'Content-Type': None}, **kwargs
+            )
 
     def _put(self, url, **kwargs):
         return self._session.put(url, **kwargs)
@@ -186,14 +189,14 @@ class GitHubCore(GitHubObject):
 
             repos = [r.refresh() for r in g.iter_repos('kennethreitz')]
 
-        Without the return value, that would be an array of ``None``'s and you 
+        Without the return value, that would be an array of ``None``'s and you
         would otherwise have to do: ::
 
             repos = [r for i in g.iter_repos('kennethreitz')]
             [r.refresh() for r in repos]
 
         Which is really an anti-pattern.
-        
+
         .. versionchanged:: 0.5
 
         .. _Conditional Requests:
