@@ -899,8 +899,10 @@ class Repository(GitHubCore):
         if milestone in ('*', 'none') or isinstance(milestone, int):
             params['milestone'] = milestone
         self._remove_none(params)
-        params.update(issue_params(None, state, labels, sort, direction,
-            since))  # nopep8
+        params.update(
+            issue_params(None, state, labels, sort, direction,
+                         since)
+        )
 
         return self._iter(int(number), url, Issue, params=params)
 
@@ -1536,8 +1538,9 @@ class RepoComment(BaseComment):
             self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Repository Comment [{0}/{1}]>'.format(self.commit_id[:7],
-                self.user.login or '')  # nopep8
+        return '<Repository Comment [{0}/{1}]>'.format(
+            self.commit_id[:7], self.user.login or ''
+        )
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)

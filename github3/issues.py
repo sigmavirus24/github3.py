@@ -456,8 +456,9 @@ class IssueEvent(GitHubCore):
         self.pull_request = event.get('pull_request', {})
 
     def __repr__(self):
-        return '<Issue Event [#{0} - {1}]>'.format(self.issue.number,
-                self.event)  # nopep8
+        return '<Issue Event [#{0} - {1}]>'.format(
+            self.issue.number, self.event
+        )
 
 
 def issue_params(filter, state, labels, sort, direction, since):
