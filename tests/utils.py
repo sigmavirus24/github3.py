@@ -79,10 +79,13 @@ class BaseCase(TestCase):
 
         expect(self.args) == args
 
-        if 'data' in self.conf and isinstance(self.conf['data'], dict):
-            for k, v in list(self.conf['data'].items()):
-                s = json.dumps({k: v})[1:-1]
-                expect(s).is_in(kwargs['data'])
+        if 'data' in self.conf:
+            if isinstance(self.conf['data'], dict):
+                for k, v in list(self.conf['data'].items()):
+                    s = json.dumps({k: v})[1:-1]
+                    expect(s).is_in(kwargs['data'])
+            else:
+                expect(self.conf['data']) == kwargs['data']
 
             del self.conf['data']
 

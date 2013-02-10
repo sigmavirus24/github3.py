@@ -4,6 +4,13 @@ from tests.utils import (expect, BaseCase, load)
 
 
 class TestGitHub(BaseCase):
+    def test_init(self):
+        g = github3.GitHub('foo', 'bar')
+        expect(repr(g).endswith('[foo]>'))
+
+        g = github3.GitHub(token='foo')
+        expect(repr(g).endswith('{0:x}>'.format(id(g))))
+
     def test_authorization(self):
         self.response('authorization')
         self.get('https://api.github.com/authorizations/10')
@@ -21,11 +28,16 @@ class TestGitHub(BaseCase):
         scopes = ['scope1', 'scope2']
 
         self.g.authorize(None, None, scopes)
-        assert self.request.called is False
+        self.not_called()
 
         a = self.g.authorize('user', 'password', scopes)
         expect(a).isinstance(github3.auths.Authorization)
         assert self.request.called is True
+
+        self.request.reset_mock()
+
+        self.login()
+        a = self.g.authorize(None, None, scopes=scopes)
 
     def test_create_gist(self):
         self.response('gist', 201)
@@ -81,6 +93,8 @@ class TestGitHub(BaseCase):
         with patch.object(github3.github.GitHub, 'key') as key:
             key.return_value = github3.users.Key(load('key'), self.g)
             assert self.g.delete_key(10) is True
+            key.return_value = None
+            assert self.g.delete_key(10) is False
 
         assert self.request.called is True
 
@@ -302,6 +316,28 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/gists')
         self.mock_assertions()
 
+    def test_iter_notifications(self):
+        self.response('notification', _iter=True)
+        self.get('https://api.github.com/notifications')
+        self.conf.update(params=None)
+
+        with expect.githuberror():
+            self.g.iter_notifications()
+
+        self.not_called()
+        self.login()
+        thread = next(self.g.iter_notifications())
+        expect(thread).isinstance(github3.notifications.Thread)
+        self.mock_assertions()
+
+        self.conf.update(params={'all': True})
+        next(self.g.iter_notifications(True))
+        self.mock_assertions()
+
+        self.conf.update(params={'participating': True})
+        next(self.g.iter_notifications(participating=True))
+        self.mock_assertions()
+
     def test_iter_org_issues(self):
         self.response('issue', _iter=True)
         self.get('https://api.github.com/orgs/github3py/issues')
@@ -377,6 +413,9 @@ class TestGitHub(BaseCase):
         expect(i).isinstance(github3.issues.Issue)
         self.mock_assertions()
 
+        with expect.raises(StopIteration):
+            next(self.g.iter_repo_issues(None, None))
+
     def test_iter_keys(self):
         self.response('key', _iter=True)
         self.get('https://api.github.com/user/keys')
@@ -414,6 +453,10 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/users/sigmavirus24/repos')
         expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
             github3.repos.Repository)
+        self.mock_assertions()
+
+        self.conf.update(params={'type': 'all', 'direction': 'desc'})
+        next(self.g.iter_repos('sigmavirus24', 'all', direction='desc'))
         self.mock_assertions()
 
     def test_iter_repos_sort(self):
@@ -476,13 +519,38 @@ class TestGitHub(BaseCase):
 
     # Unwritten test, not entirely sure how to mock this
     def test_markdown(self):
-        pass
+        self.response('archive')
+        self.post('https://api.github.com/markdown')
+        self.conf = dict(
+            data={
+                'text': 'Foo', 'mode': 'gfm', 'context': 'sigmavirus24/cfg'
+            }
+        )
+
+        expect(self.g.markdown('Foo', 'gfm', 'sigmavirus24/cfg')) == (
+            b'archive_data'
+        )
+        self.mock_assertions()
+
+        self.post('https://api.github.com/markdown/raw')
+        self.conf['data'] = 'Foo'
+        self.g.markdown('Foo', raw=True)
+        self.mock_assertions()
+
+        expect(self.g.markdown(None)) == ''
+        self.not_called()
 
     def test_meta(self):
         self.response('meta')
         self.get('https://api.github.com/meta')
         meta = self.g.meta()
         expect(meta).isinstance(dict)
+        self.mock_assertions()
+
+    def test_octocat(self):
+        self.response('archive')
+        self.get('https://api.github.com/octocat')
+        expect(self.g.octocat().startswith(b'archive_data'))
         self.mock_assertions()
 
     def test_organization(self):
@@ -512,6 +580,14 @@ class TestGitHub(BaseCase):
         self.not_called()
 
         d = dict([(k[4:], v) for k, v in body])
+        expect(self.g.pubsubhubbub(**d)).is_True()
+        _, kwargs = self.request.call_args
+        expect('data').is_in(kwargs)
+        expect(body) == kwargs['data']
+        self.mock_assertions()
+
+        d['secret'] = 'secret'
+        body.append(('hub.secret', 'secret'))
         expect(self.g.pubsubhubbub(**d)).is_True()
         _, kwargs = self.request.call_args
         expect('data').is_in(kwargs)
@@ -572,8 +648,8 @@ class TestGitHub(BaseCase):
         expect(repos[0].is_private()) == repos[0].private
         self.mock_assertions()
 
-        self.conf.update(params={'language': 'python'})
-        repos = self.g.search_repos('github3.py', language='python')
+        self.conf.update(params={'language': 'python', 'start_page': 10})
+        repos = self.g.search_repos('github3.py', 'python', 10)
         self.mock_assertions()
 
     def test_search_users(self):
@@ -607,6 +683,9 @@ class TestGitHub(BaseCase):
     def test_set_user_agent(self):
         ua = 'Fake User Agents'
         self.g.set_user_agent(ua)
+        expect(self.g._session.headers['User-Agent']) == ua
+
+        self.g.set_user_agent(None)
         expect(self.g._session.headers['User-Agent']) == ua
 
     def test_star(self):
@@ -716,4 +795,64 @@ class TestGitHub(BaseCase):
             self.fail('Regression caught. See PR #52. Names must be utf-8'
                       ' encoded')
 
-    # no test_zen
+    def test_zen(self):
+        self.response('archive')
+        self.get('https://api.github.com/zen')
+
+        expect(self.g.zen()) == b'archive_data'
+        self.mock_assertions()
+
+
+class TestGitHubEnterprise(BaseCase):
+    def setUp(self):
+        super(TestGitHubEnterprise, self).setUp()
+        self.g = github3.GitHubEnterprise('https://github.example.com/')
+
+    def test_admin_stats(self):
+        self.response('user')
+        self.get('https://github.example.com/api/v3/enterprise/stats/all')
+
+        with expect.githuberror():
+            self.g.admin_stats(None)
+
+        self.not_called()
+        self.login()
+        expect(self.g.admin_stats('all')).isinstance(dict)
+        self.mock_assertions()
+
+    def test_repr(self):
+        expect(repr(self.g).startswith('<GitHub Enterprise')).is_True()
+
+
+class TestGitHubStatus(BaseCase):
+    def setUp(self):
+        super(TestGitHubStatus, self).setUp()
+        self.g = github3.GitHubStatus()
+        self.api = 'https://status.github.com/'
+
+    def test_repr(self):
+        expect(repr(self.g)) == '<GitHub Status>'
+
+    def test_api(self):
+        self.response('user')
+        self.get(self.api + 'api.json')
+        expect(self.g.api()).isinstance(dict)
+        self.mock_assertions()
+
+    def test_status(self):
+        self.response('user')
+        self.get(self.api + 'api/status.json')
+        expect(self.g.status()).isinstance(dict)
+        self.mock_assertions()
+
+    def test_last_message(self):
+        self.response('user')
+        self.get(self.api + 'api/last-message.json')
+        expect(self.g.last_message()).isinstance(dict)
+        self.mock_assertions()
+
+    def test_messages(self):
+        self.response('user')
+        self.get(self.api + 'api/messages.json')
+        expect(self.g.messages()).isinstance(dict)
+        self.mock_assertions()

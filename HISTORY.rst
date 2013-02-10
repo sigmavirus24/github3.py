@@ -7,7 +7,7 @@ History/Changelog
 - Add support for the announced_ meta_ endpoint.
 
 - Add support for conditional refreshing, e.g.,
-  
+
   ::
 
       import github3
@@ -49,6 +49,8 @@ History/Changelog
   errors whilst accessing the json in a response. All methods that return an 
   object can now *actually* return None if it gets a 404 instead of just 
   raising an exception. (Inspired by #49)
+
+- GitHubStatus API now works.
 
 .. _announced: https://github.com/blog/1402-upcoming-changes-to-github-services
 .. _meta: http://developer.github.com/v3/meta/

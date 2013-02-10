@@ -8,7 +8,7 @@ This module provides the basic models used in github3.py
 
 from json import dumps
 from requests import session
-from requests.compat import urlparse
+from requests.compat import urlparse, basestring
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
 from github3 import __version__
@@ -113,10 +113,10 @@ class GitHubCore(GitHubObject):
             data = dumps(data) if data is not None else data
             return self._session.post(url, data=data, **kwargs)
         else:
+            if 'headers' in kwargs:
+                kwargs['headers'].update({'Content-Type': None})
             # Override the Content-Type header
-            return self._session.post(
-                url, data, headers={'Content-Type': None}, **kwargs
-            )
+            return self._session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
         return self._session.put(url, **kwargs)

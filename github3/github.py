@@ -554,7 +554,7 @@ class GitHub(GitHubCore):
             repo = self.repository(owner, repository)
             return repo.iter_issues(milestone, state, assignee, mentioned,
                                     labels, sort, direction, since, number)
-        return self._iter(0, '', type)
+        return iter([])
 
     @requires_auth
     def iter_keys(self, number=-1):
@@ -690,6 +690,7 @@ class GitHub(GitHubCore):
         :returns: str -- HTML formatted text
         """
         data = None
+        json = False
         headers = {}
         if raw:
             url = self._build_url('markdown', 'raw')
@@ -707,11 +708,10 @@ class GitHub(GitHubCore):
 
             if context:
                 data['context'] = context
-
-            data = data
+            json = True
 
         if data:
-            req = self._post(url, data=data, headers=headers)
+            req = self._post(url, data=data, json=json, headers=headers)
             if req.ok:
                 return req.content
         return ''  # (No coverage)
@@ -1003,6 +1003,9 @@ class GitHubEnterprise(GitHub):
         super(GitHubEnterprise, self).__init__(login, password, token)
         self._github_url = url.rstrip('/') + '/api/v3'
 
+    def __repr__(self):
+        return '<GitHub Enterprise [0.url]>'.format(self)
+
     @requires_auth
     def admin_stats(self, option):
         """This is a simple way to get statistics about your system.
@@ -1027,29 +1030,28 @@ class GitHubStatus(GitHubCore):
     """
     def __init__(self):
         super(GitHubStatus, self).__init__({})
-        self._github_url = 'https://status.github.com/'
+        self._github_url = 'https://status.github.com'
+
+    def __repr__(self):
+        return '<GitHub Status>'
 
     def _recipe(self, *args):
         url = self._build_url(*args)
         resp = self._get(url)
-        return resp.json if self._boolean(resp, 200, 404) else {}
+        return resp.json() if self._boolean(resp, 200, 404) else {}
 
-    @classmethod
     def api(self):
         """GET /api.json"""
         return self._recipe('api.json')
 
-    @classmethod
     def status(self):
         """GET /api/status.json"""
         return self._recipe('api', 'status.json')
 
-    @classmethod
     def last_message(self):
         """GET /api/last-message.json"""
         return self._recipe('api', 'last-message.json')
 
-    @classmethod
     def messages(self):
         """GET /api/messages.json"""
         return self._recipe('api', 'messages.json')
