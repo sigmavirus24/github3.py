@@ -45,6 +45,10 @@ History/Changelog
     was overridden in the Gist object and would cause otherwise unexpected 
     results.
 
+- ``github3.events.Event.is_public()`` and ``github3.events.Event.public`` now 
+  return the same information. In the next version, the former will be 
+  removed.
+
 - Now we won't get spurious GitHubErrors on 404s, only on other expected 
   errors whilst accessing the json in a response. All methods that return an 
   object can now *actually* return None if it gets a 404 instead of just 
