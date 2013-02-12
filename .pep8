@@ -1,2 +1,0 @@
-[flake8]
-exclude=github3/packages/*

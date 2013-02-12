@@ -30,6 +30,11 @@ History/Changelog
 
 - In github3.api, ``iter_repo_issues``'s signature has been corrected.
 
+- Remove ``list_{labels, comments, events}`` methods from github3.issues.Issue
+
+- Remove ``list_{comments, commits, files}`` methods from 
+  github3.pulls.PullRequest
+
 - In github3.gists.Gist:
 
   - the ``user`` attribute was changed by GitHub and is now the ``owner`` 
