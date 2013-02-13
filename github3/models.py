@@ -8,7 +8,7 @@ This module provides the basic models used in github3.py
 
 from json import dumps
 from requests import session
-from requests.compat import urlparse, basestring
+from requests.compat import urlparse
 from github3.decorators import requires_auth
 from github3.packages.PySO8601 import parse
 from github3 import __version__
