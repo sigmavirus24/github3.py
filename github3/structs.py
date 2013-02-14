@@ -3,13 +3,24 @@ from github3.models import GitHubCore, urlparse
 
 
 class GitHubIterator(GitHubCore, Iterator):
+    """The :class:`GitHubIterator` class powers all of the iter_* methods."""
     def __init__(self, count, url, cls, session, params=None, etag=None):
         GitHubCore.__init__(self, {}, session)
+        #: Number of items left in the iterator
         self.count = count
+        #: URL the class used to make it's first GET
         self.url = url
+        #: Class being used to cast all items to
         self.cls = cls
+        #: Parameters of the query string
         self.params = params
+        # We do not set this from the parameter sent. We want this to 
+        # represent the ETag header returned by GitHub no matter what.
+        # If this is not None, then it won't be set from the response and 
+        # that's not what we want.
+        #: The ETag Header value returned by GitHub
         self.etag = None
+        #: Headers generated for the GET request
         self.headers = {}
 
         if etag:
