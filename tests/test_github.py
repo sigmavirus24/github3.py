@@ -477,7 +477,7 @@ class TestGitHub(BaseCase):
     def test_iter_starred(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/user/starred')
-        self.conf.update(params=None)
+        self.conf.update(params={})
 
         self.login()
         expect(next(self.g.iter_starred())).isinstance(
