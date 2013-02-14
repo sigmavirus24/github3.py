@@ -21,6 +21,23 @@ History/Changelog
                        # has changed, it will not count against your ratelimit
                        # otherwise you'll get the updated user object.
 
+- Add support for conditional iterables. What this means is that you can do:
+
+  ::
+
+      import github3
+
+      i = github3.iter_all_repos(10)
+
+      for repo in i:
+          # do stuff
+
+      i = github3.iter_all_repos(10, etag=i.etag)
+
+  And the second call will only give you the new repositories since the last 
+  request. This mimics behavior in `pengwynn/octokit`_
+
+
 - Add support for `sortable stars`_.
 
 - In github3.users.User, ``iter_keys`` now allows you to iterate over **any** 
@@ -67,6 +84,7 @@ History/Changelog
 .. _meta: http://developer.github.com/v3/meta/
 .. _sortable stars:
     http://developer.github.com/changes/2013-2-13-sortable-stars/
+.. _pengwynn/octokit: https://github.com/pengwynn/octokit
 
 0.4: 2013-01-16
 ---------------

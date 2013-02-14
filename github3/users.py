@@ -121,7 +121,7 @@ class User(BaseAccount):
         self.plan = Plan(user.get('plan', {}))
 
     def __repr__(self):
-        return '<User [{0}:{1:s}]>'.format(self.login, self.name)
+        return '<User [{0}:{1}]>'.format(self.login, self.name)
 
     def __str__(self):
         return self.login
@@ -183,68 +183,78 @@ class User(BaseAccount):
                               self.login)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_events(self, public=False, number=-1):
+    def iter_events(self, public=False, number=-1, etag=None):
         """Iterate over events performed by this user.
 
         :param bool public: (optional), only list public events for the
             authenticated user
         :param int number: (optional), number of events to return. Default: -1
             returns all available events.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         path = ['events']
         if public:
             path.append('public')
         url = self._build_url(*path, base_url=self._api)
-        return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_followers(self, number=-1):
+    def iter_followers(self, number=-1, etag=None):
         """Iterate over the followers of this user.
 
         :param int number: (optional), number of followers to return. Default:
             -1 returns all available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <User>`\ s
         """
         url = self._build_url('followers', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_following(self, number=-1):
+    def iter_following(self, number=-1, etag=None):
         """Iterate over the users being followed by this user.
 
         :param int number: (optional), number of users to return. Default: -1
             returns all available users
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <User>`\ s
         """
         url = self._build_url('following', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_keys(self, number=-1):
+    def iter_keys(self, number=-1, etag=None):
         """Iterate over the public keys of this user.
 
         .. versionadded:: 0.5
 
         :param int number: (optional), number of keys to return. Default: -1
             returns all available keys
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Key <Key>`\ s
         """
         url = self._build_url('keys', base_url=self._api)
-        return self._iter(int(number), url, Key)
+        return self._iter(int(number), url, Key, etag=etag)
 
-    def iter_org_events(self, org, number=-1):
+    def iter_org_events(self, org, number=-1, etag=None):
         """Iterate over events as they appear on the user's organization
         dashboard. You must be authenticated to view this.
 
         :param str org: (required), name of the organization
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         url = ''
         if org:
             url = self._build_url('events', 'orgs', org, base_url=self._api)
-        return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_received_events(self, public=False, number=-1):
+    def iter_received_events(self, public=False, number=-1, etag=None):
         """Iterate over events that the user has received. If the user is the
         authenticated user, you will see private and public events, otherwise
         you will only see public events.
@@ -253,15 +263,17 @@ class User(BaseAccount):
             sees both private and public or just public
         :param int number: (optional), number of events to return. Default: -1
             returns all events available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         path = ['received_events']
         if public:
             path.append('public')
         url = self._build_url(*path, base_url=self._api)
-        return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_starred(self, sort=None, direction=None, number=-1):
+    def iter_starred(self, sort=None, direction=None, number=-1, etag=None):
         """Iterate over repositories starred by this user.
 
         .. versionchanged:: 0.5
@@ -274,6 +286,8 @@ class User(BaseAccount):
             created) or 'updated' (when the repository was last pushed to)
         :param str direction: (optional), either 'asc' or 'desc'. Default:
             'desc'
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         from github3.repos import Repository
@@ -281,18 +295,20 @@ class User(BaseAccount):
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
         url = self._build_url('starred', base_url=self._api)
-        return self._iter(int(number), url, Repository, params)
+        return self._iter(int(number), url, Repository, params, etag)
 
-    def iter_subscriptions(self, number=-1):
+    def iter_subscriptions(self, number=-1, etag=None):
         """Iterate over repositories subscribed to by this user.
 
         :param int number: (optional), number of subscriptions to return.
             Default: -1, returns all available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         from github3.repos import Repository
         url = self._build_url('subscriptions', base_url=self._api)
-        return self._iter(int(number), url, Repository)
+        return self._iter(int(number), url, Repository, etag=etag)
 
     @requires_auth
     def update(self, name=None, email=None, blog=None, company=None,

@@ -191,35 +191,41 @@ class PullRequest(GitHubCore):
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1):
+    def iter_comments(self, number=-1, etag=None):
         """Iterate over the comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`ReviewComment <ReviewComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, ReviewComment)
+        return self._iter(int(number), url, ReviewComment, etag=etag)
 
-    def iter_commits(self, number=-1):
+    def iter_commits(self, number=-1, etag=None):
         """Iterates over the commits on this pull request.
 
         :param int number: (optional), number of commits to return. Default:
             -1 returns all available commits.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Commit <github3.git.Commit>`\ s
         """
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, Commit)
+        return self._iter(int(number), url, Commit, etag=etag)
 
-    def iter_files(self, number=-1):
+    def iter_files(self, number=-1, etag=None):
         """Iterate over the files associated with this pull request.
 
         :param int number: (optional), number of files to return. Default:
             -1 returns all available files.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`PullFile <PullFile>`\ s
         """
         url = self._build_url('files', base_url=self._api)
-        return self._iter(int(number), url, PullFile)
+        return self._iter(int(number), url, PullFile, etag=etag)
 
     @requires_auth
     def merge(self, commit_message=''):

@@ -145,15 +145,17 @@ class Gist(GitHubCore):
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1):
+    def iter_comments(self, number=-1, etag=None):
         """List comments on this gist.
 
         :param int number: (optional), number of comments to iterate over.
             Default: -1 will iterate over all comments on the gist
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`GistComment <GistComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, GistComment)
+        return self._iter(int(number), url, GistComment, etag=etag)
 
     def iter_files(self):
         """List of :class:`GistFile <GistFile>` objects representing the files

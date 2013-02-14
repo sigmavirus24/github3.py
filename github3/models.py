@@ -148,8 +148,8 @@ class GitHubCore(GitHubObject):
         :param params dict: (optional) Parameters for the request
         :param str etag: (optional), ETag from the last call
         """
-        from github3.structs import GitHubIterable
-        return GitHubIterable(count, url, cls, params, etag)
+        from github3.structs import GitHubIterator
+        return GitHubIterator(count, url, cls, self, params, etag)
 
     @property
     def ratelimit_remaining(self):
