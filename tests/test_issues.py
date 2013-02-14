@@ -1,6 +1,7 @@
 import github3
 import datetime
 from tests.utils import BaseCase, load, expect
+from mock import patch
 
 
 class TestLabel(BaseCase):
@@ -114,7 +115,7 @@ class TestMilestone(BaseCase):
         self.not_called()
 
         expect(self.m.update('foo', 'closed', ':sparkles:',
-                             '2013-12-31TZ23:59:59Z')).is_True()
+                             '2013-12-31T23:59:59Z')).is_True()
         self.mock_assertions()
 
 
@@ -131,3 +132,50 @@ class TestIssue(BaseCase):
 
     def test_repr(self):
         expect(repr(self.i)) == '<Issue [sigmavirus24/github3.py #1]>'
+
+    def test_add_labels(self):
+        self.response('label', 200, _iter=True)
+        self.post(self.api + '/labels')
+        self.conf = {'data': '["enhancement"]'}
+
+        with expect.githuberror():
+            self.i.add_labels('foo')
+
+        self.not_called()
+        self.login()
+        labels = self.i.add_labels('enhancement')
+        expect(labels) != []
+        expect(labels[0]).isinstance(github3.issues.Label)
+        self.mock_assertions()
+
+    def test_assign(self):
+        with expect.githuberror():
+            self.i.assign('foo')
+
+        self.not_called()
+        self.login()
+
+        with patch.object(github3.issues.Issue, 'edit') as ed:
+            ed.return_value = True
+            expect(self.i.assign('sigmavirus24')).is_True()
+            n = self.i.milestone.number if self.i.milestone else None
+            ed.assert_called_once_with(
+                self.i.title, self.i.body, 'sigmavirus24', self.i.state, n,
+                self.i.labels
+            )
+
+    def test_close(self):
+        with expect.githuberror():
+            self.i.close()
+
+        self.not_called()
+        self.login()
+
+        with patch.object(github3.issues.Issue, 'edit') as ed:
+            ed.return_value = True
+            expect(self.i.close()).is_True()
+            u = self.i.assignee.login if self.i.assignee else ''
+            n = self.i.milestone.number if self.i.milestone else None
+            ed.assert_called_once_with(
+                self.i.title, self.i.body, u, self.i.state, n, self.i.labels
+            )

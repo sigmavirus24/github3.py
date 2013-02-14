@@ -216,12 +216,11 @@ class Issue(GitHubCore):
         """Add labels to this issue.
 
         :param str args: (required), names of the labels you wish to add
-        :returns: bool
+        :returns: list of :class:`Label`\ s
         """
         url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data=args),
-                          status_code=200)
-        return True if json else False
+        json = self._json(self._post(url, data=args), 200)
+        return [Label(l, self) for l in json] if json else []
 
     @requires_auth
     def assign(self, login):

@@ -73,6 +73,9 @@ History/Changelog
   return the same information. In the next version, the former will be 
   removed.
 
+- ``github3.issues.Issue.add_labels`` now returns the list of Labels on the 
+  issue instead of a boolean.
+
 - Now we won't get spurious GitHubErrors on 404s, only on other expected 
   errors whilst accessing the json in a response. All methods that return an 
   object can now *actually* return None if it gets a 404 instead of just 
