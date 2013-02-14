@@ -139,35 +139,17 @@ class GitHubCore(GitHubObject):
     def api(self, uri):
         self._uri = urlparse(uri)
 
-    def _iter(self, count, url, cls, params=None):
+    def _iter(self, count, url, cls, params=None, etag=None):
         """Generic iterator for this project.
 
         :param int count: How many items to return.
         :param int url: First URL to start with
         :param class cls: cls to return an object of
         :param params dict: (optional) Parameters for the request
+        :param str etag: (optional), ETag from the last call
         """
-        while (count == -1 or count > 0) and url:
-            response = self._get(url, params=params)
-            if params:
-                params = None  # rel_next contains the params
-            json = self._json(response, 200)
-
-            if json is None:
-                break
-
-            # languages returns a single dict. We want the items.
-            if isinstance(json, dict):
-                json = json.items()
-
-            for i in json:
-                yield cls(i, self) if issubclass(cls, GitHubCore) else cls(i)
-                count -= 1 if count > 0 else 0
-                if count == 0:
-                    break
-
-            rel_next = response.links.get('next', {})
-            url = rel_next.get('url', '')
+        from github3.structs import GitHubIterable
+        return GitHubIterable(count, url, cls, params, etag)
 
     @property
     def ratelimit_remaining(self):

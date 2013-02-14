@@ -121,7 +121,7 @@ class User(BaseAccount):
         self.plan = Plan(user.get('plan', {}))
 
     def __repr__(self):
-        return '<User [{0}:{1}]>'.format(self.login, self.name)
+        return '<User [{0}:{1:s}]>'.format(self.login, self.name)
 
     def __str__(self):
         return self.login
