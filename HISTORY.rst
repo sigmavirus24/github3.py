@@ -21,6 +21,8 @@ History/Changelog
                        # has changed, it will not count against your ratelimit
                        # otherwise you'll get the updated user object.
 
+- Add support for `sortable stars`_.
+
 - In github3.users.User, ``iter_keys`` now allows you to iterate over **any** 
   user's keys. No name is returned for each key. This is the equivalent of 
   visiting: github.com/:user.keys
@@ -63,6 +65,8 @@ History/Changelog
 
 .. _announced: https://github.com/blog/1402-upcoming-changes-to-github-services
 .. _meta: http://developer.github.com/v3/meta/
+.. _sortable stars:
+    http://developer.github.com/changes/2013-2-13-sortable-stars/
 
 0.4: 2013-01-16
 ---------------
