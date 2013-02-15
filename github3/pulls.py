@@ -130,7 +130,12 @@ class PullRequest(GitHubCore):
         # If the pull request has been merged
         if self.merged_at:
             self.merged_at = self._strptime(self.merged_at)
+        #: Whether the pull is deemed mergeable by GitHub
         self.mergeable = pull.get('mergeable', False)
+        #: Whether it would be a clelan merge or not
+        self.mergeable_state = pull.get('mergeable_state', '')
+        #: SHA of the merge commit
+        self.merge_commit_sha = pull.get('merge_commit_sha', '')
         #: :class:`User <github3.users.User>` who merged this pull
         self.merged_by = pull.get('merged_by')
         if self.merged_by:
