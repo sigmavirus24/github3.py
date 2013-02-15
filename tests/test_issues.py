@@ -185,8 +185,9 @@ class TestIssue(BaseCase):
         self.response('issue_comment')
         self.get(self.api[:-1] + 'comments/476476')
 
-        expect(self.i.comment('476476')).isinstance(
-            github3.issues.IssueComment)
+        c = self.i.comment('476476')
+        expect(c).isinstance(github3.issues.IssueComment)
+        expect(repr(c).startswith('<Issue Comment')).is_True()
         self.mock_assertions()
 
     def test_create_comment(self):
@@ -241,8 +242,9 @@ class TestIssue(BaseCase):
         self.response('issue_event', _iter=True)
         self.get(self.api + '/events')
 
-        expect(next(self.i.iter_events())).isinstance(
-            github3.issues.IssueEvent)
+        e = next(self.i.iter_events())
+        expect(e).isinstance(github3.issues.IssueEvent)
+        expect(repr(e).startswith('<Issue Event')).is_True()
         self.mock_assertions()
 
     def test_remove_label(self):
