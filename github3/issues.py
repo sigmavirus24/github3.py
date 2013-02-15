@@ -300,9 +300,7 @@ class Issue(GitHubCore):
         json = None
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        for (k, v) in list(data.items()):
-            if v is None:
-                del data[k]
+        self._remove_none(data)
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
@@ -343,16 +341,19 @@ class Issue(GitHubCore):
         """Removes label ``name`` from this issue.
 
         :param str name: (required), name of the label to remove
-        :returns: list of labels remaining
+        :returns: bool
         """
         url = self._build_url('labels', name, base_url=self._api)
-        return self._json(self._delete(url), 200)
+        # Docs say it should be a list of strings returned, practice says it 
+        # is just a 204/404 response. I'm tenatively changing this until I 
+        # hear back from Support.
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def remove_all_labels(self):
         """Remove all labels from this issue.
 
-        :returns: bool
+        :returns: an empty list if successful
         """
         # Can either send DELETE or [] to remove all labels
         return self.replace_labels([])
@@ -365,7 +366,8 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._boolean(self._put(url, data=dumps(labels)), 200, 404)
+        json = self._json(self._put(url, data=dumps(labels)), 200)
+        return [Label(l, self) for l in json] if json else []
 
     @requires_auth
     def reopen(self):

@@ -73,8 +73,16 @@ History/Changelog
   return the same information. In the next version, the former will be 
   removed.
 
-- ``github3.issues.Issue.add_labels`` now returns the list of Labels on the 
-  issue instead of a boolean.
+- In github3.issues.Issue
+
+   - ``add_labels`` now returns the list of Labels on the issue instead of a 
+     boolean.
+
+   - ``remove_label`` now retuns a boolean.
+
+   - ``remove_all_labels`` and ``replace_labels`` now return lists. The former 
+     should return an empty list on a successful call. The latter should 
+     return a list of ``github3.issue.Label`` objects.
 
 - Now we won't get spurious GitHubErrors on 404s, only on other expected 
   errors whilst accessing the json in a response. All methods that return an 

@@ -152,11 +152,12 @@ class TestIssue(BaseCase):
         with expect.githuberror():
             self.i.assign('foo')
 
-        self.not_called()
         self.login()
 
         with patch.object(github3.issues.Issue, 'edit') as ed:
             ed.return_value = True
+            expect(self.i.assign(None)).is_False()
+            self.not_called()
             expect(self.i.assign('sigmavirus24')).is_True()
             n = self.i.milestone.number if self.i.milestone else None
             ed.assert_called_once_with(
@@ -178,4 +179,121 @@ class TestIssue(BaseCase):
             n = self.i.milestone.number if self.i.milestone else None
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, self.i.state, n, self.i.labels
+            )
+
+    def test_comment(self):
+        self.response('issue_comment')
+        self.get(self.api[:-1] + 'comments/476476')
+
+        expect(self.i.comment('476476')).isinstance(
+            github3.issues.IssueComment)
+        self.mock_assertions()
+
+    def test_create_comment(self):
+        self.response('issue_comment', 201)
+        self.post(self.api + '/comments')
+        self.conf = {'data': {'body': 'comment body'}}
+
+        with expect.githuberror():
+            self.i.create_comment('')
+
+        self.login()
+        expect(self.i.create_comment(None)).is_None()
+        self.not_called()
+
+        expect(self.i.create_comment('comment body')).isinstance(
+            github3.issues.IssueComment)
+        self.mock_assertions()
+
+    def test_edit(self):
+        self.response('issue', 200)
+        self.patch(self.api)
+        self.conf = {'data': {'title': 'new title'}}
+
+        with expect.githuberror():
+            self.i.edit()
+
+        self.login()
+        expect(self.i.edit()).is_False()
+        self.not_called()
+
+        expect(self.i.edit('new title')).is_True()
+        self.mock_assertions()
+
+    def test_is_closed(self):
+        expect(self.i.is_closed()).is_True()
+
+        self.i.closed_at = None
+        expect(self.i.is_closed()).is_True()
+
+        self.i.state = 'open'
+        expect(self.i.is_closed()).is_False()
+
+    def test_iter_comments(self):
+        self.response('issue_comment', _iter=True)
+        self.get(self.api + '/comments')
+
+        expect(next(self.i.iter_comments())).isinstance(
+            github3.issues.IssueComment)
+        self.mock_assertions()
+
+    def test_iter_events(self):
+        self.response('issue_event', _iter=True)
+        self.get(self.api + '/events')
+
+        expect(next(self.i.iter_events())).isinstance(
+            github3.issues.IssueEvent)
+        self.mock_assertions()
+
+    def test_remove_label(self):
+        self.response('', 204)
+        self.delete(self.api + '/labels/name')
+
+        with expect.githuberror():
+            self.i.remove_label('name')
+
+        self.not_called()
+        self.login()
+        expect(self.i.remove_label('name')).is_True()
+        self.mock_assertions()
+
+    def test_remove_all_labels(self):
+        with expect.githuberror():
+            self.i.remove_all_labels()
+
+        self.login()
+
+        with patch.object(github3.issues.Issue, 'replace_labels') as rl:
+            rl.return_value = []
+            expect(self.i.remove_all_labels()) == []
+            rl.assert_called_once_with([])
+
+    def test_replace_labels(self):
+        self.response('label', _iter=True)
+        self.put(self.api + '/labels')
+        self.conf = {'data': '["foo", "bar"]'}
+
+        with expect.githuberror():
+            self.i.replace_labels([])
+
+        self.not_called()
+        self.login()
+
+        labels = self.i.replace_labels(['foo', 'bar'])
+        expect(labels) != []
+        expect(labels[0]).isinstance(github3.issues.Label)
+
+    def test_reopen(self):
+        with expect.githuberror():
+            self.i.reopen()
+
+        self.login()
+        n = self.i.milestone.number if self.i.milestone else None
+        u = self.i.assignee.login if self.i.assignee else None
+
+        with patch.object(github3.issues.Issue, 'edit') as ed:
+            ed.return_value = True
+            expect(self.i.reopen()).is_True()
+            ed.assert_called_once_with(
+                self.i.title, self.i.body, u, 'open', n, self.i.labels
             )
