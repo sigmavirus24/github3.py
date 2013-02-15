@@ -181,13 +181,6 @@ class PullRequest(GitHubCore):
                          headers={'Accept': 'application/vnd.github.diff'})
         return resp.content if self._boolean(resp, 200, 404) else None
 
-    def is_mergeable(self):
-        """Checks to see if the pull request can be merged by GitHub.
-
-        :returns: bool
-        """
-        return self.mergeable
-
     def is_merged(self):
         """Checks to see if the pull request was merged.
 
