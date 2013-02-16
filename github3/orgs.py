@@ -162,6 +162,13 @@ class Organization(BaseAccount):
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
 
+        .. note::
+            This method is of complexity O(n). This iterates over all teams in
+            your organization and only adds the user when the team name
+            matches the team parameter above. If you want constant time, you
+            should retrieve the team and call ``add_member`` on that team
+            directly.
+
         :param str login: (required), login name of the user to be added
         :param str team: (required), team name
         :returns: bool
@@ -175,8 +182,15 @@ class Organization(BaseAccount):
     def add_repo(self, repo, team):
         """Add ``repo`` to ``team``.
 
+        .. note::
+            This method is of complexity O(n). This iterates over all teams in
+            your organization and only adds the repo when the team name
+            matches the team parameter above. If you want constant time, you
+            should retrieve the team and call ``add_repo`` on that team
+            directly.
+
         :param str repo: (required), form: 'user/repo'
-        :param str team: (required)
+        :param str team: (required), team name
         """
         for t in self.iter_teams():
             if team == t.name:
@@ -282,9 +296,7 @@ class Organization(BaseAccount):
         json = None
         data = {'billing_email': billing_email, 'company': company,
                 'email': email, 'location': location, 'name': name}
-        for (k, v) in data.items():
-            if v is None:
-                del data[k]
+        self._remove_none(data)
 
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
@@ -362,7 +374,7 @@ class Organization(BaseAccount):
         params = {}
         if type in ('all', 'public', 'member', 'private', 'forks', 'sources'):
             params['type'] = type
-        return self._iter(int(number), url, Repository, params, etag=etag)
+        return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
     def iter_teams(self, number=-1, etag=None):
