@@ -1218,7 +1218,7 @@ class TestRepoCommit(BaseCase):
         self.get(self.api)
         self.conf.update(headers={'Accept': 'application/vnd.github.diff'})
 
-        expect(self.commit.diff()) == b'archive_data'
+        expect(self.commit.diff().startswith(b'archive_data')).is_True()
         self.mock_assertions()
 
     def test_patch(self):
@@ -1226,7 +1226,7 @@ class TestRepoCommit(BaseCase):
         self.get(self.api)
         self.conf.update(headers={'Accept': 'application/vnd.github.patch'})
 
-        expect(self.commit.patch()) == b'archive_data'
+        expect(self.commit.patch().startswith(b'archive_data')).is_True()
         self.mock_assertions()
 
 
@@ -1246,7 +1246,7 @@ class TestComparison(BaseCase):
         self.get(self.api)
         self.conf.update(headers={'Accept': 'application/vnd.github.diff'})
 
-        expect(self.comp.diff()) == b'archive_data'
+        expect(self.comp.diff().startswith(b'archive_data')).is_True()
         self.mock_assertions()
 
     def test_patch(self):
@@ -1254,5 +1254,5 @@ class TestComparison(BaseCase):
         self.get(self.api)
         self.conf.update(headers={'Accept': 'application/vnd.github.patch'})
 
-        expect(self.comp.patch()) == b'archive_data'
+        expect(self.comp.patch().startswith(b'archive_data')).is_True()
         self.mock_assertions()

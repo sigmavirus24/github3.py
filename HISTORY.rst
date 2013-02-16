@@ -1,8 +1,10 @@
 History/Changelog
 =================
 
-0.5: 2013-xx-xx
+0.5: 2013-02-16
 ---------------
+
+- 100% (mock) test coverage
 
 - Add support for the announced_ meta_ endpoint.
 
@@ -36,7 +38,6 @@ History/Changelog
 
   And the second call will only give you the new repositories since the last 
   request. This mimics behavior in `pengwynn/octokit`_
-
 
 - Add support for `sortable stars`_.
 

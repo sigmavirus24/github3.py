@@ -527,9 +527,11 @@ class TestGitHub(BaseCase):
             }
         )
 
-        expect(self.g.markdown('Foo', 'gfm', 'sigmavirus24/cfg')) == (
-            b'archive_data'
-        )
+        expect(
+            self.g.markdown(
+                'Foo', 'gfm', 'sigmavirus24/cfg'
+            ).startswith(b'archive_data')
+        ).is_True()
         self.mock_assertions()
 
         self.post('https://api.github.com/markdown/raw')
@@ -799,7 +801,7 @@ class TestGitHub(BaseCase):
         self.response('archive')
         self.get('https://api.github.com/zen')
 
-        expect(self.g.zen()) == b'archive_data'
+        expect(self.g.zen().startswith(b'archive_data')).is_True()
         self.mock_assertions()
 
 
