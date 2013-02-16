@@ -111,8 +111,8 @@ class TestGist(BaseCase):
         expect(repr(gist_file).startswith('<Gist File')).is_True()
 
     def test_iter_forks(self):
-        #expect(self.gist.iter_forks()) == iter(self.gist._forks)
-        pass
+        with expect.raises(StopIteration):
+            expect(next(self.gist.iter_forks()))
 
     def test_refresh(self):
         self.response('gist', 200)

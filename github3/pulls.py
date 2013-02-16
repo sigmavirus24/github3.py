@@ -235,11 +235,11 @@ class PullRequest(GitHubCore):
         """
         data = None
         if commit_message:
-            data = {'commit_message': commit_message}
+            data = dumps({'commit_message': commit_message})
         url = self._build_url('merge', base_url=self._api)
-        resp = self._put(url, data=dumps(data))
-        self.merge_commit_sha = resp['merge_commit_sha']
-        return resp.json['merged']
+        json = self._json(self._put(url, data=data), 200)
+        self.merge_commit_sha = json['sha']
+        return json['merged']
 
     def patch(self):
         """Return the patch"""
@@ -266,9 +266,7 @@ class PullRequest(GitHubCore):
         """
         data = {'title': title, 'body': body, 'state': state}
         json = None
-        for (k, v) in list(data.items()):
-            if v is None:
-                del data[k]
+        self._remove_none(data)
 
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)

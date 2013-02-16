@@ -89,3 +89,6 @@ class TestTree(BaseCase):
         expect(t).isinstance(github3.git.Tree)
         expect(repr(t).startswith('<Tree')).is_True()
         self.mock_assertions()
+
+        expect(t.tree[0]).isinstance(github3.git.Hash)
+        expect(repr(t.tree[0]).startswith('<Hash')).is_True()
