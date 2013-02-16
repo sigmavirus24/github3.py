@@ -90,13 +90,13 @@ class GitHubCore(GitHubObject):
                 ret['ETag'] = response.headers.get('ETag', '')
         return ret
 
-    def _boolean(self, request, true_code, false_code):
-        if request:
-            status_code = request.status_code
+    def _boolean(self, response, true_code, false_code):
+        if response is not None:
+            status_code = response.status_code
             if status_code == true_code:
                 return True
             if status_code != false_code and status_code >= 400:
-                raise GitHubError(request)
+                raise GitHubError(response)
         return False
 
     def _delete(self, url, **kwargs):
@@ -132,11 +132,11 @@ class GitHubCore(GitHubObject):
         return __url_cache__[key]
 
     @property
-    def api(self):
+    def _api(self):
         return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
 
-    @api.setter
-    def api(self, uri):
+    @_api.setter
+    def _api(self, uri):
         self._uri = urlparse(uri)
 
     def _iter(self, count, url, cls, params=None, etag=None):
@@ -345,14 +345,14 @@ class GitHubError(Exception):
         self.response = resp
         self.code = resp.status_code
         self.errors = []
-        if resp.json():  # GitHub Error
+        try:
             error = resp.json()
             #: Message associated with the error
             self.msg = error.get('message')
             #: List of errors provided by GitHub
             if error.get('errors'):
                 self.errors = error.get('errors')
-        else:  # Amazon S3 error
+        except:  # Amazon S3 error
             self.msg = resp.content or '[No message]'
 
     def __repr__(self):

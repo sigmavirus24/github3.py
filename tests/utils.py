@@ -8,6 +8,8 @@ from io import BytesIO
 from unittest import TestCase
 from requests.structures import CaseInsensitiveDict
 
+is_py3 = sys.version_info > (3, 0)
+
 
 def load(name):
     return json.load(path(name))
@@ -107,7 +109,7 @@ class BaseCase(TestCase):
             if _iter:
                 content = '[{0}]'.format(content)
                 r.raw = BytesIO(content.encode())
-            elif sys.version_info > (3, 0):
+            elif is_py3:
                 r.raw = BytesIO(content.encode())
             else:
                 r.raw = BytesIO(content)

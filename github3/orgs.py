@@ -152,9 +152,6 @@ class Organization(BaseAccount):
         #: Number of private repositories.
         self.private_repos = org.get('private_repos', 0)
 
-    def __repr__(self):
-        return '<Organization [{0}:{1}]>'.format(self.login, self.name)
-
     @requires_auth
     def add_member(self, login, team):
         """Add ``login`` to ``team`` and thereby to this organization.

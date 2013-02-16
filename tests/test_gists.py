@@ -156,8 +156,27 @@ class TestGist(BaseCase):
 
 
 class TestGistComment(BaseCase):
-    def test(self):
-        json = load('gist_comment')
-        json['user'] = load('user')
-        comment = github3.gists.GistComment(json)
-        expect(repr(comment).startswith('<Gist Comment')).is_True()
+    def __init__(self, methodName='runTest'):
+        super(TestGistComment, self).__init__(methodName)
+        self.comment = github3.gists.GistComment(load('gist_comment'))
+        self.api = "https://api.github.com/gists/4321394/comments/655725"
+
+    def setUp(self):
+        super(TestGistComment, self).setUp()
+        self.comment = github3.gists.GistComment(self.comment.to_json(),
+                                                 self.g)
+
+    def test_edit(self):
+        self.response('gist_comment', 200)
+        self.patch(self.api)
+        self.conf = {'data': {'body': 'body'}}
+
+        with expect.githuberror():
+            self.comment.edit(None)
+
+        self.login()
+        expect(self.comment.edit(None)).is_False()
+        self.not_called()
+
+        expect(self.comment.edit('body')).is_True()
+        self.mock_assertions()

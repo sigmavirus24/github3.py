@@ -1160,6 +1160,19 @@ class TestRepoComment(BaseCase):
         self.comment = github3.repos.RepoComment(self.comment.to_json(),
                                                  self.g)
 
+    def test_delete(self):
+        self.response('', 204)
+        self.delete(self.api)
+
+        with expect.githuberror():
+            self.comment.delete()
+
+        self.not_called()
+        self.login()
+
+        expect(self.comment.delete()).is_True()
+        self.mock_assertions()
+
     def test_repr(self):
         expect(repr(self.comment).startswith('<Repository Comment'))
 
