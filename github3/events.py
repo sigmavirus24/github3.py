@@ -38,7 +38,8 @@ class Event(GitHubObject):
         self.repo = event.get('repo')
         if self.repo is not None:
             self.repo = tuple(self.repo['name'].split('/'))
-        self._public = event.get('public')
+        #: Indicates whether the Event is public or not.
+        self.public = event.get('public')
 
     def __repr__(self):
         return '<Event [{0}]>'.format(self.type[:-5])
@@ -51,9 +52,11 @@ class Event(GitHubObject):
     def is_public(self):
         """Indicates whether the Event is public or not.
 
+        .. warning:: This will be deprecated in 0.6
+
         :returns: bool -- True if event is pubic, False otherwise
         """
-        return self._public
+        return self.public
 
 
 def _commitcomment(payload):

@@ -3,19 +3,26 @@
 import unittest
 import os
 import re
+
 try:
     import coverage
 except ImportError:
     coverage = None
 
+try:
+    import expecter
+    import mock
+except ImportError as ie:
+    print('Please install the test dependencies as documented in the README')
+    raise ie
 
 TEST_DIR = 'tests'
 
 if __name__ == "__main__":
     if coverage:
         cov = coverage.coverage(source=['github3'],
-                omit=['github3/packages/*'])
-        cov.exclude('(No coverage)')
+                                omit=['github3/packages/*'])
+        cov.exclude('\(No coverage\)')
         cov.exclude('def __repr__')
         cov.start()
 

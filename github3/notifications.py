@@ -99,20 +99,20 @@ class Subscription(GitHubCore):
         self.thread_url = sub.get('thread_url')
         #: API url of the repository if it exists
         self.repository_url = sub.get('repository_url')
-        self._ignored = sub.get('ignored', False)
-        self._subscribed = sub.get('subscribed', False)
+        self.ignored = sub.get('ignored', False)
+        self.subscribed = sub.get('subscribed', False)
 
     def __repr__(self):
-        return '<Subscription [{0}]>'.format(self._subscribed)
+        return '<Subscription [{0}]>'.format(self.subscribed)
 
     def delete(self):
         return self._boolean(self._delete(self._api), 204, 404)
 
     def is_ignored(self):
-        return self._ignored
+        return self.ignored
 
     def is_subscribed(self):
-        return self._subscribed
+        return self.subscribed
 
     def set(self, subscribed, ignored):
         """Set the user's subscription for this subscription

@@ -130,7 +130,12 @@ class PullRequest(GitHubCore):
         # If the pull request has been merged
         if self.merged_at:
             self.merged_at = self._strptime(self.merged_at)
+        #: Whether the pull is deemed mergeable by GitHub
         self.mergeable = pull.get('mergeable', False)
+        #: Whether it would be a clelan merge or not
+        self.mergeable_state = pull.get('mergeable_state', '')
+        #: SHA of the merge commit
+        self.merge_commit_sha = pull.get('merge_commit_sha', '')
         #: :class:`User <github3.users.User>` who merged this pull
         self.merged_by = pull.get('merged_by')
         if self.merged_by:
@@ -176,13 +181,6 @@ class PullRequest(GitHubCore):
                          headers={'Accept': 'application/vnd.github.diff'})
         return resp.content if self._boolean(resp, 200, 404) else None
 
-    def is_mergeable(self):
-        """Checks to see if the pull request can be merged by GitHub.
-
-        :returns: bool
-        """
-        return self.mergeable
-
     def is_merged(self):
         """Checks to see if the pull request was merged.
 
@@ -191,62 +189,41 @@ class PullRequest(GitHubCore):
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1):
+    def iter_comments(self, number=-1, etag=None):
         """Iterate over the comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`ReviewComment <ReviewComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, ReviewComment)
+        return self._iter(int(number), url, ReviewComment, etag=etag)
 
-    def list_comments(self):
-        """List the comments on this pull request.
-
-        :returns: list of :class:`ReviewComment <ReviewComment>`\ s
-        """
-        url = self._build_url('comments', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [ReviewComment(comment, self) for comment in json]
-
-    def iter_commits(self, number=-1):
+    def iter_commits(self, number=-1, etag=None):
         """Iterates over the commits on this pull request.
 
         :param int number: (optional), number of commits to return. Default:
             -1 returns all available commits.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Commit <github3.git.Commit>`\ s
         """
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, Commit)
+        return self._iter(int(number), url, Commit, etag=etag)
 
-    def list_commits(self):
-        """List the commits on this pull request.
-
-        :returns: list of :class:`Commit <github3.git.Commit>`\ s
-        """
-        url = self._build_url('commits', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [Commit(commit, self) for commit in json]
-
-    def iter_files(self, number=-1):
+    def iter_files(self, number=-1, etag=None):
         """Iterate over the files associated with this pull request.
 
         :param int number: (optional), number of files to return. Default:
             -1 returns all available files.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`PullFile <PullFile>`\ s
         """
         url = self._build_url('files', base_url=self._api)
-        return self._iter(int(number), url, PullFile)
-
-    def list_files(self):
-        """List the files associated with this pull request.
-
-        :returns: list of :class:`PullFile <PullFile>`\ s
-        """
-        url = self._build_url('files', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [PullFile(f) for f in json]
+        return self._iter(int(number), url, PullFile, etag=etag)
 
     @requires_auth
     def merge(self, commit_message=''):
@@ -258,11 +235,11 @@ class PullRequest(GitHubCore):
         """
         data = None
         if commit_message:
-            data = {'commit_message': commit_message}
+            data = dumps({'commit_message': commit_message})
         url = self._build_url('merge', base_url=self._api)
-        resp = self._put(url, data=dumps(data))
-        self.merge_commit_sha = resp['merge_commit_sha']
-        return resp.json['merged']
+        json = self._json(self._put(url, data=data), 200)
+        self.merge_commit_sha = json['sha']
+        return json['merged']
 
     def patch(self):
         """Return the patch"""
@@ -289,9 +266,7 @@ class PullRequest(GitHubCore):
         """
         data = {'title': title, 'body': body, 'state': state}
         json = None
-        for (k, v) in list(data.items()):
-            if v is None:
-                del data[k]
+        self._remove_none(data)
 
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)

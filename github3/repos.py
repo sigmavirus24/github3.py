@@ -128,7 +128,7 @@ class Repository(GitHubCore):
         json = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return PullRequest(json, self._session) if json else None
 
     @requires_auth
@@ -176,7 +176,8 @@ class Repository(GitHubCore):
                 header = resp.headers['content-disposition']
                 i = header.find('filename=') + len('filename=')
                 fd = open(header[i:], 'wb')
-            for chunk in resp.iter_content():
+
+            for chunk in resp.iter_content(chunk_size=512):
                 fd.write(chunk)
 
             if not pre_opened:
@@ -252,11 +253,8 @@ class Repository(GitHubCore):
         :returns: :class:`Contents <Contents>` if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)
-        resp = self._get(url)
-        if self._boolean(resp, 200, 404):
-            return Contents(self._json(resp, 200))
-        else:
-            return None
+        json = self._json(self._get(url), 200)
+        return Contents(json) if json else None
 
     @requires_auth
     def create_blob(self, content, encoding):
@@ -270,7 +268,7 @@ class Repository(GitHubCore):
         if encoding in ('base64', 'utf-8') and content:
             url = self._build_url('git', 'blobs', base_url=self._api)
             data = {'content': content, 'encoding': encoding}
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
             if json:
                 sha = json.get('sha')
         return sha
@@ -296,7 +294,7 @@ class Repository(GitHubCore):
                     'path': path, 'position': position}
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return RepoComment(json, self) if json else None
 
     @requires_auth
@@ -325,7 +323,7 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'commits', base_url=self._api)
             data = {'message': message, 'tree': tree, 'parents': parents,
                     'author': author, 'committer': committer}
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Commit(json, self) if json else None
 
     @requires_auth
@@ -338,7 +336,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
-            resp = self._post(url, data=dumps({'organization': organization}))
+            resp = self._post(url, data={'organization': organization})
         else:
             resp = self._post(url)
         json = self._json(resp, 202)
@@ -362,7 +360,7 @@ class Repository(GitHubCore):
             url = self._build_url('hooks', base_url=self._api)
             data = {'name': name, 'config': config, 'events': events,
                     'active': active}
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Hook(json, self) if json else None
 
     @requires_auth
@@ -378,9 +376,10 @@ class Repository(GitHubCore):
         :param str body: (optional), body of the issue
         :param str assignee: (optional), login of the user to assign the
             issue to
-        :param int milestone: (optional), number of the milestone to attribute
-            this issue to (e.g. ``m`` is a Milestone object, ``m.number`` is
-            what you pass here.)
+        :param int milestone: (optional), id number of the milestone to
+            attribute this issue to (e.g. ``m`` is a :class:`Milestone
+            <github3.issues.Milestone>` object, ``m.number`` is what you pass
+            here.)
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
@@ -394,7 +393,7 @@ class Repository(GitHubCore):
 
         if issue:
             url = self._build_url('issues', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(issue)), 201)
+            json = self._json(self._post(url, data=issue), 201)
 
         return Issue(json, self) if json else None
 
@@ -410,7 +409,7 @@ class Repository(GitHubCore):
         if title and key:
             data = {'title': title, 'key': key}
             url = self._build_url('keys', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Key(json, self) if json else None
 
     @requires_auth
@@ -427,7 +426,7 @@ class Repository(GitHubCore):
         if name and color:
             data = {'name': name, 'color': color.strip('#')}
             url = self._build_url('labels', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Label(json, self) if json else None
 
     @requires_auth
@@ -451,7 +450,7 @@ class Repository(GitHubCore):
         self._remove_none(data)
         json = None
         if data:
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Milestone(json, self) if json else None
 
     @requires_auth
@@ -480,7 +479,7 @@ class Repository(GitHubCore):
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
-        if issue > 0:
+        if int(issue) > 0:
             data = {'issue': issue, 'base': base, 'head': head}
             return self._create_pull(data)
         return None
@@ -500,7 +499,7 @@ class Repository(GitHubCore):
         if ref and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
             url = self._build_url('git', 'refs', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Reference(json, self) if json else None
 
     @requires_auth
@@ -518,7 +517,7 @@ class Repository(GitHubCore):
             data = {'state': state, 'target_url': target_url,
                     'description': description}
             url = self._build_url('statuses', sha, base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Status(json) if json else None
 
     @requires_auth
@@ -547,7 +546,7 @@ class Repository(GitHubCore):
             data = {'tag': tag, 'message': message, 'object': sha,
                     'type': obj_type, 'tagger': tagger}
             url = self._build_url('git', 'tags', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
             if json:
                 self.create_ref('refs/tags/' + tag, sha)
         return Tag(json) if json else None
@@ -567,7 +566,7 @@ class Repository(GitHubCore):
         if tree and isinstance(tree, list):
             data = {'tree': tree, 'base_tree': base_tree}
             url = self._build_url('git', 'trees', base_url=self._api)
-            json = self._json(self._post(url, data=dumps(data)), 201)
+            json = self._json(self._post(url, data=data), 201)
         return Tree(json) if json else None
 
     @requires_auth
@@ -741,50 +740,59 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Label(json, self) if json else None
 
-    def iter_assignees(self, number=-1):
+    def iter_assignees(self, number=-1, etag=None):
         """Iterate over all available assignees to which an issue may be
         assigned.
 
         :param int number: (optional), number of assignees to return. Default:
             -1 returns all available assignees
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('assignees', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_branches(self, number=-1):
+    def iter_branches(self, number=-1, etag=None):
         """Iterate over the branches in this repository.
 
         :param int number: (optional), number of branches to return. Default:
             -1 returns all branches
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Branch <Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
-        return self._iter(int(number), url, Branch)
+        return self._iter(int(number), url, Branch, etag=etag)
 
-    def iter_comments(self, number=-1):
+    def iter_comments(self, number=-1, etag=None):
         """Iterate over comments on all commits in the repository.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all comments
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, RepoComment)
+        return self._iter(int(number), url, RepoComment, etag=etag)
 
-    def iter_comments_on_commit(self, sha, number=1):
+    def iter_comments_on_commit(self, sha, number=1, etag=None):
         """Iterate over comments for a single commit.
 
         :param sha: (required), sha of the commit to list comments on
         :type sha: str
         :param int number: (optional), number of comments to return. Default:
             -1 returns all comments
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
-        return self._iter(int(number), url, RepoComment)
+        return self._iter(int(number), url, RepoComment, etag=etag)
 
-    def iter_commits(self, sha=None, path=None, author=None, number=-1):
+    def iter_commits(self, sha=None, path=None, author=None, number=-1,
+                     etag=None):
         """Iterate over commits in this repository.
 
         :param str sha: (optional), sha or branch to start listing commits
@@ -795,30 +803,33 @@ class Repository(GitHubCore):
             filter commits by (using commit author)
         :param int number: (optional), number of comments to return. Default:
             -1 returns all comments
-
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`RepoCommit <RepoCommit>`\ s
         """
         params = {'sha': sha, 'path': path, 'author': author}
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, RepoCommit, params=params)
+        return self._iter(int(number), url, RepoCommit, params, etag)
 
-    def iter_contributors(self, anon=False, number=-1):
+    def iter_contributors(self, anon=False, number=-1, etag=None):
         """Iterate over the contributors to this repository.
 
         :param bool anon: (optional), True lists anonymous contributors as
             well
         :param int number: (optional), number of contributors to return.
             Default: -1 returns all contributors
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
             params = {'anon': True}
-        return self._iter(int(number), url, User, params=params)
+        return self._iter(int(number), url, User, params, etag)
 
-    def iter_downloads(self, number=-1):
+    def iter_downloads(self, number=-1, etag=None):
         """Iterate over available downloads for this repository.
 
         .. warning::
@@ -828,46 +839,54 @@ class Repository(GitHubCore):
 
         :param int number: (optional), number of downloads to return. Default:
             -1 returns all available downloads
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Download <Download>`\ s
         """
         url = self._build_url('downloads', base_url=self._api)
-        return self._iter(int(number), url, Download)
+        return self._iter(int(number), url, Download, etag=etag)
 
-    def iter_events(self, number=-1):
+    def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Event <github3.events.Event>`\ s
         """
         url = self._build_url('events', base_url=self._api)
-        return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_forks(self, sort='', number=-1):
+    def iter_forks(self, sort='', number=-1, etag=None):
         """Iterate over forks of this repository.
 
         :param str sort: (optional), accepted values:
             ('newest', 'oldest', 'watchers'), API default: 'newest'
         :param int number: (optional), number of forks to return. Default: -1
             returns all forks
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Repository <Repository>`
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
         if sort in ('newest', 'oldest', 'watchers'):
             params = {'sort': sort}
-        return self._iter(int(number), url, Repository, params=params)
+        return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
-    def iter_hooks(self, number=-1):
+    def iter_hooks(self, number=-1, etag=None):
         """Iterate over hooks registered on this repository.
 
         :param int number: (optional), number of hoks to return. Default: -1
             returns all hooks
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Hook <Hook>`\ s
         """
         url = self._build_url('hooks', base_url=self._api)
-        return self._iter(int(number), url, Hook)
+        return self._iter(int(number), url, Hook, etag=etag)
 
     def iter_issues(self,
                     milestone=None,
@@ -878,7 +897,8 @@ class Repository(GitHubCore):
                     sort=None,
                     direction=None,
                     since=None,
-                    number=-1):
+                    number=-1,
+                    etag=None):
         """Iterate over issues on this repo based upon parameters passed.
 
         :param int milestone: (optional), 'none', or '*'
@@ -892,6 +912,8 @@ class Repository(GitHubCore):
         :param str since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
         :param int number: (optional), Number of issues to return.
             By default all issues are returned
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of :class:`Issue <github3.issues.Issue>`\ s
         """
         url = self._build_url('issues', base_url=self._api)
@@ -900,55 +922,65 @@ class Repository(GitHubCore):
         if milestone in ('*', 'none') or isinstance(milestone, int):
             params['milestone'] = milestone
         self._remove_none(params)
-        params.update(issue_params(None, state, labels, sort, direction,
-            since))  # nopep8
+        params.update(
+            issue_params(None, state, labels, sort, direction,
+                         since)
+        )
 
-        return self._iter(int(number), url, Issue, params=params)
+        return self._iter(int(number), url, Issue, params, etag)
 
-    def iter_issue_events(self, number=-1):
+    def iter_issue_events(self, number=-1, etag=None):
         """Iterates over issue events on this repository.
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of
             :class:`IssueEvent <github3.issues.IssueEvent>`\ s
         """
         url = self._build_url('issues', 'events', base_url=self._api)
-        return self._iter(int(number), url, IssueEvent)
+        return self._iter(int(number), url, IssueEvent, etag=etag)
 
     @requires_auth
-    def iter_keys(self, number=-1):
+    def iter_keys(self, number=-1, etag=None):
         """Iterates over deploy keys on this repository.
 
         :param int number: (optional), number of keys to return. Default: -1
             returns all available keys
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Key <github3.users.Key>`\ s
         """
         url = self._build_url('keys', base_url=self._api)
-        return self._iter(int(number), url, Key)
+        return self._iter(int(number), url, Key, etag=etag)
 
-    def iter_labels(self, number=-1):
+    def iter_labels(self, number=-1, etag=None):
         """Iterates over labels on this repository.
 
         :param int number: (optional), number of labels to return. Default: -1
             returns all available labels
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Label <github3.issues.Label>`\ s
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, Label)
+        return self._iter(int(number), url, Label, etag=etag)
 
-    def iter_languages(self, number=-1):
+    def iter_languages(self, number=-1, etag=None):
         """Iterate over the programming languages used in the repository.
 
         :param int number: (optional), number of languages to return. Default:
             -1 returns all used languages
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: list of tuples
         """
         url = self._build_url('languages', base_url=self._api)
-        return self._iter(int(number), url, tuple)
+        return self._iter(int(number), url, tuple, etag=etag)
 
     def iter_milestones(self, state=None, sort=None, direction=None,
-                        number=-1):
+                        number=-1, etag=None):
         """Iterates over the milestones on this repository.
 
         :param str state: (optional), state of the milestones, accepted
@@ -959,6 +991,8 @@ class Repository(GitHubCore):
             accepted values: ('asc', 'desc')
         :param int number: (optional), number of milestones to return.
             Default: -1 returns all milestones
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of
             :class:`Milestone <github3.issues.Milestone>`\ s
         """
@@ -972,21 +1006,24 @@ class Repository(GitHubCore):
                 del params[k]
         if not params:
             params = None
-        return self._iter(int(number), url, Milestone, params)
+        return self._iter(int(number), url, Milestone, params, etag)
 
-    def iter_network_events(self, number=-1):
+    def iter_network_events(self, number=-1, etag=None):
         """Iterates over events on a network of repositories.
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         base = self._api.replace('repos', 'networks', 1)
         url = self._build_url('events', base_url=base)
-        return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event, etag)
 
+    @requires_auth
     def iter_notifications(self, all=False, participating=False, since='',
-                           number=-1):
+                           number=-1, etag=None):
         """Iterates over the notifications for this repository.
 
         :param bool all: (optional), show all notifications, including ones
@@ -997,6 +1034,8 @@ class Repository(GitHubCore):
             before the given time. The time should be passed in as UTC in the
             ISO 8601 format: ``YYYY-MM-DDTHH:MM:SSZ``. Example:
             "2012-10-09T23:39:01Z".
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Thread <github3.notifications.Thread>`
         """
         url = self._build_url('notifications', base_url=self._api)
@@ -1004,29 +1043,33 @@ class Repository(GitHubCore):
         for (k, v) in list(params.items()):
             if not v:
                 del params[k]
-        return self._iter(int(number), url, Thread, params=params)
+        return self._iter(int(number), url, Thread, params, etag)
 
-    def iter_pulls(self, state=None, number=-1):
+    def iter_pulls(self, state=None, number=-1, etag=None):
         """List pull requests on repository.
 
         :param str state: (optional), accepted values: ('open', 'closed')
         :param int number: (optional), number of pulls to return. Default: -1
             returns all available pull requests
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of
             :class:`PullRequest <github3.pulls.PullRequest>`\ s
         """
         url = self._build_url('pulls', base_url=self._api)
         params = {}
-        if state in ('open', 'closed'):
-            params['state'] = state
-        return self._iter(int(number), url, PullRequest, params=params)
+        if state and state.lower() in ('open', 'closed'):
+            params['state'] = state.lower()
+        return self._iter(int(number), url, PullRequest, params, etag)
 
-    def iter_refs(self, subspace='', number=-1):
+    def iter_refs(self, subspace='', number=-1, etag=None):
         """Iterates over references for this repository.
 
         :param str subspace: (optional), e.g. 'tags', 'stashes', 'notes'
         :param int number: (optional), number of refs to return. Default: -1
             returns all available refs
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Reference <github3.git.Reference>`\ s
         """
         if subspace:
@@ -1034,61 +1077,74 @@ class Repository(GitHubCore):
         else:
             args = ('git', 'refs')
         url = self._build_url(*args, base_url=self._api)
-        return self._iter(int(number), url, Reference)
+        return self._iter(int(number), url, Reference, etag=etag)
 
-    def iter_stargazers(self, number=-1):
+    def iter_stargazers(self, number=-1, etag=None):
         """List users who have starred this repository.
 
+        :param int number: (optional), number of stargazers to return.
+            Default: -1 returns all subscribers available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('stargazers', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_subscribers(self, number=-1):
+    def iter_subscribers(self, number=-1, etag=None):
         """Iterates over users subscribed to this repository.
 
         :param int number: (optional), number of subscribers to return.
             Default: -1 returns all subscribers available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <github3.users.User>`
         """
         url = self._build_url('subscribers', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_statuses(self, sha, number=-1):
+    def iter_statuses(self, sha, number=-1, etag=None):
         """Iterates over the statuses for a specific SHA.
 
         :param str sha: SHA of the commit to list the statuses of
         :param int number: (optional), return up to number statuses. Default:
             -1 returns all available statuses.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Status <Status>`
         """
         url = ''
         if sha:
             url = self._build_url('statuses', sha, base_url=self._api)
-        return self._iter(int(number), url, Status)
+        return self._iter(int(number), url, Status, etag=etag)
 
-    def iter_tags(self, number=-1):
+    def iter_tags(self, number=-1, etag=None):
         """Iterates over tags on this repository.
 
         :param int number: (optional), return up to at most number tags.
             Default: -1 returns all available tags.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`RepoTag <RepoTag>`\ s
         """
         url = self._build_url('tags', base_url=self._api)
-        return self._iter(int(number), url, RepoTag)
+        return self._iter(int(number), url, RepoTag, etag=etag)
 
     @requires_auth
-    def iter_teams(self, number=-1):
+    def iter_teams(self, number=-1, etag=None):
         """Iterates over teams with access to this repository.
 
         :param int number: (optional), return up to number Teams. Default: -1
             returns all Teams.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Team <github3.orgs.Team>`\ s
         """
         from github3.orgs import Team
         url = self._build_url('teams', base_url=self._api)
-        return self._iter(int(number), url, Team)
+        return self._iter(int(number), url, Team, etag=etag)
 
+    @requires_auth
     def mark_notifications(self, last_read=''):
         """Mark all notifications in this repository as read.
 
@@ -1105,6 +1161,7 @@ class Repository(GitHubCore):
         return self._boolean(self._put(url, data=dumps(mark)),
                              205, 404)
 
+    @requires_auth
     def merge(self, base, head, message=''):
         """Perform a merge from ``head`` into ``base``.
 
@@ -1114,8 +1171,10 @@ class Repository(GitHubCore):
         :returns: :class:`RepoCommit <RepoCommit>`
         """
         url = self._build_url('merges', base_url=self._api)
-        data = {'base': base, 'head': head, 'commit_message': message}
-        json = self._json(self._post(url, data=dumps(data)), 201)
+        data = {'base': base, 'head': head}
+        if message:
+            data['commit_message'] = message
+        json = self._json(self._post(url, data=data), 201)
         return RepoCommit(json, self) if json else None
 
     def milestone(self, number):
@@ -1124,36 +1183,12 @@ class Repository(GitHubCore):
         :param int number: (required), unique id number of the milestone
         :returns: :class:`Milestone <github3.issues.Milestone>`
         """
-        url = self._build_url('milestones', str(number), base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if int(number) > 0:
+            url = self._build_url('milestones', str(number),
+                                  base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Milestone(json, self) if json else None
-
-    @requires_auth
-    def pubsubhubbub(self, mode, topic, callback, secret=''):
-        """Create/update a pubsubhubbub hook.
-
-        :param str mode: (required), accepted values: ('subscribe',
-            'unsubscribe')
-        :param str topic: (required), form:
-            https://github.com/:user/:repo/events/:event
-        :param str callback: (required), the URI that receives the updates
-        :param str secret: (optional), shared secret key that generates a
-            SHA1 HMAC of the payload content.
-        :returns: bool
-        """
-        from re import match
-        m = match('https://github\.com/\w+/[\w\._-]+/events/\w+', topic)
-        status = False
-        if mode and topic and callback and m:
-            data = [('hub.mode', mode), ('hub.topic', topic),
-                    ('hub.callback', callback)]
-            if secret:
-                data.append(('hub.secret', secret))
-            url = self._build_url('hub')
-            h = {'Content-Type': None}
-            status = self._boolean(self._post(url, data=data, headers=h), 204,
-                                   404)
-        return status
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
@@ -1188,8 +1223,10 @@ class Repository(GitHubCore):
         :type ref: str
         :returns: :class:`Reference <github3.git.Reference>`
         """
-        url = self._build_url('git', 'refs', ref, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if ref:
+            url = self._build_url('git', 'refs', ref, base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Reference(json, self) if json else None
 
     @requires_auth
@@ -1238,8 +1275,10 @@ class Repository(GitHubCore):
         :param str sha: (required), sha of the object for this tag
         :returns: :class:`Tag <github3.git.Tag>`
         """
-        url = self._build_url('git', 'tags', sha, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if sha:
+            url = self._build_url('git', 'tags', sha, base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Tag(json) if json else None
 
     def tree(self, sha):
@@ -1248,10 +1287,13 @@ class Repository(GitHubCore):
         :param str sha: (required), sha of the object for this tree
         :returns: :class:`Tree <github3.git.Tree>`
         """
-        url = self._build_url('git', 'trees', sha, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = None
+        if sha:
+            url = self._build_url('git', 'trees', sha, base_url=self._api)
+            json = self._json(self._get(url), 200)
         return Tree(json, self) if json else None
 
+    @requires_auth
     def update_label(self, name, color, new_name=''):
         """Update the label ``name``.
 
@@ -1311,7 +1353,7 @@ class Contents(GitHubObject):
         #: Decoded content of the file.
         self.decoded = self.content
         if self.encoding == 'base64':
-            self.decoded = b64decode(self.content.encode())
+            self.decoded = b64decode(self.content.encode()).decode()
 
         # file name, path, and size
         #: Name of the content.
@@ -1399,7 +1441,7 @@ class Download(GitHubCore):
             else:
                 file_like = False
                 fd = open(path, 'wb')
-            for chunk in resp.iter_content():
+            for chunk in resp.iter_content(512):
                 fd.write(chunk)
             if not file_like:
                 fd.close()
@@ -1549,8 +1591,9 @@ class RepoComment(BaseComment):
             self.user = User(comment.get('user'), self)
 
     def __repr__(self):
-        return '<Repository Comment [{0}/{1}]>'.format(self.commit_id[:7],
-                self.user.login or '')  # nopep8
+        return '<Repository Comment [{0}/{1}]>'.format(
+            self.commit_id[:7], self.user.login or ''
+        )
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
@@ -1572,7 +1615,7 @@ class RepoComment(BaseComment):
         if body and sha and path and line > 0 and position > 0:
             data = {'body': body, 'commit_id': sha, 'line': line,
                     'path': path, 'position': position}
-            json = self._json(self._post(self._api, data=dumps(data)), 200)
+            json = self._json(self._post(self._api, data=data), 200)
 
         if json:
             self._update_(json)

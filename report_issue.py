@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import os
 from github3 import login
 from getpass import getpass
 
@@ -47,7 +48,8 @@ issue_type = prompt_user('Bug or feature request? ')
 traceback = None
 if issue_type.lower() == 'bug':
     tb_file = prompt_user('Filename with traceback: ')
-    traceback = open(tb_file).read()
+    if os.path.isfile(tb_file):
+        traceback = open(tb_file).read()
 
 description = prompt_user('Description: ')
 
@@ -70,4 +72,6 @@ body = """**Issue type**: {0}
 *Generated with github3.py using the report_issue script*
 """.format(issue_type, traceback, description)
 
-repo.create_issue(title, body)
+i = repo.create_issue(title, body)
+
+print(i.html_url)

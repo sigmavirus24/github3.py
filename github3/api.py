@@ -139,8 +139,9 @@ def iter_gists(username=None, number=-1):
     return gh.iter_gists(username, number)
 
 
-def iter_repo_issues(owner, repository, filter='', state='', labels='',
-                     sort='', direction='', since='', number=-1):
+def iter_repo_issues(owner, repository, milestone=None, state=None,
+                     assignee=None, mentioned=None, labels=None, sort=None,
+                     direction=None, since=None, number=-1):
     """List issues on owner/repository. Only owner and repository are
     required.
 
@@ -164,8 +165,9 @@ def iter_repo_issues(owner, repository, filter='', state='', labels='',
     :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
     """
     if owner and repository:
-        return gh.iter_repo_issues(owner, repository, filter, state, labels,
-                                   sort, direction, since, number)
+        return gh.iter_repo_issues(owner, repository, milestone, state,
+                                   assignee, mentioned, labels, sort,
+                                   direction, since, number)
     return iter([])
 
 

@@ -22,6 +22,9 @@ class GitHubObject(object):
     object."""
     def __init__(self, json):
         super(GitHubObject, self).__init__()
+        if json is not None:
+            self.etag = json.pop('ETag', None)
+            self.last_modified = json.pop('Last-Modified', None)
         self._json_data = json
 
     def to_json(self):
@@ -76,17 +79,24 @@ class GitHubCore(GitHubObject):
 
     def _json(self, response, status_code):
         ret = None
-        if response.status_code == status_code and response.content:
+        if self._boolean(response, status_code, 404) and response.content:
             ret = response.json()
-        if response.status_code >= 400:
-            raise GitHubError(response)
+            headers = response.headers
+            if ((headers.get('Last-Modified') or headers.get('ETag')) and
+                    isinstance(ret, dict)):
+                ret['Last-Modified'] = response.headers.get(
+                    'Last-Modified', ''
+                )
+                ret['ETag'] = response.headers.get('ETag', '')
         return ret
 
-    def _boolean(self, request, true_code, false_code):
-        if request.status_code == true_code:
-            return True
-        if request.status_code != false_code and request.status_code >= 400:
-            raise GitHubError(request)
+    def _boolean(self, response, true_code, false_code):
+        if response is not None:
+            status_code = response.status_code
+            if status_code == true_code:
+                return True
+            if status_code != false_code and status_code >= 400:
+                raise GitHubError(response)
         return False
 
     def _delete(self, url, **kwargs):
@@ -98,8 +108,15 @@ class GitHubCore(GitHubObject):
     def _patch(self, url, **kwargs):
         return self._session.patch(url, **kwargs)
 
-    def _post(self, url, data=None, **kwargs):
-        return self._session.post(url, data, **kwargs)
+    def _post(self, url, data=None, json=True, **kwargs):
+        if json:
+            data = dumps(data) if data is not None else data
+            return self._session.post(url, data=data, **kwargs)
+        else:
+            if 'headers' in kwargs:
+                kwargs['headers'].update({'Content-Type': None})
+            # Override the Content-Type header
+            return self._session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
         return self._session.put(url, **kwargs)
@@ -115,39 +132,24 @@ class GitHubCore(GitHubObject):
         return __url_cache__[key]
 
     @property
-    def api(self):
+    def _api(self):
         return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
 
-    @api.setter
-    def api(self, uri):
+    @_api.setter
+    def _api(self, uri):
         self._uri = urlparse(uri)
 
-    def _iter(self, count, url, cls, params=None):
+    def _iter(self, count, url, cls, params=None, etag=None):
         """Generic iterator for this project.
 
         :param int count: How many items to return.
         :param int url: First URL to start with
         :param class cls: cls to return an object of
         :param params dict: (optional) Parameters for the request
+        :param str etag: (optional), ETag from the last call
         """
-        while (count == -1 or count > 0) and url:
-            response = self._get(url, params=params)
-            if params:
-                params = None  # rel_next contains the params
-            json = self._json(response, 200)
-
-            # languages returns a single dict. We want the items.
-            if isinstance(json, dict):
-                json = json.items()
-
-            for i in json:
-                yield cls(i, self) if issubclass(cls, GitHubCore) else cls(i)
-                count -= 1 if count > 0 else 0
-                if count == 0:
-                    break
-
-            rel_next = response.links.get('next', {})
-            url = rel_next.get('url', '')
+        from github3.structs import GitHubIterator
+        return GitHubIterator(count, url, cls, self, params, etag)
 
     @property
     def ratelimit_remaining(self):
@@ -156,11 +158,43 @@ class GitHubCore(GitHubObject):
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining
 
-    def refresh(self):
+    def refresh(self, conditional=False):
         """Re-retrieve the information for this object and returns the
-        refreshed instance."""
-        json = self._json(self._get(self._api), 200)
-        self.__init__(json, self._session)
+        refreshed instance.
+
+        :param bool conditional: If True, then we will search for a stored
+            header ('Last-Modified', or 'ETag') on the object and send that
+            as described in the `Conditional Requests`_ section of the docs
+        :returns: self
+
+        The reasoning for the return value is the following example: ::
+
+            repos = [r.refresh() for r in g.iter_repos('kennethreitz')]
+
+        Without the return value, that would be an array of ``None``'s and you
+        would otherwise have to do: ::
+
+            repos = [r for i in g.iter_repos('kennethreitz')]
+            [r.refresh() for r in repos]
+
+        Which is really an anti-pattern.
+
+        .. versionchanged:: 0.5
+
+        .. _Conditional Requests:
+            http://developer.github.com/v3/#conditional-requests
+        """
+        headers = {}
+        if conditional:
+            if self.last_modified:
+                headers['If-Modified-Since'] = self.last_modified
+            elif self.etag:
+                headers['If-None-Match'] = self.etag
+
+        headers = headers or None
+        json = self._json(self._get(self._api, headers=headers), 200)
+        if json is not None:
+            self.__init__(json, self._session)
         return self
 
 
@@ -311,14 +345,14 @@ class GitHubError(Exception):
         self.response = resp
         self.code = resp.status_code
         self.errors = []
-        if resp.json():  # GitHub Error
+        try:
             error = resp.json()
             #: Message associated with the error
             self.msg = error.get('message')
             #: List of errors provided by GitHub
             if error.get('errors'):
                 self.errors = error.get('errors')
-        else:  # Amazon S3 error
+        except:  # Amazon S3 error
             self.msg = resp.content or '[No message]'
 
     def __repr__(self):

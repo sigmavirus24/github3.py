@@ -122,16 +122,6 @@ class Milestone(GitHubCore):
         url = self._build_url('labels', base_url=self._api)
         return self._iter(int(number), url, Label)
 
-    def list_labels(self):
-        """List the labels for every issue associated with this
-        milestone.
-
-        :returns: list of :class:`Label <Label>`\ s
-        """
-        url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [Label(label, self) for label in json]
-
     @requires_auth
     def update(self, title, state='', description='', due_on=''):
         """Update this milestone.
@@ -226,12 +216,11 @@ class Issue(GitHubCore):
         """Add labels to this issue.
 
         :param str args: (required), names of the labels you wish to add
-        :returns: bool
+        :returns: list of :class:`Label`\ s
         """
         url = self._build_url('labels', base_url=self._api)
-        json = self._json(self._post(url, data=dumps(args)),
-                          status_code=200)
-        return True if json else False
+        json = self._json(self._post(url, data=args), 200)
+        return [Label(l, self) for l in json] if json else []
 
     @requires_auth
     def assign(self, login):
@@ -286,7 +275,7 @@ class Issue(GitHubCore):
         json = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, data=dumps({'body': body})),
+            json = self._json(self._post(url, data={'body': body}),
                               201)
         return IssueComment(json, self) if json else None
 
@@ -311,9 +300,7 @@ class Issue(GitHubCore):
         json = None
         data = {'title': title, 'body': body, 'assignee': assignee,
                 'state': state, 'milestone': milestone, 'labels': labels}
-        for (k, v) in list(data.items()):
-            if v is None:
-                del data[k]
+        self._remove_none(data)
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
@@ -339,15 +326,6 @@ class Issue(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, IssueComment)
 
-    def list_comments(self):
-        """List comments on this issue.
-
-        :returns: list of :class:`IssueComment <IssueComment>`
-        """
-        url = self._build_url('comments', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [IssueComment(comment, self) for comment in json]
-
     def iter_events(self, number=-1):
         """Iterate over events associated with this issue only.
 
@@ -358,30 +336,24 @@ class Issue(GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent)
 
-    def list_events(self):
-        """List events associated with this issue only.
-
-        :returns: list of :class:`IssueEvent <IssueEvent>`\ s
-        """
-        url = self._build_url('events', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return [IssueEvent(event, self) for event in json]
-
     @requires_auth
     def remove_label(self, name):
         """Removes label ``name`` from this issue.
 
         :param str name: (required), name of the label to remove
-        :returns: list of labels remaining
+        :returns: bool
         """
         url = self._build_url('labels', name, base_url=self._api)
-        return self._json(self._delete(url), 200)
+        # Docs say it should be a list of strings returned, practice says it 
+        # is just a 204/404 response. I'm tenatively changing this until I 
+        # hear back from Support.
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def remove_all_labels(self):
         """Remove all labels from this issue.
 
-        :returns: bool
+        :returns: an empty list if successful
         """
         # Can either send DELETE or [] to remove all labels
         return self.replace_labels([])
@@ -394,7 +366,8 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._boolean(self._put(url, data=dumps(labels)), 200, 404)
+        json = self._json(self._put(url, data=dumps(labels)), 200)
+        return [Label(l, self) for l in json] if json else []
 
     @requires_auth
     def reopen(self):
@@ -456,8 +429,9 @@ class IssueEvent(GitHubCore):
         self.pull_request = event.get('pull_request', {})
 
     def __repr__(self):
-        return '<Issue Event [#{0} - {1}]>'.format(self.issue.number,
-                self.event)  # nopep8
+        return '<Issue Event [#{0} - {1}]>'.format(
+            self.issue.number, self.event
+        )
 
 
 def issue_params(filter, state, labels, sort, direction, since):

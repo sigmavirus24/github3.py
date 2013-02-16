@@ -18,7 +18,7 @@ packages = [
     "github3.packages",
     "github3.packages.PySO8601",
 ]
-requires = ["requests==1.0.4"]
+requires = ["requests==1.1.0"]
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
@@ -57,6 +57,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
 )

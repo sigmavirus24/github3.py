@@ -96,26 +96,30 @@ class Team(GitHubCore):
         url = self._build_url('members', login, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_members(self, number=-1):
+    def iter_members(self, number=-1, etag=None):
         """Iterate over the members of this team.
 
         :param int number: (optional), number of users to iterate over.
             Default: -1 iterates over all values
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_repos(self, number=-1):
+    def iter_repos(self, number=-1, etag=None):
         """Iterate over the repositories this team has access to.
 
         :param int number: (optional), number of repos to iterate over.
             Default: -1 iterates over all values
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
             objects
         """
         url = self._build_url('repos', base_url=self._api)
-        return self._iter(int(number), url, Repository)
+        return self._iter(int(number), url, Repository, etag=etag)
 
     @requires_auth
     def remove_member(self, login):
@@ -148,15 +152,19 @@ class Organization(BaseAccount):
         #: Number of private repositories.
         self.private_repos = org.get('private_repos', 0)
 
-    def __repr__(self):
-        return '<Organization [{0}:{1}]>'.format(self.login, self.name)
-
     @requires_auth
     def add_member(self, login, team):
         """Add ``login`` to ``team`` and thereby to this organization.
 
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
+
+        .. note::
+            This method is of complexity O(n). This iterates over all teams in
+            your organization and only adds the user when the team name
+            matches the team parameter above. If you want constant time, you
+            should retrieve the team and call ``add_member`` on that team
+            directly.
 
         :param str login: (required), login name of the user to be added
         :param str team: (required), team name
@@ -171,8 +179,15 @@ class Organization(BaseAccount):
     def add_repo(self, repo, team):
         """Add ``repo`` to ``team``.
 
+        .. note::
+            This method is of complexity O(n). This iterates over all teams in
+            your organization and only adds the repo when the team name
+            matches the team parameter above. If you want constant time, you
+            should retrieve the team and call ``add_repo`` on that team
+            directly.
+
         :param str repo: (required), form: 'user/repo'
-        :param str team: (required)
+        :param str team: (required), team name
         """
         for t in self.iter_teams():
             if team == t.name:
@@ -278,9 +293,7 @@ class Organization(BaseAccount):
         json = None
         data = {'billing_email': billing_email, 'company': company,
                 'email': email, 'location': location, 'name': name}
-        for (k, v) in data.items():
-            if v is None:
-                del data[k]
+        self._remove_none(data)
 
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
@@ -306,37 +319,43 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', login, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_events(self, number=-1):
+    def iter_events(self, number=-1, etag=None):
         """Iterate over events for this org.
 
         :param int number: (optional), number of events to return. Default: -1
             iterates over all events available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         url = self._build_url('events', base_url=self._api)
-        return self._iter(int(number), url, Event)
+        return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_members(self, number=-1):
+    def iter_members(self, number=-1, etag=None):
         """Iterate over members of this organization.
 
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_public_members(self, number=-1):
+    def iter_public_members(self, number=-1, etag=None):
         """Iterate over public members of this organization.
 
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('public_members', base_url=self._api)
-        return self._iter(int(number), url, User)
+        return self._iter(int(number), url, User, etag=etag)
 
-    def iter_repos(self, type='', number=-1):
+    def iter_repos(self, type='', number=-1, etag=None):
         """Iterate over repos for this organization.
 
         :param str type: (optional), accepted values:
@@ -344,24 +363,28 @@ class Organization(BaseAccount):
             default: 'all'
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repos', base_url=self._api)
         params = {}
         if type in ('all', 'public', 'member', 'private', 'forks', 'sources'):
             params['type'] = type
-        return self._iter(int(number), url, Repository, params)
+        return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
-    def iter_teams(self, number=-1):
+    def iter_teams(self, number=-1, etag=None):
         """Iterate over teams that are part of this organization.
 
         :param int number: (optional), number of teams to return. Default: -1
             returns all available teams.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`Team <Team>`\ s
         """
         url = self._build_url('teams', base_url=self._api)
-        return self._iter(int(number), url, Team)
+        return self._iter(int(number), url, Team, etag=etag)
 
     @requires_auth
     def publicize_member(self, login):

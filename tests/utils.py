@@ -6,6 +6,9 @@ import sys
 from mock import patch
 from io import BytesIO
 from unittest import TestCase
+from requests.structures import CaseInsensitiveDict
+
+is_py3 = sys.version_info > (3, 0)
 
 
 def load(name):
@@ -56,6 +59,8 @@ expect = CustomExpecter
 
 
 class BaseCase(TestCase):
+    github_url = 'https://api.github.com/'
+
     def setUp(self):
         self.g = github3.GitHub()
         self.args = ()
@@ -76,10 +81,13 @@ class BaseCase(TestCase):
 
         expect(self.args) == args
 
-        if 'data' in self.conf and isinstance(self.conf['data'], dict):
-            for k, v in list(self.conf['data'].items()):
-                s = json.dumps({k: v})[1:-1]
-                expect(s).is_in(kwargs['data'])
+        if 'data' in self.conf:
+            if isinstance(self.conf['data'], dict):
+                for k, v in list(self.conf['data'].items()):
+                    s = json.dumps({k: v})[1:-1]
+                    expect(s).is_in(kwargs['data'])
+            else:
+                expect(self.conf['data']) == kwargs['data']
 
             del self.conf['data']
 
@@ -97,25 +105,25 @@ class BaseCase(TestCase):
         r.encoding = enc
 
         if path_name:
+            content = path(path_name).read().strip()
             if _iter:
-                content = path(path_name).read().strip()
                 content = '[{0}]'.format(content)
                 r.raw = BytesIO(content.encode())
-            elif sys.version_info > (3, 0):
-                content = path(path_name).read().strip()
+            elif is_py3:
                 r.raw = BytesIO(content.encode())
             else:
-                r.raw = path(path_name)
+                r.raw = BytesIO(content)
         else:
             r.raw = BytesIO()
 
         if headers:
-            r.headers = headers
+            r.headers = CaseInsensitiveDict(headers)
 
         self.request.return_value = r
 
     def delete(self, url):
         self.args = ('DELETE', url)
+        self.conf = {}
 
     def get(self, url):
         self.args = ('GET', url)

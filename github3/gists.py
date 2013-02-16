@@ -33,7 +33,8 @@ class Gist(GitHubCore):
 
         #: URL of this gist at Github, e.g., https://gist.github.com/1
         self.html_url = data.get('html_url')
-        self._public = data.get('public')
+        #: Boolean describing if the gist is public or private
+        self.public = data.get('public')
 
         self._forks = data.get('forks', [])
         #: The number of forks of this gist.
@@ -53,9 +54,9 @@ class Gist(GitHubCore):
 
         #: :class:`User <github3.users.User>` object representing the owner of
         #  the gist.
-        self.user = data.get('user')
-        if data.get('user'):
-            self.user = User(data.get('user'), self._session)
+        self.owner = data.get('owner')
+        if data.get('owner'):
+            self.owner = User(data.get('owner'), self._session)
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
         #: Number of files in this gist.
@@ -64,11 +65,13 @@ class Gist(GitHubCore):
         #: History of this gist, list of :class:`GistHistory <GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
+    def __str__(self):
+        return self.id
+
     def __repr__(self):
         return '<Gist [{0}]>'.format(self.id)
 
     def _update_(self, data):
-        self._json_data = data
         self.__init__(data, self._session)
 
     @requires_auth
@@ -78,8 +81,10 @@ class Gist(GitHubCore):
         :param str body: (required), body of the comment
         :returns: :class:`GistComment <GistComment>`
         """
-        url = self._build_url('comments', base_url=self._api)
-        json = self._json(self._post(url, dumps({'body': body})), 201)
+        json = None
+        if body:
+            url = self._build_url('comments', base_url=self._api)
+            json = self._json(self._post(url, data={'body': body}), 201)
         return GistComment(json, self) if json else None
 
     @requires_auth
@@ -129,8 +134,9 @@ class Gist(GitHubCore):
 
         :returns: bool -- True if public, False if private
         """
-        return self._public
+        return self.public
 
+    @requires_auth
     def is_starred(self):
         """Checks to see if this gist is starred by the authenticated user.
 
@@ -139,15 +145,17 @@ class Gist(GitHubCore):
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1):
+    def iter_comments(self, number=-1, etag=None):
         """List comments on this gist.
 
         :param int number: (optional), number of comments to iterate over.
             Default: -1 will iterate over all comments on the gist
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
         :returns: generator of :class:`GistComment <GistComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, GistComment)
+        return self._iter(int(number), url, GistComment, etag=etag)
 
     def iter_files(self):
         """List of :class:`GistFile <GistFile>` objects representing the files
@@ -156,16 +164,7 @@ class Gist(GitHubCore):
 
     def iter_forks(self):
         """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
-        return iter(self._forks)
-
-    def refresh(self):
-        """Updates this gist by getting the information from the API again.
-
-        :returns: bool -- whether the update was successful or not"""
-        json = self._json(self._get(self._api), 200)
-        if json:
-            self._update_(json)
-        return True if json else False
+        return iter(self._forks)  # (No coverage)
 
     @requires_auth
     def star(self):
@@ -196,7 +195,7 @@ class GistComment(BaseComment):
         #: :class:`User <github3.users.User>` who made the comment
         self.user = None
         if comment.get('user'):
-            self.user = User(comment.get('user'), self)
+            self.user = User(comment.get('user'), self)  # (No coverage)
 
     def __repr__(self):
         return '<Gist Comment [{0}]>'.format(self.user.login)

@@ -15,7 +15,7 @@ try:  # (No coverage)
     from StringIO import StringIO  # (No coverage)
 except ImportError:  # (No coverage)
     # python3
-    from io import BytesIO as StringIO  # NOQA
+    from io import BytesIO as StringIO
 
 
 def requires_auth(func):
@@ -62,4 +62,4 @@ def requires_basic_auth(func):
 # Use mock decorators when generating documentation, so all functino signatures
 # are displayed correctly
 if os.getenv('GENERATING_DOCUMENTATION', None) == 'github3':
-    requires_auth = requires_basic_auth = lambda x: x  # (No coverage)
+    requires_auth = requires_basic_auth = lambda x: x  # noqa  # (No coverage)
