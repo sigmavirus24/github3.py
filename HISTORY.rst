@@ -1,6 +1,11 @@
 History/Changelog
 =================
 
+0.5.1: 2013-02-21
+-----------------
+
+- Hot fix an issue when a user doesn't have a real name set
+
 0.5: 2013-02-16
 ---------------
 
