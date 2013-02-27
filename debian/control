@@ -1,0 +1,23 @@
+Source: github3.py
+Maintainer: Dennis Kaarsemaker <dennis@kaarsemaker.net>
+Section: python
+Priority: optional
+Build-Depends: debhelper, python-all, python-setuptools, python3-all, python-requests, python3-requests
+Standards-Version: 3.9.3
+X-Python-Version: >= 2.6
+X-Python3-Version: >= 3.0
+Homepage: http://github3py.readthedocs.org/
+
+Package: python-github3.py
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends}
+Description: Comprehensive wrapper around the GitHub v3 API
+ Comprehensive wrapper around the GitHub v3 API
+
+Package: python3-github3.py
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends}
+Description: Comprehensive wrapper around the GitHub v3 API
+ Comprehensive wrapper around the GitHub v3 API
+ .
+ This package contains the Python 3 version of the library.
