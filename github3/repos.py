@@ -1350,10 +1350,16 @@ class Contents(GitHubObject):
         #: Base64-encoded content of the file.
         self.content = content.get('content', '')
 
-        #: Decoded content of the file.
+        #: Decoded content of the file as a bytes object. If we try to decode
+        #: to character set for you, we might encounter an exception which
+        #: will prevent the object from being created. On python2 this is the
+        #: same as a string, but on python3 you should call the decode method
+        #: with the character set you wish to use, e.g.,
+        #: ``content.decoded.decode('utf-8')``.
+        #: .. versionchanged:: 0.5.2
         self.decoded = self.content
         if self.encoding == 'base64':
-            self.decoded = b64decode(self.content.encode()).decode()
+            self.decoded = b64decode(self.content.encode())
 
         # file name, path, and size
         #: Name of the content.

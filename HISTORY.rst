@@ -1,6 +1,16 @@
 History/Changelog
 =================
 
+0.5.2: 2013-03-02
+-----------------
+
+- Stop trying to decode the byte strings returned by ``b64decode``. Fixes #72
+
+0.5.1: 2013-02-21
+-----------------
+
+- Hot fix an issue when a user doesn't have a real name set
+
 0.5: 2013-02-16
 ---------------
 
