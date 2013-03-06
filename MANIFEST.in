@@ -1,1 +1,1 @@
-include README.rst LICENSE HISTORY.rst AUTHORS.rst
+include README.rst LICENSE HISTORY.rst AUTHORS.rst run_tests.py
