@@ -126,6 +126,15 @@ class TestRepository(BaseCase):
         self.response('', 404)
         expect(self.repo.contents(filename)).is_None()
 
+    def test_contents_ref(self):
+        self.response('contents')
+        filename = 'setup.py'
+        self.get(self.api + 'contents/' + filename)
+        self.conf = {'params': {'ref': 'foo'}}
+
+        expect(self.repo.contents(filename, ref='foo')).isinstance(github3.repos.Contents)
+        self.mock_assertions()
+
     def test_create_blob(self):
         self.response('blob', 201)
         content = 'VGVzdCBibG9i\n'
