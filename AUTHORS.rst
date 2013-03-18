@@ -35,3 +35,5 @@ Contributors
 - Tom Parker (@palfrey)
 
 - Malcolm Box (@mbox)
+
+- Tom Petr (@tpetr)
