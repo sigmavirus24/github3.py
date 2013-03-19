@@ -14,7 +14,7 @@ try:
     import mock
 except ImportError as ie:
     print('Please install the test dependencies as documented in the README')
-    raise ie
+    raise
 
 TEST_DIR = 'tests'
 
