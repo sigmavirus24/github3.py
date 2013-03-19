@@ -1,6 +1,11 @@
 History/Changelog
 =================
 
+0.5.3: 2013-03-19
+-----------------
+
+- Add missing optional parameter to Repository.contents. Thanks @tpetr
+
 0.5.2: 2013-03-02
 -----------------
 

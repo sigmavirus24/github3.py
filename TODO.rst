@@ -6,16 +6,6 @@ High priority
 
 (In order of priority)
 
-requests 1.x
-~~~~~~~~~~~~
-
-Upgrade to requests 1.x
-
-unittests
-~~~~~~~~~
-
-Rewrite all unittests with mock.
-
 github3.api
 ~~~~~~~~~~~
 
