@@ -10,10 +10,11 @@ from json import dumps
 from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
-from github3.packages.PySO8601 import parse
+from datetime import datetime
 from github3 import __version__
 
 __url_cache__ = {}
+__timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 
 
 class GitHubObject(object):
@@ -33,7 +34,9 @@ class GitHubObject(object):
 
     def _strptime(self, time_str):
         """Converts an ISO 8601 formatted string into a datetime object."""
-        return parse(time_str) if time_str else None
+        if time_str:
+            return datetime.strptime(time_str, __timeformat__)
+        return None
 
     @classmethod
     def from_json(cls, json):

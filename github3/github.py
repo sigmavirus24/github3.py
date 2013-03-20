@@ -860,32 +860,41 @@ class GitHub(GitHubCore):
         issues = json.get('issues', [])
         return [LegacyIssue(l, self) for l in issues]
 
-    def search_repos(self, keyword, language='', start_page=0):
+    def search_repos(self, keyword, language=None, start_page=None,
+                     sort=None):
         """Search all repositories by keyword.
 
         :param str keyword: (required)
         :param str language: (optional), language to filter by
         :param int start_page: (optional), page to get (results come 100/page)
+        :param str sort: (optional), how to sort the results; accepted values:
+            ('stars', 'forks', 'updated')
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
         url = self._build_url('legacy', 'repos', 'search', keyword)
-        params = {}
-        if language:
-            params['language'] = language
-        if start_page > 0:
-            params['start_page'] = start_page
+        params = {'language': language, 'start_page': start_page}
+        if sort in ('stars', 'forks', 'updated'):
+            params['sort'] = sort
         json = self._json(self._get(url, params=params), 200)
         repos = json.get('repositories', [])
         return [LegacyRepo(r, self) for r in repos]
 
-    def search_users(self, keyword, start_page=0):
+    def search_users(self, keyword, start_page=0, sort=None, order=None):
         """Search all users by keyword.
 
         :param str keyword: (required)
         :param int start_page: (optional), page to get (results come 100/page)
+        :param str sort: (optional), how to sort the results; accepted values:
+            ('followers', 'joined', 'repositories')
+        :param str order: (optional), sort order if ``sort`` isn't provided,
+            accepted values: ('asc', 'desc')
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
         params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
+        if sort in ('followers', 'joined', 'repositories'):
+            params['sort'] = sort
+        if order in ('asc', 'desc') and not sort:
+            params['order'] = order
         url = self._build_url('legacy', 'user', 'search', str(keyword))
         json = self._json(self._get(url, params=params), 200)
         users = json.get('users', [])

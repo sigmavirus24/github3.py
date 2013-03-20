@@ -643,15 +643,23 @@ class TestGitHub(BaseCase):
         self.response('legacy_repo')
         self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
                  'legacy', 'repos', 'search', 'github3.py'))
-        self.conf.update(params={})
+        self.conf.update(params={'start_page': None, 'language': None})
         repos = self.g.search_repos('github3.py')
         expect(repos[0]).isinstance(github3.legacy.LegacyRepo)
         expect(repr(repos[0]).startswith('<Legacy Repo')).is_True()
         expect(repos[0].is_private()) == repos[0].private
         self.mock_assertions()
 
+        repos = self.g.search_repos('github3.py', sort='Foobar')
+        self.mock_assertions()
+
         self.conf.update(params={'language': 'python', 'start_page': 10})
         repos = self.g.search_repos('github3.py', 'python', 10)
+        self.mock_assertions()
+
+        self.conf.update(params={'sort': 'stars', 'start_page': None,
+                                 'language': None})
+        repos = self.g.search_repos('github3.py', sort='stars')
         self.mock_assertions()
 
     def test_search_users(self):
@@ -664,8 +672,22 @@ class TestGitHub(BaseCase):
         expect(repr(users[0]).startswith('<Legacy User')).is_True()
         self.mock_assertions()
 
+        users = self.g.search_users('sigmavirus24', sort='Foobar')
+        self.mock_assertions()
+
+        users = self.g.search_users('sigmavirus24', order='Foobar')
+        self.mock_assertions()
+
         self.conf.update({'params': {'start_page': 2}})
         self.g.search_users('sigmavirus24', 2)
+        self.mock_assertions()
+
+        self.conf.update({'params': {'sort': 'joined'}})
+        self.g.search_users('sigmavirus24', sort='joined', order='Foobar')
+        self.mock_assertions()
+
+        self.conf.update({'params': {'order': 'asc'}})
+        self.g.search_users('sigmavirus24', order='asc')
         self.mock_assertions()
 
     def test_search_email(self):
