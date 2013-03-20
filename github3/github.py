@@ -861,7 +861,7 @@ class GitHub(GitHubCore):
         return [LegacyIssue(l, self) for l in issues]
 
     def search_repos(self, keyword, language=None, start_page=None,
-                     sort=None):
+                     sort=None, order=None):
         """Search all repositories by keyword.
 
         :param str keyword: (required)
@@ -869,12 +869,16 @@ class GitHub(GitHubCore):
         :param int start_page: (optional), page to get (results come 100/page)
         :param str sort: (optional), how to sort the results; accepted values:
             ('stars', 'forks', 'updated')
+        :param str order: (optional), sort order if ``sort`` isn't provided,
+            accepted values: ('asc', 'desc')
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
         url = self._build_url('legacy', 'repos', 'search', keyword)
         params = {'language': language, 'start_page': start_page}
         if sort in ('stars', 'forks', 'updated'):
             params['sort'] = sort
+        if order in ('asc', 'desc') and not sort:
+            params['order'] = order
         json = self._json(self._get(url, params=params), 200)
         repos = json.get('repositories', [])
         return [LegacyRepo(r, self) for r in repos]

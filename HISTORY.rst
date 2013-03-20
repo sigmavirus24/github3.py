@@ -1,6 +1,14 @@
 History/Changelog
 =================
 
+0.6.0: 2013-xx-xx
+-----------------
+
+- Add ``sort`` and ``order`` parameters to ``github3.GitHub.search_users`` and 
+  ``github3.GitHub.search_repos``.
+
+- Remove vendored dependency of PySO8601.
+
 0.5.3: 2013-03-19
 -----------------
 

@@ -653,6 +653,9 @@ class TestGitHub(BaseCase):
         repos = self.g.search_repos('github3.py', sort='Foobar')
         self.mock_assertions()
 
+        repos = self.g.search_repos('github3.py', order='Foobar')
+        self.mock_assertions()
+
         self.conf.update(params={'language': 'python', 'start_page': 10})
         repos = self.g.search_repos('github3.py', 'python', 10)
         self.mock_assertions()
@@ -661,6 +664,14 @@ class TestGitHub(BaseCase):
                                  'language': None})
         repos = self.g.search_repos('github3.py', sort='stars')
         self.mock_assertions()
+
+        repos = self.g.search_repos('github3.py', sort='stars',
+                                    order='Foobar')
+        self.mock_assertions()
+
+        self.conf.update(params={'order': 'asc', 'start_page': None,
+                                 'language': None})
+        repos = self.g.search_repos('github3.py', order='asc')
 
     def test_search_users(self):
         self.response('legacy_user')
