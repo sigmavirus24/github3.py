@@ -10,13 +10,23 @@ except ImportError:
     coverage = None
 
 try:
-    import expecter
-    import mock
+    import expecter  # NOQA
+    import mock  # NOQA
 except ImportError as ie:
     print('Please install the test dependencies as documented in the README')
     raise
 
 TEST_DIR = 'tests'
+
+
+def collect_tests():
+    # list files in directory tests/
+    names = os.listdir(TEST_DIR)
+    regex = re.compile("(?!_+)\w+\.py$")
+    join = '.'.join
+    # Make a list of the names like 'tests.test_name'
+    names = [join([TEST_DIR, f[:-3]]) for f in names if regex.match(f)]
+    return unittest.defaultTestLoader.loadTestsFromNames(names)
 
 if __name__ == "__main__":
     if coverage:
@@ -26,13 +36,7 @@ if __name__ == "__main__":
         cov.exclude('def __repr__')
         cov.start()
 
-    # list files in directory tests/
-    names = os.listdir(TEST_DIR)
-    regex = re.compile("(?!_+)\w+\.py$")
-    join = '.'.join
-    # Make a list of the names like 'tests.test_name'
-    names = [join([TEST_DIR, f[:-3]]) for f in names if regex.match(f)]
-    suite = unittest.defaultTestLoader.loadTestsFromNames(names)
+    suite = collect_tests()
     unittest.TextTestRunner(verbosity=1).run(suite)
 
     if coverage:
