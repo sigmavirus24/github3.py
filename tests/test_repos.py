@@ -2,6 +2,7 @@ import os
 import github3
 from tests.utils import (expect, BaseCase, load)
 from mock import patch, mock_open
+from requests.compat import is_py2, is_py3
 
 
 class TestRepository(BaseCase):
@@ -132,7 +133,8 @@ class TestRepository(BaseCase):
         self.get(self.api + 'contents/' + filename)
         self.conf = {'params': {'ref': 'foo'}}
 
-        expect(self.repo.contents(filename, ref='foo')).isinstance(github3.repos.Contents)
+        expect(self.repo.contents(filename, ref='foo')).isinstance(
+            github3.repos.Contents)
         self.mock_assertions()
 
     def test_create_blob(self):

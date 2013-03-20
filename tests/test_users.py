@@ -76,7 +76,8 @@ class TestUser(BaseCase):
     def setUp(self):
         super(TestUser, self).setUp()
         self.user = github3.users.User(self.user.to_json(), self.g)
-        self.user.name = self.user.name.decode('utf-8')
+        if hasattr(self.user.name, 'decode'):
+            self.user.name = self.user.name.decode('utf-8')
 
     def test_refresh(self):
         """This sort of tests all instances of refresh for good measure."""

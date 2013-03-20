@@ -12,7 +12,9 @@ is_py3 = sys.version_info > (3, 0)
 
 
 def load(name):
-    return json.load(path(name))
+    with path(name) as f:
+        j = json.load(f)
+    return j
 
 
 def path(name, mode='r'):
@@ -105,7 +107,9 @@ class BaseCase(TestCase):
         r.encoding = enc
 
         if path_name:
-            content = path(path_name).read().strip()
+            with path(path_name) as f:
+                content = f.read().strip()
+
             if _iter:
                 content = '[{0}]'.format(content)
                 r.raw = BytesIO(content.encode())
