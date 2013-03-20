@@ -10,7 +10,6 @@ API.
 """
 
 from .models import GitHubCore
-from re import match
 
 
 class LegacyIssue(GitHubCore):
@@ -30,16 +29,9 @@ class LegacyIssue(GitHubCore):
         #: Number of votes on this issue. Probably effectively deprecated
         self.votes = issue.get('votes', 0)
         #: datetime object representing the creation of the issue
-        self.created_at = None
-        if issue.get('created_at'):
-            created = issue.get('created_at')[:-6] + 'Z'
-            self.created_at = self._strptime(created)
-
+        self.created_at = self._strptime(issue.get('created_at'))
         #: datetime object representing the last time the issue was updated
-        self.updated_at = None
-        if issue.get('updated_at'):
-            updated = issue.get('updated_at')[:-6] + 'Z'
-            self.updated_at = self._strptime(updated)
+        self.updated_at = issue.get(issue.get('updated_at'))
         #: Number of comments on the issue
         self.comments = issue.get('comments', 0)
         #: Body of the issue
@@ -65,10 +57,7 @@ class LegacyRepo(GitHubCore):
     def __init__(self, repo, session=None):
         super(LegacyRepo, self).__init__(repo, session)
         #: datetime object representing the date of creation of this repo
-        self.created_at = None
-        if repo.get('created'):
-            created = repo.get('created')[:-6] + 'Z'
-            self.created_at = self._strptime(created)
+        self.created_at = self._strptime(repo.get('created'))
         #: datetime object representing the date of creation of this repo
         self.created = self.created_at
         #: description of this repository
@@ -97,10 +86,7 @@ class LegacyRepo(GitHubCore):
         #: Whether the repository is private or not
         self.private = repo.get('private', False)
         #: datetime object representing the last time the repo was pushed to
-        self.pushed = None
-        if repo.get('pushed_at'):
-            pushed = repo.get('pushed_at')[:-6] + 'Z'  # (No coverage)
-            self.pushed = self._strptime(pushed)  # (No coverage)
+        self.pushed = self._strptime(repo.get('pushed_at'))
         #: datetime object representing the last time the repo was pushed to
         self.pushed_at = self.pushed
         #: Score
@@ -131,12 +117,7 @@ class LegacyUser(GitHubCore):
     def __init__(self, user, session=None):
         super(LegacyUser, self).__init__(user, session)
         #: datetime object representing when the account was created
-        self.created = None
-        if user.get('created'):
-            created = user.get('created')
-            if not match(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', created):
-                created = created[:-6] + 'Z'
-            self.created = self._strptime(created)
+        self.created = self._strptime(user.get('created'))
         #: datetime object representing when the account was created
         self.created_at = self.created
 
@@ -161,15 +142,6 @@ class LegacyUser(GitHubCore):
         self.name = user.get('fullname', '')
         #: Number of public repos owned by this user
         self.public_repo_count = user.get('public_repo_count', 0)
-        #: datetime representing the last time this user pushed
-        self.pushed = None
-        if user.get('pushed'):
-            pushed = user.get('pushed')[:-5] + 'Z'  # (No coverage)
-            self.pushed = self._strptime(pushed)  # (No coverage)
-        #: datetime representing the last time this user pushed
-        self.pushed_at = self.pushed
-        #: User's record
-        self.record = user.get('record', '')
         #: Number of repos owned by the user
         self.repos = user.get('repos', 0)
         #: Score
@@ -177,6 +149,8 @@ class LegacyUser(GitHubCore):
         #: Type of user
         self.type = user.get('type', 'user')
         # username: same as login
+        #: User's login
+        self.username = user.get('username', '')
 
     def __repr__(self):
         return '<Legacy User [{0}]>'.format(self.login)
