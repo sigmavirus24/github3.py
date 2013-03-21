@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import unittest
+import imp
 import os
 import re
 
@@ -10,8 +11,8 @@ except ImportError:
     coverage = None
 
 try:
-    import expecter  # NOQA
-    import mock  # NOQA
+    for m in ('expecter', 'mock'):
+        imp.find_module(m)
 except ImportError as ie:
     print('Please install the test dependencies as documented in the README')
     raise
