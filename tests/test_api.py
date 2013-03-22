@@ -1,9 +1,16 @@
 import github3
-from tests.utils import APITestMixin
-from mock import patch
+from unittest import TestCase
+from mock import patch, NonCallableMock
 
 
-class TestAPI(APITestMixin):
+class TestAPI(TestCase):
+    def setUp(self):
+        self.mock = patch('github3.api.gh', autospec=github3.GitHub)
+        self.gh = self.mock.start()
+
+    def tearDown(self):
+        self.mock.stop()
+
     def test_authorize(self):
         args = ('login', 'password', ['scope1'], 'note', 'note_url.com', '',
                 '')
@@ -141,8 +148,10 @@ class TestAPI(APITestMixin):
         self.gh.user.assert_called_with('login')
 
     def test_ratelimit_remaining(self):
+        # This prevents a regression in the API
+        # See 81c800658db43f86419b9c0764fc16aad3d60007
+        self.gh.ratelimit_remaining = NonCallableMock()
         github3.ratelimit_remaining()
-        assert self.gh.ratelimit_remaining.called is True
 
     def test_zen(self):
         github3.zen()

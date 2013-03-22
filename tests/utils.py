@@ -143,12 +143,3 @@ class BaseCase(TestCase):
 
     def not_called(self):
         expect(self.request.called).is_False()
-
-
-class APITestMixin(TestCase):
-    def setUp(self):
-        self.mock = patch('github3.api.gh', autospec=github3.GitHub)
-        self.gh = self.mock.start()
-
-    def tearDown(self):
-        self.mock.stop()

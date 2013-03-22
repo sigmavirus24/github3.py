@@ -7,6 +7,11 @@ History/Changelog
 - Add ``sort`` and ``order`` parameters to ``github3.GitHub.search_users`` and 
   ``github3.GitHub.search_repos``.
 
+- Add ``iter_commits`` to ``github3.gists.Gist`` as a means of re-requesting 
+  just the history from GitHub and iterating over it.
+
+- Re-organize the library
+
 - Remove vendored dependency of PySO8601.
 
 0.5.3: 2013-03-19

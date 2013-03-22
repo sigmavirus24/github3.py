@@ -8,8 +8,7 @@ kwargs = {}
 requires = []
 packages = [
     "github3",
-    "github3.packages",
-    "github3.packages.PySO8601",
+    "github3.gists",
 ]
 
 try:

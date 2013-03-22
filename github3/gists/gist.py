@@ -1,15 +1,10 @@
-"""
-github3.gists
-=============
-
-Module which contains all the gist related material.
-
-"""
-
 from json import dumps
-from github3.models import GitHubObject, GitHubCore, BaseComment
-from github3.users import User
+from github3.models import GitHubCore
 from github3.decorators import requires_auth
+from github3.gists.comment import GistComment
+from github3.gists.file import GistFile
+from github3.gists.history import GistHistory
+from github3.users import User
 
 
 class Gist(GitHubCore):
@@ -22,6 +17,9 @@ class Gist(GitHubCore):
 
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)
+        #: Number of comments on this gist
+        self.comments = data.get('comments', 0)
+
         #: Unique id for this gist.
         self.id = '{0}'.format(data.get('id', ''))
 
@@ -79,7 +77,7 @@ class Gist(GitHubCore):
         """Create a comment on this gist.
 
         :param str body: (required), body of the comment
-        :returns: :class:`GistComment <GistComment>`
+        :returns: :class:`GistComment <github3.gists.comment.GistComment>`
         """
         json = None
         if body:
@@ -152,10 +150,28 @@ class Gist(GitHubCore):
             Default: -1 will iterate over all comments on the gist
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`GistComment <GistComment>`\ s
+        :returns: generator of
+            :class:`GistComment <github3.gists.comment.GistComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment, etag=etag)
+
+    def iter_commits(self, number=-1):
+        """Iter over the commits on this gist.
+
+        These commits will be requested from the API and should be the same as
+        what is in ``Gist.history``.
+
+        .. versionadded:: 0.6
+
+        :param int number: (optional), number of commits to iterate over.
+            Default: -1 will iterate over all commits associated with this
+            gist.
+        :returns: generator of
+            :class: `GistHistory <github3.gists.history.GistHistory>`\ s
+        """
+        url = self._build_url('commits', base_url=self._api)
+        return self._iter(int(number), url, GistHistory)
 
     def iter_files(self):
         """List of :class:`GistFile <GistFile>` objects representing the files
@@ -183,84 +199,3 @@ class Gist(GitHubCore):
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
-
-
-class GistComment(BaseComment):
-    """The :class:`GistComment <GistComment>` object. This represents a comment
-    on a gist.
-    """
-    def __init__(self, comment, session=None):
-        super(GistComment, self).__init__(comment, session)
-
-        #: :class:`User <github3.users.User>` who made the comment
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)  # (No coverage)
-
-    def __repr__(self):
-        return '<Gist Comment [{0}]>'.format(self.user.login)
-
-
-class GistFile(GitHubObject):
-    """The :class:`GistFile <GistFile>` object. This is used to represent a
-    file object returned by GitHub while interacting with gists.
-    """
-    def __init__(self, attributes):
-        super(GistFile, self).__init__(attributes)
-
-        #: The raw URL for the file at GitHub.
-        self.raw_url = attributes.get('raw_url')
-        #: The name of the file.
-        self.filename = attributes.get('filename')
-        #: The name of the file.
-        self.name = attributes.get('filename')
-        #: The language associated with the file.
-        self.language = attributes.get('language')
-        #: The size of the file.
-        self.size = attributes.get('size')
-        #: The content of the file.
-        self.content = attributes.get('content')
-
-    def __repr__(self):
-        return '<Gist File [{0}]>'.format(self.name)
-
-
-class GistHistory(GitHubCore):
-    """The :class:`GistHistory <GistHistory>` object represents one version
-    (or revision) of a gist."""
-    def __init__(self, history, session=None):
-        super(GistHistory, self).__init__(history, session)
-        self._api = history.get('url', '')
-
-        #: SHA of the commit associated with this version
-        self.version = history.get('version', '')
-
-        #: user who made these changes
-        self.user = User(history.get('user') or {}, session)
-
-        #: dict containing the change status; see also: deletions, additions,
-        #: total
-        self.change_status = history.get('change_status', {})
-
-        #: number of additions made
-        self.additions = self.change_status.get('additions', 0)
-
-        #: number of deletions made
-        self.deletions = self.change_status.get('deletions', 0)
-
-        #: total number of changes made
-        self.total = self.change_status.get('total', 0)
-
-        #: datetime representation of when the commit was made
-        self.committed_at = self._strptime(history.get('committed_at'))
-
-    def __repr__(self):
-        return '<Gist History [{0}]>'.format(self.version)
-
-    def get_gist(self):
-        """Retrieves the gist at this version.
-
-        :returns: :class:`Gist <Gist>`
-        """
-        json = self._json(self._get(self._api), 200)
-        return Gist(json, self)
