@@ -290,9 +290,13 @@ def markdown(text, mode='', context='', raw=False):
     return gh.markdown(text, mode, context, raw)
 
 
-def octocat():
-    """Returns an easter egg from the API."""
-    return gh.octocat()
+def octocat(say=None):
+    """Returns an easter egg from the API.
+
+    :params str say: (optional), pass in what you'd like Octocat to say
+    :returns: ascii art of Octocat
+    """
+    return gh.octocat(say)
 
 
 def organization(login):

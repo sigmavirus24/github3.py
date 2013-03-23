@@ -773,10 +773,14 @@ class GitHub(GitHubCore):
         url = self._build_url('meta')
         return self._json(self._get(url), 200)
 
-    def octocat(self):
-        """Returns an easter egg of the API."""
+    def octocat(self, say=None):
+        """Returns an easter egg of the API.
+
+        :params str say: (optional), pass in what you'd like Octocat to say
+        :returns: ascii art of Octocat
+        """
         url = self._build_url('octocat')
-        req = self._get(url)
+        req = self._get(url, params={'s': say})
         return req.content if req.ok else ''
 
     def organization(self, login):
