@@ -51,6 +51,7 @@ More Examples
     examples/issue
     examples/iterators.rst
     examples/logging
+    examples/octocat
 
 
 .. links
