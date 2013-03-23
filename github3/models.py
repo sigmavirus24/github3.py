@@ -12,9 +12,11 @@ from requests.compat import urlparse
 from github3.decorators import requires_auth
 from datetime import datetime
 from github3 import __version__
+from logging import getLogger
 
 __url_cache__ = {}
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
+__logs__ = getLogger(__package__)
 
 
 class GitHubObject(object):
@@ -82,6 +84,9 @@ class GitHubCore(GitHubObject):
 
     def _json(self, response, status_code):
         ret = None
+        __logs__.info('Attempting to get JSON information from a Response '
+                      'with status code %d expecting %d',
+                      response.status_code, status_code)
         if self._boolean(response, status_code, 404) and response.content:
             ret = response.json()
             headers = response.headers
@@ -91,6 +96,7 @@ class GitHubCore(GitHubObject):
                     'Last-Modified', ''
                 )
                 ret['ETag'] = response.headers.get('ETag', '')
+        __logs__.info('JSON was %sreturned', 'not ' if ret is None else '')
         return ret
 
     def _boolean(self, response, true_code, false_code):
@@ -103,25 +109,28 @@ class GitHubCore(GitHubObject):
         return False
 
     def _delete(self, url, **kwargs):
+        __logs__.debug('DELETE %s with %s', url, kwargs)
         return self._session.delete(url, **kwargs)
 
     def _get(self, url, **kwargs):
+        __logs__.debug('GET %s with %s', url, kwargs)
         return self._session.get(url, **kwargs)
 
     def _patch(self, url, **kwargs):
+        __logs__.debug('PATCH %s with %s', url, kwargs)
         return self._session.patch(url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
             data = dumps(data) if data is not None else data
-            return self._session.post(url, data=data, **kwargs)
-        else:
-            if 'headers' in kwargs:
-                kwargs['headers'].update({'Content-Type': None})
+        elif 'headers' in kwargs:
             # Override the Content-Type header
-            return self._session.post(url, data, **kwargs)
+            kwargs['headers'].update({'Content-Type': None})
+        __logs__.debug('POST %s with %s, %s', url, data, kwargs)
+        return self._session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
+        __logs__.debug('PUT %s with %s', url, kwargs)
         return self._session.put(url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
@@ -130,7 +139,9 @@ class GitHubCore(GitHubObject):
         parts.extend(args)
         parts = [str(p) for p in parts]
         key = tuple(parts)
+        __logs__.info('Building a url from %s', key)
         if not key in __url_cache__:
+            __logs__.info('Missed the cache building the url')
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 

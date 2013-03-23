@@ -49,6 +49,8 @@ More Examples
     examples/git
     examples/github
     examples/issue
+    examples/iterators.rst
+    examples/logging
 
 
 .. links
@@ -74,6 +76,7 @@ Modules
     orgs
     pulls
     repos
+    structs
     users
 
 Internals

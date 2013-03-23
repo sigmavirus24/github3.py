@@ -10,7 +10,15 @@ History/Changelog
 - Add ``iter_commits`` to ``github3.gists.Gist`` as a means of re-requesting 
   just the history from GitHub and iterating over it.
 
-- Re-organize the library
+- Add minimal logging (e.g., ``logging.getLogger('github3')``)
+
+- Re-organize the library.
+
+- Calling ``refresh(True)`` on a ``github3.structs.GitHubIterator`` actually 
+  works as expected now.
+
+- API ``iter_`` methods now accept the ``etag`` argument as the
+  ``GitHub.iter_`` methods do.
 
 - Remove vendored dependency of PySO8601.
 

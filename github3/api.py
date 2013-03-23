@@ -74,74 +74,86 @@ def gitignore_templates():
     return gh.gitignore_templates()
 
 
-def iter_all_repos(number=-1):
+def iter_all_repos(number=-1, etag=None):
     """Iterate over every repository in the order they were created.
 
     :param int number: (optional), number of repositories to return.
         Default: -1, returns all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
     """
-    return gh.iter_all_repos(number)
+    return gh.iter_all_repos(number, etag)
 
 
-def iter_all_users(number=-1):
+def iter_all_users(number=-1, etag=None):
     """Iterate over every user in the order they signed up for GitHub.
 
     :param int number: (optional), number of users to return. Default: -1,
         returns all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`User <github3.users.User>`
     """
-    return gh.iter_all_users(number)
+    return gh.iter_all_users(number, etag)
 
 
-def iter_events(number=-1):
+def iter_events(number=-1, etag=None):
     """Iterate over public events.
 
     :param int number: (optional), number of events to return. Default: -1
         returns all available events
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Event <github3.events.Event>`\ s
     """
-    return gh.iter_events(number)
+    return gh.iter_events(number, etag)
 
 
-def iter_followers(username, number=-1):
+def iter_followers(username, number=-1, etag=None):
     """List the followers of ``username``.
 
     :param str username: (required), login of the person to list the followers
         of
     :param int number: (optional), number of followers to return, Default: -1,
         return all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`User <github3.users.User>`
     """
-    return gh.iter_followers(username, number) if username else []
+    return gh.iter_followers(username, number, etag) if username else []
 
 
-def iter_following(username, number=-1):
+def iter_following(username, number=-1, etag=None):
     """List the people ``username`` follows.
 
     :param str username: (required), login of the user
     :param int number: (optional), number of users being followed by username
         to return. Default: -1, return all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`User <github3.users.User>`
     """
-    return gh.iter_following(username, number) if username else []
+    return gh.iter_following(username, number, etag) if username else []
 
 
-def iter_gists(username=None, number=-1):
+def iter_gists(username=None, number=-1, etag=None):
     """Get public gists or gists for the provided username.
 
     :param str username: (optional), if provided, get the gists for this user
         instead of the authenticated user.
     :param int number: (optional), number of gists to return. Default: -1,
         return all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
     """
-    return gh.iter_gists(username, number)
+    return gh.iter_gists(username, number, etag)
 
 
 def iter_repo_issues(owner, repository, milestone=None, state=None,
                      assignee=None, mentioned=None, labels=None, sort=None,
-                     direction=None, since=None, number=-1):
+                     direction=None, since=None, number=-1, etag=None):
     """List issues on owner/repository. Only owner and repository are
     required.
 
@@ -162,26 +174,32 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
         2012-05-20T23:10:27Z
     :param int number: (optional), number of issues to return.
         Default: -1 returns all issues
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
     """
     if owner and repository:
         return gh.iter_repo_issues(owner, repository, milestone, state,
                                    assignee, mentioned, labels, sort,
-                                   direction, since, number)
+                                   direction, since, number, etag)
     return iter([])
 
 
-def iter_orgs(username, number=-1):
+def iter_orgs(username, number=-1, etag=None):
     """List the organizations associated with ``username``.
 
     :param str username: (required), login of the user
     :param int number: (optional), number of orgs to return. Default: -1,
         return all of the issues
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
+    :returns: generator of
+        :class:`Organization <github3.orgs.Organization>`\ s
     """
-    return gh.iter_orgs(username, number) if username else []
+    return gh.iter_orgs(username, number, etag) if username else []
 
 
-def iter_repos(login, type='', sort='', direction='', number=-1):
+def iter_repos(login, type='', sort='', direction='', number=-1, etag=None):
     """List public repositories for the specified ``login`` or all
     repositories for the authenticated user if ``login`` is not
     provided.
@@ -198,35 +216,41 @@ def iter_repos(login, type='', sort='', direction='', number=-1):
         'desc' otherwise
     :param int number: (optional), number of repositories to return.
         Default: -1 returns all repositories
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
         objects
     """
     if login:
-        return gh.iter_repos(login, type, sort, direction, number)
+        return gh.iter_repos(login, type, sort, direction, number, etag)
     return iter([])
 
 
-def iter_starred(username, number=-1):
+def iter_starred(username, number=-1, etag=None):
     """Iterate over repositories starred by ``username``.
 
     :param str username: (optional), name of user whose stars you want to see
     :param int number: (optional), number of repositories to return.
         Default: -1 returns all repositories
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
     """
-    return gh.iter_starred(username, number)
+    return gh.iter_starred(username, number, etag)
 
 
-def iter_subscriptions(username, number=-1):
+def iter_subscriptions(username, number=-1, etag=None):
     """Iterate over repositories subscribed to by ``username``.
 
     :param str username: (optional), name of user whose subscriptions you want
         to see
     :param int number: (optional), number of repositories to return.
         Default: -1 returns all repositories
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
     """
-    return gh.iter_subscriptions(username, number)
+    return gh.iter_subscriptions(username, number, etag)
 
 
 def create_gist(description, files):

@@ -6,10 +6,13 @@ class GitHubIterator(GitHubCore, Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
     def __init__(self, count, url, cls, session, params=None, etag=None):
         GitHubCore.__init__(self, {}, session)
+        #: Original number of items requested
+        self.original = count
         #: Number of items left in the iterator
         self.count = count
         #: URL the class used to make it's first GET
         self.url = url
+        self._api = self.url
         #: Class being used to cast all items to
         self.cls = cls
         #: Parameters of the query string
@@ -64,6 +67,13 @@ class GitHubIterator(GitHubCore, Iterator):
         if not hasattr(self, '__i__'):
             self.__i__ = self.__iter__()
         return next(self.__i__)
+
+    def refresh(self, conditional=False):
+        self.count = self.original
+        if conditional:
+            self.headers['If-None-Match'] = self.etag
+        self.__i__ = self.__iter__()
+        return self
 
     def next(self):
         return self.__next__()
