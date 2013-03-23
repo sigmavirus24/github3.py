@@ -20,9 +20,6 @@ The problem is that you will then have to reiterate over all of the users each
 time you want to get the new users. You have two approaches you can take to 
 avoid this with :class:`GitHubIterator <github3.structs.GitHubIterator>`.
 
-The First Approach
-------------------
-
 You can not call the method directly in the for-loop and keep the iterator as 
 a separate reference like so:
 
@@ -32,6 +29,9 @@ a separate reference like so:
 
     for u in i:
         add_user_to_database(u)
+
+The First Approach
+------------------
 
 Then after your first pass through your ``GitHubIterator`` object will have an 
 attribute named ``etag``. After you've added all the currently existing users 
@@ -48,6 +48,24 @@ you could do the following to retrieve the new users in a timely fashion:
 
         time.sleep(120)  # Sleep for 2 minutes
 
-If there are no new users, this won't impact your ratelimit at all. This 
-mimics the ability to conditionally refresh data on almost all other objects 
-in github3.py.
+The Second Approach
+-------------------
+
+.. code-block:: python
+
+    etag = i.etag
+    # Store this somewhere
+
+    # Later when you start a new process or go to check for new users you can 
+    # then do
+
+    i = g.iter_all_users(etag=etag)
+
+    for u in i:
+        add_user_to_database(u)
+
+------
+
+If there are no new users, these approaches won't impact your ratelimit at 
+all. This mimics the ability to conditionally refresh data on almost all other 
+objects in github3.py.
