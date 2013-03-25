@@ -40,43 +40,43 @@ class TestAPI(TestCase):
 
     def test_iter_all_repos(self):
         github3.iter_all_repos()
-        self.gh.iter_all_repos.assert_called_with(-1)
+        self.gh.iter_all_repos.assert_called_with(-1, None)
 
     def test_iter_all_users(self):
         github3.iter_all_users()
-        self.gh.iter_all_users.assert_called_with(-1)
+        self.gh.iter_all_users.assert_called_with(-1, None)
 
     def test_iter_events(self):
         github3.iter_events()
-        self.gh.iter_events.assert_called_with(-1)
+        self.gh.iter_events.assert_called_with(-1, None)
 
     def test_iter_followers(self):
         github3.iter_followers('login')
-        self.gh.iter_followers.assert_called_with('login', -1)
+        self.gh.iter_followers.assert_called_with('login', -1, None)
 
     def test_iter_following(self):
         github3.iter_following('login')
-        self.gh.iter_following.assert_called_with('login', -1)
+        self.gh.iter_following.assert_called_with('login', -1, None)
 
     def test_iter_gists(self):
         github3.iter_gists()
-        self.gh.iter_gists.assert_called_with(None, -1)
+        self.gh.iter_gists.assert_called_with(None, -1, None)
 
     def test_iter_repo_issues(self):
         args = ('owner', 'repository', None, None, None, None, None, None,
-                None, None, -1)
+                None, None, -1, None)
         github3.iter_repo_issues(*args)
         self.gh.iter_repo_issues.assert_called_with(*args)
 
         github3.iter_repo_issues(None, None)
 
     def test_iter_orgs(self):
-        args = ('login', -1)
+        args = ('login', -1, None)
         github3.iter_orgs(*args)
         self.gh.iter_orgs.assert_called_with(*args)
 
     def test_iter_repos(self):
-        args = ('login', '', '', '', -1)
+        args = ('login', '', '', '', -1, None)
         github3.iter_repos(*args)
         self.gh.iter_repos.assert_called_with(*args)
 
@@ -84,11 +84,11 @@ class TestAPI(TestCase):
 
     def test_iter_starred(self):
         github3.iter_starred('login')
-        self.gh.iter_starred.assert_called_with('login', -1)
+        self.gh.iter_starred.assert_called_with('login', -1, None)
 
     def test_iter_subcriptions(self):
         github3.iter_subscriptions('login')
-        self.gh.iter_subscriptions.assert_called_with('login', -1)
+        self.gh.iter_subscriptions.assert_called_with('login', -1, None)
 
     def test_create_gist(self):
         args = ('description', {'files': ['files']})

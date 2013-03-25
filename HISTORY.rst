@@ -20,7 +20,7 @@ History/Changelog
 - API ``iter_`` methods now accept the ``etag`` argument as the
   ``GitHub.iter_`` methods do.
 
-- ``github3.octocat`` and ``github3.github.GitHub.octocat`` both support
+- Make ``github3.octocat`` and ``github3.github.GitHub.octocat`` both support
   sending messages to make the Octocat say things. (Think cowsay)
 
 - Remove vendored dependency of PySO8601.

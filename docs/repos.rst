@@ -1,5 +1,14 @@
 .. module:: github3
-.. module:: github3.repos
+.. module:: github3.repos.branch
+.. module:: github3.repos.comment
+.. module:: github3.repos.commit
+.. module:: github3.repos.comparison
+.. module:: github3.repos.contents
+.. module:: github3.repos.download
+.. module:: github3.repos.hook
+.. module:: github3.repos.repo
+.. module:: github3.repos.status
+.. module:: github3.repos.tag
 
 Repository
 ==========

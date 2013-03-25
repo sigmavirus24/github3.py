@@ -9,6 +9,7 @@ requires = []
 packages = [
     "github3",
     "github3.gists",
+    "github3.repos",
 ]
 
 try:

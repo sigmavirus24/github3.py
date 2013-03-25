@@ -35,12 +35,13 @@ class TestPayloadHandlers(TestCase):
     def test_commitcomment(self):
         comment = {'comment': load('repo_comment')}
         comment = github3.events._commitcomment(comment)
-        expect(comment['comment']).isinstance(github3.repos.RepoComment)
+        expect(comment['comment']).isinstance(
+            github3.repos.comment.RepoComment)
 
     def test_download(self):
         dl = {'download': load('download')}
         dl = github3.events._download(dl)
-        expect(dl['download']).isinstance(github3.repos.Download)
+        expect(dl['download']).isinstance(github3.repos.download.Download)
 
     def test_follow(self):
         f = {'target': load('user')}

@@ -60,14 +60,14 @@ class Event(GitHubObject):
 
 
 def _commitcomment(payload):
-    from github3.repos import RepoComment
+    from github3.repos.comment import RepoComment
     if payload.get('comment'):
         payload['comment'] = RepoComment(payload['comment'], None)
     return payload
 
 
 def _download(payload):
-    from github3.repos import Download
+    from github3.repos.download import Download
     if payload.get('download'):
         payload['download'] = Download(payload['download'], None)
     return payload

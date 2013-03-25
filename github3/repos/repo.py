@@ -2,25 +2,37 @@
 github3.repos.repo
 ==================
 
-This module contains the Repository class alone
+This module contains the Repository object which is used to access the various
+parts of GitHub's Repository API.
 
 """
 
+from json import dumps
 from collections import Callable
 from github3.decorators import requires_auth
 from github3.events import Event
-from github3.git import Blob, Branch
+from github3.git import Blob, Commit, Reference, Tag, Tree
+from github3.issues import issue_params, Issue, IssueEvent, Label, Milestone
 from github3.models import GitHubCore
 from github3.notifications import Subscription, Thread
 from github3.pulls import PullRequest
+from github3.repos.branch import Branch
 from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
-from github3.users import User
+from github3.repos.comparison import Comparison
+from github3.repos.contents import Contents
+from github3.repos.download import Download
+from github3.repos.hook import Hook
+from github3.repos.status import Status
+from github3.repos.tag import RepoTag
+from github3.users import User, Key
 
 
 class Repository(GitHubCore):
     """The :class:`Repository <Repository>` object. It represents how GitHub
     sends information about repositories.
+
+    See also: http://developer.github.com/v3/repos/
     """
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(repo, session)
@@ -249,7 +261,8 @@ class Repository(GitHubCore):
 
         :param str path: (required), path to file, e.g.
             github3/repo.py
-        :param str ref: (optional), the string name of a commit/branch/tag. default: master
+        :param str ref: (optional), the string name of a commit/branch/tag.
+            Default: master
         :returns: :class:`Contents <Contents>` if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)

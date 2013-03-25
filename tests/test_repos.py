@@ -1,18 +1,18 @@
 import os
 import github3
+from github3 import repos
 from tests.utils import (expect, BaseCase, load)
 from mock import patch, mock_open
-from requests.compat import is_py2, is_py3
 
 
 class TestRepository(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestRepository, self).__init__(methodName)
-        self.repo = github3.repos.Repository(load('repo'))
+        self.repo = repos.Repository(load('repo'))
 
     def setUp(self):
         super(TestRepository, self).setUp()
-        self.repo = github3.repos.Repository(self.repo.to_json(), self.g)
+        self.repo = repos.Repository(self.repo.to_json(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
     def test_add_collaborator(self):
@@ -84,7 +84,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'branches/master')
 
         b = self.repo.branch('master')
-        expect(b).isinstance(github3.repos.Branch)
+        expect(b).isinstance(repos.branch.Branch)
         self.mock_assertions()
 
         expect(repr(b)) == '<Repository Branch [master]>'
@@ -94,7 +94,7 @@ class TestRepository(BaseCase):
         sha = '76dcc6cb4b9860034be81b7e58adc286a115aa97'
         self.get(self.api + 'commits/' + sha)
 
-        expect(self.repo.commit(sha)).isinstance(github3.repos.RepoCommit)
+        expect(self.repo.commit(sha)).isinstance(repos.commit.RepoCommit)
         self.mock_assertions()
 
     def test_commit_comment(self):
@@ -103,7 +103,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'comments/{0}'.format(comment_id))
 
         expect(self.repo.commit_comment(comment_id)
-               ).isinstance(github3.repos.RepoComment)
+               ).isinstance(repos.comment.RepoComment)
         self.mock_assertions()
 
     def test_compare_commits(self):
@@ -113,7 +113,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'compare/{0}...{1}'.format(base, head))
 
         expect(self.repo.compare_commits(base, head)
-               ).isinstance(github3.repos.Comparison)
+               ).isinstance(repos.comparison.Comparison)
         self.mock_assertions()
 
     def test_contents(self):
@@ -121,7 +121,8 @@ class TestRepository(BaseCase):
         filename = 'setup.py'
         self.get(self.api + 'contents/' + filename)
 
-        expect(self.repo.contents(filename)).isinstance(github3.repos.Contents)
+        expect(self.repo.contents(filename)).isinstance(
+            repos.contents.Contents)
         self.mock_assertions()
 
         self.response('', 404)
@@ -134,7 +135,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': {'ref': 'foo'}}
 
         expect(self.repo.contents(filename, ref='foo')).isinstance(
-            github3.repos.Contents)
+            repos.contents.Contents)
         self.mock_assertions()
 
     def test_create_blob(self):
@@ -175,7 +176,7 @@ class TestRepository(BaseCase):
         expect(self.repo.create_comment(None, None)).is_None()
         expect(self.repo.create_comment(body, sha, line=0)).is_None()
         expect(self.repo.create_comment(body, sha)
-               ).isinstance(github3.repos.RepoComment)
+               ).isinstance(repos.comment.RepoComment)
         self.mock_assertions()
 
     def test_create_commit(self):
@@ -212,12 +213,12 @@ class TestRepository(BaseCase):
             self.repo.create_fork()
 
         self.login()
-        expect(self.repo.create_fork()).isinstance(github3.repos.Repository)
+        expect(self.repo.create_fork()).isinstance(repos.Repository)
         self.mock_assertions()
 
         self.conf['data'] = {'organization': 'github3py'}
         expect(self.repo.create_fork('github3py')
-               ).isinstance(github3.repos.Repository)
+               ).isinstance(repos.Repository)
         self.mock_assertions()
 
     def test_create_hook(self):
@@ -242,7 +243,7 @@ class TestRepository(BaseCase):
         self.not_called()
 
         h = self.repo.create_hook(**self.conf['data'])
-        expect(h).isinstance(github3.repos.Hook)
+        expect(h).isinstance(repos.hook.Hook)
         self.mock_assertions()
 
     def test_create_issue(self):
@@ -375,7 +376,7 @@ class TestRepository(BaseCase):
         self.login()
         expect(self.repo.create_status(None, None)).is_None()
         s = self.repo.create_status('fakesha', 'success')
-        expect(s).isinstance(github3.repos.Status)
+        expect(s).isinstance(repos.status.Status)
         expect(repr(s)) > ''
         self.mock_assertions()
 
@@ -398,7 +399,7 @@ class TestRepository(BaseCase):
             self.repo.create_tag(None, None, None, None, None)
 
         self.login()
-        with patch.object(github3.repos.Repository, 'create_ref'):
+        with patch.object(repos.Repository, 'create_ref'):
             expect(self.repo.create_tag(None, None, None, None,
                                         None)).is_None()
             tag = self.repo.create_tag(**data)
@@ -406,7 +407,7 @@ class TestRepository(BaseCase):
             expect(repr(tag).startswith('<Tag')).is_True()
         self.mock_assertions()
 
-        with patch.object(github3.repos.Repository, 'create_ref') as cr:
+        with patch.object(repos.Repository, 'create_ref') as cr:
             self.repo.create_tag('tag', '', 'fakesha', '', '',
                                  lightweight=True)
             cr.assert_called_once_with('refs/tags/tag', 'fakesha')
@@ -462,7 +463,7 @@ class TestRepository(BaseCase):
 
         expect(self.repo.download(-2)).is_None()
         self.not_called()
-        expect(self.repo.download(2)).isinstance(github3.repos.Download)
+        expect(self.repo.download(2)).isinstance(repos.download.Download)
         self.mock_assertions()
 
     def test_edit(self):
@@ -511,7 +512,7 @@ class TestRepository(BaseCase):
         self.login()
         expect(self.repo.hook(-2)).is_None()
         self.not_called()
-        expect(self.repo.hook(2)).isinstance(github3.repos.Hook)
+        expect(self.repo.hook(2)).isinstance(repos.hook.Hook)
         self.mock_assertions()
 
     def test_is_assignee(self):
@@ -569,7 +570,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': None}
 
         b = next(self.repo.iter_branches())
-        expect(b).isinstance(github3.repos.Branch)
+        expect(b).isinstance(repos.branch.Branch)
         self.mock_assertions()
 
     def test_iter_comments(self):
@@ -578,7 +579,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': None}
 
         c = next(self.repo.iter_comments())
-        expect(c).isinstance(github3.repos.RepoComment)
+        expect(c).isinstance(repos.comment.RepoComment)
         self.mock_assertions()
 
     def test_iter_comments_on_commit(self):
@@ -587,7 +588,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': None}
 
         c = next(self.repo.iter_comments_on_commit('fakesha'))
-        expect(c).isinstance(github3.repos.RepoComment)
+        expect(c).isinstance(repos.comment.RepoComment)
         self.mock_assertions()
 
     def test_iter_commits(self):
@@ -596,7 +597,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': {}}
 
         c = next(self.repo.iter_commits())
-        expect(c).isinstance(github3.repos.RepoCommit)
+        expect(c).isinstance(repos.commit.RepoCommit)
         self.mock_assertions()
 
         self.conf = {'params': {'sha': 'fakesha', 'path': '/'}}
@@ -625,7 +626,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': None}
 
         d = next(self.repo.iter_downloads())
-        expect(d).isinstance(github3.repos.Download)
+        expect(d).isinstance(repos.download.Download)
         self.mock_assertions()
 
     def test_iter_events(self):
@@ -634,7 +635,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': None}
 
         e = next(self.repo.iter_events())
-        expect(e).isinstance(github3.repos.Event)
+        expect(e).isinstance(github3.events.Event)
         self.mock_assertions()
 
     def test_iter_forks(self):
@@ -643,7 +644,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': {}}
 
         r = next(self.repo.iter_forks())
-        expect(r).isinstance(github3.repos.Repository)
+        expect(r).isinstance(repos.Repository)
         self.mock_assertions()
 
         self.conf['params']['sort'] = 'newest'
@@ -660,7 +661,7 @@ class TestRepository(BaseCase):
 
         self.login()
         h = next(self.repo.iter_hooks())
-        expect(h).isinstance(github3.repos.Hook)
+        expect(h).isinstance(repos.hook.Hook)
         self.mock_assertions()
 
     def test_iter_issues(self):
@@ -707,7 +708,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'labels')
 
         l = next(self.repo.iter_labels())
-        expect(l).isinstance(github3.repos.Label)
+        expect(l).isinstance(github3.issues.Label)
         self.mock_assertions()
 
     def test_iter_languages(self):
@@ -802,7 +803,7 @@ class TestRepository(BaseCase):
             self.not_called()
 
         s = next(self.repo.iter_statuses('fakesha'))
-        expect(s).isinstance(github3.repos.Status)
+        expect(s).isinstance(repos.status.Status)
         self.mock_assertions()
 
     def test_iter_tags(self):
@@ -810,7 +811,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'tags')
 
         t = next(self.repo.iter_tags())
-        expect(t).isinstance(github3.repos.RepoTag)
+        expect(t).isinstance(repos.tag.RepoTag)
         self.mock_assertions()
 
         expect(repr(t).startswith('<Repository Tag')).is_True()
@@ -857,7 +858,7 @@ class TestRepository(BaseCase):
 
         self.login()
         expect(self.repo.merge('master', 'sigma/feature')).isinstance(
-            github3.repos.RepoCommit)
+            repos.commit.RepoCommit)
         self.mock_assertions()
 
         self.conf['data']['commit_message'] = 'Commit message'
@@ -877,8 +878,8 @@ class TestRepository(BaseCase):
     def test_parent(self):
         json = self.repo.to_json().copy()
         json['parent'] = json.copy()
-        r = github3.repos.Repository(json)
-        expect(r.parent).isinstance(github3.repos.Repository)
+        r = repos.Repository(json)
+        expect(r.parent).isinstance(repos.Repository)
 
     def test_pull_request(self):
         self.response('pull', 200)
@@ -894,7 +895,7 @@ class TestRepository(BaseCase):
         self.response('readme', 200)
         self.get(self.api + 'readme')
 
-        expect(self.repo.readme()).isinstance(github3.repos.Contents)
+        expect(self.repo.readme()).isinstance(repos.contents.Contents)
         self.mock_assertions()
 
     def test_ref(self):
@@ -928,8 +929,8 @@ class TestRepository(BaseCase):
     def test_source(self):
         json = self.repo.to_json().copy()
         json['source'] = json.copy()
-        r = github3.repos.Repository(json)
-        expect(r.source).isinstance(github3.repos.Repository)
+        r = repos.Repository(json)
+        expect(r.source).isinstance(repos.Repository)
 
     def test_set_subscription(self):
         self.response('subscription')
@@ -988,12 +989,12 @@ class TestRepository(BaseCase):
         self.not_called()
 
         self.login()
-        with patch.object(github3.repos.Repository, 'label') as l:
+        with patch.object(repos.Repository, 'label') as l:
             l.return_value = None
             expect(self.repo.update_label('foo', 'bar')).is_False()
             self.not_called()
 
-        with patch.object(github3.repos.Repository, 'label') as l:
+        with patch.object(repos.Repository, 'label') as l:
             l.return_value = github3.issues.Label(load('label'), self.g)
             expect(self.repo.update_label('big_bug', 'fafafa')).is_True()
 
@@ -1003,7 +1004,7 @@ class TestRepository(BaseCase):
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestContents, self).__init__(methodName)
-        self.contents = github3.repos.Contents(load('readme'))
+        self.contents = repos.contents.Contents(load('readme'))
 
     def test_git_url(self):
         expect(self.contents.links['git']) == self.contents.git_url
@@ -1021,13 +1022,13 @@ class TestContents(BaseCase):
 class TestDownload(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestDownload, self).__init__(methodName)
-        self.dl = github3.repos.Download(load('download'))
+        self.dl = repos.download.Download(load('download'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "downloads/338893")
 
     def setUp(self):
         super(TestDownload, self).setUp()
-        self.dl = github3.repos.Download(self.dl.to_json(), self.g)
+        self.dl = repos.download.Download(self.dl.to_json(), self.g)
 
     def test_repr(self):
         expect(repr(self.dl)) == '<Download [kr.png]>'
@@ -1081,13 +1082,13 @@ class TestDownload(BaseCase):
 class TestHook(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestHook, self).__init__(methodName)
-        self.hook = github3.repos.Hook(load('hook'))
+        self.hook = repos.hook.Hook(load('hook'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "hooks/292492")
 
     def setUp(self):
         super(TestHook, self).setUp()
-        self.hook = github3.repos.Hook(self.hook.to_json(), self.g)
+        self.hook = repos.hook.Hook(self.hook.to_json(), self.g)
 
     def test_repr(self):
         expect(repr(self.hook)) == '<Hook [readthedocs]>'
@@ -1162,13 +1163,13 @@ class TestHook(BaseCase):
 class TestRepoComment(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestRepoComment, self).__init__(methodName)
-        self.comment = github3.repos.RepoComment(load('repo_comment'))
+        self.comment = repos.comment.RepoComment(load('repo_comment'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "comments/1380832")
 
     def setUp(self):
         super(TestRepoComment, self).setUp()
-        self.comment = github3.repos.RepoComment(self.comment.to_json(),
+        self.comment = repos.comment.RepoComment(self.comment.to_json(),
                                                  self.g)
 
     def test_delete(self):
@@ -1217,7 +1218,7 @@ class TestRepoComment(BaseCase):
 class TestRepoCommit(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestRepoCommit, self).__init__(methodName)
-        self.commit = github3.repos.RepoCommit(load('commit'))
+        self.commit = repos.commit.RepoCommit(load('commit'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "commits/76dcc6cb4b9860034be81b7e58adc286a115aa97")
 
@@ -1244,7 +1245,7 @@ class TestRepoCommit(BaseCase):
 class TestComparison(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestComparison, self).__init__(methodName)
-        self.comp = github3.repos.Comparison(load('comparison'))
+        self.comp = repos.comparison.Comparison(load('comparison'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "compare/a811e1a270f65eecb65755eca38d888cbefcb0a7..."
                     "76dcc6cb4b9860034be81b7e58adc286a115aa97")
