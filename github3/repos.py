@@ -245,15 +245,16 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return Comparison(json) if json else None
 
-    def contents(self, path):
+    def contents(self, path, ref=None):
         """Get the contents of the file pointed to by ``path``.
 
         :param str path: (required), path to file, e.g.
             github3/repo.py
+        :param str ref: (optional), the string name of a commit/branch/tag. default: master
         :returns: :class:`Contents <Contents>` if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)
-        json = self._json(self._get(url), 200)
+        json = self._json(self._get(url, params={'ref': ref}), 200)
         return Contents(json) if json else None
 
     @requires_auth

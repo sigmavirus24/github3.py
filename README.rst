@@ -68,30 +68,6 @@ Install the dependencies from requirements.txt e.g.:
 
     make tests
 
-These coverage numbers are from the old-style tests and still apply to master.
-
-::
-
-    Name                 Stmts   Miss  Cover
-    ----------------------------------------
-    github3/__init__         8      0   100%
-    github3/api             54      1    98%
-    github3/auths           50      0   100%
-    github3/decorators      27      0   100%
-    github3/events          89      0   100%
-    github3/gists          101      0   100%
-    github3/git             93      0   100%
-    github3/github         374      0   100%
-    github3/issues         204      0   100%
-    github3/legacy          97      0   100%
-    github3/models         189      0   100%
-    github3/orgs           177      0   100%
-    github3/pulls          138      6    96%
-    github3/repos          790     22    97%
-    github3/users          160      0   100%
-    ----------------------------------------
-    TOTAL                 2551     29    99%
-
 Author
 ------
 
