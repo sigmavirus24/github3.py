@@ -430,7 +430,7 @@ class Repository(GitHubCore):
 
         :param str name: (required), name to give to the label
         :param str color: (required), value of the color to assign to the
-            label
+            label, e.g., '#fafafa' or 'fafafa' (the latter is what is sent)
         :returns: :class:`Label <github3.issues.Label>` if successful, else
             None
         """
