@@ -373,3 +373,6 @@ class TestOrganization(BaseCase):
 
         expect(self.org.team(1)).isinstance(github3.orgs.Team)
         self.mock_assertions()
+
+    def test_equality(self):
+        expect(self.org) == github3.orgs.Organization(load('org'))

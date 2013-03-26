@@ -125,6 +125,9 @@ class Repository(GitHubCore):
         #: default branch for the repository
         self.master_branch = repo.get('master_branch', '')
 
+    def __eq__(self, repo):
+        return self.id == repo.id
+
     def __repr__(self):
         return '<Repository [{0}]>'.format(self)
 
