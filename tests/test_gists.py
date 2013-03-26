@@ -165,6 +165,9 @@ class TestGist(BaseCase):
 
         expect(repr(hist).startswith('<Gist History')).is_True()
 
+    def test_equality(self):
+        expect(self.gist) == gists.Gist(load('gist'))
+
 
 class TestGistComment(BaseCase):
     def __init__(self, methodName='runTest'):

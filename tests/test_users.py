@@ -269,3 +269,6 @@ class TestUser(BaseCase):
 
         self.response('', 404)
         expect(self.user.update(**self.conf['data'])).is_False()
+
+    def test_equality(self):
+        expect(self.user) == github3.users.User(load('user'))
