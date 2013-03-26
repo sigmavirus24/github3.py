@@ -287,7 +287,7 @@ class Repository(GitHubCore):
         return sha
 
     @requires_auth
-    def create_comment(self, body, sha, path='', position=1, line=1):
+    def create_comment(self, body, sha, path=None, position=None, line=1):
         """Create a comment on a commit.
 
         :param str body: (required), body of the message
@@ -305,6 +305,7 @@ class Repository(GitHubCore):
         if body and sha and line > 0:
             data = {'body': body, 'commit_id': sha, 'line': line,
                     'path': path, 'position': position}
+            self._remove_none(data)
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
             json = self._json(self._post(url, data=data), 201)

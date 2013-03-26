@@ -89,7 +89,7 @@ Or you can simply use the following functions
 
 ------
 
-.. autofunction:: github3.iter_repos
+.. autofunction:: github3.iter_user_repos
 
 ------
 
