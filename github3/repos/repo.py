@@ -299,10 +299,8 @@ class Repository(GitHubCore):
             default: 1
         :returns: :class:`RepoComment <RepoComment>` if successful else None
         """
-        line = int(line)
-        position = int(position)
         json = None
-        if body and sha and line > 0:
+        if body and sha and (line and int(line) > 0):
             data = {'body': body, 'commit_id': sha, 'line': line,
                     'path': path, 'position': position}
             self._remove_none(data)
