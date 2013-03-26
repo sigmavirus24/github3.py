@@ -75,12 +75,12 @@ class TestAPI(TestCase):
         github3.iter_orgs(*args)
         self.gh.iter_orgs.assert_called_with(*args)
 
-    def test_iter_repos(self):
-        args = ('login', '', '', '', -1, None)
-        github3.iter_repos(*args)
-        self.gh.iter_repos.assert_called_with(*args)
+    def test_iter_user_repos(self):
+        args = ('login', None, None, None, -1, None)
+        github3.iter_user_repos('login')
+        self.gh.iter_user_repos.assert_called_with(*args)
 
-        github3.iter_repos(None)
+        github3.iter_user_repos(None)
 
     def test_iter_starred(self):
         github3.iter_starred('login')

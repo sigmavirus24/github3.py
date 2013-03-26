@@ -199,14 +199,17 @@ def iter_orgs(username, number=-1, etag=None):
     return gh.iter_orgs(username, number, etag) if username else []
 
 
-def iter_repos(login, type='', sort='', direction='', number=-1, etag=None):
-    """List public repositories for the specified ``login`` or all
-    repositories for the authenticated user if ``login`` is not
-    provided.
+def iter_user_repos(login, type=None, sort=None, direction=None, number=-1,
+                    etag=None):
+    """List public repositories for the specified ``login``.
+
+    .. versionadded:: 0.6
+
+    .. note:: This replaces github3.iter_repos
 
     :param str login: (required)
     :param str type: (optional), accepted values:
-        ('all', 'owner', 'public', 'private', 'member')
+        ('all', 'owner', 'member')
         API default: 'all'
     :param str sort: (optional), accepted values:
         ('created', 'updated', 'pushed', 'full_name')
@@ -222,7 +225,7 @@ def iter_repos(login, type='', sort='', direction='', number=-1, etag=None):
         objects
     """
     if login:
-        return gh.iter_repos(login, type, sort, direction, number, etag)
+        return gh.iter_user_repos(login, type, sort, direction, number, etag)
     return iter([])
 
 

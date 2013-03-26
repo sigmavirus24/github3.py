@@ -446,17 +446,34 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/user/repos')
         self.conf.update(params={})
 
+        with expect.githuberror():
+            self.g.iter_repos()
+
         self.login()
         expect(next(self.g.iter_repos())).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
-        self.get('https://api.github.com/users/sigmavirus24/repos')
         expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
             github3.repos.Repository)
         self.mock_assertions()
 
         self.conf.update(params={'type': 'all', 'direction': 'desc'})
-        next(self.g.iter_repos('sigmavirus24', 'all', direction='desc'))
+
+        next(self.g.iter_repos('all', direction='desc'))
+        self.mock_assertions()
+
+    def test_iter_user_repos(self):
+        self.response('repo', _iter=True)
+        self.get('https://api.github.com/users/sigmavirus24/repos')
+        self.conf.update(params={'type': 'all', 'direction': 'desc'})
+
+        next(self.g.iter_user_repos('sigmavirus24', 'all', direction='desc'))
+        self.mock_assertions()
+
+        self.conf.update(params={"sort": "created"})
+        self.get('https://api.github.com/users/sigmavirus24/repos')
+        expect(next(self.g.iter_user_repos('sigmavirus24', sort="created"))
+               ).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_repos_sort(self):
@@ -466,11 +483,6 @@ class TestGitHub(BaseCase):
         self.login()
         self.get('https://api.github.com/user/repos')
         expect(next(self.g.iter_repos(sort="created"))
-               ).isinstance(github3.repos.Repository)
-        self.mock_assertions()
-
-        self.get('https://api.github.com/users/sigmavirus24/repos')
-        expect(next(self.g.iter_repos('sigmavirus24', sort="created"))
                ).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
