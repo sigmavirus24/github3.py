@@ -14,6 +14,9 @@ class TestKey(BaseCase):
         super(TestKey, self).setUp()
         self.key = github3.users.Key(self.key.to_json(), self.g)
 
+    def test_equality(self):
+        expect(self.key) == github3.users.Key(self.key.to_json())
+
     def test_str(self):
         expect(str(self.key)) == self.key.key
         expect(repr(self.key).startswith('<User Key')).is_True()

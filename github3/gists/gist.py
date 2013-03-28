@@ -21,7 +21,6 @@ class Gist(GitHubCore):
     you own it).  You can also "star" or "unstar" the gist (again assuming you
     have authenticated).
     """
-
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)
         #: Number of comments on this gist
