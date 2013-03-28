@@ -25,9 +25,11 @@ History/Changelog
 
 - Remove vendored dependency of PySO8601.
 
-- Split `GitHub.iter_repos` into `GitHub.iter_user_repos` and 
-  `GitHub.iter_repos`. As a consequence `github3.iter_repos` is now 
-  `github3.iter_user_repos`
+- Split ``GitHub.iter_repos`` into ``GitHub.iter_user_repos`` and 
+  ``GitHub.iter_repos``. As a consequence ``github3.iter_repos`` is now 
+  ``github3.iter_user_repos``
+
+- ``IssueComment.update`` was corrected to match GitHub's documentation
 
 0.5.3: 2013-03-19
 -----------------

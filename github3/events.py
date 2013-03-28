@@ -95,7 +95,8 @@ def _gist(payload):
 
 
 def _issuecomm(payload):
-    from github3.issues import Issue, IssueComment
+    from github3.issues import Issue
+    from github3.issues.comment import IssueComment
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     if payload.get('comment'):

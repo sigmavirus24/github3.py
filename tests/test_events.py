@@ -62,7 +62,7 @@ class TestPayloadHandlers(TestCase):
         c = {'issue': load('issue'), 'comment': load('issue_comment')}
         github3.events._issuecomm(c)
         expect(c['issue']).isinstance(github3.issues.Issue)
-        expect(c['comment']).isinstance(github3.issues.IssueComment)
+        expect(c['comment']).isinstance(github3.issues.comment.IssueComment)
 
     def test_issueevent(self):
         c = {'issue': load('issue')}

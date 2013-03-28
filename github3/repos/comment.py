@@ -45,22 +45,15 @@ class RepoComment(BaseComment):
         self.__init__(comment, self._session)
 
     @requires_auth
-    def update(self, body, sha, line, path, position):
+    def update(self, body):
         """Update this comment.
 
         :param str body: (required)
-        :param str sha: (required), sha id of the commit to comment on
-        :param int line: (required), line number to comment on
-        :param str path: (required), relative path of the file you're
-            commenting on
-        :param int position: (required), line index in the diff to comment on
         :returns: bool
         """
         json = None
-        if body and sha and path and line > 0 and position > 0:
-            data = {'body': body, 'commit_id': sha, 'line': line,
-                    'path': path, 'position': position}
-            json = self._json(self._post(self._api, data=data), 200)
+        if body:
+            json = self._json(self._post(self._api, data={'body': body}), 200)
 
         if json:
             self._update_(json)

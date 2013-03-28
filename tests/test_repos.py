@@ -162,12 +162,7 @@ class TestRepository(BaseCase):
                 'one `BaseAccount` class to make things simpler. ')
         sha = 'd41566090114a752eb3a87dbcf2473eb427ef0f3'
         self.post(self.api + 'commits/{0}/comments'.format(sha))
-        self.conf = {
-            'data': {
-                'body': body, 'commit_id': sha, 'line': 1, 'path': '',
-                'position': 1
-            }
-        }
+        self.conf = {'data': {'body': body, 'commit_id': sha, 'line': 1}}
 
         with expect.githuberror():
             self.repo.create_comment(body, sha)
@@ -301,7 +296,7 @@ class TestRepository(BaseCase):
         expect(self.repo.create_label(None, None)).is_None()
         self.not_called()
         expect(self.repo.create_label(**self.conf['data'])).isinstance(
-            github3.issues.Label)
+            github3.issues.label.Label)
         self.mock_assertions()
 
     def test_create_milestone(self):
@@ -316,7 +311,7 @@ class TestRepository(BaseCase):
         expect(self.repo.create_milestone(None)).is_None()
         self.not_called()
         expect(self.repo.create_milestone('foo')).isinstance(
-            github3.issues.Milestone)
+            github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_create_pull(self):
@@ -552,7 +547,7 @@ class TestRepository(BaseCase):
 
         expect(self.repo.label(None)).is_None()
         self.not_called()
-        expect(self.repo.label('name')).isinstance(github3.issues.Label)
+        expect(self.repo.label('name')).isinstance(github3.issues.label.Label)
         self.mock_assertions()
 
     def test_iter_assignees(self):
@@ -688,7 +683,7 @@ class TestRepository(BaseCase):
         self.conf = {'params': None}
 
         e = next(self.repo.iter_issue_events())
-        expect(e).isinstance(github3.issues.IssueEvent)
+        expect(e).isinstance(github3.issues.event.IssueEvent)
         self.mock_assertions()
 
     def test_iter_keys(self):
@@ -708,7 +703,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'labels')
 
         l = next(self.repo.iter_labels())
-        expect(l).isinstance(github3.issues.Label)
+        expect(l).isinstance(github3.issues.label.Label)
         self.mock_assertions()
 
     def test_iter_languages(self):
@@ -725,7 +720,7 @@ class TestRepository(BaseCase):
         self.get(self.api + 'milestones')
 
         m = next(self.repo.iter_milestones())
-        expect(m).isinstance(github3.issues.Milestone)
+        expect(m).isinstance(github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_iter_network_events(self):
@@ -872,7 +867,8 @@ class TestRepository(BaseCase):
         expect(self.repo.milestone(0)).is_None()
         self.not_called()
 
-        expect(self.repo.milestone(2)).isinstance(github3.issues.Milestone)
+        expect(self.repo.milestone(2)).isinstance(
+            github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_parent(self):
@@ -995,7 +991,7 @@ class TestRepository(BaseCase):
             self.not_called()
 
         with patch.object(repos.Repository, 'label') as l:
-            l.return_value = github3.issues.Label(load('label'), self.g)
+            l.return_value = github3.issues.label.Label(load('label'), self.g)
             expect(self.repo.update_label('big_bug', 'fafafa')).is_True()
 
         self.mock_assertions()
@@ -1189,29 +1185,18 @@ class TestRepoComment(BaseCase):
         expect(repr(self.comment).startswith('<Repository Comment'))
 
     def test_update(self):
-        self.response('repo_comment', 200)
         self.post(self.api)
-        data = {
-            'body': 'This is a comment body',
-            'sha': 'fakesha', 'line': 1, 'position': 1,
-            'path': 'github3/repos.py',
-        }
-        self.conf = {'data': data.copy()}
-        self.conf['data']['commit_id'] = self.conf['data']['sha']
-        del(self.conf['data']['sha'])
+        self.response('repo_comment', 200)
+        self.conf = {'data': {'body': 'This is a comment body'}}
 
         with expect.githuberror():
-            self.comment.update('foo', 'bar', 'bogus', 'jargon', 'files')
+            self.comment.update('foo')
 
         self.login()
-        expect(self.comment.update(None, 'f', 'o', 1, 1)).is_False()
-        expect(self.comment.update('f', None, 'o', 1, 1)).is_False()
-        expect(self.comment.update('f', 'o', 1, None, 1)).is_False()
-        expect(self.comment.update('f', 'o', 0, 'o', 1)).is_False()
-        expect(self.comment.update('f', 'o', 1, 'o', 0)).is_False()
+        expect(self.comment.update(None)).is_False()
         self.not_called()
 
-        expect(self.comment.update(**data)).is_True()
+        expect(self.comment.update('This is a comment body')).is_True()
         self.mock_assertions()
 
 

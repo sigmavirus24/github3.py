@@ -12,7 +12,10 @@ from collections import Callable
 from github3.decorators import requires_auth
 from github3.events import Event
 from github3.git import Blob, Commit, Reference, Tag, Tree
-from github3.issues import issue_params, Issue, IssueEvent, Label, Milestone
+from github3.issues import issue_params, Issue
+from github3.issues.event import IssueEvent
+from github3.issues.label import Label
+from github3.issues.milestone import Milestone
 from github3.models import GitHubCore
 from github3.notifications import Subscription, Thread
 from github3.pulls import PullRequest
@@ -431,8 +434,8 @@ class Repository(GitHubCore):
         :param str name: (required), name to give to the label
         :param str color: (required), value of the color to assign to the
             label, e.g., '#fafafa' or 'fafafa' (the latter is what is sent)
-        :returns: :class:`Label <github3.issues.Label>` if successful, else
-            None
+        :returns: :class:`Label <github3.issues.label.Label>` if successful,
+            else None
         """
         json = None
         if name and color:
@@ -743,8 +746,8 @@ class Repository(GitHubCore):
         """Get the label specified by ``name``
 
         :param str name: (required), name of the label
-        :returns: :class:`Label <github3.issues.Label>` if successful, else
-            None
+        :returns: :class:`Label <github3.issues.label.Label>` if successful,
+            else None
         """
         json = None
         if name:
@@ -974,7 +977,7 @@ class Repository(GitHubCore):
             returns all available labels
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Label <github3.issues.Label>`\ s
+        :returns: generator of :class:`Label <github3.issues.label.Label>`\ s
         """
         url = self._build_url('labels', base_url=self._api)
         return self._iter(int(number), url, Label, etag=etag)
