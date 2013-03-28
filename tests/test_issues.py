@@ -302,3 +302,6 @@ class TestIssue(BaseCase):
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, 'open', n, self.i.labels
             )
+
+    def test_equality(self):
+        expect(self.i) == github3.issues.Issue(load('issue'))

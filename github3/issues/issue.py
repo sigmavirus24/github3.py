@@ -66,6 +66,9 @@ class Issue(GitHubCore):
         #: :class:`User <github3.users.User>` who opened the issue.
         self.user = User(issue.get('user'), self._session)
 
+    def __eq__(self, issue):
+        return self.id == issue.id
+
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)

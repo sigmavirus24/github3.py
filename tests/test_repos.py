@@ -996,6 +996,9 @@ class TestRepository(BaseCase):
 
         self.mock_assertions()
 
+    def test_equality(self):
+        expect(self.repo) == repos.Repository(load('repo'))
+
 
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):

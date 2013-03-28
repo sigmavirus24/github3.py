@@ -346,6 +346,9 @@ class BaseAccount(GitHubCore):
         #: Markdown formatted biography
         self.bio = acct.get('bio')
 
+    def __eq__(self, acc):
+        return self.id == acc.id
+
     def __repr__(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
 
