@@ -327,17 +327,20 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, etag=None):
+    def iter_all_repos(self, number=-1, since=None, etag=None):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
             Default: -1, returns all of them
+        :param int since: (optional), last repository id seen (allows
+            restarting this iteration)
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repositories')
-        return self._iter(int(number), url, Repository, etag=etag)
+        params = {'since': since} if since else None
+        return self._iter(int(number), url, Repository, params=params, etag=etag)
 
     def iter_all_users(self, number=-1, etag=None):
         """Iterate over every user in the order they signed up for GitHub.

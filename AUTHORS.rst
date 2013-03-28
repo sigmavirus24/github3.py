@@ -37,3 +37,5 @@ Contributors
 - Malcolm Box (@mbox)
 
 - Tom Petr (@tpetr)
+
+- David Pachura (@detenebrator)
