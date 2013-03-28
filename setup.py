@@ -16,7 +16,7 @@ packages = [
 try:
     from setuptools import setup
     kwargs['test_suite'] = 'run_tests.collect_tests'
-    requires = ['mock', 'expecter', 'coverage==3.5.2']
+    kwargs['tests_require'] = ['mock', 'expecter', 'coverage==3.5.2']
     packages.append('tests')
 except ImportError:
     from distutils.core import setup  # NOQA
