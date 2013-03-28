@@ -212,6 +212,14 @@ class TestGitHub(BaseCase):
         expect(repo).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
+        self.response('repo', _iter=True)
+        self.get('https://api.github.com/repositories')
+        self.conf.update(params={'since': 100000})
+        repo = next(self.g.iter_all_repos(since=100000))
+        expect(repo).isinstance(github3.repos.Repository)
+        assert(repo.id > 100000)
+        self.mock_assertions()
+
     def test_iter_all_users(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users')

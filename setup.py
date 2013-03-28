@@ -10,6 +10,7 @@ packages = [
     "github3",
     "github3.gists",
     "github3.repos",
+    "github3.issues",
 ]
 
 try:
