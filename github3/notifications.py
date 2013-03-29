@@ -42,6 +42,12 @@ class Thread(GitHubCore):
     def __repr__(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def delete_subscription(self):
         """Delete subscription for this thread.
 
@@ -59,9 +65,7 @@ class Thread(GitHubCore):
 
         :returns: bool
         """
-        mark = {'read': True}
-        return self._boolean(self._patch(self._api, data=dumps(mark)), 205,
-                             404)
+        return self._boolean(self._patch(self._api), 205, 404)
 
     def set_subscription(self, subscribed, ignored):
         """Set the user's subscription for this thread

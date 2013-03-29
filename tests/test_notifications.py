@@ -9,6 +9,12 @@ class TestThread(BaseCase):
         self.thread = github3.notifications.Thread(load('notification'))
         self.api = ("https://api.github.com/notifications/threads/6169361")
 
+    def test_equality(self):
+        t = github3.notifications.Thread(load('notification'))
+        expect(self.thread) == t
+        t.id = 1
+        expect(self.thread) != t
+
     def test_last_read_at(self):
         json = self.thread.to_json().copy()
         json['last_read_at'] = '2013-12-31T23:59:59Z'
