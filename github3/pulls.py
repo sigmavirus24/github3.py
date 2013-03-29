@@ -132,7 +132,7 @@ class PullRequest(GitHubCore):
             self.merged_at = self._strptime(self.merged_at)
         #: Whether the pull is deemed mergeable by GitHub
         self.mergeable = pull.get('mergeable', False)
-        #: Whether it would be a clelan merge or not
+        #: Whether it would be a clean merge or not
         self.mergeable_state = pull.get('mergeable_state', '')
         #: SHA of the merge commit
         self.merge_commit_sha = pull.get('merge_commit_sha', '')
