@@ -15,7 +15,10 @@ class TestKey(BaseCase):
         self.key = github3.users.Key(self.key.to_json(), self.g)
 
     def test_equality(self):
-        expect(self.key) == github3.users.Key(self.key.to_json())
+        k = github3.users.Key(self.key.to_json())
+        expect(self.key) == k
+        k.id += 1
+        expect(self.key) != k
 
     def test_str(self):
         expect(str(self.key)) == self.key.key
@@ -274,4 +277,7 @@ class TestUser(BaseCase):
         expect(self.user.update(**self.conf['data'])).is_False()
 
     def test_equality(self):
-        expect(self.user) == github3.users.User(load('user'))
+        u = github3.users.User(load('user'))
+        expect(self.user) == u
+        u.id += 1
+        expect(self.user) != u

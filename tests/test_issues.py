@@ -135,6 +135,12 @@ class TestIssue(BaseCase):
         super(TestIssue, self).setUp()
         self.i = Issue(self.i.to_json(), self.g)
 
+    def test_equality(self):
+        i = Issue(load('issue'))
+        expect(self.i) == i
+        i.id = 1
+        expect(self.i) != i
+
     def test_repr(self):
         expect(repr(self.i)) == '<Issue [sigmavirus24/github3.py #1]>'
 
@@ -303,5 +309,14 @@ class TestIssue(BaseCase):
                 self.i.title, self.i.body, u, 'open', n, self.i.labels
             )
 
+
+class TestIssueEvent(BaseCase):
+    def setUp(self):
+        super(TestIssueEvent, self).setUp()
+        self.ev = IssueEvent(load('issue_event'))
+
     def test_equality(self):
-        expect(self.i) == github3.issues.Issue(load('issue'))
+        e = IssueEvent(load('issue_event'))
+        expect(self.ev) == e
+        e.commit_id = 'fake'
+        expect(self.ev) != e

@@ -12,6 +12,12 @@ class TestAuthorization(BaseCase):
         super(TestAuthorization, self).setUp()
         self.auth = github3.auths.Authorization(self.auth.to_json(), self.g)
 
+    def test_equality(self):
+        a = github3.auths.Authorization(load('authorization'))
+        expect(self.auth) == a
+        a.id = 1
+        expect(self.auth) != a
+
     def test_repr(self):
         expect(repr(self.auth).startswith('<Authorization')).is_True()
 

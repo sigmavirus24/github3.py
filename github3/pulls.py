@@ -164,6 +164,12 @@ class PullRequest(GitHubCore):
     def __repr__(self):
         return '<Pull Request [#{0}]>'.format(self.number)
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def _update_(self, pull):
         self.__init__(pull, self._session)
 

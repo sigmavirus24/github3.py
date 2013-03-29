@@ -241,6 +241,12 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def _update_(self, comment):
         self.__init__(comment, self._session)
 
@@ -285,6 +291,12 @@ class BaseCommit(GitHubCore):
         if not self.sha:
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]
+
+    def __eq__(self, other):
+        return self.sha == other.sha
+
+    def __ne__(self, other):
+        return self.sha != other.sha
 
 
 class BaseAccount(GitHubCore):
@@ -346,8 +358,11 @@ class BaseAccount(GitHubCore):
         #: Markdown formatted biography
         self.bio = acct.get('bio')
 
-    def __eq__(self, acc):
-        return self.id == acc.id
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
 
     def __repr__(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)

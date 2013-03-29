@@ -41,6 +41,12 @@ class Authorization(GitHubCore):
     def __repr__(self):
         return '<Authorization [{0}]>'.format(self.name)
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def _update_(self, auth):
         self.__init__(auth, self._session)
 

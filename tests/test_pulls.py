@@ -14,6 +14,12 @@ class TestPullRequest(BaseCase):
         super(TestPullRequest, self).setUp()
         self.pull = github3.pulls.PullRequest(self.pull.to_json(), self.g)
 
+    def test_equality(self):
+        p = github3.pulls.PullRequest(load('pull'))
+        expect(self.pull) == p
+        p.id = 'foo'
+        expect(self.pull) != p
+
     def test_dest(self):
         expect(repr(self.pull.base).startswith('<Base')).is_True()
 

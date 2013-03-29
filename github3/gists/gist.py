@@ -69,8 +69,11 @@ class Gist(GitHubCore):
         #: History of this gist, list of :class:`GistHistory <GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
-    def __eq__(self, gist):
-        return self.id == gist.id
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
 
     def __str__(self):
         return self.id

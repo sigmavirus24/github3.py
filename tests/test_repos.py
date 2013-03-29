@@ -1089,6 +1089,12 @@ class TestHook(BaseCase):
         super(TestHook, self).setUp()
         self.hook = repos.hook.Hook(self.hook.to_json(), self.g)
 
+    def test_equality(self):
+        h = repos.hook.Hook(load('hook'))
+        expect(self.hook) == h
+        h.id = 1
+        expect(self.hook) != h
+
     def test_repr(self):
         expect(repr(self.hook)) == '<Hook [readthedocs]>'
 
@@ -1209,6 +1215,12 @@ class TestRepoCommit(BaseCase):
         self.commit = repos.commit.RepoCommit(load('commit'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "commits/76dcc6cb4b9860034be81b7e58adc286a115aa97")
+
+    def test_equality(self):
+        c = repos.commit.RepoCommit(load('commit'))
+        expect(self.commit) == c
+        c.sha = 'fake'
+        expect(self.commit) != c
 
     def test_repr(self):
         expect(repr(self.commit).startswith('<Repository Commit')).is_True()

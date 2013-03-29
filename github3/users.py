@@ -34,6 +34,9 @@ class Key(GitHubCore):
     def __eq__(self, other):
         return self.id == other.id
 
+    def __ne__(self, other):
+        return self.id != other.id
+
     def _update_(self, key):
         self.__init__(key, self._session)
 

@@ -33,6 +33,12 @@ class IssueEvent(GitHubCore):
         #: Dictionary of links for the pull request
         self.pull_request = event.get('pull_request', {})
 
+    def __eq__(self, other):
+        return self.commit_id == other.commit_id
+
+    def __ne__(self, other):
+        return self.commit_id != other.commit_id
+
     def __repr__(self):
         return '<Issue Event [#{0} - {1}]>'.format(
             self.issue.number, self.event

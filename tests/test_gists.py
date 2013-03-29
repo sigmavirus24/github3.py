@@ -106,7 +106,7 @@ class TestGist(BaseCase):
         self.mock_assertions()
 
     def test_iter_commits(self):
-        self.response('gist_history')
+        self.response('gist_history', _iter=True)
         self.get(self.api + '/commits')
         self.conf = {'params': None}
 
@@ -166,7 +166,10 @@ class TestGist(BaseCase):
         expect(repr(hist).startswith('<Gist History')).is_True()
 
     def test_equality(self):
-        expect(self.gist) == gists.Gist(load('gist'))
+        g = gists.Gist(load('gist'))
+        expect(self.gist) == g
+        g.id = 1
+        expect(self.gist) != g
 
 
 class TestGistComment(BaseCase):
@@ -179,6 +182,12 @@ class TestGistComment(BaseCase):
         super(TestGistComment, self).setUp()
         self.comment = gists.comment.GistComment(self.comment.to_json(),
                                                  self.g)
+
+    def test_equality(self):
+        c = gists.comment.GistComment(load('gist_comment'))
+        expect(self.comment) == c
+        c.id = 1
+        expect(self.comment) != c
 
     def test_repr(self):
         expect(repr(self.comment)) != ''
@@ -197,3 +206,15 @@ class TestGistComment(BaseCase):
 
         expect(self.comment.edit('body')).is_True()
         self.mock_assertions()
+
+
+class TestGistHistory(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestGistHistory, self).__init__(methodName)
+        self.hist = gists.history.GistHistory(load('gist_history'))
+
+    def test_equality(self):
+        h = gists.history.GistHistory(load('gist_history'))
+        expect(self.hist) == h
+        h.version = 'foo'
+        expect(self.hist) != h

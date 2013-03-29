@@ -13,6 +13,12 @@ class TestEvent(BaseCase):
         super(TestEvent, self).setUp()
         self.ev = github3.events.Event(self.ev.to_json())
 
+    def test_equality(self):
+        e = github3.events.Event(load('event'))
+        expect(self.ev) == e
+        e.id = 1
+        expect(self.ev) != e
+
     def test_org(self):
         json = self.ev.to_json().copy()
         json['org'] = self.o
