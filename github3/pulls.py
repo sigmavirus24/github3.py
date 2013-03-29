@@ -81,6 +81,10 @@ class PullRequest(GitHubCore):
         self.body_html = pull.get('body_html', '')
         #: Body of the pull request as plain text
         self.body_text = pull.get('body_text', '')
+        #: Number of additions on this pull request
+        self.additions = pull.get('additions')
+        #: Number of deletions on this pull request
+        self.deletions = pull.get('deletions')
 
         # If the pull request has been closed
         #: datetime object representing when the pull was closed
