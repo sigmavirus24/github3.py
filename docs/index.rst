@@ -174,6 +174,13 @@ Testimonials
 
 .. raw:: html
 
+    <blockquote class="twitter-tweet"><p>awesome github v3 api wrapper in 
+    python <a href="https://t.co/PhD0Aj5X" 
+    title="https://github.com/sigmavirus24/github3.py">github.com/sigmavirus24/g#</a></p>&mdash; 
+    Mahdi Yusuf (@myusuf3) <a 
+    href="https://twitter.com/myusuf3/status/258571050927915008">October 17, 
+    2012</a></blockquote>
+
     <blockquote class="twitter-tweet">
     <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> github3 is 
     awesome! Made my life much easier tonight, which is a very good 
