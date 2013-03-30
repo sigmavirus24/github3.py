@@ -49,10 +49,6 @@ class CustomExpecter(expecter.expect):
             )
         )
 
-    def list_of(self, cls):
-        for actual in self._actual:
-            CustomExpecter(actual).isinstance(cls)
-
     @classmethod
     def githuberror(cls):
         return cls.raises(github3.GitHubError)

@@ -153,6 +153,10 @@ Running the Unittests
     # Or you could run make test-deps
     make tests
 
+.. toctree::
+
+    testing
+
 
 Contact
 -------
@@ -164,3 +168,41 @@ Contact
 .. _sigmavirus24: https://twitter.com/sigmavirus24
 
 .. include:: ../HISTORY.rst
+
+Testimonials
+------------
+
+.. raw:: html
+
+    <blockquote class="twitter-tweet">
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> github3 is 
+    awesome! Made my life much easier tonight, which is a very good 
+    thing.</p>&mdash; Mike Grouchy (@mgrouchy) <a 
+    href="https://twitter.com/mgrouchy/status/316370772782350336">March 26, 
+    2013</a></blockquote>
+
+    <blockquote class="twitter-tweet" data-conversation="none">
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> ¿There are 
+    so many Python client libraries for GitHub API, I tried all of them, and 
+    my conclusion is: github3.py is the best.¿</p>&mdash; Hong Minhee 
+    (@hongminhee) <a 
+    href="https://twitter.com/hongminhee/status/315295733899210752">March 23, 
+    2013</a></blockquote>
+
+    <blockquote class="twitter-tweet">
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> I cannot 
+    wait to use your github package for <a 
+    href="https://twitter.com/search/%23zci">#zci</a>. Do you have it packaged 
+    for debian by any chance?</p>&mdash; Zygmunt Krynicki (@zygoon) <a 
+    href="https://twitter.com/zygoon/status/316608301527887872">March 26, 
+    2013</a></blockquote>
+
+    <blockquote class="twitter-tweet">
+    <p>Developing against github3.py's API is a joy, kudos to @<a 
+    href="https://twitter.com/sigmavirus24">sigmavirus24</a></p>&mdash; 
+    Alejandro Gómez (@dialelo) <a 
+    href="https://twitter.com/dialelo/status/316846075015229440">March 27, 
+    2013</a></blockquote>
+
+    <script async src="//platform.twitter.com/widgets.js" 
+    charset="utf-8"></script>

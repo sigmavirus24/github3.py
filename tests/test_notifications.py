@@ -38,7 +38,7 @@ class TestThread(BaseCase):
     def test_mark(self):
         self.response('', 205)
         self.patch(self.api)
-        self.conf = {'data': {'read': True}}
+        self.conf = {}
 
         expect(self.thread.mark()).is_True()
         self.mock_assertions()

@@ -128,12 +128,13 @@ class TestGist(BaseCase):
         self.response('gist', 200)
         self.get(self.api)
 
-        expect(self.gist.refresh()) is self.gist
+        expect(self.gist.refresh() is self.gist).is_True()
         self.mock_assertions()
 
     def test_star(self):
         self.response('', 204)
-        self.put(self.api)
+        self.put(self.api + '/star')
+        self.conf = {}
 
         with expect.githuberror():
             self.gist.star()
@@ -141,10 +142,12 @@ class TestGist(BaseCase):
         self.not_called()
         self.login()
         expect(self.gist.star()).is_True()
+        self.mock_assertions()
 
     def test_unstar(self):
         self.response('', 204)
-        self.delete(self.api)
+        self.delete(self.api + '/unstar')
+        self.conf = {}
 
         with expect.githuberror():
             self.gist.unstar()
@@ -152,6 +155,7 @@ class TestGist(BaseCase):
         self.not_called()
         self.login()
         expect(self.gist.unstar()).is_True()
+        self.mock_assertions()
 
     # As opposed to creating an all new class for this
     def test_history(self):
