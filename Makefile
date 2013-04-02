@@ -5,6 +5,8 @@
 COVERAGE_INCLUDE := github3/*.py
 TEST_RUNNER := run_tests.py
 
+.DEFAULT_GOAL := tests
+
 clean:
 	git clean -Xdf
 	rm -rf build/ dist/
