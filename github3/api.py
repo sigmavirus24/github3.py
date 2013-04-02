@@ -7,7 +7,7 @@ github3.api
 
 """
 
-from .github import GitHub
+from .github import GitHub, GitHubEnterprise
 
 gh = GitHub()
 
@@ -33,19 +33,26 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
                         client_secret)
 
 
-def login(username=None, password=None, token=None):
+def login(username=None, password=None, token=None, url=None):
     """Constructs and returns a GitHub session with the username and
-    password, or token
+    password, or token. Will return a GitHubEnterprise session if a url is
+    provided.
 
     :param str username: login name
     :param str password: password for the login
     :param str token: OAuth token
+    :param str url: (optional), URL of a GitHub Enterprise instance
     :returns: :class:`GitHub <github3.github.GitHub>`
     """
     g = None
+
     if (username and password) or token:
-        g = GitHub()
+        if url is not None:
+            g = GitHubEnterprise(url)
+        else:
+            g = GitHub()
         g.login(username, password, token)
+
     return g
 
 
