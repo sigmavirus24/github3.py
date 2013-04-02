@@ -26,7 +26,7 @@ Guidelines for Contributing to github3.py
    please also add tests to the test suite.
 
 4. If you're adding additional functionality beyond what the API covers, 
-   please open an issue reqeust first and of course add tests to cover the 
+   please open an issue request first and of course add tests to cover the 
    functionality in the event it is accepted.
 
    Also, please be certain to add docstrings_ to these functions. Follow the 
