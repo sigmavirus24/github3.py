@@ -4,7 +4,7 @@ Guidelines for Contributing to github3.py
 0. Read the README_
 
 1. Regardless of the magnitude your pull request (a couple lines to a couple 
-   hundred lines), please add your name to the AUTHORS.rst file under the 
+   hundred lines), please add your name to the AUTHORS.rst_ file under the 
    heading Contributors.
 
 2. If you're fixing a bug, please write a regression test. All the tests are 
@@ -34,7 +34,9 @@ Guidelines for Contributing to github3.py
 
 5. In case you haven't caught on, for anything you add, write tests.
 
-6. Be cordial_.
+6. Be cordial_. Seriously, if anyone who isn't cordial will be sent packing, 
+   regardless of the value of their contributions. I will not tolerate some 
+   contributors creating a hostile environment for others.
 
 7. Rebase your fork/branch if needed and possible before submitting a pull 
    request. This makes my life easier. If you honestly have no idea what I'm 
@@ -44,6 +46,7 @@ Guidelines for Contributing to github3.py
 
 .. links
 .. _README: ./README.rst
+.. _AUTHORS.rst: ./AUTHORS.rst
 .. _cordial: http://kennethreitz.com/be-cordial-or-be-on-your-way.html
 .. _pep-0008: http://www.python.org/dev/peps/pep-0008/
 .. _docstrings: http://www.python.org/dev/peps/pep-0257/
