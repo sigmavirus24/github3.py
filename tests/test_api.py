@@ -26,8 +26,8 @@ class TestAPI(TestCase):
             login.assert_called_with(*args)
 
     def test_enterprise_login(self):
-        args = ('login', 'password', None,'http://ghe.invalid/')
-        with patch.object(github3.api.GitHub, 'login') as login:
+        args = ('login', 'password', None, 'http://ghe.invalid/')
+        with patch.object(github3.api.GitHubEnterprise, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHubEnterprise)
             login.assert_called_with(*args[:3])

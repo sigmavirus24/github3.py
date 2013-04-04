@@ -47,10 +47,7 @@ def login(username=None, password=None, token=None, url=None):
     g = None
 
     if (username and password) or token:
-        if url is not None:
-            g = GitHubEnterprise(url)
-        else:
-            g = GitHub()
+        g = GitHubEnterprise(url) if url is not None else GitHub()
         g.login(username, password, token)
 
     return g
