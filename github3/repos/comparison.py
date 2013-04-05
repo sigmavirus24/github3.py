@@ -16,6 +16,16 @@ class Comparison(GitHubCore):
     information returned by GitHub comparing two commit objects in a
     repository.
 
+    Two comparison instances can be checked like so::
+
+        c1 == c2
+        c1 != c2
+
+    And is equivalent to::
+
+        c1.commits == c2.commits
+        c1.commits != c2.commits
+
     See also:
     http://developer.github.com/v3/repos/commits/#compare-two-commits
     """
@@ -48,6 +58,12 @@ class Comparison(GitHubCore):
 
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
+
+    def __eq__(self, other):
+        return self.commits == other.commits
+
+    def __ne__(self, other):
+        return self.commits != other.commits
 
     def diff(self):
         """Return the diff"""

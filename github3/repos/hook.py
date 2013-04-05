@@ -15,6 +15,16 @@ class Hook(GitHubCore):
     """The :class:`Hook <Hook>` object. This handles the information returned
     by GitHub about hooks set on a repository.
 
+    Two hook instances can be checked like so::
+
+        h1 == h2
+        h1 != h2
+
+    And is equivalent to::
+
+        h1.id == h2.id
+        h1.id != h2.id
+
     See also: http://developer.github.com/v3/repos/hooks/
     """
     def __init__(self, hook, session=None):

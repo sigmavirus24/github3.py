@@ -13,6 +13,17 @@ from github3.users import User
 class RepoComment(BaseComment):
     """The :class:`RepoComment <RepoComment>` object. This stores the
     information about a comment on a file in a repository.
+
+    Two comment instances can be checked like so::
+
+        c1 == c2
+        c1 != c2
+
+    And is equivalent to::
+
+        c1.id == c2.id
+        c1.id != c2.id
+
     """
     def __init__(self, comment, session=None):
         super(RepoComment, self).__init__(comment, session)

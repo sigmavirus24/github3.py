@@ -13,6 +13,17 @@ class Issue(GitHubCore):
     """The :class:`Issue <Issue>` object. It structures and handles the data
     returned via the `Issues <http://developer.github.com/v3/issues>`_ section
     of the GitHub API.
+
+    Two issue instances can be checked like so::
+
+        i1 == i2
+        i1 != i2
+
+    And is equivalent to::
+
+        i1.id == i2.id
+        i1.id != i2.id
+
     """
     def __init__(self, issue, session=None):
         super(Issue, self).__init__(issue, session)

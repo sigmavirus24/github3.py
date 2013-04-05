@@ -14,7 +14,18 @@ from github3.decorators import requires_auth
 
 class Key(GitHubCore):
     """The :class:`Key <Key>` object. Please see GitHub's `Key Documentation
-    <http://developer.github.com/v3/users/keys/>`_ for more information."""
+    <http://developer.github.com/v3/users/keys/>`_ for more information.
+
+    Two key instances can be checked like so::
+
+        k1 == k2
+        k1 != k2
+
+    And is equivalent to::
+
+        k1.id == k2.id
+        k1.id != k2.id
+    """
     def __init__(self, key, session=None):
         super(Key, self).__init__(key, session)
         self._api = key.get('url', '')
@@ -97,6 +108,16 @@ class Plan(GitHubObject):
 class User(BaseAccount):
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
+
+    Two user instances can be checked like so::
+
+        u1 == u2
+        u1 != u2
+
+    And is equivalent to::
+
+        u1.id == u2.id
+        u1.id != u2.id
     """
     def __init__(self, user, session=None):
         super(User, self).__init__(user, session)

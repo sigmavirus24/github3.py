@@ -77,6 +77,16 @@ class PullFile(GitHubObject):
 class PullRequest(GitHubCore):
     """The :class:`PullRequest <PullRequest>` object.
 
+    Two pull request instances can be checked like so::
+
+        p1 == p2
+        p1 != p2
+
+    And is equivalent to::
+
+        p1.id == p2.id
+        p1.id != p2.id
+
     See also: http://developer.github.com/v3/pulls/
     """
     def __init__(self, pull, session=None):
@@ -299,6 +309,16 @@ class PullRequest(GitHubCore):
 class ReviewComment(BaseComment):
     """The :class:`ReviewComment <ReviewComment>` object. This is used to
     represent comments on pull requests.
+
+    Two comment instances can be checked like so::
+
+        c1 == c2
+        c1 != c2
+
+    And is equivalent to::
+
+        c1.id == c2.id
+        c1.id != c2.id
 
     See also: http://developer.github.com/v3/pulls/comments/
     """

@@ -35,6 +35,16 @@ class Repository(GitHubCore):
     """The :class:`Repository <Repository>` object. It represents how GitHub
     sends information about repositories.
 
+    Two repository instances can be checked like so::
+
+        r1 == r2
+        r1 != r2
+
+    And is equivalent to::
+
+        r1.id == r2.id
+        r1.id != r2.id
+
     See also: http://developer.github.com/v3/repos/
     """
     def __init__(self, repo, session=None):

@@ -6,6 +6,17 @@ class IssueEvent(GitHubCore):
     with events described in the
     `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
     the GitHub API.
+
+    Two event instances can be checked like so::
+
+        e1 == e2
+        e1 != e2
+
+    And is equivalent to::
+
+        e1.commit_id == e2.commit_id
+        e1.commit_id != e2.commit_id
+
     """
     def __init__(self, event, issue=None):
         super(IssueEvent, self).__init__(event, None)

@@ -21,6 +21,16 @@ class Gist(GitHubCore):
     you own it).  You can also "star" or "unstar" the gist (again assuming you
     have authenticated).
 
+    Two gist instances can be checked like so::
+
+        g1 == g2
+        g1 != g2
+
+    And is equivalent to::
+
+        g1.id == g2.id
+        g1.id != g2.id
+
     See also: http://developer.github.com/v3/gists/
     """
     def __init__(self, data, session=None):

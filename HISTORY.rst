@@ -1,7 +1,7 @@
 History/Changelog
 =================
 
-0.6.0: 2013-xx-xx
+0.6.0: 2013-04-05
 -----------------
 
 - Add ``sort`` and ``order`` parameters to ``github3.GitHub.search_users`` and 
@@ -12,7 +12,8 @@ History/Changelog
 
 - Add minimal logging (e.g., ``logging.getLogger('github3')``)
 
-- Re-organize the library.
+- Re-organize the library a bit. (Split up repos.py, issues.py, gists.py and a 
+  few others into sub-modules for my sanity.)
 
 - Calling ``refresh(True)`` on a ``github3.structs.GitHubIterator`` actually 
   works as expected now.
@@ -30,6 +31,15 @@ History/Changelog
   ``github3.iter_user_repos``
 
 - ``IssueComment.update`` was corrected to match GitHub's documentation
+
+- ``github3.login`` now accepts an optional ``url`` parameter for users of the 
+  ``GitHubEnterprise`` API, courtesy of Kristian Glass (@doismellburning)
+
+- Several classes now allow their instances to be compared with ``==`` and 
+  ``!=``. In most cases this will check the unique id provided by GitHub. In 
+  others, it will check SHAs and any other guaranteed immutable and unique 
+  attribute. The class doc-strings all have information about this and details 
+  about how equivalence is determined.
 
 0.5.3: 2013-03-19
 -----------------

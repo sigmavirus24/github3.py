@@ -15,6 +15,16 @@ class Contents(GitHubObject):
     """The :class:`Contents <Contents>` object. It holds the information
     concerning any content in a repository requested via the API.
 
+    Two content instances can be checked like so::
+
+        c1 == c2
+        c1 != c2
+
+    And is equivalent to::
+
+        c1.sha == c2.sha
+        c1.sha != c2.sha
+
     See also: http://developer.github.com/v3/repos/contents/
     """
     def __init__(self, content):
@@ -52,7 +62,6 @@ class Contents(GitHubObject):
         self.size = content.get('size', 0)
         #: SHA string.
         self.sha = content.get('sha', '')
-
         # should always be 'file'
         #: Type of content.
         self.type = content.get('type', '')
@@ -62,6 +71,12 @@ class Contents(GitHubObject):
 
     def __str__(self):
         return self.decoded
+
+    def __eq__(self, other):
+        return self.sha == other.sha
+
+    def __ne__(self, other):
+        return self.sha != other.sha
 
     @property
     def git_url(self):

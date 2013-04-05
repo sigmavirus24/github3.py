@@ -4,7 +4,19 @@ from github3.users import User
 
 class GistHistory(GitHubCore):
     """The :class:`GistHistory <GistHistory>` object represents one version
-    (or revision) of a gist."""
+    (or revision) of a gist.
+
+    Two history instances can be checked like so::
+
+        h1 == h2
+        h1 != h2
+
+    And is equivalent to::
+
+        h1.version == h2.version
+        h1.version != h2.version
+
+    """
     def __init__(self, history, session=None):
         super(GistHistory, self).__init__(history, session)
         self._api = history.get('url', '')

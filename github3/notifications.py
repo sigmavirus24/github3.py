@@ -16,6 +16,16 @@ class Thread(GitHubCore):
     contains information about the repository generating the notification, the
     subject, and the reason.
 
+    Two thread instances can be checked like so::
+
+        t1 == t2
+        t1 != t2
+
+    And is equivalent to::
+
+        t1.id == t2.id
+        t1.id != t2.id
+
     See also:
     http://developer.github.com/v3/activity/notifications/#view-a-single-thread
     """

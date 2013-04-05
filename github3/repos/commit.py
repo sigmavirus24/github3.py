@@ -15,8 +15,18 @@ class RepoCommit(BaseCommit):
     """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
     viewed by a :class:`Repository`. This is different from a Commit object
     returned from the git data section.
-    """
 
+    Two commit instances can be checked like so::
+
+        c1 == c2
+        c1 != c2
+
+    And is equivalent to::
+
+        c1.sha == c2.sha
+        c1.sha != c2.sha
+
+    """
     def __init__(self, commit, session=None):
         super(RepoCommit, self).__init__(commit, session)
         #: :class:`User <github3.users.User>` who authored the commit.
@@ -49,6 +59,12 @@ class RepoCommit(BaseCommit):
 
     def __repr__(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
+
+    def __eq__(self, other):
+        return self.sha == other.sha
+
+    def __ne__(self, other):
+        return self.sha != other.sha
 
     def diff(self):
         """Return the diff"""

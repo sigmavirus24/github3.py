@@ -17,6 +17,16 @@ from github3.decorators import requires_auth
 class Team(GitHubCore):
     """The :class:`Team <Team>` object.
 
+    Two team instances can be checked like so::
+
+        t1 == t2
+        t1 != t2
+
+    And is equivalent to::
+
+        t1.id == t2.id
+        t1.id != t2.id
+
     See also: http://developer.github.com/v3/orgs/teams/
     """
     def __init__(self, team, session=None):
@@ -154,6 +164,16 @@ class Team(GitHubCore):
 
 class Organization(BaseAccount):
     """The :class:`Organization <Organization>` object.
+
+    Two organization instances can be checked like so::
+
+        o1 == o2
+        o1 != o2
+
+    And is equivalent to::
+
+        o1.id == o2.id
+        o1.id != o2.id
 
     See also: http://developer.github.com/v3/orgs/
     """
