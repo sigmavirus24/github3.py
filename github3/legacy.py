@@ -17,6 +17,8 @@ class LegacyIssue(GitHubCore):
     every used in conjuction with the :func:`search_issues
     <github3.github.GitHub.search_issues>`. Unfortunately, GitHub hasn't
     updated the search functionality to use the objects as they exist now.
+
+    See also: http://developer.github.com/v3/search/#search-issues
     """
     def __init__(self, issue, session=None):
         super(LegacyIssue, self).__init__(issue, session)
@@ -53,7 +55,10 @@ class LegacyIssue(GitHubCore):
 
 class LegacyRepo(GitHubCore):
     """The :class:`LegacyRepo <LegacyRepo>` object. This wraps data returned
-    using the :func:`search_repos <github3.github.GitHub.search_repos>`"""
+    using the :func:`search_repos <github3.github.GitHub.search_repos>`
+
+    See also: http://developer.github.com/v3/search/#search-repositories
+    """
     def __init__(self, repo, session=None):
         super(LegacyRepo, self).__init__(repo, session)
         #: datetime object representing the date of creation of this repo
@@ -113,6 +118,9 @@ class LegacyRepo(GitHubCore):
 class LegacyUser(GitHubCore):
     """The :class:`LegacyUser <LegacyUser>` object. This handles information
     returned by :func:`search_users <github3.github.GitHub.search_users>`.
+
+    See also: http://developer.github.com/v3/search/#search-users and
+    http://developer.github.com/v3/search/#email-search
     """
     def __init__(self, user, session=None):
         super(LegacyUser, self).__init__(user, session)

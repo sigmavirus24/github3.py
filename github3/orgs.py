@@ -15,6 +15,10 @@ from github3.decorators import requires_auth
 
 
 class Team(GitHubCore):
+    """The :class:`Team <Team>` object.
+
+    See also: http://developer.github.com/v3/orgs/teams/
+    """
     def __init__(self, team, session=None):
         super(Team, self).__init__(team, session)
         self._api = team.get('url', '')
@@ -149,7 +153,10 @@ class Team(GitHubCore):
 
 
 class Organization(BaseAccount):
-    """The :class:`Organization <Organization>` object."""
+    """The :class:`Organization <Organization>` object.
+
+    See also: http://developer.github.com/v3/orgs/
+    """
     def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
         if not self.type:

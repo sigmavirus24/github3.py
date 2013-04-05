@@ -5,6 +5,8 @@ from github3.users import User
 class GistComment(BaseComment):
     """The :class:`GistComment <GistComment>` object. This represents a comment
     on a gist.
+
+    See also: http://developer.github.com/v3/gists/comments/
     """
     def __init__(self, comment, session=None):
         super(GistComment, self).__init__(comment, session)

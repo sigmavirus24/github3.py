@@ -20,6 +20,8 @@ class Gist(GitHubCore):
     gist (assuming you are authenticated), edit or delete the gist (assuming
     you own it).  You can also "star" or "unstar" the gist (again assuming you
     have authenticated).
+
+    See also: http://developer.github.com/v3/gists/
     """
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)

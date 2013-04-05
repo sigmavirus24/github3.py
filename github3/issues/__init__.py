@@ -8,7 +8,9 @@ See also: http://developer.github.com/v3/issues/
 """
 
 from re import match
-from .issue import Issue  # NOQA
+from .issue import Issue
+
+__all__ = [Issue]
 
 
 def issue_params(filter, state, labels, sort, direction, since):

@@ -28,7 +28,7 @@ class Event(GitHubObject):
         self.org = None
         if event.get('org'):
             self.org = Organization(event.get('org'))
-        #: Event type
+        #: Event type http://developer.github.com/v3/activity/events/types/
         self.type = event.get('type')
         handler = _payload_handlers[self.type]
         #: Dictionary with the payload. Payload structure is defined by type_.

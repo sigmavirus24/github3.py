@@ -15,7 +15,10 @@ from github3.decorators import requires_auth
 
 
 class PullDestination(GitHubCore):
-    """The :class:`PullDestination <PullDestination>` object."""
+    """The :class:`PullDestination <PullDestination>` object.
+
+    See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
+    """
     def __init__(self, dest, direction):
         super(PullDestination, self).__init__(None)
         #: Direction of the merge with respect to this destination
@@ -42,7 +45,10 @@ class PullDestination(GitHubCore):
 
 
 class PullFile(GitHubObject):
-    """The :class:`PullFile <PullFile>` object."""
+    """The :class:`PullFile <PullFile>` object.
+
+    See also: http://developer.github.com/v3/pulls/#list-pull-requests-files
+    """
     def __init__(self, pfile):
         super(PullFile, self).__init__(pfile)
         #: SHA of the commit
@@ -69,7 +75,10 @@ class PullFile(GitHubObject):
 
 
 class PullRequest(GitHubCore):
-    """The :class:`PullRequest <PullRequest>` object."""
+    """The :class:`PullRequest <PullRequest>` object.
+
+    See also: http://developer.github.com/v3/pulls/
+    """
     def __init__(self, pull, session=None):
         super(PullRequest, self).__init__(pull, session)
         self._api = pull.get('url', '')
@@ -290,6 +299,8 @@ class PullRequest(GitHubCore):
 class ReviewComment(BaseComment):
     """The :class:`ReviewComment <ReviewComment>` object. This is used to
     represent comments on pull requests.
+
+    See also: http://developer.github.com/v3/pulls/comments/
     """
     def __init__(self, comment, session=None):
         super(ReviewComment, self).__init__(comment, session)
