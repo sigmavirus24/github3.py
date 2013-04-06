@@ -1005,6 +1005,12 @@ class TestContents(BaseCase):
         super(TestContents, self).__init__(methodName)
         self.contents = repos.contents.Contents(load('readme'))
 
+    def test_equality(self):
+        contents = repos.contents.Contents(load('readme'))
+        expect(self.contents) == contents
+        contents.sha = 'fakesha'
+        expect(self.contents) != contents
+
     def test_git_url(self):
         expect(self.contents.links['git']) == self.contents.git_url
 
@@ -1252,6 +1258,12 @@ class TestComparison(BaseCase):
 
     def test_repr(self):
         expect(repr(self.comp).startswith('<Comparison ')).is_True()
+
+    def test_equality(self):
+        comp = repos.comparison.Comparison(load('comparison'))
+        expect(self.comp) == comp
+        comp.commits.pop(0)
+        expect(self.comp) != comp
 
     def test_diff(self):
         self.response('archive', 200)
