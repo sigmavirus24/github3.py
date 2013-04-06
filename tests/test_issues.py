@@ -20,6 +20,12 @@ class TestLabel(BaseCase):
         super(TestLabel, self).setUp()
         self.l = Label(self.l.to_json(), self.g)
 
+    def test_equality(self):
+        l = Label(load('label'))
+        expect(self.l) == l
+        l._api = "https://api.github.com/repos/sigmavirus24/github3.py/labels/wontfix"
+        expect(self.l) != l
+
     def test_repr(self):
         expect(repr(self.l)) == '<Label [{0}]>'.format(self.l.name)
 
