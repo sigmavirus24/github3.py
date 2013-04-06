@@ -1,6 +1,11 @@
 History/Changelog
 =================
 
+0.6.1: 2013-04-06
+-----------------
+
+- Add equality for labels courtesy of Alejandro Gomez (@alejandrogomez)
+
 0.6.0: 2013-04-05
 -----------------
 
