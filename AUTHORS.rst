@@ -39,3 +39,5 @@ Contributors
 - Tom Petr (@tpetr)
 
 - David Pachura (@detenebrator)
+
+- Barry Morrison (@esacteksab)
