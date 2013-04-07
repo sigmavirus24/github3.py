@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import unittest
 import imp
 import os
@@ -39,9 +38,11 @@ if __name__ == "__main__":
         cov.start()
 
     suite = collect_tests()
-    unittest.TextTestRunner(verbosity=1).run(suite)
+    res = unittest.TextTestRunner(verbosity=1).run(suite)
 
     if coverage:
         cov.stop()
         cov.save()
         cov.report(show_missing=False)
+
+    raise SystemExit(res)
