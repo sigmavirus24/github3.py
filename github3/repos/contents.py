@@ -40,7 +40,7 @@ class Contents(GitHubObject):
 
         # content, base64 encoded and decoded
         #: Base64-encoded content of the file.
-        self.content = content.get('content', '')
+        self.content = content.get('content', 'base64')
 
         #: Decoded content of the file as a bytes object. If we try to decode
         #: to character set for you, we might encounter an exception which
@@ -73,10 +73,10 @@ class Contents(GitHubObject):
         return self.decoded
 
     def __eq__(self, other):
-        return self.sha == other.sha
+        return self.decoded ==  other
 
     def __ne__(self, other):
-        return self.sha != other.sha
+        return self.sha != other
 
     @property
     def git_url(self):
