@@ -1,4 +1,9 @@
 import os
+import sys
+if sys.version_info < (2,7):
+    import unittest2 as unittest
+else:
+    import unittest
 import github3
 from github3 import repos
 from tests.utils import (expect, BaseCase, load)
@@ -1020,6 +1025,10 @@ class TestContents(BaseCase):
     def test_repr(self):
         expect(repr(self.contents)) == '<Content [{0}]>'.format('README.rst')
 
+    @unittest.skipIf(sys.version_info < (2,7), "Python 3 is expecting bytes")
+    def test_str(self):
+        expect((self.contents)) == self.contents.decoded
+    @unittest.skipIf(sys.version_info > (3,), "Python 2 is expecting a string")
     def test_str(self):
         expect(str(self.contents)) == self.contents.decoded
 
