@@ -45,4 +45,5 @@ if __name__ == "__main__":
         cov.save()
         cov.report(show_missing=False)
 
-    raise SystemExit(res)
+    # If it was successful, we don't want to exit with code 1
+    raise SystemExit(not res.wasSuccessful())
