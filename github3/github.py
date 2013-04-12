@@ -106,6 +106,23 @@ class GitHub(GitHubCore):
                 json = self._json(ses.post(url, data=dumps(data)), 201)
         return Authorization(json, self) if json else None
 
+    def check_authorization(self, access_token):
+        """OAuth applications can use this method to check token validity
+        without hitting normal rate limits because of failed login attempts.
+        If the token is valid, it will return True, otherwise it will return
+        False.
+
+        :returns: bool
+        """
+        p = self._session.params
+        auth = (p.get('client_id'), p.get('client_secret'))
+        if access_token and auth:
+            url = self._build_url('applications', str(auth[0]), 'tokens',
+                                  str(access_token))
+            resp = self._get(url, auth=auth)
+            return self._boolean(resp, 200, 404)
+        return False
+
     def create_gist(self, description, files, public=True):
         """Create a new gist.
 
@@ -340,7 +357,8 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('repositories')
         params = {'since': since} if since else None
-        return self._iter(int(number), url, Repository, params=params, etag=etag)
+        return self._iter(int(number), url, Repository, params=params,
+                          etag=etag)
 
     def iter_all_users(self, number=-1, etag=None):
         """Iterate over every user in the order they signed up for GitHub.

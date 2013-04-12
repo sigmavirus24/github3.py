@@ -1,6 +1,14 @@
 History/Changelog
 =================
 
+0.7.0: 2013-xx-xx
+-----------------
+
+- Add ``check_authorization`` to the ``GitHub class`` to cover the `new part 
+  of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
+
+- Switch from expecter to unittest2 (python 2.6 only) and standard unittest
+
 0.6.1: 2013-04-06
 -----------------
 
