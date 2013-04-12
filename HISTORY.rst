@@ -7,6 +7,10 @@ History/Changelog
 - Add ``check_authorization`` to the ``GitHub class`` to cover the `new part 
   of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
 
+- The signature of ``Hook.edit`` has changed since that endpoint has changed 
+  as well. See: 
+  github/developer.github.com@b95f291a47954154a6a8cd7c2296cdda9b610164
+
 - Switch from expecter to unittest2 (python 2.6 only) and standard unittest
 
 0.6.1: 2013-04-06
