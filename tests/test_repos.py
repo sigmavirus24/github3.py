@@ -3,6 +3,15 @@ import github3
 from github3 import repos
 from tests.utils import (expect, BaseCase, load)
 from mock import patch, mock_open
+import sys
+
+if sys.version_info > (3, 0):
+    from unittest import skip
+else:
+    def skip(reason):
+        def fake_decorator(func):
+            return func
+        return fake_decorator
 
 
 class TestRepository(BaseCase):
@@ -1020,6 +1029,7 @@ class TestContents(BaseCase):
     def test_repr(self):
         expect(repr(self.contents)) == '<Content [{0}]>'.format('README.rst')
 
+    @skip("On Python 3 bytes and strings are not the same thing")
     def test_str(self):
         expect(str(self.contents)) == self.contents.decoded
 
@@ -1132,7 +1142,6 @@ class TestHook(BaseCase):
         self.response('hook', 200)
         self.patch(self.api)
         data = {
-            'name': 'hookname',
             'config': {'push': 'http://example.com'},
             'events': ['push'],
             'add_events': ['fake_ev'],
@@ -1147,13 +1156,18 @@ class TestHook(BaseCase):
             self.hook.edit(**data)
 
         self.login()
-        expect(self.hook.edit(None, None, None)).is_False()
-        expect(self.hook.edit('True', None, None)).is_False()
-        expect(self.hook.edit(None, 'True', None)).is_False()
-        expect(self.hook.edit(None, None, {})).is_False()
         self.not_called()
 
         expect(self.hook.edit(**data)).is_True()
+        self.mock_assertions()
+
+    def test_edit_failed(self):
+        self.response('', 404)
+        self.patch(self.api)
+        self.conf = {}
+
+        self.login()
+        expect(self.hook.edit()).is_False()
         self.mock_assertions()
 
     def test_test(self):

@@ -107,6 +107,7 @@ class Hook(GitHubCore):
         if json:
             self._update_(json)
             return True
+
         return False
 
     @requires_auth

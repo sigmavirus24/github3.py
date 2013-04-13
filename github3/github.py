@@ -119,7 +119,9 @@ class GitHub(GitHubCore):
         if access_token and auth:
             url = self._build_url('applications', str(auth[0]), 'tokens',
                                   str(access_token))
-            resp = self._get(url, auth=auth)
+            resp = self._get(url, auth=auth, params={
+                'client_id': None, 'client_secret': None
+            })
             return self._boolean(resp, 200, 404)
         return False
 
