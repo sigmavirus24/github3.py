@@ -174,6 +174,14 @@ Testimonials
 
 .. raw:: html
 
+    <blockquote class="twitter-tweet"><p>gotta hand it to 
+    @<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> ... github3.py is really well 
+    written. It will soon be powering the github stuff on
+    @<a href="https://twitter.com/workforpie">workforpie</a>
+    </p>&mdash; Brad Montgomery # (@bkmontgomery) <a 
+    href="https://twitter.com/bkmontgomery/status/325644863561400320">April 20, 2013</a>
+    </blockquote>
+
     <blockquote class="twitter-tweet"><p>awesome github v3 api wrapper in 
     python <a href="https://t.co/PhD0Aj5X" 
     title="https://github.com/sigmavirus24/github3.py">github.com/sigmavirus24/g#</a></p>&mdash; 
