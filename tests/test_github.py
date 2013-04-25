@@ -1,5 +1,5 @@
 import github3
-from mock import patch
+from mock import patch, Mock
 from tests.utils import (expect, BaseCase, load)
 
 
@@ -10,6 +10,13 @@ class TestGitHub(BaseCase):
 
         g = github3.GitHub(token='foo')
         expect(repr(g).endswith('{0:x}>'.format(id(g))))
+
+    def test_context_manager(self):
+        with github3.GitHub() as gh:
+            gh.__exit__ = Mock()
+            expect(gh).isinstance(github3.GitHub)
+
+        gh.__exit__.assert_called()
 
     def test_authorization(self):
         self.response('authorization')

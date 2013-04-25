@@ -57,6 +57,12 @@ class GitHub(GitHubCore):
             return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
     @requires_auth
     def _iter_follow(self, which, number, etag):
         url = self._build_url('user', which)

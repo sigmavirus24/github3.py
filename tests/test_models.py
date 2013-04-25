@@ -1,6 +1,6 @@
 import github3
 import requests
-from tests.utils import BaseCase, TestCase, expect, BytesIO, is_py3
+from tests.utils import BaseCase, TestCase, expect, RequestsBytesIO, is_py3
 
 
 class TestGitHubObject(TestCase):
@@ -22,7 +22,7 @@ class TestGitHubCore(BaseCase):
         r = requests.Response()
         r.headers['Last-Modified'] = 'foo'
         r.headers['ETag'] = 'bar'
-        r.raw = BytesIO('{}'.encode() if is_py3 else '{}')
+        r.raw = RequestsBytesIO('{}'.encode() if is_py3 else '{}')
         r.status_code = 200
 
         json = self.g._json(r, 200)
@@ -32,7 +32,7 @@ class TestGitHubCore(BaseCase):
     def test_boolean(self):
         r = requests.Response()
         r.status_code = 512
-        r.raw = BytesIO('{}'.encode() if is_py3 else '{}')
+        r.raw = RequestsBytesIO('{}'.encode() if is_py3 else '{}')
 
         with expect.githuberror():
             self.g._boolean(r, 200, 404)
@@ -51,7 +51,7 @@ class TestGitHubError(TestCase):
         self.r = requests.Response()
         self.r.status_code = 400
         message = '{"message": "m", "errors": ["e"]}'
-        self.r.raw = BytesIO(message.encode() if is_py3 else message)
+        self.r.raw = RequestsBytesIO(message.encode() if is_py3 else message)
         self.error = github3.models.GitHubError(self.r)
 
     def test_repr(self):
@@ -66,6 +66,6 @@ class TestGitHubError(TestCase):
     def test_amazon(self):
         r = requests.Response()
         r.status_code = 400
-        r.raw = BytesIO()
+        r.raw = RequestsBytesIO()
         e = github3.models.GitHubError(r)
         expect(e.message) == '[No message]'

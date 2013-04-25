@@ -108,13 +108,13 @@ class BaseCase(TestCase):
 
             if _iter:
                 content = '[{0}]'.format(content)
-                r.raw = BytesIO(content.encode())
+                r.raw = RequestsBytesIO(content.encode())
             elif is_py3:
-                r.raw = BytesIO(content.encode())
+                r.raw = RequestsBytesIO(content.encode())
             else:
-                r.raw = BytesIO(content)
+                r.raw = RequestsBytesIO(content)
         else:
-            r.raw = BytesIO()
+            r.raw = RequestsBytesIO()
 
         if headers:
             r.headers = CaseInsensitiveDict(headers)
@@ -139,3 +139,8 @@ class BaseCase(TestCase):
 
     def not_called(self):
         expect(self.request.called).is_False()
+
+
+class RequestsBytesIO(BytesIO):
+    def read(self, chunk_size, *args, **kwargs):
+        return super(RequestsBytesIO, self).read(chunk_size)

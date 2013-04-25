@@ -11,6 +11,12 @@ History/Changelog
   as well. See: 
   github/developer.github.com@b95f291a47954154a6a8cd7c2296cdda9b610164
 
+- ``github3.GitHub`` can now be used as a context manager, e.g.,
+  ::
+      
+       with github.GitHub() as gh:
+           u = gh.user('sigmavirus24')
+
 - Switch from expecter to unittest2 (python 2.6 only) and standard unittest
 
 0.6.1: 2013-04-06
