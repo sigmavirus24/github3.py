@@ -648,12 +648,11 @@ class GitHub(GitHubCore):
     @requires_auth
     def iter_repos(self, type=None, sort=None, direction=None, number=-1,
                    etag=None):
-        """List public repositories for the specified ``login`` or all
-        repositories for the authenticated user if ``login`` is not
-        provided.
+        """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
            Removed the login parameter for correctness. Use iter_user_repos
+           instead
 
         :param str type: (optional), accepted values:
             ('all', 'owner', 'public', 'private', 'member')
