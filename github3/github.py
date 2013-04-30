@@ -647,10 +647,13 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def iter_repos(self, type=None, sort=None, direction=None, number=-1,
-                   etag=None):
+                   etag=None, username=None):
         """List public repositories for the specified ``login`` or all
         repositories for the authenticated user if ``login`` is not
         provided.
+
+        If no username is specified, GET /user/repos, otherwise GET
+        /users/:username/repo
 
         .. versionchanged:: 0.6
            Removed the login parameter for correctness. Use iter_user_repos
@@ -671,9 +674,18 @@ class GitHub(GitHubCore):
         :returns: generator of :class:`Repository <github3.repos.Repository>`
             objects
         """
-        url = self._build_url('user', 'repos')
-
         params = {}
+        base_types = ['all', 'owner', 'member']
+
+        if username:
+            if type in base_types:
+                params.update(type=type)
+            url = self._build_url('users', username, 'repos')
+        else:
+            if type in base_types + ['private', 'public']:
+                params.update(type=type)
+            url = self._build_url('user', 'repos')
+
         if type in ('all', 'owner', 'public', 'private', 'member'):
             params.update(type=type)
         if sort in ('created', 'updated', 'pushed', 'full_name'):
