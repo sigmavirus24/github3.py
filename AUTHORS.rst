@@ -41,3 +41,5 @@ Contributors
 - David Pachura (@detenebrator)
 
 - Barry Morrison (@esacteksab)
+
+- James Pearson (@xiongchiamiov)

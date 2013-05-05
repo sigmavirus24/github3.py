@@ -851,6 +851,9 @@ class TestRepository(BaseCase):
         self.conf['data']['last_read_at'] = '2013-01-18T19:53:04Z'
         self.mock_assertions()
 
+    def test_master_branch(self):
+        expect(self.repo.master_branch) == 'master'
+
     def test_merge(self):
         self.response('commit', 201)
         self.post(self.api + 'merges')
