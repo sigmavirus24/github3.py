@@ -45,7 +45,7 @@ License
 
 Modified BSD license_
 
-.. _license:
+.. _license: https://github.com/sigmavirus24/github3.py/blob/develop/LICENSE
 
 Examples
 --------
