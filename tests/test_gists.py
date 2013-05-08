@@ -146,7 +146,7 @@ class TestGist(BaseCase):
 
     def test_unstar(self):
         self.response('', 204)
-        self.delete(self.api + '/unstar')
+        self.delete(self.api + '/star')
         self.conf = {}
 
         with expect.githuberror():
