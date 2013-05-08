@@ -42,4 +42,6 @@ Contributors
 
 - Barry Morrison (@esacteksab)
 
+- James Pearson (@xiongchiamiov)
+
 - INADA Naoki (@methane)

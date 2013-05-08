@@ -136,6 +136,9 @@ class Repository(GitHubCore):
             self.parent = Repository(self.parent, self)
 
         #: default branch for the repository
+        self.default_branch = repo.get('default_branch', '')
+
+        #: master (default) branch for the repository
         self.master_branch = repo.get('master_branch', '')
 
     def __eq__(self, repo):
