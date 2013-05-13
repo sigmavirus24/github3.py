@@ -4,6 +4,8 @@ History/Changelog
 0.7.0: 2013-xx-xx
 -----------------
 
+- Fix ``Issue.close``, ``Issue.reopen``, and ``Issue.assign``. (Issue #106)
+
 - Add ``check_authorization`` to the ``GitHub class`` to cover the `new part 
   of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
 
@@ -17,7 +19,8 @@ History/Changelog
        with github.GitHub() as gh:
            u = gh.user('sigmavirus24')
 
-- Switch from expecter to unittest2 (python 2.6 only) and standard unittest
+- Switch from expecter to unittest2 (python 2.6 only) and standard unittest ( 
+  in progress)
 
 0.6.1: 2013-04-06
 -----------------
