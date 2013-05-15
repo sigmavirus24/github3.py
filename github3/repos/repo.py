@@ -1149,6 +1149,7 @@ class Repository(GitHubCore):
         if state and state.lower() in ('open', 'closed'):
             params['state'] = state.lower()
         params.update(head=head, base=base)
+        self._remove_none(params)
         return self._iter(int(number), url, PullRequest, params, etag)
 
     def iter_refs(self, subspace='', number=-1, etag=None):
