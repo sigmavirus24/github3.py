@@ -30,9 +30,18 @@ class Contents(GitHubObject):
     def __init__(self, content):
         super(Contents, self).__init__(content)
         # links
-        self._api = content['_links'].get('self', '')
+        self._api = content.get('url')
         #: Dictionary of links
         self.links = content.get('_links')
+
+        #: URL of the README on github.com
+        self.html_url = content.get('html_url')
+
+        #: URL for the git api pertaining to the README
+        self.git_url = content.get('git_url')
+
+        #: git:// URL of the content if it is a submodule
+        self.submodule_git_url = content.get('submodule_git_url')
 
         # should always be 'base64'
         #: Returns encoding used on the content.
@@ -40,7 +49,7 @@ class Contents(GitHubObject):
 
         # content, base64 encoded and decoded
         #: Base64-encoded content of the file.
-        self.content = content.get('content', 'base64')
+        self.content = content.get('content', '')
 
         #: Decoded content of the file as a bytes object. If we try to decode
         #: to character set for you, we might encounter an exception which
@@ -49,8 +58,8 @@ class Contents(GitHubObject):
         #: with the character set you wish to use, e.g.,
         #: ``content.decoded.decode('utf-8')``.
         #: .. versionchanged:: 0.5.2
-        self.decoded = self.content
-        if self.encoding == 'base64':
+        self.decoded = ''
+        if self.encoding == 'base64' and self.content:
             self.decoded = b64decode(self.content.encode())
 
         # file name, path, and size
@@ -62,9 +71,11 @@ class Contents(GitHubObject):
         self.size = content.get('size', 0)
         #: SHA string.
         self.sha = content.get('sha', '')
-        # should always be 'file'
-        #: Type of content.
+        #: Type of content. ('file', 'symlink', 'submodule')
         self.type = content.get('type', '')
+        #: Target will only be set of type is a symlink. This is what the link
+        #: points to
+        self.target = content.get('target', '')
 
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
@@ -73,17 +84,7 @@ class Contents(GitHubObject):
         return self.decoded
 
     def __eq__(self, other):
-        return self.decoded ==  other
+        return self.decoded == other
 
     def __ne__(self, other):
         return self.sha != other
-
-    @property
-    def git_url(self):
-        """API URL for this blob"""
-        return self.links['git']
-
-    @property
-    def html_url(self):
-        """URL pointing to the content on GitHub."""
-        return self.links['html']

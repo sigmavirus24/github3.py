@@ -769,6 +769,14 @@ class TestRepository(BaseCase):
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
 
+        self.conf.update(params={'head': 'user:branch'})
+        next(self.repo.iter_pulls(head='user:branch'))
+        self.mock_assertions()
+
+        self.conf.update(params={'base': 'branch'})
+        next(self.repo.iter_pulls(base='branch'))
+        self.mock_assertions()
+
     def test_iter_refs(self):
         self.response('ref', _iter=True)
         self.get(self.api + 'git/refs')

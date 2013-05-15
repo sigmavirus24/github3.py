@@ -8,6 +8,7 @@ parts of GitHub's Repository API.
 """
 
 from json import dumps
+from base64 import b64encode
 from collections import Callable
 from github3.decorators import requires_auth
 from github3.events import Event
@@ -32,6 +33,7 @@ from github3.users import User, Key
 
 
 class Repository(GitHubCore):
+
     """The :class:`Repository <Repository>` object. It represents how GitHub
     sends information about repositories.
 
@@ -46,7 +48,9 @@ class Repository(GitHubCore):
         r1.id != r2.id
 
     See also: http://developer.github.com/v3/repos/
+
     """
+
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(repo, session)
         #: URL used to clone via HTTPS.
@@ -177,6 +181,8 @@ class Repository(GitHubCore):
     def archive(self, format, path='', ref='master'):
         """Get the tarball or zipball archive for this repo at ref.
 
+        See: http://developer.github.com/v3/repos/contents/#get-archive-link
+
         :param str format: (required), accepted values: ('tarball',
             'zipball')
         :param path: (optional), path where the file should be saved
@@ -186,6 +192,7 @@ class Repository(GitHubCore):
         :type path: str, file
         :param str ref: (optional)
         :returns: bool -- True if successful, False otherwise
+
         """
         resp = None
         written = False
@@ -278,15 +285,28 @@ class Repository(GitHubCore):
     def contents(self, path, ref=None):
         """Get the contents of the file pointed to by ``path``.
 
+        If the path provided is actually a directory, you will receive a
+        dictionary back of the form::
+
+            {
+                'filename.md': Contents(),  # Where Contents an instance
+                'github.py': Contents(),
+            }
+
         :param str path: (required), path to file, e.g.
             github3/repo.py
         :param str ref: (optional), the string name of a commit/branch/tag.
             Default: master
-        :returns: :class:`Contents <Contents>` if successful, else None
+        :returns: :class:`Contents <Contents>` or dict if successful, else
+            None
         """
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
-        return Contents(json) if json else None
+        if isinstance(json, dict):
+            return Contents(json)
+        elif isinstance(json, list):
+            return dict((j.get('name'), Contents(j)) for j in json)
+        return None
 
     @requires_auth
     def create_blob(self, content, encoding):
@@ -356,6 +376,38 @@ class Repository(GitHubCore):
                     'author': author, 'committer': committer}
             json = self._json(self._post(url, data=data), 201)
         return Commit(json, self) if json else None
+
+    @requires_auth
+    def create_file(self, path, message, content, branch=None,
+                    committer=None, author=None):
+        """Create a file in this repository.
+
+        See also: http://developer.github.com/v3/repos/contents/#create-a-file
+
+        :param str path: (required), path of the file in the repository
+        :param str message: (required), commit message
+        :param str content: (required), the actual data in the file
+        :param str branch: (optional), branch to create the commit on.
+            Defaults to the default branch of the repository
+        :param dict committer: (optional), if no information is given the
+            authenticated user's information will be used. You must specify
+            both a name and email.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+
+        """
+        json = None
+        if path and message and content:
+            url = self._build_url('contents', path, base_url=self._api)
+            data = {'message': message, 'content': b64encode(content)}
+            if committer and committer.get('name') and committer.get('email'):
+                data.update(committer=committer)
+            if author and author.get('name') and author.get('email'):
+                data.update(author=author)
+
+            json = self._json(self._put(url, data=dumps(data)), 201)
+        return Contents(json, self) if json else None
 
     @requires_auth
     def create_fork(self, organization=None):
@@ -1076,10 +1128,15 @@ class Repository(GitHubCore):
                 del params[k]
         return self._iter(int(number), url, Thread, params, etag)
 
-    def iter_pulls(self, state=None, number=-1, etag=None):
+    def iter_pulls(self, state=None, head=None, base=None, number=-1,
+                   etag=None):
         """List pull requests on repository.
 
         :param str state: (optional), accepted values: ('open', 'closed')
+        :param str head: (optional), filters pulls by head user and branch
+            name in the format ``user:ref-name``, e.g., ``seveas:debian``
+        :param str base: (optional), filter pulls by base branch name.
+            Example: ``develop``.
         :param int number: (optional), number of pulls to return. Default: -1
             returns all available pull requests
         :param str etag: (optional), ETag from a previous request to the same
@@ -1091,6 +1148,7 @@ class Repository(GitHubCore):
         params = {}
         if state and state.lower() in ('open', 'closed'):
             params['state'] = state.lower()
+        params.update(head=head, base=base)
         return self._iter(int(number), url, PullRequest, params, etag)
 
     def iter_refs(self, subspace='', number=-1, etag=None):
