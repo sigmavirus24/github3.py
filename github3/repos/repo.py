@@ -28,6 +28,7 @@ from github3.repos.contents import Contents
 from github3.repos.download import Download
 from github3.repos.hook import Hook
 from github3.repos.status import Status
+from github3.repos.stats import ContributorStats
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
 
@@ -848,6 +849,28 @@ class Repository(GitHubCore):
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch, etag=etag)
 
+    def iter_code_frequency(self, number=-1, etag=None):
+        """Iterate over the code frequency per week.
+
+        Returns a weekly aggregate of the number of additions and deletions
+        pushed to this repository.
+
+        :param int number: (optional), number of weeks to return. Default: -1
+            returns all weeks
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of lists ``[seconds_from_epoch, additions,
+            deletions]``
+
+        .. note:: All statistics methods may return a 202. On those occasions,
+                  you will not receive any objects. You should store your
+                  iterator and check the new ``last_status`` attribute. If it
+                  is a 202 you should wait before re-requesting.
+
+        """
+        url = self._build_url('stats', 'code_frequecy', base_url=self._api)
+        return self._iter(int(number), url, list, etag=etag)
+
     def iter_comments(self, number=-1, etag=None):
         """Iterate over comments on all commits in the repository.
 
@@ -873,6 +896,26 @@ class Repository(GitHubCore):
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
+
+    def iter_commit_activity(self, number=-1, etag=None):
+        """Iterate over last year of commit activity by week.
+
+        See: http://developer.github.com/v3/repos/statistics/
+
+        :param int number: (optional), number of weeks to return. Default -1
+            will return all of the weeks.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of dictionaries
+
+        .. note:: All statistics methods may return a 202. On those occasions,
+                  you will not receive any objects. You should store your
+                  iterator and check the new ``last_status`` attribute. If it
+                  is a 202 you should wait before re-requesting.
+
+        """
+        url = self._build_url('stats', 'commit_activity', base_url=self._api)
+        return self._iter(int(number), url, dict, etag=etag)
 
     def iter_commits(self, sha=None, path=None, author=None, number=-1,
                      etag=None):
@@ -911,6 +954,27 @@ class Repository(GitHubCore):
         if anon:
             params = {'anon': True}
         return self._iter(int(number), url, User, params, etag)
+
+    def iter_contributor_statistics(self, number=-1, etag=None):
+        """Iterate over the contributors list.
+
+        See also: http://developer.github.com/v3/repos/statistics/
+
+        :param int number: (optional), number of weeks to return. Default -1
+            will return all of the weeks.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`ContributorStats <github3.repos.stats.ContributorStats>`
+
+        .. note:: All statistics methods may return a 202. On those occasions,
+                  you will not receive any objects. You should store your
+                  iterator and check the new ``last_status`` attribute. If it
+                  is a 202 you should wait before re-requesting.
+
+        """
+        url = self._build_url('stats', 'contributors', base_url=self._api)
+        return self._iter(int(number), url, ContributorStats, etag=etag)
 
     def iter_downloads(self, number=-1, etag=None):
         """Iterate over available downloads for this repository.
@@ -1398,3 +1462,27 @@ class Repository(GitHubCore):
             upd = label.update
             resp = upd(new_name, color) if new_name else upd(name, color)
         return resp
+
+    def weekly_commit_count(self):
+        """Returns the total commit counts.
+
+        The dictionary returned has two entries: ``all`` and ``owner``. Each
+        has a fifty-two element long list of commit counts. (Note: ``all``
+        includes the owner.) ``d['all'][0]`` will be the oldest week,
+        ``d['all'][51]`` will be the most recent.
+
+        :returns: dict
+
+        .. note:: All statistics methods may return a 202. If github3.py
+            receives a 202 in this case, it will return an emtpy dictionary.
+            You should give the API a moment to compose the data and then re
+            -request it via this method.
+
+        """
+        url = self._build_url('stats', 'participation', base_url=self._api)
+        resp = self._get(url)
+        if resp.status_code == 202:
+            return {}
+        json = self._json(resp, 200)
+        del(json['Etag'], json['Last-Modified'])
+        return json

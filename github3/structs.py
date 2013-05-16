@@ -25,6 +25,10 @@ class GitHubIterator(GitHubCore, Iterator):
         self.etag = None
         #: Headers generated for the GET request
         self.headers = {}
+        #: The last response seen
+        self.last_response = None
+        #: Last status code received
+        self.last_status = 0
 
         if etag:
             self.headers = {'If-None-Match': etag}
@@ -39,6 +43,8 @@ class GitHubIterator(GitHubCore, Iterator):
 
         while (self.count == -1 or self.count > 0) and url:
             response = self._get(url, params=params, headers=headers)
+            self.last_response = response
+            self.last_status = response.status_code
             if params:
                 params = None  # rel_next already has the params
 

@@ -9,6 +9,9 @@ History/Changelog
 - Add ``check_authorization`` to the ``GitHub class`` to cover the `new part 
   of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
 
+- Add ``Repository.iter_contributor_statistics``, 
+  ``Repository.iter_commit_activity``, 
+
 - The signature of ``Hook.edit`` has changed since that endpoint has changed 
   as well. See: 
   github/developer.github.com@b95f291a47954154a6a8cd7c2296cdda9b610164
