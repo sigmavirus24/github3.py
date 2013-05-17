@@ -396,6 +396,9 @@ class Repository(GitHubCore):
         :param dict author: (optional), if omitted this will be filled in with
             committer information. If passed, you must specify both a name and
             email.
+        :returns: ``{
+            'content': :class:`Contents <github3.repos.contents.Content>`:,
+            'commit': :class:`Commit <github3.git.Commit>`}``
 
         """
         json = None
