@@ -177,7 +177,7 @@ class TestRepository(BaseCase):
                 'one `BaseAccount` class to make things simpler. ')
         sha = 'd41566090114a752eb3a87dbcf2473eb427ef0f3'
         self.post(self.api + 'commits/{0}/comments'.format(sha))
-        self.conf = {'data': {'body': body, 'commit_id': sha, 'line': 1}}
+        self.conf = {'data': {'body': body, 'line': 1}}
 
         with expect.githuberror():
             self.repo.create_comment(body, sha)

@@ -338,11 +338,12 @@ class Repository(GitHubCore):
         :param int line: (optional), line number of the file to comment on,
             default: 1
         :returns: :class:`RepoComment <RepoComment>` if successful else None
+
         """
         json = None
         if body and sha and (line and int(line) > 0):
-            data = {'body': body, 'commit_id': sha, 'line': line,
-                    'path': path, 'position': position}
+            data = {'body': body, 'line': line, 'path': path,
+                    'position': position}
             self._remove_none(data)
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
