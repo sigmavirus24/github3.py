@@ -137,6 +137,13 @@ class TestRepository(BaseCase):
         self.response('', 404)
         expect(self.repo.contents(filename)).is_None()
 
+        self.response('contents', _iter=True)
+        files = self.repo.contents(filename)
+        expect(files).isinstance(dict)
+        expect(files.values()[0]).isinstance(repos.contents.Contents)
+
+        self.mock_assertions()
+
     def test_contents_ref(self):
         self.response('contents')
         filename = 'setup.py'
@@ -993,7 +1000,7 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_update_label(self):
-        self.response('label', 200)
+        self.response('label')
         self.patch(self.api + 'labels/bug')
         self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
 
@@ -1015,6 +1022,73 @@ class TestRepository(BaseCase):
 
     def test_equality(self):
         expect(self.repo) == repos.Repository(load('repo'))
+
+    def test_create_file(self):
+        self.response('create_content', 201)
+        self.put(self.api + 'contents/setup.py')
+        self.conf = {'data': {'message': 'Foo bar',
+                              'content': 'Zm9vIGJhciBib2d1cw==',
+                              'branch': 'develop',
+                              'author': {'name': 'Ian', 'email': 'foo'},
+                              'committer': {'name': 'Ian', 'email': 'foo'}}}
+
+        with expect.githuberror():
+            self.repo.create_file(None, None, None)
+
+        self.not_called()
+        self.login()
+
+        ret = self.repo.create_file('setup.py', 'Foo bar', 'foo bar bogus',
+                                    'develop',
+                                    {'name': 'Ian', 'email': 'foo'},
+                                    {'name': 'Ian', 'email': 'foo'})
+        expect(ret).isinstance(dict)
+        expect(ret['commit']).isinstance(github3.git.Commit)
+        expect(ret['content']).isinstance(repos.contents.Contents)
+        self.mock_assertions()
+
+    def test_weekly_commit_count(self):
+        self.response('weekly_commit_count', ETag='"foobarbogus"')
+        self.request.return_value.headers['Last-Modified'] = 'foo'
+        self.get(self.api + 'stats/participation')
+
+        w = self.repo.weekly_commit_count()
+        self.assertTrue(w.get('owner') is not None)
+        self.assertTrue(w.get('all') is not None)
+
+        self.mock_assertions()
+
+        self.response('', 202)
+        w = self.repo.weekly_commit_count()
+        self.assertEqual(w, {})
+        self.mock_assertions()
+
+    def test_iter_commit_activity(self):
+        self.response('commit_activity', _iter=True)
+        self.get(self.api + 'stats/commit_activity')
+
+        w = next(self.repo.iter_commit_activity())
+        expect(w).isinstance(dict)
+
+        self.mock_assertions()
+
+    def test_iter_contributor_statistics(self):
+        self.response('contributor_statistics', _iter=True)
+        self.get(self.api + 'stats/contributors')
+
+        s = next(self.repo.iter_contributor_statistics())
+        expect(s).isinstance(repos.stats.ContributorStats)
+
+        self.mock_assertions()
+
+    def test_iter_code_frequency(self):
+        self.response('code_frequency', _iter=True)
+        self.get(self.api + 'stats/code_frequency')
+
+        s = next(self.repo.iter_code_frequency())
+        expect(s).isinstance(list)
+
+        self.mock_assertions()
 
 
 class TestContents(BaseCase):

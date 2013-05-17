@@ -9,8 +9,9 @@ History/Changelog
 - Add ``check_authorization`` to the ``GitHub class`` to cover the `new part 
   of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
 
-- Add ``Repository.iter_contributor_statistics``, 
-  ``Repository.iter_commit_activity``, 
+- Add ``create_file``, ``iter_contributor_statistics``, 
+  ``iter_commit_activity``, ``iter_code_frequency`` and 
+  ``weekly_commit_count``.
 
 - The signature of ``Hook.edit`` has changed since that endpoint has changed 
   as well. See: 
@@ -18,12 +19,9 @@ History/Changelog
 
 - ``github3.GitHub`` can now be used as a context manager, e.g.,
   ::
-      
+
        with github.GitHub() as gh:
            u = gh.user('sigmavirus24')
-
-- Switch from expecter to unittest2 (python 2.6 only) and standard unittest ( 
-  in progress)
 
 0.6.1: 2013-04-06
 -----------------

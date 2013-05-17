@@ -401,14 +401,18 @@ class Repository(GitHubCore):
         json = None
         if path and message and content:
             url = self._build_url('contents', path, base_url=self._api)
-            data = {'message': message, 'content': b64encode(content)}
+            data = {'message': message, 'content': b64encode(content),
+                    'branch': branch}
             if committer and committer.get('name') and committer.get('email'):
                 data.update(committer=committer)
             if author and author.get('name') and author.get('email'):
                 data.update(author=author)
 
+            self._remove_none(data)
             json = self._json(self._put(url, data=dumps(data)), 201)
-        return Contents(json, self) if json else None
+            json['content'] = Contents(json['content'])
+            json['commit'] = Commit(json['commit'], self)
+        return json
 
     @requires_auth
     def create_fork(self, organization=None):
@@ -867,8 +871,10 @@ class Repository(GitHubCore):
                   iterator and check the new ``last_status`` attribute. If it
                   is a 202 you should wait before re-requesting.
 
+        .. versionadded:: 0.7
+
         """
-        url = self._build_url('stats', 'code_frequecy', base_url=self._api)
+        url = self._build_url('stats', 'code_frequency', base_url=self._api)
         return self._iter(int(number), url, list, etag=etag)
 
     def iter_comments(self, number=-1, etag=None):
@@ -912,6 +918,8 @@ class Repository(GitHubCore):
                   you will not receive any objects. You should store your
                   iterator and check the new ``last_status`` attribute. If it
                   is a 202 you should wait before re-requesting.
+
+        .. versionadded:: 0.7
 
         """
         url = self._build_url('stats', 'commit_activity', base_url=self._api)
@@ -971,6 +979,8 @@ class Repository(GitHubCore):
                   you will not receive any objects. You should store your
                   iterator and check the new ``last_status`` attribute. If it
                   is a 202 you should wait before re-requesting.
+
+        .. versionadded:: 0.7
 
         """
         url = self._build_url('stats', 'contributors', base_url=self._api)
@@ -1478,11 +1488,16 @@ class Repository(GitHubCore):
             You should give the API a moment to compose the data and then re
             -request it via this method.
 
+        ..versionadded:: 0.7
+
         """
         url = self._build_url('stats', 'participation', base_url=self._api)
         resp = self._get(url)
         if resp.status_code == 202:
             return {}
         json = self._json(resp, 200)
-        del(json['Etag'], json['Last-Modified'])
+        if json.get('ETag'):
+            del json['ETag']
+        if json.get('Last-Modified'):
+            del json['Last-Modified']
         return json
