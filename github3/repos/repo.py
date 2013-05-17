@@ -387,7 +387,7 @@ class Repository(GitHubCore):
 
         :param str path: (required), path of the file in the repository
         :param str message: (required), commit message
-        :param str content: (required), the actual data in the file
+        :param bytes content: (required), the actual data in the file
         :param str branch: (optional), branch to create the commit on.
             Defaults to the default branch of the repository
         :param dict committer: (optional), if no information is given the
@@ -401,10 +401,16 @@ class Repository(GitHubCore):
             'commit': :class:`Commit <github3.git.Commit>`}
 
         """
+        if content and not isinstance(content, bytes):
+            raise ValueError(  # (No coverage)
+                'content must be a bytes object')  # (No coverage)
+
         json = None
         if path and message and content:
             url = self._build_url('contents', path, base_url=self._api)
-            data = {'message': message, 'content': b64encode(content),
+            content = b64encode(content).decode('utf-8')
+
+            data = {'message': message, 'content': content,
                     'branch': branch}
             if committer and committer.get('name') and committer.get('email'):
                 data.update(committer=committer)

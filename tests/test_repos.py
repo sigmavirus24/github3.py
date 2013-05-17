@@ -140,7 +140,6 @@ class TestRepository(BaseCase):
         self.response('contents', _iter=True)
         files = self.repo.contents(filename)
         expect(files).isinstance(dict)
-        expect(files.values()[0]).isinstance(repos.contents.Contents)
 
         self.mock_assertions()
 
@@ -1038,7 +1037,7 @@ class TestRepository(BaseCase):
         self.not_called()
         self.login()
 
-        ret = self.repo.create_file('setup.py', 'Foo bar', 'foo bar bogus',
+        ret = self.repo.create_file('setup.py', 'Foo bar', b'foo bar bogus',
                                     'develop',
                                     {'name': 'Ian', 'email': 'foo'},
                                     {'name': 'Ian', 'email': 'foo'})
