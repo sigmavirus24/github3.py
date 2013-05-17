@@ -1046,6 +1046,44 @@ class TestRepository(BaseCase):
         expect(ret['content']).isinstance(repos.contents.Contents)
         self.mock_assertions()
 
+    def test_update_file(self):
+        self.response('create_content', 200)
+        self.put(self.api + 'contents/setup.py')
+        self.conf = {
+            'data': {
+                'message': 'foo',
+                'content': 'Zm9vIGJhciBib2d1cw==',
+                'sha': 'ae02db',
+            }
+        }
+
+        with expect.githuberror():
+            self.repo.update_file(None, None, None, None)
+
+        self.not_called()
+        self.login()
+
+        ret = self.repo.update_file('setup.py', 'foo', b'foo bar bogus',
+                                    'ae02db')
+        expect(ret).isinstance(dict)
+        expect(ret['commit']).isinstance(github3.git.Commit)
+        expect(ret['content']).isinstance(repos.contents.Contents)
+        self.mock_assertions()
+
+    def test_delete_file(self):
+        self.response('create_content', 200)
+        self.delete(self.api + 'contents/setup.py')
+        self.conf = {'data': {'message': 'foo', 'sha': 'ae02db'}}
+
+        with expect.githuberror():
+            self.repo.delete_file('setup.py', None, None)
+
+        self.not_called()
+        self.login()
+        ret = self.repo.delete_file('setup.py', 'foo', 'ae02db')
+        expect(ret).isinstance(github3.git.Commit)
+        self.mock_assertions()
+
     def test_weekly_commit_count(self):
         self.response('weekly_commit_count', ETag='"foobarbogus"')
         self.request.return_value.headers['Last-Modified'] = 'foo'
@@ -1094,6 +1132,12 @@ class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestContents, self).__init__(methodName)
         self.contents = repos.contents.Contents(load('readme'))
+        self.api = self.contents._api
+
+    def setUp(self):
+        super(TestContents, self).setUp()
+        self.contents = repos.contents.Contents(self.contents.to_json(),
+                                                self.g)
 
     def test_equality(self):
         contents = repos.contents.Contents(load('readme'))
@@ -1113,6 +1157,47 @@ class TestContents(BaseCase):
     @skip("On Python 3 bytes and strings are not the same thing")
     def test_str(self):
         expect(str(self.contents)) == self.contents.decoded
+
+    def test_delete(self):
+        self.response('create_content', 200)
+        self.delete(self.api)
+        self.conf = {
+            'data': {
+                'message': 'foo',
+                'sha': self.contents.sha,
+            }
+        }
+
+        with expect.githuberror():
+            self.contents.delete(None)
+
+        self.not_called()
+        self.login()
+
+        c = self.contents.delete('foo')
+        expect(c).isinstance(github3.git.Commit)
+        self.mock_assertions()
+
+    def test_update(self):
+        self.response('create_content', 200)
+        self.put(self.api)
+        self.conf = {
+            'data': {
+                'message': 'foo',
+                'content': 'Zm9vIGJhciBib2d1cw==',
+                'sha': self.contents.sha,
+            }
+        }
+
+        with expect.githuberror():
+            self.contents.update(None, None)
+
+        self.not_called()
+        self.login()
+
+        ret = self.contents.update('foo', b'foo bar bogus')
+        expect(ret).isinstance(github3.git.Commit)
+        self.mock_assertions()
 
 
 class TestDownload(BaseCase):

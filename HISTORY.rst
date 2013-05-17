@@ -9,9 +9,12 @@ History/Changelog
 - Add ``check_authorization`` to the ``GitHub class`` to cover the `new part 
   of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
 
-- Add ``create_file``, ``iter_contributor_statistics``, 
-  ``iter_commit_activity``, ``iter_code_frequency`` and 
-  ``weekly_commit_count`` to the ``Repository`` object.
+- Add ``create_file``, ``update_file``, ``delete_file``, 
+  ``iter_contributor_statistics``, ``iter_commit_activity``, 
+  ``iter_code_frequency`` and ``weekly_commit_count`` to the ``Repository`` 
+  object.
+
+- Add ``update`` and ``delete`` methods to the ``Contents`` object.
 
 - Add ``is_following`` to the ``User`` object.
 

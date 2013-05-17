@@ -7,11 +7,14 @@ that can be accessed via the GitHub API.
 
 """
 
-from base64 import b64decode
-from github3.models import GitHubObject
+from json import dumps
+from base64 import b64decode, b64encode
+from github3.git import Commit
+from github3.models import GitHubCore
+from github3.decorators import requires_auth
 
 
-class Contents(GitHubObject):
+class Contents(GitHubCore):
     """The :class:`Contents <Contents>` object. It holds the information
     concerning any content in a repository requested via the API.
 
@@ -27,8 +30,8 @@ class Contents(GitHubObject):
 
     See also: http://developer.github.com/v3/repos/contents/
     """
-    def __init__(self, content):
-        super(Contents, self).__init__(content)
+    def __init__(self, content, session=None):
+        super(Contents, self).__init__(content, session)
         # links
         self._api = content.get('url')
         #: Dictionary of links
@@ -88,3 +91,66 @@ class Contents(GitHubObject):
 
     def __ne__(self, other):
         return self.sha != other
+
+    @requires_auth
+    def delete(self, message, committer=None, author=None):
+        """Delete this file.
+
+        :param str message: (required), commit message to describe the removal
+        :param dict committer: (optional), if no information is given the
+            authenticated user's information will be used. You must specify
+            both a name and email.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: :class:`Commit <github3.git.Commit>`
+
+        """
+        json = None
+        if message:
+            data = {'message': message, 'sha': self.sha,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._delete(self._api, data=dumps(data)), 200)
+            if 'commit' in json:
+                json = Commit(json['commit'], self)
+        return json
+
+    @requires_auth
+    def update(self, message, content, committer=None, author=None):
+        """Update this file.
+
+        :param str message: (required), commit message to describe the update
+        :param str content: (required), content to update the file with
+        :param dict committer: (optional), if no information is given the
+            authenticated user's information will be used. You must specify
+            both a name and email.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: :class:`Commit <github3.git.Commit>`
+
+        """
+        if content and not isinstance(content, bytes):
+            raise ValueError(  # (No coverage)
+                'content must be a bytes object')  # (No coverage)
+
+        json = None
+        if message and content:
+            content = b64encode(content).decode('utf-8')
+            data = {'message': message, 'content': content, 'sha': self.sha,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._put(self._api, data=dumps(data)), 200)
+            if 'content' in json and 'commit' in json:
+                self.__init__(json['content'], self)
+                json = Commit(json['commit'], self)
+        return json
+
+
+def validate_commmitter(d):
+    if d and d.get('name') and d.get('email'):
+        return d
+    return None

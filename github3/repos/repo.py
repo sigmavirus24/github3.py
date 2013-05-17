@@ -24,7 +24,7 @@ from github3.repos.branch import Branch
 from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
-from github3.repos.contents import Contents
+from github3.repos.contents import Contents, validate_commmitter
 from github3.repos.download import Download
 from github3.repos.hook import Hook
 from github3.repos.status import Status
@@ -304,9 +304,9 @@ class Repository(GitHubCore):
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
         if isinstance(json, dict):
-            return Contents(json)
+            return Contents(json, self)
         elif isinstance(json, list):
-            return dict((j.get('name'), Contents(j)) for j in json)
+            return dict((j.get('name'), Contents(j, self)) for j in json)
         return None
 
     @requires_auth
@@ -409,18 +409,14 @@ class Repository(GitHubCore):
         if path and message and content:
             url = self._build_url('contents', path, base_url=self._api)
             content = b64encode(content).decode('utf-8')
-
-            data = {'message': message, 'content': content,
-                    'branch': branch}
-            if committer and committer.get('name') and committer.get('email'):
-                data.update(committer=committer)
-            if author and author.get('name') and author.get('email'):
-                data.update(author=author)
-
+            data = {'message': message, 'content': content, 'branch': branch,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
             self._remove_none(data)
             json = self._json(self._put(url, data=dumps(data)), 201)
-            json['content'] = Contents(json['content'])
-            json['commit'] = Commit(json['commit'], self)
+            if 'content' in json and 'commit' in json:
+                json['content'] = Contents(json['content'], self)
+                json['commit'] = Commit(json['commit'], self)
         return json
 
     @requires_auth
@@ -673,6 +669,41 @@ class Repository(GitHubCore):
         :returns: bool -- True if successful, False otherwise
         """
         return self._boolean(self._delete(self._api), 204, 404)
+
+    @requires_auth
+    def delete_file(self, path, message, sha, branch=None, committer=None,
+                    author=None):
+        """Delete the file located at ``path``.
+
+        This is part of the Contents CrUD (Create Update Delete) API. See
+        http://developer.github.com/v3/repos/contents/#delete-a-file for more
+        information.
+
+        :param str path: (required), path to the file being removed
+        :param str message: (required), commit message for the deletion
+        :param str sha: (required), blob sha of the file being removed
+        :param str branch: (optional), if not provided, uses the repository's
+            default branch
+        :param dict committer: (optional), if no information is given the
+            authenticated user's information will be used. You must specify
+            both a name and email.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: :class:`Commit <github3.git.Commit>` if successful
+
+        """
+        json = None
+        if path and message and sha:
+            url = self._build_url('contents', path, base_url=self._api)
+            data = {'message': message, 'sha': sha, 'branch': branch,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._delete(url, data=dumps(data)), 200)
+            if json and 'commit' in json:
+                json = Commit(json['commit'])
+        return json
 
     @requires_auth
     def delete_key(self, key_id):
@@ -1382,7 +1413,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('readme', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return Contents(json) if json else None
+        return Contents(json, self) if json else None
 
     def ref(self, ref):
         """Get a reference pointed to by ``ref``.
@@ -1465,6 +1496,46 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'trees', sha, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Tree(json, self) if json else None
+
+    @requires_auth
+    def update_file(self, path, message, content, sha, branch=None,
+                    author=None, committer=None):
+        """Update the file ``path`` with ``content``.
+
+        This is part of the Contents CrUD (Create Update Delete) API. See
+        http://developer.github.com/v3/repos/contents/#update-a-file for more
+        information.
+
+        :param str path: (required), path to the file being updated
+        :param str message: (required), commit message
+        :param str content: (required), updated contents of the file
+        :param str sha: (required), blob sha of the file being updated
+        :param str branch: (optional), uses the default branch on the
+            repository if not provided.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: {'commit': :class:`Commit <github3.git.Commit>`,
+            'content': :class:`Contents <github3.repos.contents.Contents>`}
+
+        """
+        if content and not isinstance(content, bytes):
+            raise ValueError(  # (No coverage)
+                'content must be a bytes object')  # (No coverage)
+
+        json = None
+        if path and message and content and sha:
+            url = self._build_url('contents', path, base_url=self._api)
+            content = b64encode(content).decode('utf-8')
+            data = {'message': message, 'content': content, 'sha': sha,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._put(url, data=dumps(data)), 200)
+            if 'content' in json and 'commit' in json:
+                json['content'] = Contents(json['content'], self)
+                json['commit'] = Commit(json['commit'], self)
+        return json
 
     @requires_auth
     def update_label(self, name, color, new_name=''):
