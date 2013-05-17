@@ -181,6 +181,13 @@ class TestUser(BaseCase):
         expect(self.user.is_assignee_on('abc', 'def')).is_False()
         self.mock_assertions()
 
+    def test_is_following(self):
+        self.response('', 204)
+        self.get(self.api + '/following/kennethreitz')
+
+        expect(self.user.is_following('kennethreitz')).is_True()
+        self.mock_assertions()
+
     def test_iter_events(self):
         self.response('event', 200, _iter=True)
         self.get(self.api + '/events')

@@ -11,7 +11,9 @@ History/Changelog
 
 - Add ``create_file``, ``iter_contributor_statistics``, 
   ``iter_commit_activity``, ``iter_code_frequency`` and 
-  ``weekly_commit_count``.
+  ``weekly_commit_count`` to the ``Repository`` object.
+
+- Add ``is_following`` to the ``User`` object.
 
 - The signature of ``Hook.edit`` has changed since that endpoint has changed 
   as well. See: 
