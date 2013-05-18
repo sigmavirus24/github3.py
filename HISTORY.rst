@@ -18,6 +18,8 @@ History/Changelog
 
 - Add ``is_following`` to the ``User`` object.
 
+- Add ``head``, ``base`` parameters to ``Repository.iter_pulls``.
+
 - The signature of ``Hook.edit`` has changed since that endpoint has changed 
   as well. See: 
   github/developer.github.com@b95f291a47954154a6a8cd7c2296cdda9b610164
