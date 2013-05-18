@@ -27,6 +27,12 @@ of the issue you're concerned with in ``num``.
     issue.create_comment('This should be fixed in 6d4oe5. Closing as fixed.')
     issue.close()
 
+If you would like to test the above, see
+`issue #109 <https://github.com/sigmavirus24/github3.py/issues/108>`_. Just 
+follow the code there and fill in your username, password (or token), and 
+comment message. Then run the script and watch as the issue opens in your 
+browser focusing on the comment **you** just created.
+
 The following shows how you could use github3.py to fetch and display your
 issues in your own style and in your webbrowser.
 
