@@ -21,11 +21,17 @@ of the issue you're concerned with in ``num``.
 
     issue.edit('New issue title', issue.body + '\n------\n**Update:** Text to append')
 
+Closing and Commenting on Issues
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ::
 
     # Assuming issue is the same as above ...
     issue.create_comment('This should be fixed in 6d4oe5. Closing as fixed.')
     issue.close()
+
+Example issue to comment on
+---------------------------
 
 If you would like to test the above, see
 `issue #109 <https://github.com/sigmavirus24/github3.py/issues/108>`_. Just 
