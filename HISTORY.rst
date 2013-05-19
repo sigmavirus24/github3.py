@@ -1,7 +1,7 @@
 History/Changelog
 =================
 
-0.7.0: 2013-xx-xx
+0.7.0: 2013-05-19
 -----------------
 
 - Fix ``Issue.close``, ``Issue.reopen``, and ``Issue.assign``. (Issue #106)
