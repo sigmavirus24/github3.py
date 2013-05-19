@@ -6,4 +6,4 @@ include run_tests.py
 prune *.pyc
 recursive-include github3/*
 recursive-include docs/*
-prune docs/_build/
+prune docs/_build

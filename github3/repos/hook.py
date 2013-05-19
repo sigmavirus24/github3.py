@@ -77,12 +77,11 @@ class Hook(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def edit(self, name, config, events=[], add_events=[], rm_events=[],
+    def edit(self, config={}, events=[], add_events=[], rm_events=[],
              active=True):
         """Edit this hook.
 
-        :param str name: (required), name of the service being called
-        :param dict config: (required), key-value pairs of settings for this
+        :param dict config: (optional), key-value pairs of settings for this
             hook
         :param list events: (optional), which events should this be triggered
             for
@@ -93,23 +92,22 @@ class Hook(GitHubCore):
         :param bool active: (optional), should this event be active
         :returns: bool
         """
-        json = None
-        if name and config and isinstance(config, dict):
-            data = {'name': name, 'config': config, 'active': active}
-            if events:
-                data['events'] = events
+        data = {'config': config, 'active': active}
+        if events:
+            data['events'] = events
 
-            if add_events:
-                data['add_events'] = add_events
+        if add_events:
+            data['add_events'] = add_events
 
-            if rm_events:
-                data['remove_events'] = rm_events
+        if rm_events:
+            data['remove_events'] = rm_events
 
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+        json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
             self._update_(json)
             return True
+
         return False
 
     @requires_auth

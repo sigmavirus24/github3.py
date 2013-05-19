@@ -17,6 +17,12 @@ class Label(GitHubCore):
         #: Name of the label, e.g., 'bug'
         self.name = label.get('name')
 
+    def __eq__(self, label):
+        return self._api == label._api
+
+    def __ne__(self, label):
+        return self._api != label._api
+
     def __repr__(self):
         return '<Label [{0}]>'.format(self)
 

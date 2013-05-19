@@ -60,12 +60,6 @@ class RepoCommit(BaseCommit):
     def __repr__(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
-    def __eq__(self, other):
-        return self.sha == other.sha
-
-    def __ne__(self, other):
-        return self.sha != other.sha
-
     def diff(self):
         """Return the diff"""
         resp = self._get(self._api,

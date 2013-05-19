@@ -112,8 +112,9 @@ class Issue(GitHubCore):
         if not login:
             return False
         number = self.milestone.number if self.milestone else None
+        labels = [str(l) for l in self.labels]
         return self.edit(self.title, self.body, login, self.state, number,
-                         self.labels)
+                         labels)
 
     @requires_auth
     def close(self):
@@ -123,8 +124,9 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
+        labels = [str(l) for l in self.labels]
         return self.edit(self.title, self.body, assignee, 'closed',
-                         number, self.labels)
+                         number, labels)
 
     def comment(self, id_num):
         """Get a single comment by its id.
@@ -256,5 +258,6 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
+        labels = [str(l) for l in self.labels]
         return self.edit(self.title, self.body, assignee, 'open',
-                         number, self.labels)
+                         number, labels)

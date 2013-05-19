@@ -1,30 +1,20 @@
 .. module:: github3
-.. module:: github3.repos.branch
-.. module:: github3.repos.comment
-.. module:: github3.repos.commit
-.. module:: github3.repos.comparison
-.. module:: github3.repos.contents
-.. module:: github3.repos.download
-.. module:: github3.repos.hook
-.. module:: github3.repos.repo
-.. module:: github3.repos.status
-.. module:: github3.repos.tag
 
 Repository
 ==========
 
 This part of the documentation covers:
 
-- :class:`Repository <Repository>`
-- :class:`Branch <Branch>`
-- :class:`Contents <Contents>`
-- :class:`Download <Download>`
-- :class:`Hook <Hook>`
-- :class:`RepoTag <RepoTag>`
-- :class:`RepoComment <RepoComment>`
-- :class:`RepoCommit <RepoCommit>`
-- :class:`Comparison <Comparison>`
-- :class:`Status <Status>`
+- :class:`Repository <github3.repos.repo.Repository>`
+- :class:`Branch <github3.repos.branch.Branch>`
+- :class:`Contents <github3.repos.contents.Contents>`
+- :class:`Download <github3.repos.download.Download>`
+- :class:`Hook <github3.repos.hook.Hook>`
+- :class:`RepoTag <github3.repos.tag.RepoTag>`
+- :class:`RepoComment <github3.repos.comment.RepoComment>`
+- :class:`RepoCommit <github3.repos.commit.RepoCommit>`
+- :class:`Comparison <github3.repos.comparison.Comparison>`
+- :class:`Status <github3.repos.status.Status>`
 
 None of these objects should be instantiated directly by the user (developer).
 These are here for reference only.
@@ -41,32 +31,32 @@ sections of the GitHub documentation.
 Repository Objects
 ------------------
 
-.. autoclass:: Repository
+.. autoclass:: github3.repos.repo.Repository
     :inherited-members:
 
 ---------
 
-.. autoclass:: Branch
+.. autoclass:: github3.repos.branch.Branch
     :members:
 
 ---------
 
-.. autoclass:: Contents
+.. autoclass:: github3.repos.contents.Contents
     :members:
 
 ---------
 
-.. autoclass:: Download
+.. autoclass:: github3.repos.download.Download
     :members:
 
 ---------
 
-.. autoclass:: Hook
+.. autoclass:: github3.repos.hook.Hook
     :members:
 
 ---------
 
-.. autoclass:: RepoTag
+.. autoclass:: github3.repos.tag.RepoTag
     :members:
 
 ---------
@@ -74,20 +64,20 @@ Repository Objects
 More information about this class can be found in the official documentation
 about `comments <http://developer.github.com/v3/repos/comments/>`_.
 
-.. autoclass:: RepoComment
+.. autoclass:: github3.repos.comment.RepoComment
     :inherited-members:
 
 ---------
 
-.. autoclass:: RepoCommit
+.. autoclass:: github3.repos.commit.RepoCommit
     :members:
 
 ---------
 
-.. autoclass:: Comparison
+.. autoclass:: github3.repos.comparison.Comparison
     :members:
 
 ---------
 
-.. autoclass:: Status
+.. autoclass:: github3.repos.status.Status
     :members:

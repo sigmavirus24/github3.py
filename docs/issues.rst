@@ -1,44 +1,38 @@
 .. module:: github3
-.. module:: github3.issues
-.. module:: github3.issues.comment
-.. module:: github3.issues.event
-.. module:: github3.issues.issue
-.. module:: github3.issues.label
-.. module:: github3.issues.milestone
 
 Issue
 =====
 
 This part of the documentation covers the module which handles :class:`Issue
-<Issue>`\ s and their related objects:
+<github3.issues.issue.Issue>`\ s and their related objects:
 
-- :class:`IssueComment <IssueComment>`
-- :class:`IssueEvent <IssueEvent>`
-- :class:`Milestone <Milestone>`
-- :class:`Label <Label>`.
+- :class:`IssueComment <github3.issues.comment.IssueComment>`
+- :class:`IssueEvent <github3.issues.event.IssueEvent>`
+- :class:`Milestone <github3.issues.milestone.Milestone>`
+- :class:`Label <github3.issues.label.Label>`.
 
 Issue Objects
 -------------
 
-.. autoclass:: Issue
+.. autoclass:: github3.issues.issue.Issue
     :inherited-members:
 
 ------
 
-.. autoclass:: IssueComment
+.. autoclass:: github3.issues.comment.IssueComment
     :inherited-members:
 
 ------
 
-.. autoclass:: IssueEvent
+.. autoclass:: github3.issues.event.IssueEvent
     :inherited-members:
 
 ------
 
-.. autoclass:: Milestone
+.. autoclass:: github3.issues.milestone.Milestone
     :inherited-members:
 
 ------
 
-.. autoclass:: Label
+.. autoclass:: github3.issues.label.Label
     :inherited-members:

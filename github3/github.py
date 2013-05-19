@@ -57,6 +57,12 @@ class GitHub(GitHubCore):
             return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
     @requires_auth
     def _iter_follow(self, which, number, etag):
         url = self._build_url('user', which)
@@ -105,6 +111,25 @@ class GitHub(GitHubCore):
                 ses.auth = (login, password)
                 json = self._json(ses.post(url, data=dumps(data)), 201)
         return Authorization(json, self) if json else None
+
+    def check_authorization(self, access_token):
+        """OAuth applications can use this method to check token validity
+        without hitting normal rate limits because of failed login attempts.
+        If the token is valid, it will return True, otherwise it will return
+        False.
+
+        :returns: bool
+        """
+        p = self._session.params
+        auth = (p.get('client_id'), p.get('client_secret'))
+        if access_token and auth:
+            url = self._build_url('applications', str(auth[0]), 'tokens',
+                                  str(access_token))
+            resp = self._get(url, auth=auth, params={
+                'client_id': None, 'client_secret': None
+            })
+            return self._boolean(resp, 200, 404)
+        return False
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -340,7 +365,8 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('repositories')
         params = {'since': since} if since else None
-        return self._iter(int(number), url, Repository, params=params, etag=etag)
+        return self._iter(int(number), url, Repository, params=params,
+                          etag=etag)
 
     def iter_all_users(self, number=-1, etag=None):
         """Iterate over every user in the order they signed up for GitHub.
@@ -622,12 +648,11 @@ class GitHub(GitHubCore):
     @requires_auth
     def iter_repos(self, type=None, sort=None, direction=None, number=-1,
                    etag=None):
-        """List public repositories for the specified ``login`` or all
-        repositories for the authenticated user if ``login`` is not
-        provided.
+        """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
            Removed the login parameter for correctness. Use iter_user_repos
+           instead
 
         :param str type: (optional), accepted values:
             ('all', 'owner', 'public', 'private', 'member')

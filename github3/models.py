@@ -288,6 +288,8 @@ class BaseCommit(GitHubCore):
         self.message = commit.get('message')
         #: List of parents to this commit.
         self.parents = commit.get('parents', [])
+        #: URL to view the commit on GitHub
+        self.html_url = commit.get('html_url', '')
         if not self.sha:
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]

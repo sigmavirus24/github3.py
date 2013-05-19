@@ -146,8 +146,6 @@ class PullRequest(GitHubCore):
             'review_comments': self._api + '/comments'
         }
 
-        #: SHA of the merge commit
-        self.merge_commit_sha = pull.get('merge_commit_sha', '')
         #: datetime object representing when the pull was merged
         self.merged_at = pull.get('merged_at')
         # If the pull request has been merged

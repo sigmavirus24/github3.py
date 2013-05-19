@@ -3,6 +3,15 @@ import github3
 from github3 import repos
 from tests.utils import (expect, BaseCase, load)
 from mock import patch, mock_open
+import sys
+
+if sys.version_info > (3, 0):
+    from unittest import skip
+else:
+    def skip(reason):
+        def fake_decorator(func):
+            return func
+        return fake_decorator
 
 
 class TestRepository(BaseCase):
@@ -128,6 +137,12 @@ class TestRepository(BaseCase):
         self.response('', 404)
         expect(self.repo.contents(filename)).is_None()
 
+        self.response('contents', _iter=True)
+        files = self.repo.contents(filename)
+        expect(files).isinstance(dict)
+
+        self.mock_assertions()
+
     def test_contents_ref(self):
         self.response('contents')
         filename = 'setup.py'
@@ -162,7 +177,7 @@ class TestRepository(BaseCase):
                 'one `BaseAccount` class to make things simpler. ')
         sha = 'd41566090114a752eb3a87dbcf2473eb427ef0f3'
         self.post(self.api + 'commits/{0}/comments'.format(sha))
-        self.conf = {'data': {'body': body, 'commit_id': sha, 'line': 1}}
+        self.conf = {'data': {'body': body, 'line': 1}}
 
         with expect.githuberror():
             self.repo.create_comment(body, sha)
@@ -760,6 +775,14 @@ class TestRepository(BaseCase):
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
 
+        self.conf.update(params={'head': 'user:branch'})
+        next(self.repo.iter_pulls(head='user:branch'))
+        self.mock_assertions()
+
+        self.conf.update(params={'base': 'branch'})
+        next(self.repo.iter_pulls(base='branch'))
+        self.mock_assertions()
+
     def test_iter_refs(self):
         self.response('ref', _iter=True)
         self.get(self.api + 'git/refs')
@@ -976,7 +999,7 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_update_label(self):
-        self.response('label', 200)
+        self.response('label')
         self.patch(self.api + 'labels/bug')
         self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
 
@@ -999,11 +1022,128 @@ class TestRepository(BaseCase):
     def test_equality(self):
         expect(self.repo) == repos.Repository(load('repo'))
 
+    def test_create_file(self):
+        self.response('create_content', 201)
+        self.put(self.api + 'contents/setup.py')
+        self.conf = {'data': {'message': 'Foo bar',
+                              'content': 'Zm9vIGJhciBib2d1cw==',
+                              'branch': 'develop',
+                              'author': {'name': 'Ian', 'email': 'foo'},
+                              'committer': {'name': 'Ian', 'email': 'foo'}}}
+
+        with expect.githuberror():
+            self.repo.create_file(None, None, None)
+
+        self.not_called()
+        self.login()
+
+        ret = self.repo.create_file('setup.py', 'Foo bar', b'foo bar bogus',
+                                    'develop',
+                                    {'name': 'Ian', 'email': 'foo'},
+                                    {'name': 'Ian', 'email': 'foo'})
+        expect(ret).isinstance(dict)
+        expect(ret['commit']).isinstance(github3.git.Commit)
+        expect(ret['content']).isinstance(repos.contents.Contents)
+        self.mock_assertions()
+
+    def test_update_file(self):
+        self.response('create_content', 200)
+        self.put(self.api + 'contents/setup.py')
+        self.conf = {
+            'data': {
+                'message': 'foo',
+                'content': 'Zm9vIGJhciBib2d1cw==',
+                'sha': 'ae02db',
+            }
+        }
+
+        with expect.githuberror():
+            self.repo.update_file(None, None, None, None)
+
+        self.not_called()
+        self.login()
+
+        ret = self.repo.update_file('setup.py', 'foo', b'foo bar bogus',
+                                    'ae02db')
+        expect(ret).isinstance(dict)
+        expect(ret['commit']).isinstance(github3.git.Commit)
+        expect(ret['content']).isinstance(repos.contents.Contents)
+        self.mock_assertions()
+
+    def test_delete_file(self):
+        self.response('create_content', 200)
+        self.delete(self.api + 'contents/setup.py')
+        self.conf = {'data': {'message': 'foo', 'sha': 'ae02db'}}
+
+        with expect.githuberror():
+            self.repo.delete_file('setup.py', None, None)
+
+        self.not_called()
+        self.login()
+        ret = self.repo.delete_file('setup.py', 'foo', 'ae02db')
+        expect(ret).isinstance(github3.git.Commit)
+        self.mock_assertions()
+
+    def test_weekly_commit_count(self):
+        self.response('weekly_commit_count', ETag='"foobarbogus"')
+        self.request.return_value.headers['Last-Modified'] = 'foo'
+        self.get(self.api + 'stats/participation')
+
+        w = self.repo.weekly_commit_count()
+        self.assertTrue(w.get('owner') is not None)
+        self.assertTrue(w.get('all') is not None)
+
+        self.mock_assertions()
+
+        self.response('', 202)
+        w = self.repo.weekly_commit_count()
+        self.assertEqual(w, {})
+        self.mock_assertions()
+
+    def test_iter_commit_activity(self):
+        self.response('commit_activity', _iter=True)
+        self.get(self.api + 'stats/commit_activity')
+
+        w = next(self.repo.iter_commit_activity())
+        expect(w).isinstance(dict)
+
+        self.mock_assertions()
+
+    def test_iter_contributor_statistics(self):
+        self.response('contributor_statistics', _iter=True)
+        self.get(self.api + 'stats/contributors')
+
+        s = next(self.repo.iter_contributor_statistics())
+        expect(s).isinstance(repos.stats.ContributorStats)
+
+        self.mock_assertions()
+
+    def test_iter_code_frequency(self):
+        self.response('code_frequency', _iter=True)
+        self.get(self.api + 'stats/code_frequency')
+
+        s = next(self.repo.iter_code_frequency())
+        expect(s).isinstance(list)
+
+        self.mock_assertions()
+
 
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestContents, self).__init__(methodName)
         self.contents = repos.contents.Contents(load('readme'))
+        self.api = self.contents._api
+
+    def setUp(self):
+        super(TestContents, self).setUp()
+        self.contents = repos.contents.Contents(self.contents.to_json(),
+                                                self.g)
+
+    def test_equality(self):
+        contents = repos.contents.Contents(load('readme'))
+        expect(self.contents) == contents
+        contents.sha = 'fakesha'
+        expect(self.contents) != contents
 
     def test_git_url(self):
         expect(self.contents.links['git']) == self.contents.git_url
@@ -1014,8 +1154,50 @@ class TestContents(BaseCase):
     def test_repr(self):
         expect(repr(self.contents)) == '<Content [{0}]>'.format('README.rst')
 
+    @skip("On Python 3 bytes and strings are not the same thing")
     def test_str(self):
         expect(str(self.contents)) == self.contents.decoded
+
+    def test_delete(self):
+        self.response('create_content', 200)
+        self.delete(self.api)
+        self.conf = {
+            'data': {
+                'message': 'foo',
+                'sha': self.contents.sha,
+            }
+        }
+
+        with expect.githuberror():
+            self.contents.delete(None)
+
+        self.not_called()
+        self.login()
+
+        c = self.contents.delete('foo')
+        expect(c).isinstance(github3.git.Commit)
+        self.mock_assertions()
+
+    def test_update(self):
+        self.response('create_content', 200)
+        self.put(self.api)
+        self.conf = {
+            'data': {
+                'message': 'foo',
+                'content': 'Zm9vIGJhciBib2d1cw==',
+                'sha': self.contents.sha,
+            }
+        }
+
+        with expect.githuberror():
+            self.contents.update(None, None)
+
+        self.not_called()
+        self.login()
+
+        ret = self.contents.update('foo', b'foo bar bogus')
+        expect(ret).isinstance(github3.git.Commit)
+        self.mock_assertions()
 
 
 class TestDownload(BaseCase):
@@ -1126,7 +1308,6 @@ class TestHook(BaseCase):
         self.response('hook', 200)
         self.patch(self.api)
         data = {
-            'name': 'hookname',
             'config': {'push': 'http://example.com'},
             'events': ['push'],
             'add_events': ['fake_ev'],
@@ -1141,13 +1322,18 @@ class TestHook(BaseCase):
             self.hook.edit(**data)
 
         self.login()
-        expect(self.hook.edit(None, None, None)).is_False()
-        expect(self.hook.edit('True', None, None)).is_False()
-        expect(self.hook.edit(None, 'True', None)).is_False()
-        expect(self.hook.edit(None, None, {})).is_False()
         self.not_called()
 
         expect(self.hook.edit(**data)).is_True()
+        self.mock_assertions()
+
+    def test_edit_failed(self):
+        self.response('', 404)
+        self.patch(self.api)
+        self.conf = {}
+
+        self.login()
+        expect(self.hook.edit()).is_False()
         self.mock_assertions()
 
     def test_test(self):
@@ -1252,6 +1438,12 @@ class TestComparison(BaseCase):
 
     def test_repr(self):
         expect(repr(self.comp).startswith('<Comparison ')).is_True()
+
+    def test_equality(self):
+        comp = repos.comparison.Comparison(load('comparison'))
+        expect(self.comp) == comp
+        comp.commits.pop(0)
+        expect(self.comp) != comp
 
     def test_diff(self):
         self.response('archive', 200)

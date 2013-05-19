@@ -174,6 +174,14 @@ Testimonials
 
 .. raw:: html
 
+    <blockquote class="twitter-tweet"><p>gotta hand it to @<a 
+    href="https://twitter.com/sigmavirus24">sigmavirus24</a> ... github3.py is 
+    really well written. It will soon be powering the github stuff on
+    @<a href="https://twitter.com/workforpie">workforpie</a>
+    </p>&mdash; Brad Montgomery # (@bkmontgomery) <a 
+    href="https://twitter.com/bkmontgomery/status/325644863561400320">April 20, 2013</a>
+    </blockquote>
+
     <blockquote class="twitter-tweet"><p>awesome github v3 api wrapper in 
     python <a href="https://t.co/PhD0Aj5X" 
     title="https://github.com/sigmavirus24/github3.py">github.com/sigmavirus24/g#</a></p>&mdash; 
@@ -189,9 +197,9 @@ Testimonials
     2013</a></blockquote>
 
     <blockquote class="twitter-tweet" data-conversation="none">
-    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> ¿There are 
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> "There are 
     so many Python client libraries for GitHub API, I tried all of them, and 
-    my conclusion is: github3.py is the best.¿</p>&mdash; Hong Minhee 
+    my conclusion is: github3.py is the best."</p>&mdash; Hong Minhee 
     (@hongminhee) <a 
     href="https://twitter.com/hongminhee/status/315295733899210752">March 23, 
     2013</a></blockquote>
@@ -207,7 +215,7 @@ Testimonials
     <blockquote class="twitter-tweet">
     <p>Developing against github3.py's API is a joy, kudos to @<a 
     href="https://twitter.com/sigmavirus24">sigmavirus24</a></p>&mdash; 
-    Alejandro Gómez (@dialelo) <a 
+    Alejandro Gomez (@dialelo) <a 
     href="https://twitter.com/dialelo/status/316846075015229440">March 27, 
     2013</a></blockquote>
 

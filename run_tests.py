@@ -38,9 +38,12 @@ if __name__ == "__main__":
         cov.start()
 
     suite = collect_tests()
-    unittest.TextTestRunner(verbosity=1).run(suite)
+    res = unittest.TextTestRunner(verbosity=1).run(suite)
 
     if coverage:
         cov.stop()
         cov.save()
         cov.report(show_missing=False)
+
+    # If it was successful, we don't want to exit with code 1
+    raise SystemExit(not res.wasSuccessful())

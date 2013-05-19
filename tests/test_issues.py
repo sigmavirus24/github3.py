@@ -20,6 +20,12 @@ class TestLabel(BaseCase):
         super(TestLabel, self).setUp()
         self.l = Label(self.l.to_json(), self.g)
 
+    def test_equality(self):
+        l = Label(load('label'))
+        expect(self.l) == l
+        l._api = "https://api.github.com/repos/sigmavirus24/github3.py/labels/wontfix"
+        expect(self.l) != l
+
     def test_repr(self):
         expect(repr(self.l)) == '<Label [{0}]>'.format(self.l.name)
 
@@ -171,9 +177,10 @@ class TestIssue(BaseCase):
             self.not_called()
             expect(self.i.assign('sigmavirus24')).is_True()
             n = self.i.milestone.number if self.i.milestone else None
+            labels = [str(l) for l in self.i.labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, 'sigmavirus24', self.i.state, n,
-                self.i.labels
+                labels
             )
 
     def test_close(self):
@@ -188,8 +195,9 @@ class TestIssue(BaseCase):
             expect(self.i.close()).is_True()
             u = self.i.assignee.login if self.i.assignee else ''
             n = self.i.milestone.number if self.i.milestone else None
+            l = [str(label) for label in self.i.labels]
             ed.assert_called_once_with(
-                self.i.title, self.i.body, u, self.i.state, n, self.i.labels
+                self.i.title, self.i.body, u, self.i.state, n, l
             )
 
     def test_comment(self):
@@ -305,8 +313,9 @@ class TestIssue(BaseCase):
         with patch.object(Issue, 'edit') as ed:
             ed.return_value = True
             expect(self.i.reopen()).is_True()
+            labels = [str(l) for l in self.i.labels]
             ed.assert_called_once_with(
-                self.i.title, self.i.body, u, 'open', n, self.i.labels
+                self.i.title, self.i.body, u, 'open', n, labels
             )
 
 

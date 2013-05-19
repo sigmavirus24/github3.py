@@ -1,5 +1,5 @@
 import github3
-from mock import patch
+from mock import patch, Mock
 from tests.utils import (expect, BaseCase, load)
 
 
@@ -10,6 +10,13 @@ class TestGitHub(BaseCase):
 
         g = github3.GitHub(token='foo')
         expect(repr(g).endswith('{0:x}>'.format(id(g))))
+
+    def test_context_manager(self):
+        with github3.GitHub() as gh:
+            gh.__exit__ = Mock()
+            expect(gh).isinstance(github3.GitHub)
+
+        gh.__exit__.assert_called()
 
     def test_authorization(self):
         self.response('authorization')
@@ -38,6 +45,22 @@ class TestGitHub(BaseCase):
 
         self.login()
         a = self.g.authorize(None, None, scopes=scopes)
+
+    def test_check_authorization(self):
+        self.response('', 200)
+        self.get('https://api.github.com/applications/fake_id/tokens/'
+                 'access_token')
+        self.conf = {
+            'params': {'client_id': None, 'client_secret': None},
+            'auth': ('fake_id', 'fake_secret'),
+        }
+
+        expect(self.g.check_authorization(None)).is_False()
+        self.not_called()
+
+        self.g.set_client_id('fake_id', 'fake_secret')
+        expect(self.g.check_authorization('access_token')).is_True()
+        self.mock_assertions()
 
     def test_create_gist(self):
         self.response('gist', 201)

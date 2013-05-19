@@ -70,7 +70,10 @@ class TestSubscription(BaseCase):
                     "subscription")
 
     def test_repr(self):
-        expect(repr(self.subscription)) == '<Subscription [True]>'
+        expect(repr(self.subscription)) == '<Subscription [{0}]>'.format(True)
+        # The above formatting is for pypy. Otherwise you get "<Subscription 
+        # [1]>" == "<Subscription [True]>" so we let the interpreter do the 
+        # string interpolation for us.
 
     def test_delete(self):
         self.response('', 204)
