@@ -34,7 +34,7 @@ Example issue to comment on
 ---------------------------
 
 If you would like to test the above, see
-`issue #109 <https://github.com/sigmavirus24/github3.py/issues/108>`_. Just 
+`issue #108 <https://github.com/sigmavirus24/github3.py/issues/108>`_. Just 
 follow the code there and fill in your username, password (or token), and 
 comment message. Then run the script and watch as the issue opens in your 
 browser focusing on the comment **you** just created.
