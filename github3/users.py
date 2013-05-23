@@ -7,6 +7,7 @@ This module contains everything relating to Users.
 """
 
 from json import dumps
+from uritemplate import URITemplate
 from github3.events import Event
 from github3.models import GitHubObject, GitHubCore, BaseAccount
 from github3.decorators import requires_auth
@@ -106,6 +107,7 @@ class Plan(GitHubObject):
 
 
 class User(BaseAccount):
+
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
 
@@ -118,7 +120,9 @@ class User(BaseAccount):
 
         u1.id == u2.id
         u1.id != u2.id
+
     """
+
     def __init__(self, user, session=None):
         super(User, self).__init__(user, session)
         if not self.type:
@@ -146,6 +150,39 @@ class User(BaseAccount):
 
         #: Which plan this user is on
         self.plan = Plan(user.get('plan', {}))
+
+        #: Events URL Template
+        self.events_url = None
+        events_url = user.get('events_url', '')
+        if events_url:
+            self.events_url = URITemplate(events_url)
+
+        #: Followers URL (not a template)
+        self.followers_url = user.get('followers_url', '')
+
+        #: Gists URL Template
+        self.gists_url = None
+        gists_url = user.get('gists_url', '')
+        if gists_url:
+            self.gists_url = URITemplate(gists_url)
+
+        #: Organizations URL (not a template)
+        self.organizations_url = user.get('organizations_url', '')
+
+        #: Received Events URL (not a template)
+        self.received_events_url = user.get('received_events_url', '')
+
+        #: Repostories URL (not a template)
+        self.repos_url = user.get('repos_url', '')
+
+        #: Starred URL Template
+        self.starred_url = None
+        starred_url = user.get('starred_url', '')
+        if starred_url:
+            self.starred_url = URITemplate(starred_url)
+
+        #: Subscriptions URL (not a template)
+        self.subscriptions_url = user.get('subscriptions_url', '')
 
     def __str__(self):
         return self.login
@@ -214,7 +251,7 @@ class User(BaseAccount):
         :returns: bool
 
         """
-        url = self._build_url('following', login, base_url=self._api)
+        url = self.following_url.expand(login)
         return self._boolean(self._get(url), 204, 404)
 
     def iter_events(self, public=False, number=-1, etag=None):
@@ -328,7 +365,7 @@ class User(BaseAccount):
 
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
-        url = self._build_url('starred', base_url=self._api)
+        url = self.starred_url.expand(owner=None, repo=None)
         return self._iter(int(number), url, Repository, params, etag)
 
     def iter_subscriptions(self, number=-1, etag=None):
