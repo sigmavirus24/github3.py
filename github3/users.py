@@ -160,6 +160,12 @@ class User(BaseAccount):
         #: Followers URL (not a template)
         self.followers_url = user.get('followers_url', '')
 
+        #: Following URL Template
+        self.following_url = None
+        following_url = user.get('following_url', '')
+        if following_url:
+            self.following_url = URITemplate(following_url)
+
         #: Gists URL Template
         self.gists_url = None
         gists_url = user.get('gists_url', '')
@@ -251,7 +257,7 @@ class User(BaseAccount):
         :returns: bool
 
         """
-        url = self.following_url.expand(login)
+        url = self.following_url.expand(other_user=login)
         return self._boolean(self._get(url), 204, 404)
 
     def iter_events(self, public=False, number=-1, etag=None):

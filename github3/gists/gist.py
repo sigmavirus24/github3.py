@@ -68,11 +68,10 @@ class Gist(GitHubCore):
         #: datetime object representing the last time this gist was updated.
         self.updated_at = self._strptime(data.get('updated_at'))
 
+        owner = data.get('owner')
         #: :class:`User <github3.users.User>` object representing the owner of
         #  the gist.
-        self.owner = data.get('owner')
-        if data.get('owner'):
-            self.owner = User(data.get('owner'), self._session)
+        self.owner = User(owner, self) if owner else None
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
         #: Number of files in this gist.

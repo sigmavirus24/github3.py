@@ -14,7 +14,7 @@ class TestLabel(BaseCase):
         super(TestLabel, self).__init__(methodName)
         self.l = Label(load('label'))
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "labels/bug")
+                    "labels/Bug")
 
     def setUp(self):
         super(TestLabel, self).setUp()
@@ -23,7 +23,8 @@ class TestLabel(BaseCase):
     def test_equality(self):
         l = Label(load('label'))
         expect(self.l) == l
-        l._api = "https://api.github.com/repos/sigmavirus24/github3.py/labels/wontfix"
+        l._api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                  "labels/wontfix")
         expect(self.l) != l
 
     def test_repr(self):
