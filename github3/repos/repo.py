@@ -877,7 +877,7 @@ class Repository(GitHubCore):
             -1 returns all available assignees
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('assignees', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
@@ -889,7 +889,7 @@ class Repository(GitHubCore):
             -1 returns all branches
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Branch <Branch>`\ es
+        :returns: generator of :class:`Branch <Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch, etag=etag)
@@ -925,7 +925,7 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -939,7 +939,7 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -980,7 +980,7 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`RepoCommit <RepoCommit>`\ s
+        :returns: generator of :class:`RepoCommit <RepoCommit>`\ s
         """
         params = {'sha': sha, 'path': path, 'author': author}
         self._remove_none(params)
@@ -996,7 +996,7 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
@@ -1039,7 +1039,7 @@ class Repository(GitHubCore):
             -1 returns all available downloads
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Download <Download>`\ s
+        :returns: generator of :class:`Download <Download>`\ s
         """
         url = self._build_url('downloads', base_url=self._api)
         return self._iter(int(number), url, Download, etag=etag)
@@ -1051,7 +1051,7 @@ class Repository(GitHubCore):
             returns all available events
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Event <github3.events.Event>`\ s
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
@@ -1065,7 +1065,7 @@ class Repository(GitHubCore):
             returns all forks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Repository <Repository>`
+        :returns: generator of :class:`Repository <Repository>`
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
@@ -1081,7 +1081,7 @@ class Repository(GitHubCore):
             returns all hooks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Hook <Hook>`\ s
+        :returns: generator of :class:`Hook <Hook>`\ s
         """
         url = self._build_url('hooks', base_url=self._api)
         return self._iter(int(number), url, Hook, etag=etag)
@@ -1112,7 +1112,7 @@ class Repository(GitHubCore):
             By default all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
         """
         url = self._build_url('issues', base_url=self._api)
 
@@ -1172,7 +1172,7 @@ class Repository(GitHubCore):
             -1 returns all used languages
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of tuples
+        :returns: generator of tuples
         """
         url = self._build_url('languages', base_url=self._api)
         return self._iter(int(number), url, tuple, etag=etag)
