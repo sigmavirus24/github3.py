@@ -25,7 +25,7 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py sdist upload")
     sys.exit()
 
-requires.append("requests")
+requires.append("requests >= 1.2.3")
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
