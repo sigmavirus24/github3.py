@@ -5,6 +5,7 @@ github3.utils
 This module provides internal utility classes and functions to the rest of the library
 
 """
+import types
 
 
 class RequestsRawWrapper(object):
@@ -22,3 +23,7 @@ class RequestsRawWrapper(object):
 
     def read(self, size=None, decode_content=False):
         return self._wrapped_object.read(size)
+
+    def seek(self, pos, mode=0):
+        return self._wrapped_object.seek(pos, mode)
+    
