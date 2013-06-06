@@ -9,6 +9,7 @@ This module provides decorators to the rest of the library
 from functools import wraps
 from requests.models import Response
 import os
+from github3.utils import RequestsRawWrapper
 
 try:  # (No coverage)
     # python2
@@ -35,7 +36,7 @@ def requires_auth(func):
             r = Response()
             r.status_code = 401
             r.encoding = 'utf-8'
-            r.raw = StringIO('{"message": "Requires authentication"}'.encode())
+            r.raw = RequestsRawWrapper(StringIO('{"message": "Requires authentication"}'.encode()))
             raise GitHubError(r)
     return auth_wrapper
 
@@ -55,7 +56,7 @@ def requires_basic_auth(func):
             r.encoding = 'utf-8'
             msg = ('{"message": "Requires username/password '
                    'authentication"}').encode()
-            r.raw = StringIO(msg)
+            r.raw = RequestsRawWrapper(StringIO(msg))
             raise GitHubError(r)
     return auth_wrapper
 

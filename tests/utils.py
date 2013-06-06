@@ -6,6 +6,7 @@ import sys
 from mock import patch
 from io import BytesIO
 from unittest import TestCase
+from github3.utils import RequestsRawWrapper
 
 
 def load(name):
@@ -108,6 +109,7 @@ class BaseCase(TestCase):
                 r.raw = path(path_name)
         else:
             r.raw = BytesIO()
+        r.raw = RequestsRawWrapper(r.raw)
 
         if headers:
             r.headers = headers
