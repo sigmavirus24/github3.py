@@ -10,6 +10,7 @@ parts of GitHub's Repository API.
 from json import dumps
 from base64 import b64encode
 from collections import Callable
+from datetime import datetime
 from github3.decorators import requires_auth
 from github3.events import Event
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -966,8 +967,8 @@ class Repository(GitHubCore):
         url = self._build_url('stats', 'commit_activity', base_url=self._api)
         return self._iter(int(number), url, dict, etag=etag)
 
-    def iter_commits(self, sha=None, path=None, author=None, number=-1,
-                     etag=None):
+    def iter_commits(self, sha=None, path=None, author=None, number=-1, 
+                     etag=None, since=None, until=None):
         """Iterate over commits in this repository.
 
         :param str sha: (optional), sha or branch to start listing commits
@@ -980,9 +981,28 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
+        :param since: (optional), Only commits after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :type since: datetime or string
+        :param until: (optional), Only commits before this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :type until: datetime or string
+
         :returns: generator of :class:`RepoCommit <RepoCommit>`\ s
         """
         params = {'sha': sha, 'path': path, 'author': author}
+
+        if since is not None:
+            if isinstance(since, datetime):
+                since = since.isoformat()
+            params['since'] = since
+        if until is not None:
+            if isinstance(until, datetime):
+                until = until.isoformat()
+            params['until'] = until
+
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, RepoCommit, params, etag)
