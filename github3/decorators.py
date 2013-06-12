@@ -18,6 +18,11 @@ except ImportError:  # (No coverage)
     from io import BytesIO as StringIO
 
 
+class RequestsStringIO(StringIO):
+    def read(self, chunk_size, *args, **kwargs):
+        return super(RequestsStringIO, self).read(chunk_size)
+
+
 def requires_auth(func):
     """Decorator to note which object methods require authorization."""
     @wraps(func)
@@ -61,7 +66,7 @@ def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
     r = Response()
     r.status_code = status_code
     r.encoding = encoding
-    r.raw = StringIO(msg)
+    r.raw = RequestsStringIO(msg)
     r._content_consumed = True
     r._content = r.raw.read()
     return r
