@@ -19,8 +19,8 @@ except ImportError:  # (No coverage)
 
 
 class RequestsStringIO(StringIO):
-    def read(self, chunk_size, *args, **kwargs):
-        return super(RequestsStringIO, self).read(chunk_size)
+    def read(self, n=-1, *args, **kwargs):
+        return super(RequestsStringIO, self).read(n)
 
 
 def requires_auth(func):
