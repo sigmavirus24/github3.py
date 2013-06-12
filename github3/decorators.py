@@ -20,7 +20,8 @@ except ImportError:  # (No coverage)
 
 class RequestsStringIO(StringIO):
     def read(self, n=-1, *args, **kwargs):
-        return super(RequestsStringIO, self).read(n)
+        # StringIO is an old-style class, so can't use super
+        return StringIO.read(self, n)
 
 
 def requires_auth(func):
