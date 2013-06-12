@@ -32,6 +32,7 @@ from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
+from github3.utils import timestamp_parameter
 
 
 class Repository(GitHubCore):
@@ -992,16 +993,9 @@ class Repository(GitHubCore):
 
         :returns: generator of :class:`RepoCommit <RepoCommit>`\ s
         """
-        params = {'sha': sha, 'path': path, 'author': author}
-
-        if since is not None:
-            if isinstance(since, datetime):
-                since = since.isoformat()
-            params['since'] = since
-        if until is not None:
-            if isinstance(until, datetime):
-                until = until.isoformat()
-            params['until'] = until
+        params = {'sha': sha, 'path': path, 'author': author,
+                  'since': timestamp_parameter(since),
+                  'until': timestamp_parameter(until)}
 
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
@@ -1127,7 +1121,10 @@ class Repository(GitHubCore):
             'bug,ui,@high' :param sort: accepted values:
             ('created', 'updated', 'comments', 'created')
         :param str direction: (optional), accepted values: ('asc', 'desc')
-        :param str since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param int number: (optional), Number of issues to return.
             By default all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
@@ -1240,7 +1237,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Event, etag)
 
     @requires_auth
-    def iter_notifications(self, all=False, participating=False, since='',
+    def iter_notifications(self, all=False, participating=False, since=None,
                            number=-1, etag=None):
         """Iterates over the notifications for this repository.
 
@@ -1248,16 +1245,16 @@ class Repository(GitHubCore):
             marked as read
         :param bool participating: (optional), show only the notifications the
             user is participating in directly
-        :param str since: (optional), filters out any notifications updated
-            before the given time. The time should be passed in as UTC in the
-            ISO 8601 format: ``YYYY-MM-DDTHH:MM:SSZ``. Example:
-            "2012-10-09T23:39:01Z".
+        :param since: (optional), filters out any notifications updated
+            before the given time. This can be a `datetime` or an `ISO8601` formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Thread <github3.notifications.Thread>`
         """
         url = self._build_url('notifications', base_url=self._api)
-        params = {'all': all, 'participating': participating, 'since': since}
+        params = {'all': all, 'participating': participating, 'since': timestamp_parameter(since)}
         for (k, v) in list(params.items()):
             if not v:
                 del params[k]

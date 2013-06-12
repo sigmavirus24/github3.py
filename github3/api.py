@@ -174,8 +174,10 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
         api-default: created
     :param str direction: accepted values: ('asc', 'desc')
         api-default: desc
-    :param str since: ISO 8601 formatted timestamp, e.g.,
-        2012-05-20T23:10:27Z
+    :param since: (optional), Only issues after this date will
+        be returned. This can be a `datetime` or an `ISO8601` formatted
+        date string, e.g., 2012-05-20T23:10:27Z
+    :type since: datetime or string
     :param int number: (optional), number of issues to return.
         Default: -1 returns all issues
     :param str etag: (optional), ETag from a previous request to the same
