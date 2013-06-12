@@ -31,7 +31,8 @@ def issue_params(filter, state, labels, sort, direction, since):
     if direction in ('asc', 'desc'):
         params['direction'] = direction
 
+    since = timestamp_parameter(since)
     if since:
-        params['since'] = timestamp_parameter(since)
+        params['since'] = since
 
     return params
