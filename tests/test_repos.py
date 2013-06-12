@@ -615,8 +615,8 @@ class TestRepository(BaseCase):
         c = next(self.repo.iter_commits('fakesha', '/'))
         self.mock_assertions()
 
-        since = datetime(2013, 06, 01, 0, 0, 0)
-        until = datetime(2013, 06, 02, 0, 0, 0)
+        since = datetime(2013, 6, 1, 0, 0, 0)
+        until = datetime(2013, 6, 2, 0, 0, 0)
         self.conf = {'params': {'since': '2013-06-01T00:00:00', 'until': '2013-06-02T00:00:00'}}
         c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
