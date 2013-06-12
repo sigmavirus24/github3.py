@@ -609,7 +609,7 @@ class GitHub(GitHubCore):
         if owner and repository:
             repo = self.repository(owner, repository)
             return repo.iter_issues(milestone, state, assignee, mentioned,
-                                    labels, sort, direction, since, number)
+                                    labels, sort, direction, since, number, etag)
         return iter([])
 
     @requires_auth
