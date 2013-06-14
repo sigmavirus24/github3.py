@@ -175,7 +175,7 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
     :param str direction: accepted values: ('asc', 'desc')
         api-default: desc
     :param since: (optional), Only issues after this date will
-        be returned. This can be a `datetime` or an `ISO8601` formatted
+        be returned. This can be a `datetime` or an ISO8601 formatted
         date string, e.g., 2012-05-20T23:10:27Z
     :type since: datetime or string
     :param int number: (optional), number of issues to return.
