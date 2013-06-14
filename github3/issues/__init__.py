@@ -8,6 +8,7 @@ See also: http://developer.github.com/v3/issues/
 """
 
 from re import match
+from github3.utils import timestamp_parameter
 from .issue import Issue
 
 __all__ = [Issue]
@@ -30,7 +31,8 @@ def issue_params(filter, state, labels, sort, direction, since):
     if direction in ('asc', 'desc'):
         params['direction'] = direction
 
-    if since and match('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', since):
+    since = timestamp_parameter(since)
+    if since:
         params['since'] = since
 
     return params

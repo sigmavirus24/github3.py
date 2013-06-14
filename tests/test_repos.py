@@ -1,6 +1,7 @@
 import os
 import github3
 from github3 import repos
+from datetime import datetime
 from tests.utils import (expect, BaseCase, load)
 from mock import patch, mock_open
 import sys
@@ -612,6 +613,18 @@ class TestRepository(BaseCase):
 
         self.conf = {'params': {'sha': 'fakesha', 'path': '/'}}
         c = next(self.repo.iter_commits('fakesha', '/'))
+        self.mock_assertions()
+
+        since = datetime(2013, 6, 1, 0, 0, 0)
+        until = datetime(2013, 6, 2, 0, 0, 0)
+        self.conf = {'params': {'since': '2013-06-01T00:00:00', 'until': '2013-06-02T00:00:00'}}
+        c = next(self.repo.iter_commits(since=since, until=until))
+        self.mock_assertions()
+
+        since = '2013-06-01T00:00:00'
+        until = '2013-06-02T00:00:00'
+        self.conf = {'params': {'since': '2013-06-01T00:00:00', 'until': '2013-06-02T00:00:00'}}
+        c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
 
     def test_iter_contributors(self):
