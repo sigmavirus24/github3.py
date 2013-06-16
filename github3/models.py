@@ -78,6 +78,8 @@ class GitHubCore(GitHubObject):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
     def _remove_none(self, data):
+        if not data:
+            return
         for (k, v) in list(data.items()):
             if v is None:
                 del(data[k])
