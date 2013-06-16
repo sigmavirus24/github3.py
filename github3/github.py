@@ -19,7 +19,6 @@ from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
-from github3.utils import timestamp_parameter
 
 
 class GitHub(GitHubCore):
@@ -353,7 +352,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, since=None, etag=None):
+    def iter_all_repos(self, number=-1, since=None, etag=None, per_page=None):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
@@ -362,24 +361,28 @@ class GitHub(GitHubCore):
             restarting this iteration)
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
+        :param int per_page: (optional), number of repositories to list per
+            request
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repositories')
-        params = {'since': since} if since else None
-        return self._iter(int(number), url, Repository, params=params,
+        return self._iter(int(number), url, Repository,
+                          params={'since': since, 'per_page': per_page},
                           etag=etag)
 
-    def iter_all_users(self, number=-1, etag=None):
+    def iter_all_users(self, number=-1, etag=None, per_page=None):
         """Iterate over every user in the order they signed up for GitHub.
 
         :param int number: (optional), number of users to return. Default: -1,
             returns all of them
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
+        :param int per_page: (optional), number of users to list per request
         :returns: generator of :class:`User <github3.users.User>`
         """
         url = self._build_url('users')
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, User,
+                          params={'per_page': per_page}, etag=etag)
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1, etag=None):
@@ -621,7 +624,8 @@ class GitHub(GitHubCore):
         if owner and repository:
             repo = self.repository(owner, repository)
             return repo.iter_issues(milestone, state, assignee, mentioned,
-                                    labels, sort, direction, since, number, etag)
+                                    labels, sort, direction, since, number,
+                                    etag)
         return iter([])
 
     @requires_auth
