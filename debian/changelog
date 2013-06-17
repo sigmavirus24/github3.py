@@ -1,3 +1,9 @@
+github3.py (0.7.0-1) quantal; urgency=low
+
+  * New upstream version
+
+ -- Dennis Kaarsemaker <dennis@kaarsemaker.net>  Mon, 17 Jun 2013 22:59:42 +0200
+
 github3.py (0.5.3-1) quantal; urgency=low
 
   * New upstream version
