@@ -57,6 +57,12 @@ class GitHub(GitHubCore):
             return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
     @requires_auth
     def _iter_follow(self, which, number, etag):
         url = self._build_url('user', which)
@@ -105,6 +111,25 @@ class GitHub(GitHubCore):
                 ses.auth = (login, password)
                 json = self._json(ses.post(url, data=dumps(data)), 201)
         return Authorization(json, self) if json else None
+
+    def check_authorization(self, access_token):
+        """OAuth applications can use this method to check token validity
+        without hitting normal rate limits because of failed login attempts.
+        If the token is valid, it will return True, otherwise it will return
+        False.
+
+        :returns: bool
+        """
+        p = self._session.params
+        auth = (p.get('client_id'), p.get('client_secret'))
+        if access_token and auth:
+            url = self._build_url('applications', str(auth[0]), 'tokens',
+                                  str(access_token))
+            resp = self._get(url, auth=auth, params={
+                'client_id': None, 'client_secret': None
+            })
+            return self._boolean(resp, 200, 404)
+        return False
 
     def create_gist(self, description, files, public=True):
         """Create a new gist.
@@ -327,17 +352,21 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, etag=None):
+    def iter_all_repos(self, number=-1, since=None, etag=None):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
             Default: -1, returns all of them
+        :param int since: (optional), last repository id seen (allows
+            restarting this iteration)
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repositories')
-        return self._iter(int(number), url, Repository, etag=etag)
+        params = {'since': since} if since else None
+        return self._iter(int(number), url, Repository, params=params,
+                          etag=etag)
 
     def iter_all_users(self, number=-1, etag=None):
         """Iterate over every user in the order they signed up for GitHub.
@@ -616,13 +645,15 @@ class GitHub(GitHubCore):
 
         return self._iter(int(number), url, Organization, etag=etag)
 
-    def iter_repos(self, login=None, type='', sort='', direction='',
-                   number=-1, etag=None):
-        """List public repositories for the specified ``login`` or all
-        repositories for the authenticated user if ``login`` is not
-        provided.
+    @requires_auth
+    def iter_repos(self, type=None, sort=None, direction=None, number=-1,
+                   etag=None):
+        """List public repositories for the authenticated user.
 
-        :param str login: (optional)
+        .. versionchanged:: 0.6
+           Removed the login parameter for correctness. Use iter_user_repos
+           instead
+
         :param str type: (optional), accepted values:
             ('all', 'owner', 'public', 'private', 'member')
             API default: 'all'
@@ -639,10 +670,7 @@ class GitHub(GitHubCore):
         :returns: generator of :class:`Repository <github3.repos.Repository>`
             objects
         """
-        if login:
-            url = self._build_url('users', login, 'repos')
-        else:
-            url = self._build_url('user', 'repos')
+        url = self._build_url('user', 'repos')
 
         params = {}
         if type in ('all', 'owner', 'public', 'private', 'member'):
@@ -699,6 +727,41 @@ class GitHub(GitHubCore):
 
         url = self._build_url('user', 'subscriptions')
         return self._iter(int(number), url, Repository, etag=etag)
+
+    def iter_user_repos(self, login, type=None, sort=None, direction=None,
+                        number=-1, etag=None):
+        """List public repositories for the specified ``login``.
+
+        .. versionadded:: 0.6
+
+        :param str login: (required), username
+        :param str type: (optional), accepted values:
+            ('all', 'owner', 'member')
+            API default: 'all'
+        :param str sort: (optional), accepted values:
+            ('created', 'updated', 'pushed', 'full_name')
+            API default: 'created'
+        :param str direction: (optional), accepted values:
+            ('asc', 'desc'), API default: 'asc' when using 'full_name',
+            'desc' otherwise
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+            objects
+        """
+        url = self._build_url('users', login, 'repos')
+
+        params = {}
+        if type in ('all', 'owner', 'member'):
+            params.update(type=type)
+        if sort in ('created', 'updated', 'pushed', 'full_name'):
+            params.update(sort=sort)
+        if direction in ('asc', 'desc'):
+            params.update(direction=direction)
+
+        return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
     def key(self, id_num):
@@ -773,10 +836,14 @@ class GitHub(GitHubCore):
         url = self._build_url('meta')
         return self._json(self._get(url), 200)
 
-    def octocat(self):
-        """Returns an easter egg of the API."""
+    def octocat(self, say=None):
+        """Returns an easter egg of the API.
+
+        :params str say: (optional), pass in what you'd like Octocat to say
+        :returns: ascii art of Octocat
+        """
         url = self._build_url('octocat')
-        req = self._get(url)
+        req = self._get(url, params={'s': say})
         return req.content if req.ok else ''
 
     def organization(self, login):
@@ -860,32 +927,45 @@ class GitHub(GitHubCore):
         issues = json.get('issues', [])
         return [LegacyIssue(l, self) for l in issues]
 
-    def search_repos(self, keyword, language='', start_page=0):
+    def search_repos(self, keyword, language=None, start_page=None,
+                     sort=None, order=None):
         """Search all repositories by keyword.
 
         :param str keyword: (required)
         :param str language: (optional), language to filter by
         :param int start_page: (optional), page to get (results come 100/page)
+        :param str sort: (optional), how to sort the results; accepted values:
+            ('stars', 'forks', 'updated')
+        :param str order: (optional), sort order if ``sort`` isn't provided,
+            accepted values: ('asc', 'desc')
         :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
         """
         url = self._build_url('legacy', 'repos', 'search', keyword)
-        params = {}
-        if language:
-            params['language'] = language
-        if start_page > 0:
-            params['start_page'] = start_page
+        params = {'language': language, 'start_page': start_page}
+        if sort in ('stars', 'forks', 'updated'):
+            params['sort'] = sort
+        if order in ('asc', 'desc') and not sort:
+            params['order'] = order
         json = self._json(self._get(url, params=params), 200)
         repos = json.get('repositories', [])
         return [LegacyRepo(r, self) for r in repos]
 
-    def search_users(self, keyword, start_page=0):
+    def search_users(self, keyword, start_page=0, sort=None, order=None):
         """Search all users by keyword.
 
         :param str keyword: (required)
         :param int start_page: (optional), page to get (results come 100/page)
+        :param str sort: (optional), how to sort the results; accepted values:
+            ('followers', 'joined', 'repositories')
+        :param str order: (optional), sort order if ``sort`` isn't provided,
+            accepted values: ('asc', 'desc')
         :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
         """
         params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
+        if sort in ('followers', 'joined', 'repositories'):
+            params['sort'] = sort
+        if order in ('asc', 'desc') and not sort:
+            params['order'] = order
         url = self._build_url('legacy', 'user', 'search', str(keyword))
         json = self._json(self._get(url, params=params), 200)
         users = json.get('users', [])

@@ -13,6 +13,17 @@ class Event(GitHubObject):
     """The :class:`Event <Event>` object. It structures and handles the data
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
+
+    Two events can be compared like so::
+
+        e1 == e2
+        e1 != e2
+
+    And that is equivalent to::
+
+        e1.id == e2.id
+        e1.id != e2.id
+
     """
     def __init__(self, event):
         super(Event, self).__init__(event)
@@ -28,7 +39,7 @@ class Event(GitHubObject):
         self.org = None
         if event.get('org'):
             self.org = Organization(event.get('org'))
-        #: Event type
+        #: Event type http://developer.github.com/v3/activity/events/types/
         self.type = event.get('type')
         handler = _payload_handlers[self.type]
         #: Dictionary with the payload. Payload structure is defined by type_.
@@ -43,6 +54,12 @@ class Event(GitHubObject):
 
     def __repr__(self):
         return '<Event [{0}]>'.format(self.type[:-5])
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
 
     @staticmethod
     def list_types():
@@ -60,14 +77,14 @@ class Event(GitHubObject):
 
 
 def _commitcomment(payload):
-    from github3.repos import RepoComment
+    from github3.repos.comment import RepoComment
     if payload.get('comment'):
         payload['comment'] = RepoComment(payload['comment'], None)
     return payload
 
 
 def _download(payload):
-    from github3.repos import Download
+    from github3.repos.download import Download
     if payload.get('download'):
         payload['download'] = Download(payload['download'], None)
     return payload
@@ -95,7 +112,8 @@ def _gist(payload):
 
 
 def _issuecomm(payload):
-    from github3.issues import Issue, IssueComment
+    from github3.issues import Issue
+    from github3.issues.comment import IssueComment
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     if payload.get('comment'):

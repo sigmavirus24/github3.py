@@ -1,5 +1,5 @@
 import github3
-from mock import patch
+from mock import patch, Mock
 from tests.utils import (expect, BaseCase, load)
 
 
@@ -10,6 +10,13 @@ class TestGitHub(BaseCase):
 
         g = github3.GitHub(token='foo')
         expect(repr(g).endswith('{0:x}>'.format(id(g))))
+
+    def test_context_manager(self):
+        with github3.GitHub() as gh:
+            gh.__exit__ = Mock()
+            expect(gh).isinstance(github3.GitHub)
+
+        gh.__exit__.assert_called()
 
     def test_authorization(self):
         self.response('authorization')
@@ -38,6 +45,22 @@ class TestGitHub(BaseCase):
 
         self.login()
         a = self.g.authorize(None, None, scopes=scopes)
+
+    def test_check_authorization(self):
+        self.response('', 200)
+        self.get('https://api.github.com/applications/fake_id/tokens/'
+                 'access_token')
+        self.conf = {
+            'params': {'client_id': None, 'client_secret': None},
+            'auth': ('fake_id', 'fake_secret'),
+        }
+
+        expect(self.g.check_authorization(None)).is_False()
+        self.not_called()
+
+        self.g.set_client_id('fake_id', 'fake_secret')
+        expect(self.g.check_authorization('access_token')).is_True()
+        self.mock_assertions()
 
     def test_create_gist(self):
         self.response('gist', 201)
@@ -210,6 +233,14 @@ class TestGitHub(BaseCase):
 
         repo = next(self.g.iter_all_repos())
         expect(repo).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
+        self.response('repo', _iter=True)
+        self.get('https://api.github.com/repositories')
+        self.conf.update(params={'since': 100000})
+        repo = next(self.g.iter_all_repos(since=100000))
+        expect(repo).isinstance(github3.repos.Repository)
+        assert(repo.id > 100000)
         self.mock_assertions()
 
     def test_iter_all_users(self):
@@ -446,17 +477,34 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/user/repos')
         self.conf.update(params={})
 
+        with expect.githuberror():
+            self.g.iter_repos()
+
         self.login()
         expect(next(self.g.iter_repos())).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
-        self.get('https://api.github.com/users/sigmavirus24/repos')
         expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
             github3.repos.Repository)
         self.mock_assertions()
 
         self.conf.update(params={'type': 'all', 'direction': 'desc'})
-        next(self.g.iter_repos('sigmavirus24', 'all', direction='desc'))
+
+        next(self.g.iter_repos('all', direction='desc'))
+        self.mock_assertions()
+
+    def test_iter_user_repos(self):
+        self.response('repo', _iter=True)
+        self.get('https://api.github.com/users/sigmavirus24/repos')
+        self.conf.update(params={'type': 'all', 'direction': 'desc'})
+
+        next(self.g.iter_user_repos('sigmavirus24', 'all', direction='desc'))
+        self.mock_assertions()
+
+        self.conf.update(params={"sort": "created"})
+        self.get('https://api.github.com/users/sigmavirus24/repos')
+        expect(next(self.g.iter_user_repos('sigmavirus24', sort="created"))
+               ).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_repos_sort(self):
@@ -466,11 +514,6 @@ class TestGitHub(BaseCase):
         self.login()
         self.get('https://api.github.com/user/repos')
         expect(next(self.g.iter_repos(sort="created"))
-               ).isinstance(github3.repos.Repository)
-        self.mock_assertions()
-
-        self.get('https://api.github.com/users/sigmavirus24/repos')
-        expect(next(self.g.iter_repos('sigmavirus24', sort="created"))
                ).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
@@ -643,16 +686,35 @@ class TestGitHub(BaseCase):
         self.response('legacy_repo')
         self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
                  'legacy', 'repos', 'search', 'github3.py'))
-        self.conf.update(params={})
+        self.conf.update(params={'start_page': None, 'language': None})
         repos = self.g.search_repos('github3.py')
         expect(repos[0]).isinstance(github3.legacy.LegacyRepo)
         expect(repr(repos[0]).startswith('<Legacy Repo')).is_True()
         expect(repos[0].is_private()) == repos[0].private
         self.mock_assertions()
 
+        repos = self.g.search_repos('github3.py', sort='Foobar')
+        self.mock_assertions()
+
+        repos = self.g.search_repos('github3.py', order='Foobar')
+        self.mock_assertions()
+
         self.conf.update(params={'language': 'python', 'start_page': 10})
         repos = self.g.search_repos('github3.py', 'python', 10)
         self.mock_assertions()
+
+        self.conf.update(params={'sort': 'stars', 'start_page': None,
+                                 'language': None})
+        repos = self.g.search_repos('github3.py', sort='stars')
+        self.mock_assertions()
+
+        repos = self.g.search_repos('github3.py', sort='stars',
+                                    order='Foobar')
+        self.mock_assertions()
+
+        self.conf.update(params={'order': 'asc', 'start_page': None,
+                                 'language': None})
+        repos = self.g.search_repos('github3.py', order='asc')
 
     def test_search_users(self):
         self.response('legacy_user')
@@ -664,8 +726,22 @@ class TestGitHub(BaseCase):
         expect(repr(users[0]).startswith('<Legacy User')).is_True()
         self.mock_assertions()
 
+        users = self.g.search_users('sigmavirus24', sort='Foobar')
+        self.mock_assertions()
+
+        users = self.g.search_users('sigmavirus24', order='Foobar')
+        self.mock_assertions()
+
         self.conf.update({'params': {'start_page': 2}})
         self.g.search_users('sigmavirus24', 2)
+        self.mock_assertions()
+
+        self.conf.update({'params': {'sort': 'joined'}})
+        self.g.search_users('sigmavirus24', sort='joined', order='Foobar')
+        self.mock_assertions()
+
+        self.conf.update({'params': {'order': 'asc'}})
+        self.g.search_users('sigmavirus24', order='asc')
         self.mock_assertions()
 
     def test_search_email(self):

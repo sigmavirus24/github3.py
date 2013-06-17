@@ -10,10 +10,13 @@ from json import dumps
 from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
-from github3.packages.PySO8601 import parse
+from datetime import datetime
 from github3 import __version__
+from logging import getLogger
 
 __url_cache__ = {}
+__timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
+__logs__ = getLogger(__package__)
 
 
 class GitHubObject(object):
@@ -33,7 +36,9 @@ class GitHubObject(object):
 
     def _strptime(self, time_str):
         """Converts an ISO 8601 formatted string into a datetime object."""
-        return parse(time_str) if time_str else None
+        if time_str:
+            return datetime.strptime(time_str, __timeformat__)
+        return None
 
     @classmethod
     def from_json(cls, json):
@@ -79,6 +84,9 @@ class GitHubCore(GitHubObject):
 
     def _json(self, response, status_code):
         ret = None
+        __logs__.info('Attempting to get JSON information from a Response '
+                      'with status code %d expecting %d',
+                      response.status_code, status_code)
         if self._boolean(response, status_code, 404) and response.content:
             ret = response.json()
             headers = response.headers
@@ -88,6 +96,7 @@ class GitHubCore(GitHubObject):
                     'Last-Modified', ''
                 )
                 ret['ETag'] = response.headers.get('ETag', '')
+        __logs__.info('JSON was %sreturned', 'not ' if ret is None else '')
         return ret
 
     def _boolean(self, response, true_code, false_code):
@@ -100,25 +109,28 @@ class GitHubCore(GitHubObject):
         return False
 
     def _delete(self, url, **kwargs):
+        __logs__.debug('DELETE %s with %s', url, kwargs)
         return self._session.delete(url, **kwargs)
 
     def _get(self, url, **kwargs):
+        __logs__.debug('GET %s with %s', url, kwargs)
         return self._session.get(url, **kwargs)
 
     def _patch(self, url, **kwargs):
+        __logs__.debug('PATCH %s with %s', url, kwargs)
         return self._session.patch(url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
             data = dumps(data) if data is not None else data
-            return self._session.post(url, data=data, **kwargs)
-        else:
-            if 'headers' in kwargs:
-                kwargs['headers'].update({'Content-Type': None})
+        elif 'headers' in kwargs:
             # Override the Content-Type header
-            return self._session.post(url, data, **kwargs)
+            kwargs['headers'].update({'Content-Type': None})
+        __logs__.debug('POST %s with %s, %s', url, data, kwargs)
+        return self._session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
+        __logs__.debug('PUT %s with %s', url, kwargs)
         return self._session.put(url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
@@ -127,7 +139,9 @@ class GitHubCore(GitHubObject):
         parts.extend(args)
         parts = [str(p) for p in parts]
         key = tuple(parts)
+        __logs__.info('Building a url from %s', key)
         if not key in __url_cache__:
+            __logs__.info('Missed the cache building the url')
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 
@@ -227,6 +241,12 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def _update_(self, comment):
         self.__init__(comment, self._session)
 
@@ -268,9 +288,17 @@ class BaseCommit(GitHubCore):
         self.message = commit.get('message')
         #: List of parents to this commit.
         self.parents = commit.get('parents', [])
+        #: URL to view the commit on GitHub
+        self.html_url = commit.get('html_url', '')
         if not self.sha:
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]
+
+    def __eq__(self, other):
+        return self.sha == other.sha
+
+    def __ne__(self, other):
+        return self.sha != other.sha
 
 
 class BaseAccount(GitHubCore):
@@ -319,7 +347,7 @@ class BaseAccount(GitHubCore):
         ## e.g. first_name last_name
         #: Real name of the user/org
         self.name = acct.get('name') or ''
-        self.name.encode('utf-8')
+        self.name = self.name.encode('utf-8')
 
         ## The number of public_repos
         #: Number of public repos owned by the user/org
@@ -331,6 +359,12 @@ class BaseAccount(GitHubCore):
 
         #: Markdown formatted biography
         self.bio = acct.get('bio')
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
 
     def __repr__(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)

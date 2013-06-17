@@ -1,156 +1,29 @@
-"""
-github3.issues
-==============
-
-This module contains the classes related to issues.
-
-"""
-
 from re import match
 from json import dumps
-from github3.models import GitHubCore, BaseComment
-from github3.users import User
 from github3.decorators import requires_auth
-
-
-class Label(GitHubCore):
-    """The :class:`Label <Label>` object. Succintly represents a label that
-    exists in a repository."""
-    def __init__(self, label, session=None):
-        super(Label, self).__init__(label, session)
-        self._api = label.get('url', '')
-        #: Color of the label, e.g., 626262
-        self.color = label.get('color')
-        #: Name of the label, e.g., 'bug'
-        self.name = label.get('name')
-
-    def __repr__(self):
-        return '<Label [{0}]>'.format(self)
-
-    def __str__(self):
-        return self.name
-
-    def _update_(self, label):
-        self.__init__(label, self._session)
-
-    @requires_auth
-    def delete(self):
-        """Delete this label.
-
-        :returns: bool
-        """
-        return self._boolean(self._delete(self._api), 204, 404)
-
-    @requires_auth
-    def update(self, name, color):
-        """Update this label.
-
-        :param str name: (required), new name of the label
-        :param str color: (required), color code, e.g., 626262, no leading '#'
-        :returns: bool
-        """
-        json = None
-
-        if name and color:
-            if color[0] == '#':
-                color = color[1:]
-            json = self._json(self._patch(self._api, data=dumps({
-                'name': name, 'color': color})), 200)
-
-        if json:
-            self._update_(json)
-            return True
-
-        return False
-
-
-class Milestone(GitHubCore):
-    """The :class:`Milestone <Milestone>` object. This is a small class to
-    handle information about milestones on repositories and issues.
-    """
-    def __init__(self, mile, session=None):
-        super(Milestone, self).__init__(mile, session)
-        self._api = mile.get('url', '')
-        #: Identifying number associated with milestone.
-        self.number = mile.get('number')
-        #: State of the milestone, e.g., open or closed.
-        self.state = mile.get('state')
-        #: Title of the milestone, e.g., 0.2.
-        self.title = mile.get('title')
-        #: Description of this milestone.
-        self.description = mile.get('description')
-        #: :class:`User <github3.users.User>` object representing the creator
-        #  of the milestone.
-        self.creator = User(mile.get('creator'), self._session)
-        #: Number of issues associated with this milestone which are still
-        #  open.
-        self.open_issues = mile.get('open_issues')
-        #: The number of closed issues associated with this milestone.
-        self.closed_issues = mile.get('closed_issues')
-        #: datetime object representing when the milestone was created.
-        self.created_at = self._strptime(mile.get('created_at'))
-        #: datetime representing when this milestone is due.
-        self.due_on = None
-        if mile.get('due_on'):
-            self.due_on = self._strptime(mile.get('due_on'))
-
-    def __repr__(self):
-        return '<Milestone [{0}]>'.format(self)
-
-    def __str__(self):
-        return self.title
-
-    def _update_(self, mile):
-        self.__init__(mile, self._session)
-
-    @requires_auth
-    def delete(self):
-        """Delete this milestone.
-
-        :returns: bool
-        """
-        return self._boolean(self._delete(self._api), 204, 404)
-
-    def iter_labels(self, number=-1):
-        """Iterate over the labels for every issue associated with this
-        milestone.
-
-        :param int number: (optional), number of labels to return. Default: -1
-            returns all available labels.
-        :returns: generator of :class:`Label <Label>`\ s
-        """
-        url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, Label)
-
-    @requires_auth
-    def update(self, title, state='', description='', due_on=''):
-        """Update this milestone.
-
-        state, description, and due_on are optional
-
-        :param str title: (required), new title of the milestone
-        :param str state: (optional), ('open', 'closed')
-        :param str description: (optional)
-        :param str due_on: (optional), ISO 8601 time format:
-            YYYY-MM-DDTHH:MM:SSZ
-        :returns: bool
-        """
-        data = {'title': title, 'state': state,
-                'description': description, 'due_on': due_on}
-        json = None
-
-        if title:
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
-        if json:
-            self._update_(json)
-            return True
-        return False
+from github3.issues.comment import IssueComment
+from github3.issues.event import IssueEvent
+from github3.issues.label import Label
+from github3.issues.milestone import Milestone
+from github3.models import GitHubCore
+from github3.users import User
 
 
 class Issue(GitHubCore):
     """The :class:`Issue <Issue>` object. It structures and handles the data
     returned via the `Issues <http://developer.github.com/v3/issues>`_ section
     of the GitHub API.
+
+    Two issue instances can be checked like so::
+
+        i1 == i2
+        i1 != i2
+
+    And is equivalent to::
+
+        i1.id == i2.id
+        i1.id != i2.id
+
     """
     def __init__(self, issue, session=None):
         super(Issue, self).__init__(issue, session)
@@ -204,6 +77,12 @@ class Issue(GitHubCore):
         #: :class:`User <github3.users.User>` who opened the issue.
         self.user = User(issue.get('user'), self._session)
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)
@@ -233,8 +112,9 @@ class Issue(GitHubCore):
         if not login:
             return False
         number = self.milestone.number if self.milestone else None
+        labels = [str(l) for l in self.labels]
         return self.edit(self.title, self.body, login, self.state, number,
-                         self.labels)
+                         labels)
 
     @requires_auth
     def close(self):
@@ -244,8 +124,9 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
+        labels = [str(l) for l in self.labels]
         return self.edit(self.title, self.body, assignee, 'closed',
-                         number, self.labels)
+                         number, labels)
 
     def comment(self, id_num):
         """Get a single comment by its id.
@@ -344,8 +225,8 @@ class Issue(GitHubCore):
         :returns: bool
         """
         url = self._build_url('labels', name, base_url=self._api)
-        # Docs say it should be a list of strings returned, practice says it 
-        # is just a 204/404 response. I'm tenatively changing this until I 
+        # Docs say it should be a list of strings returned, practice says it
+        # is just a 204/404 response. I'm tenatively changing this until I
         # hear back from Support.
         return self._boolean(self._delete(url), 204, 404)
 
@@ -377,81 +258,6 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
+        labels = [str(l) for l in self.labels]
         return self.edit(self.title, self.body, assignee, 'open',
-                         number, self.labels)
-
-
-class IssueComment(BaseComment):
-    """The :class:`IssueComment <IssueComment>` object. This structures and
-    handles the comments on issues specifically.
-    """
-    def __init__(self, comment, session=None):
-        super(IssueComment, self).__init__(comment, session)
-
-        #: :class:`User <github3.users.User>` who made the comment
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)
-
-    def __repr__(self):
-        return '<Issue Comment [{0}]>'.format(self.user.login)
-
-
-class IssueEvent(GitHubCore):
-    """The :class:`IssueEvent <IssueEvent>` object. This specifically deals
-    with events described in the
-    `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
-    the GitHub API.
-    """
-    def __init__(self, event, issue=None):
-        super(IssueEvent, self).__init__(event, None)
-        # The type of event:
-        #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
-        #    'mentioned', 'assigned')
-        #: The type of event, e.g., closed
-        self.event = event.get('event')
-        #: SHA of the commit.
-        self.commit_id = event.get('commit_id')
-        self._api = event.get('url', '')
-
-        #: :class:`Issue <Issue>` where this comment was made.
-        self.issue = issue
-        if event.get('issue'):
-            self.issue = Issue(event.get('issue'), self)
-
-        #: Number of comments
-        self.comments = event.get('comments', 0)
-
-        #: datetime object representing when the event was created.
-        self.created_at = self._strptime(event.get('created_at'))
-
-        #: Dictionary of links for the pull request
-        self.pull_request = event.get('pull_request', {})
-
-    def __repr__(self):
-        return '<Issue Event [#{0} - {1}]>'.format(
-            self.issue.number, self.event
-        )
-
-
-def issue_params(filter, state, labels, sort, direction, since):
-    params = {}
-    if filter in ('assigned', 'created', 'mentioned', 'subscribed'):
-        params['filter'] = filter
-
-    if state in ('open', 'closed'):
-        params['state'] = state
-
-    if labels:
-        params['labels'] = labels
-
-    if sort in ('created', 'updated', 'comments'):
-        params['sort'] = sort
-
-    if direction in ('asc', 'desc'):
-        params['direction'] = direction
-
-    if since and match('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$', since):
-        params['since'] = since
-
-    return params
+                         number, labels)

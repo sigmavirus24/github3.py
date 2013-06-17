@@ -16,6 +16,12 @@ class TestTeam(BaseCase):
     def test_repr(self):
         expect(repr(self.team).startswith('<Team')).is_True()
 
+    def test_equality(self):
+        t = github3.orgs.Team(load('team'))
+        expect(self.team) == t
+        t.id = 'foo'
+        expect(self.team) != t
+
     def test_add_member(self):
         self.response('', 204)
         self.put(self.api + '/members/foo')
@@ -373,3 +379,6 @@ class TestOrganization(BaseCase):
 
         expect(self.org.team(1)).isinstance(github3.orgs.Team)
         self.mock_assertions()
+
+    def test_equality(self):
+        expect(self.org) == github3.orgs.Organization(load('org'))

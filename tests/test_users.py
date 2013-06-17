@@ -14,6 +14,12 @@ class TestKey(BaseCase):
         super(TestKey, self).setUp()
         self.key = github3.users.Key(self.key.to_json(), self.g)
 
+    def test_equality(self):
+        k = github3.users.Key(self.key.to_json())
+        expect(self.key) == k
+        k.id += 1
+        expect(self.key) != k
+
     def test_str(self):
         expect(str(self.key)) == self.key.key
         expect(repr(self.key).startswith('<User Key')).is_True()
@@ -76,7 +82,8 @@ class TestUser(BaseCase):
     def setUp(self):
         super(TestUser, self).setUp()
         self.user = github3.users.User(self.user.to_json(), self.g)
-        self.user.name = self.user.name.decode('utf-8')
+        if hasattr(self.user.name, 'decode'):
+            self.user.name = self.user.name.decode('utf-8')
 
     def test_refresh(self):
         """This sort of tests all instances of refresh for good measure."""
@@ -174,6 +181,13 @@ class TestUser(BaseCase):
         expect(self.user.is_assignee_on('abc', 'def')).is_False()
         self.mock_assertions()
 
+    def test_is_following(self):
+        self.response('', 204)
+        self.get(self.api + '/following/kennethreitz')
+
+        expect(self.user.is_following('kennethreitz')).is_True()
+        self.mock_assertions()
+
     def test_iter_events(self):
         self.response('event', 200, _iter=True)
         self.get(self.api + '/events')
@@ -268,3 +282,9 @@ class TestUser(BaseCase):
 
         self.response('', 404)
         expect(self.user.update(**self.conf['data'])).is_False()
+
+    def test_equality(self):
+        u = github3.users.User(load('user'))
+        expect(self.user) == u
+        u.id += 1
+        expect(self.user) != u

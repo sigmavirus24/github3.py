@@ -1,16 +1,16 @@
-import github3
+from github3 import gists
 from tests.utils import (expect, BaseCase, load)
 
 
 class TestGist(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestGist, self).__init__(methodName)
-        self.gist = github3.gists.Gist(load('gist'))
+        self.gist = gists.Gist(load('gist'))
         self.api = 'https://api.github.com/gists/3813862'
 
     def setUp(self):
         super(TestGist, self).setUp()
-        self.gist = github3.gists.Gist(self.gist.to_json(), self.g)
+        self.gist = gists.Gist(self.gist.to_json(), self.g)
 
     def test_str(self):
         expect(str(self.gist)) == str(self.gist.id)
@@ -32,7 +32,7 @@ class TestGist(BaseCase):
         expect(self.gist.create_comment('')).is_None()
         self.not_called()
         expect(self.gist.create_comment('bar')).isinstance(
-            github3.gists.GistComment)
+            gists.comment.GistComment)
         self.mock_assertions()
 
     def test_delete(self):
@@ -78,7 +78,7 @@ class TestGist(BaseCase):
 
         self.not_called()
         self.login()
-        expect(self.gist.fork()).isinstance(github3.gists.Gist)
+        expect(self.gist.fork()).isinstance(gists.Gist)
         self.mock_assertions()
 
     def test_is_public(self):
@@ -97,17 +97,27 @@ class TestGist(BaseCase):
         self.mock_assertions()
 
     def test_iter_comments(self):
-        self.response('gist_comment', 200, _iter=True)
+        self.response('gist_comment', _iter=True)
         self.get(self.api + '/comments')
         self.conf = {'params': None}
 
         c = next(self.gist.iter_comments())
-        expect(c).isinstance(github3.gists.GistComment)
+        expect(c).isinstance(gists.comment.GistComment)
+        self.mock_assertions()
+
+    def test_iter_commits(self):
+        self.response('gist_history', _iter=True)
+        self.get(self.api + '/commits')
+        self.conf = {'params': None}
+
+        h = next(self.gist.iter_commits())
+        expect(h).isinstance(gists.history.GistHistory)
         self.mock_assertions()
 
     def test_iter_files(self):
         gist_file = next(self.gist.iter_files())
         expect(gist_file) == self.gist._files[0]
+        expect(gist_file).isinstance(gists.file.GistFile)
         expect(repr(gist_file).startswith('<Gist File')).is_True()
 
     def test_iter_forks(self):
@@ -118,12 +128,13 @@ class TestGist(BaseCase):
         self.response('gist', 200)
         self.get(self.api)
 
-        expect(self.gist.refresh()) is self.gist
+        expect(self.gist.refresh() is self.gist).is_True()
         self.mock_assertions()
 
     def test_star(self):
         self.response('', 204)
-        self.put(self.api)
+        self.put(self.api + '/star')
+        self.conf = {}
 
         with expect.githuberror():
             self.gist.star()
@@ -131,10 +142,12 @@ class TestGist(BaseCase):
         self.not_called()
         self.login()
         expect(self.gist.star()).is_True()
+        self.mock_assertions()
 
     def test_unstar(self):
         self.response('', 204)
-        self.delete(self.api)
+        self.delete(self.api + '/star')
+        self.conf = {}
 
         with expect.githuberror():
             self.gist.unstar()
@@ -142,6 +155,7 @@ class TestGist(BaseCase):
         self.not_called()
         self.login()
         expect(self.gist.unstar()).is_True()
+        self.mock_assertions()
 
     # As opposed to creating an all new class for this
     def test_history(self):
@@ -149,22 +163,38 @@ class TestGist(BaseCase):
         self.response('gist', 200)
         self.get(hist._api)
 
-        expect(hist.get_gist()).isinstance(github3.gists.Gist)
+        expect(hist).isinstance(gists.history.GistHistory)
+        expect(hist.get_gist()).isinstance(gists.Gist)
         self.mock_assertions()
 
         expect(repr(hist).startswith('<Gist History')).is_True()
+
+    def test_equality(self):
+        g = gists.Gist(load('gist'))
+        expect(self.gist) == g
+        g.id = 1
+        expect(self.gist) != g
 
 
 class TestGistComment(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestGistComment, self).__init__(methodName)
-        self.comment = github3.gists.GistComment(load('gist_comment'))
+        self.comment = gists.comment.GistComment(load('gist_comment'))
         self.api = "https://api.github.com/gists/4321394/comments/655725"
 
     def setUp(self):
         super(TestGistComment, self).setUp()
-        self.comment = github3.gists.GistComment(self.comment.to_json(),
+        self.comment = gists.comment.GistComment(self.comment.to_json(),
                                                  self.g)
+
+    def test_equality(self):
+        c = gists.comment.GistComment(load('gist_comment'))
+        expect(self.comment) == c
+        c.id = 1
+        expect(self.comment) != c
+
+    def test_repr(self):
+        expect(repr(self.comment)) != ''
 
     def test_edit(self):
         self.response('gist_comment', 200)
@@ -180,3 +210,15 @@ class TestGistComment(BaseCase):
 
         expect(self.comment.edit('body')).is_True()
         self.mock_assertions()
+
+
+class TestGistHistory(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestGistHistory, self).__init__(methodName)
+        self.hist = gists.history.GistHistory(load('gist_history'))
+
+    def test_equality(self):
+        h = gists.history.GistHistory(load('gist_history'))
+        expect(self.hist) == h
+        h.version = 'foo'
+        expect(self.hist) != h

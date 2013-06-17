@@ -13,6 +13,12 @@ class TestEvent(BaseCase):
         super(TestEvent, self).setUp()
         self.ev = github3.events.Event(self.ev.to_json())
 
+    def test_equality(self):
+        e = github3.events.Event(load('event'))
+        expect(self.ev) == e
+        e.id = 1
+        expect(self.ev) != e
+
     def test_org(self):
         json = self.ev.to_json().copy()
         json['org'] = self.o
@@ -35,12 +41,13 @@ class TestPayloadHandlers(TestCase):
     def test_commitcomment(self):
         comment = {'comment': load('repo_comment')}
         comment = github3.events._commitcomment(comment)
-        expect(comment['comment']).isinstance(github3.repos.RepoComment)
+        expect(comment['comment']).isinstance(
+            github3.repos.comment.RepoComment)
 
     def test_download(self):
         dl = {'download': load('download')}
         dl = github3.events._download(dl)
-        expect(dl['download']).isinstance(github3.repos.Download)
+        expect(dl['download']).isinstance(github3.repos.download.Download)
 
     def test_follow(self):
         f = {'target': load('user')}
@@ -61,7 +68,7 @@ class TestPayloadHandlers(TestCase):
         c = {'issue': load('issue'), 'comment': load('issue_comment')}
         github3.events._issuecomm(c)
         expect(c['issue']).isinstance(github3.issues.Issue)
-        expect(c['comment']).isinstance(github3.issues.IssueComment)
+        expect(c['comment']).isinstance(github3.issues.comment.IssueComment)
 
     def test_issueevent(self):
         c = {'issue': load('issue')}

@@ -1,6 +1,7 @@
 import github3
 from github3.structs import GitHubIterator
 from tests.utils import BaseCase, expect
+from mock import patch
 
 
 class TestGitHubIterator(BaseCase):
@@ -71,3 +72,12 @@ class TestGitHubIterator(BaseCase):
             next(self.i)
 
         self.mock_assertions()
+
+    def test_refresh(self):
+        with patch.object(GitHubIterator, '__iter__') as i:
+            self.i.refresh()
+            i.__iter__.assert_called()
+
+            i.reset_mock()
+            self.i.refresh(True)
+            i.__iter__.assert_called()

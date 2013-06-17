@@ -4,8 +4,20 @@ import sys
 import os
 import re
 
+kwargs = {}
+requires = []
+packages = [
+    "github3",
+    "github3.gists",
+    "github3.repos",
+    "github3.issues",
+]
+
 try:
     from setuptools import setup
+    kwargs['test_suite'] = 'run_tests.collect_tests'
+    kwargs['tests_require'] = ['mock', 'expecter', 'coverage==3.5.2']
+    packages.append('tests')
 except ImportError:
     from distutils.core import setup  # NOQA
 
@@ -13,12 +25,7 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py sdist upload")
     sys.exit()
 
-packages = [
-    "github3",
-    "github3.packages",
-    "github3.packages.PySO8601",
-]
-requires = ["requests==1.1.0"]
+requires.append("requests")
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
@@ -60,4 +67,5 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
+    **kwargs
 )

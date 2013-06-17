@@ -11,7 +11,20 @@ from github3.models import GitHubCore
 
 
 class Authorization(GitHubCore):
-    """The :class:`Authorization <Authorization>` object."""
+    """The :class:`Authorization <Authorization>` object.
+
+    Two authorization instances can be checked like so::
+
+        a1 == a2
+        a1 != a2
+
+    And is equivalent to::
+
+        a1.id == a2.id
+        a1.id != a2.id
+
+    See also: http://developer.github.com/v3/oauth/#oauth-authorizations-api
+    """
     def __init__(self, auth, session=None):
         super(Authorization, self).__init__(auth, session)
         #: Details about the application (name, url)
@@ -40,6 +53,12 @@ class Authorization(GitHubCore):
 
     def __repr__(self):
         return '<Authorization [{0}]>'.format(self.name)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
 
     def _update_(self, auth):
         self.__init__(auth, self._session)

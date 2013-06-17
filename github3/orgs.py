@@ -15,6 +15,20 @@ from github3.decorators import requires_auth
 
 
 class Team(GitHubCore):
+    """The :class:`Team <Team>` object.
+
+    Two team instances can be checked like so::
+
+        t1 == t2
+        t1 != t2
+
+    And is equivalent to::
+
+        t1.id == t2.id
+        t1.id != t2.id
+
+    See also: http://developer.github.com/v3/orgs/teams/
+    """
     def __init__(self, team, session=None):
         super(Team, self).__init__(team, session)
         self._api = team.get('url', '')
@@ -31,6 +45,12 @@ class Team(GitHubCore):
 
     def __repr__(self):
         return '<Team [{0}]>'.format(self.name)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
 
     def _update_(self, team):
         self.__init__(team, self._session)
@@ -143,7 +163,20 @@ class Team(GitHubCore):
 
 
 class Organization(BaseAccount):
-    """The :class:`Organization <Organization>` object."""
+    """The :class:`Organization <Organization>` object.
+
+    Two organization instances can be checked like so::
+
+        o1 == o2
+        o1 != o2
+
+    And is equivalent to::
+
+        o1.id == o2.id
+        o1.id != o2.id
+
+    See also: http://developer.github.com/v3/orgs/
+    """
     def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
         if not self.type:

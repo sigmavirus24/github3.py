@@ -9,6 +9,12 @@ class TestThread(BaseCase):
         self.thread = github3.notifications.Thread(load('notification'))
         self.api = ("https://api.github.com/notifications/threads/6169361")
 
+    def test_equality(self):
+        t = github3.notifications.Thread(load('notification'))
+        expect(self.thread) == t
+        t.id = 1
+        expect(self.thread) != t
+
     def test_last_read_at(self):
         json = self.thread.to_json().copy()
         json['last_read_at'] = '2013-12-31T23:59:59Z'
@@ -32,7 +38,7 @@ class TestThread(BaseCase):
     def test_mark(self):
         self.response('', 205)
         self.patch(self.api)
-        self.conf = {'data': {'read': True}}
+        self.conf = {}
 
         expect(self.thread.mark()).is_True()
         self.mock_assertions()
@@ -64,7 +70,10 @@ class TestSubscription(BaseCase):
                     "subscription")
 
     def test_repr(self):
-        expect(repr(self.subscription)) == '<Subscription [True]>'
+        expect(repr(self.subscription)) == '<Subscription [{0}]>'.format(True)
+        # The above formatting is for pypy. Otherwise you get "<Subscription 
+        # [1]>" == "<Subscription [True]>" so we let the interpreter do the 
+        # string interpolation for us.
 
     def test_delete(self):
         self.response('', 204)

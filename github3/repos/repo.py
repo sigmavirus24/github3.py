@@ -1,28 +1,57 @@
 """
-github3.repos
-=============
+github3.repos.repo
+==================
 
-This module contains the classes relating to repositories.
+This module contains the Repository object which is used to access the various
+parts of GitHub's Repository API.
 
 """
 
 from json import dumps
-from base64 import b64decode
+from base64 import b64encode
 from collections import Callable
-from github3.events import Event
-from github3.issues import Issue, IssueEvent, Label, Milestone, issue_params
-from github3.git import Blob, Commit, Reference, Tag, Tree
-from github3.models import GitHubObject, GitHubCore, BaseComment, BaseCommit
-from github3.pulls import PullRequest
-from github3.users import User, Key
 from github3.decorators import requires_auth
+from github3.events import Event
+from github3.git import Blob, Commit, Reference, Tag, Tree
+from github3.issues import issue_params, Issue
+from github3.issues.event import IssueEvent
+from github3.issues.label import Label
+from github3.issues.milestone import Milestone
+from github3.models import GitHubCore
 from github3.notifications import Subscription, Thread
+from github3.pulls import PullRequest
+from github3.repos.branch import Branch
+from github3.repos.comment import RepoComment
+from github3.repos.commit import RepoCommit
+from github3.repos.comparison import Comparison
+from github3.repos.contents import Contents, validate_commmitter
+from github3.repos.download import Download
+from github3.repos.hook import Hook
+from github3.repos.status import Status
+from github3.repos.stats import ContributorStats
+from github3.repos.tag import RepoTag
+from github3.users import User, Key
 
 
 class Repository(GitHubCore):
+
     """The :class:`Repository <Repository>` object. It represents how GitHub
     sends information about repositories.
+
+    Two repository instances can be checked like so::
+
+        r1 == r2
+        r1 != r2
+
+    And is equivalent to::
+
+        r1.id == r2.id
+        r1.id != r2.id
+
+    See also: http://developer.github.com/v3/repos/
+
     """
+
     def __init__(self, repo, session=None):
         super(Repository, self).__init__(repo, session)
         #: URL used to clone via HTTPS.
@@ -112,7 +141,13 @@ class Repository(GitHubCore):
             self.parent = Repository(self.parent, self)
 
         #: default branch for the repository
+        self.default_branch = repo.get('default_branch', '')
+
+        #: master (default) branch for the repository
         self.master_branch = repo.get('master_branch', '')
+
+    def __eq__(self, repo):
+        return self.id == repo.id
 
     def __repr__(self):
         return '<Repository [{0}]>'.format(self)
@@ -147,6 +182,8 @@ class Repository(GitHubCore):
     def archive(self, format, path='', ref='master'):
         """Get the tarball or zipball archive for this repo at ref.
 
+        See: http://developer.github.com/v3/repos/contents/#get-archive-link
+
         :param str format: (required), accepted values: ('tarball',
             'zipball')
         :param path: (optional), path where the file should be saved
@@ -156,6 +193,7 @@ class Repository(GitHubCore):
         :type path: str, file
         :param str ref: (optional)
         :returns: bool -- True if successful, False otherwise
+
         """
         resp = None
         written = False
@@ -248,14 +286,28 @@ class Repository(GitHubCore):
     def contents(self, path, ref=None):
         """Get the contents of the file pointed to by ``path``.
 
+        If the path provided is actually a directory, you will receive a
+        dictionary back of the form::
+
+            {
+                'filename.md': Contents(),  # Where Contents an instance
+                'github.py': Contents(),
+            }
+
         :param str path: (required), path to file, e.g.
             github3/repo.py
-        :param str ref: (optional), the string name of a commit/branch/tag. default: master
-        :returns: :class:`Contents <Contents>` if successful, else None
+        :param str ref: (optional), the string name of a commit/branch/tag.
+            Default: master
+        :returns: :class:`Contents <Contents>` or dict if successful, else
+            None
         """
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
-        return Contents(json) if json else None
+        if isinstance(json, dict):
+            return Contents(json, self)
+        elif isinstance(json, list):
+            return dict((j.get('name'), Contents(j, self)) for j in json)
+        return None
 
     @requires_auth
     def create_blob(self, content, encoding):
@@ -275,7 +327,7 @@ class Repository(GitHubCore):
         return sha
 
     @requires_auth
-    def create_comment(self, body, sha, path='', position=1, line=1):
+    def create_comment(self, body, sha, path=None, position=None, line=1):
         """Create a comment on a commit.
 
         :param str body: (required), body of the message
@@ -286,13 +338,13 @@ class Repository(GitHubCore):
         :param int line: (optional), line number of the file to comment on,
             default: 1
         :returns: :class:`RepoComment <RepoComment>` if successful else None
+
         """
-        line = int(line)
-        position = int(position)
         json = None
-        if body and sha and line > 0:
-            data = {'body': body, 'commit_id': sha, 'line': line,
-                    'path': path, 'position': position}
+        if body and sha and (line and int(line) > 0):
+            data = {'body': body, 'line': line, 'path': path,
+                    'position': position}
+            self._remove_none(data)
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
@@ -326,6 +378,47 @@ class Repository(GitHubCore):
                     'author': author, 'committer': committer}
             json = self._json(self._post(url, data=data), 201)
         return Commit(json, self) if json else None
+
+    @requires_auth
+    def create_file(self, path, message, content, branch=None,
+                    committer=None, author=None):
+        """Create a file in this repository.
+
+        See also: http://developer.github.com/v3/repos/contents/#create-a-file
+
+        :param str path: (required), path of the file in the repository
+        :param str message: (required), commit message
+        :param bytes content: (required), the actual data in the file
+        :param str branch: (optional), branch to create the commit on.
+            Defaults to the default branch of the repository
+        :param dict committer: (optional), if no information is given the
+            authenticated user's information will be used. You must specify
+            both a name and email.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: {
+            'content': :class:`Contents <github3.repos.contents.Content>`:,
+            'commit': :class:`Commit <github3.git.Commit>`}
+
+        """
+        if content and not isinstance(content, bytes):
+            raise ValueError(  # (No coverage)
+                'content must be a bytes object')  # (No coverage)
+
+        json = None
+        if path and message and content:
+            url = self._build_url('contents', path, base_url=self._api)
+            content = b64encode(content).decode('utf-8')
+            data = {'message': message, 'content': content, 'branch': branch,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._put(url, data=dumps(data)), 201)
+            if 'content' in json and 'commit' in json:
+                json['content'] = Contents(json['content'], self)
+                json['commit'] = Commit(json['commit'], self)
+        return json
 
     @requires_auth
     def create_fork(self, organization=None):
@@ -419,9 +512,9 @@ class Repository(GitHubCore):
 
         :param str name: (required), name to give to the label
         :param str color: (required), value of the color to assign to the
-            label
-        :returns: :class:`Label <github3.issues.Label>` if successful, else
-            None
+            label, e.g., '#fafafa' or 'fafafa' (the latter is what is sent)
+        :returns: :class:`Label <github3.issues.label.Label>` if successful,
+            else None
         """
         json = None
         if name and color:
@@ -579,6 +672,41 @@ class Repository(GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
+    def delete_file(self, path, message, sha, branch=None, committer=None,
+                    author=None):
+        """Delete the file located at ``path``.
+
+        This is part of the Contents CrUD (Create Update Delete) API. See
+        http://developer.github.com/v3/repos/contents/#delete-a-file for more
+        information.
+
+        :param str path: (required), path to the file being removed
+        :param str message: (required), commit message for the deletion
+        :param str sha: (required), blob sha of the file being removed
+        :param str branch: (optional), if not provided, uses the repository's
+            default branch
+        :param dict committer: (optional), if no information is given the
+            authenticated user's information will be used. You must specify
+            both a name and email.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: :class:`Commit <github3.git.Commit>` if successful
+
+        """
+        json = None
+        if path and message and sha:
+            url = self._build_url('contents', path, base_url=self._api)
+            data = {'message': message, 'sha': sha, 'branch': branch,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._delete(url, data=dumps(data)), 200)
+            if json and 'commit' in json:
+                json = Commit(json['commit'])
+        return json
+
+    @requires_auth
     def delete_key(self, key_id):
         """Delete the key with the specified id from your deploy keys list.
 
@@ -732,8 +860,8 @@ class Repository(GitHubCore):
         """Get the label specified by ``name``
 
         :param str name: (required), name of the label
-        :returns: :class:`Label <github3.issues.Label>` if successful, else
-            None
+        :returns: :class:`Label <github3.issues.label.Label>` if successful,
+            else None
         """
         json = None
         if name:
@@ -766,6 +894,30 @@ class Repository(GitHubCore):
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch, etag=etag)
 
+    def iter_code_frequency(self, number=-1, etag=None):
+        """Iterate over the code frequency per week.
+
+        Returns a weekly aggregate of the number of additions and deletions
+        pushed to this repository.
+
+        :param int number: (optional), number of weeks to return. Default: -1
+            returns all weeks
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of lists ``[seconds_from_epoch, additions,
+            deletions]``
+
+        .. note:: All statistics methods may return a 202. On those occasions,
+                  you will not receive any objects. You should store your
+                  iterator and check the new ``last_status`` attribute. If it
+                  is a 202 you should wait before re-requesting.
+
+        .. versionadded:: 0.7
+
+        """
+        url = self._build_url('stats', 'code_frequency', base_url=self._api)
+        return self._iter(int(number), url, list, etag=etag)
+
     def iter_comments(self, number=-1, etag=None):
         """Iterate over comments on all commits in the repository.
 
@@ -791,6 +943,28 @@ class Repository(GitHubCore):
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
+
+    def iter_commit_activity(self, number=-1, etag=None):
+        """Iterate over last year of commit activity by week.
+
+        See: http://developer.github.com/v3/repos/statistics/
+
+        :param int number: (optional), number of weeks to return. Default -1
+            will return all of the weeks.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of dictionaries
+
+        .. note:: All statistics methods may return a 202. On those occasions,
+                  you will not receive any objects. You should store your
+                  iterator and check the new ``last_status`` attribute. If it
+                  is a 202 you should wait before re-requesting.
+
+        .. versionadded:: 0.7
+
+        """
+        url = self._build_url('stats', 'commit_activity', base_url=self._api)
+        return self._iter(int(number), url, dict, etag=etag)
 
     def iter_commits(self, sha=None, path=None, author=None, number=-1,
                      etag=None):
@@ -829,6 +1003,29 @@ class Repository(GitHubCore):
         if anon:
             params = {'anon': True}
         return self._iter(int(number), url, User, params, etag)
+
+    def iter_contributor_statistics(self, number=-1, etag=None):
+        """Iterate over the contributors list.
+
+        See also: http://developer.github.com/v3/repos/statistics/
+
+        :param int number: (optional), number of weeks to return. Default -1
+            will return all of the weeks.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`ContributorStats <github3.repos.stats.ContributorStats>`
+
+        .. note:: All statistics methods may return a 202. On those occasions,
+                  you will not receive any objects. You should store your
+                  iterator and check the new ``last_status`` attribute. If it
+                  is a 202 you should wait before re-requesting.
+
+        .. versionadded:: 0.7
+
+        """
+        url = self._build_url('stats', 'contributors', base_url=self._api)
+        return self._iter(int(number), url, ContributorStats, etag=etag)
 
     def iter_downloads(self, number=-1, etag=None):
         """Iterate over available downloads for this repository.
@@ -963,7 +1160,7 @@ class Repository(GitHubCore):
             returns all available labels
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Label <github3.issues.Label>`\ s
+        :returns: generator of :class:`Label <github3.issues.label.Label>`\ s
         """
         url = self._build_url('labels', base_url=self._api)
         return self._iter(int(number), url, Label, etag=etag)
@@ -1046,10 +1243,15 @@ class Repository(GitHubCore):
                 del params[k]
         return self._iter(int(number), url, Thread, params, etag)
 
-    def iter_pulls(self, state=None, number=-1, etag=None):
+    def iter_pulls(self, state=None, head=None, base=None, number=-1,
+                   etag=None):
         """List pull requests on repository.
 
         :param str state: (optional), accepted values: ('open', 'closed')
+        :param str head: (optional), filters pulls by head user and branch
+            name in the format ``user:ref-name``, e.g., ``seveas:debian``
+        :param str base: (optional), filter pulls by base branch name.
+            Example: ``develop``.
         :param int number: (optional), number of pulls to return. Default: -1
             returns all available pull requests
         :param str etag: (optional), ETag from a previous request to the same
@@ -1061,6 +1263,8 @@ class Repository(GitHubCore):
         params = {}
         if state and state.lower() in ('open', 'closed'):
             params['state'] = state.lower()
+        params.update(head=head, base=base)
+        self._remove_none(params)
         return self._iter(int(number), url, PullRequest, params, etag)
 
     def iter_refs(self, subspace='', number=-1, etag=None):
@@ -1210,7 +1414,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('readme', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return Contents(json) if json else None
+        return Contents(json, self) if json else None
 
     def ref(self, ref):
         """Get a reference pointed to by ``ref``.
@@ -1295,6 +1499,46 @@ class Repository(GitHubCore):
         return Tree(json, self) if json else None
 
     @requires_auth
+    def update_file(self, path, message, content, sha, branch=None,
+                    author=None, committer=None):
+        """Update the file ``path`` with ``content``.
+
+        This is part of the Contents CrUD (Create Update Delete) API. See
+        http://developer.github.com/v3/repos/contents/#update-a-file for more
+        information.
+
+        :param str path: (required), path to the file being updated
+        :param str message: (required), commit message
+        :param str content: (required), updated contents of the file
+        :param str sha: (required), blob sha of the file being updated
+        :param str branch: (optional), uses the default branch on the
+            repository if not provided.
+        :param dict author: (optional), if omitted this will be filled in with
+            committer information. If passed, you must specify both a name and
+            email.
+        :returns: {'commit': :class:`Commit <github3.git.Commit>`,
+            'content': :class:`Contents <github3.repos.contents.Contents>`}
+
+        """
+        if content and not isinstance(content, bytes):
+            raise ValueError(  # (No coverage)
+                'content must be a bytes object')  # (No coverage)
+
+        json = None
+        if path and message and content and sha:
+            url = self._build_url('contents', path, base_url=self._api)
+            content = b64encode(content).decode('utf-8')
+            data = {'message': message, 'content': content, 'sha': sha,
+                    'committer': validate_commmitter(committer),
+                    'author': validate_commmitter(author)}
+            self._remove_none(data)
+            json = self._json(self._put(url, data=dumps(data)), 200)
+            if 'content' in json and 'commit' in json:
+                json['content'] = Contents(json['content'], self)
+                json['commit'] = Commit(json['commit'], self)
+        return json
+
+    @requires_auth
     def update_label(self, name, color, new_name=''):
         """Update the label ``name``.
 
@@ -1310,447 +1554,31 @@ class Repository(GitHubCore):
             resp = upd(new_name, color) if new_name else upd(name, color)
         return resp
 
+    def weekly_commit_count(self):
+        """Returns the total commit counts.
 
-class Branch(GitHubCore):
-    """The :class:`Branch <Branch>` object. It holds the information GitHub
-    returns about a branch on a :class:`Repository <Repository>`.
-    """
-    def __init__(self, branch, session=None):
-        super(Branch, self).__init__(branch, session)
-        #: Name of the branch.
-        self.name = branch.get('name')
-        #: Returns the branch's :class:`RepoCommit <RepoCommit>` or
-        #  ``None``.
-        self.commit = branch.get('commit')
-        if self.commit:
-            self.commit = RepoCommit(self.commit, self._session)
-        #: Returns '_links' attribute.
-        self.links = branch.get('_links', {})
+        The dictionary returned has two entries: ``all`` and ``owner``. Each
+        has a fifty-two element long list of commit counts. (Note: ``all``
+        includes the owner.) ``d['all'][0]`` will be the oldest week,
+        ``d['all'][51]`` will be the most recent.
 
-    def __repr__(self):
-        return '<Repository Branch [{0}]>'.format(self.name)
+        :returns: dict
 
+        .. note:: All statistics methods may return a 202. If github3.py
+            receives a 202 in this case, it will return an emtpy dictionary.
+            You should give the API a moment to compose the data and then re
+            -request it via this method.
 
-class Contents(GitHubObject):
-    """The :class:`Contents <Contents>` object. It holds the information
-    concerning any content in a repository requested via the API.
-    """
+        ..versionadded:: 0.7
 
-    def __init__(self, content):
-        super(Contents, self).__init__(content)
-        # links
-        self._api = content['_links'].get('self', '')
-        #: Dictionary of links
-        self.links = content.get('_links')
-
-        # should always be 'base64'
-        #: Returns encoding used on the content.
-        self.encoding = content.get('encoding', '')
-
-        # content, base64 encoded and decoded
-        #: Base64-encoded content of the file.
-        self.content = content.get('content', '')
-
-        #: Decoded content of the file as a bytes object. If we try to decode
-        #: to character set for you, we might encounter an exception which
-        #: will prevent the object from being created. On python2 this is the
-        #: same as a string, but on python3 you should call the decode method
-        #: with the character set you wish to use, e.g.,
-        #: ``content.decoded.decode('utf-8')``.
-        #: .. versionchanged:: 0.5.2
-        self.decoded = self.content
-        if self.encoding == 'base64':
-            self.decoded = b64decode(self.content.encode())
-
-        # file name, path, and size
-        #: Name of the content.
-        self.name = content.get('name', '')
-        #: Path to the content.
-        self.path = content.get('path', '')
-        #: Size of the content
-        self.size = content.get('size', 0)
-        #: SHA string.
-        self.sha = content.get('sha', '')
-
-        # should always be 'file'
-        #: Type of content.
-        self.type = content.get('type', '')
-
-    def __repr__(self):
-        return '<Content [{0}]>'.format(self.path)
-
-    def __str__(self):
-        return self.decoded
-
-    @property
-    def git_url(self):
-        """API URL for this blob"""
-        return self.links['git']
-
-    @property
-    def html_url(self):
-        """URL pointing to the content on GitHub."""
-        return self.links['html']
-
-
-class Download(GitHubCore):
-    """The :class:`Download <Download>` object. It represents how GitHub sends
-    information about files uploaded to the downloads section of a repository.
-
-    .. warning::
-
-        On 2013-03-11, this API will be deprecated by GitHub. There will also
-        be a new version of github3.py to accompany this at that date.
-    """
-
-    def __init__(self, download, session=None):
-        super(Download, self).__init__(download, session)
-        self._api = download.get('url', '')
-        #: URL of the download at GitHub.
-        self.html_url = download.get('html_url', '')
-        #: Unique id of the download on GitHub.
-        self.id = download.get('id', 0)
-        #: Name of the download.
-        self.name = download.get('name', '')
-        #: Description of the download.
-        self.description = download.get('description', '')
-        #: Size of the download.
-        self.size = download.get('size', 0)
-        #: How many times this particular file has been downloaded.
-        self.download_count = download.get('download_count', 0)
-        #: Content type of the download.
-        self.content_type = download.get('content_type', '')
-
-    def __repr__(self):
-        return '<Download [{0}]>'.format(self.name)
-
-    @requires_auth
-    def delete(self):
-        """Delete this download if authenticated"""
-        return self._boolean(self._delete(self._api), 204, 404)
-
-    def saveas(self, path=''):
-        """Save this download to the path specified.
-
-        :param str path: (optional), if no path is specified, it will be
-            saved in the current directory with the name specified by GitHub.
-            it can take a file-like object as well
-        :returns: bool
         """
-        if not path:
-            path = self.name
-
-        resp = self._get(self.html_url, allow_redirects=True, stream=True)
-        if self._boolean(resp, 200, 404):
-            if isinstance(getattr(path, 'write', None), Callable):
-                file_like = True
-                fd = path
-            else:
-                file_like = False
-                fd = open(path, 'wb')
-            for chunk in resp.iter_content(512):
-                fd.write(chunk)
-            if not file_like:
-                fd.close()
-            return True
-        return False  # (No coverage)
-
-
-class Hook(GitHubCore):
-    """The :class:`Hook <Hook>` object. This handles the information returned
-    by GitHub about hooks set on a repository."""
-
-    def __init__(self, hook, session=None):
-        super(Hook, self).__init__(hook, session)
-        self._api = hook.get('url', '')
-        #: datetime object representing when this hook was last updated.
-        self.updated_at = None
-        if hook.get('updated_at'):
-            self.updated_at = self._strptime(hook.get('updated_at'))
-        #: datetime object representing the date the hook was created.
-        self.created_at = self._strptime(hook.get('created_at'))
-        #: The name of the hook.
-        self.name = hook.get('name')
-        #: Events which trigger the hook.
-        self.events = hook.get('events')
-        #: Whether or not this Hook is marked as active on GitHub
-        self.active = hook.get('active')
-        #: Dictionary containing the configuration for the Hook.
-        self.config = hook.get('config')
-        #: Unique id of the hook.
-        self.id = hook.get('id')
-
-    def __repr__(self):
-        return '<Hook [{0}]>'.format(self.name)
-
-    def _update_(self, hook):
-        self.__init__(hook, self._session)
-
-    @requires_auth
-    def delete(self):
-        """Delete this hook.
-
-        :returns: bool
-        """
-        return self._boolean(self._delete(self._api), 204, 404)
-
-    @requires_auth
-    def delete_subscription(self):
-        """Delete the user's subscription to this repository.
-
-        :returns: bool
-        """
-        url = self._build_url('subscription', base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
-
-    @requires_auth
-    def edit(self, name, config, events=[], add_events=[], rm_events=[],
-             active=True):
-        """Edit this hook.
-
-        :param str name: (required), name of the service being called
-        :param dict config: (required), key-value pairs of settings for this
-            hook
-        :param list events: (optional), which events should this be triggered
-            for
-        :param list add_events: (optional), events to be added to the list of
-           events that this hook triggers for
-        :param list rm_events: (optional), events to be remvoed from the list
-            of events that this hook triggers for
-        :param bool active: (optional), should this event be active
-        :returns: bool
-        """
-        json = None
-        if name and config and isinstance(config, dict):
-            data = {'name': name, 'config': config, 'active': active}
-            if events:
-                data['events'] = events
-
-            if add_events:
-                data['add_events'] = add_events
-
-            if rm_events:
-                data['remove_events'] = rm_events
-
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
-
-        if json:
-            self._update_(json)
-            return True
-        return False
-
-    @requires_auth
-    def test(self):
-        """Test this hook
-
-        :returns: bool
-        """
-        url = self._build_url('tests', base_url=self._api)
-        return self._boolean(self._post(url), 204, 404)
-
-
-class RepoTag(GitHubObject):
-    """The :class:`RepoTag <RepoTag>` object. This stores the information
-    representing a tag that was created on a repository.
-    """
-
-    def __init__(self, tag):
-        super(RepoTag, self).__init__(tag)
-        #: Name of the tag.
-        self.name = tag.get('name')
-        #: URL for the GitHub generated zipball associated with the tag.
-        self.zipball_url = tag.get('zipball_url')
-        #: URL for the GitHub generated tarball associated with the tag.
-        self.tarball_url = tag.get('tarball_url')
-        #: Dictionary containing the SHA and URL of the commit.
-        self.commit = tag.get('commit', {})
-
-    def __repr__(self):
-        return '<Repository Tag [{0}]>'.format(self)
-
-    def __str__(self):
-        return self.name
-
-
-class RepoComment(BaseComment):
-    """The :class:`RepoComment <RepoComment>` object. This stores the
-    information about a comment on a file in a repository.
-    """
-    def __init__(self, comment, session=None):
-        super(RepoComment, self).__init__(comment, session)
-        #: Commit id on which the comment was made.
-        self.commit_id = comment.get('commit_id')
-        #: URL of the comment on GitHub.
-        self.html_url = comment.get('html_url')
-        #: The line number where the comment is located.
-        self.line = comment.get('line')
-        #: The path to the file where the comment was made.
-        self.path = comment.get('path')
-        #: The position in the diff where the comment was made.
-        self.position = comment.get('position')
-        #: datetime object representing when the comment was updated.
-        self.updated_at = comment.get('updated_at')
-        if self.updated_at:
-            self.updated_at = self._strptime(self.updated_at)
-        #: Login of the user who left the comment.
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)
-
-    def __repr__(self):
-        return '<Repository Comment [{0}/{1}]>'.format(
-            self.commit_id[:7], self.user.login or ''
-        )
-
-    def _update_(self, comment):
-        super(RepoComment, self)._update_(comment)
-        self.__init__(comment, self._session)
-
-    @requires_auth
-    def update(self, body, sha, line, path, position):
-        """Update this comment.
-
-        :param str body: (required)
-        :param str sha: (required), sha id of the commit to comment on
-        :param int line: (required), line number to comment on
-        :param str path: (required), relative path of the file you're
-            commenting on
-        :param int position: (required), line index in the diff to comment on
-        :returns: bool
-        """
-        json = None
-        if body and sha and path and line > 0 and position > 0:
-            data = {'body': body, 'commit_id': sha, 'line': line,
-                    'path': path, 'position': position}
-            json = self._json(self._post(self._api, data=data), 200)
-
-        if json:
-            self._update_(json)
-            return True
-        return False
-
-
-class RepoCommit(BaseCommit):
-    """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
-    viewed by a :class:`Repository`. This is different from a Commit object
-    returned from the git data section.
-    """
-
-    def __init__(self, commit, session=None):
-        super(RepoCommit, self).__init__(commit, session)
-        #: :class:`User <github3.users.User>` who authored the commit.
-        self.author = commit.get('author')
-        if self.author:
-            self.author = User(self.author, self._session)
-        #: :class:`User <github3.users.User>` who committed the commit.
-        self.committer = commit.get('committer')
-        if self.committer:
-            self.committer = User(self.committer, self._session)
-        #: :class:`Commit <github3.git.Commit>`.
-        self.commit = commit.get('commit')
-        if self.commit:
-            self.commit = Commit(self.commit, self._session)
-
-        self.sha = commit.get('sha')
-        #: The number of additions made in the commit.
-        self.additions = 0
-        #: The number of deletions made in the commit.
-        self.deletions = 0
-        #: Total number of changes in the files.
-        self.total = 0
-        if commit.get('stats'):
-            self.additions = commit['stats'].get('additions')
-            self.deletions = commit['stats'].get('deletions')
-            self.total = commit['stats'].get('total')
-
-        #: The files that were modified by this commit.
-        self.files = commit.get('files', [])
-
-    def __repr__(self):
-        return '<Repository Commit [{0}]>'.format(self.sha[:7])
-
-    def diff(self):
-        """Return the diff"""
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.diff'})
-        return resp.content if self._boolean(resp, 200, 404) else None
-
-    def patch(self):
-        """Return the patch"""
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.patch'})
-        return resp.content if self._boolean(resp, 200, 404) else None
-
-
-class Comparison(GitHubCore):
-    """The :class:`Comparison <Comparison>` object. This encapsulates the
-    information returned by GitHub comparing two commit objects in a
-    repository."""
-
-    def __init__(self, compare):
-        super(Comparison, self).__init__(compare)
-        self._api = compare.get('url', '')
-        #: URL to view the comparison at GitHub
-        self.html_url = compare.get('html_url')
-        #: Permanent link to this comparison.
-        self.permalink_url = compare.get('permalink_url')
-        #: URL to see the diff between the two commits.
-        self.diff_url = compare.get('diff_url')
-        #: Patch URL at GitHub for the comparison.
-        self.patch_url = compare.get('patch_url')
-        #: :class:`RepoCommit <RepoCommit>` object representing the base of
-        #  comparison.
-        self.base_commit = RepoCommit(compare.get('base_commit'), None)
-        #: Behind or ahead.
-        self.status = compare.get('status')
-        #: Number of commits ahead by.
-        self.ahead_by = compare.get('ahead_by')
-        #: Number of commits behind by.
-        self.behind_by = compare.get('behind_by')
-        #: Number of commits difference in the comparison.
-        self.total_commits = compare.get('total_commits')
-        #: List of :class:`RepoCommit <RepoCommit>` objects.
-        self.commits = [RepoCommit(com) for com in compare.get('commits')]
-        #: List of dicts describing the files modified.
-        self.files = compare.get('files', [])
-
-    def __repr__(self):
-        return '<Comparison of {0} commits>'.format(self.total_commits)
-
-    def diff(self):
-        """Return the diff"""
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.diff'})
-        return resp.content if self._boolean(resp, 200, 404) else None
-
-    def patch(self):
-        """Return the patch"""
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.patch'})
-        return resp.content if self._boolean(resp, 200, 404) else None
-
-
-class Status(GitHubObject):
-    """The :class:`Status <Status>` object. This represents information from
-    the Repo Status API."""
-    def __init__(self, status):
-        super(Status, self).__init__(status)
-        #: datetime object representing the creation of the status object
-        self.created_at = self._strptime(status.get('created_at'))
-        #: :class:`User <github3.users.User>` who created the object
-        self.creator = User(status.get('creator'))
-        #: Short description of the Status
-        self.description = status.get('description')
-        #: GitHub ID for the status object
-        self.id = status.get('id')
-        #: State of the status, e.g., 'success', 'pending', 'failed', 'error'
-        self.state = status.get('state')
-        #: URL to view more information about the status
-        self.target_url = status.get('target_url')
-        #: datetime object representing the last time the status was updated
-        self.updated_at = None
-        if status.get('updated_at'):
-            self.updated_at = self._strptime(status.get('updated_at'))
-
-    def __repr__(self):
-        return '<Status [{s.id}:{s.state}]>'.format(s=self)
+        url = self._build_url('stats', 'participation', base_url=self._api)
+        resp = self._get(url)
+        if resp.status_code == 202:
+            return {}
+        json = self._json(resp, 200)
+        if json.get('ETag'):
+            del json['ETag']
+        if json.get('Last-Modified'):
+            del json['Last-Modified']
+        return json

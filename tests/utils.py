@@ -12,7 +12,9 @@ is_py3 = sys.version_info > (3, 0)
 
 
 def load(name):
-    return json.load(path(name))
+    with path(name) as f:
+        j = json.load(f)
+    return j
 
 
 def path(name, mode='r'):
@@ -46,10 +48,6 @@ class CustomExpecter(expecter.expect):
                 repr(self._actual), repr(iterable)
             )
         )
-
-    def list_of(self, cls):
-        for actual in self._actual:
-            CustomExpecter(actual).isinstance(cls)
 
     @classmethod
     def githuberror(cls):
@@ -105,16 +103,18 @@ class BaseCase(TestCase):
         r.encoding = enc
 
         if path_name:
-            content = path(path_name).read().strip()
+            with path(path_name) as f:
+                content = f.read().strip()
+
             if _iter:
                 content = '[{0}]'.format(content)
-                r.raw = BytesIO(content.encode())
+                r.raw = RequestsBytesIO(content.encode())
             elif is_py3:
-                r.raw = BytesIO(content.encode())
+                r.raw = RequestsBytesIO(content.encode())
             else:
-                r.raw = BytesIO(content)
+                r.raw = RequestsBytesIO(content)
         else:
-            r.raw = BytesIO()
+            r.raw = RequestsBytesIO()
 
         if headers:
             r.headers = CaseInsensitiveDict(headers)
@@ -141,10 +141,6 @@ class BaseCase(TestCase):
         expect(self.request.called).is_False()
 
 
-class APITestMixin(TestCase):
-    def setUp(self):
-        self.mock = patch('github3.api.gh', autospec=github3.GitHub)
-        self.gh = self.mock.start()
-
-    def tearDown(self):
-        self.mock.stop()
+class RequestsBytesIO(BytesIO):
+    def read(self, chunk_size, *args, **kwargs):
+        return super(RequestsBytesIO, self).read(chunk_size)

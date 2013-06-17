@@ -6,6 +6,10 @@ github3.py
     :alt: Build Status
     :target: http://travis-ci.org/sigmavirus24/github3.py
 
+.. image:: https://pypip.in/d/github3.py/badge.png
+    :alt: Downloads
+    :target: https://crate.io/packages/github3.py
+
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
 
@@ -45,7 +49,7 @@ License
 
 Modified BSD license_
 
-.. _license:
+.. _license: https://github.com/sigmavirus24/github3.py/blob/develop/LICENSE
 
 Examples
 --------

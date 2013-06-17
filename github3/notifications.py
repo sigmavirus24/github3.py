@@ -4,6 +4,7 @@ github3.notifications
 
 This module contains the classes relating to notifications.
 
+See also: http://developer.github.com/v3/activity/notifications/
 """
 
 from json import dumps
@@ -11,6 +12,23 @@ from github3.models import GitHubCore
 
 
 class Thread(GitHubCore):
+    """The :class:`Thread <Thread>` object wraps notification threads. This
+    contains information about the repository generating the notification, the
+    subject, and the reason.
+
+    Two thread instances can be checked like so::
+
+        t1 == t2
+        t1 != t2
+
+    And is equivalent to::
+
+        t1.id == t2.id
+        t1.id != t2.id
+
+    See also:
+    http://developer.github.com/v3/activity/notifications/#view-a-single-thread
+    """
     def __init__(self, notif, session=None):
         super(Thread, self).__init__(notif, session)
         self._api = notif.get('url')
@@ -42,6 +60,12 @@ class Thread(GitHubCore):
     def __repr__(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
 
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
     def delete_subscription(self):
         """Delete subscription for this thread.
 
@@ -59,9 +83,7 @@ class Thread(GitHubCore):
 
         :returns: bool
         """
-        mark = {'read': True}
-        return self._boolean(self._patch(self._api, data=dumps(mark)), 205,
-                             404)
+        return self._boolean(self._patch(self._api), 205, 404)
 
     def set_subscription(self, subscribed, ignored):
         """Set the user's subscription for this thread
@@ -88,6 +110,12 @@ class Thread(GitHubCore):
 
 
 class Subscription(GitHubCore):
+    """The :class:`Subscription <Subscription>` object wraps thread and
+    repository subscription information.
+
+    See also:
+    developer.github.com/v3/activity/notifications/#get-a-thread-subscription
+    """
     def __init__(self, sub, session=None):
         super(Subscription, self).__init__(sub, session)
         self._api = sub.get('url')

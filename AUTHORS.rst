@@ -37,3 +37,11 @@ Contributors
 - Malcolm Box (@mbox)
 
 - Tom Petr (@tpetr)
+
+- David Pachura (@detenebrator)
+
+- Barry Morrison (@esacteksab)
+
+- James Pearson (@xiongchiamiov)
+
+- INADA Naoki (@methane)
