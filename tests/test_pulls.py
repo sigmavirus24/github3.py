@@ -72,6 +72,18 @@ class TestPullRequest(BaseCase):
 
         expect(repr(c).startswith('<Review Comment')).is_True()
 
+    def test_iter_issue_comments(self):
+        pull = github3.pulls.PullRequest(load('pull19'))
+        self.response('pull19_comment', _iter=True)
+        self.get(pull.links['comments'])
+
+        c = next(pull.iter_issue_comments())
+        expect(c).isinstance(
+            github3.issues.comment.IssueComment)
+        self.mock_assertions()
+
+        expect(repr(c).startswith('<Issue Comment')).is_True()
+
     def test_iter_comits(self):
         self.response('commit', _iter=True)
         self.get(self.api + '/commits')
