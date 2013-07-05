@@ -80,6 +80,11 @@ Ian Cordasco (sigmavirus24)
 Contact Options
 ---------------
 
-- It is preferred that you send an email to github3.py@librelist.com
+- Feel free to use the `github3.py`_ tag on StackOverflow for any questions 
+  you may have
+- If you dislike StackOverflow it is preferred that you send an email to 
+  github3.py@librelist.com
 - You may also contact (via email) the author directly with 
-  questions/suggestions/comments
+  questions/suggestions/comments or if you wish to include sensitive data.
+
+.. _github3.py: http://stackoverflow.com/questions/tagged/github3.py
