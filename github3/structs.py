@@ -84,3 +84,39 @@ class GitHubIterator(GitHubCore, Iterator):
 
     def next(self):
         return self.__next__()
+
+
+class ParameterValidator(object):
+    """This class is used to validate parameters sent to methods.
+
+    It will use a slightly strict validation method and be capable of being
+    passed directly to requests or ``json.dumps``.
+    """
+
+    def __init__(self, params, schema):
+        self.params = params
+        self.schema = schema
+        self.validate()
+
+    def __repr__(self):
+        # This is the trick to making this compatible with ``json.dumps``
+        return repr(self.params)
+
+    def validate(self):
+        params_copy = self.params.copy()
+        for key in params_copy:
+            if key not in self.schema:
+                del self.params[key]
+                # We can not pass extra information onto GitHub
+                # If we let items pass through that we don't validate, this
+                # would be a pointless exercise
+
+        for key, validator in self.schema.items():
+            if key not in self.params:
+                continue
+            if not validator.is_valid(self.params[key]):
+                try:
+                    self.params[key] = validator.convert(self.params[key])
+                except:
+                    # If we don't know how to handle it, we shouldn't pass it
+                    del self.params[key]
