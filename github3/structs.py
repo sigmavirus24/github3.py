@@ -112,11 +112,15 @@ class ParameterValidator(dict):
                 # If we let items pass through that we don't validate, this
                 # would be a pointless exercise
 
-        for key, validator in self.schema.items():
+        for key, (required, validator) in self.schema.items():
             if key not in self.params:
                 continue
             value = self.params[key]
             if not validator.is_valid(value):
+                if required:
+                    raise ValueError(
+                        'Key "{0}" is required but is invalid.'.format(key)
+                    )
                 self.remove_key(key)
             else:
                 self.set_key(key, validator.convert(value))
@@ -194,8 +198,7 @@ class StringValidator(BaseValidator):
 
         return True
 
-    @staticmethod
-    def convert(string):
+    def convert(self, string):
         return string if isinstance(string, basestring) else str(string)
 
 
@@ -206,5 +209,29 @@ class DictValidator(BaseValidator):
         except ValueError:
             return False
 
-        if self.sub_schema:
-            for
+        schema_items = self.sub_schema.items()
+        return any(
+            [v.is_valid(dictionary[k]) for (k, v) in schema_items]
+        )
+
+    def convert(self, dictionary):
+        dictionary = dict(dictionary)
+        for k, v in self.sub_schema.items():
+            if dictionary.get(k):
+                dictionary[k] = v.convert(dictionary[k])
+        return dictionary
+
+
+class ListValidator(BaseValidator):
+    def is_valid(self, lyst):
+        try:
+            lyst = list(lyst)
+        except TypeError:
+            return False
+
+        is_valid = self.sub_schema.is_valid
+        return all([is_valid(i) for i in lyst])
+
+    def convert(self, lyst):
+        convert = self.sub_schema.convert
+        return [convert(i) for i in lyst]
