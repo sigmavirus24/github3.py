@@ -126,6 +126,8 @@ class DictValidator(BaseValidator):
     def is_valid(self, dictionary):
         try:
             d = dict(dictionary)
+        except TypeError:
+            return self.none(dictionary)
         except ValueError:
             return False
 
@@ -135,6 +137,9 @@ class DictValidator(BaseValidator):
         )
 
     def convert(self, dictionary):
+        if self.none(dictionary):
+            return None
+
         dictionary = dict(dictionary)
         for k, v in self.sub_schema.items():
             if dictionary.get(k):
@@ -153,6 +158,9 @@ class ListValidator(BaseValidator):
         return all([is_valid(i) for i in lyst])
 
     def convert(self, lyst):
+        if self.none(lyst):
+            return None
+
         convert = self.sub_schema.convert
         return [convert(i) for i in lyst]
 
@@ -164,8 +172,9 @@ class IntegerValidator(BaseValidator):
         except ValueError:
             return False
         except TypeError:
-            if not self.allow_none:
+            if integer is not None:
                 raise
+            return self.none(integer)
         return True
 
     def convert(self, integer):

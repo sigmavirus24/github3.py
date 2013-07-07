@@ -7,7 +7,10 @@ class TestIntegerValidator(TestCase):
         self.v = validation.IntegerValidator()
 
     def test_is_valid_raises_TypeError(self):
-        self.assertRaises(TypeError, self.v.is_valid, None)
+        self.assertRaises(TypeError, self.v.is_valid, {})
+
+    def test_handles_None(self):
+        self.assertFalse(self.v.is_valid(None))
 
     def test_handles_ValueError(self):
         self.assertFalse(self.v.is_valid('abc'))
@@ -42,6 +45,10 @@ class TestListValidator(TestCase):
         self.assertFalse(self.v.is_valid(None))
         self.v.allow_none = True
         self.assertTrue(self.v.is_valid(None))
+
+    def test_converts_None(self):
+        self.v.allow_none = True
+        self.assertEqual(self.v.convert(None), None)
 
     def test_empty_list_is_valid(self):
         self.assertTrue(self.v.is_valid([]))
@@ -97,6 +104,11 @@ class TestDictValidator(TestCase):
     def setUp(self):
         self.v = validation.DictValidator(sub_schema=self.sub_schema)
 
+    def test_handles_None(self):
+        self.assertFalse(self.v.is_valid(None))
+        self.v.allow_none = True
+        self.assertTrue(self.v.is_valid(None))
+
     def test_skips_missing_optional_keys(self):
         data = {'committer': 'Ian', 'message': 'Foo'}
         self.assertTrue(self.v.is_valid(data))
@@ -109,6 +121,27 @@ class TestDictValidator(TestCase):
         data = {'committer': 'Ian', 'message': 'Foo'}.items()
         self.assertTrue(self.v.is_valid(data))
 
+    def test_converts_list_of_tuples(self):
+        data = {'committer': 'Ian', 'message': 'Foo'}
+        self.assertEqual(
+            self.v.convert(data.items()),
+            data
+        )
+
+    def test_converts_dicts(self):
+        data = {'committer': 'Ian', 'message': 'Foo'}
+        self.assertEqual(
+            self.v.convert(data),
+            data
+        )
+
+
+class TestStringValidator(TestCase):
+    def setUp(self):
+        self.v = validation.StringValidator()
+
+    def test_fails_with_None(self):
+        self.assertFalse(self.v.is_valid(None))
 
 if __name__ == '__main__':
     import unittest
