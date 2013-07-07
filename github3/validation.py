@@ -7,54 +7,53 @@ class ParameterValidator(dict):
     """This class is used to validate parameters sent to methods.
 
     It will use a slightly strict validation method and be capable of being
-    passed directly to requests or ``json.dumps``.
+    passed directly to requests or ``json.dumps``. The user will ideally never
+    see this class unless they go digging.
 
     """
 
     def __init__(self, params, schema):
         self.schema = schema
-        self.params = params
-        self.update(**self.params)
-        self.validate()
+        self.original_params = params
+        self.update(**params)
 
     def validate(self):
-        params_copy = self.params.copy()
+        params_copy = self.copy()
         for key in params_copy:
             if key not in self.schema:
-                self.remove_key(key)
+                del self[key]
                 # We can not pass extra information onto GitHub
                 # If we let items pass through that we don't validate, this
                 # would be a pointless exercise
 
         for key, validator in self.schema.items():
-            if key not in self.params:
-                continue
-            value = self.params[key]
+            if key not in self:
+                if validator.required:
+                    raise ValueError(
+                        'Key "{0}" is required but is not given.'.format(key)
+                    )
+                continue  # (No coverage)
+                # Apparently continues are uncoverable?
+            value = self[key]
             if not validator.is_valid(value):
-                if not validator.allow_none:
+                if validator.required or validator.none(value):
                     raise ValueError(
                         'Key "{0}" is required but is invalid.'.format(key)
                     )
-                self.remove_key(key)
+                del self[key]
             else:
-                self.set_key(key, validator.convert(value))
-
-    def remove_key(self, key):
-        del(self.params[key], self[key])
-
-    def set_key(self, key, value):
-        self.params[key] = self[key] = value
+                self[key] = validator.convert(value)
 
     def update(self, **kwargs):
         super(ParameterValidator, self).update(**kwargs)
-        self.params.update(**kwargs)
         self.validate()
 
 
 class BaseValidator(object):
-    def __init__(self, allow_none=False, sub_schema=None):
+    def __init__(self, allow_none=False, sub_schema=None, required=False):
         self.allow_none = allow_none
         self.sub_schema = sub_schema or {}
+        self.required = required
 
     def none(self, o):
         if self.allow_none and o is None:
