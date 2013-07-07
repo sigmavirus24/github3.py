@@ -38,17 +38,78 @@ class TestListValidator(TestCase):
             sub_schema=validation.IntegerValidator()
         )
 
-    def test_is_valid_None(self):
+    def test_None_is_valid(self):
         self.assertFalse(self.v.is_valid(None))
         self.v.allow_none = True
         self.assertTrue(self.v.is_valid(None))
 
-    def test_is_valid_empty_list(self):
+    def test_empty_list_is_valid(self):
         self.assertTrue(self.v.is_valid([]))
 
-    def test_is_valid_list_of_strings(self):
-        self.assertFalse(
-            self.v.is_valid(
-                ["abc", "def"]
-            )
+    def test_list_of_strings_is_not_valid(self):
+        self.assertFalse(self.v.is_valid(["abc", "def"]))
+
+    def test_tuple_of_strings_is_not_valid(self):
+        self.assertFalse(self.v.is_valid(("abc", "def")))
+
+    def test_list_of_integers_is_valid(self):
+        self.assertTrue(self.v.is_valid([123, 456]))
+
+    def test_tuple_of_integers_is_valid(self):
+        self.assertTrue(self.v.is_valid((123, 456)))
+
+    def test_list_of_strings_is_valid(self):
+        self.assertTrue(self.v.is_valid(['123', '456']))
+
+    def test_tuple_of_strings_is_valid(self):
+        self.assertTrue(self.v.is_valid(('123', '456')))
+
+    def test_list_of_strings_converts(self):
+        self.assertEqual(
+            self.v.convert(['123', '456']),
+            [123, 456]
         )
+
+    def test_tuple_of_strings_converts(self):
+        self.assertEqual(
+            self.v.convert(('123', '456')),
+            [123, 456]
+        )
+
+    def test_list_of_integers_converts(self):
+        self.assertEqual(
+            self.v.convert([123, 456]),
+            [123, 456]
+        )
+
+    def test_tuple_of_integers_converts(self):
+        self.assertEqual(
+            self.v.convert((123, 456)),
+            [123, 456]
+        )
+
+
+class TestDictValidator(TestCase):
+    sub_schema = {'author': validation.StringValidator(True),
+                  'committer': validation.StringValidator(),
+                  'message': validation.StringValidator()}
+
+    def setUp(self):
+        self.v = validation.DictValidator(sub_schema=self.sub_schema)
+
+    def test_skips_missing_optional_keys(self):
+        data = {'committer': 'Ian', 'message': 'Foo'}
+        self.assertTrue(self.v.is_valid(data))
+
+    def test_fails_missing_required_keys(self):
+        data = {'author': 'Ian', 'message': 'Foo'}
+        self.assertFalse(self.v.is_valid(data))
+
+    def test_accepts_list_of_tuples(self):
+        data = {'committer': 'Ian', 'message': 'Foo'}.items()
+        self.assertTrue(self.v.is_valid(data))
+
+
+if __name__ == '__main__':
+    import unittest
+    unittest.main()

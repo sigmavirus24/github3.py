@@ -125,13 +125,13 @@ class StringValidator(BaseValidator):
 class DictValidator(BaseValidator):
     def is_valid(self, dictionary):
         try:
-            dictionary = dict(dictionary)
+            d = dict(dictionary)
         except ValueError:
             return False
 
         schema_items = self.sub_schema.items()
-        return any(
-            [v.is_valid(dictionary[k]) for (k, v) in schema_items]
+        return all(
+            [v.is_valid(d.get(k)) for (k, v) in schema_items]
         )
 
     def convert(self, dictionary):
