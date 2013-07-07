@@ -6,6 +6,10 @@ github3.py
     :alt: Build Status
     :target: http://travis-ci.org/sigmavirus24/github3.py
 
+.. image:: https://badge.fury.io/py/github3.py.png
+    :alt: Latest version of github3.py released to PyPi
+    :target: https://crate.io/packages/github3.py
+
 .. image:: https://pypip.in/d/github3.py/badge.png
     :alt: Downloads
     :target: https://crate.io/packages/github3.py
