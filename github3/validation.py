@@ -12,9 +12,9 @@ class ParameterValidator(dict):
     """
 
     def __init__(self, params, schema):
-        self.params = params
-        self.update(self.params)
         self.schema = schema
+        self.params = params
+        self.update(**self.params)
         self.validate()
 
     def validate(self):
@@ -26,12 +26,12 @@ class ParameterValidator(dict):
                 # If we let items pass through that we don't validate, this
                 # would be a pointless exercise
 
-        for key, (required, validator) in self.schema.items():
+        for key, validator in self.schema.items():
             if key not in self.params:
                 continue
             value = self.params[key]
             if not validator.is_valid(value):
-                if required:
+                if not validator.allow_none:
                     raise ValueError(
                         'Key "{0}" is required but is invalid.'.format(key)
                     )
@@ -45,6 +45,11 @@ class ParameterValidator(dict):
     def set_key(self, key, value):
         self.params[key] = self[key] = value
 
+    def update(self, **kwargs):
+        super(ParameterValidator, self).update(**kwargs)
+        self.params.update(**kwargs)
+        self.validate()
+
 
 class BaseValidator(object):
     def __init__(self, allow_none=False, sub_schema=None):
@@ -54,6 +59,7 @@ class BaseValidator(object):
     def none(self, o):
         if self.allow_none and o is None:
             return True
+        return False
 
     def is_valid(self, obj):
         raise NotImplementedError(
@@ -141,7 +147,7 @@ class ListValidator(BaseValidator):
         try:
             lyst = list(lyst)
         except TypeError:
-            return False
+            return self.none(lyst)
 
         is_valid = self.sub_schema.is_valid
         return all([is_valid(i) for i in lyst])
@@ -149,3 +155,18 @@ class ListValidator(BaseValidator):
     def convert(self, lyst):
         convert = self.sub_schema.convert
         return [convert(i) for i in lyst]
+
+
+class IntegerValidator(BaseValidator):
+    def is_valid(self, integer):
+        try:
+            integer = int(integer)
+        except ValueError:
+            return False
+        except TypeError:
+            if not self.allow_none:
+                raise
+        return True
+
+    def convert(self, integer):
+        return int(integer)

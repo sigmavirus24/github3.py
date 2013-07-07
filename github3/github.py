@@ -19,6 +19,8 @@ from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
+from github3.validation import (ParameterValidator, StringValidator,
+                                IntegerValidator)
 
 
 class GitHub(GitHubCore):
@@ -352,7 +354,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, since=None, etag=None, per_page=None):
+    def iter_all_repos(self, number=-1, etag=None, **kwargs):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
@@ -365,9 +367,12 @@ class GitHub(GitHubCore):
             request
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
+        params = ParameterValidator(
+            kwargs, {'per_page': IntegerValidator(True),
+                     'since': IntegerValidator(True)}
+        )
         url = self._build_url('repositories')
-        return self._iter(int(number), url, Repository,
-                          params={'since': since, 'per_page': per_page},
+        return self._iter(int(number), url, Repository, params=params,
                           etag=etag)
 
     def iter_all_users(self, number=-1, etag=None, per_page=None):
@@ -662,8 +667,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Organization, etag=etag)
 
     @requires_auth
-    def iter_repos(self, type=None, sort=None, direction=None, number=-1,
-                   etag=None):
+    def iter_repos(self, number=-1, etag=None, **kwargs):
         """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
@@ -688,13 +692,20 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'repos')
 
-        params = {}
-        if type in ('all', 'owner', 'public', 'private', 'member'):
-            params.update(type=type)
-        if sort in ('created', 'updated', 'pushed', 'full_name'):
-            params.update(sort=sort)
-        if direction in ('asc', 'desc'):
-            params.update(direction=direction)
+        params = ParameterValidator(kwargs,
+                                    {'type': StringValidator(True),
+                                     'sort': StringValidator(True),
+                                     'direction': StringValidator(True),
+                                     })
+        t = params.get('type')
+        s = params.get('sort')
+        d = params.get('direction')
+        if t and (t not in ('all', 'owner', 'public', 'private', 'member')):
+            del params['type']
+        if s and (s not in ('created', 'updated', 'pushed', 'full_name')):
+            del params['sort']
+        if d and (d not in ('asc', 'desc')):
+            del params['direction']
 
         return self._iter(int(number), url, Repository, params, etag)
 
