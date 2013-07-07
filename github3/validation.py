@@ -85,7 +85,7 @@ class DateValidator(BaseValidator):
                  DateValidator.ISO_8601.match(timestamp)))
 
     def convert(self, timestamp):
-        if timestamp is None:
+        if self.none(timestamp):
             return None
 
         if isinstance(timestamp, datetime):
@@ -110,10 +110,8 @@ class StringValidator(BaseValidator):
         if not self.allow_none and string is None:
             return False
 
-        try:
-            str(string)
-        except:
-            return False
+        # I can not think of anything that str can not handle except the
+        # occasional unicode string on python 2.7
 
         return True
 
