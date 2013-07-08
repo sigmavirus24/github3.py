@@ -19,7 +19,7 @@ from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
-from github3.validation import (ParameterValidator, StringValidator,
+from github3.validation import (SchemaValidator, StringValidator,
                                 IntegerValidator, ListValidator)
 
 
@@ -111,7 +111,7 @@ class GitHub(GitHubCore):
                 'client_id': string_validator,
                 'client_secret': string_validator,
             }
-            data = ParameterValidator(
+            data = SchemaValidator(
                 {'scopes': scopes, 'note': note, 'note_url': note_url,
                  'client_id': client_id, 'client_secret': client_secret},
                 schema
@@ -378,7 +378,7 @@ class GitHub(GitHubCore):
         :param int since: (optional), id of the repository to start with
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
-        params = ParameterValidator(
+        params = SchemaValidator(
             kwargs, {'per_page': IntegerValidator(True),
                      'since': IntegerValidator(True)}
         )
@@ -397,7 +397,7 @@ class GitHub(GitHubCore):
         :param int since: (optional), id of the repository to start with
         :returns: generator of :class:`User <github3.users.User>`
         """
-        params = ParameterValidator(
+        params = SchemaValidator(
             kwargs, {'per_page': IntegerValidator(True),
                      'since': IntegerValidator(True)}
         )
@@ -707,11 +707,10 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'repos')
 
-        params = ParameterValidator(kwargs,
-                                    {'type': StringValidator(True),
-                                     'sort': StringValidator(True),
-                                     'direction': StringValidator(True),
-                                     })
+        params = SchemaValidator(
+            kwargs,
+            {'type': StringValidator(True), 'sort': StringValidator(True),
+             'direction': StringValidator(True)})
         t = params.get('type')
         s = params.get('sort')
         d = params.get('direction')

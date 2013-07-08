@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 
 
-class ParameterValidator(dict):
+class SchemaValidator(dict):
     """This class is used to validate parameters sent to methods.
 
     It will use a slightly strict validation method and be capable of being
@@ -45,7 +45,7 @@ class ParameterValidator(dict):
                 self[key] = validator.convert(value)
 
     def update(self, **kwargs):
-        super(ParameterValidator, self).update(**kwargs)
+        super(SchemaValidator, self).update(**kwargs)
         self.validate()
 
 

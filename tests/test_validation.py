@@ -214,7 +214,7 @@ class TestBaseValidator(TestCase):
         self.assertRaises(NotImplementedError, self.v.is_valid, None)
 
 
-class TestParameterValidator(TestCase):
+class TestSchemaValidator(TestCase):
     def setUp(self):
         self.schema = {
             'author': validation.StringValidator(required=True),
@@ -224,23 +224,23 @@ class TestParameterValidator(TestCase):
         }
 
     def test_validate_is_called_upon_initialization(self):
-        with patch.object(validation.ParameterValidator, 'validate') as v:
-            validation.ParameterValidator({'author': 'Ian'}, self.schema)
+        with patch.object(validation.SchemaValidator, 'validate') as v:
+            validation.SchemaValidator({'author': 'Ian'}, self.schema)
             v.assert_called()
 
     def test_removes_extra_keys(self):
         data = {'author': 'Ian', 'irrelevant': 'spam'}
-        v = validation.ParameterValidator(data, self.schema)
+        v = validation.SchemaValidator(data, self.schema)
         self.assertTrue('irrelevant' not in v)
 
     def test_raises_ValueError_for_required_parameter(self):
         data = {'committer': 'Ian'}
-        self.assertRaises(ValueError, validation.ParameterValidator, data,
+        self.assertRaises(ValueError, validation.SchemaValidator, data,
                           self.schema)
 
     def test_skips_keys_that_are_not_present(self):
         data = {'author': 'Ian'}
-        v = validation.ParameterValidator(data, self.schema)
+        v = validation.SchemaValidator(data, self.schema)
         self.assertTrue('author' in v)
         self.assertTrue('committer' not in v)
         self.assertTrue('date' not in v)
@@ -248,11 +248,11 @@ class TestParameterValidator(TestCase):
 
     def test_raises_ValueError_with_invalid_required_parameter(self):
         data = {'author': None}
-        self.assertRaises(ValueError, validation.ParameterValidator, data,
+        self.assertRaises(ValueError, validation.SchemaValidator, data,
                           self.schema)
 
     def test_deletes_key_when_invalid_but_not_required(self):
         data = {'author': 'Ian', 'committer': None}
-        v = validation.ParameterValidator(data, self.schema)
+        v = validation.SchemaValidator(data, self.schema)
         self.assertTrue('author' in v)
         self.assertTrue('committer' not in v)
