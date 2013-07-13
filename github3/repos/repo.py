@@ -10,7 +10,6 @@ parts of GitHub's Repository API.
 from json import dumps
 from base64 import b64encode
 from collections import Callable
-from datetime import datetime
 from github3.decorators import requires_auth
 from github3.events import Event
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -968,7 +967,7 @@ class Repository(GitHubCore):
         url = self._build_url('stats', 'commit_activity', base_url=self._api)
         return self._iter(int(number), url, dict, etag=etag)
 
-    def iter_commits(self, sha=None, path=None, author=None, number=-1, 
+    def iter_commits(self, sha=None, path=None, author=None, number=-1,
                      etag=None, since=None, until=None):
         """Iterate over commits in this repository.
 
@@ -1246,15 +1245,16 @@ class Repository(GitHubCore):
         :param bool participating: (optional), show only the notifications the
             user is participating in directly
         :param since: (optional), filters out any notifications updated
-            before the given time. This can be a `datetime` or an `ISO8601` formatted
-            date string, e.g., 2012-05-20T23:10:27Z
+            before the given time. This can be a `datetime` or an `ISO8601`
+            formatted date string, e.g., 2012-05-20T23:10:27Z
         :type since: datetime or string
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Thread <github3.notifications.Thread>`
         """
         url = self._build_url('notifications', base_url=self._api)
-        params = {'all': all, 'participating': participating, 'since': timestamp_parameter(since)}
+        params = {'all': all, 'participating': participating,
+                  'since': timestamp_parameter(since)}
         for (k, v) in list(params.items()):
             if not v:
                 del params[k]
