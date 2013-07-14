@@ -7,7 +7,6 @@ This module contains the classes related to issues.
 See also: http://developer.github.com/v3/issues/
 """
 
-from re import match
 from github3.utils import timestamp_parameter
 from .issue import Issue
 

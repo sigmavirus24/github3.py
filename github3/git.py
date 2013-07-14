@@ -15,10 +15,13 @@ from github3.decorators import requires_auth
 
 
 class Blob(GitHubObject):
+
     """The :class:`Blob <Blob>` object.
 
     See also: http://developer.github.com/v3/git/blobs/
+
     """
+
     def __init__(self, blob):
         super(Blob, self).__init__(blob)
         self._api = blob.get('url', '')
@@ -44,10 +47,13 @@ class Blob(GitHubObject):
 
 
 class GitData(GitHubCore):
+
     """The :class:`GitData <GitData>` object. This isn't directly returned to
     the user (developer) ever. This is used to prevent duplication of some
     common items among other Git Data objects.
+
     """
+
     def __init__(self, data, session=None):
         super(GitData, self).__init__(data, session)
         #: SHA of the object
@@ -56,11 +62,14 @@ class GitData(GitHubCore):
 
 
 class Commit(BaseCommit):
+
     """The :class:`Commit <Commit>` object. This represents a commit made in a
     repository.
 
     See also: http://developer.github.com/v3/git/commits/
+
     """
+
     def __init__(self, commit, session=None):
         super(Commit, self).__init__(commit, session)
 
@@ -88,6 +97,7 @@ class Commit(BaseCommit):
         """Attempt to return the author attribute as a
         :class:`User <github3.users.User>`. No guarantees are made about the
         validity of this object, i.e., having a login or created_at object.
+
         """
         return User(self.author, self._session)
 
@@ -95,16 +105,20 @@ class Commit(BaseCommit):
         """Attempt to return the committer attribute as a
         :class:`User <github3.users.User>` object. No guarantees are made
         about the validity of this object.
+
         """
         return User(self.committer, self._session)
 
 
 class Reference(GitHubCore):
+
     """The :class:`Reference <Reference>` object. This represents a reference
     created on a repository.
 
     See also: http://developer.github.com/v3/git/refs/
+
     """
+
     def __init__(self, ref, session=None):
         super(Reference, self).__init__(ref, session)
         self._api = ref.get('url', '')
@@ -124,6 +138,7 @@ class Reference(GitHubCore):
         """Delete this reference.
 
         :returns: bool
+
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
@@ -134,6 +149,7 @@ class Reference(GitHubCore):
         :param str sha: (required), sha of the reference
         :param bool force: (optional), force the update or not
         :returns: bool
+
         """
         data = {'sha': sha, 'force': force}
         json = self._json(self._patch(self._api, data=dumps(data)), 200)
@@ -144,7 +160,9 @@ class Reference(GitHubCore):
 
 
 class GitObject(GitData):
+
     """The :class:`GitObject <GitObject>` object."""
+
     def __init__(self, obj):
         super(GitObject, self).__init__(obj, None)
         #: The type of object.
@@ -155,10 +173,13 @@ class GitObject(GitData):
 
 
 class Tag(GitData):
+
     """The :class:`Tag <Tag>` object.
 
     See also: http://developer.github.com/v3/git/tags/
+
     """
+
     def __init__(self, tag):
         super(Tag, self).__init__(tag, None)
         #: String of the tag
@@ -175,10 +196,13 @@ class Tag(GitData):
 
 
 class Tree(GitData):
+
     """The :class:`Tree <Tree>` object.
 
     See also: http://developer.github.com/v3/git/trees/
+
     """
+
     def __init__(self, tree, session=None):
         super(Tree, self).__init__(tree, session)
         #: list of :class:`Hash <Hash>` objects
@@ -198,10 +222,13 @@ class Tree(GitData):
 
 
 class Hash(GitHubObject):
+
     """The :class:`Hash <Hash>` object.
 
     See also: http://developer.github.com/v3/git/trees/#create-a-tree
+
     """
+
     def __init__(self, info):
         super(Hash, self).__init__(info)
         #: Path to file

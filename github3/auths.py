@@ -11,6 +11,7 @@ from github3.models import GitHubCore
 
 
 class Authorization(GitHubCore):
+
     """The :class:`Authorization <Authorization>` object.
 
     Two authorization instances can be checked like so::
@@ -24,7 +25,9 @@ class Authorization(GitHubCore):
         a1.id != a2.id
 
     See also: http://developer.github.com/v3/oauth/#oauth-authorizations-api
+
     """
+
     def __init__(self, auth, session=None):
         super(Authorization, self).__init__(auth, session)
         #: Details about the application (name, url)
@@ -80,6 +83,7 @@ class Authorization(GitHubCore):
         :param str note: (optional), new note about authorization
         :param str note_url: (optional), new note URL about this authorization
         :returns: bool
+
         """
         success = False
         json = None

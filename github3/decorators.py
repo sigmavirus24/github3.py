@@ -46,8 +46,12 @@ def requires_auth(func):
 
 
 def requires_basic_auth(func):
-    """Decorator to note which object methods require username/password
-    authorization and won't work with token based authorization."""
+    """Specific (basic) authentication decorator.
+
+    This is used to note which object methods require username/password
+    authorization and won't work with token based authorization.
+
+    """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         if hasattr(self, '_session') and self._session.auth:
