@@ -1,10 +1,18 @@
+"""
+github3.gists.history
+---------------------
+
+Module containing the logic for the GistHistory object.
+
+"""
+
 from github3.models import GitHubCore
 from github3.users import User
 
 
 class GistHistory(GitHubCore):
-    """The :class:`GistHistory <GistHistory>` object represents one version
-    (or revision) of a gist.
+
+    """Thisobject represents one version (or revision) of a gist.
 
     Two history instances can be checked like so::
 
@@ -17,6 +25,7 @@ class GistHistory(GitHubCore):
         h1.version != h2.version
 
     """
+
     def __init__(self, history, session=None):
         super(GistHistory, self).__init__(history, session)
         self._api = history.get('url', '')
@@ -53,9 +62,10 @@ class GistHistory(GitHubCore):
         return self.version != other.version
 
     def get_gist(self):
-        """Retrieves the gist at this version.
+        """Retrieve the gist at this version.
 
         :returns: :class:`Gist <github3.gists.gist.Gist>`
+
         """
         from github3.gists.gist import Gist
         json = self._json(self._get(self._api), 200)

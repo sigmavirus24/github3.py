@@ -1,10 +1,22 @@
+"""
+github3.gists.file
+------------------
+
+Module containing the logic for the GistFile object.
+"""
+
 from github3.models import GitHubObject
 
 
 class GistFile(GitHubObject):
-    """The :class:`GistFile <GistFile>` object. This is used to represent a
-    file object returned by GitHub while interacting with gists.
+
+    """This represents the file object returned by interacting with gists.
+
+    It stores the raw url of the file, the file name, language, size and
+    content.
+
     """
+
     def __init__(self, attributes):
         super(GistFile, self).__init__(attributes)
 
