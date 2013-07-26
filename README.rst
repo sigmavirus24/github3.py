@@ -1,14 +1,5 @@
-github3.py
-==========
-
 .. image::
-    https://secure.travis-ci.org/sigmavirus24/github3.py.png?branch=mock
-    :alt: Build Status
-    :target: http://travis-ci.org/sigmavirus24/github3.py
-
-.. image:: https://pypip.in/d/github3.py/badge.png
-    :alt: Downloads
-    :target: https://crate.io/packages/github3.py
+    https://raw.github.com/sigmavirus24/github3.py/develop/images/gh3-logo.png
 
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
