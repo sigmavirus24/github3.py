@@ -151,26 +151,20 @@ class User(BaseAccount):
         #: Which plan this user is on
         self.plan = Plan(user.get('plan', {}))
 
-        #: Events URL Template
-        self.events_url = None
         events_url = user.get('events_url', '')
-        if events_url:
-            self.events_url = URITemplate(events_url)
+        #: Events URL Template
+        self.events_url = URITemplate(events_url) if events_url else None
 
         #: Followers URL (not a template)
         self.followers_url = user.get('followers_url', '')
 
+        furl = user.get('following_url', '')
         #: Following URL Template
-        self.following_url = None
-        following_url = user.get('following_url', '')
-        if following_url:
-            self.following_url = URITemplate(following_url)
+        self.following_url = URITemplate(furl) if furl else None
 
-        #: Gists URL Template
-        self.gists_url = None
         gists_url = user.get('gists_url', '')
-        if gists_url:
-            self.gists_url = URITemplate(gists_url)
+        #: Gists URL Template
+        self.gists_url = URITemplate(gists_url) if gists_url else None
 
         #: Organizations URL (not a template)
         self.organizations_url = user.get('organizations_url', '')
