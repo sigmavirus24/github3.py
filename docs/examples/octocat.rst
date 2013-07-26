@@ -1,8 +1,8 @@
 A Conversation With Octocat
 ===========================
 
-.. include:: source/octocat_say.py
-    :code: python
+.. literalinclude:: source/octocat_say.py
+    :language: python
 
 What you should see
 

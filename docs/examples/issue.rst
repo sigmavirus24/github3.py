@@ -42,10 +42,10 @@ browser focusing on the comment **you** just created.
 The following shows how you could use github3.py to fetch and display your
 issues in your own style and in your webbrowser.
 
-.. include:: source/browser.py
-    :code: python
+.. literalinclude:: source/browser.py
+    :language: python
 
 Or how to do the same by wrapping the lines in your terminal.
 
-.. include:: source/wrap_text.py
-    :code: python
+.. literalinclude:: source/wrap_text.py
+    :language: python

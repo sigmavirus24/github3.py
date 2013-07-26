@@ -229,7 +229,7 @@ class TestGitHub(BaseCase):
     def test_iter_all_repos(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/repositories')
-        self.conf.update(params=None)
+        self.conf.update(params={})
 
         repo = next(self.g.iter_all_repos())
         expect(repo).isinstance(github3.repos.Repository)
@@ -243,12 +243,22 @@ class TestGitHub(BaseCase):
         assert(repo.id > 100000)
         self.mock_assertions()
 
+        repo = next(self.g.iter_all_repos(per_page=100))
+        self.conf.update(params={'per_page': 100})
+        expect(repo).isinstance(github3.repos.Repository)
+        self.mock_assertions()
+
     def test_iter_all_users(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users')
-        self.conf.update(params=None)
+        self.conf.update(params={})
 
         repo = next(self.g.iter_all_users())
+        expect(repo).isinstance(github3.users.User)
+        self.mock_assertions()
+
+        repo = next(self.g.iter_all_users(per_page=100))
+        self.conf.update(params={'per_page': 100})
         expect(repo).isinstance(github3.users.User)
         self.mock_assertions()
 

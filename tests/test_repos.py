@@ -1,17 +1,9 @@
 import os
 import github3
 from github3 import repos
+from datetime import datetime
 from tests.utils import (expect, BaseCase, load)
 from mock import patch, mock_open
-import sys
-
-if sys.version_info > (3, 0):
-    from unittest import skip
-else:
-    def skip(reason):
-        def fake_decorator(func):
-            return func
-        return fake_decorator
 
 
 class TestRepository(BaseCase):
@@ -614,6 +606,20 @@ class TestRepository(BaseCase):
         c = next(self.repo.iter_commits('fakesha', '/'))
         self.mock_assertions()
 
+        since = datetime(2013, 6, 1, 0, 0, 0)
+        until = datetime(2013, 6, 2, 0, 0, 0)
+        self.conf = {'params': {'since': '2013-06-01T00:00:00',
+                                'until': '2013-06-02T00:00:00'}}
+        c = next(self.repo.iter_commits(since=since, until=until))
+        self.mock_assertions()
+
+        since = '2013-06-01T00:00:00'
+        until = '2013-06-02T00:00:00'
+        self.conf = {'params': {'since': '2013-06-01T00:00:00',
+                                'until': '2013-06-02T00:00:00'}}
+        c = next(self.repo.iter_commits(since=since, until=until))
+        self.mock_assertions()
+
     def test_iter_contributors(self):
         self.response('user', _iter=True)
         self.get(self.api + 'contributors')
@@ -1153,10 +1159,6 @@ class TestContents(BaseCase):
 
     def test_repr(self):
         expect(repr(self.contents)) == '<Content [{0}]>'.format('README.rst')
-
-    @skip("On Python 3 bytes and strings are not the same thing")
-    def test_str(self):
-        expect(str(self.contents)) == self.contents.decoded
 
     def test_delete(self):
         self.response('create_content', 200)

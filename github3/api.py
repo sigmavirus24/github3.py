@@ -14,8 +14,7 @@ gh = GitHub()
 
 def authorize(login, password, scopes, note='', note_url='', client_id='',
               client_secret=''):
-    """Obtain an authorization token from the GitHub API for the GitHub
-    API.
+    """Obtain an authorization token for the GitHub API.
 
     :param str login: (required)
     :param str password: (required)
@@ -28,21 +27,23 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
     :param str client_secret: (optional), 40 character OAuth client secret for
         which to create the token
     :returns: :class:`Authorization <Authorization>`
+
     """
     return gh.authorize(login, password, scopes, note, note_url, client_id,
                         client_secret)
 
 
 def login(username=None, password=None, token=None, url=None):
-    """Constructs and returns a GitHub session with the username and
-    password, or token. Will return a GitHubEnterprise session if a url is
-    provided.
+    """Construct and return an authenticated GitHub session.
+
+    This will return a GitHubEnterprise session if a url is provided.
 
     :param str username: login name
     :param str password: password for the login
     :param str token: OAuth token
     :param str url: (optional), URL of a GitHub Enterprise instance
     :returns: :class:`GitHub <github3.github.GitHub>`
+
     """
     g = None
 
@@ -54,26 +55,29 @@ def login(username=None, password=None, token=None, url=None):
 
 
 def gist(id_num):
-    """Get the gist identified by ``id_num``.
+    """Retrieve the gist identified by ``id_num``.
 
     :param int id_num: (required), unique id of the gist
     :returns: :class:`Gist <github3.gists.Gist>`
+
     """
     return gh.gist(id_num)
 
 
 def gitignore_template(language):
-    """Returns the template for language.
+    """Return the template for language.
 
     :returns: str
+
     """
     return gh.gitignore_template(language)
 
 
 def gitignore_templates():
-    """Returns the list of available templates.
+    """Return the list of available templates.
 
     :returns: list of template names
+
     """
     return gh.gitignore_templates()
 
@@ -86,6 +90,7 @@ def iter_all_repos(number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
+
     """
     return gh.iter_all_repos(number, etag)
 
@@ -98,6 +103,7 @@ def iter_all_users(number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of :class:`User <github3.users.User>`
+
     """
     return gh.iter_all_users(number, etag)
 
@@ -109,7 +115,8 @@ def iter_events(number=-1, etag=None):
         returns all available events
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
-    :returns: generator of :class:`Event <github3.events.Event>`\ s
+    :returns: generator of :class:`Event <github3.events.Event>`
+
     """
     return gh.iter_events(number, etag)
 
@@ -124,6 +131,7 @@ def iter_followers(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of :class:`User <github3.users.User>`
+
     """
     return gh.iter_followers(username, number, etag) if username else []
 
@@ -137,12 +145,13 @@ def iter_following(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of :class:`User <github3.users.User>`
+
     """
     return gh.iter_following(username, number, etag) if username else []
 
 
 def iter_gists(username=None, number=-1, etag=None):
-    """Get public gists or gists for the provided username.
+    """Iterate over public gists or gists for the provided username.
 
     :param str username: (optional), if provided, get the gists for this user
         instead of the authenticated user.
@@ -150,7 +159,8 @@ def iter_gists(username=None, number=-1, etag=None):
         return all of them
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
-    :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+    :returns: generator of :class:`Gist <github3.gists.Gist>`
+
     """
     return gh.iter_gists(username, number, etag)
 
@@ -158,8 +168,7 @@ def iter_gists(username=None, number=-1, etag=None):
 def iter_repo_issues(owner, repository, milestone=None, state=None,
                      assignee=None, mentioned=None, labels=None, sort=None,
                      direction=None, since=None, number=-1, etag=None):
-    """List issues on owner/repository. Only owner and repository are
-    required.
+    """Iterate over issues on owner/repository.
 
     :param str owner: login of the owner of the repository
     :param str repository: name of the repository
@@ -174,13 +183,16 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
         api-default: created
     :param str direction: accepted values: ('asc', 'desc')
         api-default: desc
-    :param str since: ISO 8601 formatted timestamp, e.g.,
-        2012-05-20T23:10:27Z
+    :param since: (optional), Only issues after this date will
+        be returned. This can be a `datetime` or an ISO8601 formatted
+        date string, e.g., 2012-05-20T23:10:27Z
+    :type since: datetime or string
     :param int number: (optional), number of issues to return.
         Default: -1 returns all issues
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
-    :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+    :returns: generator of :class:`Issue <github3.issues.Issue>`
+
     """
     if owner and repository:
         return gh.iter_repo_issues(owner, repository, milestone, state,
@@ -198,7 +210,8 @@ def iter_orgs(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of
-        :class:`Organization <github3.orgs.Organization>`\ s
+        :class:`Organization <github3.orgs.Organization>`
+
     """
     return gh.iter_orgs(username, number, etag) if username else []
 
@@ -227,6 +240,7 @@ def iter_user_repos(login, type=None, sort=None, direction=None, number=-1,
         endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
         objects
+
     """
     if login:
         return gh.iter_user_repos(login, type, sort, direction, number, etag)
@@ -242,6 +256,7 @@ def iter_starred(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
+
     """
     return gh.iter_starred(username, number, etag)
 
@@ -256,18 +271,20 @@ def iter_subscriptions(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of :class:`Repository <github3.repos.Repository>`
+
     """
     return gh.iter_subscriptions(username, number, etag)
 
 
 def create_gist(description, files):
-    """Creates an anonymous public gist.
+    """Create an anonymous public gist.
 
     :param str description: (required), short description of the gist
     :param dict files: (required), file names with associated
         dictionaries for content, e.g.
         {'spam.txt': {'content': 'File contents ...'}}
     :returns: :class:`Gist <github3.gists.Gist>`
+
     """
     return gh.create_gist(description, files)  # (No coverage)
 
@@ -279,6 +296,7 @@ def issue(owner, repository, number):
     :param str repository: (required), repository name
     :param int number: (required), issue number
     :returns: :class:`Issue <github3.issues.Issue>`
+
     """
     return gh.issue(owner, repository, number)
 
@@ -293,38 +311,41 @@ def markdown(text, mode='', context='', raw=False):
     :param bool raw: (optional), renders a document like a README.md, no gfm,
         no context
     :returns: str -- HTML formatted text
+
     """
     return gh.markdown(text, mode, context, raw)
 
 
 def octocat(say=None):
-    """Returns an easter egg from the API.
+    """Return an easter egg from the API.
 
     :params str say: (optional), pass in what you'd like Octocat to say
     :returns: ascii art of Octocat
+
     """
     return gh.octocat(say)
 
 
 def organization(login):
-    """See :func:`organization <github3.github.GitHub.organization>`."""
     return gh.organization(login)
+organization.__doc__ = gh.organization.__doc__
 
 
 def pull_request(owner, repository, number):
-    """Anonymously retrieve pull request :number on :owner/:repository
+    """Anonymously retrieve pull request :number on :owner/:repository.
 
     :param str owner: (required), repository owner
     :param str repository: (required), repository name
     :param int number: (required), pull request number
     :returns: :class:`PullRequest <github3.pulls.PullRequest>`
+
     """
     return gh.pull_request(owner, repository, number)
 
 
 def repository(owner, repository):
-    """See :func:`repository <github3.github.GitHub.repository>`."""
     return gh.repository(owner, repository)
+repository.__doc__ = gh.repository.__doc__
 
 
 def search_issues(owner, repo, state, keyword):
@@ -335,7 +356,8 @@ def search_issues(owner, repo, state, keyword):
     :param str state: (required), accepted values: ('open', 'closed')
     :param str keyword: (required), what to search for
     :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
+    :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`
+
     """
     return gh.search_issues(owner, repo, state, keyword)
 
@@ -346,7 +368,8 @@ def search_repos(keyword, **params):
     :param str keyword: (required)
     :param str language: (optional), language to filter by
     :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
+    :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`
+
     """
     return gh.search_repos(keyword, **params)
 
@@ -356,7 +379,8 @@ def search_users(keyword):
 
     :param str keyword: (required)
     :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
+    :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`
+
     """
     return gh.search_users(keyword)
 
@@ -366,20 +390,29 @@ def search_email(email):
 
     :param str email: (required)
     :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
+
     """
     return gh.search_email(email)
 
 
 def user(login):
-    """See :func:`user <github3.github.GitHub.user>`."""
     return gh.user(login)
+user.__doc__ = gh.user.__doc__
 
 
 def ratelimit_remaining():
-    """Get the remaining number of requests allowed."""
+    """Get the remaining number of requests allowed.
+
+    :returns: int
+
+    """
     return gh.ratelimit_remaining
 
 
 def zen():
-    """Returns a quote from the Zen of GitHub. Yet another API Easter Egg"""
+    """Return a quote from the Zen of GitHub. Yet another API Easter Egg.
+
+    :returns: str
+
+    """
     return gh.zen()

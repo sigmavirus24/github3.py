@@ -8,8 +8,8 @@ Using Logging with github3.py
 The following example shows how to set up logging for github3.py. It is off by 
 default in the library and will not pollute your logs.
 
-.. include:: source/logging_ex.py
-    :code: python
+.. literalinclude:: source/logging_ex.py
+    :language: python
 
 One thing to note is that if you want more detailed information about what is 
 happening while the requests are sent, you can do the following:

@@ -18,6 +18,12 @@ except ImportError:  # (No coverage)
     from io import BytesIO as StringIO
 
 
+class RequestsStringIO(StringIO):
+    def read(self, n=-1, *args, **kwargs):
+        # StringIO is an old-style class, so can't use super
+        return StringIO.read(self, n)
+
+
 def requires_auth(func):
     """Decorator to note which object methods require authorization."""
     @wraps(func)
@@ -40,8 +46,12 @@ def requires_auth(func):
 
 
 def requires_basic_auth(func):
-    """Decorator to note which object methods require username/password
-    authorization and won't work with token based authorization."""
+    """Specific (basic) authentication decorator.
+
+    This is used to note which object methods require username/password
+    authorization and won't work with token based authorization.
+
+    """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         if hasattr(self, '_session') and self._session.auth:
@@ -61,7 +71,7 @@ def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
     r = Response()
     r.status_code = status_code
     r.encoding = encoding
-    r.raw = StringIO(msg)
+    r.raw = RequestsStringIO(msg)
     r._content_consumed = True
     r._content = r.raw.read()
     return r

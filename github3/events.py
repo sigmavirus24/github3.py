@@ -10,6 +10,7 @@ from github3.models import GitHubObject
 
 
 class Event(GitHubObject):
+
     """The :class:`Event <Event>` object. It structures and handles the data
     returned by via the `Events <http://developer.github.com/v3/events>`_
     section of the GitHub API.
@@ -25,6 +26,7 @@ class Event(GitHubObject):
         e1.id != e2.id
 
     """
+
     def __init__(self, event):
         super(Event, self).__init__(event)
         from github3.users import User

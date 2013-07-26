@@ -83,9 +83,6 @@ class Contents(GitHubCore):
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
 
-    def __str__(self):
-        return self.decoded
-
     def __eq__(self, other):
         return self.decoded == other
 
