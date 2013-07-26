@@ -32,6 +32,7 @@ from github3.repos.stats import ContributorStats
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
 from github3.utils import timestamp_parameter
+from uritemplate import URITemplate
 
 
 class Repository(GitHubCore):
@@ -146,6 +147,11 @@ class Repository(GitHubCore):
 
         #: master (default) branch for the repository
         self.master_branch = repo.get('master_branch', '')
+
+        ## Template URLS
+        teams_url = repo.get('teams_url')
+        #: Teams URL Template
+        self.teams_url = URITemplate(teams_url) if teams_url else None
 
     def __eq__(self, repo):
         return self.id == repo.id
