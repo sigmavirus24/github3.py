@@ -494,13 +494,20 @@ class TestGitHub(BaseCase):
         expect(next(self.g.iter_repos())).isinstance(github3.repos.Repository)
         self.mock_assertions()
 
-        expect(next(self.g.iter_repos('sigmavirus24'))).isinstance(
-            github3.repos.Repository)
+        next(self.g.iter_repos(type='baz', direction='foobar'))
         self.mock_assertions()
 
         self.conf.update(params={'type': 'all', 'direction': 'desc'})
 
-        next(self.g.iter_repos('all', direction='desc'))
+        next(self.g.iter_repos(type='all', direction='desc'))
+        self.mock_assertions()
+
+        self.conf.update(params={'type': 'all'})
+
+        next(self.g.iter_repos(type='all', direction='foobar'))
+        self.mock_assertions()
+
+        next(self.g.iter_repos(type='all', sort='foobar'))
         self.mock_assertions()
 
     def test_iter_user_repos(self):

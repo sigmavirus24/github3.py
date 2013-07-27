@@ -19,6 +19,8 @@ from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
+from github3.validation import (SchemaValidator, StringValidator,
+                                IntegerValidator, ListValidator)
 
 
 class GitHub(GitHubCore):
@@ -77,7 +79,7 @@ class GitHub(GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._build_url('authorizations', str(id_num))
+            url = self._build_url('authorizations', id_num)
             json = self._json(self._get(url), 200)
         return Authorization(json, self) if json else None
 
@@ -102,8 +104,18 @@ class GitHub(GitHubCore):
         auth = self._session.auth or (login and password)
         if isinstance(scopes, list) and auth:
             url = self._build_url('authorizations')
-            data = {'scopes': scopes, 'note': note, 'note_url': note_url,
-                    'client_id': client_id, 'client_secret': client_secret}
+            data = string_validator = StringValidator()
+            schema = {
+                'scopes': ListValidator(True, sub_schema=string_validator),
+                'note': string_validator, 'note_url': string_validator,
+                'client_id': string_validator,
+                'client_secret': string_validator,
+            }
+            data = SchemaValidator(
+                {'scopes': scopes, 'note': note, 'note_url': note_url,
+                 'client_id': client_id, 'client_secret': client_secret},
+                schema
+            )
             if self._session.auth:
                 json = self._json(self._post(url, data=data), 201)
             else:
@@ -123,8 +135,8 @@ class GitHub(GitHubCore):
         p = self._session.params
         auth = (p.get('client_id'), p.get('client_secret'))
         if access_token and auth:
-            url = self._build_url('applications', str(auth[0]), 'tokens',
-                                  str(access_token))
+            url = self._build_url('applications', auth[0], 'tokens',
+                                  access_token)
             resp = self._get(url, auth=auth, params={
                 'client_id': None, 'client_secret': None
             })
@@ -352,7 +364,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, since=None, etag=None, per_page=None):
+    def iter_all_repos(self, number=-1, etag=None, **kwargs):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
@@ -363,14 +375,18 @@ class GitHub(GitHubCore):
             endpoint
         :param int per_page: (optional), number of repositories to list per
             request
+        :param int since: (optional), id of the repository to start with
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
+        params = SchemaValidator(
+            kwargs, {'per_page': IntegerValidator(True),
+                     'since': IntegerValidator(True)}
+        )
         url = self._build_url('repositories')
-        return self._iter(int(number), url, Repository,
-                          params={'since': since, 'per_page': per_page},
+        return self._iter(int(number), url, Repository, params=params,
                           etag=etag)
 
-    def iter_all_users(self, number=-1, etag=None, per_page=None):
+    def iter_all_users(self, number=-1, etag=None, **kwargs):
         """Iterate over every user in the order they signed up for GitHub.
 
         :param int number: (optional), number of users to return. Default: -1,
@@ -378,11 +394,15 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :param int per_page: (optional), number of users to list per request
+        :param int since: (optional), id of the repository to start with
         :returns: generator of :class:`User <github3.users.User>`
         """
+        params = SchemaValidator(
+            kwargs, {'per_page': IntegerValidator(True),
+                     'since': IntegerValidator(True)}
+        )
         url = self._build_url('users')
-        return self._iter(int(number), url, User,
-                          params={'per_page': per_page}, etag=etag)
+        return self._iter(int(number), url, User, params=params, etag=etag)
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1, etag=None):
@@ -662,8 +682,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Organization, etag=etag)
 
     @requires_auth
-    def iter_repos(self, type=None, sort=None, direction=None, number=-1,
-                   etag=None):
+    def iter_repos(self, number=-1, etag=None, **kwargs):
         """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
@@ -688,13 +707,19 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'repos')
 
-        params = {}
-        if type in ('all', 'owner', 'public', 'private', 'member'):
-            params.update(type=type)
-        if sort in ('created', 'updated', 'pushed', 'full_name'):
-            params.update(sort=sort)
-        if direction in ('asc', 'desc'):
-            params.update(direction=direction)
+        params = SchemaValidator(
+            kwargs,
+            {'type': StringValidator(True), 'sort': StringValidator(True),
+             'direction': StringValidator(True)})
+        t = params.get('type')
+        s = params.get('sort')
+        d = params.get('direction')
+        if t and (t not in ('all', 'owner', 'public', 'private', 'member')):
+            del params['type']
+        if s and (s not in ('created', 'updated', 'pushed', 'full_name')):
+            del params['sort']
+        if d and (d not in ('asc', 'desc')):
+            del params['direction']
 
         return self._iter(int(number), url, Repository, params, etag)
 
