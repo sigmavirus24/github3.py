@@ -175,6 +175,12 @@ class Repository(GitHubCore):
         #: Subscription url (not a template)
         self.subscription_url = repo.get('subscription_url', '')
 
+        #: Merges url (not a template)
+        self.merges_url = repo.get('merges_url', '')
+
+        #: Downloads url (not a template)
+        self.download_url = repo.get('downloads_url', '')
+
         ## Template URLS
         ie_url_t = repo.get('issue_events_url')
         #: Issue events URL Template. Expand with ``number``
@@ -223,6 +229,39 @@ class Repository(GitHubCore):
         comments = repo.get('issue_comment_url')
         #: Issue comment URL Template. Expand with ``number``
         self.issue_comment_url = URITemplate(comments) if comments else None
+
+        contents = repo.get('contents_url')
+        #: Contents URL Template. Expand with ``path``
+        self.contents_url = URITemplate(contents) if contents else None
+
+        compare = repo.get('compare_url')
+        #: Comparison URL Template. Expand with ``base`` and ``head``
+        self.compare_url = URITemplate(compare) if compare else None
+
+        archive = repo.get('archive_url')
+        #: Archive URL Template. Expand with ``archive_format`` and ``ref``
+        self.archive_url = URITemplate(archive) if archive else None
+
+        issues = repo.get('issues_url')
+        #: Issues URL Template. Expand with ``number``
+        self.issues_url = URITemplate(issues) if issues else None
+
+        pulls = repo.get('pulls_url')
+        #: Pull Requests URL Template. Expand with ``number``
+        self.pulls_url = URITemplate(pulls) if issues else None
+
+        miles = repo.get('milestones_url')
+        #: Milestones URL Template. Expand with ``number``
+        self.milestones_url = URITemplate(miles) if miles else None
+
+        notif = repo.get('notifications_url')
+        #: Notifications URL Template. Expand with ``since``, ``all``,
+        #: ``participating``
+        self.notifications_url = URITemplate(notif) if notif else None
+
+        labels = repo.get('labels_url')
+        #: Labels URL Template. Expand with ``name``
+        self.labels_url = URITemplate(labels) if labels else None
 
     def __eq__(self, repo):
         return self.id == repo.id
