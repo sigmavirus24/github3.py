@@ -148,10 +148,81 @@ class Repository(GitHubCore):
         #: master (default) branch for the repository
         self.master_branch = repo.get('master_branch', '')
 
+        #: Teams url (not a template)
+        self.teams_url = repo.get('teams_url', '')
+
+        #: Hooks url (not a template)
+        self.hooks_url = repo.get('hooks_url', '')
+
+        #: Events url (not a template)
+        self.events_url = repo.get('events_url', '')
+
+        #: Tags url (not a template)
+        self.tags_url = repo.get('tags_url', '')
+
+        #: Languages url (not a template)
+        self.languages_url = repo.get('languages_url', '')
+
+        #: Stargazers url (not a template)
+        self.stargarzers_url = repo.get('stargazers_url', '')
+
+        #: Contributors url (not a template)
+        self.contributors_url = repo.get('contributors_url', '')
+
+        #: Subscribers url (not a template)
+        self.subscribers_url = repo.get('subscribers_url', '')
+
+        #: Subscription url (not a template)
+        self.subscription_url = repo.get('subscription_url', '')
+
         ## Template URLS
-        teams_url = repo.get('teams_url')
-        #: Teams URL Template
-        self.teams_url = URITemplate(teams_url) if teams_url else None
+        ie_url_t = repo.get('issue_events_url')
+        #: Issue events URL Template. Expand with ``number``
+        self.issue_events_url = URITemplate(ie_url_t) if ie_url_t else None
+
+        assignees = repo.get('assignees_url')
+        #: Assignees URL Template. Expand with ``user``
+        self.assignees_url = URITemplate(assignees) if assignees else None
+
+        branches = repo.get('branches_url')
+        #: Branches URL Template. Expand with ``branch``
+        self.branches_url = URITemplate(branches) if branches else None
+
+        blobs = repo.get('blobs_url')
+        #: Blobs URL Template. Expand with ``sha``
+        self.blobs_url = URITemplate(blobs) if blobs else None
+
+        git_tags = repo.get('git_tags_url')
+        #: Git tags URL Template. Expand with ``sha``
+        self.git_tags_url = URITemplate(git_tags) if git_tags else None
+
+        git_refs = repo.get('git_refs_url')
+        #: Git refs URL Template. Expand with ``sha``
+        self.git_refs_url = URITemplate(git_refs) if git_refs else None
+
+        trees = repo.get('trees_url')
+        #: Trres URL Template. Expand with ``sha``
+        self.trees_url = URITemplate(trees) if trees else None
+
+        statuses = repo.get('statuses_url')
+        #: Statuses URL Template. Expand with ``sha``
+        self.statuses_url = URITemplate(statuses) if statuses else None
+
+        commits = repo.get('commits_url')
+        #: Commits URL Template. Expand with ``sha``
+        self.commits_url = URITemplate(commits) if commits else None
+
+        commits = repo.get('git_commits_url')
+        #: Git commits URL Template. Expand with ``sha``
+        self.git_commits_url = URITemplate(commits) if commits else None
+
+        comments = repo.get('comments_url')
+        #: Comments URL Template. Expand with ``number``
+        self.comments_url = URITemplate(comments) if comments else None
+
+        comments = repo.get('issue_comment_url')
+        #: Issue comment URL Template. Expand with ``number``
+        self.issue_comment_url = URITemplate(comments) if comments else None
 
     def __eq__(self, repo):
         return self.id == repo.id
