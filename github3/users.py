@@ -152,18 +152,18 @@ class User(BaseAccount):
         self.plan = Plan(user.get('plan', {}))
 
         events_url = user.get('events_url', '')
-        #: Events URL Template
+        #: Events URL Template. Expands with ``privacy``
         self.events_url = URITemplate(events_url) if events_url else None
 
         #: Followers URL (not a template)
         self.followers_url = user.get('followers_url', '')
 
         furl = user.get('following_url', '')
-        #: Following URL Template
+        #: Following URL Template. Expands with ``other_user``
         self.following_url = URITemplate(furl) if furl else None
 
         gists_url = user.get('gists_url', '')
-        #: Gists URL Template
+        #: Gists URL Template. Expands with ``gist_id``
         self.gists_url = URITemplate(gists_url) if gists_url else None
 
         #: Organizations URL (not a template)
@@ -175,11 +175,9 @@ class User(BaseAccount):
         #: Repostories URL (not a template)
         self.repos_url = user.get('repos_url', '')
 
-        #: Starred URL Template
-        self.starred_url = None
         starred_url = user.get('starred_url', '')
-        if starred_url:
-            self.starred_url = URITemplate(starred_url)
+        #: Starred URL Template. Expands with ``owner`` and ``repo``
+        self.starred_url = URITemplate(starred_url) if starred_url else None
 
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')

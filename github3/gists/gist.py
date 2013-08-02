@@ -83,6 +83,17 @@ class Gist(GitHubCore):
         #: History of this gist, list of :class:`GistHistory <GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
+        ## New urls
+
+        #: Comments URL (not a template)
+        self.comments_url = data.get('comments_url', '')
+
+        #: Commits URL (not a template)
+        self.commits_url = data.get('commits_url', '')
+
+        #: Forks URL (not a template)
+        self.forks_url = data.get('forks_url', '')
+
     def __eq__(self, other):
         return self.id == other.id
 
