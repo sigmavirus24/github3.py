@@ -65,7 +65,8 @@ class Issue(GitHubCore):
         self.number = issue.get('number')
         #: Dictionary URLs for the pull request (if they exist)
         self.pull_request = issue.get('pull_request')
-        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+', self.html_url)
+        m = match('https://[\w\d\-\.\:]+/(\S+)/(\S+)/issues/\d+',
+                  self.html_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
         #: State of the issue, e.g., open, closed
