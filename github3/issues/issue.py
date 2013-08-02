@@ -65,7 +65,7 @@ class Issue(GitHubCore):
         self.labels = [Label(l, self._session) for l in issue.get('labels')]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
-        self.labels_url = URITemplate(labels_url) if labels_url else None
+        self.labels_urlt = URITemplate(labels_url) if labels_url else None
         #: :class:`Milestone <Milestone>` this issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):
