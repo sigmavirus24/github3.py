@@ -1,6 +1,13 @@
 History/Changelog
 =================
 
+0.8.0: 2013-xx-xx
+-----------------
+
+- Add dependency on uritemplate.py_ to add URITemplates to different classes
+
+.. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
+
 0.7.0: 2013-05-19
 -----------------
 
