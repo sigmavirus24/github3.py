@@ -172,6 +172,7 @@ class Team(GitHubCore):
 
 
 class Organization(BaseAccount):
+
     """The :class:`Organization <Organization>` object.
 
     Two organization instances can be checked like so::
@@ -185,14 +186,28 @@ class Organization(BaseAccount):
         o1.id != o2.id
 
     See also: http://developer.github.com/v3/orgs/
+
     """
+
     def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
         if not self.type:
             self.type = 'Organization'
 
+        #: Events url (not a template)
+        self.events_url = org.get('events_url')
         #: Number of private repositories.
         self.private_repos = org.get('private_repos', 0)
+
+        members = org.get('members_url')
+        #: Members URL Template. Expands with ``member``
+        self.members_urlt = URITemplate(members) if members else None
+
+        members = org.get('public_members_url')
+        #: Public Members URL Template. Expands with ``member``
+        self.public_members_urlt = URITemplate(members) if members else None
+        #: Repositories url (not a template)
+        self.repos_url = org.get('repos_url')
 
     @requires_auth
     def add_member(self, login, team):
