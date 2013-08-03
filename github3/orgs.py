@@ -12,9 +12,11 @@ from github3.models import BaseAccount, GitHubCore
 from github3.repos import Repository
 from github3.users import User
 from github3.decorators import requires_auth
+from uritemplate import URITemplate
 
 
 class Team(GitHubCore):
+
     """The :class:`Team <Team>` object.
 
     Two team instances can be checked like so::
@@ -28,7 +30,9 @@ class Team(GitHubCore):
         t1.id != t2.id
 
     See also: http://developer.github.com/v3/orgs/teams/
+
     """
+
     def __init__(self, team, session=None):
         super(Team, self).__init__(team, session)
         self._api = team.get('url', '')
@@ -40,8 +44,13 @@ class Team(GitHubCore):
         self.permission = team.get('permission')
         #: Number of members in this team.
         self.members_count = team.get('members_count')
+        members = team.get('members_url')
+        #: Members URL Template. Expands with ``member``
+        self.members_urlt = URITemplate(members) if members else None
         #: Number of repos owned by this team.
         self.repos_count = team.get('repos_count')
+        #: Repositories url (not a template)
+        self.repositories_url = team.get('repositories_url')
 
     def __repr__(self):
         return '<Team [{0}]>'.format(self.name)
