@@ -21,10 +21,12 @@ class IssueComment(BaseComment):
     def __init__(self, comment, session=None):
         super(IssueComment, self).__init__(comment, session)
 
+        user = comment.get('user')
         #: :class:`User <github3.users.User>` who made the comment
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)
+        self.user = User(user, self) if user else None
+
+        #: Issue url (not a template)
+        self.issue_url = comment.get('issue_url')
 
     def __repr__(self):
         return '<Issue Comment [{0}]>'.format(self.user.login)
