@@ -1006,7 +1006,7 @@ class TestRepository(BaseCase):
 
     def test_update_label(self):
         self.response('label')
-        self.patch(self.api + 'labels/bug')
+        self.patch(self.api + 'labels/Bug')
         self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
 
         with expect.githuberror():

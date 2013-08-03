@@ -12,9 +12,11 @@ from github3.models import BaseAccount, GitHubCore
 from github3.repos import Repository
 from github3.users import User
 from github3.decorators import requires_auth
+from uritemplate import URITemplate
 
 
 class Team(GitHubCore):
+
     """The :class:`Team <Team>` object.
 
     Two team instances can be checked like so::
@@ -28,7 +30,9 @@ class Team(GitHubCore):
         t1.id != t2.id
 
     See also: http://developer.github.com/v3/orgs/teams/
+
     """
+
     def __init__(self, team, session=None):
         super(Team, self).__init__(team, session)
         self._api = team.get('url', '')
@@ -40,8 +44,13 @@ class Team(GitHubCore):
         self.permission = team.get('permission')
         #: Number of members in this team.
         self.members_count = team.get('members_count')
+        members = team.get('members_url')
+        #: Members URL Template. Expands with ``member``
+        self.members_urlt = URITemplate(members) if members else None
         #: Number of repos owned by this team.
         self.repos_count = team.get('repos_count')
+        #: Repositories url (not a template)
+        self.repositories_url = team.get('repositories_url')
 
     def __repr__(self):
         return '<Team [{0}]>'.format(self.name)
@@ -163,6 +172,7 @@ class Team(GitHubCore):
 
 
 class Organization(BaseAccount):
+
     """The :class:`Organization <Organization>` object.
 
     Two organization instances can be checked like so::
@@ -176,14 +186,28 @@ class Organization(BaseAccount):
         o1.id != o2.id
 
     See also: http://developer.github.com/v3/orgs/
+
     """
+
     def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
         if not self.type:
             self.type = 'Organization'
 
+        #: Events url (not a template)
+        self.events_url = org.get('events_url')
         #: Number of private repositories.
         self.private_repos = org.get('private_repos', 0)
+
+        members = org.get('members_url')
+        #: Members URL Template. Expands with ``member``
+        self.members_urlt = URITemplate(members) if members else None
+
+        members = org.get('public_members_url')
+        #: Public Members URL Template. Expands with ``member``
+        self.public_members_urlt = URITemplate(members) if members else None
+        #: Repositories url (not a template)
+        self.repos_url = org.get('repos_url')
 
     @requires_auth
     def add_member(self, login, team):
