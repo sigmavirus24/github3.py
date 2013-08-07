@@ -318,6 +318,9 @@ class TestIssue(BaseCase):
                 self.i.title, self.i.body, u, 'open', n, labels
             )
 
+    def test_enterprise(self):
+        Issue(load('issue_enterprise'))
+
 
 class TestIssueEvent(BaseCase):
     def setUp(self):
