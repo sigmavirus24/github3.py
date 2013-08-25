@@ -894,11 +894,11 @@ class TestGitHub(BaseCase):
 class TestGitHubEnterprise(BaseCase):
     def setUp(self):
         super(TestGitHubEnterprise, self).setUp()
-        self.g = github3.GitHubEnterprise('https://github.example.com/')
+        self.g = github3.GitHubEnterprise('https://github.example.com:8080/')
 
     def test_admin_stats(self):
         self.response('user')
-        self.get('https://github.example.com/api/v3/enterprise/stats/all')
+        self.get('https://github.example.com:8080/api/v3/enterprise/stats/all')
 
         with expect.githuberror():
             self.g.admin_stats(None)
@@ -910,6 +910,32 @@ class TestGitHubEnterprise(BaseCase):
 
     def test_repr(self):
         expect(repr(self.g).startswith('<GitHub Enterprise')).is_True()
+
+    def test_pubsubhubbub(self):
+        self.response('', 204)
+        self.post('https://github.example.com:8080/api/v3/hub')
+        body = [('hub.mode', 'subscribe'),
+                ('hub.topic',
+                 'https://github.example.com:8080/foo/bar/events/push'),
+                ('hub.callback', 'https://localhost/post')]
+        self.conf = {}
+
+        self.login()
+
+        d = dict([(k[4:], v) for k, v in body])
+        expect(self.g.pubsubhubbub(**d)).is_True()
+        _, kwargs = self.request.call_args
+        expect('data').is_in(kwargs)
+        expect(body) == kwargs['data']
+        self.mock_assertions()
+
+        d['secret'] = 'secret'
+        body.append(('hub.secret', 'secret'))
+        expect(self.g.pubsubhubbub(**d)).is_True()
+        _, kwargs = self.request.call_args
+        expect('data').is_in(kwargs)
+        expect(body) == kwargs['data']
+        self.mock_assertions()
 
 
 class TestGitHubStatus(BaseCase):

@@ -150,3 +150,6 @@ class TestPullRequest(BaseCase):
 
         expect(self.pull.update('t', 'b', 'open')).is_True()
         self.mock_assertions()
+
+    def test_enterprise(self):
+        github3.pulls.PullRequest(load('pull_enterprise'))
