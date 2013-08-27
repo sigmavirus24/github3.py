@@ -90,7 +90,7 @@ class GitHubCore(GitHubObject):
                       'with status code %d expecting %d',
                       response.status_code, status_code)
         if self._boolean(response, status_code, 404) and response.content:
-            ret = response.json()
+            ret = response.json
             headers = response.headers
             if ((headers.get('Last-Modified') or headers.get('ETag')) and
                     isinstance(ret, dict)):
