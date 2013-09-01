@@ -1,5 +1,5 @@
 import github3
-from tests.utils import (expect, BaseCase, load)
+from tests.utils import (BaseCase, load)
 
 
 class TestAuthorization(BaseCase):
@@ -14,23 +14,22 @@ class TestAuthorization(BaseCase):
 
     def test_equality(self):
         a = github3.auths.Authorization(load('authorization'))
-        expect(self.auth) == a
+        assert self.auth == a
         a.id = 1
-        expect(self.auth) != a
+        assert self.auth != a
 
     def test_repr(self):
-        expect(repr(self.auth).startswith('<Authorization')).is_True()
+        assert repr(self.auth).startswith('<Authorization')
 
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
 
-        with expect.githuberror():
-            self.auth.delete()
+        self.assertRaises(github3.GitHubError, self.auth.delete)
         self.not_called()
 
         self.login()
-        expect(self.auth.delete()).is_True()
+        assert self.auth.delete()
         self.mock_assertions()
 
     def test_update(self):
@@ -41,15 +40,14 @@ class TestAuthorization(BaseCase):
         }
         self.conf = {'data': data}
 
-        with expect.githuberror():
-            self.auth.update()
+        self.assertRaises(github3.GitHubError, self.auth.update)
 
         def sub_test():
-            expect(self.auth.update(**data)).is_True()
+            assert self.auth.update(**data)
             self.mock_assertions()
 
         self.login()
-        expect(self.auth.update()).is_False()
+        assert self.auth.update() is False
         self.not_called()
 
         sub_test()
