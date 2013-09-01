@@ -15,9 +15,9 @@ class TestEvent(BaseCase):
 
     def test_equality(self):
         e = github3.events.Event(load('event'))
-        expect(self.ev) == e
+        assert self.ev == e
         e.id = 1
-        expect(self.ev) != e
+        assert self.ev != e
 
     def test_org(self):
         json = self.ev.to_json().copy()
@@ -26,15 +26,15 @@ class TestEvent(BaseCase):
         expect(ev.org).isinstance(github3.orgs.Organization)
 
     def test_repr(self):
-        expect(repr(self.ev).startswith('<Event')).is_True()
+        assert repr(self.ev).startswith('<Event')
 
     def test_list_types(self):
         Event, handlers = (github3.events.Event,
                            github3.events._payload_handlers)
-        expect(Event.list_types()) == sorted(handlers.keys())
+        assert Event.list_types() == sorted(handlers.keys())
 
     def test_is_public(self):
-        expect(self.ev.is_public()) == self.ev.public
+        assert self.ev.is_public() == self.ev.public
 
 
 class TestPayloadHandlers(TestCase):
