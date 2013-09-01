@@ -1,3 +1,4 @@
+import github3
 from github3 import gists
 from tests.utils import (expect, BaseCase, load)
 
@@ -13,23 +14,21 @@ class TestGist(BaseCase):
         self.gist = gists.Gist(self.gist.to_json(), self.g)
 
     def test_str(self):
-        expect(str(self.gist)) == str(self.gist.id)
+        assert str(self.gist) == str(self.gist.id)
 
     def test_repr(self):
-        expect(repr(self.gist)) == '<Gist [{0}]>'.format(self.gist)
+        assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
     def test_create_comment(self):
         self.response('gist_comment', 201)
         self.post(self.api + '/comments')
         self.conf = {'data': {'body': 'bar'}}
 
-        with expect.githuberror():
-            self.gist.create_comment(None)
-
+        self.assertRaises(github3.GitHubError, self.gist.create_comment)
         self.login()
 
-        expect(self.gist.create_comment(None)).is_None()
-        expect(self.gist.create_comment('')).is_None()
+        assert self.gist.create_comment(None) is None
+        assert self.gist.create_comment('') is None
         self.not_called()
         expect(self.gist.create_comment('bar')).isinstance(
             gists.comment.GistComment)
@@ -40,12 +39,11 @@ class TestGist(BaseCase):
         self.delete(self.api)
         self.conf = {}
 
-        with expect.githuberror():
-            self.gist.delete()
+        self.assertRaises(github3.GitHubError, self.gist.delete)
 
         self.not_called()
         self.login()
-        expect(self.gist.delete()).is_True()
+        assert self.gist.delete()
         self.mock_assertions()
 
     def test_edit(self):
@@ -58,14 +56,13 @@ class TestGist(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.gist.edit(None, None)
+        self.assertRaises(github3.GitHubError, self.gist.edit)
 
         self.login()
-        expect(self.gist.edit()).is_False()
+        assert self.gist.edit() is False
         self.not_called()
 
-        expect(self.gist.edit(**self.conf['data'])).is_True()
+        assert self.gist.edit(**self.conf['data'])
         self.mock_assertions()
 
     def test_fork(self):
@@ -73,8 +70,7 @@ class TestGist(BaseCase):
         self.post(self.api + '/forks')
         self.conf = {}
 
-        with expect.githuberror():
-            self.gist.fork()
+        self.assertRaises(github3.GitHubError, self.gist.fork)
 
         self.not_called()
         self.login()
@@ -82,18 +78,17 @@ class TestGist(BaseCase):
         self.mock_assertions()
 
     def test_is_public(self):
-        expect(self.gist.is_public()) == self.gist.public
+        assert self.gist.is_public() == self.gist.public
 
     def test_is_starred(self):
         self.response('', 204)
         self.get(self.api + '/star')
 
-        with expect.githuberror():
-            self.gist.is_starred()
+        self.assertRaises(github3.GitHubError, self.gist.is_starred)
 
         self.not_called()
         self.login()
-        expect(self.gist.is_starred()).is_True()
+        assert self.gist.is_starred()
         self.mock_assertions()
 
     def test_iter_comments(self):
@@ -116,9 +111,10 @@ class TestGist(BaseCase):
 
     def test_iter_files(self):
         gist_file = next(self.gist.iter_files())
+        assert gist_file == self.gist._files[0]
         expect(gist_file) == self.gist._files[0]
         expect(gist_file).isinstance(gists.file.GistFile)
-        expect(repr(gist_file).startswith('<Gist File')).is_True()
+        assert repr(gist_file).startswith('<Gist File')
 
     def test_iter_forks(self):
         with expect.raises(StopIteration):
@@ -128,7 +124,7 @@ class TestGist(BaseCase):
         self.response('gist', 200)
         self.get(self.api)
 
-        expect(self.gist.refresh() is self.gist).is_True()
+        assert self.gist.refresh() is self.gist
         self.mock_assertions()
 
     def test_star(self):
@@ -136,12 +132,11 @@ class TestGist(BaseCase):
         self.put(self.api + '/star')
         self.conf = {}
 
-        with expect.githuberror():
-            self.gist.star()
+        self.assertRaises(github3.GitHubError, self.gist.star)
 
         self.not_called()
         self.login()
-        expect(self.gist.star()).is_True()
+        assert self.gist.star()
         self.mock_assertions()
 
     def test_unstar(self):
@@ -149,12 +144,11 @@ class TestGist(BaseCase):
         self.delete(self.api + '/star')
         self.conf = {}
 
-        with expect.githuberror():
-            self.gist.unstar()
+        self.assertRaises(github3.GitHubError, self.gist.unstar)
 
         self.not_called()
         self.login()
-        expect(self.gist.unstar()).is_True()
+        assert self.gist.unstar()
         self.mock_assertions()
 
     # As opposed to creating an all new class for this
@@ -167,13 +161,13 @@ class TestGist(BaseCase):
         expect(hist.get_gist()).isinstance(gists.Gist)
         self.mock_assertions()
 
-        expect(repr(hist).startswith('<Gist History')).is_True()
+        assert repr(hist).startswith('<Gist History')
 
     def test_equality(self):
         g = gists.Gist(load('gist'))
-        expect(self.gist) == g
+        assert self.gist == g
         g.id = 1
-        expect(self.gist) != g
+        assert self.gist != g
 
 
 class TestGistComment(BaseCase):
@@ -189,26 +183,25 @@ class TestGistComment(BaseCase):
 
     def test_equality(self):
         c = gists.comment.GistComment(load('gist_comment'))
-        expect(self.comment) == c
+        assert self.comment == c
         c.id = 1
-        expect(self.comment) != c
+        assert self.comment != c
 
     def test_repr(self):
-        expect(repr(self.comment)) != ''
+        assert repr(self.comment) != ''
 
     def test_edit(self):
         self.response('gist_comment', 200)
         self.patch(self.api)
         self.conf = {'data': {'body': 'body'}}
 
-        with expect.githuberror():
-            self.comment.edit(None)
+        self.assertRaises(github3.GitHubError, self.comment.edit)
 
         self.login()
-        expect(self.comment.edit(None)).is_False()
+        assert self.comment.edit(None) is False
         self.not_called()
 
-        expect(self.comment.edit('body')).is_True()
+        assert self.comment.edit('body')
         self.mock_assertions()
 
 
@@ -219,6 +212,6 @@ class TestGistHistory(BaseCase):
 
     def test_equality(self):
         h = gists.history.GistHistory(load('gist_history'))
-        expect(self.hist) == h
+        assert self.hist == h
         h.version = 'foo'
-        expect(self.hist) != h
+        assert self.hist != h
