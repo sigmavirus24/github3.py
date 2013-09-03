@@ -1,6 +1,6 @@
 import github3
 from github3 import gists
-from tests.utils import (expect, BaseCase, load)
+from tests.utils import (BaseCase, load)
 
 
 class TestGist(BaseCase):
@@ -30,8 +30,7 @@ class TestGist(BaseCase):
         assert self.gist.create_comment(None) is None
         assert self.gist.create_comment('') is None
         self.not_called()
-        expect(self.gist.create_comment('bar')).isinstance(
-            gists.comment.GistComment)
+        assert isinstance(self.gist.create_comment('bar'), gists.comment.GistComment)
         self.mock_assertions()
 
     def test_delete(self):
@@ -74,7 +73,7 @@ class TestGist(BaseCase):
 
         self.not_called()
         self.login()
-        expect(self.gist.fork()).isinstance(gists.Gist)
+        assert isinstance(self.gist.fork(), gists.Gist)
         self.mock_assertions()
 
     def test_is_public(self):
@@ -97,7 +96,8 @@ class TestGist(BaseCase):
         self.conf = {'params': None}
 
         c = next(self.gist.iter_comments())
-        expect(c).isinstance(gists.comment.GistComment)
+
+        assert isinstance(c, gists.comment.GistComment)
         self.mock_assertions()
 
     def test_iter_commits(self):
@@ -106,19 +106,18 @@ class TestGist(BaseCase):
         self.conf = {'params': None}
 
         h = next(self.gist.iter_commits())
-        expect(h).isinstance(gists.history.GistHistory)
+        assert isinstance(h, gists.history.GistHistory)
         self.mock_assertions()
 
     def test_iter_files(self):
         gist_file = next(self.gist.iter_files())
         assert gist_file == self.gist._files[0]
-        expect(gist_file) == self.gist._files[0]
-        expect(gist_file).isinstance(gists.file.GistFile)
+        assert isinstance(gist_file, gists.file.GistFile)
         assert repr(gist_file).startswith('<Gist File')
 
     def test_iter_forks(self):
-        with expect.raises(StopIteration):
-            expect(next(self.gist.iter_forks()))
+        with self.assertRaises(StopIteration):
+            assert next(self.gist.iter_forks())
 
     def test_refresh(self):
         self.response('gist', 200)
@@ -157,8 +156,8 @@ class TestGist(BaseCase):
         self.response('gist', 200)
         self.get(hist._api)
 
-        expect(hist).isinstance(gists.history.GistHistory)
-        expect(hist.get_gist()).isinstance(gists.Gist)
+        assert isinstance(hist, gists.history.GistHistory)
+        assert isinstance(hist.get_gist(), gists.Gist)
         self.mock_assertions()
 
         assert repr(hist).startswith('<Gist History')
