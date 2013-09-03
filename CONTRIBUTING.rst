@@ -1,13 +1,20 @@
 Guidelines for Contributing to github3.py
 =========================================
 
-0. Read the README_
+#. Read the README_
 
-1. Regardless of the magnitude your pull request (a couple lines to a couple 
+#. Regardless of the magnitude your pull request (a couple lines to a couple 
    hundred lines), please add your name to the AUTHORS.rst_ file under the 
    heading Contributors.
 
-2. If you're fixing a bug, please write a regression test. All the tests are 
+#. There is a label for issues that should be minor and should be a good way
+   to become acquainted with the project. The easy_ label is the over-arching 
+   way to determine which issues you can dig into without a great deal of 
+   prior knowledge. Most of these issues have a `Pair with Ian`_ label which 
+   means that if you would like, I (@sigmavirus24) will happily pair program 
+   with you to solve the issue.
+
+#. If you're fixing a bug, please write a regression test. All the tests are 
    structured like so::
 
     tests/
@@ -22,30 +29,32 @@ Guidelines for Contributing to github3.py
    ``test_issues.py`` in the class ``TestIssue``. You can place the new test 
    in any order, e.g., below all the existing tests, near a related one, &c.
 
-3. If you're adding a new section of the API that does not already exist, 
+#. If you're adding a new section of the API that does not already exist, 
    please also add tests to the test suite.
 
-4. If you're adding additional functionality beyond what the API covers, 
+#. If you're adding additional functionality beyond what the API covers, 
    please open an issue request first and of course add tests to cover the 
    functionality in the event it is accepted.
 
    Also, please be certain to add docstrings_ to these functions. Follow the 
    example of other docstrings.
 
-5. In case you haven't caught on, for anything you add, write tests.
+#. In case you haven't caught on, for anything you add, write tests.
 
-6. Be cordial_. Seriously, if anyone who isn't cordial will be sent packing, 
+#. Be cordial_. Seriously, if anyone who isn't cordial will be sent packing, 
    regardless of the value of their contributions. I will not tolerate some 
    contributors creating a hostile environment for others.
 
-7. Rebase your fork/branch if needed and possible before submitting a pull 
+#. Rebase your fork/branch if needed and possible before submitting a pull 
    request. This makes my life easier. If you honestly have no idea what I'm 
    talking about, don't worry, I'll take care of it.
 
-8. Please follow pep-0008_. Feel free to also use flake8_ to help.
+#. Please follow pep-0008_. Feel free to also use flake8_ to help.
 
 .. links
 .. _README: ./README.rst
+.. _easy: https://github.com/sigmavirus24/github3.py/issues?labels=Easy&page=1&state=open
+.. _Pair with Ian: https://github.com/sigmavirus24/github3.py/issues?labels=Pair+with+Ian&page=1&state=open
 .. _AUTHORS.rst: ./AUTHORS.rst
 .. _cordial: http://kennethreitz.com/be-cordial-or-be-on-your-way.html
 .. _pep-0008: http://www.python.org/dev/peps/pep-0008/

@@ -22,6 +22,13 @@ Dependencies
 .. _requests: https://github.com/kennethreitz/requests
 .. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
 
+Contributing
+------------
+
+Please read the `CONTRIBUTING`_ document.
+
+.. _CONTRIBUTING: https://github.com/sigmavirus24/github3.py/blob/develop/CONTRIBUTING.rst
+
 Testing
 ~~~~~~~
 
