@@ -140,6 +140,9 @@ class BaseCase(TestCase):
     def not_called(self):
         expect(self.request.called).is_False()
 
+    def assertGitHubErrorRaised(self, func, *args, **kwargs):
+        return self.assertRaises(github3.GitHubError, func(*args, **kwargs))
+
 
 class RequestsBytesIO(BytesIO):
     def read(self, chunk_size, *args, **kwargs):
