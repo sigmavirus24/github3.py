@@ -4,6 +4,9 @@ import sys
 import os
 import re
 
+from setuptools import setup
+from setuptools.command.test import test as TestCommand
+
 kwargs = {}
 requires = []
 packages = [
@@ -13,13 +16,10 @@ packages = [
     "github3.issues",
 ]
 
-try:
-    from setuptools import setup
-    kwargs['test_suite'] = 'run_tests.collect_tests'
-    kwargs['tests_require'] = ['mock', 'expecter', 'coverage==3.5.2']
-    packages.append('tests')
-except ImportError:
-    from distutils.core import setup  # NOQA
+kwargs['tests_require'] = ['mock==1.0.1', 'expecter', 'pytest==2.3.5']
+if sys.version_info < (3, 0):
+    kwargs['tests_require'].append('unittest2==0.5.1')
+packages.append('tests')
 
 if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py sdist upload")
@@ -38,6 +38,17 @@ with open('github3/__init__.py', 'r') as fd:
 
 if not __version__:
     raise RuntimeError('Cannot find version information')
+
+class PyTest(TestCommand):
+     def finalize_options(self):
+         TestCommand.finalize_options(self)
+         self.test_args = []
+         self.test_suite = True
+     def run_tests(self):
+         #import here, cause outside the eggs aren't loaded
+         import pytest
+         errno = pytest.main(self.test_args)
+         sys.exit(errno)
 
 setup(
     name="github3.py",
@@ -67,5 +78,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
+    extras_require={'test': kwargs['tests_require']},
+    cmdclass={'test': PyTest},
     **kwargs
 )

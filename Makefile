@@ -3,7 +3,7 @@
 # Copyright 2012, Ian Cordasco
 
 COVERAGE_INCLUDE := github3/*.py
-TEST_RUNNER := py.test
+TEST_RUNNER := python setup.py test
 
 .DEFAULT_GOAL := tests
 
