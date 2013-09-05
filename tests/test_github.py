@@ -6,10 +6,10 @@ from tests.utils import (expect, BaseCase, load)
 class TestGitHub(BaseCase):
     def test_init(self):
         g = github3.GitHub('foo', 'bar')
-        assert repr((g).endswith('[foo]>'))
+        assert repr(g).endswith('[foo]>')
 
         g = github3.GitHub(token='foo')
-        assert repr((g).endswith('{0:x}>'.format(id(g))))
+        assert repr(g).endswith('{0:x}>'.format(id(g)))
 
     def test_context_manager(self):
         with github3.GitHub() as gh:
@@ -21,7 +21,7 @@ class TestGitHub(BaseCase):
     def test_authorization(self):
         self.response('authorization')
         self.get('https://api.github.com/authorizations/10')
-        self.assertRaises(github3.GitHubError, self.g.authorization(10))
+        self.assertRaises(github3.GitHubError, self.g.authorization, 10)
         assert self.request.called is False
 
         self.login()
@@ -126,7 +126,7 @@ class TestGitHub(BaseCase):
         self.put('https://api.github.com/user/following/sigmavirus24')
         self.conf = {'data': None}
 
-        self.assertRaises(github3.GitHubError, self.g.follow('sigmavirus24'))
+        self.assertRaises(github3.GitHubError, self.g.follow, 'sigmavirus24')
 
         self.login()
         assert self.g.follow(None) is False
@@ -160,7 +160,7 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/following/login')
 
-        self.assertRaises(github3.GitHubError, self.g.is_following('login'))
+        self.assertRaises(github3.GitHubError, self.g.is_following, 'login')
 
         self.login()
         assert self.g.is_following(None) is False
@@ -173,7 +173,7 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/starred/user/repo')
 
-        self.assertRaises(github3.GitHubError, self.g.is_starred('user', 'repo'))
+        self.assertRaises(github3.GitHubError, self.g.is_starred, 'user', 'repo')
 
         self.login()
 
@@ -187,7 +187,7 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/subscriptions/user/repo')
 
-        self.assertRaises(github3.GitHubError, self.g.is_subscribed('user', 'repo'))
+        self.assertRaises(github3.GitHubError, self.g.is_subscribed, 'user', 'repo')
 
         self.login()
         assert self.g.is_subscribed(None, None) is False
@@ -213,7 +213,7 @@ class TestGitHub(BaseCase):
         self.response('key')
         self.get('https://api.github.com/user/keys/10')
 
-        self.assertRaises(github3.GitHubError, self.g.key(10))
+        self.assertRaises(github3.GitHubError, self.g.key, 10)
         assert self.request.called is False
 
         self.login()
@@ -277,7 +277,7 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/user/emails')
         self.conf.update(params=None)
 
-        self.assertRaises(github3.GitHubError, self.g.iter_emails())
+        self.assertRaises(github3.GitHubError, self.g.iter_emails)
         assert self.request.called is False
 
         self.login()
@@ -299,7 +299,7 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/users/sigmavirus24/followers')
         self.conf.update(params=None)
 
-        self.assertRaises(github3.GitHubError, self.g.iter_followers())
+        self.assertRaises(github3.GitHubError, self.g.iter_followers)
 
         with patch.object(github3.github.GitHub, 'user') as ghuser:
             ghuser.return_value = github3.users.User(load('user'))
@@ -310,7 +310,7 @@ class TestGitHub(BaseCase):
 
             self.login()
             v = next(self.g.iter_followers())
-            assert isinstance(v, github3.users.Users)
+            assert isinstance(v, github3.users.User)
             self.get('https://api.github.com/user/followers')
             assert self.request.called is True
             self.mock_assertions()
@@ -320,7 +320,7 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/users/sigmavirus24/following')
         self.conf.update(params=None)
 
-        self.assertRaises(github3.GitHubError, self.g.iter_following())
+        self.assertRaises(github3.GitHubError, self.g.iter_following)
         assert self.request.called is False
 
         with patch.object(github3.github.GitHub, 'user') as ghuser:
@@ -376,7 +376,7 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/orgs/github3py/issues')
         self.conf.update(params={})
 
-        self.assertRaises(github3.GitHubError, self.g.iter_org_issues('github3py'))
+        self.assertRaises(github3.GitHubError, self.g.iter_org_issues, 'github3py')
 
         self.login()
         i = next(self.g.iter_org_issues('github3py'))
@@ -396,10 +396,10 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/issues')
         self.conf.update(params={})
 
-        self.assertRaises(github3.GitHubError, self.g.iter_issues())
+        self.assertRaises(github3.GitHubError, self.g.iter_issues)
 
         self.login()
-        assert isinstance(next(self.g.iter_issues), github3.issues.Issue)
+        assert isinstance(next(self.g.iter_issues()), github3.issues.Issue)
         self.mock_assertions()
 
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
@@ -414,10 +414,10 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/user/issues')
         self.conf.update(params={})
 
-        self.assertRaises(github3.GitHubError, self.g.iter_user_issues())
+        self.assertRaises(github3.GitHubError, self.g.iter_user_issues)
 
         self.login()
-        assert isinstance(next.self.g.iter_user_issues(), github3.issues.Issue)
+        assert isinstance(next(self.g.iter_user_issues()), github3.issues.Issue)
         self.mock_assertions()
 
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
@@ -448,7 +448,7 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/user/keys')
         self.conf.update(params=None)
 
-        self.assertRaises(github3.GitHubError, self.g.iter_keys())
+        self.assertRaises(github3.GitHubError, self.g.iter_keys)
 
         self.login()
         assert isinstance(next(self.g.iter_keys()), github3.users.Key)
@@ -604,7 +604,7 @@ class TestGitHub(BaseCase):
                 ('hub.callback', 'https://localhost/post')]
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.pubsubhubbub('', '', ''))
+        self.assertRaises(github3.GitHubError, self.g.pubsubhubbub, '', '', '')
 
         self.login()
         assert self.g.pubsubhubbub('', '', '') is False
@@ -664,7 +664,7 @@ class TestGitHub(BaseCase):
                                       'requests')
 
         assert isinstance(issues[0], github3.legacy.LegacyIssue)
-        assert repr(issues[0].startswith('<Legacy Issue'))
+        assert repr(issues[0]).startswith('<Legacy Issue')
         self.mock_assertions()
 
         self.conf.update({'params': {'start_page': 2}})
@@ -679,7 +679,7 @@ class TestGitHub(BaseCase):
         self.conf.update(params={'start_page': None, 'language': None})
         repos = self.g.search_repos('github3.py')
         assert isinstance(repos[0], github3.legacy.LegacyRepo)
-        assert repr((repos[0]).startswith('<Legacy Repo'))
+        assert repr(repos[0]).startswith('<Legacy Repo')
         assert repos[0].is_private() == repos[0].private
         self.mock_assertions()
 
@@ -713,7 +713,7 @@ class TestGitHub(BaseCase):
         self.conf.update({'params': {}})
         users = self.g.search_users('sigmavirus24')
         assert isinstance(users[0], github3.legacy.LegacyUser)
-        assert repr((users[0]).startswith('<Legacy User'))
+        assert repr(users[0]).startswith('<Legacy User')
         self.mock_assertions()
 
         users = self.g.search_users('sigmavirus24', sort='Foobar')
@@ -761,7 +761,7 @@ class TestGitHub(BaseCase):
         self.put('https://api.github.com/user/starred/sigmavirus24/github3.py')
         self.conf = {'data': None}
 
-        self.assertRaises(github3.GitHubError, self.g.star('foo', 'bar'))
+        self.assertRaises(github3.GitHubError, self.g.star, 'foo', 'bar')
 
         self.login()
         assert self.g.star(None, None) is False
@@ -774,7 +774,7 @@ class TestGitHub(BaseCase):
                  'sigmavirus24/github3.py')
         self.conf = {'data': None}
 
-        self.assertRaises(github3.GitHubError, self.g.subscribe('foo', 'bar'))
+        self.assertRaises(github3.GitHubError, self.g.subscribe, 'foo', 'bar')
 
         self.login()
         assert self.g.subscribe(None, None) is False
@@ -787,7 +787,7 @@ class TestGitHub(BaseCase):
                     'sigmavirus24')
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.unfollow('foo'))
+        self.assertRaises(github3.GitHubError, self.g.unfollow, 'foo')
 
         self.login()
         assert self.g.unfollow(None) is False
@@ -800,11 +800,11 @@ class TestGitHub(BaseCase):
                     'sigmavirus24/github3.py')
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.unstar('foo', 'bar'))
+        self.assertRaises(github3.GitHubError, self.g.unstar, 'foo', 'bar')
 
         self.login()
         assert self.g.unstar(None, None) is False
-        assert self.g.unstart('sigmavirus24', 'github3.py')
+        assert self.g.unstar('sigmavirus24', 'github3.py')
         self.mock_assertions()
 
     def test_unsubscribe(self):
@@ -813,7 +813,7 @@ class TestGitHub(BaseCase):
                     'sigmavirus24/github3.py')
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.unsubscribe('foo', 'bar'))
+        self.assertRaises(github3.GitHubError, self.g.unsubscribe, 'foo', 'bar')
 
         self.login()
         assert self.g.unsubscribe(None, None) is False
@@ -875,7 +875,7 @@ class TestGitHubEnterprise(BaseCase):
         self.response('user')
         self.get('https://github.example.com:8080/api/v3/enterprise/stats/all')
 
-        self.assertRaises(github3.GitHubError, self.g.admin_stats(None))
+        self.assertRaises(github3.GitHubError, self.g.admin_stats, None)
 
         self.not_called()
         self.login()
