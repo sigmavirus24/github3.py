@@ -1,6 +1,6 @@
 import github3
 from mock import patch, Mock
-from tests.utils import BaseCase, load, expect
+from tests.utils import BaseCase, load
 
 
 class TestTeam(BaseCase):
@@ -14,25 +14,24 @@ class TestTeam(BaseCase):
         self.team = github3.orgs.Team(self.team.to_json(), self.g)
 
     def test_repr(self):
-        expect(repr(self.team).startswith('<Team')).is_True()
+        assert repr(self.team).startswith('<Team')
 
     def test_equality(self):
         t = github3.orgs.Team(load('team'))
-        expect(self.team) == t
+        assert self.team == t
         t.id = 'foo'
-        expect(self.team) != t
+        assert self.team != t
 
     def test_add_member(self):
         self.response('', 204)
         self.put(self.api + '/members/foo')
         self.conf = {'data': None}
 
-        with expect.githuberror():
-            self.team.add_member('foo')
+        self.assertRaises(github3.GitHubError, self.team.add_member, 'foo')
 
         self.not_called()
         self.login()
-        expect(self.team.add_member('foo')).is_True()
+        assert self.team.add_member('foo')
         self.mock_assertions()
 
     def test_add_repo(self):
@@ -40,24 +39,22 @@ class TestTeam(BaseCase):
         self.put(self.api + '/repos/repo')
         self.conf = {'data': None}
 
-        with expect.githuberror():
-            self.team.add_repo('repo')
+        self.assertRaises(github3.GitHubError, self.team.add_repo, 'repo')
 
         self.not_called()
         self.login()
-        expect(self.team.add_repo('repo')).is_True()
+        assert self.team.add_repo('repo')
         self.mock_assertions()
 
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
 
-        with expect.githuberror():
-            self.team.delete()
+        self.assertRaises(github3.GitHubError, self.team.delete)
 
         self.not_called()
         self.login()
-        expect(self.team.delete()).is_True()
+        assert self.team.delete()
         self.mock_assertions()
 
     def test_edit(self):
@@ -65,67 +62,64 @@ class TestTeam(BaseCase):
         self.patch(self.api)
         self.conf = {'data': {'name': 'Collab', 'permission': 'admin'}}
 
-        with expect.githuberror():
-            self.team.edit(None)
+        self.assertRaises(github3.GitHubError, self.team.edit, None)
 
         self.login()
-        expect(self.team.edit(None)).is_False()
+        assert self.team.edit(None) is False
         self.not_called()
 
-        expect(self.team.edit('Collab', 'admin')).is_True()
+        assert self.team.edit('Collab', 'admin')
         self.mock_assertions()
 
     def test_has_repo(self):
         self.response('', 204)
         self.get(self.api + '/repos/repo')
 
-        expect(self.team.has_repo('repo')).is_True()
+        assert self.team.has_repo('repo')
         self.mock_assertions()
 
     def test_is_member(self):
         self.response('', 404)
         self.get(self.api + '/members/user')
 
-        expect(self.team.is_member('user')).is_False()
+        assert self.team.is_member('user') is False
         self.mock_assertions()
 
     def test_iter_members(self):
         self.response('user', _iter=True)
         self.get(self.api + '/members')
 
-        expect(next(self.team.iter_members())).isinstance(github3.users.User)
+        assert isinstance(next(self.team.iter_members()), github3.users.User)
         self.mock_assertions()
 
     def test_iter_repos(self):
         self.response('repo', _iter=True)
         self.get(self.api + '/repos')
 
-        expect(next(self.team.iter_repos())).isinstance(
-            github3.repos.Repository)
+        assert isinstance(next(self.team.iter_repos()),
+                          github3.repos.Repository)
         self.mock_assertions()
 
     def test_remove_member(self):
         self.response('', 204)
         self.delete(self.api + '/members/user')
 
-        with expect.githuberror():
-            self.team.remove_member(None)
+        self.assertRaises(github3.GitHubError, self.team.remove_member, None)
 
         self.not_called()
         self.login()
-        expect(self.team.remove_member('user')).is_True()
+        assert self.team.remove_member('user')
         self.mock_assertions()
 
     def test_remove_repo(self):
         self.response('', 204)
         self.delete(self.api + '/repos/repo')
 
-        with expect.githuberror():
-            self.team.remove_repo(None)
+        self.assertRaises(github3.GitHubError, self.team.remove_repo, None)
 
         self.not_called()
         self.login()
-        expect(self.team.remove_repo('repo')).is_True()
+        assert self.team.remove_repo('repo')
         self.mock_assertions()
 
 
@@ -140,42 +134,40 @@ class TestOrganization(BaseCase):
         self.org = github3.orgs.Organization(self.org.to_json(), self.g)
 
     def test_repr(self):
-        expect(repr(self.org).startswith('<Organization ')).is_True()
+        assert repr(self.org).startswith('<Organization ')
 
     def test_set_type(self):
         json = self.org.to_json().copy()
         del json['type']
         o = github3.orgs.Organization(json)
-        expect(o.type) == 'Organization'
+        assert o.type == 'Organization'
 
     def test_add_member(self):
-        with expect.githuberror():
-            self.org.add_member(None, None)
+        self.assertRaises(github3.GitHubError, self.org.add_member, None, None)
 
         self.login()
         with patch.object(github3.orgs.Organization, 'iter_teams') as it:
             it.return_value = iter([])
-            expect(self.org.add_member('foo', 'bar')).is_False()
+            assert self.org.add_member('foo', 'bar') is False
             team = Mock()
             team.name = 'bar'
             team.add_member.return_value = True
             it.return_value = iter([team])
-            expect(self.org.add_member('foo', 'bar')).is_True()
+            assert self.org.add_member('foo', 'bar')
             team.add_member.assert_called_once_with('foo')
 
     def test_add_repo(self):
-        with expect.githuberror():
-            self.org.add_repo(None, None)
+        self.assertRaises(github3.GitHubError, self.org.add_repo, None, None)
 
         self.login()
         with patch.object(github3.orgs.Organization, 'iter_teams') as it:
             it.return_value = iter([])
-            expect(self.org.add_repo('foo', 'bar')).is_False()
+            assert self.org.add_repo('foo', 'bar') is False
             team = Mock()
             team.name = 'bar'
             team.add_repo.return_value = True
             it.return_value = iter([team])
-            expect(self.org.add_repo('foo', 'bar')).is_True()
+            assert self.org.add_repo('foo', 'bar')
             team.add_repo.assert_called_once_with('foo')
 
     def test_create_repo(self):
@@ -196,25 +188,23 @@ class TestOrganization(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.org.create_repo(None)
+        self.assertRaises(github3.GitHubError, self.org.create_repo, None)
 
         self.not_called()
         self.login()
-        expect(self.org.create_repo('repo', 'desc', team_id=1)).isinstance(
-            github3.repos.Repository)
+        assert isinstance(self.org.create_repo('repo', 'desc', team_id=1),
+                          github3.repos.Repository)
         self.mock_assertions()
 
     def test_conceal_member(self):
         self.response('', 204)
         self.delete(self.api + '/public_members/user')
 
-        with expect.githuberror():
-            self.org.conceal_member(None)
+        self.assertRaises(github3.GitHubError, self.org.conceal_member, None)
 
         self.not_called()
         self.login()
-        expect(self.org.conceal_member('user')).is_True()
+        assert self.org.conceal_member('user')
         self.mock_assertions()
 
     def test_create_team(self):
@@ -228,13 +218,12 @@ class TestOrganization(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.org.create_team(None)
+        self.assertRaises(github3.GitHubError, self.org.create_team, None)
 
         self.not_called()
         self.login()
-        expect(self.org.create_team('team', permissions='push')).isinstance(
-            github3.orgs.Team)
+        assert isinstance(self.org.create_team('team', permissions='push'),
+                          github3.orgs.Team)
         self.mock_assertions()
 
     def test_edit(self):
@@ -250,50 +239,49 @@ class TestOrganization(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.org.edit()
+        self.assertRaises(github3.GitHubError, self.org.edit)
 
         self.login()
-        expect(self.org.edit()).is_False()
+        assert self.org.edit() is False
         self.not_called()
 
-        expect(self.org.edit('foo', 'foo', 'foo', 'foo', 'foo')).is_True()
+        assert self.org.edit('foo', 'foo', 'foo', 'foo', 'foo')
         self.mock_assertions()
 
     def test_is_member(self):
         self.response('', 404)
         self.get(self.api + '/members/user')
 
-        expect(self.org.is_member('user')).is_False()
+        assert self.org.is_member('user') is False
         self.mock_assertions()
 
     def test_is_public_member(self):
         self.response('', 204)
         self.get(self.api + '/public_members/user')
 
-        expect(self.org.is_public_member('user')).is_True()
+        assert self.org.is_public_member('user') is True
         self.mock_assertions()
 
     def test_iter_events(self):
         self.response('event', _iter=True)
         self.get(self.api + '/events')
 
-        expect(next(self.org.iter_events())).isinstance(github3.events.Event)
+        assert isinstance(next(self.org.iter_events()), github3.events.Event)
         self.mock_assertions()
 
     def test_iter_members(self):
         self.response('user', _iter=True)
         self.get(self.api + '/members')
 
-        expect(next(self.org.iter_members())).isinstance(github3.users.User)
+        assert isinstance(next(self.org.iter_members()), github3.users.User)
         self.mock_assertions()
 
     def test_iter_public_members(self):
         self.response('user', _iter=True)
         self.get(self.api + '/public_members')
 
-        expect(next(self.org.iter_public_members())).isinstance(
-            github3.users.User)
+        assert isinstance(next(self.org.iter_public_members()),
+                          github3.users.User)
         self.mock_assertions()
 
     def test_iter_repos(self):
@@ -301,29 +289,28 @@ class TestOrganization(BaseCase):
         self.get(self.api + '/repos')
         self.conf = {'params': {}}
 
-        expect(next(self.org.iter_repos())).isinstance(
-            github3.repos.Repository)
+        assert isinstance(next(self.org.iter_repos()),
+                          github3.repos.Repository)
         self.mock_assertions()
 
-        expect(next(self.org.iter_repos('foo'))).isinstance(
-            github3.repos.Repository)
+        assert isinstance(next(self.org.iter_repos('foo')),
+                          github3.repos.Repository)
         self.mock_assertions()
 
         self.conf['params'] = {'type': 'all'}
-        expect(next(self.org.iter_repos('all'))).isinstance(
-            github3.repos.Repository)
+        assert isinstance(next(self.org.iter_repos('all')),
+                          github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_teams(self):
         self.response('team', _iter=True)
         self.get(self.api + '/teams')
 
-        with expect.githuberror():
-            self.org.iter_teams()
+        self.assertRaises(github3.GitHubError, self.org.iter_teams)
 
         self.not_called()
         self.login()
-        expect(next(self.org.iter_teams())).isinstance(github3.orgs.Team)
+        assert isinstance(next(self.org.iter_teams()), github3.orgs.Team)
         self.mock_assertions()
 
     def test_publicize_member(self):
@@ -331,54 +318,49 @@ class TestOrganization(BaseCase):
         self.put(self.api + '/public_members/user')
         self.conf = {}
 
-        with expect.githuberror():
-            self.org.publicize_member(None)
+        self.assertRaises(github3.GitHubError, self.org.publicize_member, None)
 
-        self.not_called()
         self.login()
-        expect(self.org.publicize_member('user')).is_True()
+        assert self.org.publicize_member('user')
         self.mock_assertions()
 
     def test_remove_member(self):
         self.response('', 404)
         self.delete(self.api + '/members/user')
 
-        with expect.githuberror():
-            self.org.remove_member(None)
+        self.assertRaises(github3.GitHubError, self.org.remove_member, None)
 
         self.not_called()
         self.login()
-        expect(self.org.remove_member('user')).is_False()
+        assert self.org.remove_member('user') is False
         self.mock_assertions()
 
     def test_remove_repo(self):
-        with expect.githuberror():
-            self.org.remove_repo(None, None)
+        self.assertRaises(github3.GitHubError, self.org.remove_repo, None, None)
 
         self.login()
         with patch.object(github3.orgs.Organization, 'iter_teams') as it:
             it.return_value = iter([])
-            expect(self.org.remove_repo('foo', 'bar')).is_False()
+            assert self.org.remove_repo('foo', 'bar') is False
             team = Mock()
             team.name = 'bar'
             team.remove_repo.return_value = True
             it.return_value = iter([team])
-            expect(self.org.remove_repo('foo', 'bar')).is_True()
+            assert self.org.remove_repo('foo', 'bar') is True
             team.remove_repo.assert_called_once_with('foo')
 
     def test_team(self):
         self.response('team')
         self.get(self.github_url + 'teams/1')
 
-        with expect.githuberror():
-            self.org.team(0)
+        self.assertRaises(github3.GitHubError, self.org.team, 0)
 
         self.login()
-        expect(self.org.team(-1)).is_None()
+        assert self.org.team(-1) is None
         self.not_called()
 
-        expect(self.org.team(1)).isinstance(github3.orgs.Team)
+        assert isinstance(self.org.team(1), github3.orgs.Team)
         self.mock_assertions()
 
     def test_equality(self):
-        expect(self.org) == github3.orgs.Organization(load('org'))
+        assert self.org == github3.orgs.Organization(load('org'))
