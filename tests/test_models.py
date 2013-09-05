@@ -1,6 +1,6 @@
 import github3
 import requests
-from tests.utils import BaseCase, TestCase, expect, RequestsBytesIO, is_py3
+from tests.utils import BaseCase, TestCase, RequestsBytesIO, is_py3
 
 
 class TestGitHubObject(TestCase):
