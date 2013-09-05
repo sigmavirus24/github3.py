@@ -1,6 +1,6 @@
 import github3
 from github3.structs import GitHubIterator
-from tests.utils import BaseCase, expect
+from tests.utils import BaseCase
 from mock import patch
 
 
@@ -15,10 +15,10 @@ class TestGitHubIterator(BaseCase):
     def test_headers(self):
         i = GitHubIterator(self.i.count, self.i.url, self.i.cls, self.g,
                            etag='"foobarbogus"')
-        expect(i.headers.get('If-None-Match')) == '"foobarbogus"'
+        assert i.headers.get('If-None-Match') == '"foobarbogus"'
 
     def test_repr(self):
-        expect(repr(self.i)) == '<GitHubIterator [{0}, /users]>'.format(
+        assert repr(self.i) == '<GitHubIterator [{0}, /users]>'.format(
             self.num)
 
     def test_nexts(self):
@@ -27,7 +27,7 @@ class TestGitHubIterator(BaseCase):
         self.conf = {'params': None, 'headers': {}}
         self.j = GitHubIterator(self.num, self.api_url, github3.users.User,
                                 self.g)
-        expect(self.j.next().login) == next(self.i).login
+        assert self.j.next().login == next(self.i).login
         self.mock_assertions()
 
     def test_catch_etags(self):
@@ -35,8 +35,8 @@ class TestGitHubIterator(BaseCase):
         self.get(self.api_url)
         self.conf = {'params': None, 'headers': {}}
 
-        expect(next(self.i)).isinstance(github3.users.User)
-        expect(self.i.etag) == '"foobarbogus"'
+        assert isinstance(next(self.i), github3.users.User)
+        assert self.i.etag == '"foobarbogus"'
         self.mock_assertions()
 
     def test_catch_None(self):
@@ -44,7 +44,7 @@ class TestGitHubIterator(BaseCase):
         self.get(self.api_url)
         self.conf = {'params': None, 'headers': {}}
 
-        with expect.raises(StopIteration):
+        with self.assertRaises(StopIteration):
             next(self.i)
 
         self.mock_assertions()
@@ -54,9 +54,9 @@ class TestGitHubIterator(BaseCase):
         self.get(self.api_url)
         self.conf = {'params': None, 'headers': {}}
 
-        expect(next(self.i)).isinstance(github3.users.User)
+        assert isinstance(next(self.i), github3.users.User)
 
-        with expect.raises(StopIteration):
+        with self.assertRaises(StopIteration):
             next(self.i)
 
         self.mock_assertions()
@@ -67,8 +67,8 @@ class TestGitHubIterator(BaseCase):
         self.conf = {'params': None, 'headers': {}}
         self.i = GitHubIterator(1, self.api_url, github3.users.User, self.g)
 
-        expect(next(self.i)).isinstance(github3.users.User)
-        with expect.raises(StopIteration):
+        assert isinstance(next(self.i), github3.users.User)
+        with self.assertRaises(StopIteration):
             next(self.i)
 
         self.mock_assertions()
