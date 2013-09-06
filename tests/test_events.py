@@ -1,5 +1,5 @@
 import github3
-from tests.utils import BaseCase, expect, load
+from tests.utils import BaseCase, load
 from unittest import TestCase
 
 
@@ -23,7 +23,7 @@ class TestEvent(BaseCase):
         json = self.ev.to_json().copy()
         json['org'] = self.o
         ev = github3.events.Event(json)
-        expect(ev.org).isinstance(github3.orgs.Organization)
+        assert isinstance(ev.org, github3.orgs.Organization)
 
     def test_repr(self):
         assert repr(self.ev).startswith('<Event')
@@ -41,58 +41,57 @@ class TestPayloadHandlers(TestCase):
     def test_commitcomment(self):
         comment = {'comment': load('repo_comment')}
         comment = github3.events._commitcomment(comment)
-        expect(comment['comment']).isinstance(
-            github3.repos.comment.RepoComment)
+        assert isinstance(comment['comment'], github3.repos.comment.RepoComment)
 
     def test_download(self):
         dl = {'download': load('download')}
         dl = github3.events._download(dl)
-        expect(dl['download']).isinstance(github3.repos.download.Download)
+        assert isinstance(dl['download'], github3.repos.download.Download)
 
     def test_follow(self):
         f = {'target': load('user')}
         github3.events._follow(f)
-        expect(f['target']).isinstance(github3.users.User)
+        assert isinstance(f['target'], github3.users.User)
 
     def test_forkev(self):
         f = {'forkee': load('repo')}
         github3.events._forkev(f)
-        expect(f['forkee']).isinstance(github3.repos.Repository)
+        assert isinstance(f['forkee'], github3.repos.Repository)
 
     def test_gist(self):
         g = {'gist': load('gist')}
         github3.events._gist(g)
-        expect(g['gist']).isinstance(github3.gists.Gist)
+        assert isinstance(g['gist'], github3.gists.Gist)
 
     def test_issuecomm(self):
         c = {'issue': load('issue'), 'comment': load('issue_comment')}
         github3.events._issuecomm(c)
-        expect(c['issue']).isinstance(github3.issues.Issue)
-        expect(c['comment']).isinstance(github3.issues.comment.IssueComment)
+        assert isinstance(c['issue'], github3.issues.Issue)
+        assert isinstance(c['comment'], github3.issues.comment.IssueComment)
 
     def test_issueevent(self):
         c = {'issue': load('issue')}
         github3.events._issueevent(c)
-        expect(c['issue']).isinstance(github3.issues.Issue)
+        assert isinstance(c['issue'], github3.issues.Issue)
 
     def test_member(self):
         m = {'member': load('user')}
         github3.events._member(m)
-        expect(m['member']).isinstance(github3.users.User)
+        assert isinstance(m['member'], github3.users.User)
 
     def test_pullreqev(self):
         p = {'pull_request': load('pull')}
         github3.events._pullreqev(p)
-        expect(p['pull_request']).isinstance(github3.pulls.PullRequest)
+        assert isinstance(p['pull_request'], github3.pulls.PullRequest)
 
     def test_pullreqcomm(self):
         p = {'comment': load('review_comment')}
         github3.events._pullreqcomm(p)
-        expect(p['comment']).isinstance(github3.pulls.ReviewComment)
+        assert isinstance(p['comment'], github3.pulls.ReviewComment)
 
     def test_team(payload):
         t = {'team': load('team'), 'repo': load('repo'), 'user': load('user')}
         github3.events._team(t)
-        expect(t['team']).isinstance(github3.orgs.Team)
-        expect(t['repo']).isinstance(github3.repos.Repository)
-        expect(t['user']).isinstance(github3.users.User)
+        assert isinstance(t['team'], github3.orgs.Team)
+        assert isinstance(t['repo'], github3.repos.Repository)
+        assert isinstance(t['user'], github3.users.User)
