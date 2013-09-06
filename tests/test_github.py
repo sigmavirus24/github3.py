@@ -639,14 +639,14 @@ class TestGitHub(BaseCase):
             repo.return_value = github3.repos.Repository(load('repo'))
             pr = self.g.pull_request('sigmavirus24', 'github3.py', 18)
 
-        expect(pr).isinstance(github3.pulls.PullRequest)
+        assert isinstance(pr, github3.pulls.PullRequest)
 
         self.mock_assertions()
 
     def test_repository(self):
         self.response('repo')
         repo = self.g.repository(None, None)
-        expect(repo).is_None()
+        assert repo is None
         self.not_called()
 
         self.get('https://api.github.com/repos/sigmavirus24/github3.py')
