@@ -1,6 +1,6 @@
 import github3
 from mock import patch, Mock
-from tests.utils import (expect, BaseCase, load)
+from tests.utils import (BaseCase, load)
 
 
 class TestGitHub(BaseCase):
@@ -617,7 +617,7 @@ class TestGitHub(BaseCase):
         assert self.g.pubsubhubbub(**d) is True
         _, kwargs = self.request.call_args
 
-        expect('data').is_in(kwargs)
+        assert 'data' in kwargs
         assert body == kwargs['data']
         self.mock_assertions()
 
@@ -625,7 +625,7 @@ class TestGitHub(BaseCase):
         body.append(('hub.secret', 'secret'))
         assert self.g.pubsubhubbub(**d)
         _, kwargs = self.request.call_args
-        expect('data').is_in(kwargs)
+        assert 'data' in kwargs
         assert body == kwargs['data']
         self.mock_assertions()
 
@@ -899,7 +899,7 @@ class TestGitHubEnterprise(BaseCase):
         d = dict([(k[4:], v) for k, v in body])
         assert self.g.pubsubhubbub(**d)
         _, kwargs = self.request.call_args
-        expect('data').is_in(kwargs)
+        assert 'data' in kwargs
         assert body == kwargs['data']
         self.mock_assertions()
 
@@ -907,7 +907,7 @@ class TestGitHubEnterprise(BaseCase):
         body.append(('hub.secret', 'secret'))
         assert self.g.pubsubhubbub(**d)
         _, kwargs = self.request.call_args
-        expect('data').is_in(kwargs)
+        assert 'data' in kwargs
         assert body == kwargs['data']
         self.mock_assertions()
 
