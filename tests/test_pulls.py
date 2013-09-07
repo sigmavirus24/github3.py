@@ -146,3 +146,7 @@ class TestPullRequest(BaseCase):
 
     def test_enterprise(self):
         github3.pulls.PullRequest(load('pull_enterprise'))
+
+    def test_pull_request_issues(self):
+        pr = github3.pulls.PullRequest(load('pull_request'))
+        self.assertTrue(pr.issue_url, 'https://github.com/sigmavirus24/github3.py/pull/135')
