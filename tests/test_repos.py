@@ -798,7 +798,7 @@ class TestRepository(BaseCase):
 
         with self.assertRaises(StopIteration):
             next(self.repo.iter_statuses(None))
-            self.not_called()
+        self.not_called()
 
         s = next(self.repo.iter_statuses('fakesha'))
         assert isinstance(s, repos.status.Status)

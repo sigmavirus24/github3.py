@@ -96,9 +96,9 @@ class TestGitHub(BaseCase):
     def test_create_key(self):
         self.response('key', 201)
 
-        with self.assertRaises(github3.GitHubError):
-            k = self.g.create_key(None, None)
-            assert k is None
+        self.assertRaises(github3.GitHubError, self.g.create_key, None, None)
+#            k = self.g.create_key(None, None)
+#            assert k is None
         assert self.request.called is False
 
         self.login()

@@ -1,7 +1,11 @@
+import sys
+import json
+if sys.version_info < (3, 0):
+    import unittest2 as unittest
+else:
+    import unittest
 import requests
 import github3
-import json
-import sys
 from mock import patch
 from io import BytesIO
 from unittest import TestCase
@@ -20,7 +24,7 @@ def path(name, mode='r'):
     return open('tests/json/{0}'.format(name), mode)
 
 
-class BaseCase(TestCase):
+class BaseCase(unittest.TestCase):
     github_url = 'https://api.github.com/'
 
     def setUp(self):

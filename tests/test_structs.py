@@ -49,8 +49,7 @@ class TestGitHubIterator(BaseCase):
         self.get(self.api_url)
         self.conf = {'params': None, 'headers': {}}
 
-        with self.assertRaises(StopIteration):
-            next(self.i)
+        self.assertRaises(StopIteration, next, self.i)
 
         self.mock_assertions()
 
@@ -61,8 +60,7 @@ class TestGitHubIterator(BaseCase):
 
         assert isinstance(next(self.i), github3.users.User)
 
-        with self.assertRaises(StopIteration):
-            next(self.i)
+        self.assertRaises(StopIteration, next, self.i)
 
         self.mock_assertions()
 
@@ -73,8 +71,7 @@ class TestGitHubIterator(BaseCase):
         self.i = GitHubIterator(1, self.api_url, github3.users.User, self.g)
 
         assert isinstance(next(self.i), github3.users.User)
-        with self.assertRaises(StopIteration):
-            next(self.i)
+        self.assertRaises(StopIteration, next, self.i)
 
         self.mock_assertions()
 

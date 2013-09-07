@@ -121,8 +121,7 @@ class TestGist(BaseCase):
         assert repr(gist_file).startswith('<Gist File')
 
     def test_iter_forks(self):
-        with self.assertRaises(StopIteration):
-            assert next(self.gist.iter_forks())
+        self.assertRaises(StopIteration, next, self.gist.iter_forks())
 
     def test_refresh(self):
         self.response('gist', 200)
