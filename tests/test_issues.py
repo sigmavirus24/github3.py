@@ -5,7 +5,7 @@ from github3.issues.label import Label
 from github3.issues.milestone import Milestone
 from github3.issues import Issue
 import datetime
-from tests.utils import BaseCase, load, expect
+from tests.utils import BaseCase, load
 from mock import patch
 
 
@@ -22,44 +22,42 @@ class TestLabel(BaseCase):
 
     def test_equality(self):
         l = Label(load('label'))
-        expect(self.l) == l
+        assert self.l == l
         l._api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                   "labels/wontfix")
-        expect(self.l) != l
+        assert self.l != l
 
     def test_repr(self):
-        expect(repr(self.l)) == '<Label [{0}]>'.format(self.l.name)
+        assert repr(self.l) == '<Label [{0}]>'.format(self.l.name)
 
     def test_str(self):
-        expect(str(self.l)) == self.l.name
+        assert str(self.l) == self.l.name
 
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
 
-        with expect.githuberror():
-            self.l.delete()
+        self.assertRaises(github3.GitHubError, self.l.delete)
 
         self.not_called()
         self.login()
-        expect(self.l.delete()).is_True()
+        assert self.l.delete()
 
     def test_update(self):
         self.response('label', 200)
         self.patch(self.api)
         self.conf = {'data': {'name': 'newname', 'color': 'afafaf'}}
 
-        with expect.githuberror():
-            self.l.update(None, None)
+        self.assertRaises(github3.GitHubError, self.l.update, None, None)
 
         self.login()
-        expect(self.l.update(None, None)).is_False()
+        assert self.l.update(None, None) is False
         self.not_called()
 
-        expect(self.l.update('newname', 'afafaf')).is_True()
+        assert self.l.update('newname', 'afafaf')
         self.mock_assertions()
 
-        expect(self.l.update('newname', '#afafaf')).is_True()
+        assert self.l.update('newname', '#afafaf')
         self.mock_assertions()
 
 
@@ -75,36 +73,35 @@ class TestMilestone(BaseCase):
         self.m = Milestone(self.m.to_json(), self.g)
 
     def test_repr(self):
-        expect(repr(self.m)) == '<Milestone [v1.0.0]>'
+        assert repr(self.m) == '<Milestone [v1.0.0]>'
 
     def test_str(self):
-        expect(str(self.m)) == 'v1.0.0'
+        assert str(self.m) == 'v1.0.0'
 
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
 
-        with expect.githuberror():
-            self.m.delete()
+        self.assertRaises(github3.GitHubError, self.m.delete)
 
         self.not_called()
         self.login()
-        expect(self.m.delete()).is_True()
+        assert self.m.delete()
         self.mock_assertions()
 
     def test_due_on(self):
         json = self.m.to_json().copy()
         json['due_on'] = '2012-12-31T23:59:59Z'
         m = Milestone(json)
-        expect(m.due_on).isinstance(datetime.datetime)
+        assert isinstance(m.due_on, datetime.datetime)
 
     def test_iter_labels(self):
         self.response('label', _iter=True)
         self.get(self.api + '/labels')
 
         i = self.m.iter_labels()
-        expect(i).isinstance(github3.structs.GitHubIterator)
-        expect(next(i)).isinstance(Label)
+        assert isinstance(i, github3.structs.GitHubIterator)
+        assert isinstance((next(i)), Label)
         self.mock_assertions()
 
     def test_update(self):
@@ -119,15 +116,14 @@ class TestMilestone(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.m.update(None)
+        self.assertRaises(github3.GitHubError, self.m.update, None)
 
         self.login()
-        expect(self.m.update(None)).is_False()
+        assert self.m.update(None) is False
         self.not_called()
 
-        expect(self.m.update('foo', 'closed', ':sparkles:',
-                             '2013-12-31T23:59:59Z')).is_True()
+        assert self.m.update('foo', 'closed', ':sparkles:',
+                             '2013-12-31T23:59:59Z')
         self.mock_assertions()
 
 
@@ -144,39 +140,37 @@ class TestIssue(BaseCase):
 
     def test_equality(self):
         i = Issue(load('issue'))
-        expect(self.i) == i
+        assert self.i == i
         i.id = 1
-        expect(self.i) != i
+        assert self.i != i
 
     def test_repr(self):
-        expect(repr(self.i)) == '<Issue [sigmavirus24/github3.py #1]>'
+        assert repr(self.i) == '<Issue [sigmavirus24/github3.py #1]>'
 
     def test_add_labels(self):
         self.response('label', 200, _iter=True)
         self.post(self.api + '/labels')
         self.conf = {'data': '["enhancement"]'}
 
-        with expect.githuberror():
-            self.i.add_labels('foo')
+        self.assertRaises(github3.GitHubError, self.i.add_labels, 'foo')
 
         self.not_called()
         self.login()
         labels = self.i.add_labels('enhancement')
-        expect(labels) != []
-        expect(labels[0]).isinstance(Label)
+        assert labels != []
+        assert isinstance(labels[0], Label)
         self.mock_assertions()
 
     def test_assign(self):
-        with expect.githuberror():
-            self.i.assign('foo')
+        self.assertRaises(github3.GitHubError, self.i.assign, 'foo')
 
         self.login()
 
         with patch.object(Issue, 'edit') as ed:
             ed.return_value = True
-            expect(self.i.assign(None)).is_False()
+            assert self.i.assign(None) is False
             self.not_called()
-            expect(self.i.assign('sigmavirus24')).is_True()
+            assert self.i.assign('sigmavirus24')
             n = self.i.milestone.number if self.i.milestone else None
             labels = [str(l) for l in self.i.labels]
             ed.assert_called_once_with(
@@ -185,15 +179,14 @@ class TestIssue(BaseCase):
             )
 
     def test_close(self):
-        with expect.githuberror():
-            self.i.close()
+        self.assertRaises(github3.GitHubError, self.i.close)
 
         self.not_called()
         self.login()
 
         with patch.object(Issue, 'edit') as ed:
             ed.return_value = True
-            expect(self.i.close()).is_True()
+            assert self.i.close()
             u = self.i.assignee.login if self.i.assignee else ''
             n = self.i.milestone.number if self.i.milestone else None
             l = [str(label) for label in self.i.labels]
@@ -206,8 +199,8 @@ class TestIssue(BaseCase):
         self.get(self.api[:-1] + 'comments/476476')
 
         c = self.i.comment('476476')
-        expect(c).isinstance(IssueComment)
-        expect(repr(c).startswith('<Issue Comment')).is_True()
+        assert isinstance(c, IssueComment)
+        assert repr(c).startswith('<Issue Comment')
         self.mock_assertions()
 
     def test_create_comment(self):
@@ -215,14 +208,13 @@ class TestIssue(BaseCase):
         self.post(self.api + '/comments')
         self.conf = {'data': {'body': 'comment body'}}
 
-        with expect.githuberror():
-            self.i.create_comment('')
+        self.assertRaises(github3.GitHubError, self.i.create_comment, '')
 
         self.login()
-        expect(self.i.create_comment(None)).is_None()
+        assert self.i.create_comment(None) is None
         self.not_called()
 
-        expect(self.i.create_comment('comment body')).isinstance(IssueComment)
+        assert isinstance(self.i.create_comment('comment body'), IssueComment)
         self.mock_assertions()
 
     def test_edit(self):
@@ -230,30 +222,29 @@ class TestIssue(BaseCase):
         self.patch(self.api)
         self.conf = {'data': {'title': 'new title'}}
 
-        with expect.githuberror():
-            self.i.edit()
+        self.assertRaises(github3.GitHubError, self.i.edit)
 
         self.login()
-        expect(self.i.edit()).is_False()
+        assert self.i.edit() is False
         self.not_called()
 
-        expect(self.i.edit('new title')).is_True()
+        assert self.i.edit('new title')
         self.mock_assertions()
 
     def test_is_closed(self):
-        expect(self.i.is_closed()).is_True()
+        assert self.i.is_closed()
 
         self.i.closed_at = None
-        expect(self.i.is_closed()).is_True()
+        assert self.i.is_closed()
 
         self.i.state = 'open'
-        expect(self.i.is_closed()).is_False()
+        assert self.i.is_closed() is False
 
     def test_iter_comments(self):
         self.response('issue_comment', _iter=True)
         self.get(self.api + '/comments')
 
-        expect(next(self.i.iter_comments())).isinstance(IssueComment)
+        assert isinstance((next(self.i.iter_comments())), IssueComment)
         self.mock_assertions()
 
     def test_iter_events(self):
@@ -261,31 +252,29 @@ class TestIssue(BaseCase):
         self.get(self.api + '/events')
 
         e = next(self.i.iter_events())
-        expect(e).isinstance(IssueEvent)
-        expect(repr(e).startswith('<Issue Event')).is_True()
+        assert isinstance(e, IssueEvent)
+        assert repr(e).startswith('<Issue Event')
         self.mock_assertions()
 
     def test_remove_label(self):
         self.response('', 204)
         self.delete(self.api + '/labels/name')
 
-        with expect.githuberror():
-            self.i.remove_label('name')
+        self.assertRaises(github3.GitHubError, self.i.remove_label, 'name')
 
         self.not_called()
         self.login()
-        expect(self.i.remove_label('name')).is_True()
+        assert self.i.remove_label('name')
         self.mock_assertions()
 
     def test_remove_all_labels(self):
-        with expect.githuberror():
-            self.i.remove_all_labels()
+        self.assertRaises(github3.GitHubError, self.i.remove_all_labels)
 
         self.login()
 
         with patch.object(Issue, 'replace_labels') as rl:
             rl.return_value = []
-            expect(self.i.remove_all_labels()) == []
+            assert self.i.remove_all_labels() == []
             rl.assert_called_once_with([])
 
     def test_replace_labels(self):
@@ -293,19 +282,17 @@ class TestIssue(BaseCase):
         self.put(self.api + '/labels')
         self.conf = {'data': '["foo", "bar"]'}
 
-        with expect.githuberror():
-            self.i.replace_labels([])
+        self.assertRaises(github3.GitHubError, self.i.replace_labels, [])
 
         self.not_called()
         self.login()
 
         labels = self.i.replace_labels(['foo', 'bar'])
-        expect(labels) != []
-        expect(labels[0]).isinstance(Label)
+        assert labels != []
+        assert isinstance(labels[0], Label)
 
     def test_reopen(self):
-        with expect.githuberror():
-            self.i.reopen()
+        self.assertRaises(github3.GitHubError, self.i.reopen)
 
         self.login()
         n = self.i.milestone.number if self.i.milestone else None
@@ -313,7 +300,7 @@ class TestIssue(BaseCase):
 
         with patch.object(Issue, 'edit') as ed:
             ed.return_value = True
-            expect(self.i.reopen()).is_True()
+            assert self.i.reopen()
             labels = [str(l) for l in self.i.labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, 'open', n, labels
@@ -330,6 +317,6 @@ class TestIssueEvent(BaseCase):
 
     def test_equality(self):
         e = IssueEvent(load('issue_event'))
-        expect(self.ev) == e
+        assert self.ev == e
         e.commit_id = 'fake'
-        expect(self.ev) != e
+        assert self.ev != e

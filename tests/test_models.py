@@ -1,12 +1,12 @@
 import github3
 import requests
-from tests.utils import BaseCase, TestCase, expect, RequestsBytesIO, is_py3
+from tests.utils import BaseCase, TestCase, RequestsBytesIO, is_py3
 
 
 class TestGitHubObject(TestCase):
     def test_from_json(self):
         o = github3.models.GitHubObject.from_json({})
-        expect(o).isinstance(github3.models.GitHubObject)
+        assert isinstance(o, github3.models.GitHubObject)
 
 
 class TestGitHubCore(BaseCase):
@@ -16,7 +16,7 @@ class TestGitHubCore(BaseCase):
 
     def test_repr(self):
         g = self.g
-        expect(repr(g)) == '<github3-core at 0x{0:x}>'.format(id(g))
+        assert repr(g) == '<github3-core at 0x{0:x}>'.format(id(g))
 
     def test_json(self):
         r = requests.Response()
@@ -26,22 +26,21 @@ class TestGitHubCore(BaseCase):
         r.status_code = 200
 
         json = self.g._json(r, 200)
-        expect(json['Last-Modified']) == 'foo'
-        expect(json['ETag']) == 'bar'
+        assert json['Last-Modified'] == 'foo'
+        assert json['ETag'] == 'bar'
 
     def test_boolean(self):
         r = requests.Response()
         r.status_code = 512
         r.raw = RequestsBytesIO('{}'.encode() if is_py3 else '{}')
 
-        with expect.githuberror():
-            self.g._boolean(r, 200, 404)
+        self.assertRaises(github3.GitHubError, self.g._boolean, r, 200, 404)
 
     def test_ratelimit_remaining(self):
         self.response('ratelimit')
         self.get(self.github_url + 'rate_limit')
 
-        expect(self.g.ratelimit_remaining) == 60
+        assert self.g.ratelimit_remaining == 60
         self.mock_assertions()
 
 
@@ -55,17 +54,17 @@ class TestGitHubError(TestCase):
         self.error = github3.models.GitHubError(self.r)
 
     def test_repr(self):
-        expect(repr(self.error)) == '<GitHubError [m]>'
+        assert repr(self.error) == '<GitHubError [m]>'
 
     def test_str(self):
-        expect(str(self.error)) == '400 m'
+        assert str(self.error) == '400 m'
 
     def test_message(self):
-        expect(self.error.message) == self.error.msg
+        assert self.error.message == self.error.msg
 
     def test_amazon(self):
         r = requests.Response()
         r.status_code = 400
         r.raw = RequestsBytesIO()
         e = github3.models.GitHubError(r)
-        expect(e.message) == '[No message]'
+        assert e.message == '[No message]'

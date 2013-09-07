@@ -1,6 +1,11 @@
+import sys
+if sys.version_info < (3, 0):
+    import unittest2 as unittest
+else:
+    import unittest
 import github3
 from mock import patch
-from tests.utils import (expect, BaseCase, load)
+from tests.utils import (BaseCase, load)
 from datetime import datetime
 
 
@@ -16,24 +21,23 @@ class TestKey(BaseCase):
 
     def test_equality(self):
         k = github3.users.Key(self.key.to_json())
-        expect(self.key) == k
+        assert self.key == k
         k.id += 1
-        expect(self.key) != k
+        assert self.key != k
 
     def test_str(self):
-        expect(str(self.key)) == self.key.key
-        expect(repr(self.key).startswith('<User Key')).is_True()
+        assert str(self.key) == self.key.key
+        assert repr(self.key).startswith('<User Key')
 
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
 
-        with expect.githuberror():
-            self.key.delete()
+        self.assertRaises(github3.GitHubError, self.key.delete)
 
         self.not_called()
         self.login()
-        expect(self.key.delete()).is_True()
+        assert self.key.delete()
         self.mock_assertions()
 
     def test_update(self):
@@ -46,14 +50,13 @@ class TestKey(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.key.update(None, None)
+        self.assertRaises(github3.GitHubError, self.key.update, None, None)
 
         self.login()
 
-        expect(self.key.update(None, None)).is_False()
+        assert self.key.update(None, None) is False
         self.not_called()
-        expect(self.key.update(**self.conf['data'])).is_True()
+        assert self.key.update(**self.conf['data'])
         self.mock_assertions()
 
 
@@ -68,9 +71,9 @@ class TestPlan(BaseCase):
         })
 
     def test_str(self):
-        expect(str(self.plan)) == self.plan.name
-        expect(repr(self.plan)) == '<Plan [free]>'
-        expect(self.plan.is_free()).is_True()
+        assert str(self.plan) == self.plan.name
+        assert repr(self.plan) == '<Plan [free]>'
+        assert self.plan.is_free()
 
 
 class TestUser(BaseCase):
@@ -118,12 +121,11 @@ class TestUser(BaseCase):
         self.mock_assertions()
 
     def test_str(self):
-        expect(str(self.user)) == 'sigmavirus24'
-        expect(repr(self.user)) == '<User [sigmavirus24:Ian Cordasco]>'
+        assert str(self.user) == 'sigmavirus24'
+        assert repr(self.user) == '<User [sigmavirus24:Ian Cordasco]>'
 
     def test_add_email_address(self):
-        with expect.githuberror():
-            self.user.add_email_address('foo')
+        self.assertRaises(github3.GitHubError, self.user.add_email_address, 'foo')
 
         self.not_called()
         self.login()
@@ -138,8 +140,7 @@ class TestUser(BaseCase):
             'data': '["foo@bar.com"]',
         }
 
-        with expect.githuberror():
-            self.user.add_email_addresses([])
+        self.assertRaises(github3.GitHubError, self.user.add_email_addresses, [])
 
         self.not_called()
         self.login()
@@ -148,8 +149,7 @@ class TestUser(BaseCase):
         self.mock_assertions()
 
     def test_delete_email_address(self):
-        with expect.githuberror():
-            self.user.delete_email_address('foo')
+        self.assertRaises(github3.GitHubError, self.user.delete_email_address, 'foo')
 
         self.not_called()
         self.login()
@@ -164,35 +164,32 @@ class TestUser(BaseCase):
             'data': '["foo@bar.com"]'
         }
 
-        with expect.githuberror():
-            self.user.delete_email_addresses([])
+        self.assertRaises(github3.GitHubError, self.user.delete_email_addresses, [])
 
         self.not_called()
         self.login()
-        expect(
-            self.user.delete_email_addresses(['foo@bar.com'])
-        ).is_True()
+        assert self.user.delete_email_addresses(['foo@bar.com'])
         self.mock_assertions()
 
     def test_is_assignee_on(self):
         self.response('', 404)
         self.get(self.github_url + 'repos/abc/def/assignees/sigmavirus24')
 
-        expect(self.user.is_assignee_on('abc', 'def')).is_False()
+        assert self.user.is_assignee_on('abc', 'def') is False
         self.mock_assertions()
 
     def test_is_following(self):
         self.response('', 204)
         self.get(self.api + '/following/kennethreitz')
 
-        expect(self.user.is_following('kennethreitz')).is_True()
+        assert self.user.is_following('kennethreitz')
         self.mock_assertions()
 
     def test_iter_events(self):
         self.response('event', 200, _iter=True)
         self.get(self.api + '/events')
 
-        expect(next(self.user.iter_events())).isinstance(github3.events.Event)
+        assert isinstance(next(self.user.iter_events()), github3.events.Event)
         self.mock_assertions()
 
         self.get(self.api + '/events/public')
@@ -203,34 +200,34 @@ class TestUser(BaseCase):
         self.response('user', 200, _iter=True)
         self.get(self.api + '/followers')
 
-        expect(next(self.user.iter_followers())).isinstance(github3.users.User)
+        assert isinstance(next(self.user.iter_followers()), github3.users.User)
         self.mock_assertions()
 
     def test_iter_following(self):
         self.response('user', 200, _iter=True)
         self.get(self.api + '/following')
 
-        expect(next(self.user.iter_following())).isinstance(github3.users.User)
+        assert isinstance(next(self.user.iter_following()), github3.users.User)
         self.mock_assertions()
 
     def test_iter_org_events(self):
         self.response('event', 200, _iter=True)
         self.get(self.api + '/events/orgs/foo')
 
-        with expect.raises(StopIteration):
+        with self.assertRaises(StopIteration):
             next(self.user.iter_org_events(None))
 
         self.not_called()
-        expect(next(self.user.iter_org_events('foo'))).isinstance(
-            github3.events.Event)
+        assert isinstance(next(self.user.iter_org_events('foo')),
+                          github3.events.Event)
         self.mock_assertions()
 
     def test_iter_received_events(self):
         self.response('event', 200, _iter=True)
         self.get(self.api + '/received_events')
 
-        expect(next(self.user.iter_received_events())).isinstance(
-            github3.events.Event)
+        assert isinstance(next(self.user.iter_received_events()),
+                          github3.events.Event)
         self.mock_assertions()
 
         self.get(self.api + '/received_events/public')
@@ -241,23 +238,23 @@ class TestUser(BaseCase):
         self.response('repo', 200, _iter=True)
         self.get(self.api + '/starred')
 
-        expect(next(self.user.iter_starred())).isinstance(
-            github3.repos.Repository)
+        assert isinstance(next(self.user.iter_starred()),
+                          github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_subscriptions(self):
         self.response('repo', 200, _iter=True)
         self.get(self.api + '/subscriptions')
 
-        expect(next(self.user.iter_subscriptions())).isinstance(
-            github3.repos.Repository)
+        assert isinstance(next(self.user.iter_subscriptions()),
+                          github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_keys(self):
         self.response('key', 200, _iter=True)
         self.get(self.api + '/keys')
 
-        expect(next(self.user.iter_keys())).isinstance(github3.users.Key)
+        assert isinstance(next(self.user.iter_keys()), github3.users.Key)
         self.mock_assertions()
 
     def test_update(self):
@@ -272,19 +269,18 @@ class TestUser(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.user.update()
+        self.assertRaises(github3.GitHubError, self.user.update)
 
         self.not_called()
         self.login()
-        expect(self.user.update(**self.conf['data'])).is_True()
+        assert self.user.update(**self.conf['data'])
         self.mock_assertions()
 
         self.response('', 404)
-        expect(self.user.update(**self.conf['data'])).is_False()
+        assert self.user.update(**self.conf['data']) is False
 
     def test_equality(self):
         u = github3.users.User(load('user'))
-        expect(self.user) == u
+        assert self.user == u
         u.id += 1
-        expect(self.user) != u
+        assert self.user != u
