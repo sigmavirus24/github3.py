@@ -1,3 +1,8 @@
+import sys
+if sys.version_info < (3, 0):
+    import unittest2 as unittest
+else:
+    import unittest
 import github3
 from github3 import gists
 from tests.utils import (BaseCase, load)
