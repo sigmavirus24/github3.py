@@ -2,5 +2,5 @@ requests==1.2.3
 uritemplate.py==0.2.0
 git+git://github.com/garybernhardt/expecter.git
 coverage==3.5.2
-mock==1.0.0
+mock==1.0.1
 pytest==2.3.5
