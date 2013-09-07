@@ -4,3 +4,4 @@ git+git://github.com/garybernhardt/expecter.git
 coverage==3.5.2
 mock==1.0.1
 pytest==2.3.5
+wheel==0.21.0
