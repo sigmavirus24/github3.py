@@ -78,21 +78,21 @@ class BaseCase(TestCase):
         conf = self.conf.copy()
         args, kwargs = self.request.call_args
 
-        expect(self.args) == args
+        assert self.args == args
 
         if 'data' in self.conf:
             if isinstance(self.conf['data'], dict):
                 for k, v in list(self.conf['data'].items()):
                     s = json.dumps({k: v})[1:-1]
-                    expect(s).is_in(kwargs['data'])
+                    assert s in kwargs['data']
             else:
-                expect(self.conf['data']) == kwargs['data']
+                assert self.conf['data'] == kwargs['data']
 
             del self.conf['data']
 
         for k in self.conf:
-            expect(k).is_in(kwargs)
-            expect(self.conf[k]) == kwargs[k]
+            assert k in kwargs
+            assert self.conf[k] == kwargs[k]
 
         self.request.reset_mock()
         self.conf = conf
@@ -139,7 +139,7 @@ class BaseCase(TestCase):
         self.args = ('PUT', url)
 
     def not_called(self):
-        expect(self.request.called).is_False()
+        assert self.request.called is False
 
     def assertGitHubErrorRaised(self, func, *args, **kwargs):
         return self.assertRaises(github3.GitHubError, func(*args, **kwargs))
