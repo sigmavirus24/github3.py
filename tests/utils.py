@@ -1,7 +1,5 @@
-import contextlib
 import requests
 import github3
-import expecter
 import json
 import sys
 from mock import patch
@@ -20,41 +18,6 @@ def load(name):
 
 def path(name, mode='r'):
     return open('tests/json/{0}'.format(name), mode)
-
-
-class CustomExpecter(expecter.expect):
-    def is_not_None(self):
-        assert self._actual is not None, (
-            'Expected anything but None but got it.'
-        )
-
-    def is_None(self):
-        assert self._actual is None, (
-            'Expected None but got %s' % repr(self._actual)  # nopep8
-        )
-
-    def is_True(self):
-        assert self._actual is True, (
-            'Expected True but got %s' % repr(self._actual)  # nopep8
-        )
-
-    def is_False(self):
-        assert self._actual is False, (
-            'Expected False but got %s' % repr(self._actual)  # nopep8
-        )
-
-    def is_in(self, iterable):
-        assert self._actual in iterable, (
-            "Expected %s in %s but it wasn't" % (
-                repr(self._actual), repr(iterable)
-            )
-        )
-
-    @classmethod
-    def githuberror(cls):
-        return cls.raises(github3.GitHubError)
-
-expect = CustomExpecter
 
 
 class BaseCase(TestCase):
