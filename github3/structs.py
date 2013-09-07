@@ -41,7 +41,8 @@ class GitHubIterator(GitHubCore, Iterator):
     def __iter__(self):
         url, params, cls = self.url, self.params, self.cls
         headers = self.headers
-
+        if params.get('per_page') is None:
+            params['per_page'] = 100
         while (self.count == -1 or self.count > 0) and url:
             response = self._get(url, params=params, headers=headers)
             self.last_response = response
