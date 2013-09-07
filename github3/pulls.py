@@ -166,7 +166,7 @@ class PullRequest(GitHubCore):
         #: The URL of the patch
         self.patch_url = pull.get('patch_url')
 
-        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+',
+        m = match('https://github\.com/(\S+)/(\S+)/(?:issues|pull)?/\d+',
                   self.issue_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
