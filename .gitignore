@@ -13,3 +13,4 @@ htmlcov/
 venv/
 venv*/
 build/
+*.egg
