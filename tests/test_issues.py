@@ -309,6 +309,18 @@ class TestIssue(BaseCase):
     def test_enterprise(self):
         Issue(load('issue_enterprise'))
 
+    def test_issue_137(self):
+        """
+        GitHub sometimes returns `pull` as part of of the `html_url` for Issue
+        requests.
+        """
+        i = Issue(load('issue_137'))
+        self.assertEqual(
+            i.html_url,
+            "https://github.com/sigmavirus24/github3.py/pull/1")
+        self.assertEqual(i.repository, ("sigmavirus24", "github3.py"))
+
+
 
 class TestIssueEvent(BaseCase):
     def setUp(self):
