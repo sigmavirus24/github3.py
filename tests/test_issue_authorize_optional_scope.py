@@ -1,11 +1,12 @@
 import github3
-from mock import patch, Mock
-from tests.utils import (expect, BaseCase, load)
+from tests.utils import BaseCase
 
 """
-http://github3py.readthedocs.org/en/0.7.0/github.html#github3.github.GitHub.authorize says scopes are required.
+http://github3py.readthedocs.org/en/0.7.0/github.html#github3.github.GitHub
+says scopes are required to create an authorization.
 
-http://developer.github.com/v3/oauth/#create-a-new-authorization (at time of writing - 2013-09-06) disagrees
+http://developer.github.com/v3/oauth/#create-a-new-authorization (at time of
+writing - 2013-09-06) disagrees
 """
 
 
@@ -20,7 +21,7 @@ class TestOptionalScope(BaseCase):
         self.not_called()
 
         a = self.g.authorize('user', 'password', scopes)
-        expect(a).isinstance(github3.auths.Authorization)
+        assert isinstance(a, github3.auths.Authorization)
         assert self.request.called is True
 
         self.request.reset_mock()
@@ -35,7 +36,7 @@ class TestOptionalScope(BaseCase):
         self.not_called()
 
         a = self.g.authorize('user', 'password')
-        expect(a).isinstance(github3.auths.Authorization)
+        assert isinstance(a, github3.auths.Authorization)
         assert self.request.called is True
 
         self.request.reset_mock()
