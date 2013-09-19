@@ -16,7 +16,7 @@ packages = [
     "github3.issues",
 ]
 
-kwargs['tests_require'] = ['mock==1.0.1', 'expecter', 'pytest==2.3.5']
+kwargs['tests_require'] = ['mock==1.0.1', 'betamax', 'pytest==2.3.5']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2==0.5.1')
 packages.append('tests')
@@ -39,16 +39,18 @@ with open('github3/__init__.py', 'r') as fd:
 if not __version__:
     raise RuntimeError('Cannot find version information')
 
+
 class PyTest(TestCommand):
-     def finalize_options(self):
-         TestCommand.finalize_options(self)
-         self.test_args = ['-q', 'tests/']
-         self.test_suite = True
-     def run_tests(self):
-         #import here, cause outside the eggs aren't loaded
-         import pytest
-         errno = pytest.main(self.test_args)
-         sys.exit(errno)
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['-q', 'tests/']
+        self.test_suite = True
+
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 setup(
     name="github3.py",
