@@ -22,5 +22,5 @@ test-deps:
 htmlcov: .coverage
 	coverage html --omit=github3/packages/*
 
-docs:
+docs: docs/*.rst
 	make -C docs/ html
