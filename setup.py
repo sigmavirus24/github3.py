@@ -22,7 +22,7 @@ if sys.version_info < (3, 0):
 packages.append('tests')
 
 if sys.argv[-1] in ("submit", "publish"):
-    os.system("python setup.py sdist upload")
+    os.system("python setup.py bdist_wheel sdist upload")
     sys.exit()
 
 requires.extend(["requests >= 1.2.3", "uritemplate.py >= 0.2.0"])
