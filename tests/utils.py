@@ -1,14 +1,13 @@
-import sys
 import json
-if sys.version_info < (3, 0):
+import os
     import unittest2 as unittest
 else:
     import unittest
+
 import requests
 import github3
 from mock import patch
 from io import BytesIO
-from unittest import TestCase
 from requests.structures import CaseInsensitiveDict
 
 is_py3 = sys.version_info > (3, 0)
@@ -29,6 +28,8 @@ class BaseCase(unittest.TestCase):
 
     def setUp(self):
         self.g = github3.GitHub()
+        if os.environ.get('GH_AUTH'):
+            self.g.login(token=os.environ['GH_AUTH'])
         self.args = ()
         self.conf = {'allow_redirects': True}
         self.mock = patch.object(requests.sessions.Session, 'request')
