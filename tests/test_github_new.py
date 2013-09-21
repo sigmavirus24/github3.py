@@ -21,8 +21,9 @@ class BaseCase(TestCase):
 
     def test_create_gist(self):
         self.login()
+        #import pytest
+        #pytest.set_trace()
         with Betamax(self.session).use_cassette('GitHub_create_gist'):
-            #import pytest; pytest.set_trace()
             g = self.g.create_gist(
                 'Gist Title', {'filename.py': {'content': '#content'}}
             )
