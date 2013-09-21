@@ -1,8 +1,11 @@
 import json
 import os
-    import unittest2 as unittest
+import sys
+
+if sys.version_info < (3, 0):
+    from unittest2 import TestCase
 else:
-    import unittest
+    from unittest import TestCase
 
 import requests
 import github3
@@ -23,11 +26,12 @@ def path(name, mode='r'):
     return open('tests/json/{0}'.format(name), mode)
 
 
-class BaseCase(unittest.TestCase):
+class BaseCase(TestCase):
     github_url = 'https://api.github.com/'
 
     def setUp(self):
         self.g = github3.GitHub()
+        self.session = self.g._session
         if os.environ.get('GH_AUTH'):
             self.g.login(token=os.environ['GH_AUTH'])
         self.args = ()

@@ -1,13 +1,7 @@
-import sys
-if sys.version_info < (3, 0):
-    import unittest2 as unittest
-else:
-    import unittest
-
 import github3
 from mock import patch, Mock
 from tests.utils import (BaseCase, load)
-from betamax import Betamax
+#from betamax import Betamax
 
 
 class TestGitHub(BaseCase):
@@ -69,16 +63,16 @@ class TestGitHub(BaseCase):
         self.mock_assertions()
 
     def test_create_gist(self):
-        #self.response('gist', 201)
+        self.response('gist', 201)
 
-        #g = self.g.create_gist('description', 'files')
-        #assert isinstance(g, github3.gists.Gist)
-        #assert self.request.called is True
-        with Betamax(self.session).use_cassette('GitHub_create_gist'):
-            self.g.create_gist(
-                'description of test_gist', {
-                    'filename': 'contents'
-                })
+        g = self.g.create_gist('description', 'files')
+        assert isinstance(g, github3.gists.Gist)
+        assert self.request.called is True
+        #with Betamax(self.session).use_cassette('GitHub_create_gist'):
+        #    self.g.create_gist(
+        #        'description of test_gist', {
+        #            'filename': 'contents'
+        #        })
 
     def test_create_issue(self):
         self.response('issue', 201)
