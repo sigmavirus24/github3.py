@@ -15,6 +15,4 @@ branches:
    except:
       - uricore
 
-env:
-    - TRAVIS_GH3="True"
-    - GH_AUTH=xxxxxxxxx
+env: TRAVIS_GH3="True"
