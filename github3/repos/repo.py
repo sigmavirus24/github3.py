@@ -1093,8 +1093,8 @@ class Repository(GitHubCore):
             listed
         :param str author: (optional), GitHub login, real name, or email to
             filter commits by (using commit author)
-        :param int number: (optional), number of comments to return. Default:
-            -1 returns all comments
+        :param int number: (optional), number of commits to return. Default:
+            -1 returns all commits
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :param since: (optional), Only commits after this date will
