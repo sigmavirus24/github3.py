@@ -14,7 +14,7 @@ class BaseCase(TestCase):
     def setUp(self):
         self.user = os.environ.get('GH_USER')
         self.password = os.environ.get('GH_PASSWORD')
-        self.token = os.environ.get('GH_AUTH')
+        self.token = os.environ.get('GH_AUTH', 'x' * 20)
         self.g = github3.GitHub()
         self.session = self.g._session
 
