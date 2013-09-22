@@ -16,7 +16,7 @@ packages = [
     "github3.issues",
 ]
 
-kwargs['tests_require'] = ['mock==1.0.1', 'betamax', 'pytest==2.3.5']
+kwargs['tests_require'] = ['mock==1.0.1', 'betamax==0.1.2', 'pytest==2.3.5']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2==0.5.1')
 packages.append('tests')
