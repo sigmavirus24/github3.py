@@ -43,7 +43,7 @@ class Event(GitHubObject):
             self.org = Organization(event.get('org'))
         #: Event type http://developer.github.com/v3/activity/events/types/
         self.type = event.get('type')
-        handler = _payload_handlers[self.type]
+        handler = _payload_handlers.get(self.type, identity)
         #: Dictionary with the payload. Payload structure is defined by type_.
         #  _type: http://developer.github.com/v3/events/types
         self.payload = handler(event.get('payload'))
@@ -164,23 +164,27 @@ def _team(payload):
     return payload
 
 
+def identity(x):
+    return x
+
+
 _payload_handlers = {
     'CommitCommentEvent': _commitcomment,
-    'CreateEvent': lambda x: x,
-    'DeleteEvent': lambda x: x,
+    'CreateEvent': identity,
+    'DeleteEvent': identity,
     'DownloadEvent': _download,
     'FollowEvent': _follow,
     'ForkEvent': _forkev,
-    'ForkApplyEvent': lambda x: x,
+    'ForkApplyEvent': identity,
     'GistEvent': _gist,
-    'GollumEvent': lambda x: x,
+    'GollumEvent': identity,
     'IssueCommentEvent': _issuecomm,
     'IssuesEvent': _issueevent,
     'MemberEvent': _member,
     'PublicEvent': lambda x: '',
     'PullRequestEvent': _pullreqev,
     'PullRequestReviewCommentEvent': _pullreqcomm,
-    'PushEvent': lambda x: x,
+    'PushEvent': identity,
     'TeamAddEvent': _team,
-    'WatchEvent': lambda x: x,
+    'WatchEvent': identity,
 }
