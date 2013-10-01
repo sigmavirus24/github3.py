@@ -41,7 +41,7 @@ Guidelines for Contributing to github3.py
 
 #. In case you haven't caught on, for anything you add, write tests.
 
-#. Be cordial_. Seriously, if anyone who isn't cordial will be sent packing, 
+#. Be cordial_. Seriously, anyone who isn't cordial will be sent packing, 
    regardless of the value of their contributions. I will not tolerate some 
    contributors creating a hostile environment for others.
 
