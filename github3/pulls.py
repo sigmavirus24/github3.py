@@ -158,7 +158,7 @@ class PullRequest(GitHubCore):
         }
 
         #: datetime object representing when the pull was merged
-        merged = pull.get('murged_at')
+        merged = pull.get('merged_at')
         # If the pull request has been merged
         self.merged_at = self._strptime(merged) if merged else None
         #: Whether the pull is deemed mergeable by GitHub
