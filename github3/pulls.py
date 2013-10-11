@@ -198,6 +198,11 @@ class PullRequest(GitHubCore):
         self.user = pull.get('user')
         if self.user:
             self.user = User(self.user, self)
+        #: :class:`User <github3.users.User>` object representing the assignee
+        #  of the pull request
+        self.assignee = pull.get('assignee')
+        if self.assignee:
+            self.assignee = User(self.assignee, self)
 
     def __repr__(self):
         return '<Pull Request [#{0}]>'.format(self.number)
