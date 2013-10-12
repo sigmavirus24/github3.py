@@ -49,3 +49,5 @@ Contributors
 - Matias Bordese (@matiasb)
 
 - Aleksey Ostapenko (@kbakba)
+
+- Vincent Driessen (@nvie)
