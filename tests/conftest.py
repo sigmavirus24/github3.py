@@ -10,5 +10,5 @@ with betamax.Betamax.configure() as config:
 
     config.define_cassette_placeholder(
         '<AUTH_TOKEN>',
-        os.environ.get('GH_AUTH', 'xxxxxxxxxxx')
+        os.environ.get('GH_AUTH', 'x' * 20)
         )
