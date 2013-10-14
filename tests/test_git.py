@@ -1,5 +1,5 @@
 import github3
-from tests.utils import (expect, BaseCase, load)
+from tests.utils import (BaseCase, load)
 
 
 class TestCommit(BaseCase):
@@ -8,15 +8,15 @@ class TestCommit(BaseCase):
         self.commit = github3.git.Commit(load('commit'))
 
     def test_repr(self):
-        expect(repr(self.commit).startswith('<Commit'))
+        assert repr(self.commit).startswith('<Commit')
 
     def test_author_as_User(self):
         u = self.commit.author_as_User()
-        expect(u).isinstance(github3.users.User)
+        assert isinstance(u, github3.users.User)
 
     def test_committer_as_User(self):
         u = self.commit.committer_as_User()
-        expect(u).isinstance(github3.users.User)
+        assert isinstance(u, github3.users.User)
 
 
 class TestReference(BaseCase):
@@ -31,19 +31,18 @@ class TestReference(BaseCase):
         self.ref = github3.git.Reference(self.ref.to_json(), self.g)
 
     def test_repr(self):
-        expect(repr(self.ref).startswith('<Reference')).is_True()
-        expect(repr(self.ref.object).startswith('<Git Object')).is_True()
+        assert repr(self.ref).startswith('<Reference')
+        assert repr(self.ref.object).startswith('<Git Object')
 
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
 
-        with expect.githuberror():
-            self.ref.delete()
+        self.assertRaises(github3.GitHubError, self.ref.delete)
 
         self.not_called()
         self.login()
-        expect(self.ref.delete()).is_True()
+        assert self.ref.delete()
         self.mock_assertions()
 
     def test_update(self):
@@ -56,16 +55,15 @@ class TestReference(BaseCase):
             }
         }
 
-        with expect.githuberror():
-            self.ref.update('fake')
+        self.assertRaises(github3.GitHubError, self.ref.update, 'fake')
 
         self.not_called()
         self.login()
-        expect(self.ref.update('fakesha', True)).is_True()
+        assert self.ref.update('fakesha', True)
         self.mock_assertions()
 
         self.response('', 404)
-        expect(self.ref.update('fakesha', True)).is_False()
+        assert self.ref.update('fakesha', True) is False
         self.mock_assertions()
 
 
@@ -86,9 +84,9 @@ class TestTree(BaseCase):
         self.conf = {'params': {'recursive': '1'}}
 
         t = self.tree.recurse()
-        expect(t).isinstance(github3.git.Tree)
-        expect(repr(t).startswith('<Tree')).is_True()
+        assert isinstance(t, github3.git.Tree)
+        assert repr(t).startswith('<Tree')
         self.mock_assertions()
 
-        expect(t.tree[0]).isinstance(github3.git.Hash)
-        expect(repr(t.tree[0]).startswith('<Hash')).is_True()
+        assert isinstance(t.tree[0], github3.git.Hash)
+        assert repr(t.tree[0]).startswith('<Hash')

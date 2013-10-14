@@ -17,9 +17,9 @@ class GitHubIterator(GitHubCore, Iterator):
         self.cls = cls
         #: Parameters of the query string
         self.params = params
+        self._remove_none(self.params)
         # We do not set this from the parameter sent. We want this to
-        # represent the ETag header returned by GitHub no matter what.
-        # If this is not None, then it won't be set from the response and
+        # represent the ETag header returned by GitHub no matter what. # If this is not None, then it won't be set from the response and
         # that's not what we want.
         #: The ETag Header value returned by GitHub
         self.etag = None

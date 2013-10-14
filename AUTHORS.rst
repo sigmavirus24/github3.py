@@ -45,3 +45,7 @@ Contributors
 - James Pearson (@xiongchiamiov)
 
 - INADA Naoki (@methane)
+
+- Matias Bordese (@matiasb)
+
+- Aleksey Ostapenko (@kbakba)

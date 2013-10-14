@@ -78,6 +78,8 @@ class GitHubCore(GitHubObject):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
     def _remove_none(self, data):
+        if not data:
+            return
         for (k, v) in list(data.items()):
             if v is None:
                 del(data[k])
@@ -167,7 +169,11 @@ class GitHubCore(GitHubObject):
 
     @property
     def ratelimit_remaining(self):
-        """Number of requests before GitHub imposes a ratelimit."""
+        """Number of requests before GitHub imposes a ratelimit.
+
+        :returns: int
+
+        """
         json = self._json(self._get(self._github_url + '/rate_limit'), 200)
         self._remaining = json.get('rate', {}).get('remaining', 0)
         return self._remaining

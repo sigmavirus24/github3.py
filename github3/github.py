@@ -81,14 +81,14 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Authorization(json, self) if json else None
 
-    def authorize(self, login, password, scopes, note='', note_url='',
+    def authorize(self, login, password, scopes=None, note='', note_url='',
                   client_id='', client_secret=''):
         """Obtain an authorization token from the GitHub API for the GitHub
         API.
 
         :param str login: (required)
         :param str password: (required)
-        :param list scopes: (required), areas you want this token to apply to,
+        :param list scopes: (optional), areas you want this token to apply to,
             i.e., 'gist', 'user'
         :param str note: (optional), note about the authorization
         :param str note_url: (optional), url for the application
@@ -100,10 +100,12 @@ class GitHub(GitHubCore):
         """
         json = None
         auth = self._session.auth or (login and password)
-        if isinstance(scopes, list) and auth:
+        if auth:
             url = self._build_url('authorizations')
-            data = {'scopes': scopes, 'note': note, 'note_url': note_url,
+            data = {'note': note, 'note_url': note_url,
                     'client_id': client_id, 'client_secret': client_secret}
+            if scopes:
+                data['scopes'] = scopes
             if self._session.auth:
                 json = self._json(self._post(url, data=data), 201)
             else:
@@ -352,7 +354,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, since=None, etag=None):
+    def iter_all_repos(self, number=-1, since=None, etag=None, per_page=None):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
@@ -361,24 +363,28 @@ class GitHub(GitHubCore):
             restarting this iteration)
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
+        :param int per_page: (optional), number of repositories to list per
+            request
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         url = self._build_url('repositories')
-        params = {'since': since} if since else None
-        return self._iter(int(number), url, Repository, params=params,
+        return self._iter(int(number), url, Repository,
+                          params={'since': since, 'per_page': per_page},
                           etag=etag)
 
-    def iter_all_users(self, number=-1, etag=None):
+    def iter_all_users(self, number=-1, etag=None, per_page=None):
         """Iterate over every user in the order they signed up for GitHub.
 
         :param int number: (optional), number of users to return. Default: -1,
             returns all of them
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
+        :param int per_page: (optional), number of users to list per request
         :returns: generator of :class:`User <github3.users.User>`
         """
         url = self._build_url('users')
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, User,
+                          params={'per_page': per_page}, etag=etag)
 
     @requires_basic_auth
     def iter_authorizations(self, number=-1, etag=None):
@@ -493,7 +499,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def iter_org_issues(self, name, filter='', state='', labels='', sort='',
-                        direction='', since='', number=-1, etag=None):
+                        direction='', since=None, number=-1, etag=None):
         """Iterate over the organnization's issues if the authenticated user
         belongs to it.
 
@@ -509,8 +515,10 @@ class GitHub(GitHubCore):
             api-default: created
         :param str direction: accepted values: ('asc', 'desc')
             api-default: desc
-        :param str since: ISO 8601 formatted timestamp, e.g.,
-            2012-05-20T23:10:27Z
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param int number: (optional), number of issues to return. Default:
             -1, returns all available issues
         :param str etag: (optional), ETag from a previous request to the same
@@ -518,12 +526,13 @@ class GitHub(GitHubCore):
         :returns: generator of :class:`Issue <github3.issues.Issue>`
         """
         url = self._build_url('orgs', name, 'issues')
+        # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params, etag)
 
     @requires_auth
     def iter_issues(self, filter='', state='', labels='', sort='',
-                    direction='', since='', number=-1, etag=None):
+                    direction='', since=None, number=-1, etag=None):
         """List all of the authenticated user's (and organization's) issues.
 
         :param str filter: accepted values:
@@ -537,8 +546,10 @@ class GitHub(GitHubCore):
             api-default: created
         :param str direction: accepted values: ('asc', 'desc')
             api-default: desc
-        :param str since: ISO 8601 formatted timestamp, e.g.,
-            2012-05-20T23:10:27Z
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param int number: (optional), number of issues to return.
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
@@ -546,12 +557,13 @@ class GitHub(GitHubCore):
         :returns: generator of :class:`Issue <github3.issues.Issue>`
         """
         url = self._build_url('issues')
+        # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params, etag)
 
     @requires_auth
     def iter_user_issues(self, filter='', state='', labels='', sort='',
-                         direction='', since='', number=-1, etag=None):
+                         direction='', since=None, number=-1, etag=None):
         """List only the authenticated user's issues. Will not list
         organization's issues
 
@@ -566,8 +578,10 @@ class GitHub(GitHubCore):
             api-default: created
         :param str direction: accepted values: ('asc', 'desc')
             api-default: desc
-        :param str since: ISO 8601 formatted timestamp, e.g.,
-            2012-05-20T23:10:27Z
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param int number: (optional), number of issues to return.
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
@@ -575,6 +589,7 @@ class GitHub(GitHubCore):
         :returns: generator of :class:`Issue <github3.issues.Issue>`
         """
         url = self._build_url('user', 'issues')
+        # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params, etag)
 
@@ -598,8 +613,10 @@ class GitHub(GitHubCore):
             api-default: created
         :param str direction: accepted values: ('asc', 'desc')
             api-default: desc
-        :param str since: ISO 8601 formatted timestamp, e.g.,
-            2012-05-20T23:10:27Z
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param int number: (optional), number of issues to return.
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
@@ -609,7 +626,8 @@ class GitHub(GitHubCore):
         if owner and repository:
             repo = self.repository(owner, repository)
             return repo.iter_issues(milestone, state, assignee, mentioned,
-                                    labels, sort, direction, since, number)
+                                    labels, sort, direction, since, number,
+                                    etag)
         return iter([])
 
     @requires_auth
@@ -870,7 +888,7 @@ class GitHub(GitHubCore):
         :returns: bool
         """
         from re import match
-        m = match('https://github\.com/\w+/[\w\._-]+/events/\w+', topic)
+        m = match('https://[\w\d\-\.\:]+/\w+/[\w\._-]+/events/\w+', topic)
         status = False
         if mode and topic and callback and m:
             data = [('hub.mode', mode), ('hub.topic', topic),

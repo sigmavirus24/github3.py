@@ -1,14 +1,5 @@
-github3.py
-==========
-
 .. image::
-    https://secure.travis-ci.org/sigmavirus24/github3.py.png?branch=mock
-    :alt: Build Status
-    :target: http://travis-ci.org/sigmavirus24/github3.py
-
-.. image:: https://pypip.in/d/github3.py/badge.png
-    :alt: Downloads
-    :target: https://crate.io/packages/github3.py
+    https://raw.github.com/sigmavirus24/github3.py/develop/images/gh3-logo.png
 
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
@@ -26,8 +17,17 @@ Dependencies
 ------------
 
 - requests_  by Kenneth Reitz
+- uritemplate.py_ by Ian Cordasco
 
 .. _requests: https://github.com/kennethreitz/requests
+.. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
+
+Contributing
+------------
+
+Please read the `CONTRIBUTING`_ document.
+
+.. _CONTRIBUTING: https://github.com/sigmavirus24/github3.py/blob/develop/CONTRIBUTING.rst
 
 Testing
 ~~~~~~~
@@ -80,6 +80,11 @@ Ian Cordasco (sigmavirus24)
 Contact Options
 ---------------
 
-- It is preferred that you send an email to github3.py@librelist.com
+- Feel free to use the `github3.py`_ tag on StackOverflow for any questions 
+  you may have
+- If you dislike StackOverflow it is preferred that you send an email to 
+  github3.py@librelist.com
 - You may also contact (via email) the author directly with 
-  questions/suggestions/comments
+  questions/suggestions/comments or if you wish to include sensitive data.
+
+.. _github3.py: http://stackoverflow.com/questions/tagged/github3.py

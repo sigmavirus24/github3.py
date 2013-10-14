@@ -15,11 +15,12 @@ from github3.users import User
 
 
 class Gist(GitHubCore):
-    """The :class:`Gist <Gist>` object. This object holds all the information
-    returned by Github about a gist. With it you can comment on or fork the
-    gist (assuming you are authenticated), edit or delete the gist (assuming
-    you own it).  You can also "star" or "unstar" the gist (again assuming you
-    have authenticated).
+
+    """This object holds all the information returned by Github about a gist.
+
+    With it you can comment on or fork the gist (assuming you are
+    authenticated), edit or delete the gist (assuming you own it).  You can
+    also "star" or "unstar" the gist (again assuming you have authenticated).
 
     Two gist instances can be checked like so::
 
@@ -32,7 +33,9 @@ class Gist(GitHubCore):
         g1.id != g2.id
 
     See also: http://developer.github.com/v3/gists/
+
     """
+
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)
         #: Number of comments on this gist
@@ -68,11 +71,10 @@ class Gist(GitHubCore):
         #: datetime object representing the last time this gist was updated.
         self.updated_at = self._strptime(data.get('updated_at'))
 
+        owner = data.get('owner')
         #: :class:`User <github3.users.User>` object representing the owner of
         #  the gist.
-        self.owner = data.get('owner')
-        if data.get('owner'):
-            self.owner = User(data.get('owner'), self._session)
+        self.owner = User(owner, self) if owner else None
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
         #: Number of files in this gist.
@@ -80,6 +82,17 @@ class Gist(GitHubCore):
 
         #: History of this gist, list of :class:`GistHistory <GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
+
+        ## New urls
+
+        #: Comments URL (not a template)
+        self.comments_url = data.get('comments_url', '')
+
+        #: Commits URL (not a template)
+        self.commits_url = data.get('commits_url', '')
+
+        #: Forks URL (not a template)
+        self.forks_url = data.get('forks_url', '')
 
     def __eq__(self, other):
         return self.id == other.id
@@ -102,6 +115,7 @@ class Gist(GitHubCore):
 
         :param str body: (required), body of the comment
         :returns: :class:`GistComment <github3.gists.comment.GistComment>`
+
         """
         json = None
         if body:
@@ -113,7 +127,9 @@ class Gist(GitHubCore):
     def delete(self):
         """Delete this gist.
 
-        :returns: bool -- whether the deletion was successful"""
+        :returns: bool -- whether the deletion was successful
+
+        """
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
@@ -127,6 +143,7 @@ class Gist(GitHubCore):
             'filename' where the former is the content of the file and the
             latter is the new name of the file.
         :returns: bool -- whether the edit was successful
+
         """
         data = {}
         json = None
@@ -146,23 +163,26 @@ class Gist(GitHubCore):
         """Fork this gist.
 
         :returns: :class:`Gist <Gist>` if successful, ``None`` otherwise
+
         """
         url = self._build_url('forks', base_url=self._api)
         json = self._json(self._post(url), 201)
         return Gist(json, self) if json else None
 
     def is_public(self):
-        """Checks to see if this gist is public or not.
+        """Check to see if this gist is public or not.
 
         :returns: bool -- True if public, False if private
+
         """
         return self.public
 
     @requires_auth
     def is_starred(self):
-        """Checks to see if this gist is starred by the authenticated user.
+        """Check to see if this gist is starred by the authenticated user.
 
         :returns: bool -- True if it is starred, False otherwise
+
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
@@ -175,7 +195,8 @@ class Gist(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`GistComment <github3.gists.comment.GistComment>`\ s
+            :class:`GistComment <github3.gists.comment.GistComment>`
+
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment, etag=etag)
@@ -192,18 +213,26 @@ class Gist(GitHubCore):
             Default: -1 will iterate over all commits associated with this
             gist.
         :returns: generator of
-            :class: `GistHistory <github3.gists.history.GistHistory>`\ s
+            :class:`GistHistory <github3.gists.history.GistHistory>`
+
         """
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, GistHistory)
 
     def iter_files(self):
-        """List of :class:`GistFile <GistFile>` objects representing the files
-        stored in this gist."""
+        """Iterator over the files stored in this gist.
+
+        :returns: generator of :class`GistFile <github3.gists.file.GistFile>`
+
+        """
         return iter(self._files)
 
     def iter_forks(self):
-        """List of :class:`Gist <Gist>`\ s representing forks of this gist."""
+        """Iterator of forks of this gist.
+
+        :returns: generator of :class:`Gist <Gist>`
+
+        """
         return iter(self._forks)  # (No coverage)
 
     @requires_auth
@@ -211,6 +240,7 @@ class Gist(GitHubCore):
         """Star this gist.
 
         :returns: bool -- True if successful, False otherwise
+
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
@@ -220,6 +250,7 @@ class Gist(GitHubCore):
         """Un-star this gist.
 
         :returns: bool -- True if successful, False otherwise
+
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)

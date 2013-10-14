@@ -3,7 +3,7 @@
 # Copyright 2012, Ian Cordasco
 
 COVERAGE_INCLUDE := github3/*.py
-TEST_RUNNER := run_tests.py
+TEST_RUNNER := python setup.py test
 
 .DEFAULT_GOAL := tests
 
@@ -12,15 +12,15 @@ clean:
 	rm -rf build/ dist/
 
 travis:
-	python $(TEST_RUNNER)
+	$(TEST_RUNNER)
 
 tests: travis
 
 test-deps:
-	pip install -r requirements.txt
+	pip install -r dev-requirements.txt
 
 htmlcov: .coverage
 	coverage html --omit=github3/packages/*
 
-docs:
+docs: docs/*.rst
 	make -C docs/ html

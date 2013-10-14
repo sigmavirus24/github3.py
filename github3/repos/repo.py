@@ -31,6 +31,8 @@ from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
+from github3.utils import timestamp_parameter
+from uritemplate import URITemplate
 
 
 class Repository(GitHubCore):
@@ -145,6 +147,121 @@ class Repository(GitHubCore):
 
         #: master (default) branch for the repository
         self.master_branch = repo.get('master_branch', '')
+
+        #: Teams url (not a template)
+        self.teams_url = repo.get('teams_url', '')
+
+        #: Hooks url (not a template)
+        self.hooks_url = repo.get('hooks_url', '')
+
+        #: Events url (not a template)
+        self.events_url = repo.get('events_url', '')
+
+        #: Tags url (not a template)
+        self.tags_url = repo.get('tags_url', '')
+
+        #: Languages url (not a template)
+        self.languages_url = repo.get('languages_url', '')
+
+        #: Stargazers url (not a template)
+        self.stargarzers_url = repo.get('stargazers_url', '')
+
+        #: Contributors url (not a template)
+        self.contributors_url = repo.get('contributors_url', '')
+
+        #: Subscribers url (not a template)
+        self.subscribers_url = repo.get('subscribers_url', '')
+
+        #: Subscription url (not a template)
+        self.subscription_url = repo.get('subscription_url', '')
+
+        #: Merges url (not a template)
+        self.merges_url = repo.get('merges_url', '')
+
+        #: Downloads url (not a template)
+        self.download_url = repo.get('downloads_url', '')
+
+        ## Template URLS
+        ie_url_t = repo.get('issue_events_url')
+        #: Issue events URL Template. Expand with ``number``
+        self.issue_events_urlt = URITemplate(ie_url_t) if ie_url_t else None
+
+        assignees = repo.get('assignees_url')
+        #: Assignees URL Template. Expand with ``user``
+        self.assignees_urlt = URITemplate(assignees) if assignees else None
+
+        branches = repo.get('branches_url')
+        #: Branches URL Template. Expand with ``branch``
+        self.branches_urlt = URITemplate(branches) if branches else None
+
+        blobs = repo.get('blobs_url')
+        #: Blobs URL Template. Expand with ``sha``
+        self.blobs_urlt = URITemplate(blobs) if blobs else None
+
+        git_tags = repo.get('git_tags_url')
+        #: Git tags URL Template. Expand with ``sha``
+        self.git_tags_urlt = URITemplate(git_tags) if git_tags else None
+
+        git_refs = repo.get('git_refs_url')
+        #: Git refs URL Template. Expand with ``sha``
+        self.git_refs_urlt = URITemplate(git_refs) if git_refs else None
+
+        trees = repo.get('trees_url')
+        #: Trres URL Template. Expand with ``sha``
+        self.trees_urlt = URITemplate(trees) if trees else None
+
+        statuses = repo.get('statuses_url')
+        #: Statuses URL Template. Expand with ``sha``
+        self.statuses_urlt = URITemplate(statuses) if statuses else None
+
+        commits = repo.get('commits_url')
+        #: Commits URL Template. Expand with ``sha``
+        self.commits_urlt = URITemplate(commits) if commits else None
+
+        commits = repo.get('git_commits_url')
+        #: Git commits URL Template. Expand with ``sha``
+        self.git_commits_urlt = URITemplate(commits) if commits else None
+
+        comments = repo.get('comments_url')
+        #: Comments URL Template. Expand with ``number``
+        self.comments_urlt = URITemplate(comments) if comments else None
+
+        comments = repo.get('issue_comment_url')
+        #: Issue comment URL Template. Expand with ``number``
+        self.issue_comment_urlt = URITemplate(comments) if comments else None
+
+        contents = repo.get('contents_url')
+        #: Contents URL Template. Expand with ``path``
+        self.contents_urlt = URITemplate(contents) if contents else None
+
+        compare = repo.get('compare_url')
+        #: Comparison URL Template. Expand with ``base`` and ``head``
+        self.compare_urlt = URITemplate(compare) if compare else None
+
+        archive = repo.get('archive_url')
+        #: Archive URL Template. Expand with ``archive_format`` and ``ref``
+        self.archive_urlt = URITemplate(archive) if archive else None
+
+        issues = repo.get('issues_url')
+        #: Issues URL Template. Expand with ``number``
+        self.issues_urlt = URITemplate(issues) if issues else None
+
+        pulls = repo.get('pulls_url')
+        #: Pull Requests URL Template. Expand with ``number``
+        self.pulls_urlt = URITemplate(pulls) if issues else None
+
+        miles = repo.get('milestones_url')
+        #: Milestones URL Template. Expand with ``number``
+        self.milestones_urlt = URITemplate(miles) if miles else None
+
+        notif = repo.get('notifications_url')
+        #: Notifications URL Template. Expand with ``since``, ``all``,
+        #: ``participating``
+        self.notifications_urlt = URITemplate(notif) if notif else None
+
+        labels = repo.get('labels_url')
+        #: Labels URL Template. Expand with ``name``
+        self.labels_urlt = URITemplate(labels) if labels else None
 
     def __eq__(self, repo):
         return self.id == repo.id
@@ -877,7 +994,7 @@ class Repository(GitHubCore):
             -1 returns all available assignees
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('assignees', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
@@ -889,7 +1006,7 @@ class Repository(GitHubCore):
             -1 returns all branches
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Branch <Branch>`\ es
+        :returns: generator of :class:`Branch <Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch, etag=etag)
@@ -925,7 +1042,7 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -939,7 +1056,7 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of :class:`RepoComment <RepoComment>`\ s
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -967,7 +1084,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, dict, etag=etag)
 
     def iter_commits(self, sha=None, path=None, author=None, number=-1,
-                     etag=None):
+                     etag=None, since=None, until=None):
         """Iterate over commits in this repository.
 
         :param str sha: (optional), sha or branch to start listing commits
@@ -980,9 +1097,21 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`RepoCommit <RepoCommit>`\ s
+        :param since: (optional), Only commits after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :type since: datetime or string
+        :param until: (optional), Only commits before this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :type until: datetime or string
+
+        :returns: generator of :class:`RepoCommit <RepoCommit>`\ s
         """
-        params = {'sha': sha, 'path': path, 'author': author}
+        params = {'sha': sha, 'path': path, 'author': author,
+                  'since': timestamp_parameter(since),
+                  'until': timestamp_parameter(until)}
+
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, RepoCommit, params, etag)
@@ -996,7 +1125,7 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
@@ -1039,7 +1168,7 @@ class Repository(GitHubCore):
             -1 returns all available downloads
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Download <Download>`\ s
+        :returns: generator of :class:`Download <Download>`\ s
         """
         url = self._build_url('downloads', base_url=self._api)
         return self._iter(int(number), url, Download, etag=etag)
@@ -1051,7 +1180,7 @@ class Repository(GitHubCore):
             returns all available events
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Event <github3.events.Event>`\ s
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
@@ -1065,7 +1194,7 @@ class Repository(GitHubCore):
             returns all forks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Repository <Repository>`
+        :returns: generator of :class:`Repository <Repository>`
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
@@ -1081,7 +1210,7 @@ class Repository(GitHubCore):
             returns all hooks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Hook <Hook>`\ s
+        :returns: generator of :class:`Hook <Hook>`\ s
         """
         url = self._build_url('hooks', base_url=self._api)
         return self._iter(int(number), url, Hook, etag=etag)
@@ -1107,12 +1236,15 @@ class Repository(GitHubCore):
             'bug,ui,@high' :param sort: accepted values:
             ('created', 'updated', 'comments', 'created')
         :param str direction: (optional), accepted values: ('asc', 'desc')
-        :param str since: (optional), ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param int number: (optional), Number of issues to return.
             By default all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
         """
         url = self._build_url('issues', base_url=self._api)
 
@@ -1172,7 +1304,7 @@ class Repository(GitHubCore):
             -1 returns all used languages
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of tuples
+        :returns: generator of tuples
         """
         url = self._build_url('languages', base_url=self._api)
         return self._iter(int(number), url, tuple, etag=etag)
@@ -1220,7 +1352,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Event, etag)
 
     @requires_auth
-    def iter_notifications(self, all=False, participating=False, since='',
+    def iter_notifications(self, all=False, participating=False, since=None,
                            number=-1, etag=None):
         """Iterates over the notifications for this repository.
 
@@ -1228,16 +1360,20 @@ class Repository(GitHubCore):
             marked as read
         :param bool participating: (optional), show only the notifications the
             user is participating in directly
-        :param str since: (optional), filters out any notifications updated
-            before the given time. The time should be passed in as UTC in the
-            ISO 8601 format: ``YYYY-MM-DDTHH:MM:SSZ``. Example:
-            "2012-10-09T23:39:01Z".
+        :param since: (optional), filters out any notifications updated
+            before the given time. This can be a `datetime` or an `ISO8601`
+            formatted date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Thread <github3.notifications.Thread>`
         """
         url = self._build_url('notifications', base_url=self._api)
-        params = {'all': all, 'participating': participating, 'since': since}
+        params = {
+            'all': all,
+            'participating': participating,
+            'since': timestamp_parameter(since)
+        }
         for (k, v) in list(params.items()):
             if not v:
                 del params[k]

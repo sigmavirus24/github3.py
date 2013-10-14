@@ -1,6 +1,11 @@
 Writing Tests for github3.py
 ============================
 
+.. warning::
+
+    This page is now wildly out of date. An up-to-date version will be created 
+    soon.
+
 Writing tests for github3.py is a non-trivial task and takes some 
 understanding of the expecter_ module and mock_ modules.
 

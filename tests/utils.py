@@ -1,8 +1,11 @@
+import sys
+import json
+if sys.version_info < (3, 0):
+    import unittest2 as unittest
+else:
+    import unittest
 import requests
 import github3
-import expecter
-import json
-import sys
 from mock import patch
 from io import BytesIO
 from unittest import TestCase
@@ -21,42 +24,7 @@ def path(name, mode='r'):
     return open('tests/json/{0}'.format(name), mode)
 
 
-class CustomExpecter(expecter.expect):
-    def is_not_None(self):
-        assert self._actual is not None, (
-            'Expected anything but None but got it.'
-        )
-
-    def is_None(self):
-        assert self._actual is None, (
-            'Expected None but got %s' % repr(self._actual)  # nopep8
-        )
-
-    def is_True(self):
-        assert self._actual is True, (
-            'Expected True but got %s' % repr(self._actual)  # nopep8
-        )
-
-    def is_False(self):
-        assert self._actual is False, (
-            'Expected False but got %s' % repr(self._actual)  # nopep8
-        )
-
-    def is_in(self, iterable):
-        assert self._actual in iterable, (
-            "Expected %s in %s but it wasn't" % (
-                repr(self._actual), repr(iterable)
-            )
-        )
-
-    @classmethod
-    def githuberror(cls):
-        return cls.raises(github3.GitHubError)
-
-expect = CustomExpecter
-
-
-class BaseCase(TestCase):
+class BaseCase(unittest.TestCase):
     github_url = 'https://api.github.com/'
 
     def setUp(self):
@@ -77,21 +45,21 @@ class BaseCase(TestCase):
         conf = self.conf.copy()
         args, kwargs = self.request.call_args
 
-        expect(self.args) == args
+        assert self.args == args
 
         if 'data' in self.conf:
             if isinstance(self.conf['data'], dict):
                 for k, v in list(self.conf['data'].items()):
                     s = json.dumps({k: v})[1:-1]
-                    expect(s).is_in(kwargs['data'])
+                    assert s in kwargs['data']
             else:
-                expect(self.conf['data']) == kwargs['data']
+                assert self.conf['data'] == kwargs['data']
 
             del self.conf['data']
 
         for k in self.conf:
-            expect(k).is_in(kwargs)
-            expect(self.conf[k]) == kwargs[k]
+            assert k in kwargs
+            assert self.conf[k] == kwargs[k]
 
         self.request.reset_mock()
         self.conf = conf
@@ -138,7 +106,10 @@ class BaseCase(TestCase):
         self.args = ('PUT', url)
 
     def not_called(self):
-        expect(self.request.called).is_False()
+        assert self.request.called is False
+
+    def assertGitHubErrorRaised(self, func, *args, **kwargs):
+        return self.assertRaises(github3.GitHubError, func(*args, **kwargs))
 
 
 class RequestsBytesIO(BytesIO):

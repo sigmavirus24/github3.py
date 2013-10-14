@@ -12,13 +12,18 @@ from github3.git import Commit
 from github3.models import GitHubObject, GitHubCore, BaseComment
 from github3.users import User
 from github3.decorators import requires_auth
+from github3.issues.comment import IssueComment
+from uritemplate import URITemplate
 
 
 class PullDestination(GitHubCore):
+
     """The :class:`PullDestination <PullDestination>` object.
 
     See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
+
     """
+
     def __init__(self, dest, direction):
         super(PullDestination, self).__init__(None)
         #: Direction of the merge with respect to this destination
@@ -105,12 +110,18 @@ class PullRequest(GitHubCore):
         #: Number of deletions on this pull request
         self.deletions = pull.get('deletions')
 
+        closed = pull.get('closed_at')
         # If the pull request has been closed
         #: datetime object representing when the pull was closed
-        self.closed_at = pull.get('closed_at')
-        if self.closed_at:
-            self.closed_at = self._strptime(self.closed_at)
-
+        self.closed_at = self._strptime(closed) if closed else None
+        #: Number of comments
+        self.comments = pull.get('comments')
+        #: Comments url (not a template)
+        self.comments_url = pull.get('comments_url')
+        #: Number of commits
+        self.commits = pull.get('commits')
+        #: GitHub.com url of commits in this pull request
+        self.commits_url = pull.get('commits_url')
         #: datetime object representing when the pull was created
         self.created_at = self._strptime(pull.get('created_at'))
         #: URL to view the diff associated with the pull
@@ -147,26 +158,32 @@ class PullRequest(GitHubCore):
         }
 
         #: datetime object representing when the pull was merged
-        self.merged_at = pull.get('merged_at')
+        merged = pull.get('murged_at')
         # If the pull request has been merged
-        if self.merged_at:
-            self.merged_at = self._strptime(self.merged_at)
+        self.merged_at = self._strptime(merged) if merged else None
         #: Whether the pull is deemed mergeable by GitHub
         self.mergeable = pull.get('mergeable', False)
         #: Whether it would be a clean merge or not
         self.mergeable_state = pull.get('mergeable_state', '')
         #: SHA of the merge commit
         self.merge_commit_sha = pull.get('merge_commit_sha', '')
+        user = pull.get('merged_by')
         #: :class:`User <github3.users.User>` who merged this pull
-        self.merged_by = pull.get('merged_by')
-        if self.merged_by:
-            self.merged_by = User(self.merged_by, self)
+        self.merged_by = User(user, self) if user else None
         #: Number of the pull/issue on the repository
         self.number = pull.get('number')
         #: The URL of the patch
         self.patch_url = pull.get('patch_url')
 
-        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+',
+        comments = pull.get('review_comment_url')
+        #: Review comment URL Template. Expands with ``number``
+        self.review_comment_url = URITemplate(comments) if comments else None
+        #: Number of review comments on the pull request
+        self.review_comments = pull.get('review_comments')
+        #: GitHub.com url for review comments (not a template)
+        self.review_comments_url = pull.get('review_comments_url')
+
+        m = match('https://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)?/\d+',
                   self.issue_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
@@ -251,6 +268,18 @@ class PullRequest(GitHubCore):
         """
         url = self._build_url('files', base_url=self._api)
         return self._iter(int(number), url, PullFile, etag=etag)
+
+    def iter_issue_comments(self, number=-1, etag=None):
+        """Iterate over the issue comments on this pull request.
+
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all available comments.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`IssueComment <IssueComment>`\ s
+        """
+        url = self._build_url(base_url=self.links['comments'])
+        return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
     def merge(self, commit_message=''):

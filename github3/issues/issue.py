@@ -7,9 +7,11 @@ from github3.issues.label import Label
 from github3.issues.milestone import Milestone
 from github3.models import GitHubCore
 from github3.users import User
+from uritemplate import URITemplate
 
 
 class Issue(GitHubCore):
+
     """The :class:`Issue <Issue>` object. It structures and handles the data
     returned via the `Issues <http://developer.github.com/v3/issues>`_ section
     of the GitHub API.
@@ -25,6 +27,7 @@ class Issue(GitHubCore):
         i1.id != i2.id
 
     """
+
     def __init__(self, issue, session=None):
         super(Issue, self).__init__(issue, session)
         self._api = issue.get('url', '')
@@ -48,15 +51,21 @@ class Issue(GitHubCore):
 
         #: Number of comments on this issue.
         self.comments = issue.get('comments')
+        #: Comments url (not a template)
+        self.comments_url = issue.get('comments_url')
         #: datetime object representing when the issue was created.
         self.created_at = self._strptime(issue.get('created_at'))
+        #: Events url (not a template)
+        self.events_url = issue.get('events_url')
         #: URL to view the issue at GitHub.
         self.html_url = issue.get('html_url')
         #: Unique ID for the issue.
         self.id = issue.get('id')
         #: Returns the list of :class:`Label <Label>`\ s on this issue.
         self.labels = [Label(l, self._session) for l in issue.get('labels')]
-
+        labels_url = issue.get('labels_url')
+        #: Labels URL Template. Expand with ``name``
+        self.labels_urlt = URITemplate(labels_url) if labels_url else None
         #: :class:`Milestone <Milestone>` this issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):
@@ -65,7 +74,8 @@ class Issue(GitHubCore):
         self.number = issue.get('number')
         #: Dictionary URLs for the pull request (if they exist)
         self.pull_request = issue.get('pull_request')
-        m = match('https://github\.com/(\S+)/(\S+)/issues/\d+', self.html_url)
+        m = match('https://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)/\d+',
+                  self.html_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
         #: State of the issue, e.g., open, closed
@@ -75,7 +85,11 @@ class Issue(GitHubCore):
         #: datetime object representing the last time the issue was updated.
         self.updated_at = self._strptime(issue.get('updated_at'))
         #: :class:`User <github3.users.User>` who opened the issue.
-        self.user = User(issue.get('user'), self._session)
+        self.user = User(issue.get('user'), self)
+
+        closed_by = issue.get('closed_by')
+        #: :class:`User <github3.users.User>` who closed the issue.
+        self.closed_by = User(closed_by, self) if closed_by else None
 
     def __eq__(self, other):
         return self.id == other.id

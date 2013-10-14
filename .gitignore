@@ -12,3 +12,5 @@ htmlcov/
 .tox/
 venv/
 venv*/
+build/
+*.egg
