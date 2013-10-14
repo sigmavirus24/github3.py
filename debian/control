@@ -2,7 +2,7 @@ Source: github3.py
 Maintainer: Dennis Kaarsemaker <dennis@kaarsemaker.net>
 Section: python
 Priority: optional
-Build-Depends: debhelper, python-all, python-setuptools, python3-all, python-requests, python3-requests
+Build-Depends: debhelper, python-all, python-setuptools, python3-all, python-requests, python3-requests, python-uritemplate.py, python3-uritemplate.py
 Standards-Version: 3.9.3
 X-Python-Version: >= 2.6
 X-Python3-Version: >= 3.0

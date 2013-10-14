@@ -1,3 +1,9 @@
+github3.py (0.7.1-1) saucy; urgency=low
+
+  * New upstream version
+
+ -- Dennis Kaarsemaker <dennis@kaarsemaker.net>  Mon, 14 Oct 2013 20:48:56 +0200
+
 github3.py (0.7.0-1) quantal; urgency=low
 
   * New upstream version
