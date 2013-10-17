@@ -111,7 +111,20 @@ class GitHub(GitHubCore):
             else:
                 ses = session()
                 ses.auth = (login, password)
-                json = self._json(ses.post(url, data=dumps(data)), 201)
+                headers = None
+                response = ses.post(url, data=dumps(data), headers=headers)
+                if 'two-factor' in response.json().get('message', ''):
+                    # py2k and py3k
+                    try:
+                        prompt = raw_input
+                    except NameError:
+                        prompt = input
+                    code = prompt('2-factor auth code: ')
+                    headers = {'X-GitHub-OTP': code}
+                    json = self._json(ses.post(url, data=dumps(data), \
+                            headers=headers), 201)
+                else:
+                    json = self._json(response, 201)
         return Authorization(json, self) if json else None
 
     def check_authorization(self, access_token):
