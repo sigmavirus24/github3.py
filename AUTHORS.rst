@@ -51,3 +51,5 @@ Contributors
 - Aleksey Ostapenko (@kbakba)
 
 - Vincent Driessen (@nvie)
+
+- Philip Chimento (@ptomato)
