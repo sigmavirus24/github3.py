@@ -24,6 +24,11 @@ class IntegrationHelper(TestCase):
     def basic_login(self):
         self.gh.login(self.user, self.password)
 
-    def cassette_name(self, test_name):
-        class_name = self.__class__.described_class
-        return '_'.join([class_name, test_name])
+    def cassette_name(self, method):
+        class_name = self.described_class
+        return '_'.join([class_name, method])
+
+    @property
+    def described_class(self):
+        class_name = self.__class__.__name__
+        return class_name[4:]
