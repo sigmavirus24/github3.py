@@ -1,14 +1,16 @@
-import sys
 import json
+import os
+import sys
+
 if sys.version_info < (3, 0):
-    import unittest2 as unittest
+    from unittest2 import TestCase
 else:
-    import unittest
+    from unittest import TestCase
+
 import requests
 import github3
 from mock import patch
 from io import BytesIO
-from unittest import TestCase
 from requests.structures import CaseInsensitiveDict
 
 is_py3 = sys.version_info > (3, 0)
@@ -24,11 +26,14 @@ def path(name, mode='r'):
     return open('tests/json/{0}'.format(name), mode)
 
 
-class BaseCase(unittest.TestCase):
+class BaseCase(TestCase):
     github_url = 'https://api.github.com/'
 
     def setUp(self):
         self.g = github3.GitHub()
+        self.session = self.g._session
+        if os.environ.get('GH_AUTH'):
+            self.g.login(token=os.environ['GH_AUTH'])
         self.args = ()
         self.conf = {'allow_redirects': True}
         self.mock = patch.object(requests.sessions.Session, 'request')
