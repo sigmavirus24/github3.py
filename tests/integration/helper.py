@@ -11,8 +11,8 @@ else:
 
 class IntegrationHelper(TestCase):
     def setUp(self):
-        self.user = os.environ.get('GH_USER')
-        self.password = os.environ.get('GH_PASSWORD')
+        self.user = os.environ.get('GH_USER', 'foo')
+        self.password = os.environ.get('GH_PASSWORD', 'bar')
         self.token = os.environ.get('GH_AUTH', 'x' * 20)
         self.gh = github3.GitHub()
         self.session = self.gh._session
