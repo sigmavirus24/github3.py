@@ -57,12 +57,6 @@ class Event(GitHubObject):
     def __repr__(self):
         return '<Event [{0}]>'.format(self.type[:-5])
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     @staticmethod
     def list_types():
         """List available payload types"""

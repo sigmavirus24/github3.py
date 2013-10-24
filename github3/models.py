@@ -29,6 +29,7 @@ class GitHubObject(object):
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
         self._json_data = json
+        self._uniq = json.get('url', None)
 
     def to_json(self):
         """Return the json representing this object."""
@@ -44,6 +45,15 @@ class GitHubObject(object):
     def from_json(cls, json):
         """Return an instance of ``cls`` formed from ``json``."""
         return cls(json)
+
+    def __eq__(self, other):
+        return self._uniq == other._uniq
+
+    def __ne__(self, other):
+        return self._uniq != other._uniq
+
+    def __hash__(self):
+        return hash(self._uniq)
 
 
 class GitHubCore(GitHubObject):
@@ -247,12 +257,6 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     def _update_(self, comment):
         self.__init__(comment, self._session)
 
@@ -300,11 +304,7 @@ class BaseCommit(GitHubCore):
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]
 
-    def __eq__(self, other):
-        return self.sha == other.sha
-
-    def __ne__(self, other):
-        return self.sha != other.sha
+        self._uniq = self.sha
 
 
 class BaseAccount(GitHubCore):
@@ -365,12 +365,6 @@ class BaseAccount(GitHubCore):
 
         #: Markdown formatted biography
         self.bio = acct.get('bio')
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
     def __repr__(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)

@@ -22,7 +22,7 @@ class TestKey(BaseCase):
     def test_equality(self):
         k = github3.users.Key(self.key.to_json())
         assert self.key == k
-        k.id += 1
+        k._uniq += "cruft"
         assert self.key != k
 
     def test_str(self):
@@ -282,5 +282,5 @@ class TestUser(BaseCase):
     def test_equality(self):
         u = github3.users.User(load('user'))
         assert self.user == u
-        u.id += 1
+        u._uniq += 1
         assert self.user != u

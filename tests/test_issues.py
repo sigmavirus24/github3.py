@@ -23,8 +23,8 @@ class TestLabel(BaseCase):
     def test_equality(self):
         l = Label(load('label'))
         assert self.l == l
-        l._api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                  "labels/wontfix")
+        l._uniq = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                   "labels/wontfix")
         assert self.l != l
 
     def test_repr(self):
@@ -141,7 +141,7 @@ class TestIssue(BaseCase):
     def test_equality(self):
         i = Issue(load('issue'))
         assert self.i == i
-        i.id = 1
+        i._uniq = 1
         assert self.i != i
 
     def test_repr(self):
@@ -330,5 +330,5 @@ class TestIssueEvent(BaseCase):
     def test_equality(self):
         e = IssueEvent(load('issue_event'))
         assert self.ev == e
-        e.commit_id = 'fake'
+        e._uniq = 'fake'
         assert self.ev != e
