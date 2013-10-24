@@ -80,6 +80,8 @@ class Contents(GitHubCore):
         #: points to
         self.target = content.get('target', '')
 
+        self._uniq = self.sha
+
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)
 

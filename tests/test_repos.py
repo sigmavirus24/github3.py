@@ -1236,7 +1236,7 @@ class TestHook(BaseCase):
     def test_equality(self):
         h = repos.hook.Hook(load('hook'))
         assert self.hook == h
-        h.id = 1
+        h._uniq = 1
         assert self.hook != h
 
     def test_repr(self):
@@ -1361,7 +1361,7 @@ class TestRepoCommit(BaseCase):
     def test_equality(self):
         c = repos.commit.RepoCommit(load('commit'))
         assert self.commit == c
-        c.sha = 'fake'
+        c._uniq = 'fake'
         assert self.commit != c
 
     def test_repr(self):

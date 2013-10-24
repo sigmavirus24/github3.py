@@ -94,12 +94,6 @@ class Gist(GitHubCore):
         #: Forks URL (not a template)
         self.forks_url = data.get('forks_url', '')
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     def __str__(self):
         return self.id
 

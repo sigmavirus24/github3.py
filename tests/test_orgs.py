@@ -19,7 +19,7 @@ class TestTeam(BaseCase):
     def test_equality(self):
         t = github3.orgs.Team(load('team'))
         assert self.team == t
-        t.id = 'foo'
+        t._uniq = 'foo'
         assert self.team != t
 
     def test_add_member(self):

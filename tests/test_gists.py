@@ -169,7 +169,7 @@ class TestGist(BaseCase):
     def test_equality(self):
         g = gists.Gist(load('gist'))
         assert self.gist == g
-        g.id = 1
+        g._uniq = 1
         assert self.gist != g
 
 
@@ -187,7 +187,7 @@ class TestGistComment(BaseCase):
     def test_equality(self):
         c = gists.comment.GistComment(load('gist_comment'))
         assert self.comment == c
-        c.id = 1
+        c._uniq = 1
         assert self.comment != c
 
     def test_repr(self):
@@ -216,5 +216,5 @@ class TestGistHistory(BaseCase):
     def test_equality(self):
         h = gists.history.GistHistory(load('gist_history'))
         assert self.hist == h
-        h.version = 'foo'
+        h._uniq = 'foo'
         assert self.hist != h
