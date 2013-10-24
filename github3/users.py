@@ -182,6 +182,9 @@ class User(BaseAccount):
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')
 
+        # URL to the public profile
+        self.profile_url = 'https://github.com/users/%s' % user.get('login')
+
     def __str__(self):
         return self.login
 
@@ -378,6 +381,15 @@ class User(BaseAccount):
         from github3.repos import Repository
         url = self._build_url('subscriptions', base_url=self._api)
         return self._iter(int(number), url, Repository, etag=etag)
+
+    def iter_contributions_calendar_data(self, number=-1):
+        import requests
+        url = self._build_url('contributions_calendar_data', base_url=self.profile_url)
+        for data in requests.get(url).json():
+            yield data
+            number -= 1
+            if number == 0:
+                break
 
     @requires_auth
     def update(self, name=None, email=None, blog=None, company=None,
