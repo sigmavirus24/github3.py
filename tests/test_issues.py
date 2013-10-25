@@ -122,6 +122,8 @@ class TestMilestone(BaseCase):
         assert self.m.update(None) is False
         self.not_called()
 
+        assert self.m.update(state='closed')
+
         assert self.m.update('foo', 'closed', ':sparkles:',
                              '2013-12-31T23:59:59Z')
         self.mock_assertions()
