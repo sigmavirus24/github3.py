@@ -25,7 +25,7 @@ class PullDestination(GitHubCore):
     """
 
     def __init__(self, dest, direction):
-        super(PullDestination, self).__init__(None)
+        super(PullDestination, self).__init__(dest)
         #: Direction of the merge with respect to this destination
         self.direction = direction
         #: Full reference string of the object
@@ -206,12 +206,6 @@ class PullRequest(GitHubCore):
 
     def __repr__(self):
         return '<Pull Request [#{0}]>'.format(self.number)
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
     def _update_(self, pull):
         self.__init__(pull, self._session)

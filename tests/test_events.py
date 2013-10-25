@@ -16,7 +16,7 @@ class TestEvent(BaseCase):
     def test_equality(self):
         e = github3.events.Event(load('event'))
         assert self.ev == e
-        e.id = 1
+        e._uniq = 1
         assert self.ev != e
 
     def test_org(self):

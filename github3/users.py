@@ -43,12 +43,6 @@ class Key(GitHubCore):
     def __str__(self):
         return self.key
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     def _update_(self, key):
         self.__init__(key, self._session)
 
@@ -181,6 +175,8 @@ class User(BaseAccount):
 
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')
+
+        self._uniq = user.get('id', None)
 
     def __str__(self):
         return self.login

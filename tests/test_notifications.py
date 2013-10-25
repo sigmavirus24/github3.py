@@ -12,7 +12,7 @@ class TestThread(BaseCase):
     def test_equality(self):
         t = github3.notifications.Thread(load('notification'))
         assert self.thread == t
-        t.id = 1
+        t._uniq = 1
         assert self.thread != t
 
     def test_last_read_at(self):

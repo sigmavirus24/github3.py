@@ -15,7 +15,7 @@ class TestAuthorization(BaseCase):
     def test_equality(self):
         a = github3.auths.Authorization(load('authorization'))
         assert self.auth == a
-        a.id = 1
+        a._uniq = 1
         assert self.auth != a
 
     def test_repr(self):

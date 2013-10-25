@@ -91,12 +91,6 @@ class Issue(GitHubCore):
         #: :class:`User <github3.users.User>` who closed the issue.
         self.closed_by = User(closed_by, self) if closed_by else None
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)
