@@ -222,7 +222,7 @@ class TestIssue(BaseCase):
     def test_edit(self):
         self.response('issue', 200)
         self.patch(self.api)
-        self.conf = {'data': {'title': 'new title'}}
+        self.conf = {'data': {'title': 'new title', 'milestone': None}}
 
         self.assertRaises(github3.GitHubError, self.i.edit)
 
@@ -230,7 +230,7 @@ class TestIssue(BaseCase):
         assert self.i.edit() is False
         self.not_called()
 
-        assert self.i.edit('new title')
+        assert self.i.edit('new title', milestone=0)
         self.mock_assertions()
 
     def test_is_closed(self):
