@@ -12,6 +12,8 @@ class Release(GitHubCore):
 
     """
 
+    CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
+
     def __init__(self, release, session=None):
         super(Release, self).__init__(release, session)
         #: URL for uploaded assets
@@ -50,9 +52,8 @@ class Release(GitHubCore):
         :returns: True if successful; False if not successful
         """
         url = self._api
-        headers = {'Accept': 'application/vnd.github.manifold-preview'}
         return self._boolean(
-            self._session.delete(url, headers=headers),
+            self._session.delete(url, headers=Release.CUSTOM_HEADERS),
             204,
             404
         )
@@ -75,7 +76,6 @@ class Release(GitHubCore):
         :returns: True if successful; False if not successful
         """
         url = self._api
-        headers = {'Accept': 'application/vnd.github.manifold-preview'}
         data = {
             'tag_name': tag_name,
             'target_commitish': target_commitish,
@@ -85,8 +85,22 @@ class Release(GitHubCore):
             'prerelease': prerelease,
         }
         self._remove_none(data)
-        r = self._session.patch(url, data=data, headers=headers)
+
+        r = self._session.patch(
+            url, data=data, headers=Release.CUSTOM_HEADERS
+        )
+
         successful = self._boolean(r, 200, 404)
         if successful:
+            # If the edit was successful, let's update the object.
             self.__init__(r.json())
+
         return successful
+
+    def iter_assets(self, etag=None):
+        """Iterate over the assets available for this release.
+
+        :param str etag: (optional), last ETag header sent
+        :returns: generator of :class:`Asset <Asset>` objects
+        """
+        pass
