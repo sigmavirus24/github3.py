@@ -122,6 +122,27 @@ class Release(GitHubCore):
         url = self._build_url('assets', base_url=self.__api)
         return self._iter(number, url, Asset, etag=etag)
 
+    @requires_auth
+    def upload_asset(self, content_type, name, asset):
+        """Upload an asset to this release.
+
+        All parameters are required.
+
+        :param str content_type: The content type of the asset. Wikipedia has
+            a list of common media types
+        :param str name: The name of the file
+        :param asset: The file or bytes object to upload.
+        :returns: :class:`Asset <Asset>`
+        """
+        headers = Release.CUSTOM_HEADERS.copy()
+        headers.update({'Content-Type': content_type})
+        url = self.upload_urlt.expand({'name': name})
+        data = self._json(
+            self._post(url, data=asset, headers=headers),
+            201
+        )
+        return Asset(data, self)
+
 
 class Asset(GitHubCore):
     def __init__(self, asset, session=None):
