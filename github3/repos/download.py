@@ -9,7 +9,7 @@ class Download(GitHubCore):
 
     .. warning::
 
-        On 2013-03-11, this API was suppoed to be deprecated by GitHub. This
+        On 2013-03-11, this API was supposed to be deprecated by GitHub. This
         means that at any time, GitHub could deprecate this part of the API at
         any time without further notice. Until I find out it has been
         deprecated, this will remain part of the API, although it will be
