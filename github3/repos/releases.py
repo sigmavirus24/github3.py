@@ -1,12 +1,17 @@
+from github3.decorators import requires_auth
 from github3.models import GitHubCore
 from uritemplate import URITemplate
 
 
 class Release(GitHubCore):
-    """The :class:`Branch <Branch>` object. It holds the information GitHub
-    returns about a branch on a
+
+    """The :class:`Release <Release>` object.
+
+    It holds the information GitHub returns about a release from a
     :class:`Repository <github3.repos.repo.Repository>`.
+
     """
+
     def __init__(self, release, session=None):
         super(Release, self).__init__(release, session)
         #: URL for uploaded assets
@@ -31,9 +36,57 @@ class Release(GitHubCore):
         self.tag_name = release.get('tag_name')
         #: "Commit" that this release targets
         self.target_commitish = release.get('target_commitish')
-        #: URITemplate to upload an asset with
         upload_url = release.get('upload_url')
+        #: URITemplate to upload an asset with
         self.upload_urlt = URITemplate(upload_url) if upload_url else None
 
     def __repr__(self):
         return '<Release [{0}]>'.format(self.name)
+
+    @requires_auth
+    def delete(self):
+        """Users with push access to the repository can delete a release.
+
+        :returns: True if successful; False if not successful
+        """
+        url = self._api
+        headers = {'Accept': 'application/vnd.github.manifold-preview'}
+        return self._boolean(
+            self._session.delete(url, headers=headers),
+            204,
+            404
+        )
+
+    @requires_auth
+    def edit(self, tag_name=None, target_commitish=None, name=None, body=None,
+             draft=None, prerelease=None):
+        """Users with push access to the repository can edit a release.
+
+        If the edit is successful, this object will update itself.
+
+        :param str tag_name: (optional), Name of the tag to use
+        :param str target_commitish: (optional), The "commitish" value that
+            determines where the Git tag is created from. Defaults to the
+            repository's default branch.
+        :param str name: (optional), Name of the release
+        :param str body: (optional), Description of the release
+        :param boolean draft: (optional), True => Release is a draft
+        :param boolean prerelease: (optional), True => Release is a prerelease
+        :returns: True if successful; False if not successful
+        """
+        url = self._api
+        headers = {'Accept': 'application/vnd.github.manifold-preview'}
+        data = {
+            'tag_name': tag_name,
+            'target_commitish': target_commitish,
+            'name': name,
+            'body': body,
+            'draft': draft,
+            'prerelease': prerelease,
+        }
+        self._remove_none(data)
+        r = self._session.patch(url, data=data, headers=headers)
+        successful = self._boolean(r, 200, 404)
+        if successful:
+            self.__init__(r.json())
+        return successful
