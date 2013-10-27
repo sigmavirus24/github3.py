@@ -68,7 +68,7 @@ class Release(GitHubCore):
         """
         url = self._api
         return self._boolean(
-            self._session.delete(url, headers=Release.CUSTOM_HEADERS),
+            self._delete(url, headers=Release.CUSTOM_HEADERS),
             204,
             404
         )
