@@ -1,3 +1,5 @@
+import json
+
 from github3.decorators import requires_auth
 from github3.models import GitHubCore
 from uritemplate import URITemplate
@@ -87,7 +89,7 @@ class Release(GitHubCore):
         self._remove_none(data)
 
         r = self._session.patch(
-            url, data=data, headers=Release.CUSTOM_HEADERS
+            url, data=json.dumps(data), headers=Release.CUSTOM_HEADERS
         )
 
         successful = self._boolean(r, 200, 404)
@@ -97,10 +99,35 @@ class Release(GitHubCore):
 
         return successful
 
-    def iter_assets(self, etag=None):
+    def iter_assets(self, number=-1, etag=None):
         """Iterate over the assets available for this release.
 
+        :param int number: (optional), Number of assets to return
         :param str etag: (optional), last ETag header sent
         :returns: generator of :class:`Asset <Asset>` objects
         """
-        pass
+        url = self._build_url('assets', base_url=self.__api)
+        return self._iter(number, url, Asset, etag=etag)
+
+
+class Asset(GitHubCore):
+    def __init__(self, asset, session=None):
+        super(Asset, self).__init__(asset, session)
+        #: Content-Type provided when the asset was created
+        self.content_type = asset.get('content_type')
+        #: Date the asset was created
+        self.created_at = self._strptime(asset.get('created_at'))
+        #: Number of times the asset was downloaded
+        self.download_count = asset.get('download_count')
+        #: GitHub id of the asset
+        self.id = asset.get('id')
+        #: Short description of the asset
+        self.label = asset.get('label')
+        #: Name of the asset
+        self.name = asset.get('name')
+        #: Size of the asset
+        self.size = asset.get('size')
+        #: State of the asset, e.g., "uploaded"
+        self.state = asset.get('state')
+        #: Date the asset was updated
+        self.updated_at = self._strptime(asset.get('updated_at'))
