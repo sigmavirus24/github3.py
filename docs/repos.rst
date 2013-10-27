@@ -46,6 +46,11 @@ Repository Objects
 
 ---------
 
+.. autoclass:: github3.repos.release.Release
+    :members:
+
+---------
+
 .. autoclass:: github3.repos.download.Download
     :members:
 
