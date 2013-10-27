@@ -47,6 +47,19 @@ class Release(GitHubCore):
     def __repr__(self):
         return '<Release [{0}]>'.format(self.name)
 
+    def asset(self, id):
+        """Returns a single Asset.
+
+        :param int id: (required), id of the asset
+        :returns: :class:`Asset <Asset>`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url(str(id), base_url=self._api)
+            data = self._json(self._get(url, headers=Release.CUSTOM_HEADERS),
+                              200)
+        return Asset(data, self) if data else None
+
     @requires_auth
     def delete(self):
         """Users with push access to the repository can delete a release.
