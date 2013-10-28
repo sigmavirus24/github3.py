@@ -1,7 +1,7 @@
 import json
 
 from github3.decorators import requires_auth
-from github3.models import GitHubCore
+from github3.models import GitHubCore, GitHubError
 from uritemplate import URITemplate
 
 
@@ -108,7 +108,7 @@ class Release(GitHubCore):
         successful = self._boolean(r, 200, 404)
         if successful:
             # If the edit was successful, let's update the object.
-            self.__init__(r.json())
+            self.__init__(r.json(), self)
 
         return successful
 
@@ -137,11 +137,10 @@ class Release(GitHubCore):
         headers = Release.CUSTOM_HEADERS.copy()
         headers.update({'Content-Type': content_type})
         url = self.upload_urlt.expand({'name': name})
-        data = self._json(
-            self._post(url, data=asset, headers=headers),
-            201
-        )
-        return Asset(data, self)
+        r = self._post(url, data=asset, headers=headers)
+        if r.status_code in (201, 202):
+            return Asset(r.json(), self)
+        raise GitHubError(r)
 
 
 class Asset(GitHubCore):
@@ -165,3 +164,25 @@ class Asset(GitHubCore):
         self.state = asset.get('state')
         #: Date the asset was updated
         self.updated_at = self._strptime(asset.get('updated_at'))
+
+    def edit(self, name, label=None):
+        """Edit this asset.
+
+        :param str name: (required), The file name of the asset
+        :param str label: (optional), An alternate description of the asset
+        :returns: boolean
+        """
+        if not name:
+            return False
+        edit_data = {'name': name, 'label': label}
+        self._remove_none(edit_data)
+        r = self._patch(
+            self._api,
+            data=edit_data,
+            headers=Release.CUSTOM_HEADERS
+        )
+        successful = self._boolean(r, 200, 404)
+        if successful:
+            self.__init__(r.json(), self)
+
+        return successful
