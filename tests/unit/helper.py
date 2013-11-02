@@ -12,6 +12,11 @@ class UnitHelper(unittest.TestCase):
     # Sub-classes must also assign a dictionary to this during definition
     example_data = {}
 
+    def create_session_mock(self):
+        session = MockedSession()
+        session.attach_mock(mock.Mock(), 'headers')
+        return session
+
     def setUp(self):
-        self.session = MockedSession()
+        self.session = self.create_session_mock()
         self.instance = self.described_class(self.example_data, self.session)
