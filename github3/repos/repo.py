@@ -29,6 +29,7 @@ from github3.repos.download import Download
 from github3.repos.hook import Hook
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
+from github3.repos.release import Release, Asset
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
 from github3.utils import timestamp_parameter
@@ -337,6 +338,20 @@ class Repository(GitHubCore):
 
             written = True
         return written
+
+    def asset(self, id):
+        """Returns a single Asset.
+
+        :param int id: (required), id of the asset
+        :returns: :class:`Asset <Asset>`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url('releases', 'assets', str(id),
+                                  base_url=self._api)
+            data = self._json(self._get(url, headers=Release.CUSTOM_HEADERS),
+                              200)
+        return Asset(data, self) if data else None
 
     def blob(self, sha):
         """Get the blob indicated by ``sha``.

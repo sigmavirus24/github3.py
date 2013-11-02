@@ -26,8 +26,17 @@ class TestRelease(UnitHelper):
         "published_at": "2013-02-27T19:35:32Z"
         }
 
+    # Attribute tests
     def test_has_upload_urlt(self):
         assert self.instance.upload_urlt is not None
+
+    # Method tests
+    def test_delete(self):
+        self.instance.delete()
+        self.session.delete.assert_called_once_with(
+            self.example_data['url'],
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
+        )
 
 
 class TestAsset(UnitHelper):
