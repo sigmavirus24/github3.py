@@ -18,6 +18,11 @@ class UnitHelper(unittest.TestCase):
             (key, mock.Mock()) for key in set(args).union(base_attrs)
         )
         session.configure_mock(**attrs)
+        session.delete.return_value = None
+        session.get.return_value = None
+        session.patch.return_value = None
+        session.post.return_value = None
+        session.put.return_value = None
         return session
 
     def setUp(self):
