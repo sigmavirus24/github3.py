@@ -1588,7 +1588,6 @@ class Repository(GitHubCore):
         including notes and stashes (provided they exist on the server).
 
         :param str ref: (required)
-        :type ref: str
         :returns: :class:`Reference <github3.git.Reference>`
         """
         json = None
