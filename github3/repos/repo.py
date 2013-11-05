@@ -726,6 +726,21 @@ class Repository(GitHubCore):
         return Reference(json, self) if json else None
 
     @requires_auth
+    def create_release(self, tag_name, target_commitish=None, name=None,
+                       body=None, draft=False, prerelease=False):
+        """Create a release for this repository.
+
+        :param str tag_name: (required)
+        :param str target_commitish: (optional)
+        :param str name: (optional)
+        :param str body: (optional)
+        :param bool draft: (optional)
+        :param bool prerelease: (optional)
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        # TODO(Ian): Fill out docs and method body
+
+    @requires_auth
     def create_status(self, sha, state, target_url='', description=''):
         """Create a status object on a commit.
 
