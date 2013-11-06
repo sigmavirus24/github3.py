@@ -730,12 +730,14 @@ class Repository(GitHubCore):
                        body=None, draft=False, prerelease=False):
         """Create a release for this repository.
 
-        :param str tag_name: (required)
-        :param str target_commitish: (optional)
-        :param str name: (optional)
-        :param str body: (optional)
-        :param bool draft: (optional)
-        :param bool prerelease: (optional)
+        :param str tag_name: (required), name to give to the tag
+        :param str target_commitish: (optional), vague concept of a target,
+            either a SHA or a branch name.
+        :param str name: (optional), name of the release
+        :param str body: (optional), description of the release
+        :param bool draft: (optional), whether this release is a draft or not
+        :param bool prerelease: (optional), whether this is a prerelease or
+            not
         :returns: :class:`Release <github3.repos.release.Release>`
         """
         data = {'tag_name': str(tag_name),
