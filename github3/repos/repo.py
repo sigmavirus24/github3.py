@@ -738,7 +738,20 @@ class Repository(GitHubCore):
         :param bool prerelease: (optional)
         :returns: :class:`Release <github3.repos.release.Release>`
         """
-        # TODO(Ian): Fill out docs and method body
+        data = {'tag_name': str(tag_name),
+                'target_commitish': target_commitish,
+                'name': name,
+                'body': body,
+                'draft': draft,
+                'prerelease': prerelease
+                }
+        self._remove_none(data)
+
+        url = self._build_url('releases', base_url=self._api)
+        json = self._json(self._post(
+            url, data=data, headers=Release.CUSTOM_HEADERS
+            ), 201)
+        return Release(json, self)
 
     @requires_auth
     def create_status(self, sha, state, target_url='', description=''):
