@@ -34,4 +34,5 @@ class TestRepository(IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             release = repository.release(76677)
+
         assert isinstance(release, github3.repos.release.Release)
