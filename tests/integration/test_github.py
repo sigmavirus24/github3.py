@@ -55,3 +55,19 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(k, github3.users.Key)
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
+
+    def test_repository(self):
+        """Test the ability to retrieve a Repository"""
+        cassette_name = self.cassette_name('repository')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.repository('sigmavirus24', 'github3.py')
+
+        assert isinstance(r, github3.repos.repo.Repository)
+
+    def test_user(self):
+        """Test the ability to retrieve a User"""
+        cassette_name = self.cassette_name('user')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.user('sigmavirus24')
+
+        assert isinstance(r, github3.users.User)
