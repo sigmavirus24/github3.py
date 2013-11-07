@@ -56,6 +56,14 @@ class TestGitHub(IntegrationHelper):
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
 
+    def test_organization(self):
+        """Test the ability to retrieve an Organization"""
+        cassette_name = self.cassette_name('organization')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+
+        assert isinstance(o, github3.orgs.Organization)
+
     def test_repository(self):
         """Test the ability to retrieve a Repository"""
         cassette_name = self.cassette_name('repository')
