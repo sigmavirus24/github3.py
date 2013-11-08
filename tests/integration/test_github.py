@@ -56,6 +56,17 @@ class TestGitHub(IntegrationHelper):
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
 
+    def test_octocat(self):
+        """Test the ability to use the octocat endpoint"""
+        cassette_name = self.cassette_name('octocat')
+        say = 'github3.py is awesome'
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.octocat()
+            assert o is not None
+            assert o is not ''
+            o = self.gh.octocat(say)
+            assert say in o
+
     def test_organization(self):
         """Test the ability to retrieve an Organization"""
         cassette_name = self.cassette_name('organization')
