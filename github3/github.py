@@ -862,7 +862,7 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('octocat')
         req = self._get(url, params={'s': say})
-        return req.text if req.ok else ''
+        return req.content if req.ok else ''
 
     def organization(self, login):
         """Returns a Organization object for the login name
