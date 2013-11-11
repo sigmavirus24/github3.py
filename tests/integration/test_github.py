@@ -101,6 +101,9 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to retrieve a User"""
         cassette_name = self.cassette_name('user')
         with self.recorder.use_cassette(cassette_name):
-            r = self.gh.user('sigmavirus24')
+            s = self.gh.user('sigmavirus24')
+            self.basic_login()
+            u = self.gh.user()
 
-        assert isinstance(r, github3.users.User)
+        assert isinstance(s, github3.users.User)
+        assert isinstance(u, github3.users.User)
