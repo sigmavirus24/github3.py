@@ -107,3 +107,12 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(s, github3.users.User)
         assert isinstance(u, github3.users.User)
+
+    def test_zen(self):
+        """Test the ability to retrieve tidbits of Zen"""
+        cassette_name = self.cassette_name('zen')
+        with self.recorder.use_cassette(cassette_name):
+            z = self.gh.zen()
+
+        assert z is not None
+        assert z != ''
