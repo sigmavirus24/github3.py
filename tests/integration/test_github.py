@@ -46,7 +46,6 @@ class TestGitHub(IntegrationHelper):
     def test_create_key(self):
         """Test the ability to create a key and delete it."""
         self.basic_login()
-        #import pytest; pytest.set_trace()
         cassette_name = self.cassette_name('create_delete_key')
         with self.recorder.use_cassette(cassette_name):
             k = self.gh.create_key('Key name', SSH_KEY)
@@ -55,6 +54,13 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(k, github3.users.Key)
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
+
+    def test_meta(self):
+        """Test the ability to get the CIDR formatted addresses"""
+        cassette_name = self.cassette_name('meta')
+        with self.recorder.use_cassette(cassette_name):
+            m = self.gh.meta()
+            assert isinstance(m, dict)
 
     def test_octocat(self):
         """Test the ability to use the octocat endpoint"""

@@ -846,8 +846,9 @@ class GitHub(GitHubCore):
         return ''  # (No coverage)
 
     def meta(self):
-        """Returns an array of addresses in CIDR format specifying the
-        addresses that the incoming service hooks will originate from.
+        """Returns a dictionary with arrays of addresses in CIDR format
+        specifying theaddresses that the incoming service hooks will originate
+        from.
 
         .. versionadded:: 0.5
         """
