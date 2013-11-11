@@ -81,6 +81,14 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(o, github3.orgs.Organization)
 
+    def test_pull_request(self):
+        """Test the ability to retrieve a Pull Request"""
+        cassette_name = self.cassette_name('pull_request')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.gh.pull_request('sigmavirus24', 'github3.py', 119)
+
+        assert isinstance(p, github3.pulls.PullRequest)
+
     def test_repository(self):
         """Test the ability to retrieve a Repository"""
         cassette_name = self.cassette_name('repository')
