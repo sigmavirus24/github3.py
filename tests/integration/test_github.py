@@ -63,6 +63,15 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(g, github3.gists.Gist)
 
+    def test_gitignore_template(self):
+        """Test the ability to retrieve a single gitignore template"""
+        cassette_name = self.cassette_name('gitignore_template')
+        with self.recorder.use_cassette(cassette_name):
+            t = self.gh.gitignore_template('Python')
+
+        assert t is not None
+        assert t != ''
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
         cassette_name = self.cassette_name('meta')
