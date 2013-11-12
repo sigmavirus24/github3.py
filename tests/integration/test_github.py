@@ -103,6 +103,13 @@ class TestGitHub(IntegrationHelper):
             for u in self.gh.iter_all_users(number=25):
                 assert isinstance(u, github3.users.User)
 
+    def test_iter_events(self):
+        """Test the ability to iterate over all public events"""
+        cassette_name = self.cassette_name('iter_events')
+        with self.recorder.use_cassette(cassette_name):
+            for e in self.gh.iter_events(number=25):
+                assert isinstance(e, github3.events.Event)
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
         cassette_name = self.cassette_name('meta')
