@@ -72,6 +72,15 @@ class TestGitHub(IntegrationHelper):
         assert t is not None
         assert t != ''
 
+    def test_gitignore_templates(self):
+        """Test the ability to retrieve a list of gitignore templates"""
+        cassette_name = self.cassette_name('gitignore_templates')
+        with self.recorder.use_cassette(cassette_name):
+            l = self.gh.gitignore_templates()
+
+        assert l != []
+        assert isinstance(l, list)
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
         cassette_name = self.cassette_name('meta')
