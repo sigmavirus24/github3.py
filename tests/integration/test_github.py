@@ -81,6 +81,14 @@ class TestGitHub(IntegrationHelper):
         assert l != []
         assert isinstance(l, list)
 
+    def test_issue(self):
+        """Test the ability to retrieve a single issue"""
+        cassette_name = self.cassette_name('issue')
+        with self.recorder.use_cassette(cassette_name):
+            i = self.gh.issue('sigmavirus24', 'github3.py', 1)
+
+        assert isinstance(i, github3.issues.Issue)
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
         cassette_name = self.cassette_name('meta')
