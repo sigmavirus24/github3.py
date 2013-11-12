@@ -55,6 +55,14 @@ class TestGitHub(IntegrationHelper):
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
 
+    def test_gist(self):
+        """Test the ability to retrieve a single gist"""
+        cassette_name = self.cassette_name('gist')
+        with self.recorder.use_cassette(cassette_name):
+            g = self.gh.gist(7160899)
+
+        assert isinstance(g, github3.gists.Gist)
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
         cassette_name = self.cassette_name('meta')
