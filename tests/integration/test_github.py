@@ -89,6 +89,13 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(i, github3.issues.Issue)
 
+    def test_iter_all_repos(self):
+        """Test the ability to iterate over all of the repositories"""
+        cassette_name = self.cassette_name('iter_all_repos')
+        with self.recorder.use_cassette(cassette_name):
+            for r in self.gh.iter_all_repos(number=25):
+                assert isinstance(r, github3.repos.repo.Repository)
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
         cassette_name = self.cassette_name('meta')
