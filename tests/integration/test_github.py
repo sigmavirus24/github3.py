@@ -100,8 +100,8 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to iterate over all of the users"""
         cassette_name = self.cassette_name('iter_all_users')
         with self.recorder.use_cassette(cassette_name):
-            for r in self.gh.iter_all_users(number=25):
-                assert isinstance(r, github3.users.User)
+            for u in self.gh.iter_all_users(number=25):
+                assert isinstance(u, github3.users.User)
 
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses"""
