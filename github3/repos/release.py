@@ -125,7 +125,8 @@ class Release(GitHubCore):
         headers = Release.CUSTOM_HEADERS.copy()
         headers.update({'Content-Type': content_type})
         url = self.upload_urlt.expand({'name': name})
-        r = self._post(url, data=asset, headers=headers)
+        r = self._post(url, data=asset, json=False, headers=headers,
+                       verify=False)
         if r.status_code in (201, 202):
             return Asset(r.json(), self)
         raise GitHubError(r)

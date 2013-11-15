@@ -24,3 +24,20 @@ class TestRelease(IntegrationHelper):
             release = repository.release(85783)
             assert release.edit(body='Test editing a release') is True
             assert release.body == 'Test editing a release'
+
+    def test_upload_asset(self):
+        """Test the ability to upload an asset to a release."""
+        self.token_login()
+        cassette_name = self.cassette_name('upload_asset')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'github3.py')
+            release = repository.create_release(
+                '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
+                'To be deleted'
+                )
+            with open(__file__) as fd:
+                asset = release.upload_asset(
+                    'text/plain', 'test_repos_release.py', fd.read()
+                    )
+            assert isinstance(asset, github3.repos.release.Asset)
+            release.delete()
