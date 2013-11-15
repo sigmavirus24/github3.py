@@ -2,7 +2,7 @@ from .helper import IntegrationHelper
 
 
 class TestRelease(IntegrationHelper):
-    def test_edit_release(self):
+    def test_edit(self):
         """Test the ability to edit a release on a repository."""
         self.token_login()
         cassette_name = self.cassette_name('edit')
