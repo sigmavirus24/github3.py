@@ -107,7 +107,7 @@ class Release(GitHubCore):
         :param str etag: (optional), last ETag header sent
         :returns: generator of :class:`Asset <Asset>` objects
         """
-        url = self._build_url('assets', base_url=self.__api)
+        url = self._build_url('assets', base_url=self._api)
         return self._iter(number, url, Asset, etag=etag)
 
     @requires_auth
