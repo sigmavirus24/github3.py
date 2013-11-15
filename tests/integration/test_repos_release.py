@@ -1,9 +1,11 @@
+import github3
+
 from .helper import IntegrationHelper
 
 
 class TestRelease(IntegrationHelper):
     def test_delete(self):
-        """Test the ability to delete a release"""
+        """Test the ability to delete a release."""
         self.token_login()
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
