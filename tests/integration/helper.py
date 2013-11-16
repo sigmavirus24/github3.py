@@ -2,14 +2,10 @@ import betamax
 import github3
 import os
 import sys
-
-if sys.version_info < (3, 0):
-    from unittest2 import TestCase
-else:
-    from unittest import TestCase
+import unittest
 
 
-class IntegrationHelper(TestCase):
+class IntegrationHelper(unittest.TestCase):
     def setUp(self):
         self.user = os.environ.get('GH_USER', 'foo')
         self.password = os.environ.get('GH_PASSWORD', 'bar')
