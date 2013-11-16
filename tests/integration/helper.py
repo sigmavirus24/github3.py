@@ -1,7 +1,6 @@
 import betamax
 import github3
 import os
-import sys
 import unittest
 
 
