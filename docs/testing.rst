@@ -7,99 +7,7 @@ Writing Tests for github3.py
     soon.
 
 Writing tests for github3.py is a non-trivial task and takes some 
-understanding of the expecter_ module and mock_ modules.
-
-expecter
---------
-
-I chose to use the expecter_ module in the tests for github3.py because I feel 
-that writing tests with it read far more naturally. Take for instance the 
-following:
-
-.. code-block:: python
-
-    x = 1
-
-    def foo(x):
-        return [x + 1]
-
-    self.assertEquals(foo(x), [x + 1])
-
-You have the variable ``x``, the function ``foo`` and the inherited 
-``assertEquals`` method from ``unittest.TestCase``. My first issue with this 
-is that the unittest module, although technically grandfathered in, uses 
-camel-casing for its methods. To me, this is ugly and annoying to type. I've 
-found myself typing ``self.assertequals`` more often than not. Now consider 
-this:
-
-.. code-block:: python
-
-    x = 1
-
-    def foo(x):
-        return [x + 1]
-
-    expect(foo(x)) == [x + 1]
-
-This tests the exact same thing but this reads differently. Instead of "assert 
-that ``foo(x)`` and ``[x + 1]`` are equal", you're saying "expect ``foo(x)`` 
-and ``[x + 1]`` to be equal". It's the same thing, but the latter reads better 
-than the former to me.
-
-The standard ``expecter`` module has fewer methods than what we use in 
-github3.py but that's because I've subclassed the ``expect`` class and renamed 
-it to look the same in github3.py. So the extra functionality are the 
-following methods:
-
-- ``is_not_None`` which expects the object passed in to be anything but 
-  ``None``. Example usage::
-
-      expect(a).is_not_None()
-
-- ``is_None`` which expects the opposite of ``is_not_None``. Example usage::
-
-      expect(None).is_None()
-
-- ``is_True`` which expects the object passed in to be True. Example usage::
-
-      expect(True).is_True()
-
-- ``is_False`` which expects the object passed in to be False. Example usage::
-
-      expect(False).is_False()
-
-- ``is_in(iterable)`` which expects the object passed in be in ``iterable``.  
-  Example usage::
-
-      expect('foo').is_in(['foo', 'bar', 'bogus'])
-
-- ``githuberror`` which is used as a context manager to show that we're 
-  expecting something to raise a ``GitHubError``. Example usage::
-
-      with expect.githuberror():
-          github3.authorize()
-
-Why implement these custom methods?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When using ``expecter.expect``, you receive an instance of a class instead of 
-the actual object, so where you would like the following to work, it does not:
-
-.. code-block:: python
-
-    expect(a) is not None
-
-The reality, however, is that test is tautologically true. Every instance of 
-``expecter.expect`` is not ``None``. In other cases, tools like ``pep8`` and 
-``flake8`` will complain if you do:
-
-.. code-block:: python
-
-    expect(a) == True
-
-And they rightfully complain. So these methods just make life easier. If they 
-cause significant enough confusion, then I'll consider rewriting the test 
-suite in something better.
+understanding of the mock_ module.
 
 mock
 ----
@@ -146,18 +54,18 @@ From ``tests/test_gists.py``:
 
 .. code-block:: python
 
-    def test_unstar(self):
+        def test_unstar(self):
         self.response('', 204)
-        self.delete(self.api)
+        self.delete(self.api + '/star')
         self.conf = {}
 
-        with expect.githuberror():
-            self.gist.unstar()
+        self.assertRaises(github3.GitHubError, self.gist.unstar)
 
         self.not_called()
         self.login()
-        expect(self.gist.unstar()).is_True()
+        assert self.gist.unstar()
         self.mock_assertions()
+
 
 First notice that this, like every other test, is prefaced with ``test_`` and 
 then followed by the name of the method it is testing, in this case, 
@@ -220,31 +128,31 @@ From ``tests/test_repos.py``:
 
     def test_archive(self):
         headers = {'content-disposition': 'filename=foo'}
-        self.response('archive', 200, **headers)  #**
+        self.response('archive', 200, **headers)
         self.get(self.api + 'tarball/master')
         self.conf.update({'stream': True})
 
-        expect(self.repo.archive(None)).is_False()
+        assert self.repo.archive(None) is False
 
-        expect(os.path.isfile('foo')).is_False()
-        expect(self.repo.archive('tarball')).is_True()
-        expect(os.path.isfile('foo')).is_True()
+        assert os.path.isfile('foo') is False
+        assert self.repo.archive('tarball')
+        assert os.path.isfile('foo')
         os.unlink('foo')
         self.mock_assertions()
 
         self.request.return_value.raw.seek(0)
         self.request.return_value._content_consumed = False
 
-        expect(os.path.isfile('path_to_file')).is_False()
-        expect(self.repo.archive('tarball', 'path_to_file')).is_True()
-        expect(os.path.isfile('path_to_file')).is_True()
+        assert os.path.isfile('path_to_file') is False
+        assert self.repo.archive('tarball', 'path_to_file')
+        assert os.path.isfile('path_to_file')
         os.unlink('path_to_file')
 
         self.request.return_value.raw.seek(0)
         self.request.return_value._content_consumed = False
 
         self.get(self.api + 'zipball/randomref')
-        expect(self.repo.archive('zipball', ref='randomref')).is_True()
+        assert self.repo.archive('zipball', ref='randomref')
         os.unlink('foo')
 
         self.request.return_value.raw.seek(0)
