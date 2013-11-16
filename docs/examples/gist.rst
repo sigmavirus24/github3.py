@@ -58,4 +58,4 @@ In the above examples ``'spam.txt'`` is the file name. GitHub will auto-detect
 file type based on extension provided. ``'What... is the air-speed velocity of
 an unladen swallow?'`` is the file's content or body. ``'Answer this to cross
 the bridge'`` is the gists's description. While required by github3.py, it is
-allowed to be empty, ``''`` is legal. 
+allowed to be empty, e.g., ``''`` is accepted by GitHub.
