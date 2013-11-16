@@ -151,9 +151,11 @@ Running the Unittests
     mkdir -p /path/to/virtualenv/github3.py
     cd /path/to/virtualenv/github3.py
     virtualenv .
-    cd /path/to/github3.py_repo/dev_requirements.txt
-    pip install -r requirements.txt
-    py.test
+    cd /path/to/github3.py_repo/
+    pip install -r dev-requirements.txt
+    # Or you could run make test-deps
+    make tests
+
 
 .. toctree::
 
