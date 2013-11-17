@@ -9,6 +9,7 @@ with betamax.Betamax.configure() as config:
     config.cassette_library_dir = 'tests/cassettes'
 
     record_mode = 'never' if os.environ.get('TRAVIS_GH3') else 'once'
+    print('Record mode: {0}'.format(record_mode))
 
     config.default_cassette_options['record_mode'] = record_mode
 
