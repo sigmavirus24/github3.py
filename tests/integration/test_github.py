@@ -1,4 +1,5 @@
 import github3
+import uritemplate
 
 from .helper import IntegrationHelper
 
@@ -54,6 +55,23 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(k, github3.users.Key)
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
+
+    def test_feeds(self):
+        """Test the ability to retrieve a user's timelime URLs"""
+        self.basic_login()
+        cassette_name = self.cassette_name('feeds')
+        with self.recorder.use_cassette(cassette_name):
+            feeds = self.gh.feeds()
+
+        for v in feeds['_links'].values():
+            assert isinstance(v['href'], uritemplate.URITemplate)
+
+        # The processing on _links has been tested. Get rid of it.
+        del feeds['_links']
+
+        # Test the rest of the response
+        for v in feeds.values():
+            assert isinstance(v, uritemplate.URITemplate)
 
     def test_gist(self):
         """Test the ability to retrieve a single gist"""

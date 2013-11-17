@@ -19,6 +19,7 @@ from github3.repos import Repository
 from github3.users import User, Key
 from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
+from uritemplate import URITemplate
 
 
 class GitHub(GitHubCore):
@@ -258,6 +259,32 @@ class GitHub(GitHubCore):
         if key:
             return key.delete()
         return False  # (No coverage)
+
+    @requires_basic_auth
+    def feeds(self):
+        """List GitHub's timeline resources in Atom format.
+
+        :returns: dictionary parsed to include URITemplates
+        """
+        url = self._build_url('feeds')
+        json = self._json(self._get(url), 200)
+        del json['ETag']
+        del json['Last-Modified']
+
+        urls = [
+            'timeline_url', 'user_url', 'current_user_public_url',
+            'current_user_url', 'current_user_actor_url',
+            'current_user_organization_url',
+            ]
+
+        for url in urls:
+            json[url] = URITemplate(json[url])
+
+        links = json.get('_links', {})
+        for d in links.values():
+            d['href'] = URITemplate(d['href'])
+
+        return json
 
     @requires_auth
     def follow(self, login):
