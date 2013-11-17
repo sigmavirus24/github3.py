@@ -59,7 +59,10 @@ class GitHubIterator(GitHubCore, Iterator):
 
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):
-                # TODO: Remove ETag and Last-Modified headers here
+                if json.get('ETag'):
+                    del json['ETag']
+                if json.get('Last-Modified'):
+                    del json['Last-Modified']
                 json = json.items()
 
             for i in json:

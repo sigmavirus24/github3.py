@@ -709,6 +709,8 @@ class TestRepository(BaseCase):
 
         l = next(self.repo.iter_languages())
         assert isinstance(l, tuple)
+        self.assertNotIn('ETag', l)
+        self.assertNotIn('Last-Modified', l)
         self.mock_assertions()
 
     def test_iter_milestones(self):
