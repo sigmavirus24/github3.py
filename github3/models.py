@@ -11,7 +11,6 @@ from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
 from datetime import datetime
-from github3 import __version__
 from logging import getLogger
 
 __url_cache__ = {}
@@ -68,18 +67,6 @@ class GitHubCore(GitHubObject):
         elif ses is None:
             ses = session()
         self._session = ses
-        headers = {
-            # Only accept JSON responses
-            'Accept': 'application/vnd.github.v3.full+json',
-            # Only accept UTF-8 encoded data
-            'Accept-Charset': 'utf-8',
-            # Always sending JSON
-            'Content-Type': "application/json",
-            # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/{0}'.format(__version__),
-        }
-
-        self._session.headers.update(headers)
 
         # set a sane default
         self._github_url = 'https://api.github.com'

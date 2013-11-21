@@ -802,10 +802,9 @@ class GitHub(GitHubCore):
         :param str token: (optional)
         """
         if username and password:
-            self._session.auth = (username, password)
+            self._session.basic_auth(username, password)
         elif token:
-            self._session.headers.update({
-                'Authorization': 'token ' + token})
+            self._session.token_auth(token)
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.
