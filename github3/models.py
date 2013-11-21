@@ -7,9 +7,9 @@ This module provides the basic models used in github3.py
 """
 
 from json import dumps
-from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
+from github3.session import GitHubSession
 from datetime import datetime
 from logging import getLogger
 
@@ -59,14 +59,14 @@ class GitHubCore(GitHubObject):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
     """
-    def __init__(self, json, ses=None):
+    def __init__(self, json, session=None):
         super(GitHubCore, self).__init__(json)
-        if hasattr(ses, '_session'):
+        if hasattr(session, '_session'):
             # i.e. session is actually a GitHub object
-            ses = ses._session
-        elif ses is None:
-            ses = session()
-        self._session = ses
+            session = session._session
+        elif session is None:
+            session = GitHubSession()
+        self._session = session
 
         # set a sane default
         self._github_url = 'https://api.github.com'
