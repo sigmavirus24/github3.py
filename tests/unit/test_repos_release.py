@@ -53,3 +53,19 @@ class TestAsset(UnitHelper):
         "created_at": "2013-02-27T19:35:32Z",
         "updated_at": "2013-02-27T19:35:32Z"
         }
+
+    def test_edit_without_label(self):
+        self.instance.edit('new name')
+        self.session.patch.assert_called_once_with(
+            self.example_data['url'],
+            data={'name': 'new name'},
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
+        )
+
+    def test_edit_with_label(self):
+        self.instance.edit('new name', 'label')
+        self.session.patch.assert_called_once_with(
+            self.example_data['url'],
+            data={'name': 'new name', 'label': 'label'},
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
+        )
