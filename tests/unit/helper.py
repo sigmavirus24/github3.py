@@ -2,8 +2,6 @@ import mock
 import github3
 import unittest
 
-MockedSession = mock.create_autospec(github3.session.GitHubSession)
-
 
 def build_url(self, *args, **kwargs):
     # We want to assert what is happening with the actual calls to the
@@ -17,8 +15,12 @@ class UnitHelper(unittest.TestCase):
     # Sub-classes must also assign a dictionary to this during definition
     example_data = {}
 
+    def create_mocked_session(self):
+        MockedSession = mock.create_autospec(github3.session.GitHubSession)
+        return MockedSession()
+
     def create_session_mock(self, *args):
-        session = MockedSession()
+        session = self.create_mocked_session()
         base_attrs = ['headers', 'auth']
         attrs = dict(
             (key, mock.Mock()) for key in set(args).union(base_attrs)
