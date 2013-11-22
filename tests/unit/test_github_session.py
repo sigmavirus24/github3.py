@@ -1,5 +1,6 @@
 import pytest
 
+import requests
 from github3 import session
 
 
@@ -91,3 +92,8 @@ class TestGitHubSession:
         s = self.build_session()
         with pytest.raises(NotImplementedError):
             s.oauth2_auth('Foo', 'bar')
+
+    def test_issubclass_of_requests_Session(self):
+        """Test that GitHubSession is a subclass of requests.Session"""
+        assert issubclass(session.GitHubSession,
+                          requests.Session)
