@@ -1,6 +1,10 @@
 import requests
 
 from github3 import __version__
+from logging import getLogger
+
+__url_cache__ = {}
+__logs__ = getLogger(__package__)
 
 
 class GitHubSession(requests.Session):
@@ -16,6 +20,7 @@ class GitHubSession(requests.Session):
             # Set our own custom User-Agent string
             'User-Agent': 'github3.py/{0}'.format(__version__),
             })
+        self.base_url = 'https://api.github.com'
 
     def basic_auth(self, username, password):
         """Set the Basic Auth credentials on this Session.
@@ -27,6 +32,18 @@ class GitHubSession(requests.Session):
             return
 
         self.auth = (username, password)
+
+    def build_url(self, *args, **kwargs):
+        """Builds a new API url from scratch."""
+        parts = [kwargs.get('base_url') or self.base_url]
+        parts.extend(args)
+        parts = [str(p) for p in parts]
+        key = tuple(parts)
+        __logs__.info('Building a url from %s', key)
+        if not key in __url_cache__:
+            __logs__.info('Missed the cache building the url')
+            __url_cache__[key] = '/'.join(parts)
+        return __url_cache__[key]
 
     def token_auth(self, token):
         """Use an application token for authentication.

@@ -1,8 +1,14 @@
 import mock
-import requests
+import github3
 import unittest
 
-MockedSession = mock.create_autospec(requests.Session)
+MockedSession = mock.create_autospec(github3.session.GitHubSession)
+
+
+def build_url(self, *args, **kwargs):
+    # We want to assert what is happening with the actual calls to the
+    # Internet. We can proxy this.
+    return github3.session.GitHubSession().build_url(*args, **kwargs)
 
 
 class UnitHelper(unittest.TestCase):
@@ -28,3 +34,7 @@ class UnitHelper(unittest.TestCase):
     def setUp(self):
         self.session = self.create_session_mock()
         self.instance = self.described_class(self.example_data, self.session)
+        # Proxy the build_url method to the class so it can build the URL and
+        # we can assert things about the call that will be attempted to the
+        # internet
+        self.described_class._build_url = build_url

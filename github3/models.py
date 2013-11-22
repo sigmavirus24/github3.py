@@ -13,7 +13,6 @@ from github3.session import GitHubSession
 from datetime import datetime
 from logging import getLogger
 
-__url_cache__ = {}
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
@@ -136,15 +135,7 @@ class GitHubCore(GitHubObject):
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
-        parts = [kwargs.get('base_url') or self._github_url]
-        parts.extend(args)
-        parts = [str(p) for p in parts]
-        key = tuple(parts)
-        __logs__.info('Building a url from %s', key)
-        if not key in __url_cache__:
-            __logs__.info('Missed the cache building the url')
-            __url_cache__[key] = '/'.join(parts)
-        return __url_cache__[key]
+        return self._session.build_url(*args, **kwargs)
 
     @property
     def _api(self):
