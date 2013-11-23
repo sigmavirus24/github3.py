@@ -7,14 +7,12 @@ This module provides the basic models used in github3.py
 """
 
 from json import dumps
-from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
+from github3.session import GitHubSession
 from datetime import datetime
-from github3 import __version__
 from logging import getLogger
 
-__url_cache__ = {}
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
@@ -60,26 +58,14 @@ class GitHubCore(GitHubObject):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
     """
-    def __init__(self, json, ses=None):
+    def __init__(self, json, session=None):
         super(GitHubCore, self).__init__(json)
-        if hasattr(ses, '_session'):
+        if hasattr(session, '_session'):
             # i.e. session is actually a GitHub object
-            ses = ses._session
-        elif ses is None:
-            ses = session()
-        self._session = ses
-        headers = {
-            # Only accept JSON responses
-            'Accept': 'application/vnd.github.v3.full+json',
-            # Only accept UTF-8 encoded data
-            'Accept-Charset': 'utf-8',
-            # Always sending JSON
-            'Content-Type': "application/json",
-            # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/{0}'.format(__version__),
-        }
-
-        self._session.headers.update(headers)
+            session = session._session
+        elif session is None:
+            session = GitHubSession()
+        self._session = session
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -149,15 +135,7 @@ class GitHubCore(GitHubObject):
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
-        parts = [kwargs.get('base_url') or self._github_url]
-        parts.extend(args)
-        parts = [str(p) for p in parts]
-        key = tuple(parts)
-        __logs__.info('Building a url from %s', key)
-        if not key in __url_cache__:
-            __logs__.info('Missed the cache building the url')
-            __url_cache__[key] = '/'.join(parts)
-        return __url_cache__[key]
+        return self._session.build_url(*args, **kwargs)
 
     @property
     def _api(self):
