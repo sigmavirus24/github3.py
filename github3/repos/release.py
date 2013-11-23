@@ -135,6 +135,7 @@ class Release(GitHubCore):
 class Asset(GitHubCore):
     def __init__(self, asset, session=None):
         super(Asset, self).__init__(asset, session)
+        self._api = asset.get('url')
         #: Content-Type provided when the asset was created
         self.content_type = asset.get('content_type')
         #: Date the asset was created

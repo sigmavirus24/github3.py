@@ -829,10 +829,9 @@ class GitHub(GitHubCore):
         :param str token: (optional)
         """
         if username and password:
-            self._session.auth = (username, password)
+            self._session.basic_auth(username, password)
         elif token:
-            self._session.headers.update({
-                'Authorization': 'token ' + token})
+            self._session.token_auth(token)
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.
@@ -1176,7 +1175,7 @@ class GitHubEnterprise(GitHub):
     """
     def __init__(self, url, login='', password='', token=''):
         super(GitHubEnterprise, self).__init__(login, password, token)
-        self._github_url = url.rstrip('/') + '/api/v3'
+        self._session.base_url = url.rstrip('/') + '/api/v3'
 
     def __repr__(self):
         return '<GitHub Enterprise [0.url]>'.format(self)
@@ -1205,7 +1204,7 @@ class GitHubStatus(GitHubCore):
     """
     def __init__(self):
         super(GitHubStatus, self).__init__({})
-        self._github_url = 'https://status.github.com'
+        self._session.base_url = 'https://status.github.com'
 
     def __repr__(self):
         return '<GitHub Status>'
