@@ -72,7 +72,9 @@ class GitHubSession(requests.Session):
                 'X-GitHub-OTP': self.two_factor_auth_cb()
                 })
             kwargs.update(headers=headers)
-            response = super(GitHubSession, self).request(*args, **kwargs)
+            new_response = super(GitHubSession, self).request(*args, **kwargs)
+            new_response.history.append(response)
+            response = new_response
         return response
 
     def two_factor_auth_callback(self, callback):
