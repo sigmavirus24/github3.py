@@ -54,6 +54,14 @@ class GitHubSession(requests.Session):
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 
+    def handle_two_factor_auth(self, args, kwargs):
+        headers = kwargs.pop('headers', {})
+        headers.update({
+            'X-GitHub-OTP': self.two_factor_auth_cb()
+            })
+        kwargs.update(headers=headers)
+        return super(GitHubSession, self).request(*args, **kwargs)
+
     def oauth2_auth(self, client_id, client_secret):
         """Use OAuth2 for authentication.
 
@@ -67,12 +75,9 @@ class GitHubSession(requests.Session):
     def request(self, *args, **kwargs):
         response = super(GitHubSession, self).request(*args, **kwargs)
         if requires_2fa(response) and self.two_factor_auth_cb:
-            headers = kwargs.pop('headers', {})
-            headers.update({
-                'X-GitHub-OTP': self.two_factor_auth_cb()
-                })
-            kwargs.update(headers=headers)
-            new_response = super(GitHubSession, self).request(*args, **kwargs)
+            # No need to flatten and re-collect the args in
+            # handle_two_factor_auth
+            new_response = self.handle_two_factor_auth(args, kwargs)
             new_response.history.append(response)
             response = new_response
         return response
