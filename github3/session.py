@@ -1,10 +1,18 @@
 import requests
 
+from collections import Callable
 from github3 import __version__
 from logging import getLogger
 
 __url_cache__ = {}
 __logs__ = getLogger(__package__)
+
+
+def requires_2fa(response):
+    if (response.status_code == 401 and 'X-GitHub-OTP' in response.headers
+            and 'required' in response.headers['X-GitHub-OTP']):
+        return True
+    return False
 
 
 class GitHubSession(requests.Session):
@@ -21,6 +29,7 @@ class GitHubSession(requests.Session):
             'User-Agent': 'github3.py/{0}'.format(__version__),
             })
         self.base_url = 'https://api.github.com'
+        self.two_factor_auth_cb = None
 
     def basic_auth(self, username, password):
         """Set the Basic Auth credentials on this Session.
@@ -45,6 +54,36 @@ class GitHubSession(requests.Session):
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
 
+    def oauth2_auth(self, client_id, client_secret):
+        """Use OAuth2 for authentication.
+
+        It is suggested you install requests-oauthlib to use this.
+
+        :param str client_id: Client ID retrieved from GitHub
+        :param str client_secret: Client secret retrieved from GitHub
+        """
+        raise NotImplementedError('These features are not implemented yet')
+
+    def request(self, *args, **kwargs):
+        response = super(GitHubSession, self).request(*args, **kwargs)
+        if requires_2fa(response) and self.two_factor_auth_cb:
+            headers = kwargs.pop('headers', {})
+            headers.update({
+                'X-GitHub-OTP': self.two_factor_auth_cb()
+                })
+            kwargs.update(headers=headers)
+            response = super(GitHubSession, self).request(*args, **kwargs)
+        return response
+
+    def two_factor_auth_callback(self, callback):
+        if not callback:
+            return
+
+        if not isinstance(callback, Callable):
+            raise ValueError('Your callback should be callable')
+
+        self.two_factor_auth_cb = callback
+
     def token_auth(self, token):
         """Use an application token for authentication.
 
@@ -57,13 +96,3 @@ class GitHubSession(requests.Session):
         self.headers.update({
             'Authorization': 'token {0}'.format(token)
             })
-
-    def oauth2_auth(self, client_id, client_secret):
-        """Use OAuth2 for authentication.
-
-        It is suggested you install requests-oauthlib to use this.
-
-        :param str client_id: Client ID retrieved from GitHub
-        :param str client_secret: Client secret retrieved from GitHub
-        """
-        raise NotImplementedError('These features are not implemented yet')

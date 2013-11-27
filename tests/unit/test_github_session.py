@@ -84,6 +84,26 @@ class TestGitHubSession:
             s.token_auth(token)
             assert 'Authorization' not in s.headers
 
+    def test_two_factor_auth_callback_handles_None(self):
+        s = self.build_session()
+        assert s.two_factor_auth_cb is None
+        s.two_factor_auth_callback(None)
+        assert s.two_factor_auth_cb is None
+
+    def test_two_factor_auth_callback_checks_for_Callable(self):
+        s = self.build_session()
+        assert s.two_factor_auth_cb is None
+        with pytest.raises(ValueError):
+            s.two_factor_auth_callback(1)
+
+    def test_two_factor_auth_callback_accepts_a_Callable(self):
+        s = self.build_session()
+        assert s.two_factor_auth_cb is None
+        # You have to have a sense of humor ;)
+        not_so_anonymous = lambda *args: 'foo'
+        s.two_factor_auth_callback(not_so_anonymous)
+        assert s.two_factor_auth_cb is not_so_anonymous
+
     def test_oauth2_auth(self):
         """Test that oauth2 authentication works
 
