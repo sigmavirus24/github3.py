@@ -1,7 +1,9 @@
 import pytest
 
 import requests
+
 from github3 import session
+from mock import patch, Mock
 
 
 class TestGitHubSession:
@@ -69,6 +71,49 @@ class TestGitHubSession:
         s = self.build_session()
         s.basic_auth('username', 'password')
         assert s.auth == ('username', 'password')
+
+    @patch.object(requests.Session, 'request')
+    def test_handle_two_factor_auth(self, request_mock):
+        """Test the method that handles getting the 2fa code"""
+        s = self.build_session()
+        s.two_factor_auth_callback(lambda: 'fake')
+        args = ('GET', 'http://example.com')
+        s.handle_two_factor_auth(args, {})
+        request_mock.assert_called_once_with(
+            *args,
+            headers={'X-GitHub-OTP': 'fake'}
+            )
+
+    @patch.object(requests.Session, 'request')
+    def test_request_ignores_responses_that_do_not_require_2fa(self,
+                                                               request_mock):
+        """Test that request does not try to handle 2fa when it should not"""
+        response = Mock()
+        response.configure_mock(status_code=200, headers={})
+        request_mock.return_value = response
+        s = self.build_session()
+        s.two_factor_auth_callback(lambda: 'fake')
+        r = s.get('http://example.com')
+        assert r is response
+        request_mock.assert_called_once_with(
+            'GET', 'http://example.com', allow_redirects=True
+            )
+
+    @patch.object(requests.Session, 'request')
+    def test_creates_history_while_handling_2fa(self, request_mock):
+        """Test that the overridden request method will create history"""
+        response = Mock()
+        response.configure_mock(
+            status_code=401,
+            headers={'X-GitHub-OTP': 'required;2fa'},
+            history=[]
+            )
+        request_mock.return_value = response
+        s = self.build_session()
+        s.two_factor_auth_callback(lambda: 'fake')
+        r = s.get('http://example.com')
+        assert len(r.history) != 0
+        assert request_mock.call_count == 2
 
     def test_token_auth(self):
         """Test that token auth will work with a valid token"""
