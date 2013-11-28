@@ -57,7 +57,7 @@ class GitHubSession(requests.Session):
     def handle_two_factor_auth(self, args, kwargs):
         headers = kwargs.pop('headers', {})
         headers.update({
-            'X-GitHub-OTP': self.two_factor_auth_cb()
+            'X-GitHub-OTP': str(self.two_factor_auth_cb())
             })
         kwargs.update(headers=headers)
         return super(GitHubSession, self).request(*args, **kwargs)
