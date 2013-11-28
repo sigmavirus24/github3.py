@@ -1,6 +1,17 @@
 History/Changelog
 =================
 
+0.8.0: 2013-xx-xx
+-----------------
+
+- Use Betamax to start recording integration tests
+
+- Add support for Releases API
+
+- Add support for Feeds API
+
+- Add support for Two-Factor Authentication via the API
+
 0.7.1: 2013-09-30
 -----------------
 
