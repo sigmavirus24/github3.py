@@ -6,6 +6,7 @@ python:
   - 3.3
   - pypy
 # # command to run tests, e.g. python setup.py test
+before_script: pip install -r dev-requirements.txt
 script:  make travis
 notifications:
    on_success: change
