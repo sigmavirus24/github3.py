@@ -12,6 +12,8 @@ History/Changelog
 
 - Add support for Two-Factor Authentication via the API
 
+- Switch to requests >= 2.0
+
 0.7.1: 2013-09-30
 -----------------
 
