@@ -821,7 +821,8 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Key(json, self) if json else None
 
-    def login(self, username=None, password=None, token=None):
+    def login(self, username=None, password=None, token=None,
+              two_factor_callback=None):
         """Logs the user into GitHub for protected API calls.
 
         :param str username: (optional)
@@ -832,6 +833,9 @@ class GitHub(GitHubCore):
             self._session.basic_auth(username, password)
         elif token:
             self._session.token_auth(token)
+
+        # The Session method handles None for free.
+        self._session.two_factor_auth_callback(two_factor_callback)
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.

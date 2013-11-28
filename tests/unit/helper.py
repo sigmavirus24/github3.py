@@ -35,7 +35,12 @@ class UnitHelper(unittest.TestCase):
 
     def setUp(self):
         self.session = self.create_session_mock()
-        self.instance = self.described_class(self.example_data, self.session)
+        if self.example_data:
+            self.instance = self.described_class(self.example_data,
+                                                 self.session)
+        else:
+            self.instance = self.described_class()
+            self.instance._session = self.session
         # Proxy the build_url method to the class so it can build the URL and
         # we can assert things about the call that will be attempted to the
         # internet

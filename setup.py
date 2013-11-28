@@ -16,7 +16,7 @@ packages = [
     "github3.issues",
 ]
 
-kwargs['tests_require'] = ['mock==1.0.1', 'betamax==0.1.5', 'pytest']
+kwargs['tests_require'] = ['mock==1.0.1', 'betamax', 'pytest']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2==0.5.1')
 packages.append('tests')
@@ -25,7 +25,7 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py bdist_wheel sdist upload")
     sys.exit()
 
-requires.extend(["requests >= 1.2.3", "uritemplate.py >= 0.2.0"])
+requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0"])
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
