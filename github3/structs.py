@@ -16,7 +16,7 @@ class GitHubIterator(GitHubCore, Iterator):
         #: Class being used to cast all items to
         self.cls = cls
         #: Parameters of the query string
-        self.params = params
+        self.params = params or {}
         self._remove_none(self.params)
         # We do not set this from the parameter sent. We want this to
         # represent the ETag header returned by GitHub no matter what.
@@ -42,7 +42,7 @@ class GitHubIterator(GitHubCore, Iterator):
         url, params, cls = self.url, self.params, self.cls
         headers = self.headers
 
-        if params and 'per_page' not in params:
+        if 'per_page' not in params:
             params['per_page'] = 100
 
         while (self.count == -1 or self.count > 0) and url:
