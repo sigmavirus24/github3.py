@@ -123,6 +123,11 @@ class TestRepository(UnitHelper):
     }
 
     def test_asset(self):
+        """Test retrieving an asset uses the right headers
+
+        The Releases section of the API is still in Beta and uses custom
+        headers
+        """
         assert self.instance.asset(0) is None
         assert self.session.get.call_count == 0
 
