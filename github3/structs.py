@@ -42,7 +42,10 @@ class GitHubIterator(GitHubCore, Iterator):
         url, params, cls = self.url, self.params, self.cls
         headers = self.headers
 
-        if 'per_page' not in params:
+        if 0 < self.count <= 100:
+            params['per_page'] = self.count
+
+        if 'per_page' not in params and self.count == -1:
             params['per_page'] = 100
 
         while (self.count == -1 or self.count > 0) and url:
