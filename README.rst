@@ -4,7 +4,6 @@
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
 
-
 See HISTORY.rst for any "breaking" changes.
 
 Installation
