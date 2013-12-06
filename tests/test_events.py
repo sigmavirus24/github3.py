@@ -41,7 +41,8 @@ class TestPayloadHandlers(TestCase):
     def test_commitcomment(self):
         comment = {'comment': load('repo_comment')}
         comment = github3.events._commitcomment(comment)
-        assert isinstance(comment['comment'], github3.repos.comment.RepoComment)
+        assert isinstance(comment['comment'],
+                          github3.repos.comment.RepoComment)
 
     def test_follow(self):
         f = {'target': load('user')}

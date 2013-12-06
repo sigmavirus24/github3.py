@@ -1,8 +1,3 @@
-import sys
-if sys.version_info < (3, 0):
-    import unittest2 as unittest
-else:
-    import unittest
 import github3
 from github3 import gists
 from tests.utils import (BaseCase, load)
@@ -35,7 +30,8 @@ class TestGist(BaseCase):
         assert self.gist.create_comment(None) is None
         assert self.gist.create_comment('') is None
         self.not_called()
-        assert isinstance(self.gist.create_comment('bar'), gists.comment.GistComment)
+        assert isinstance(self.gist.create_comment('bar'),
+                          gists.comment.GistComment)
         self.mock_assertions()
 
     def test_delete(self):
