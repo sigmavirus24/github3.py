@@ -323,7 +323,6 @@ class TestIssue(BaseCase):
         self.assertEqual(i.repository, ("sigmavirus24", "github3.py"))
 
 
-
 class TestIssueEvent(BaseCase):
     def setUp(self):
         super(TestIssueEvent, self).setUp()

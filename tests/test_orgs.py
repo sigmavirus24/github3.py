@@ -336,7 +336,8 @@ class TestOrganization(BaseCase):
         self.mock_assertions()
 
     def test_remove_repo(self):
-        self.assertRaises(github3.GitHubError, self.org.remove_repo, None, None)
+        self.assertRaises(github3.GitHubError, self.org.remove_repo,
+                          None, None)
 
         self.login()
         with patch.object(github3.orgs.Organization, 'iter_teams') as it:

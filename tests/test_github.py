@@ -179,7 +179,8 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/starred/user/repo')
 
-        self.assertRaises(github3.GitHubError, self.g.is_starred, 'user', 'repo')
+        self.assertRaises(github3.GitHubError, self.g.is_starred,
+                          'user', 'repo')
 
         self.login()
 
@@ -193,7 +194,8 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/subscriptions/user/repo')
 
-        self.assertRaises(github3.GitHubError, self.g.is_subscribed, 'user', 'repo')
+        self.assertRaises(github3.GitHubError, self.g.is_subscribed,
+                          'user', 'repo')
 
         self.login()
         assert self.g.is_subscribed(None, None) is False
@@ -382,7 +384,8 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/orgs/github3py/issues')
         self.conf.update(params={})
 
-        self.assertRaises(github3.GitHubError, self.g.iter_org_issues, 'github3py')
+        self.assertRaises(github3.GitHubError, self.g.iter_org_issues,
+                          'github3py')
 
         self.login()
         i = next(self.g.iter_org_issues('github3py'))
@@ -412,7 +415,8 @@ class TestGitHub(BaseCase):
                   'sort': 'created', 'direction': 'asc',
                   'since': '2012-05-20T23:10:27Z'}
         self.conf.update(params=params)
-        assert isinstance(next(self.g.iter_issues(**params)), github3.issues.Issue)
+        assert isinstance(next(self.g.iter_issues(**params)),
+                          github3.issues.Issue)
         self.mock_assertions()
 
     def test_iter_user_issues(self):
@@ -423,14 +427,16 @@ class TestGitHub(BaseCase):
         self.assertRaises(github3.GitHubError, self.g.iter_user_issues)
 
         self.login()
-        assert isinstance(next(self.g.iter_user_issues()), github3.issues.Issue)
+        assert isinstance(next(self.g.iter_user_issues()),
+                          github3.issues.Issue)
         self.mock_assertions()
 
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
                   'sort': 'created', 'direction': 'asc',
                   'since': '2012-05-20T23:10:27Z'}
         self.conf.update(params=params)
-        assert isinstance(next(self.g.iter_user_issues(**params)), github3.issues.Issue)
+        assert isinstance(next(self.g.iter_user_issues(**params)),
+                          github3.issues.Issue)
         self.mock_assertions()
 
     def test_iter_repo_issues(self):
@@ -464,7 +470,8 @@ class TestGitHub(BaseCase):
         self.response('org', _iter=True)
         self.get('https://api.github.com/users/login/orgs')
 
-        assert isinstance(next(self.g.iter_orgs('login')), github3.orgs.Organization)
+        assert isinstance(next(self.g.iter_orgs('login')),
+                          github3.orgs.Organization)
         self.mock_assertions()
 
         self.get('https://api.github.com/user/orgs')
@@ -483,7 +490,8 @@ class TestGitHub(BaseCase):
         assert isinstance(next(self.g.iter_repos()), github3.repos.Repository)
         self.mock_assertions()
 
-        assert isinstance(next(self.g.iter_repos('sigmavirus24')), github3.repos.Repository)
+        assert isinstance(next(self.g.iter_repos('sigmavirus24')),
+                          github3.repos.Repository)
         self.mock_assertions()
 
         self.conf.update(params={'type': 'all', 'direction': 'desc'})
@@ -502,7 +510,8 @@ class TestGitHub(BaseCase):
         self.conf.update(params={"sort": "created"})
         self.get('https://api.github.com/users/sigmavirus24/repos')
 
-        assert isinstance(next(self.g.iter_user_repos('sigmavirus24', sort="created")),
+        assert isinstance(next(self.g.iter_user_repos('sigmavirus24',
+                                                      sort="created")),
                           github3.repos.Repository)
         self.mock_assertions()
 
@@ -610,17 +619,19 @@ class TestGitHub(BaseCase):
                 ('hub.callback', 'https://localhost/post')]
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.pubsubhubbub, '', '', '')
+        pubsubhubbub = self.g.pubsubhubbub
+
+        self.assertRaises(github3.GitHubError, pubsubhubbub, '', '', '')
 
         self.login()
-        assert self.g.pubsubhubbub('', '', '') is False
+        assert pubsubhubbub('', '', '') is False
         self.not_called()
 
-        assert self.g.pubsubhubbub('foo', 'https://example.com', 'foo') is False
+        assert pubsubhubbub('foo', 'https://example.com', 'foo') is False
         self.not_called()
 
         d = dict([(k[4:], v) for k, v in body])
-        assert self.g.pubsubhubbub(**d) is True
+        assert pubsubhubbub(**d) is True
         _, kwargs = self.request.call_args
 
         assert 'data' in kwargs
@@ -629,7 +640,7 @@ class TestGitHub(BaseCase):
 
         d['secret'] = 'secret'
         body.append(('hub.secret', 'secret'))
-        assert self.g.pubsubhubbub(**d)
+        assert pubsubhubbub(**d)
         _, kwargs = self.request.call_args
         assert 'data' in kwargs
         assert body == kwargs['data']
@@ -819,7 +830,8 @@ class TestGitHub(BaseCase):
                     'sigmavirus24/github3.py')
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.unsubscribe, 'foo', 'bar')
+        self.assertRaises(github3.GitHubError, self.g.unsubscribe,
+                          'foo', 'bar')
 
         self.login()
         assert self.g.unsubscribe(None, None) is False
