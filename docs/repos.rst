@@ -8,7 +8,6 @@ This part of the documentation covers:
 - :class:`Repository <github3.repos.repo.Repository>`
 - :class:`Branch <github3.repos.branch.Branch>`
 - :class:`Contents <github3.repos.contents.Contents>`
-- :class:`Download <github3.repos.download.Download>`
 - :class:`Hook <github3.repos.hook.Hook>`
 - :class:`RepoTag <github3.repos.tag.RepoTag>`
 - :class:`RepoComment <github3.repos.comment.RepoComment>`
@@ -50,10 +49,6 @@ Repository Objects
 .. autoclass:: github3.repos.release.Release
     :members:
 
----------
-
-.. autoclass:: github3.repos.download.Download
-    :members:
 
 ---------
 

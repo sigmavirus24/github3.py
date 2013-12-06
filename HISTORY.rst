@@ -14,6 +14,8 @@ History/Changelog
 
 - Switch to requests >= 2.0
 
+- Totally remove all references to the Downloads API
+
 0.7.1: 2013-09-30
 -----------------
 
