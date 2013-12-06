@@ -439,15 +439,6 @@ class TestRepository(BaseCase):
         assert self.repo.delete_key(2)
         self.mock_assertions()
 
-    def test_download(self):
-        self.response('download')
-        self.get(self.api + 'downloads/2')
-
-        assert self.repo.download(-2) is None
-        self.not_called()
-        assert isinstance(self.repo.download(2), repos.download.Download)
-        self.mock_assertions()
-
     def test_edit(self):
         self.response('repo')
         self.patch(self.api[:-1])
@@ -611,15 +602,6 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
         next(self.repo.iter_contributors('true value'))
-        self.mock_assertions()
-
-    def test_iter_downloads(self):
-        self.response('download', _iter=True)
-        self.get(self.api + 'downloads')
-        self.conf = {'params': None}
-
-        d = next(self.repo.iter_downloads())
-        assert isinstance(d, repos.download.Download)
         self.mock_assertions()
 
     def test_iter_events(self):
@@ -1163,65 +1145,6 @@ class TestContents(BaseCase):
         ret = self.contents.update('foo', b'foo bar bogus')
         assert isinstance(ret, github3.git.Commit)
         self.mock_assertions()
-
-
-class TestDownload(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestDownload, self).__init__(methodName)
-        self.dl = repos.download.Download(load('download'))
-        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "downloads/338893")
-
-    def setUp(self):
-        super(TestDownload, self).setUp()
-        self.dl = repos.download.Download(self.dl.to_json(), self.g)
-
-    def test_repr(self):
-        assert repr(self.dl) == '<Download [kr.png]>'
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.dl.delete)
-        self.not_called()
-
-        self.login()
-        assert self.dl.delete()
-        self.mock_assertions()
-
-    def test_saveas(self):
-        self.response('archive', 200)
-        self.get(self.dl.html_url)
-
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
-            with open('archive', 'wb+') as fd:
-                assert self.dl.saveas(fd)
-
-        o.assert_called_once_with('archive', 'wb+')
-        fd = o()
-        fd.write.assert_called_once_with(b'archive_data')
-        self.mock_assertions()
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        self.dl.saveas()
-        assert os.path.isfile(self.dl.name)
-        os.unlink(self.dl.name)
-        assert os.path.isfile(self.dl.name) is False
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        self.dl.saveas('tmp')
-        assert os.path.isfile('tmp')
-        os.unlink('tmp')
-        assert os.path.isfile('tmp') is False
-
-        self.response('', 404)
-        assert self.dl.saveas() is False
 
 
 class TestHook(BaseCase):

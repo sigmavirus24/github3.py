@@ -79,13 +79,6 @@ def _commitcomment(payload):
     return payload
 
 
-def _download(payload):
-    from github3.repos.download import Download
-    if payload.get('download'):
-        payload['download'] = Download(payload['download'], None)
-    return payload
-
-
 def _follow(payload):
     from github3.users import User
     if payload.get('target'):
@@ -166,7 +159,6 @@ _payload_handlers = {
     'CommitCommentEvent': _commitcomment,
     'CreateEvent': identity,
     'DeleteEvent': identity,
-    'DownloadEvent': _download,
     'FollowEvent': _follow,
     'ForkEvent': _forkev,
     'ForkApplyEvent': identity,
