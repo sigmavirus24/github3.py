@@ -25,7 +25,6 @@ from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
-from github3.repos.download import Download
 from github3.repos.hook import Hook
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
@@ -876,24 +875,6 @@ class Repository(GitHubCore):
         url = self._build_url('keys', str(key_id), base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    def download(self, id_num):
-        """Get a single download object by its id.
-
-        .. warning::
-
-            On 2012-03-11, GitHub will be deprecating the Downloads API. This
-            method will no longer work.
-
-        :param int id_num: (required), id of the download
-        :returns: :class:`Download <Download>` if successful, else None
-        """
-        json = None
-        if int(id_num) > 0:
-            url = self._build_url('downloads', str(id_num),
-                                  base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return Download(json, self) if json else None
-
     @requires_auth
     def edit(self,
              name,
@@ -1197,23 +1178,6 @@ class Repository(GitHubCore):
         """
         url = self._build_url('stats', 'contributors', base_url=self._api)
         return self._iter(int(number), url, ContributorStats, etag=etag)
-
-    def iter_downloads(self, number=-1, etag=None):
-        """Iterate over available downloads for this repository.
-
-        .. warning::
-
-            On 2012-03-11, GitHub will be deprecating the Downloads API. This
-            method will no longer work.
-
-        :param int number: (optional), number of downloads to return. Default:
-            -1 returns all available downloads
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Download <Download>`\ s
-        """
-        url = self._build_url('downloads', base_url=self._api)
-        return self._iter(int(number), url, Download, etag=etag)
 
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
