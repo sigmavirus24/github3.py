@@ -1,9 +1,4 @@
 import os
-import sys
-if sys.version_info < (3, 0):
-    import unittest2 as unittest
-else:
-    import unittest
 import github3
 from github3 import repos
 from datetime import datetime
@@ -26,7 +21,8 @@ class TestRepository(BaseCase):
         self.put(self.api + 'collaborators/sigmavirus24')
         self.conf = {'data': None}
 
-        self.assertRaises(github3.GitHubError, self.repo.add_collaborator, 'foo')
+        self.assertRaises(github3.GitHubError, self.repo.add_collaborator,
+                          'foo')
 
         self.login()
         assert self.repo.add_collaborator(None) is False
@@ -157,7 +153,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'git/blobs')
         self.conf = {'data': {'content': content, 'encoding': encoding}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_blob, content, encoding)
+        self.assertRaises(github3.GitHubError, self.repo.create_blob,
+                          content, encoding)
 
         self.login()
         assert self.repo.create_blob(None, None) == ''
@@ -174,7 +171,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'commits/{0}/comments'.format(sha))
         self.conf = {'data': {'body': body, 'line': 1}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_comment, body, sha)
+        self.assertRaises(github3.GitHubError, self.repo.create_comment,
+                          body, sha)
 
         self.login()
         assert self.repo.create_comment(None, None) is None
@@ -234,7 +232,8 @@ class TestRepository(BaseCase):
             }
         }
 
-        self.assertRaises(github3.GitHubError, self.repo.create_hook, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.create_hook,
+                          None, None)
 
         self.login()
         assert self.repo.create_hook(None, {'foo': 'bar'}) is None
@@ -261,13 +260,15 @@ class TestRepository(BaseCase):
 
         body = 'Fake body'
         #self.conf['data'].update(body=body)
-        assert isinstance(self.repo.create_issue(title, body), github3.issues.Issue)
+        assert isinstance(self.repo.create_issue(title, body),
+                          github3.issues.Issue)
         self.mock_assertions()
 
         assignee, mile, labels = 'sigmavirus24', 1, ['bug', 'enhancement']
         #self.conf['data'].update({'assignee': assignee, 'milestone': mile,
         #                          'labels': labels})
-        assert isinstance(self.repo.create_issue(title, body, assignee, mile, labels), github3.issues.Issue)
+        issue = self.repo.create_issue(title, body, assignee, mile, labels)
+        assert isinstance(issue, github3.issues.Issue)
         self.mock_assertions()
 
     def test_create_key(self):
@@ -276,12 +277,14 @@ class TestRepository(BaseCase):
         self.conf = {'data': {'key': 'ssh-rsa foobarbogus',
                               'title': 'Fake key'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_key, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_key,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_key(None, None) is None
         self.not_called()
-        assert isinstance(self.repo.create_key(**self.conf['data']), github3.users.Key)
+        assert isinstance(self.repo.create_key(**self.conf['data']),
+                          github3.users.Key)
         self.mock_assertions()
 
     def test_create_label(self):
@@ -289,12 +292,14 @@ class TestRepository(BaseCase):
         self.post(self.api + 'labels')
         self.conf = {'data': {'name': 'foo', 'color': 'f00f00'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_label, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_label,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_label(None, None) is None
         self.not_called()
-        assert isinstance(self.repo.create_label(**self.conf['data']), github3.issues.label.Label)
+        assert isinstance(self.repo.create_label(**self.conf['data']),
+                          github3.issues.label.Label)
         self.mock_assertions()
 
     def test_create_milestone(self):
@@ -302,12 +307,14 @@ class TestRepository(BaseCase):
         self.post(self.api + 'milestones')
         self.conf = {'data': {'title': 'foo'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_milestone, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_milestone,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_milestone(None) is None
         self.not_called()
-        assert isinstance(self.repo.create_milestone('foo'), github3.issues.milestone.Milestone)
+        assert isinstance(self.repo.create_milestone('foo'),
+                          github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_create_pull(self):
@@ -316,12 +323,14 @@ class TestRepository(BaseCase):
         self.conf = {'data': {'title': 'Fake title', 'base': 'master',
                               'head': 'feature_branch'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_pull, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_pull,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_pull(None, None, None) is None
         self.not_called()
-        assert isinstance(self.repo.create_pull(**self.conf['data']), github3.pulls.PullRequest)
+        assert isinstance(self.repo.create_pull(**self.conf['data']),
+                          github3.pulls.PullRequest)
         self.mock_assertions()
 
     def test_create_pull_from_issue(self):
@@ -330,13 +339,15 @@ class TestRepository(BaseCase):
         self.conf = {'data': {'issue': 1, 'base': 'master',
                               'head': 'feature_branch'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_pull_from_issue, **self.conf['data'])
+        self.assertRaises(github3.GitHubError,
+                          self.repo.create_pull_from_issue,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_pull_from_issue(0, 'foo', 'bar') is None
         self.not_called()
-        assert isinstance(self.repo.create_pull_from_issue(**self.conf['data']),
-                          github3.pulls.PullRequest)
+        pull = self.repo.create_pull_from_issue(**self.conf['data'])
+        assert isinstance(pull, github3.pulls.PullRequest)
         self.mock_assertions()
 
     def test_create_ref(self):
@@ -344,7 +355,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'git/refs')
         self.conf = {'data': {'ref': 'refs/heads/master', 'sha': 'fakesha'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_ref, 'foo', 'bar')
+        self.assertRaises(github3.GitHubError, self.repo.create_ref,
+                          'foo', 'bar')
 
         self.login()
         assert self.repo.create_ref('foo/bar', None) is None
@@ -357,7 +369,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'statuses/fakesha')
         self.conf = {'data': {'state': 'success'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_status, 'fakesha', 'success')
+        self.assertRaises(github3.GitHubError, self.repo.create_status,
+                          'fakesha', 'success')
 
         self.login()
         assert self.repo.create_status(None, None) is None
@@ -381,7 +394,8 @@ class TestRepository(BaseCase):
         data['sha'] = data['object']
         del(data['type'], data['object'])
 
-        self.assertRaises(github3.GitHubError, self.repo.create_tag, None, None, None, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.create_tag,
+                          None, None, None, None, None)
 
         self.login()
         with patch.object(repos.Repository, 'create_ref'):
@@ -851,7 +865,8 @@ class TestRepository(BaseCase):
         assert self.repo.milestone(0) is None
         self.not_called()
 
-        assert isinstance(self.repo.milestone(2), github3.issues.milestone.Milestone)
+        assert isinstance(self.repo.milestone(2),
+                          github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_parent(self):
@@ -891,7 +906,8 @@ class TestRepository(BaseCase):
         self.response('', 204)
         self.delete(self.api + 'collaborators/login')
 
-        self.assertRaises(github3.GitHubError, self.repo.remove_collaborator, None)
+        self.assertRaises(github3.GitHubError, self.repo.remove_collaborator,
+                          None)
         self.not_called()
 
         self.login()
@@ -915,7 +931,8 @@ class TestRepository(BaseCase):
         self.put(self.api + 'subscription')
         self.conf = {'data': {'subscribed': True, 'ignored': False}}
 
-        self.assertRaises(github3.GitHubError, self.repo.set_subscription, True, False)
+        self.assertRaises(github3.GitHubError, self.repo.set_subscription,
+                          True, False)
         self.not_called()
 
         self.login()
@@ -960,7 +977,8 @@ class TestRepository(BaseCase):
         self.patch(self.api + 'labels/Bug')
         self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.update_label, 'foo', 'bar')
+        self.assertRaises(github3.GitHubError, self.repo.update_label,
+                          'foo', 'bar')
         self.not_called()
 
         self.login()
@@ -987,7 +1005,8 @@ class TestRepository(BaseCase):
                               'author': {'name': 'Ian', 'email': 'foo'},
                               'committer': {'name': 'Ian', 'email': 'foo'}}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_file, None, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.create_file,
+                          None, None, None)
 
         self.not_called()
         self.login()
@@ -1012,7 +1031,8 @@ class TestRepository(BaseCase):
             }
         }
 
-        self.assertRaises(github3.GitHubError, self.repo.update_file, None, None, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.update_file,
+                          None, None, None, None)
 
         self.not_called()
         self.login()
@@ -1029,7 +1049,8 @@ class TestRepository(BaseCase):
         self.delete(self.api + 'contents/setup.py')
         self.conf = {'data': {'message': 'foo', 'sha': 'ae02db'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.delete_file, 'setup.py', None, None)
+        self.assertRaises(github3.GitHubError, self.repo.delete_file,
+                          'setup.py', None, None)
 
         self.not_called()
         self.login()
@@ -1137,7 +1158,8 @@ class TestContents(BaseCase):
             }
         }
 
-        self.assertRaises(github3.GitHubError, self.contents.update, None, None)
+        self.assertRaises(github3.GitHubError, self.contents.update,
+                          None, None)
 
         self.not_called()
         self.login()
