@@ -224,7 +224,7 @@ it.
 
 Every test also has access to ``self.recorder``. This is the Betamax recorder 
 that has been set up for you to record your interactions. The recorder is 
-started when you do write
+started when you write
 
 .. code:: python
 
