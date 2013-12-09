@@ -3,6 +3,11 @@ Development Lead
 
 - Ian Cordasco <graffatcolmingov@gmail.com>
 
+Maintainer(s)
+`````````````
+
+- Barry Morrison (@esacteksab)
+
 Requests
 ````````
 
