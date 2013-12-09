@@ -1698,7 +1698,8 @@ class Repository(GitHubCore):
             content = b64encode(content).decode('utf-8')
             data = {'message': message, 'content': content, 'sha': sha,
                     'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author)}
+                    'author': validate_commmitter(author),
+                    'branch': branch}
             self._remove_none(data)
             json = self._json(self._put(url, data=dumps(data)), 200)
             if 'content' in json and 'commit' in json:
