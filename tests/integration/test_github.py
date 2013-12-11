@@ -175,7 +175,6 @@ class TestGitHub(IntegrationHelper):
             r = self.gh.rate_limit()
 
         assert isinstance(r, dict)
-        assert 'rate' in r
         assert 'resources' in r
 
     def test_repository(self):
