@@ -169,6 +169,15 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(p, github3.pulls.PullRequest)
 
+    def test_rate_limit(self):
+        cassette_name = self.cassette_name('rate_limit')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.rate_limit()
+
+        assert isinstance(r, dict)
+        assert 'rate' in r
+        assert 'resources' in r
+
     def test_repository(self):
         """Test the ability to retrieve a Repository"""
         cassette_name = self.cassette_name('repository')
