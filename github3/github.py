@@ -946,6 +946,17 @@ class GitHub(GitHubCore):
         r = self.repository(owner, repository)
         return r.pull_request(number) if r else None
 
+    def rate_limit(self):
+        """Returns a dictionary with information from /rate_limit.
+
+        The dictionary has two keys: ``resources`` and ``rate``. In
+        ``resources`` you can access information about ``core`` or ``search``.
+
+        :returns: dict
+        """
+        url = self._build_url('rate_limit')
+        return self._json(self._get(url), 200)
+
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
         owner and repository
