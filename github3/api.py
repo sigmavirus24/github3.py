@@ -343,6 +343,11 @@ def pull_request(owner, repository, number):
     return gh.pull_request(owner, repository, number)
 
 
+def rate_limit():
+    return gh.rate_limit()
+rate_limit.__doc__ = gh.rate_limit.__doc__
+
+
 def repository(owner, repository):
     return gh.repository(owner, repository)
 repository.__doc__ = gh.repository.__doc__
