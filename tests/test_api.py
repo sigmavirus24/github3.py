@@ -155,6 +155,10 @@ class TestAPI(TestCase):
         github3.user('login')
         self.gh.user.assert_called_with('login')
 
+    def test_rate_limit(self):
+        github3.rate_limit()
+        self.gh.rate_limit.assert_called_once_with()
+
     def test_ratelimit_remaining(self):
         # This prevents a regression in the API
         # See 81c800658db43f86419b9c0764fc16aad3d60007
