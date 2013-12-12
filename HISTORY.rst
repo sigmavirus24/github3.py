@@ -19,6 +19,9 @@ History/Changelog
 - Fix bug in ``Repository#update_file`` where ``branch`` was not being sent to
   the API. Thanks @tpetr!
 
+- Add ``GitHub#rate_limit`` to return all of the information from the
+  ``/rate_limit`` endpoint.
+
 0.7.1: 2013-09-30
 -----------------
 
