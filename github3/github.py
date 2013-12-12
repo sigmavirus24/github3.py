@@ -962,6 +962,8 @@ class GitHub(GitHubCore):
             rates['resources']['core']  # => your normal ratelimit info
             rates['resources']['search']  # => your search ratelimit info
 
+        .. versionadded:: 0.8
+
         :returns: dict
         """
         url = self._build_url('rate_limit')
