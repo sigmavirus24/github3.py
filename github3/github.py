@@ -952,6 +952,16 @@ class GitHub(GitHubCore):
         The dictionary has two keys: ``resources`` and ``rate``. In
         ``resources`` you can access information about ``core`` or ``search``.
 
+        Note: the ``rate`` key will be deprecated before version 3 of the
+        GitHub API is finalized. Do not rely on that key. Instead, make your
+        code future-proof by using ``core`` in ``resources``, e.g.,
+
+        ::
+
+            rates = g.rate_limit()
+            rates['resources']['core']  # => your normal ratelimit info
+            rates['resources']['search']  # => your search ratelimit info
+
         :returns: dict
         """
         url = self._build_url('rate_limit')
