@@ -162,10 +162,10 @@ class GitHubCore(GitHubObject):
         """Number of requests before GitHub imposes a ratelimit.
 
         :returns: int
-
         """
         json = self._json(self._get(self._github_url + '/rate_limit'), 200)
-        self._remaining = json.get('rate', {}).get('remaining', 0)
+        core = json.get('resources', {}).get('core', {})
+        self._remaining = core.get('remaining', 0)
         return self._remaining
 
     def refresh(self, conditional=False):
