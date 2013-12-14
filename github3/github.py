@@ -316,6 +316,8 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('gitignore', 'templates', language)
         json = self._json(self._get(url), 200)
+        if not json:
+            return ''
         return json.get('source', '')
 
     def gitignore_templates(self):
