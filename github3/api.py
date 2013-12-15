@@ -353,53 +353,6 @@ def repository(owner, repository):
 repository.__doc__ = gh.repository.__doc__
 
 
-def search_issues(owner, repo, state, keyword):
-    """Find issues by state and keyword.
-
-    :param str owner: (required)
-    :param str repo: (required)
-    :param str state: (required), accepted values: ('open', 'closed')
-    :param str keyword: (required), what to search for
-    :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`
-
-    """
-    return gh.search_issues(owner, repo, state, keyword)
-
-
-def search_repos(keyword, **params):
-    """Search all repositories by keyword.
-
-    :param str keyword: (required)
-    :param str language: (optional), language to filter by
-    :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`
-
-    """
-    return gh.search_repos(keyword, **params)
-
-
-def search_users(keyword):
-    """Search all users by keyword.
-
-    :param str keyword: (required)
-    :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`
-
-    """
-    return gh.search_users(keyword)
-
-
-def search_email(email):
-    """Search users by email.
-
-    :param str email: (required)
-    :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
-
-    """
-    return gh.search_email(email)
-
-
 def user(login):
     return gh.user(login)
 user.__doc__ = gh.user.__doc__
