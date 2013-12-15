@@ -131,26 +131,6 @@ class TestAPI(TestCase):
         github3.repository(*args)
         self.gh.repository.assert_called_with(*args)
 
-    def test_search_issues(self):
-        args = ('owner', 'repo', 'state', 'keyword')
-        github3.search_issues(*args)
-        self.gh.search_issues.assert_called_with(*args)
-
-    def test_search_repos(self):
-        args = ('keyword',)
-        github3.search_repos(*args)
-        self.gh.search_repos.assert_called_with(*args)
-
-    def test_search_users(self):
-        args = ('login',)
-        github3.search_users(*args)
-        self.gh.search_users.assert_called_with(*args)
-
-    def test_search_email(self):
-        args = ('email',)
-        github3.search_email(*args)
-        self.gh.search_email.assert_called_with(*args)
-
     def test_user(self):
         github3.user('login')
         self.gh.user.assert_called_with('login')
