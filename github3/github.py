@@ -12,7 +12,6 @@ from github3.auths import Authorization
 from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
-from github3.legacy import LegacyIssue, LegacyRepo, LegacyUser
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
@@ -982,78 +981,6 @@ class GitHub(GitHubCore):
             url = self._build_url('repos', owner, repository)
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
-
-    def search_issues(self, owner, repo, state, keyword, start_page=0):
-        """Find issues by state and keyword.
-
-        :param str owner: (required)
-        :param str repo: (required)
-        :param str state: (required), accepted values: ('open', 'closed')
-        :param str keyword: (required), what to search for
-        :param int start_page: (optional), page to get (results come 100/page)
-        :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
-        """
-        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
-        url = self._build_url('legacy', 'issues', 'search', owner, repo,
-                              state, keyword)
-        json = self._json(self._get(url, params=params), 200)
-        issues = json.get('issues', [])
-        return [LegacyIssue(l, self) for l in issues]
-
-    def search_repos(self, keyword, language=None, start_page=None,
-                     sort=None, order=None):
-        """Search all repositories by keyword.
-
-        :param str keyword: (required)
-        :param str language: (optional), language to filter by
-        :param int start_page: (optional), page to get (results come 100/page)
-        :param str sort: (optional), how to sort the results; accepted values:
-            ('stars', 'forks', 'updated')
-        :param str order: (optional), sort order if ``sort`` isn't provided,
-            accepted values: ('asc', 'desc')
-        :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
-        """
-        url = self._build_url('legacy', 'repos', 'search', keyword)
-        params = {'language': language, 'start_page': start_page}
-        if sort in ('stars', 'forks', 'updated'):
-            params['sort'] = sort
-        if order in ('asc', 'desc') and not sort:
-            params['order'] = order
-        json = self._json(self._get(url, params=params), 200)
-        repos = json.get('repositories', [])
-        return [LegacyRepo(r, self) for r in repos]
-
-    def search_users(self, keyword, start_page=0, sort=None, order=None):
-        """Search all users by keyword.
-
-        :param str keyword: (required)
-        :param int start_page: (optional), page to get (results come 100/page)
-        :param str sort: (optional), how to sort the results; accepted values:
-            ('followers', 'joined', 'repositories')
-        :param str order: (optional), sort order if ``sort`` isn't provided,
-            accepted values: ('asc', 'desc')
-        :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
-        """
-        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
-        if sort in ('followers', 'joined', 'repositories'):
-            params['sort'] = sort
-        if order in ('asc', 'desc') and not sort:
-            params['order'] = order
-        url = self._build_url('legacy', 'user', 'search', str(keyword))
-        json = self._json(self._get(url, params=params), 200)
-        users = json.get('users', [])
-        return [LegacyUser(u, self) for u in users]
-
-    def search_email(self, email):
-        """Search users by email.
-
-        :param str email: (required)
-        :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
-        """
-        url = self._build_url('legacy', 'user', 'email', email)
-        json = self._json(self._get(url), 200)
-        u = json.get('user', {})
-        return LegacyUser(u, self) if u else None
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
