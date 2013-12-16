@@ -194,6 +194,14 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(r, github3.repos.repo.Repository)
 
+    def test_search_repositories(self):
+        """Test the ability to use the repository search endpoint"""
+        cassette_name = self.cassette_name('search_repositories')
+        with self.recorder.use_cassette(cassette_name):
+            repos = self.gh.search_repositories('github3 language:python')
+
+        assert isinstance(repos, dict)
+
     def test_user(self):
         """Test the ability to retrieve a User"""
         cassette_name = self.cassette_name('user')

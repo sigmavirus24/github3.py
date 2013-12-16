@@ -984,6 +984,52 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
+    def search_repositories(self, query, sort=None, order=None,
+                            per_page=None, text_match=False):
+        """Find repositories via various criteria.
+
+        The query can contain any combination of the following supported
+        qualifers:
+
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the repository name, description,
+          readme, or any combination of these.
+        - ``size`` Finds repositories that match a certain size (in
+          kilobytes).
+        - ``forks`` Filters repositories based on the number of forks, and/or
+          whether forked repositories should be included in the results at
+          all.
+        - ``created`` or ``pushed`` Filters repositories based on times of
+          creation, or when they were last updated.
+        - ``user`` or ``repo`` Limits searches to a specific user or
+          repository.
+        - ``language`` Searches repositories based on the language they're
+          written in.
+        - ``stars`` Searches repositories based on the number of stars.
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``tetris language:assembly``
+        :param str sort: (optional), how the results should be sorted;
+            options: ``stars``, ``forks``, ``updated``; default: best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+            terms. See http://git.io/4ct1eQ for more information
+        :return: dict
+        """
+        # TODO Describe the dictionary being returned
+        params = {'q': query}
+
+        if sort in ('stars', 'forks', 'updated'):
+            params['sort'] = sort
+
+        if order in ('asc', 'desc'):
+            params['order'] = order
+
+        url = self._build_url('search', 'repositories')
+        return self._json(self._get(url, params=params), 200)
+
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
         their OAuth application.
