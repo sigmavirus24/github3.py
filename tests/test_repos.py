@@ -542,7 +542,7 @@ class TestRepository(BaseCase):
     def test_iter_assignees(self):
         self.response('user', _iter=True)
         self.get(self.api + 'assignees')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         u = next(self.repo.iter_assignees())
         assert isinstance(u, github3.users.User)
@@ -551,7 +551,7 @@ class TestRepository(BaseCase):
     def test_iter_branches(self):
         self.response('branch', _iter=True)
         self.get(self.api + 'branches')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         b = next(self.repo.iter_branches())
         assert isinstance(b, repos.branch.Branch)
@@ -560,7 +560,7 @@ class TestRepository(BaseCase):
     def test_iter_comments(self):
         self.response('repo_comment', _iter=True)
         self.get(self.api + 'comments')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         c = next(self.repo.iter_comments())
         assert isinstance(c, repos.comment.RepoComment)
@@ -569,7 +569,7 @@ class TestRepository(BaseCase):
     def test_iter_comments_on_commit(self):
         self.response('repo_comment', _iter=True)
         self.get(self.api + 'commits/fakesha/comments')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 1}}
 
         c = next(self.repo.iter_comments_on_commit('fakesha'))
         assert isinstance(c, repos.comment.RepoComment)
@@ -578,40 +578,43 @@ class TestRepository(BaseCase):
     def test_iter_commits(self):
         self.response('commit', _iter=True)
         self.get(self.api + 'commits')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         c = next(self.repo.iter_commits())
         assert isinstance(c, repos.commit.RepoCommit)
         self.mock_assertions()
 
-        self.conf = {'params': {'sha': 'fakesha', 'path': '/'}}
+        self.conf = {'params': {'sha': 'fakesha', 'path': '/',
+                                'per_page': 100}}
         c = next(self.repo.iter_commits('fakesha', '/'))
         self.mock_assertions()
 
         since = datetime(2013, 6, 1, 0, 0, 0)
         until = datetime(2013, 6, 2, 0, 0, 0)
         self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00'}}
+                                'until': '2013-06-02T00:00:00',
+                                'per_page': 100}}
         c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
 
         since = '2013-06-01T00:00:00'
         until = '2013-06-02T00:00:00'
         self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00'}}
+                                'until': '2013-06-02T00:00:00',
+                                'per_page': 100}}
         c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
 
     def test_iter_contributors(self):
         self.response('user', _iter=True)
         self.get(self.api + 'contributors')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         u = next(self.repo.iter_contributors())
         assert isinstance(u, github3.users.User)
         self.mock_assertions()
 
-        self.conf = {'params': {'anon': True}}
+        self.conf = {'params': {'anon': True, 'per_page': 100}}
         next(self.repo.iter_contributors(True))
         self.mock_assertions()
 
@@ -621,7 +624,7 @@ class TestRepository(BaseCase):
     def test_iter_events(self):
         self.response('event', _iter=True)
         self.get(self.api + 'events')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         e = next(self.repo.iter_events())
         assert isinstance(e, github3.events.Event)
@@ -630,20 +633,22 @@ class TestRepository(BaseCase):
     def test_iter_forks(self):
         self.response('repo', _iter=True)
         self.get(self.api + 'forks')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         r = next(self.repo.iter_forks())
         assert isinstance(r, repos.Repository)
         self.mock_assertions()
 
         self.conf['params']['sort'] = 'newest'
-        next(self.repo.iter_forks(**self.conf['params']))
+        forks_params = self.conf['params'].copy()
+        forks_params.pop('per_page')
+        next(self.repo.iter_forks(**forks_params))
         self.mock_assertions()
 
     def test_iter_hooks(self):
         self.response('hook', _iter=True)
         self.get(self.api + 'hooks')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         self.assertRaises(github3.GitHubError, self.repo.iter_hooks)
 
@@ -655,7 +660,7 @@ class TestRepository(BaseCase):
     def test_iter_issues(self):
         self.response('issue', _iter=True)
         self.get(self.api + 'issues')
-        params = {}
+        params = {'per_page': 100}
         self.conf = {'params': params}
 
         i = next(self.repo.iter_issues())
@@ -667,13 +672,16 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
         params['state'] = 'open'
-        next(self.repo.iter_issues(**params))
+
+        request_params = params.copy()
+        request_params.pop('per_page')
+        next(self.repo.iter_issues(**request_params))
         self.mock_assertions()
 
     def test_iter_issue_events(self):
         self.response('issue_event', _iter=True)
         self.get(self.api + 'issues/events')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         e = next(self.repo.iter_issue_events())
         assert isinstance(e, github3.issues.event.IssueEvent)
@@ -728,7 +736,7 @@ class TestRepository(BaseCase):
     def test_iter_notifications(self):
         self.response('notification', _iter=True)
         self.get(self.api + 'notifications')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.repo.iter_notifications)
 
@@ -740,7 +748,7 @@ class TestRepository(BaseCase):
     def test_iter_pulls(self):
         self.response('pull', _iter=True)
         self.get(self.api + 'pulls')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         p = next(self.repo.iter_pulls())
         assert isinstance(p, github3.pulls.PullRequest)
@@ -749,15 +757,15 @@ class TestRepository(BaseCase):
         next(self.repo.iter_pulls('foo'))
         self.mock_assertions()
 
-        self.conf.update(params={'state': 'open'})
+        self.conf.update(params={'state': 'open', 'per_page': 100})
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
 
-        self.conf.update(params={'head': 'user:branch'})
+        self.conf.update(params={'head': 'user:branch', 'per_page': 100})
         next(self.repo.iter_pulls(head='user:branch'))
         self.mock_assertions()
 
-        self.conf.update(params={'base': 'branch'})
+        self.conf.update(params={'base': 'branch', 'per_page': 100})
         next(self.repo.iter_pulls(base='branch'))
         self.mock_assertions()
 

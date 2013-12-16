@@ -94,7 +94,7 @@ class TestGist(BaseCase):
     def test_iter_comments(self):
         self.response('gist_comment', _iter=True)
         self.get(self.api + '/comments')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         c = next(self.gist.iter_comments())
 
@@ -104,7 +104,7 @@ class TestGist(BaseCase):
     def test_iter_commits(self):
         self.response('gist_history', _iter=True)
         self.get(self.api + '/commits')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         h = next(self.gist.iter_commits())
         assert isinstance(h, gists.history.GistHistory)
