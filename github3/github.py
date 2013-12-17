@@ -1020,6 +1020,7 @@ class GitHub(GitHubCore):
         """
         # TODO Describe the dictionary being returned
         params = {'q': query}
+        headers = {}
 
         if sort in ('stars', 'forks', 'updated'):
             params['sort'] = sort
@@ -1027,8 +1028,18 @@ class GitHub(GitHubCore):
         if order in ('asc', 'desc'):
             params['order'] = order
 
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
+
         url = self._build_url('search', 'repositories')
-        return self._json(self._get(url, params=params), 200)
+        results = self._json(self._get(url, params=params, headers=headers),
+                             200)
+        repos_dicts = results['items']
+        repos = [Repository(r) for r in repos_dicts]
+        results['repositories'] = repos
+        return results
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
