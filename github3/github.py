@@ -9,14 +9,15 @@ This module contains the main GitHub session object.
 from json import dumps
 from requests import session
 from github3.auths import Authorization
+from github3.decorators import requires_auth, requires_basic_auth
 from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
+from github3.structs import SearchIterator
 from github3.users import User, Key
-from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
 from uritemplate import URITemplate
 
@@ -983,7 +984,8 @@ class GitHub(GitHubCore):
         return Repository(json, self) if json else None
 
     def search_repositories(self, query, sort=None, order=None,
-                            per_page=None, text_match=False):
+                            per_page=None, text_match=False, number=-1,
+                            etag=None):
         """Find repositories via various criteria.
 
         The query can contain any combination of the following supported
@@ -1014,6 +1016,9 @@ class GitHub(GitHubCore):
         :param int per_page: (optional)
         :param bool text_match: (optional), if True, return matching search
             terms. See http://git.io/4ct1eQ for more information
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all available repositories
+        :param str etag: (optional), previous ETag header value
         :return: dict
         """
         # TODO Describe the dictionary being returned
@@ -1032,12 +1037,7 @@ class GitHub(GitHubCore):
                 }
 
         url = self._build_url('search', 'repositories')
-        results = self._json(self._get(url, params=params, headers=headers),
-                             200)
-        repos_dicts = results['items']
-        repos = [Repository(r) for r in repos_dicts]
-        results['repositories'] = repos
-        return results
+        return SearchIterator(number, url, Repository, self, params, etag)
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
