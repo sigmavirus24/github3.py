@@ -199,22 +199,24 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('search_repositories')
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories('github3 language:python')
+            assert isinstance(next(repos), github3.repos.repo.Repository)
 
         assert isinstance(repos, github3.structs.SearchIterator)
-        assert isinstance(next(repos), github3.repos.repo.Repository)
 
     def test_search_repositories_with_text_match(self):
         """Test the ability to use the repository search endpoint"""
+        self.token_login()
         cassette_name = self.cassette_name('search_repositories_text_match')
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories('github3 language:python',
                                                 text_match=True)
+            assert isinstance(next(repos), github3.repos.repo.Repository)
 
         assert isinstance(repos, github3.structs.SearchIterator)
-        assert isinstance(next(repos), github3.repos.repo.Repository)
 
     def test_user(self):
         """Test the ability to retrieve a User"""
+        self.token_login()
         cassette_name = self.cassette_name('user')
         with self.recorder.use_cassette(cassette_name):
             s = self.gh.user('sigmavirus24')
