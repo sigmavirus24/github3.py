@@ -200,8 +200,8 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories('github3 language:python')
 
-        assert isinstance(repos, dict)
-        assert 'repositories' in repos
+        assert isinstance(repos, github3.structs.SearchIterator)
+        assert isinstance(next(repos), github3.repos.repo.Repository)
 
     def test_search_repositories_with_text_match(self):
         """Test the ability to use the repository search endpoint"""
@@ -210,8 +210,8 @@ class TestGitHub(IntegrationHelper):
             repos = self.gh.search_repositories('github3 language:python',
                                                 text_match=True)
 
-        assert isinstance(repos, dict)
-        assert 'repositories' in repos
+        assert isinstance(repos, github3.structs.SearchIterator)
+        assert isinstance(next(repos), github3.repos.repo.Repository)
 
     def test_user(self):
         """Test the ability to retrieve a User"""
