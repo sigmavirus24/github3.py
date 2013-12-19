@@ -34,9 +34,10 @@ class GitHubIterator(GitHubCore, Iterator):
         if etag:
             self.headers = {'If-None-Match': etag}
 
+        self.path = urlparse(self.url).path
+
     def __repr__(self):
-        path = urlparse(self.url).path
-        return '<GitHubIterator [{0}, {1}]>'.format(self.count, path)
+        return '<GitHubIterator [{0}, {1}]>'.format(self.count, self.path)
 
     def __iter__(self):
         url, params, cls = self.url, self.params, self.cls
@@ -94,3 +95,23 @@ class GitHubIterator(GitHubCore, Iterator):
 
     def next(self):
         return self.__next__()
+
+
+class SearchIterator(GitHubIterator):
+    def __init__(self, count, url, cls, session, params=None, etag=None):
+        super(SearchIterator, self).__init__(count, url, cls, session, params,
+                                             etag)
+        self.total_count = 0
+
+    def __repr__(self):
+        return '<SearchIterator [{0}, {1}]>'.format(self.count, self.path)
+
+    def _json(self, response, status_code):
+        json = super(SearchIterator, self)._json(response, status_code)
+        # I'm not sure if another page will retain the total_count attribute,
+        # so if it's not in the response, just set it back to what it used to
+        # be
+        self.total_count = json.get('total_count', self.total_count)
+        self.items = json.get('items', [])
+        # If we return None then it will short-circuit the while loop.
+        return json.get('items')
