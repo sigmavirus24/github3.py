@@ -247,6 +247,21 @@ cassette file to the repository, like so:
 
     git add tests/cassettes/Release_delete.json
 
+Recording Cassettes that Require Authentication/Authorization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to write a test that requires an Authorization (i.e., oAuth token)
+or Authentication (i.e., username and password), all you need to do is set
+environment variables when running `py.test`, e.g.,
+
+.. code::
+
+    GH_AUTH="abc123" py.test
+    GH_USER="sigmavirus24" GH_PASS="super-secure-password-plz-kthxbai" py.test
+
+If you are concerned that your credentials will be saved, you need not worry.
+Betamax sanitizes information like that before saving the cassette. It never
+does hurt to double check though.
 
 .. _Betamax: https://github.com/sigmavirus24/betamax
 .. _cassettes: https://betamax.readthedocs.org/en/latest/cassettes.html
