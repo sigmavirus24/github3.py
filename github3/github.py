@@ -1019,9 +1019,8 @@ class GitHub(GitHubCore):
         :param int number: (optional), number of repositories to return.
             Default: -1, returns all available repositories
         :param str etag: (optional), previous ETag header value
-        :return: dict
+        :return: generator of :class:`Repository <github3.repos.Repository>`
         """
-        # TODO Describe the dictionary being returned
         params = {'q': query}
         headers = {}
 

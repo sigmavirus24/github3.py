@@ -404,11 +404,10 @@ def search_repositories(query, sort=None, order=None, per_page=None,
     :param int number: (optional), number of repositories to return.
         Default: -1, returns all available repositories
     :param str etag: (optional), previous ETag header value
-    :return: dict
+    :return: generator of :class:`Repository <github3.repos.Repository>`
     """
     return gh.search_repositories(query, sort, order, per_page, text_match,
                                   number, etag)
-    # TODO Describe the dictionary being returned
 
 
 def user(login):
