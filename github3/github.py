@@ -983,6 +983,28 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
+    def search_code(self, query, sort=None, order=None, per_page=None,
+                    text_match=False, number=-1, etag=None):
+        """Find code via the code search API.
+
+        The query can contain any combination of the following supported
+        qualifiers:
+
+        - in Qualifies which fields are searched. With this qualifier you can
+          restrict the search to just the file contents, the file path, or
+          both.
+        - language Searches code based on the language it’s written in.
+        - fork Specifies that code from forked repositories should be
+          searched.  Repository forks will not be searchable unless the fork
+          has more stars than the parent repository.
+        - size Finds files that match a certain size (in bytes).
+        - path Specifies the path that the resulting file must be at.
+        - extension Matches files with a certain extension.
+        - user or repo Limits searches to a specific user or repository.
+
+
+        """
+
     def search_repositories(self, query, sort=None, order=None,
                             per_page=None, text_match=False, number=-1,
                             etag=None):
