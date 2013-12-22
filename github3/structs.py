@@ -55,7 +55,7 @@ class GitHubIterator(GitHubCore, Iterator):
             if not self.etag and response.headers.get('ETag'):
                 self.etag = response.headers.get('ETag')
 
-            json = self._json(response, 200)
+            json = self._get_json(response)
 
             if json is None:
                 break
@@ -82,6 +82,9 @@ class GitHubIterator(GitHubCore, Iterator):
             self.__i__ = self.__iter__()
         return next(self.__i__)
 
+    def _get_json(self, response):
+        return self._json(response, 200)
+
     def refresh(self, conditional=False):
         self.count = self.original
         if conditional:
@@ -104,8 +107,8 @@ class SearchIterator(GitHubIterator):
         return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
                                                         urlencode(self.params))
 
-    def _json(self, response, status_code):
-        json = super(SearchIterator, self)._json(response, status_code)
+    def _get_json(self, response):
+        json = self._json(response, 200)
         # I'm not sure if another page will retain the total_count attribute,
         # so if it's not in the response, just set it back to what it used to
         # be
