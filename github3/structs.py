@@ -107,7 +107,8 @@ class SearchIterator(GitHubIterator):
         self.total_count = 0
 
     def __repr__(self):
-        return '<SearchIterator [{0}, {1}]>'.format(self.count, self.path)
+        return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
+                                                        urlencode(self.params))
 
     def _json(self, response, status_code):
         json = super(SearchIterator, self)._json(response, status_code)
