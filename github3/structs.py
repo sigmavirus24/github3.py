@@ -1,10 +1,12 @@
 from collections import Iterator
-from github3.models import GitHubCore, urlparse
+from github3.models import GitHubCore
+from requests.compat import urlparse, urlencode
 
 
 class GitHubIterator(GitHubCore, Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
-    def __init__(self, count, url, cls, session, params=None, etag=None):
+    def __init__(self, count, url, cls, session, params=None, etag=None,
+                 headers=None):
         GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
         self.original = count
@@ -25,18 +27,19 @@ class GitHubIterator(GitHubCore, Iterator):
         #: The ETag Header value returned by GitHub
         self.etag = None
         #: Headers generated for the GET request
-        self.headers = {}
+        self.headers = headers or {}
         #: The last response seen
         self.last_response = None
         #: Last status code received
         self.last_status = 0
 
         if etag:
-            self.headers = {'If-None-Match': etag}
+            self.headers.update({'If-None-Match': etag})
+
+        self.path = urlparse(self.url).path
 
     def __repr__(self):
-        path = urlparse(self.url).path
-        return '<GitHubIterator [{0}, {1}]>'.format(self.count, path)
+        return '<GitHubIterator [{0}, {1}]>'.format(self.count, self.path)
 
     def __iter__(self):
         url, params, cls = self.url, self.params, self.cls
@@ -52,7 +55,7 @@ class GitHubIterator(GitHubCore, Iterator):
             if not self.etag and response.headers.get('ETag'):
                 self.etag = response.headers.get('ETag')
 
-            json = self._json(response, 200)
+            json = self._get_json(response)
 
             if json is None:
                 break
@@ -79,6 +82,9 @@ class GitHubIterator(GitHubCore, Iterator):
             self.__i__ = self.__iter__()
         return next(self.__i__)
 
+    def _get_json(self, response):
+        return self._json(response, 200)
+
     def refresh(self, conditional=False):
         self.count = self.original
         if conditional:
@@ -88,3 +94,25 @@ class GitHubIterator(GitHubCore, Iterator):
 
     def next(self):
         return self.__next__()
+
+
+class SearchIterator(GitHubIterator):
+    def __init__(self, count, url, cls, session, params=None, etag=None,
+                 headers=None):
+        super(SearchIterator, self).__init__(count, url, cls, session, params,
+                                             etag, headers)
+        self.total_count = 0
+
+    def __repr__(self):
+        return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
+                                                        urlencode(self.params))
+
+    def _get_json(self, response):
+        json = self._json(response, 200)
+        # I'm not sure if another page will retain the total_count attribute,
+        # so if it's not in the response, just set it back to what it used to
+        # be
+        self.total_count = json.get('total_count', self.total_count)
+        self.items = json.get('items', [])
+        # If we return None then it will short-circuit the while loop.
+        return json.get('items')

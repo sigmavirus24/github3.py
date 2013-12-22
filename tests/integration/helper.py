@@ -19,8 +19,8 @@ class IntegrationHelper(unittest.TestCase):
     def basic_login(self):
         self.gh.login(self.user, self.password)
 
-    def cassette_name(self, method):
-        class_name = self.described_class
+    def cassette_name(self, method, cls=None):
+        class_name = cls or self.described_class
         return '_'.join([class_name, method])
 
     @property

@@ -9,14 +9,15 @@ This module contains the main GitHub session object.
 from json import dumps
 from requests import session
 from github3.auths import Authorization
+from github3.decorators import requires_auth, requires_basic_auth
 from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
+from github3.structs import SearchIterator
 from github3.users import User, Key
-from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
 from uritemplate import URITemplate
 
@@ -981,6 +982,66 @@ class GitHub(GitHubCore):
             url = self._build_url('repos', owner, repository)
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
+
+    def search_repositories(self, query, sort=None, order=None,
+                            per_page=None, text_match=False, number=-1,
+                            etag=None):
+        """Find repositories via various criteria.
+
+        The query can contain any combination of the following supported
+        qualifers:
+
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the repository name, description,
+          readme, or any combination of these.
+        - ``size`` Finds repositories that match a certain size (in
+          kilobytes).
+        - ``forks`` Filters repositories based on the number of forks, and/or
+          whether forked repositories should be included in the results at
+          all.
+        - ``created`` or ``pushed`` Filters repositories based on times of
+          creation, or when they were last updated. Format: ``YYYY-MM-DD``.
+          Examples: ``created:<2011``, ``pushed:<2013-02``,
+          ``pushed:>=2013-03-06``
+        - ``user`` or ``repo`` Limits searches to a specific user or
+          repository.
+        - ``language`` Searches repositories based on the language they're
+          written in.
+        - ``stars`` Searches repositories based on the number of stars.
+
+        For more information about these qualifiers, see: http://git.io/4Z8AkA
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``tetris language:assembly``
+        :param str sort: (optional), how the results should be sorted;
+            options: ``stars``, ``forks``, ``updated``; default: best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+            terms. See http://git.io/4ct1eQ for more information
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all available repositories
+        :param str etag: (optional), previous ETag header value
+        :return: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        params = {'q': query}
+        headers = {}
+
+        if sort in ('stars', 'forks', 'updated'):
+            params['sort'] = sort
+
+        if order in ('asc', 'desc'):
+            params['order'] = order
+
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
+
+        url = self._build_url('search', 'repositories')
+        return SearchIterator(number, url, Repository, self, params, etag,
+                              headers)
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
