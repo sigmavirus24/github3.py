@@ -1036,7 +1036,8 @@ class GitHub(GitHubCore):
                 }
 
         url = self._build_url('search', 'repositories')
-        return SearchIterator(number, url, Repository, self, params, etag)
+        return SearchIterator(number, url, Repository, self, params, etag,
+                              headers)
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
