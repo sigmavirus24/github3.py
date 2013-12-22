@@ -385,12 +385,16 @@ def search_repositories(query, sort=None, order=None, per_page=None,
       whether forked repositories should be included in the results at
       all.
     - ``created`` or ``pushed`` Filters repositories based on times of
-      creation, or when they were last updated.
+      creation, or when they were last updated. Format: ``YYYY-MM-DD``.
+      Examples: ``created:<2011``, ``pushed:<2013-02``,
+      ``pushed:>=2013-03-06``
     - ``user`` or ``repo`` Limits searches to a specific user or
       repository.
     - ``language`` Searches repositories based on the language they're
       written in.
     - ``stars`` Searches repositories based on the number of stars.
+
+    For more information about these qualifiers, see: http://git.io/4Z8AkA
 
     :param str query: (required), a valid query as described above, e.g.,
         ``tetris language:assembly``
