@@ -1,10 +1,12 @@
 from collections import Iterator
-from github3.models import GitHubCore, urlparse
+from github3.models import GitHubCore
+from requests.compat import urlparse, urlencode
 
 
 class GitHubIterator(GitHubCore, Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
-    def __init__(self, count, url, cls, session, params=None, etag=None):
+    def __init__(self, count, url, cls, session, params=None, etag=None,
+                 headers=None):
         GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
         self.original = count
@@ -25,14 +27,14 @@ class GitHubIterator(GitHubCore, Iterator):
         #: The ETag Header value returned by GitHub
         self.etag = None
         #: Headers generated for the GET request
-        self.headers = {}
+        self.headers = headers or {}
         #: The last response seen
         self.last_response = None
         #: Last status code received
         self.last_status = 0
 
         if etag:
-            self.headers = {'If-None-Match': etag}
+            self.headers.update({'If-None-Match': etag})
 
         self.path = urlparse(self.url).path
 
@@ -98,9 +100,10 @@ class GitHubIterator(GitHubCore, Iterator):
 
 
 class SearchIterator(GitHubIterator):
-    def __init__(self, count, url, cls, session, params=None, etag=None):
+    def __init__(self, count, url, cls, session, params=None, etag=None,
+                 headers=None):
         super(SearchIterator, self).__init__(count, url, cls, session, params,
-                                             etag)
+                                             etag, headers)
         self.total_count = 0
 
     def __repr__(self):
