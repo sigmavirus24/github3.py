@@ -17,6 +17,7 @@ from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
+from githbu3.search import CodeSearchResult
 from github3.structs import SearchIterator
 from github3.users import User, Key
 from github3.notifications import Thread
@@ -1020,7 +1021,8 @@ class GitHub(GitHubCore):
         :param int number: (optional), number of repositories to return.
             Default: -1, returns all available repositories
         :param str etag: (optional), previous ETag header value
-        :return: generator of :class:`Repository <github3.repos.Repository>`
+        :return: generator of :class:`CodeSearchResult
+            <github3.search.CodeSearchResult>`
         """
         params = {'q': query}
         headers = {}
@@ -1037,8 +1039,8 @@ class GitHub(GitHubCore):
                 }
 
         url = self._build_url('search', 'code')
-        return SearchIterator(number, url, Repository, self, params, etag,
-                              headers)
+        return SearchIterator(number, url, CodeSearchResult, self, params,
+                              etag, headers)
 
     def search_repositories(self, query, sort=None, order=None,
                             per_page=None, text_match=False, number=-1,
