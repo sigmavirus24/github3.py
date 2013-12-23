@@ -353,7 +353,6 @@ class User(BaseAccount):
         url = self._build_url('orgs', base_url=self._api)
         return self._iter(int(number), url, Organization, etag=etag)
 
-
     def iter_starred(self, sort=None, direction=None, number=-1, etag=None):
         """Iterate over repositories starred by this user.
 
