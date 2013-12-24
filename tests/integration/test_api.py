@@ -10,4 +10,5 @@ class TestAPI(IntegrationHelper):
                                            cls='GitHub')
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories('github3 language:python')
-            assert isinstance(next(repos), github3.repos.repo.Repository)
+            assert isinstance(next(repos),
+                              github3.search.RepositorySearchResult)
