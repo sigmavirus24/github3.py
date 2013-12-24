@@ -194,6 +194,32 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(r, github3.repos.repo.Repository)
 
+    def test_search_code(self):
+        """Test the ability to use the code search endpoint"""
+        cassette_name = self.cassette_name('search_code')
+        with self.recorder.use_cassette(cassette_name):
+            result_iterator = self.gh.search_code(
+                'HTTPAdapter in:file language:python'
+                ' repo:kennethreitz/requests'
+                )
+            code_result = next(result_iterator)
+
+        assert isinstance(code_result, github3.search.CodeSearchResult)
+
+    def test_search_code_with_text_match(self):
+        """Test the ability to use the code search endpoint"""
+        cassette_name = self.cassette_name('search_code_with_text_match')
+        with self.recorder.use_cassette(cassette_name):
+            result_iterator = self.gh.search_code(
+                ('HTTPAdapter in:file language:python'
+                 ' repo:kennethreitz/requests'),
+                text_match=True
+                )
+            code_result = next(result_iterator)
+
+        assert isinstance(code_result, github3.search.CodeSearchResult)
+        assert len(code_result.text_matches) > 0
+
     def test_search_repositories(self):
         """Test the ability to use the repository search endpoint"""
         cassette_name = self.cassette_name('search_repositories')
