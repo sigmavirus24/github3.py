@@ -17,7 +17,7 @@ from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
-from githbu3.search import CodeSearchResult
+from github3.search import CodeSearchResult
 from github3.structs import SearchIterator
 from github3.users import User, Key
 from github3.notifications import Thread
