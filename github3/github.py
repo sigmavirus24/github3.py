@@ -17,7 +17,7 @@ from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
-from github3.search import CodeSearchResult
+from github3.search import CodeSearchResult, RepositorySearchResult
 from github3.structs import SearchIterator
 from github3.users import User, Key
 from github3.notifications import Thread
@@ -1099,8 +1099,8 @@ class GitHub(GitHubCore):
                 }
 
         url = self._build_url('search', 'repositories')
-        return SearchIterator(number, url, Repository, self, params, etag,
-                              headers)
+        return SearchIterator(number, url, RepositorySearchResult, self,
+                              params, etag, headers)
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for

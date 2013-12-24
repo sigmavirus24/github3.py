@@ -17,6 +17,8 @@ SSH_KEY = (
 
 
 class TestGitHub(IntegrationHelper):
+    match_on = ['method', 'uri', 'headers']
+
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist"""
         self.token_login()
@@ -209,7 +211,8 @@ class TestGitHub(IntegrationHelper):
     def test_search_code_with_text_match(self):
         """Test the ability to use the code search endpoint"""
         cassette_name = self.cassette_name('search_code_with_text_match')
-        with self.recorder.use_cassette(cassette_name):
+        with self.recorder.use_cassette(cassette_name,
+                                        match_requests_on=self.match_on):
             result_iterator = self.gh.search_code(
                 ('HTTPAdapter in:file language:python'
                  ' repo:kennethreitz/requests'),
@@ -225,7 +228,8 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('search_repositories')
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories('github3 language:python')
-            assert isinstance(next(repos), github3.repos.repo.Repository)
+            assert isinstance(next(repos),
+                              github3.search.RepositorySearchResult)
 
         assert isinstance(repos, github3.structs.SearchIterator)
 
@@ -233,12 +237,16 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to use the repository search endpoint"""
         self.token_login()
         cassette_name = self.cassette_name('search_repositories_text_match')
-        with self.recorder.use_cassette(cassette_name):
+        with self.recorder.use_cassette(cassette_name,
+                                        match_requests_on=self.match_on):
             repos = self.gh.search_repositories('github3 language:python',
                                                 text_match=True)
-            assert isinstance(next(repos), github3.repos.repo.Repository)
+            repo_result = next(repos)
+            assert isinstance(repo_result,
+                              github3.search.RepositorySearchResult)
 
         assert isinstance(repos, github3.structs.SearchIterator)
+        assert len(repo_result.text_matches) > 0
 
     def test_user(self):
         """Test the ability to retrieve a User"""
