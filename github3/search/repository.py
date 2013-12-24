@@ -12,3 +12,6 @@ class RepositorySearchResult(GitHubCore):
         self.text_matches = result.pop('text_matches', [])
         #: Repository object
         self.repository = Repository(result, self)
+
+    def __repr__(self):
+        return '<RepositorySearchResult [{0}]>'.format(self.repository)
