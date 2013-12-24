@@ -4,6 +4,9 @@ from .helper import IntegrationHelper
 
 
 class TestAPI(IntegrationHelper):
+    def get_client(self):
+        return github3.gh
+
     def test_search_repositories(self):
         """Test the ability to use the repository search endpoint"""
         cassette_name = self.cassette_name('search_repositories',
