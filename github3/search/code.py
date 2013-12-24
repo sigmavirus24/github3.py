@@ -23,3 +23,6 @@ class CodeSearchResult(GitHubCore):
         self.score = data.get('score')
         #: Text matches
         self.text_matches = data.get('text_matches', [])
+
+    def __repr__(self):
+        return '<CodeSearchResult [{0}]>'.format(self.path)
