@@ -425,27 +425,26 @@ def search_issues(query, sort=None, order=None, per_page=None,
     The query can contain any combination of the following supported
     qualifers:
 
-    - ``in`` Qualifies which fields are searched. With this qualifier you
-        can restrict the search to just the repository name, description,
-        readme, or any combination of these.
     - ``type`` With this qualifier you can restrict the search to issues or
-        pull request only.
+      pull request only.
+    - ``in`` Qualifies which fields are searched. With this qualifier you can
+      restrict the search to just the title, body, comments, or any
+      combination of these.
     - ``author`` Finds issues created by a certain user.
     - ``assignee`` Finds issues that are assigned to a certain user.
     - ``mentions`` Finds issues that mention a certain user.
     - ``commenter`` Finds issues that a certain user commented on.
     - ``involves`` Finds issues that were either created by a certain user,
-        assigned to that user, mention that user, or were commented on by that
-        user.
-    - ``created`` or ``updated`` Filters issues based on times of
-        creation, or when they were last updated. Format: ``YYYY-MM-DD``.
-        Examples: ``created:<2011``, ``pushed:<2013-02``,
-        ``pushed:>=2013-03-06``
-    - ``user`` or ``repo`` Limits searches to a specific user or repository.
-    - ``language`` Searches for issues within repositories that match a
-        certain language.
-    - ``comments`` Filters issues based on the quantity of comments.
+      assigned to that user, mention that user, or were commented on by that
+      user.
+    - ``state`` Filter issues based on whether they’re open or closed.
     - ``labels`` Filters issues based on their labels.
+    - ``language`` Searches for issues within repositories that match a
+      certain language.
+    - ``created`` or ``updated`` Filters issues based on times of creation, or
+      when they were last updated.
+    - ``comments`` Filters issues based on the quantity of comments.
+    - ``user`` or ``repo`` Limits searches to a specific user or repository.
 
     For more information about these qualifiers, see: http://git.io/d1oELA
 
@@ -461,7 +460,8 @@ def search_issues(query, sort=None, order=None, per_page=None,
     :param int number: (optional), number of issues to return.
         Default: -1, returns all available issues
     :param str etag: (optional), previous ETag header value
-    :return: generator of :class:`Issue <github3.issues.Issue>`
+    :return: generator of :class:`IssueSearchResult
+        <github3.search.IssueSearchResult>`
     """
     return gh.search_issues(query, sort, order, per_page, text_match,
                             number, etag)

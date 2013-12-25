@@ -228,7 +228,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('search_issues')
         with self.recorder.use_cassette(cassette_name):
             issues = self.gh.search_issues('github3 labels:bugs')
-            assert isinstance(next(issues), github3.issues.issue.Issue)
+            assert isinstance(next(issues), github3.search.IssueSearchResult)
 
         assert isinstance(issues, github3.structs.SearchIterator)
 
