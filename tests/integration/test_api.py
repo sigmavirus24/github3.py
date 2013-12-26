@@ -19,6 +19,15 @@ class TestAPI(IntegrationHelper):
             assert isinstance(next(repos),
                               github3.search.CodeSearchResult)
 
+    def test_search_issues(self):
+        """Test the ability to use the issues search endpoint"""
+        cassette_name = self.cassette_name('search_issues',
+                                           cls='GitHub')
+        with self.recorder.use_cassette(cassette_name):
+            repos = self.gh.search_issues('github3 labels:bugs')
+            assert isinstance(next(repos),
+                              github3.search.IssueSearchResult)
+
     def test_search_repositories(self):
         """Test the ability to use the repository search endpoint"""
         cassette_name = self.cassette_name('search_repositories',
