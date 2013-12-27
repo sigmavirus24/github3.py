@@ -17,7 +17,8 @@ from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
-from github3.search import CodeSearchResult, RepositorySearchResult
+from github3.search import (CodeSearchResult, RepositorySearchResult,
+                            UserSearchResult)
 from github3.structs import SearchIterator
 from github3.users import User, Key
 from github3.notifications import Thread
@@ -1101,6 +1102,65 @@ class GitHub(GitHubCore):
         url = self._build_url('search', 'repositories')
         return SearchIterator(number, url, RepositorySearchResult, self,
                               params, etag, headers)
+
+    def search_users(self, query, sort=None, order=None, per_page=None,
+                     text_match=False, number=-1, etag=None):
+        """Find users via the Search API.
+
+        The query can contain any combination of the following supported
+        qualifers:
+
+
+        - ``type`` With this qualifier you can restrict the search to just
+          personal accounts or just organization accounts.
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the username, public email, full
+          name, or any combination of these.
+        - ``repos`` Filters users based on the number of repositories they
+          have.
+        - ``location`` Filter users by the location indicated in their
+          profile.
+        - ``language`` Search for users that have repositories that match a
+          certain language.
+        - ``created`` Filter users based on when they joined.
+        - ``followers`` Filter users based on the number of followers they
+          have.
+
+        For more information about these qualifiers see: http://git.io/wjVYJw
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``tom repos:>42 followers:>1000``
+        :param str sort: (optional), how the results should be sorted;
+            options: ``followers``, ``repositories``, or ``joined``; default:
+            best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+            terms.
+        :param int number: (optional), number of search results to return;
+            Default: -1 returns all available
+        :param str etag: (optional), ETag header value of the last request.
+        :return: generator of :class:`UserSearchResult
+            <github3.search.UserSearchResult>`
+        """
+        params = {'q': query}
+        headers = {}
+
+        if sort in ('followers', 'repositories', 'joined'):
+            params['sort'] = sort
+
+        if order in ('asc', 'desc'):
+            params['order'] = order
+
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
+
+        url = self._build_url('search', 'repositories')
+        return SearchIterator(number, url, UserSearchResult, self, params,
+                              etag, headers)
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for
