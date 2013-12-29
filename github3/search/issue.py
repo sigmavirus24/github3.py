@@ -10,8 +10,8 @@ class IssueSearchResult(GitHubCore):
         self.score = result.pop('score')
         #: Text matches
         self.text_matches = result.pop('text_matches', [])
-        #: Repository object
-        self.repository = Issue(result, self)
+        #: Issue object
+        self.issue = Issue(result, self)
 
     def __repr__(self):
         return '<IssueSearchResult [{0}]>'.format(self.repository)
