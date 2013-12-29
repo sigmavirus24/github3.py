@@ -223,6 +223,15 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(code_result, github3.search.CodeSearchResult)
         assert len(code_result.text_matches) > 0
 
+    def test_search_issues(self):
+        """Test the ability to use the issues search endpoint"""
+        cassette_name = self.cassette_name('search_issues')
+        with self.recorder.use_cassette(cassette_name):
+            issues = self.gh.search_issues('github3 labels:bugs')
+            assert isinstance(next(issues), github3.search.IssueSearchResult)
+
+        assert isinstance(issues, github3.structs.SearchIterator)
+
     def test_search_repositories(self):
         """Test the ability to use the repository search endpoint"""
         cassette_name = self.cassette_name('search_repositories')
