@@ -1137,7 +1137,7 @@ class GitHub(GitHubCore):
             options: ``asc``, ``desc``; default: ``desc``
         :param int per_page: (optional)
         :param bool text_match: (optional), if True, return matching search
-            terms.
+            terms. See http://git.io/_V1zRwa for more information
         :param int number: (optional), number of search results to return;
             Default: -1 returns all available
         :param str etag: (optional), ETag header value of the last request.
