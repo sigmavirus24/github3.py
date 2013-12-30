@@ -104,11 +104,23 @@ class GitHubIterator(GitHubCore, Iterator):
 
 
 class SearchIterator(GitHubIterator):
+
+    """This is a special-cased class for returning iterable search results.
+
+    It inherits from :class:`GitHubIterator <github3.structs.GitHubIterator>`.
+    All members and methods documented here are unique to instances of this
+    class. For other members and methods, check its parent class.
+
+    """
+
     def __init__(self, count, url, cls, session, params=None, etag=None,
                  headers=None):
         super(SearchIterator, self).__init__(count, url, cls, session, params,
                                              etag, headers)
+        #: Total count returned by GitHub
         self.total_count = 0
+        #: Items array returned in the last request
+        self.items = []
 
     def __repr__(self):
         return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
