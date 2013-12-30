@@ -19,6 +19,14 @@ class TestAPI(IntegrationHelper):
             assert isinstance(next(repos),
                               github3.search.CodeSearchResult)
 
+    def test_search_users(self):
+        """Test the ability to use the user search endpoint"""
+        cassette_name = self.cassette_name('search_users', cls='GitHub')
+        with self.recorder.use_cassette(cassette_name):
+            users = self.gh.search_users('tom followers:>1000')
+            assert isinstance(next(users),
+                              github3.search.UserSearchResult)
+
     def test_search_issues(self):
         """Test the ability to use the issues search endpoint"""
         cassette_name = self.cassette_name('search_issues',
