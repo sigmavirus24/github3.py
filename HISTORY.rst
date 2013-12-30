@@ -4,6 +4,11 @@ History/Changelog
 0.8.0: 2013-xx-xx
 -----------------
 
+- **Breaking Change** Remove legacy search API
+
+  I realize this should have been scheduled for 1.0 but I was a bit eager to 
+  remove this.
+
 - Use Betamax to start recording integration tests
 
 - Add support for Releases API
@@ -11,6 +16,14 @@ History/Changelog
 - Add support for Feeds API
 
 - Add support for Two-Factor Authentication via the API
+
+- Add support for New Search API
+
+  - Add ``github3.search_code``, ``github3.search_issues``, 
+    ``github3.search_repositories``, ``github3.search_users``
+
+  - Add ``GitHub#search_code``, ``GitHub#search_issues``, 
+    ``GitHub#search_repositories``, ``GitHub#search_users``
 
 - Switch to requests >= 2.0
 

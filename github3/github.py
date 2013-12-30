@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.github
 ==============
@@ -9,15 +10,17 @@ This module contains the main GitHub session object.
 from json import dumps
 from requests import session
 from github3.auths import Authorization
+from github3.decorators import requires_auth, requires_basic_auth
 from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
-from github3.legacy import LegacyIssue, LegacyRepo, LegacyUser
 from github3.models import GitHubCore
 from github3.orgs import Organization
 from github3.repos import Repository
+from github3.search import (CodeSearchResult, IssueSearchResult,
+                            RepositorySearchResult, UserSearchResult)
+from github3.structs import SearchIterator
 from github3.users import User, Key
-from github3.decorators import requires_auth, requires_basic_auth
 from github3.notifications import Thread
 from uritemplate import URITemplate
 
@@ -985,77 +988,244 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
-    def search_issues(self, owner, repo, state, keyword, start_page=0):
-        """Find issues by state and keyword.
+    def search_code(self, query, sort=None, order=None, per_page=None,
+                    text_match=False, number=-1, etag=None):
+        """Find code via the code search API.
 
-        :param str owner: (required)
-        :param str repo: (required)
-        :param str state: (required), accepted values: ('open', 'closed')
-        :param str keyword: (required), what to search for
-        :param int start_page: (optional), page to get (results come 100/page)
-        :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`\ s
+        The query can contain any combination of the following supported
+        qualifiers:
+
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the file contents, the file path, or
+          both.
+        - ``language`` Searches code based on the language it’s written in.
+        - ``fork`` Specifies that code from forked repositories should be
+          searched.  Repository forks will not be searchable unless the fork
+          has more stars than the parent repository.
+        - ``size`` Finds files that match a certain size (in bytes).
+        - ``path`` Specifies the path that the resulting file must be at.
+        - ``extension`` Matches files with a certain extension.
+        - ``user`` or ``repo`` Limits searches to a specific user or
+          repository.
+
+        For more information about these qualifiers, see: http://git.io/-DvAuA
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``addClass in:file language:js repo:jquery/jquery``
+        :param str sort: (optional), how the results should be sorted;
+            option(s): ``indexed``; default: best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+            terms. See http://git.io/iRmJxg for more information
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all available repositories
+        :param str etag: (optional), previous ETag header value
+        :return: generator of :class:`CodeSearchResult
+            <github3.search.CodeSearchResult>`
         """
-        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
-        url = self._build_url('legacy', 'issues', 'search', owner, repo,
-                              state, keyword)
-        json = self._json(self._get(url, params=params), 200)
-        issues = json.get('issues', [])
-        return [LegacyIssue(l, self) for l in issues]
+        params = {'q': query}
+        headers = {}
 
-    def search_repos(self, keyword, language=None, start_page=None,
-                     sort=None, order=None):
-        """Search all repositories by keyword.
+        if sort == 'indexed':
+            params['sort'] = sort
 
-        :param str keyword: (required)
-        :param str language: (optional), language to filter by
-        :param int start_page: (optional), page to get (results come 100/page)
-        :param str sort: (optional), how to sort the results; accepted values:
-            ('stars', 'forks', 'updated')
-        :param str order: (optional), sort order if ``sort`` isn't provided,
-            accepted values: ('asc', 'desc')
-        :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`\ s
+        if sort and order in ('asc', 'desc'):
+            params['order'] = order
+
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
+
+        url = self._build_url('search', 'code')
+        return SearchIterator(number, url, CodeSearchResult, self, params,
+                              etag, headers)
+
+    def search_issues(self, query, sort=None, order=None, per_page=None,
+                      text_match=False, number=-1, etag=None):
+        """Find issues by state and keyword
+
+        The query can contain any combination of the following supported
+        qualifers:
+
+        - ``type`` With this qualifier you can restrict the search to issues
+          or pull request only.
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the title, body, comments, or any
+          combination of these.
+        - ``author`` Finds issues created by a certain user.
+        - ``assignee`` Finds issues that are assigned to a certain user.
+        - ``mentions`` Finds issues that mention a certain user.
+        - ``commenter`` Finds issues that a certain user commented on.
+        - ``involves`` Finds issues that were either created by a certain user,
+          assigned to that user, mention that user, or were commented on by
+          that user.
+        - ``state`` Filter issues based on whether they’re open or closed.
+        - ``labels`` Filters issues based on their labels.
+        - ``language`` Searches for issues within repositories that match a
+          certain language.
+        - ``created`` or ``updated`` Filters issues based on times of creation,
+          or when they were last updated.
+        - ``comments`` Filters issues based on the quantity of comments.
+        - ``user`` or ``repo`` Limits searches to a specific user or
+          repository.
+
+        For more information about these qualifiers, see: http://git.io/d1oELA
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``windows label:bug``
+        :param str sort: (optional), how the results should be sorted;
+            options: ``created``, ``comments``, ``updated``;
+            default: best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+          terms. See http://git.io/QLQuSQ for more information
+        :param int number: (optional), number of issues to return.
+            Default: -1, returns all available issues
+        :param str etag: (optional), previous ETag header value
+        :return: generator of :class:`IssueSearchResult
+            <github3.search.IssueSearchResult>`
         """
-        url = self._build_url('legacy', 'repos', 'search', keyword)
-        params = {'language': language, 'start_page': start_page}
+        params = {'q': query}
+        headers = {}
+
+        if sort in ('comments', 'created', 'updated'):
+            params['sort'] = sort
+
+        if order in ('asc', 'desc'):
+            params['order'] = order
+
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
+
+        url = self._build_url('search', 'issues')
+        return SearchIterator(number, url, IssueSearchResult, self, params,
+                              etag, headers)
+
+    def search_repositories(self, query, sort=None, order=None,
+                            per_page=None, text_match=False, number=-1,
+                            etag=None):
+        """Find repositories via various criteria.
+
+        The query can contain any combination of the following supported
+        qualifers:
+
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the repository name, description,
+          readme, or any combination of these.
+        - ``size`` Finds repositories that match a certain size (in
+          kilobytes).
+        - ``forks`` Filters repositories based on the number of forks, and/or
+          whether forked repositories should be included in the results at
+          all.
+        - ``created`` or ``pushed`` Filters repositories based on times of
+          creation, or when they were last updated. Format: ``YYYY-MM-DD``.
+          Examples: ``created:<2011``, ``pushed:<2013-02``,
+          ``pushed:>=2013-03-06``
+        - ``user`` or ``repo`` Limits searches to a specific user or
+          repository.
+        - ``language`` Searches repositories based on the language they're
+          written in.
+        - ``stars`` Searches repositories based on the number of stars.
+
+        For more information about these qualifiers, see: http://git.io/4Z8AkA
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``tetris language:assembly``
+        :param str sort: (optional), how the results should be sorted;
+            options: ``stars``, ``forks``, ``updated``; default: best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+            terms. See http://git.io/4ct1eQ for more information
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all available repositories
+        :param str etag: (optional), previous ETag header value
+        :return: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        params = {'q': query}
+        headers = {}
+
         if sort in ('stars', 'forks', 'updated'):
             params['sort'] = sort
-        if order in ('asc', 'desc') and not sort:
+
+        if order in ('asc', 'desc'):
             params['order'] = order
-        json = self._json(self._get(url, params=params), 200)
-        repos = json.get('repositories', [])
-        return [LegacyRepo(r, self) for r in repos]
 
-    def search_users(self, keyword, start_page=0, sort=None, order=None):
-        """Search all users by keyword.
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
 
-        :param str keyword: (required)
-        :param int start_page: (optional), page to get (results come 100/page)
-        :param str sort: (optional), how to sort the results; accepted values:
-            ('followers', 'joined', 'repositories')
-        :param str order: (optional), sort order if ``sort`` isn't provided,
-            accepted values: ('asc', 'desc')
-        :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`\ s
+        url = self._build_url('search', 'repositories')
+        return SearchIterator(number, url, RepositorySearchResult, self,
+                              params, etag, headers)
+
+    def search_users(self, query, sort=None, order=None, per_page=None,
+                     text_match=False, number=-1, etag=None):
+        """Find users via the Search API.
+
+        The query can contain any combination of the following supported
+        qualifers:
+
+
+        - ``type`` With this qualifier you can restrict the search to just
+          personal accounts or just organization accounts.
+        - ``in`` Qualifies which fields are searched. With this qualifier you
+          can restrict the search to just the username, public email, full
+          name, or any combination of these.
+        - ``repos`` Filters users based on the number of repositories they
+          have.
+        - ``location`` Filter users by the location indicated in their
+          profile.
+        - ``language`` Search for users that have repositories that match a
+          certain language.
+        - ``created`` Filter users based on when they joined.
+        - ``followers`` Filter users based on the number of followers they
+          have.
+
+        For more information about these qualifiers see: http://git.io/wjVYJw
+
+        :param str query: (required), a valid query as described above, e.g.,
+            ``tom repos:>42 followers:>1000``
+        :param str sort: (optional), how the results should be sorted;
+            options: ``followers``, ``repositories``, or ``joined``; default:
+            best match
+        :param str order: (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page: (optional)
+        :param bool text_match: (optional), if True, return matching search
+            terms. See http://git.io/_V1zRwa for more information
+        :param int number: (optional), number of search results to return;
+            Default: -1 returns all available
+        :param str etag: (optional), ETag header value of the last request.
+        :return: generator of :class:`UserSearchResult
+            <github3.search.UserSearchResult>`
         """
-        params = {'start_page': int(start_page)} if int(start_page) > 0 else {}
-        if sort in ('followers', 'joined', 'repositories'):
+        params = {'q': query}
+        headers = {}
+
+        if sort in ('followers', 'repositories', 'joined'):
             params['sort'] = sort
-        if order in ('asc', 'desc') and not sort:
+
+        if order in ('asc', 'desc'):
             params['order'] = order
-        url = self._build_url('legacy', 'user', 'search', str(keyword))
-        json = self._json(self._get(url, params=params), 200)
-        users = json.get('users', [])
-        return [LegacyUser(u, self) for u in users]
 
-    def search_email(self, email):
-        """Search users by email.
+        if text_match:
+            headers = {
+                'Accept': 'application/vnd.github.v3.full.text-match+json'
+                }
 
-        :param str email: (required)
-        :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
-        """
-        url = self._build_url('legacy', 'user', 'email', email)
-        json = self._json(self._get(url), 200)
-        u = json.get('user', {})
-        return LegacyUser(u, self) if u else None
+        url = self._build_url('search', 'repositories')
+        return SearchIterator(number, url, UserSearchResult, self, params,
+                              etag, headers)
 
     def set_client_id(self, id, secret):
         """Allows the developer to set their client_id and client_secret for

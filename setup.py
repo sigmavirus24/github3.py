@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
 import sys
@@ -14,6 +15,7 @@ packages = [
     "github3.gists",
     "github3.repos",
     "github3.issues",
+    "github3.search",
 ]
 
 kwargs['tests_require'] = ['mock == 1.0.1', 'betamax >=0.1.6', 'pytest']

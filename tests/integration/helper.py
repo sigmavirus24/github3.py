@@ -9,9 +9,12 @@ class IntegrationHelper(unittest.TestCase):
         self.user = os.environ.get('GH_USER', 'foo')
         self.password = os.environ.get('GH_PASSWORD', 'bar')
         self.token = os.environ.get('GH_AUTH', 'x' * 20)
-        self.gh = github3.GitHub()
+        self.gh = self.get_client()
         self.session = self.gh._session
         self.recorder = betamax.Betamax(self.session)
+
+    def get_client(self):
+        return github3.GitHub()
 
     def token_login(self):
         self.gh.login(token=self.token)
@@ -19,8 +22,8 @@ class IntegrationHelper(unittest.TestCase):
     def basic_login(self):
         self.gh.login(self.user, self.password)
 
-    def cassette_name(self, method):
-        class_name = self.described_class
+    def cassette_name(self, method, cls=None):
+        class_name = cls or self.described_class
         return '_'.join([class_name, method])
 
     @property

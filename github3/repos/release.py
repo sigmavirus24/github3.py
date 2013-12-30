@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 
 from github3.decorators import requires_auth

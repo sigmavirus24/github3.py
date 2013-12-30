@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime
 from github3.models import GitHubCore
 from github3.users import User
