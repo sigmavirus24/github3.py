@@ -72,11 +72,11 @@ Modules
     git
     github
     issues
-    legacy
     models
     orgs
     pulls
     repos
+    search_structs
     structs
     users
 
