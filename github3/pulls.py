@@ -362,8 +362,10 @@ class ReviewComment(BaseComment):
 
         #: Path to the file
         self.path = comment.get('path')
+
         #: Position within the commit
         self.position = comment.get('position') or 0
+
         #: SHA of the commit the comment is on
         self.commit_id = comment.get('commit_id')
 
