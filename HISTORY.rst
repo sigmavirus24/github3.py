@@ -35,6 +35,9 @@ History/Changelog
 - Add ``GitHub#rate_limit`` to return all of the information from the
   ``/rate_limit`` endpoint.
 
+- Catch missing attributes -- ``diff_hunk``, ``original_commit_id`` -- on 
+  ``ReviewComment``.
+
 0.7.1: 2013-09-30
 -----------------
 
