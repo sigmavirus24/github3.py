@@ -367,5 +367,11 @@ class ReviewComment(BaseComment):
         #: SHA of the commit the comment is on
         self.commit_id = comment.get('commit_id')
 
+        #: The diff hunk
+        self.diff_hunk = comment.get('diff_hunk')
+
+        #: Original commit SHA
+        self.original_commit_id = comment.get('original_commit_id')
+
     def __repr__(self):
         return '<Review Comment [{0}]>'.format(self.user.login)
