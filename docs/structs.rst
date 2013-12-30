@@ -23,3 +23,7 @@ Objects
 
 .. autoclass:: GitHubIterator
     :inherited-members:
+
+
+.. autoclass:: SearchIterator
+    :inherited-members:
