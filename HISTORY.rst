@@ -38,6 +38,8 @@ History/Changelog
 - Catch missing attributes -- ``diff_hunk``, ``original_commit_id`` -- on 
   ``ReviewComment``.
 
+- Add support for the Emojis endpoint
+
 0.7.1: 2013-09-30
 -----------------
 
