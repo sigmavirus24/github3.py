@@ -58,6 +58,16 @@ class TestGitHub(IntegrationHelper):
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
 
+    def test_emojis(self):
+        """Test the ability to retrieve from /emojis"""
+        cassette_name = self.cassette_name('emojis')
+        with self.recorder.use_cassette(cassette_name):
+            emojis = self.gh.emojis()
+
+        assert isinstance(emojis, dict)
+        # Asserts that it's a string and looks ilke the URLs we expect to see
+        assert emojis['+1'].startswith('https://github')
+
     def test_feeds(self):
         """Test the ability to retrieve a user's timelime URLs"""
         self.basic_login()
