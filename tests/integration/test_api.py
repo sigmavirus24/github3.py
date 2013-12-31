@@ -7,6 +7,14 @@ class TestAPI(IntegrationHelper):
     def get_client(self):
         return github3.gh
 
+    def test_emojis(self):
+        """Test the ability to use the /emojis endpoint"""
+        cassette_name = self.cassette_name('emojis', cls='GitHub')
+        with self.recorder.use_cassette(cassette_name):
+            emojis = self.gh.emojis()
+
+        assert emojis['+1'] is not None
+
     def test_search_code(self):
         """Test the ability to use the code search endpoint"""
         cassette_name = self.cassette_name('search_code',

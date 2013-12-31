@@ -55,6 +55,11 @@ def login(username=None, password=None, token=None, url=None):
     return g
 
 
+def emojis():
+    return gh.emojis()
+emojis.__doc__ = gh.emojis.__doc__
+
+
 def gist(id_num):
     """Retrieve the gist identified by ``id_num``.
 
