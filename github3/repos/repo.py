@@ -102,9 +102,11 @@ class Repository(GitHubCore):
         #: Name of the repository.
         self.name = repo.get('name', '')
 
-        # Number of open issues
-        #: Number of open issues on the repository.
+        #: Number of open issues on the repository. DEPRECATED
         self.open_issues = repo.get('open_issues', 0)
+
+        #: Number of open issues on the repository
+        self.open_issues_count = repo.get('open_issues_count')
 
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
