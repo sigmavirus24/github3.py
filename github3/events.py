@@ -172,6 +172,7 @@ _payload_handlers = {
     'PullRequestEvent': _pullreqev,
     'PullRequestReviewCommentEvent': _pullreqcomm,
     'PushEvent': identity,
+    'StatusEvent': identity,
     'TeamAddEvent': _team,
     'WatchEvent': identity,
 }
