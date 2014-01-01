@@ -65,8 +65,11 @@ class Repository(GitHubCore):
         self.description = repo.get('description', '')
 
         # The number of forks
-        #: The number of forks made of this repository.
+        #: The number of forks made of this repository. DEPRECATED
         self.forks = repo.get('forks', 0)
+
+        #: The number of forks of this repository.
+        self.fork_count = repo.get('fork_count')
 
         #: Is this repository a fork?
         self.fork = repo.get('fork')
