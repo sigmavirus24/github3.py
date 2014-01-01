@@ -166,7 +166,7 @@ class PullRequest(GitHubCore):
         self.mergeable = pull.get('mergeable', False)
         #: Whether it would be a clean merge or not
         self.mergeable_state = pull.get('mergeable_state', '')
-        #: SHA of the merge commit
+        #: SHA of the merge commit. DEPRECATED
         self.merge_commit_sha = pull.get('merge_commit_sha', '')
         user = pull.get('merged_by')
         #: :class:`User <github3.users.User>` who merged this pull
