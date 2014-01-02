@@ -135,6 +135,8 @@ class PullRequest(GitHubCore):
         self.id = pull.get('id')
         #: The URL of the associated issue
         self.issue_url = pull.get('issue_url')
+        #: Statuses URL
+        self.statuses_url = pull.get('statuses_url')
 
         # These are the links provided by the dictionary in the json called
         # '_links'. It's structure is horrific, so to make this look a lot
