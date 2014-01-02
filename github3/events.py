@@ -139,6 +139,14 @@ def _pullreqcomm(payload):
     return payload
 
 
+def _release(payload):
+    from github3.repos.release import Release
+    release = payload.get('release')
+    if release:
+        payload['release'] = Release(release)
+    return payload
+
+
 def _team(payload):
     from github3.orgs import Team
     from github3.repos import Repository
@@ -172,6 +180,7 @@ _payload_handlers = {
     'PullRequestEvent': _pullreqev,
     'PullRequestReviewCommentEvent': _pullreqcomm,
     'PushEvent': identity,
+    'ReleaseEvent': _release,
     'StatusEvent': identity,
     'TeamAddEvent': _team,
     'WatchEvent': identity,
