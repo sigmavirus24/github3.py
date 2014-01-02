@@ -40,6 +40,10 @@ History/Changelog
 
 - Add support for the Emojis endpoint
 
+- Note deprecation of a few object attributes
+
+- Add support for the ``ReleaseEvent``
+
 0.7.1: 2013-09-30
 -----------------
 
