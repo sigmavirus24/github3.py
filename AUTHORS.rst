@@ -3,6 +3,11 @@ Development Lead
 
 - Ian Cordasco <graffatcolmingov@gmail.com>
 
+Maintainer(s)
+`````````````
+
+- Barry Morrison (@esacteksab)
+
 Requests
 ````````
 
@@ -49,3 +54,7 @@ Contributors
 - Matias Bordese (@matiasb)
 
 - Aleksey Ostapenko (@kbakba)
+
+- Vincent Driessen (@nvie)
+
+- Philip Chimento (@ptomato)

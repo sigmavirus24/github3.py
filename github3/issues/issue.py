@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from re import match
 from json import dumps
 from github3.decorators import requires_auth
@@ -91,12 +92,6 @@ class Issue(GitHubCore):
         #: :class:`User <github3.users.User>` who closed the issue.
         self.closed_by = User(closed_by, self) if closed_by else None
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     def __repr__(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)
@@ -185,7 +180,7 @@ class Issue(GitHubCore):
             to
         :param str state: accepted values: ('open', 'closed')
         :param int milestone: the NUMBER (not title) of the milestone to
-            assign this to [1]_
+            assign this to [1]_, or 0 to remove the milestone
         :param list labels: list of labels to apply this to
         :returns: bool
 
@@ -197,6 +192,8 @@ class Issue(GitHubCore):
                 'state': state, 'milestone': milestone, 'labels': labels}
         self._remove_none(data)
         if data:
+            if 'milestone' in data and data['milestone'] == 0:
+                data['milestone'] = None
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)

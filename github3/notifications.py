@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.notifications
 =====================
@@ -59,12 +60,6 @@ class Thread(GitHubCore):
 
     def __repr__(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
     def delete_subscription(self):
         """Delete subscription for this thread.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.models
 ==============
@@ -7,14 +8,12 @@ This module provides the basic models used in github3.py
 """
 
 from json import dumps
-from requests import session
 from requests.compat import urlparse
 from github3.decorators import requires_auth
+from github3.session import GitHubSession
 from datetime import datetime
-from github3 import __version__
 from logging import getLogger
 
-__url_cache__ = {}
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
@@ -29,6 +28,7 @@ class GitHubObject(object):
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
         self._json_data = json
+        self._uniq = json.get('url', None)
 
     def to_json(self):
         """Return the json representing this object."""
@@ -45,31 +45,28 @@ class GitHubObject(object):
         """Return an instance of ``cls`` formed from ``json``."""
         return cls(json)
 
+    def __eq__(self, other):
+        return self._uniq == other._uniq
+
+    def __ne__(self, other):
+        return self._uniq != other._uniq
+
+    def __hash__(self):
+        return hash(self._uniq)
+
 
 class GitHubCore(GitHubObject):
     """The :class:`GitHubCore <GitHubCore>` object. This class provides some
     basic attributes to other classes that are very useful to have.
     """
-    def __init__(self, json, ses=None):
+    def __init__(self, json, session=None):
         super(GitHubCore, self).__init__(json)
-        if hasattr(ses, '_session'):
+        if hasattr(session, '_session'):
             # i.e. session is actually a GitHub object
-            ses = ses._session
-        elif ses is None:
-            ses = session()
-        self._session = ses
-        headers = {
-            # Only accept JSON responses
-            'Accept': 'application/vnd.github.v3.full+json',
-            # Only accept UTF-8 encoded data
-            'Accept-Charset': 'utf-8',
-            # Always sending JSON
-            'Content-Type': "application/json",
-            # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/{0}'.format(__version__),
-        }
-
-        self._session.headers.update(headers)
+            session = session._session
+        elif session is None:
+            session = GitHubSession()
+        self._session = session
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -86,10 +83,10 @@ class GitHubCore(GitHubObject):
 
     def _json(self, response, status_code):
         ret = None
-        __logs__.info('Attempting to get JSON information from a Response '
-                      'with status code %d expecting %d',
-                      response.status_code, status_code)
         if self._boolean(response, status_code, 404) and response.content:
+            __logs__.info('Attempting to get JSON information from a Response '
+                          'with status code %d expecting %d',
+                          response.status_code, status_code)
             ret = response.json()
             headers = response.headers
             if ((headers.get('Last-Modified') or headers.get('ETag')) and
@@ -127,7 +124,9 @@ class GitHubCore(GitHubObject):
             data = dumps(data) if data is not None else data
         elif 'headers' in kwargs:
             # Override the Content-Type header
-            kwargs['headers'].update({'Content-Type': None})
+            kwargs['headers'] = {
+                'Content-Type': None
+                }.update(kwargs['headers'])
         __logs__.debug('POST %s with %s, %s', url, data, kwargs)
         return self._session.post(url, data, **kwargs)
 
@@ -137,15 +136,7 @@ class GitHubCore(GitHubObject):
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
-        parts = [kwargs.get('base_url') or self._github_url]
-        parts.extend(args)
-        parts = [str(p) for p in parts]
-        key = tuple(parts)
-        __logs__.info('Building a url from %s', key)
-        if not key in __url_cache__:
-            __logs__.info('Missed the cache building the url')
-            __url_cache__[key] = '/'.join(parts)
-        return __url_cache__[key]
+        return self._session.build_url(*args, **kwargs)
 
     @property
     def _api(self):
@@ -172,10 +163,10 @@ class GitHubCore(GitHubObject):
         """Number of requests before GitHub imposes a ratelimit.
 
         :returns: int
-
         """
         json = self._json(self._get(self._github_url + '/rate_limit'), 200)
-        self._remaining = json.get('rate', {}).get('remaining', 0)
+        core = json.get('resources', {}).get('core', {})
+        self._remaining = core.get('remaining', 0)
         return self._remaining
 
     def refresh(self, conditional=False):
@@ -247,12 +238,6 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     def _update_(self, comment):
         self.__init__(comment, self._session)
 
@@ -300,11 +285,7 @@ class BaseCommit(GitHubCore):
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]
 
-    def __eq__(self, other):
-        return self.sha == other.sha
-
-    def __ne__(self, other):
-        return self.sha != other.sha
+        self._uniq = self.sha
 
 
 class BaseAccount(GitHubCore):
@@ -365,12 +346,6 @@ class BaseAccount(GitHubCore):
 
         #: Markdown formatted biography
         self.bio = acct.get('bio')
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
     def __repr__(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)

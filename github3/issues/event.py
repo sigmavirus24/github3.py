@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from github3.models import GitHubCore
 
 
@@ -44,11 +45,7 @@ class IssueEvent(GitHubCore):
         #: Dictionary of links for the pull request
         self.pull_request = event.get('pull_request', {})
 
-    def __eq__(self, other):
-        return self.commit_id == other.commit_id
-
-    def __ne__(self, other):
-        return self.commit_id != other.commit_id
+        self._uniq = self.commit_id
 
     def __repr__(self):
         return '<Issue Event [#{0} - {1}]>'.format(

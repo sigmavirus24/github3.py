@@ -23,8 +23,8 @@ class TestLabel(BaseCase):
     def test_equality(self):
         l = Label(load('label'))
         assert self.l == l
-        l._api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                  "labels/wontfix")
+        l._uniq = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                   "labels/wontfix")
         assert self.l != l
 
     def test_repr(self):
@@ -122,6 +122,8 @@ class TestMilestone(BaseCase):
         assert self.m.update(None) is False
         self.not_called()
 
+        assert self.m.update(state='closed')
+
         assert self.m.update('foo', 'closed', ':sparkles:',
                              '2013-12-31T23:59:59Z')
         self.mock_assertions()
@@ -141,7 +143,7 @@ class TestIssue(BaseCase):
     def test_equality(self):
         i = Issue(load('issue'))
         assert self.i == i
-        i.id = 1
+        i._uniq = 1
         assert self.i != i
 
     def test_repr(self):
@@ -220,7 +222,7 @@ class TestIssue(BaseCase):
     def test_edit(self):
         self.response('issue', 200)
         self.patch(self.api)
-        self.conf = {'data': {'title': 'new title'}}
+        self.conf = {'data': {'title': 'new title', 'milestone': None}}
 
         self.assertRaises(github3.GitHubError, self.i.edit)
 
@@ -228,7 +230,7 @@ class TestIssue(BaseCase):
         assert self.i.edit() is False
         self.not_called()
 
-        assert self.i.edit('new title')
+        assert self.i.edit('new title', milestone=0)
         self.mock_assertions()
 
     def test_is_closed(self):
@@ -321,7 +323,6 @@ class TestIssue(BaseCase):
         self.assertEqual(i.repository, ("sigmavirus24", "github3.py"))
 
 
-
 class TestIssueEvent(BaseCase):
     def setUp(self):
         super(TestIssueEvent, self).setUp()
@@ -330,5 +331,5 @@ class TestIssueEvent(BaseCase):
     def test_equality(self):
         e = IssueEvent(load('issue_event'))
         assert self.ev == e
-        e.commit_id = 'fake'
+        e._uniq = 'fake'
         assert self.ev != e

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.repos.contents
 ======================
@@ -79,6 +80,8 @@ class Contents(GitHubCore):
         #: Target will only be set of type is a symlink. This is what the link
         #: points to
         self.target = content.get('target', '')
+
+        self._uniq = self.sha
 
     def __repr__(self):
         return '<Content [{0}]>'.format(self.path)

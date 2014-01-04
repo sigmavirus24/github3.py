@@ -1,8 +1,54 @@
 History/Changelog
-=================
+-----------------
+
+0.8.0: 2014-01-03
+~~~~~~~~~~~~~~~~~
+
+- **Breaking Change** Remove legacy search API
+
+  I realize this should have been scheduled for 1.0 but I was a bit eager to 
+  remove this.
+
+- Use Betamax to start recording integration tests
+
+- Add support for Releases API
+
+- Add support for Feeds API
+
+- Add support for Two-Factor Authentication via the API
+
+- Add support for New Search API
+
+  - Add ``github3.search_code``, ``github3.search_issues``, 
+    ``github3.search_repositories``, ``github3.search_users``
+
+  - Add ``GitHub#search_code``, ``GitHub#search_issues``, 
+    ``GitHub#search_repositories``, ``GitHub#search_users``
+
+- Switch to requests >= 2.0
+
+- Totally remove all references to the Downloads API
+
+- Fix bug in ``Repository#update_file`` where ``branch`` was not being sent to
+  the API. Thanks @tpetr!
+
+- Add ``GitHub#rate_limit`` to return all of the information from the
+  ``/rate_limit`` endpoint.
+
+- Catch missing attributes -- ``diff_hunk``, ``original_commit_id`` -- on 
+  ``ReviewComment``.
+
+- Add support for the Emojis endpoint
+
+- Note deprecation of a few object attributes
+
+- Add support for the ``ReleaseEvent``
+
+- Add ``GitHub#iter_user_teams`` to return all of the teams the authenticated 
+  user belongs to
 
 0.7.1: 2013-09-30
------------------
+~~~~~~~~~~~~~~~~~
 
 - Add dependency on uritemplate.py_ to add URITemplates to different classes.  
   See the documentation for attributes which are templates.
@@ -17,7 +63,7 @@ History/Changelog
 .. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
 
 0.7.0: 2013-05-19
------------------
+~~~~~~~~~~~~~~~~~
 
 - Fix ``Issue.close``, ``Issue.reopen``, and ``Issue.assign``. (Issue #106)
 
@@ -46,12 +92,12 @@ History/Changelog
            u = gh.user('sigmavirus24')
 
 0.6.1: 2013-04-06
------------------
+~~~~~~~~~~~~~~~~~
 
 - Add equality for labels courtesy of Alejandro Gomez (@alejandrogomez)
 
 0.6.0: 2013-04-05
------------------
+~~~~~~~~~~~~~~~~~
 
 - Add ``sort`` and ``order`` parameters to ``github3.GitHub.search_users`` and 
   ``github3.GitHub.search_repos``.
@@ -91,22 +137,22 @@ History/Changelog
   about how equivalence is determined.
 
 0.5.3: 2013-03-19
------------------
+~~~~~~~~~~~~~~~~~
 
 - Add missing optional parameter to Repository.contents. Thanks @tpetr
 
 0.5.2: 2013-03-02
------------------
+~~~~~~~~~~~~~~~~~
 
 - Stop trying to decode the byte strings returned by ``b64decode``. Fixes #72
 
 0.5.1: 2013-02-21
------------------
+~~~~~~~~~~~~~~~~~
 
 - Hot fix an issue when a user doesn't have a real name set
 
 0.5: 2013-02-16
----------------
+~~~~~~~~~~~~~~~
 
 - 100% (mock) test coverage
 
@@ -203,7 +249,7 @@ History/Changelog
 .. _pengwynn/octokit: https://github.com/pengwynn/octokit
 
 0.4: 2013-01-16
----------------
+~~~~~~~~~~~~~~~
 
 - In github3.legacy.LegacyRepo
 
@@ -235,7 +281,7 @@ History/Changelog
 - 70% test coverage
 
 0.3: 2013-01-01
----------------
+~~~~~~~~~~~~~~~
 
 - In github3.repos.Repository
 
@@ -305,7 +351,7 @@ History/Changelog
 .. _types: http://developer.github.com/v3/repos/#list-organization-repositories
 
 0.2: 2012-11-21
----------------
+~~~~~~~~~~~~~~~
 
 - MAJOR API CHANGES:
 
@@ -323,12 +369,12 @@ History/Changelog
 - 50% test coverage via mock tests
 
 0.1: 2012-11-13
----------------
+~~~~~~~~~~~~~~~
 
 - Add API for GitHub Enterprise customers.
 
 0.1b2: 2012-11-10
------------------
+~~~~~~~~~~~~~~~~~
 
 - Handle 500 errors better, courtesy of Kristian Glass (@doismellburning)
 - Handle sending json with `%` symbols better, courtesy of Kristian Glass
@@ -337,14 +383,14 @@ History/Changelog
 - Correctly display method signatures in documentation courtesy of (@seveas)
 
 0.1b1: 2012-10-31
------------------
+~~~~~~~~~~~~~~~~~
 
 - unit tests implemented using mock instead of hitting the GitHub API (#37)
 - removed ``list_*`` functions from GitHub object
 - Notifications API coverage
 
 0.1b0: 2012-10-06
------------------
+~~~~~~~~~~~~~~~~~
 
 - Support for the complete GitHub API (accomplished)
 

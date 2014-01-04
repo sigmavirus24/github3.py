@@ -16,7 +16,7 @@ class TestEvent(BaseCase):
     def test_equality(self):
         e = github3.events.Event(load('event'))
         assert self.ev == e
-        e.id = 1
+        e._uniq = 1
         assert self.ev != e
 
     def test_org(self):
@@ -41,12 +41,8 @@ class TestPayloadHandlers(TestCase):
     def test_commitcomment(self):
         comment = {'comment': load('repo_comment')}
         comment = github3.events._commitcomment(comment)
-        assert isinstance(comment['comment'], github3.repos.comment.RepoComment)
-
-    def test_download(self):
-        dl = {'download': load('download')}
-        dl = github3.events._download(dl)
-        assert isinstance(dl['download'], github3.repos.download.Download)
+        assert isinstance(comment['comment'],
+                          github3.repos.comment.RepoComment)
 
     def test_follow(self):
         f = {'target': load('user')}

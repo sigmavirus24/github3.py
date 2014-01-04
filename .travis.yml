@@ -1,16 +1,24 @@
 language: python
 python:
-  - 2.6
-  - 2.7
-  - 3.2
-  - 3.3
-  - pypy
-# # command to run tests, e.g. python setup.py test
+- 2.6
+- 2.7
+- 3.2
+- 3.3
+- pypy
+# command to run tests, e.g. python setup.py test
+before_script:
+- pip install -r dev-requirements.txt
+- pip install -U requests"$REQUESTS_VERSION"
+
+# test script
 script:  make travis
 notifications:
    on_success: change
    on_failure: always
 
-branches:
-   except:
-      - uricore
+env:
+  global:
+  - TRAVIS_GH3="True"
+  matrix:
+  - REQUESTS_VERSION="==2.0.1"
+  - REQUESTS_VERSION=""  # Latest

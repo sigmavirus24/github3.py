@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.repos.hook
 ==================
@@ -49,12 +50,6 @@ class Hook(GitHubCore):
 
     def __repr__(self):
         return '<Hook [{0}]>'.format(self.name)
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
     def _update_(self, hook):
         self.__init__(hook, self._session)

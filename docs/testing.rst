@@ -1,271 +1,267 @@
 Writing Tests for github3.py
 ============================
 
-.. warning::
+Unit Tests
+----------
+
+    In computer programming, unit testing is a method by which individual 
+    units of source code, sets of one or more computer program modules 
+    together with associated control data, usage procedures, and operating 
+    procedures are tested to determine if they are fit for use. Intuitively, 
+    one can view a unit as the smallest testable part of an application.
+
+    -- `Unit Testing on Wikipedia 
+    <http://en.wikipedia.org/wiki/Unit_testing>`_
+
+In github3.py we use unit tests to make assertions about how the library 
+behaves without making a request to the internet. For example, one assertion 
+we might write would check if custom information is sent along in a request to 
+GitHub.
+
+An existing test like this can be found in 
+``tests/unit/test_repos_release.py``:
+
+.. code:: python
+
+    def test_delete(self):
+        self.instance.delete()
+        self.session.delete.assert_called_once_with(
+            self.example_data['url'],
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
+        )
+
+In this test, we check that the library passes on important headers to the API 
+to ensure the request will work properly. ``self.instance`` is created for us 
+and is an instance of the ``Release`` class. The test then calls ``delete`` to 
+make a request to the API. ``self.session`` is a mock object which fakes out a 
+normal session. It does not allow the request through but allows us to verify 
+how github3.py makes a request. We can see that github3.py called ``delete`` 
+on the session. We assert that it was only called once and that the only 
+parameters sent were a URL and the custom headers that we are concerned with.
+
+Mocks
+~~~~~
+
+Above we talked about mock objects. What are they?
+
+    In object-oriented programming, mock objects are simulated objects that 
+    mimic the behavior of real objects in controlled ways. A programmer 
+    typically creates a mock object to test the behavior of some other object, 
+    in much the same way that a car designer uses a crash test dummy to 
+    simulate the dynamic behavior of a human in vehicle impacts.
+
+    -- `Mock Object on Wikipedia <http://en.wikipedia.org/wiki/Mock_object>`_
+
+We use mocks in github3.py to prevent the library from talking directly with 
+GitHub. The mocks we use intercept requests the library makes so we can verify 
+the parameters we use. In the example above, we were able to check that 
+certain parameters were the only ones sent to a session method because we 
+mocked out the session.
+
+You may have noticed in the example above that we did not have to set up the 
+mock object. There is a convenient helper written in ``tests/unit/helper.py`` 
+to do this for you.
+
+Example - Testing the Release Object
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here's a full example of how we test the ``Release`` object in 
+``tests/unit/test_repos_release.py``.
+
+Our first step is to import the ``UnitHelper`` class from 
+``tests/unit/helper.py`` and the ``Release`` object from 
+``github3/repos/release.py``.
+
+.. code:: python
+
+    from .helper import UnitHelper
+    from github3.repos.release import Release
+
+Then we construct our test class and indicate which class we will be testing 
+(or describing).
+
+.. code:: python
+
+    class TestRelease(UnitHelper):
+        described_class = Release
+
+We can then use the `GitHub API documentation about Releases 
+<http://developer.github.com/v3/repos/releases/>`_ to retrieve example release 
+data. We then can use that as example data for our like so:
+
+.. code:: python
+
+    class TestRelease(UnitHelper):
+        described_class = Release
+        example_data = {
+            "url": releases_url("/1"),
+            "html_url": "https://github.com/octocat/Hello-World/releases/v1.0.0",
+            "assets_url": releases_url("/1/assets"),
+            "upload_url": releases_url("/1/assets{?name}"),
+            "id": 1,
+            "tag_name": "v1.0.0",
+            "target_commitish": "master",
+            "name": "v1.0.0",
+            "body": "Description of the release",
+            "draft": False,
+            "prerelease": False,
+            "created_at": "2013-02-27T19:35:32Z",
+            "published_at": "2013-02-27T19:35:32Z"
+            }
+
+The above code now will handle making clean and brand new instances of the 
+``Release`` object with the example data and a faked out session. We can now 
+construct our first test.
+
+.. code:: python
+
+    def test_delete(self):
+        self.instance.delete()
+        self.session.delete.assert_called_once_with(
+            self.example_data['url'],
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
+        )
+
+
+Integration Tests
+-----------------
+
+    Integration testing is the phase in software testing in which individual 
+    software modules are combined and tested as a group.
+
+    The purpose of integration testing is to verify functional, performance, 
+    and reliability requirements placed on major design items.
+
+    -- `Integration tests on Wikipedia 
+    <http://en.wikipedia.org/wiki/Integration_tests>`_
+
+In github3.py we use integration tests to ensure that when we make what should 
+be a valid request to GitHub, it is in fact valid. For example, if we were 
+testing how github3.py requests a user's information, we would expect a 
+request for a real user's data to be valid. If the test fails we know either 
+what the library is doing is wrong or the data requested does not exist.
+
+An existing test that demonstrates integration testing can be found in 
+``tests/integration/test_repos_release.py``:
+
+.. code:: python
 
-    This page is now wildly out of date. An up-to-date version will be created 
-    soon.
+    def test_iter_assets(self):
+        """Test the ability to iterate over the assets of a release."""
+        cassette_name = self.cassette_name('iter_assets')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            release = repository.release(76677)
+            for asset in release.iter_assets():
+                assert isinstance(asset, github3.repos.release.Asset)
+            assert asset is not None
 
-Writing tests for github3.py is a non-trivial task and takes some 
-understanding of the expecter_ module and mock_ modules.
+In this test we use ``self.recorder`` to record our interaction with GitHub. 
+We then proceed to make the request to GitHub that will exercise the code we 
+wish to test. First we request a ``Repository`` object from GitHub and then 
+using that we request a ``Release`` object. After receiving that release, we 
+exercise the code that lists the assets of a ``Release``. We verify that each 
+asset is an instance of the ``Asset`` class and that at the end the ``asset`` 
+variable is not ``None``. If ``asset`` was ``None``, that would indicate that 
+GitHub did not return any data and it did not exercise the code we are trying 
+to test.
 
-expecter
---------
+Betamax
+~~~~~~~
 
-I chose to use the expecter_ module in the tests for github3.py because I feel 
-that writing tests with it read far more naturally. Take for instance the 
-following:
+Betamax_ is the library that we use to create the recorder above. It sets up 
+the session object to intercept every request and corresponding response and 
+save them to what it calls cassettes_. After you record the interaction it 
+never has to speak to the internet again for that request.
 
-.. code-block:: python
+In github3.py there is a helper class (much like ``UnitHelper``) in 
+``tests/integration/helper.py`` which sets everything up for us.
 
-    x = 1
+Example - Testing the Release Object
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def foo(x):
-        return [x + 1]
+Here's an example of how we write an integration test for github3.py. The 
+example can be found in ``tests/integration/test_repos_release.py``.
 
-    self.assertEquals(foo(x), [x + 1])
+Our first steps are the necessary imports.
 
-You have the variable ``x``, the function ``foo`` and the inherited 
-``assertEquals`` method from ``unittest.TestCase``. My first issue with this 
-is that the unittest module, although technically grandfathered in, uses 
-camel-casing for its methods. To me, this is ugly and annoying to type. I've 
-found myself typing ``self.assertequals`` more often than not. Now consider 
-this:
+.. code:: python
 
-.. code-block:: python
+    import github3
 
-    x = 1
+    from .helper import IntegrationHelper
 
-    def foo(x):
-        return [x + 1]
 
-    expect(foo(x)) == [x + 1]
+Then we start writing our test right away.
 
-This tests the exact same thing but this reads differently. Instead of "assert 
-that ``foo(x)`` and ``[x + 1]`` are equal", you're saying "expect ``foo(x)`` 
-and ``[x + 1]`` to be equal". It's the same thing, but the latter reads better 
-than the former to me.
+.. code:: python
 
-The standard ``expecter`` module has fewer methods than what we use in 
-github3.py but that's because I've subclassed the ``expect`` class and renamed 
-it to look the same in github3.py. So the extra functionality are the 
-following methods:
+    class TestRelease(IntegrationHelper):
+        def test_delete(self):
+            """Test the ability to delete a release."""
+            self.token_login()
+            cassette_name = self.cassette_name('delete')
+            with self.recorder.use_cassette(cassette_name):
+                repository = self.gh.repository('github3py', 'github3.py')
+                release = repository.create_release(
+                    '0.8.0.pre', 'develop', '0.8.0 fake release',
+                    'To be deleted'
+                    )
+                assert release is not None
+                assert release.delete() is True
 
-- ``is_not_None`` which expects the object passed in to be anything but 
-  ``None``. Example usage::
+Every test has access to ``self.gh`` which is an instance of ``GitHub``.  
+``IntegrationHelper`` provides a lot of methods that allow you to focus on 
+what we are testing instead of setting up for the test. The first of those 
+methods we see in use is ``self.token_login`` which handles authenticating 
+with a token. It's sister method is ``self.basic_login`` which handles 
+authentication with basic credentials. Both of these methods will set up the 
+authentication for you on ``self.gh``. 
 
-      expect(a).is_not_None()
+The next convenience method we see is ``self.cassette_name``. It constructs a 
+cassette name for you based on the test class name and the string you provide 
+it.
 
-- ``is_None`` which expects the opposite of ``is_not_None``. Example usage::
+Every test also has access to ``self.recorder``. This is the Betamax recorder 
+that has been set up for you to record your interactions. The recorder is 
+started when you write
 
-      expect(None).is_None()
+.. code:: python
 
-- ``is_True`` which expects the object passed in to be True. Example usage::
+    with self.recorder.use_cassette(cassette_name):
+        # ...
 
-      expect(True).is_True()
+Everything that talks to GitHub should be written inside of the context 
+created by the context manager there. No requests to GitHub should be made 
+outside of that context.
 
-- ``is_False`` which expects the object passed in to be False. Example usage::
+In that context, we then retrieve a repository and create a release for it. We 
+want to be sure that we will be deleting something that exists so we assert 
+that what we received back from GitHub is not ``None``. Finally we call 
+``delete`` and assert that it returns ``True``.
 
-      expect(False).is_False()
+When you write your new test and record a new cassette, be sure to add the new 
+cassette file to the repository, like so:
 
-- ``is_in(iterable)`` which expects the object passed in be in ``iterable``.  
-  Example usage::
+.. code::
 
-      expect('foo').is_in(['foo', 'bar', 'bogus'])
+    git add tests/cassettes/Release_delete.json
 
-- ``githuberror`` which is used as a context manager to show that we're 
-  expecting something to raise a ``GitHubError``. Example usage::
+Recording Cassettes that Require Authentication/Authorization
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-      with expect.githuberror():
-          github3.authorize()
+If you need to write a test that requires an Authorization (i.e., oAuth token)
+or Authentication (i.e., username and password), all you need to do is set
+environment variables when running `py.test`, e.g.,
 
-Why implement these custom methods?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code::
 
-When using ``expecter.expect``, you receive an instance of a class instead of 
-the actual object, so where you would like the following to work, it does not:
+    GH_AUTH="abc123" py.test
+    GH_USER="sigmavirus24" GH_PASS="super-secure-password-plz-kthxbai" py.test
 
-.. code-block:: python
+If you are concerned that your credentials will be saved, you need not worry.
+Betamax sanitizes information like that before saving the cassette. It never
+does hurt to double check though.
 
-    expect(a) is not None
-
-The reality, however, is that test is tautologically true. Every instance of 
-``expecter.expect`` is not ``None``. In other cases, tools like ``pep8`` and 
-``flake8`` will complain if you do:
-
-.. code-block:: python
-
-    expect(a) == True
-
-And they rightfully complain. So these methods just make life easier. If they 
-cause significant enough confusion, then I'll consider rewriting the test 
-suite in something better.
-
-mock
-----
-
-The mock library written by Michael Foord is a fantastic tool and is entirely 
-necessary to testing github3.py. Last year, GitHub changed their ratelimit 
-(for anonymous requests) from 5000 per hour to 60 per hour. This meant that 
-all of a sudden, github3.py's tests failed and failed miserably when trying to 
-test directly against the API. The best solution was to collect all of the 
-possible JSON responses and store then locally. You can find them in 
-``tests/json/``. We then had to construct our own fake ``requests.Response`` 
-objects and mock the ``request`` method on ``requests.Session`` objects. To 
-help do this, I wrote some methods that are present on the ``BaseCase`` class:
-
-- ``response`` takes the name of the file in ``tests/json``, the 
-  ``status_code``, the "default" encoding for the data, optional headers and a 
-  paramtere ``_iter`` which determines if the results should be iterable or 
-  not. This then constructs a ``requests.Response`` object and sets it as the 
-  return value of the mocked ``requests.Session#request`` method.
-
-- ``get``, ``put``, ``patch``, ``post``, ``delete`` all modify a tuple that 
-  looks like: ``(METHOD, url)`` where ``METHOD`` is either ``GET``, ``PUT``, 
-  &c. and the ``url`` is passed to the method.
-
-- ``mock_assertions`` has a set of assertions it makes about **every** request 
-  we deal with and which are true of every request to the API. After making 
-  these assertions, it resets the mock in case it needs to be used again 
-  during the same test.
-
-- ``not_called`` asserts that at no point was the mock used up until this 
-  point.
-
-The ``setUp`` and ``tearDown`` methods take care of instantiating the mock 
-object that we use in this case. The code for those methods are taken directly 
-from mocks documentation.
-
-Walking through a couple real tests
------------------------------------
-
-Simple
-~~~~~~
-
-From ``tests/test_gists.py``:
-
-.. code-block:: python
-
-    def test_unstar(self):
-        self.response('', 204)
-        self.delete(self.api)
-        self.conf = {}
-
-        with expect.githuberror():
-            self.gist.unstar()
-
-        self.not_called()
-        self.login()
-        expect(self.gist.unstar()).is_True()
-        self.mock_assertions()
-
-First notice that this, like every other test, is prefaced with ``test_`` and 
-then followed by the name of the method it is testing, in this case, 
-``unstar``.
-
-The first thing we then do is call ``self.response('', 204)`` which means 
-we're going to be mocking a response with No Content and a status code of 204.  
-Then we cal ``self.delete(self.api)``. ``self.api`` is an attribute I've set 
-on this class which has the URL that will be used to communicate with the 
-GitHub API 90% of the time. (Other times it may be modified.) ``self.delete`` 
-simply sets ``self.args = ('DELETE', self.api)``. Then we use one of our 
-custom expect methods. Right now, the ``Gist`` object stored in ``self.gist`` 
-thinks the user is anonymous so calling ``unstar`` on it should raise a 
-``GitHubError``. If it didn't, expect would raise an ``AssertionError`` 
-exception and the test would fail. If that does not happen, then we just check 
-(because we're paranoid) that the mock was not called with 
-``self.not_called``. Next we login, and assert that calling ``unstar`` results 
-in ``True``. Finally, we make sure those core assertions about the mock held.
-
-Moderate
-~~~~~~~~
-
-From ``tests/test_gists.py``:
-
-.. code-block:: python
-
-    def test_create_comment(self):
-        self.response('gist_comment', 201)
-        self.post(self.api + '/comments')
-        self.conf = {'data': {'body': 'bar'}}
-
-        with expect.githuberror():
-            self.gist.create_comment(None)
-
-        self.login()
-
-        expect(self.gist.create_comment(None)).is_None()
-        expect(self.gist.create_comment('')).is_None()
-        self.not_called()
-        expect(self.gist.create_comment('bar')).isinstance(
-            gists.comment.GistComment)
-        self.mock_assertions()
-
-Now we're setting an attribute called ``conf`` with ``{'data': {'body': 
-'bar'}}``. We use this to assert that the data we're sending to GitHub is 
-actually sent.
-
-You'll now see that there are two calls to ``create_comment`` where we expect 
-to receive ``None`` because github3.py refused to act on bad data. We then 
-make sure that nothing was called and create a comment with the text ``'bar'`` 
-and expect it to return an instance of ``GistComment``. Notice how the 
-**body** of the new comment is **bar**.
-
-Difficult
-~~~~~~~~~
-
-From ``tests/test_repos.py``:
-
-.. code-block:: python
-
-    def test_archive(self):
-        headers = {'content-disposition': 'filename=foo'}
-        self.response('archive', 200, **headers)  #**
-        self.get(self.api + 'tarball/master')
-        self.conf.update({'stream': True})
-
-        expect(self.repo.archive(None)).is_False()
-
-        expect(os.path.isfile('foo')).is_False()
-        expect(self.repo.archive('tarball')).is_True()
-        expect(os.path.isfile('foo')).is_True()
-        os.unlink('foo')
-        self.mock_assertions()
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        expect(os.path.isfile('path_to_file')).is_False()
-        expect(self.repo.archive('tarball', 'path_to_file')).is_True()
-        expect(os.path.isfile('path_to_file')).is_True()
-        os.unlink('path_to_file')
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        self.get(self.api + 'zipball/randomref')
-        expect(self.repo.archive('zipball', ref='randomref')).is_True()
-        os.unlink('foo')
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
-            with open('archive', 'wb+') as fd:
-                self.repo.archive('tarball', fd)
-
-        o.assert_called_once_with('archive', 'wb+')
-        fd = o()
-        fd.write.assert_called_once_with(b'archive_data')
-
-We start this test by setting up headers that are set by GitHub when returning 
-data like an archive. We then pass those headers to the Response constructor 
-and set the url. We're also expecting that github3.py is going to pass 
-``stream=True`` to the request. We then finally make a request and test the 
-assertions about the mock. That resets the mock and then we can go on to test 
-the other features of the ``archive`` method. At the end, we mock the built-in 
-``open`` method, but that's covered in the mock documentation.
-
-.. _expecter: http://expecter-gadget.rtfd.org
-.. _mock: http://mock.rtfd.org
+.. _Betamax: https://github.com/sigmavirus24/betamax
+.. _cassettes: https://betamax.readthedocs.org/en/latest/cassettes.html

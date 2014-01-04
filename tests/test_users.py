@@ -1,8 +1,3 @@
-import sys
-if sys.version_info < (3, 0):
-    import unittest2 as unittest
-else:
-    import unittest
 import github3
 from mock import patch
 from tests.utils import (BaseCase, load)
@@ -22,7 +17,7 @@ class TestKey(BaseCase):
     def test_equality(self):
         k = github3.users.Key(self.key.to_json())
         assert self.key == k
-        k.id += 1
+        k._uniq += "cruft"
         assert self.key != k
 
     def test_str(self):
@@ -125,7 +120,8 @@ class TestUser(BaseCase):
         assert repr(self.user) == '<User [sigmavirus24:Ian Cordasco]>'
 
     def test_add_email_address(self):
-        self.assertRaises(github3.GitHubError, self.user.add_email_address, 'foo')
+        self.assertRaises(github3.GitHubError, self.user.add_email_address,
+                          'foo')
 
         self.not_called()
         self.login()
@@ -140,7 +136,8 @@ class TestUser(BaseCase):
             'data': '["foo@bar.com"]',
         }
 
-        self.assertRaises(github3.GitHubError, self.user.add_email_addresses, [])
+        self.assertRaises(github3.GitHubError, self.user.add_email_addresses,
+                          [])
 
         self.not_called()
         self.login()
@@ -149,7 +146,8 @@ class TestUser(BaseCase):
         self.mock_assertions()
 
     def test_delete_email_address(self):
-        self.assertRaises(github3.GitHubError, self.user.delete_email_address, 'foo')
+        self.assertRaises(github3.GitHubError, self.user.delete_email_address,
+                          'foo')
 
         self.not_called()
         self.login()
@@ -164,7 +162,9 @@ class TestUser(BaseCase):
             'data': '["foo@bar.com"]'
         }
 
-        self.assertRaises(github3.GitHubError, self.user.delete_email_addresses, [])
+        self.assertRaises(github3.GitHubError,
+                          self.user.delete_email_addresses,
+                          [])
 
         self.not_called()
         self.login()
@@ -282,5 +282,5 @@ class TestUser(BaseCase):
     def test_equality(self):
         u = github3.users.User(load('user'))
         assert self.user == u
-        u.id += 1
+        u._uniq += 1
         assert self.user != u

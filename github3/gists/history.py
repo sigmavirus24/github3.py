@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.gists.history
 ---------------------
@@ -54,12 +55,6 @@ class GistHistory(GitHubCore):
 
     def __repr__(self):
         return '<Gist History [{0}]>'.format(self.version)
-
-    def __eq__(self, other):
-        return self.version == other.version
-
-    def __ne__(self, other):
-        return self.version != other.version
 
     def get_gist(self):
         """Retrieve the gist at this version.
