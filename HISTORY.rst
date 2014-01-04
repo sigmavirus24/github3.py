@@ -1,7 +1,7 @@
 History/Changelog
 =================
 
-0.8.0: 2013-xx-xx
+0.8.0: 2014-01-03
 -----------------
 
 - **Breaking Change** Remove legacy search API
