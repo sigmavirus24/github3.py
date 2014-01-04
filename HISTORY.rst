@@ -44,6 +44,9 @@ History/Changelog
 
 - Add support for the ``ReleaseEvent``
 
+- Add ``GitHub#iter_user_teams`` to return all of the teams the authenticated 
+  user belongs to
+
 0.7.1: 2013-09-30
 -----------------
 

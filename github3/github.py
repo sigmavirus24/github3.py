@@ -15,7 +15,7 @@ from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
-from github3.orgs import Organization
+from github3.orgs import Organization, Team
 from github3.repos import Repository
 from github3.search import (CodeSearchResult, IssueSearchResult,
                             RepositorySearchResult, UserSearchResult)
@@ -826,6 +826,19 @@ class GitHub(GitHubCore):
             params.update(direction=direction)
 
         return self._iter(int(number), url, Repository, params, etag)
+
+    @requires_auth
+    def iter_user_teams(self, number=-1, etag=None):
+        """Gets the authenticated user's teams across all of organizations.
+
+        List all of the teams across all of the organizations to which the
+        authenticated user belongs. This method requires user or repo scope
+        when authenticating via OAuth.
+
+        :returns: generator of :class:`Team <github3.orgs.Team>` objects
+        """
+        url = self._build_url('user', 'teams')
+        return self._iter(int(number), url, Team, etag=etag)
 
     @requires_auth
     def key(self, id_num):
