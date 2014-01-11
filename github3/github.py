@@ -857,9 +857,11 @@ class GitHub(GitHubCore):
               two_factor_callback=None):
         """Logs the user into GitHub for protected API calls.
 
-        :param str username: (optional)
-        :param str password: (optional)
-        :param str token: (optional)
+        :param str username: login name
+        :param str password: password for the login
+        :param str token: OAuth token
+        :param func two_factor_callback: (optional), function you implement to
+            provide the Two Factor Authentication code to GitHub when necessary
         """
         if username and password:
             self._session.basic_auth(username, password)
