@@ -44,6 +44,7 @@ More Examples
 .. toctree::
     :maxdepth: 2
 
+    examples/two_factor_auth
     examples/oauth
     examples/gist
     examples/git
