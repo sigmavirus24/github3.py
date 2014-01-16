@@ -3,7 +3,7 @@
 github3.api
 ===========
 
-:copyright: (c) 2012 by SigmaVirus24
+:copyright: (c) 2012-2014 by Ian Cordasco
 :license: Modified BSD, see LICENSE for more details
 
 """
