@@ -34,16 +34,19 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
                         client_secret)
 
 
-def login(username=None, password=None, token=None, url=None,
-          two_factor_callback=None):
+def login(username=None, password=None, token=None, two_factor_callback=None):
     """Construct and return an authenticated GitHub session.
 
-    This will return a GitHubEnterprise session if a url is provided.
+    .. note::
+
+        To allow you to specify either a username and password combination or
+        a token, none of the parameters are required. If you provide none of
+        them, you will receive a
+        :class:`NullObject <github3.structs.NullObject>`
 
     :param str username: login name
     :param str password: password for the login
     :param str token: OAuth token
-    :param str url: (optional), URL of a GitHub Enterprise instance
     :param func two_factor_callback: (optional), function you implement to
         provide the Two Factor Authentication code to GitHub when necessary
     :returns: :class:`GitHub <github3.github.GitHub>`
@@ -52,7 +55,40 @@ def login(username=None, password=None, token=None, url=None,
     g = None
 
     if (username and password) or token:
-        g = GitHubEnterprise(url) if url is not None else GitHub()
+        g = GitHub()
+        g.login(username, password, token, two_factor_callback)
+
+    return g
+
+
+def enterprise_login(username=None, password=None, token=None, url=None,
+                     two_factor_callback=None):
+    """Construct and return an authenticated GitHubEnterprise session.
+
+    .. note::
+
+        To allow you to specify either a username and password combination or
+        a token, none of the parameters are required. If you provide none of
+        them, you will receive a
+        :class:`NullObject <github3.structs.NullObject>`
+
+    :param str username: login name
+    :param str password: password for the login
+    :param str token: OAuth token
+    :param str url: URL of a GitHub Enterprise instance
+    :param func two_factor_callback: (optional), function you implement to
+        provide the Two Factor Authentication code to GitHub when necessary
+    :returns: :class:`GitHubEnterprise <github3.github.GitHubEnterprise>`
+
+    """
+    if not url:
+        raise ValueError('GitHub Enterprise requires you provide the URL of'
+                         ' the instance')
+
+    g = None
+
+    if (username and password) or token:
+        g = GitHubEnterprise(url)
         g.login(username, password, token, two_factor_callback)
 
     return g
