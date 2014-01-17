@@ -64,7 +64,22 @@ In depth documentation
 ----------------------
 
 Organized using GitHub's documentation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
+
+Users (`http://developer.github.com/v3/users/ <http://developer.github.com/v3/users/>`_)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. I'm not sure I like this or if i should use :mod:`users`
+
+If you want to manage a user, use the `Users`_ module:
+
+.. _Users: modules/users.html
+
+but if you want a list of all users in order they signed up to GitHub, use:
+
+.. similarly to above, perhaps :func:`iter_all_users` would be better suited inline?
+
+.. autofunction:: github3.iter_all_users
 
 .. one-to-one correspondence with developer.github.com/v3
 
@@ -81,20 +96,20 @@ Modules
 .. toctree::
     :maxdepth: 1
 
-    api
-    auths
-    events
-    gists
-    git
-    github
-    issues
-    models
-    orgs
-    pulls
-    repos
-    search_structs
-    structs
-    users
+    modules/api
+    modules/auths
+    modules/events
+    modules/gists
+    modules/git
+    modules/github
+    modules/issues
+    modules/models
+    modules/orgs
+    modules/pulls
+    modules/repos
+    modules/search_structs
+    modules/structs
+    modules/users
 
 Internals
 ~~~~~~~~~
@@ -105,7 +120,7 @@ feel the need to contribute to the project.
 .. toctree::
     :maxdepth: 1
 
-    models
+    modules/models
     decorators
 
 
