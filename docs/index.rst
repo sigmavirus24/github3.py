@@ -41,6 +41,11 @@ Let's get information about a user::
 More Examples
 ~~~~~~~~~~~~~
 
+.. note::
+
+    We would love for you to submit more examples to the documentation. Just 
+    send a `pull request <https://github.com/sigmavirus24/github3.py>`_!
+
 .. toctree::
     :maxdepth: 2
 
@@ -55,13 +60,23 @@ More Examples
     examples/octocat
 
 
+In depth documentation
+----------------------
+
+Organized using GitHub's documentation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. one-to-one correspondence with developer.github.com/v3
+
 .. links
 
 .. _GitHub API: http://developer.github.com
 
 
 Modules
--------
+~~~~~~~
+
+.. TODO: Move these to modules/*.rst
 
 .. toctree::
     :maxdepth: 1
