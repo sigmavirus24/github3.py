@@ -373,20 +373,6 @@ class GitHub(GitHubCore):
             json = self._boolean(self._get(url), 204, 404)
         return json
 
-    @requires_auth
-    def is_subscribed(self, login, repo):
-        """Check if the authenticated user is subscribed to login/repo.
-
-        :param str login: (required), owner of repository
-        :param str repo: (required), name of repository
-        :returns: bool
-        """
-        json = False
-        if login and repo:
-            url = self._build_url('user', 'subscriptions', login, repo)
-            json = self._boolean(self._get(url), 204, 404)
-        return json
-
     def issue(self, owner, repository, number):
         """Fetch issue #:number: from https://github.com/:owner:/:repository:
 
@@ -1292,20 +1278,6 @@ class GitHub(GitHubCore):
         return resp
 
     @requires_auth
-    def subscribe(self, login, repo):
-        """Subscribe to login/repo
-
-        :param str login: (required), owner of the repo
-        :param str repo: (required), name of the repo
-        :return: bool
-        """
-        resp = False
-        if login and repo:
-            url = self._build_url('user', 'subscriptions', login, repo)
-            resp = self._boolean(self._put(url), 204, 404)
-        return resp
-
-    @requires_auth
     def unfollow(self, login):
         """Make the authenticated user stop following login
 
@@ -1329,20 +1301,6 @@ class GitHub(GitHubCore):
         resp = False
         if login and repo:
             url = self._build_url('user', 'starred', login, repo)
-            resp = self._boolean(self._delete(url), 204, 404)
-        return resp
-
-    @requires_auth
-    def unsubscribe(self, login, repo):
-        """Unsubscribe to login/repo
-
-        :param str login: (required), owner of the repo
-        :param str repo: (required), name of the repo
-        :return: bool
-        """
-        resp = False
-        if login and repo:
-            url = self._build_url('user', 'subscriptions', login, repo)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
