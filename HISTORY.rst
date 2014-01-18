@@ -1,6 +1,59 @@
 History/Changelog
 -----------------
 
+1.0.0: 2014-xx-xx
+~~~~~~~~~~~~~~~~~
+
+1.0.0 is a huge release. It includes a great deal of changes to 
+``github3.py``.  It is suggested you read the following release notes *very* 
+carefully.
+
+Breaking Changes
+````````````````
+
+- All methods and functions starting with ``iter_`` have been renamed.
+
+    ==============================     =========================
+    Old name                           New name
+    ==============================     =========================
+    ``github3.iter_all_repos``         ``github3.all_repos``
+    ``github3.iter_all_users``         ``github3.all_users``
+    ``github3.iter_events``            ``github3.events``
+    ``github3.iter_followers``         ``github3.followers``
+    ``github3.iter_following``         ``github3.following``
+    ``github3.iter_gists``             ``github3.gists``
+    ``github3.iter_repo_issues``       ``github3.repo_issues``
+    ``github3.iter_orgs``              ``github3.orgs``
+    ``github3.iter_user_repos``        ``github3.user_repos``
+    ``github3.iter_starred``           ``github3.starred``
+    ``github3.iter_subscriptions``     ``github3.subscriptions``
+    ``github3.iter_subscriptions``     ``github3.subscriptions``
+    ==============================     =========================
+
+- ``github3.login`` has been simplified and split into two functions:
+
+  - ``github3.login`` serves the majority use case and only provides an 
+    authenticated ``GitHub`` object.
+
+  - ``github3.enterprise_login`` allows GitHub Enterprise users to log into 
+    their service.
+
+- Remove legacy watching API:
+
+  - ``GitHub#subscribe``
+
+  - ``GitHub#unsubscribe``
+
+  - ``GitHub#is_subscribed``
+
+- ``Repository#set_subscription`` was split into two simpler functions
+
+  - ``Repository#subscribe`` subscribes the authenticated user to the 
+    repository's notifications
+
+  - ``Repository#ignore`` ignores notifications from the repository for the 
+    authenticated user
+
 0.8.0: 2014-01-03
 ~~~~~~~~~~~~~~~~~
 
