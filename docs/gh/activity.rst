@@ -3,17 +3,13 @@ Activity
 
 `http://developer.github.com/v3/activity/ <http://developer.github.com/v3/activity/>`_
 
-Notifications
-~~~~~~~~~~~~~
+.. toctree::
+    :maxdepth: 1
 
-Starring
-~~~~~~~~
 
-Watching
-~~~~~~~~
-
-Events
-~~~~~~
-
-Feeds
-~~~~~
+    activity/events
+    activity/event-types
+    activity/feeds
+    activity/notifications
+    activity/starring
+    activity/watching
