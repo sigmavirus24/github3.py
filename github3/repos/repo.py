@@ -965,6 +965,20 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Hook(json, self) if json else None
 
+    @requires_auth
+    def ignore(self):
+        """Ignore notifications from this repository for the user.
+
+        .. versionadded:: 1.0
+
+        This replaces ``Repository#set_subscription``.
+
+        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        json = self._json(self._put(url, data=dumps({'ignored': True})), 200)
+        return Subscription(json, self) if json else None
+
     def is_assignee(self, login):
         """Check if the user is a possible assignee for an issue on this
         repository.
@@ -1622,18 +1636,18 @@ class Repository(GitHubCore):
         return resp
 
     @requires_auth
-    def set_subscription(self, subscribed, ignored):
-        """Set the user's subscription for this repository
+    def subscribe(self):
+        """Subscribe the user to this repository's notifications.
 
-        :param bool subscribed: (required), determines if notifications should
-            be received from this repository.
-        :param bool ignored: (required), determines if notifications should be
-            ignored from this repository.
-        :returns: :class;`Subscription <Subscription>`
+        .. versionadded:: 1.0
+
+        This replaces ``Repository#set_subscription``
+
+        :returns: :class:`Subscription <github3.notifications.Subscription>`
         """
-        sub = {'subscribed': subscribed, 'ignored': ignored}
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=dumps(sub)), 200)
+        json = self._json(self._put(url, data=dumps({'subcribed': True})),
+                          200)
         return Subscription(json, self) if json else None
 
     @requires_auth
