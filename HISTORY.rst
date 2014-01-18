@@ -13,22 +13,22 @@ Breaking Changes
 
 - All methods and functions starting with ``iter_`` have been renamed.
 
-    ==============================     =========================
-    Old name                           New name
-    ==============================     =========================
-    ``github3.iter_all_repos``         ``github3.all_repos``
-    ``github3.iter_all_users``         ``github3.all_users``
-    ``github3.iter_events``            ``github3.events``
-    ``github3.iter_followers``         ``github3.followers``
-    ``github3.iter_following``         ``github3.following``
-    ``github3.iter_gists``             ``github3.gists``
-    ``github3.iter_repo_issues``       ``github3.repo_issues``
-    ``github3.iter_orgs``              ``github3.orgs``
-    ``github3.iter_user_repos``        ``github3.user_repos``
-    ``github3.iter_starred``           ``github3.starred``
-    ``github3.iter_subscriptions``     ``github3.subscriptions``
-    ``github3.iter_subscriptions``     ``github3.subscriptions``
-    ==============================     =========================
+==============================     =========================
+Old name                           New name
+==============================     =========================
+``github3.iter_all_repos``         ``github3.all_repos``
+``github3.iter_all_users``         ``github3.all_users``
+``github3.iter_events``            ``github3.events``
+``github3.iter_followers``         ``github3.followers``
+``github3.iter_following``         ``github3.following``
+``github3.iter_gists``             ``github3.gists``
+``github3.iter_repo_issues``       ``github3.repo_issues``
+``github3.iter_orgs``              ``github3.orgs``
+``github3.iter_user_repos``        ``github3.user_repos``
+``github3.iter_starred``           ``github3.starred``
+``github3.iter_subscriptions``     ``github3.subscriptions``
+``github3.iter_subscriptions``     ``github3.subscriptions``
+==============================     =========================
 
 - ``github3.login`` has been simplified and split into two functions:
 
