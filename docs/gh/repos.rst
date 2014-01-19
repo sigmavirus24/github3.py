@@ -6,8 +6,9 @@ Repositories
 .. toctree::
     :maxdepth: 1
     
-    repos/collborators
+    repos/collaborators
     repos/comments
+    repos/commits
     repos/contents
     repos/deploy-keys
     repos/deployments
