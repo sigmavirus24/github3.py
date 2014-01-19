@@ -66,6 +66,8 @@ In depth documentation
 Organized using GitHub's documentation
 --------------------------------------
 
+This follows the outline that exists on `http://developer.github.com/v3/ <http://developer.github.com/v3/>`_
+
 .. toctree::
     :maxdepth: 1
     
