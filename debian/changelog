@@ -1,3 +1,10 @@
+github3.py (0.8.0-1) saucy; urgency=low
+
+  * New upstream version
+  * Update (build) dependencies
+
+ -- Dennis Kaarsemaker <dennis@kaarsemaker.net>  Sun, 19 Jan 2014 20:17:19 +0100
+
 github3.py (0.7.1-1) saucy; urgency=low
 
   * New upstream version
