@@ -124,6 +124,10 @@ class Repository(GitHubCore):
         #: Size of the repository.
         self.size = repo.get('size', 0)
 
+        # The number of stargazers
+        #: Number of users who starred the repository
+        self.stargazers = repo.get('stargazers_count', 0)
+
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
         self.ssh_url = repo.get('ssh_url', '')
