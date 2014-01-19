@@ -1,11 +1,13 @@
-import sys
-if sys.version_info < (3, 0):
-    import unittest2 as unittest
-else:
-    import unittest
 import github3
 from mock import patch, Mock
 from tests.utils import (BaseCase, load)
+
+
+def merge(first, second=None, **kwargs):
+    copy = first.copy()
+    copy.update(second or {})
+    copy.update(kwargs)
+    return copy
 
 
 class TestGitHub(BaseCase):
@@ -72,6 +74,11 @@ class TestGitHub(BaseCase):
         g = self.g.create_gist('description', 'files')
         assert isinstance(g, github3.gists.Gist)
         assert self.request.called is True
+        #with Betamax(self.session).use_cassette('GitHub_create_gist'):
+        #    self.g.create_gist(
+        #        'description of test_gist', {
+        #            'filename': 'contents'
+        #        })
 
     def test_create_issue(self):
         self.response('issue', 201)
@@ -178,7 +185,8 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/starred/user/repo')
 
-        self.assertRaises(github3.GitHubError, self.g.is_starred, 'user', 'repo')
+        self.assertRaises(github3.GitHubError, self.g.is_starred,
+                          'user', 'repo')
 
         self.login()
 
@@ -192,7 +200,8 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
         self.get('https://api.github.com/user/subscriptions/user/repo')
 
-        self.assertRaises(github3.GitHubError, self.g.is_subscribed, 'user', 'repo')
+        self.assertRaises(github3.GitHubError, self.g.is_subscribed,
+                          'user', 'repo')
 
         self.login()
         assert self.g.is_subscribed(None, None) is False
@@ -231,7 +240,7 @@ class TestGitHub(BaseCase):
     def test_iter_all_repos(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/repositories')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         repo = next(self.g.iter_all_repos())
         assert isinstance(repo, github3.repos.Repository)
@@ -239,7 +248,7 @@ class TestGitHub(BaseCase):
 
         self.response('repo', _iter=True)
         self.get('https://api.github.com/repositories')
-        self.conf.update(params={'since': 100000})
+        self.conf.update(params={'since': 100000, 'per_page': 100})
         repo = next(self.g.iter_all_repos(since=100000))
         assert isinstance(repo, github3.repos.Repository)
         assert(repo.id > 100000)
@@ -253,7 +262,7 @@ class TestGitHub(BaseCase):
     def test_iter_all_users(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         repo = next(self.g.iter_all_users())
         assert isinstance(repo, github3.users.User)
@@ -267,7 +276,7 @@ class TestGitHub(BaseCase):
     def test_iter_authorizations(self):
         self.response('authorization', _iter=True)
         self.get('https://api.github.com/authorizations')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_authorizations)
         assert self.request.called is False
@@ -280,7 +289,7 @@ class TestGitHub(BaseCase):
     def test_iter_emails(self):
         self.response('emails', _iter=True)
         self.get('https://api.github.com/user/emails')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_emails)
         assert self.request.called is False
@@ -293,7 +302,7 @@ class TestGitHub(BaseCase):
     def test_iter_events(self):
         self.response('event', _iter=True)
         self.get('https://api.github.com/events')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         event = next(self.g.iter_events())
         assert isinstance(event, github3.events.Event)
@@ -302,7 +311,7 @@ class TestGitHub(BaseCase):
     def test_iter_followers(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users/sigmavirus24/followers')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_followers)
 
@@ -323,7 +332,7 @@ class TestGitHub(BaseCase):
     def test_iter_following(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users/sigmavirus24/following')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_following)
         assert self.request.called is False
@@ -343,7 +352,7 @@ class TestGitHub(BaseCase):
     def test_iter_gists(self):
         self.response('gist', _iter=True)
         self.get('https://api.github.com/users/sigmavirus24/gists')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         g = next(self.g.iter_gists('sigmavirus24'))
         assert isinstance(g, github3.gists.Gist)
@@ -358,7 +367,7 @@ class TestGitHub(BaseCase):
     def test_iter_notifications(self):
         self.response('notification', _iter=True)
         self.get('https://api.github.com/notifications')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_notifications)
 
@@ -368,20 +377,21 @@ class TestGitHub(BaseCase):
         assert isinstance(thread, github3.notifications.Thread)
         self.mock_assertions()
 
-        self.conf.update(params={'all': True})
+        self.conf.update(params={'all': True, 'per_page': 100})
         next(self.g.iter_notifications(True))
         self.mock_assertions()
 
-        self.conf.update(params={'participating': True})
+        self.conf.update(params={'participating': True, 'per_page': 100})
         next(self.g.iter_notifications(participating=True))
         self.mock_assertions()
 
     def test_iter_org_issues(self):
         self.response('issue', _iter=True)
         self.get('https://api.github.com/orgs/github3py/issues')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
-        self.assertRaises(github3.GitHubError, self.g.iter_org_issues, 'github3py')
+        self.assertRaises(github3.GitHubError, self.g.iter_org_issues,
+                          'github3py')
 
         self.login()
         i = next(self.g.iter_org_issues('github3py'))
@@ -391,7 +401,8 @@ class TestGitHub(BaseCase):
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
                   'sort': 'created', 'direction': 'asc',
                   'since': '2012-05-20T23:10:27Z'}
-        self.conf.update(params=params)
+        request_params = merge(params, per_page=100)
+        self.conf.update(params=request_params)
         j = next(self.g.iter_org_issues('github3py', **params))
         assert isinstance(j, github3.issues.Issue)
         self.mock_assertions()
@@ -399,7 +410,7 @@ class TestGitHub(BaseCase):
     def test_iter_issues(self):
         self.response('issue', _iter=True)
         self.get('https://api.github.com/issues')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_issues)
 
@@ -410,26 +421,31 @@ class TestGitHub(BaseCase):
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
                   'sort': 'created', 'direction': 'asc',
                   'since': '2012-05-20T23:10:27Z'}
-        self.conf.update(params=params)
-        assert isinstance(next(self.g.iter_issues(**params)), github3.issues.Issue)
+        request_params = merge(params, per_page=100)
+        self.conf.update(params=request_params)
+        assert isinstance(next(self.g.iter_issues(**params)),
+                          github3.issues.Issue)
         self.mock_assertions()
 
     def test_iter_user_issues(self):
         self.response('issue', _iter=True)
         self.get('https://api.github.com/user/issues')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_user_issues)
 
         self.login()
-        assert isinstance(next(self.g.iter_user_issues()), github3.issues.Issue)
+        assert isinstance(next(self.g.iter_user_issues()),
+                          github3.issues.Issue)
         self.mock_assertions()
 
         params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
                   'sort': 'created', 'direction': 'asc',
                   'since': '2012-05-20T23:10:27Z'}
-        self.conf.update(params=params)
-        assert isinstance(next(self.g.iter_user_issues(**params)), github3.issues.Issue)
+        request_params = merge(params, per_page=100)
+        self.conf.update(params=request_params)
+        assert isinstance(next(self.g.iter_user_issues(**params)),
+                          github3.issues.Issue)
         self.mock_assertions()
 
     def test_iter_repo_issues(self):
@@ -451,7 +467,7 @@ class TestGitHub(BaseCase):
     def test_iter_keys(self):
         self.response('key', _iter=True)
         self.get('https://api.github.com/user/keys')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_keys)
 
@@ -463,7 +479,8 @@ class TestGitHub(BaseCase):
         self.response('org', _iter=True)
         self.get('https://api.github.com/users/login/orgs')
 
-        assert isinstance(next(self.g.iter_orgs('login')), github3.orgs.Organization)
+        assert isinstance(next(self.g.iter_orgs('login')),
+                          github3.orgs.Organization)
         self.mock_assertions()
 
         self.get('https://api.github.com/user/orgs')
@@ -474,7 +491,7 @@ class TestGitHub(BaseCase):
     def test_iter_repos(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/user/repos')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.g.iter_repos)
 
@@ -482,10 +499,12 @@ class TestGitHub(BaseCase):
         assert isinstance(next(self.g.iter_repos()), github3.repos.Repository)
         self.mock_assertions()
 
-        assert isinstance(next(self.g.iter_repos('sigmavirus24')), github3.repos.Repository)
+        assert isinstance(next(self.g.iter_repos('sigmavirus24')),
+                          github3.repos.Repository)
         self.mock_assertions()
 
-        self.conf.update(params={'type': 'all', 'direction': 'desc'})
+        self.conf.update(params={'type': 'all', 'direction': 'desc',
+                                 'per_page': 100})
 
         next(self.g.iter_repos('all', direction='desc'))
         self.mock_assertions()
@@ -493,21 +512,23 @@ class TestGitHub(BaseCase):
     def test_iter_user_repos(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/users/sigmavirus24/repos')
-        self.conf.update(params={'type': 'all', 'direction': 'desc'})
+        self.conf.update(params={'type': 'all', 'direction': 'desc',
+                                 'per_page': 100})
 
         next(self.g.iter_user_repos('sigmavirus24', 'all', direction='desc'))
         self.mock_assertions()
 
-        self.conf.update(params={"sort": "created"})
+        self.conf.update(params={'sort': 'created', 'per_page': 100})
         self.get('https://api.github.com/users/sigmavirus24/repos')
 
-        assert isinstance(next(self.g.iter_user_repos('sigmavirus24', sort="created")),
+        assert isinstance(next(self.g.iter_user_repos('sigmavirus24',
+                                                      sort="created")),
                           github3.repos.Repository)
         self.mock_assertions()
 
     def test_iter_repos_sort(self):
         self.response('repo', _iter=True)
-        self.conf.update(params={"sort": "created"})
+        self.conf.update(params={'sort': 'created', 'per_page': 100})
 
         self.login()
         self.get('https://api.github.com/user/repos')
@@ -518,7 +539,7 @@ class TestGitHub(BaseCase):
     def test_iter_starred(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/user/starred')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         self.login()
         assert isinstance(next(self.g.iter_starred()),
@@ -535,7 +556,7 @@ class TestGitHub(BaseCase):
     def test_iter_subscriptions(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/user/subscriptions')
-        self.conf.update(params=None)
+        self.conf.update(params={'per_page': 100})
 
         self.login()
         assert isinstance(next(self.g.iter_subscriptions()),
@@ -609,17 +630,19 @@ class TestGitHub(BaseCase):
                 ('hub.callback', 'https://localhost/post')]
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.pubsubhubbub, '', '', '')
+        pubsubhubbub = self.g.pubsubhubbub
+
+        self.assertRaises(github3.GitHubError, pubsubhubbub, '', '', '')
 
         self.login()
-        assert self.g.pubsubhubbub('', '', '') is False
+        assert pubsubhubbub('', '', '') is False
         self.not_called()
 
-        assert self.g.pubsubhubbub('foo', 'https://example.com', 'foo') is False
+        assert pubsubhubbub('foo', 'https://example.com', 'foo') is False
         self.not_called()
 
         d = dict([(k[4:], v) for k, v in body])
-        assert self.g.pubsubhubbub(**d) is True
+        assert pubsubhubbub(**d) is True
         _, kwargs = self.request.call_args
 
         assert 'data' in kwargs
@@ -628,7 +651,7 @@ class TestGitHub(BaseCase):
 
         d['secret'] = 'secret'
         body.append(('hub.secret', 'secret'))
-        assert self.g.pubsubhubbub(**d)
+        assert pubsubhubbub(**d)
         _, kwargs = self.request.call_args
         assert 'data' in kwargs
         assert body == kwargs['data']
@@ -657,94 +680,6 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/repos/sigmavirus24/github3.py')
         repo = self.g.repository('sigmavirus24', 'github3.py')
         assert isinstance(repo, github3.repos.Repository)
-        self.mock_assertions()
-
-    def test_search_issues(self):
-        self.response('legacy_issue')
-        self.get('https://api.github.com/legacy/{0}/{1}/{2}/{3}/{4}/'
-                 '{5}'.format('issues', 'search', 'sigmavirus24',
-                              'github3.py', 'closed', 'requests'))
-        self.conf.update({'params': {}})
-        issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
-                                      'requests')
-
-        assert isinstance(issues[0], github3.legacy.LegacyIssue)
-        assert repr(issues[0]).startswith('<Legacy Issue')
-        self.mock_assertions()
-
-        self.conf.update({'params': {'start_page': 2}})
-        issues = self.g.search_issues('sigmavirus24', 'github3.py', 'closed',
-                                      'requests', 2)
-        self.mock_assertions()
-
-    def test_search_repos(self):
-        self.response('legacy_repo')
-        self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
-                 'legacy', 'repos', 'search', 'github3.py'))
-        self.conf.update(params={'start_page': None, 'language': None})
-        repos = self.g.search_repos('github3.py')
-        assert isinstance(repos[0], github3.legacy.LegacyRepo)
-        assert repr(repos[0]).startswith('<Legacy Repo')
-        assert repos[0].is_private() == repos[0].private
-        self.mock_assertions()
-
-        repos = self.g.search_repos('github3.py', sort='Foobar')
-        self.mock_assertions()
-
-        repos = self.g.search_repos('github3.py', order='Foobar')
-        self.mock_assertions()
-
-        self.conf.update(params={'language': 'python', 'start_page': 10})
-        repos = self.g.search_repos('github3.py', 'python', 10)
-        self.mock_assertions()
-
-        self.conf.update(params={'sort': 'stars', 'start_page': None,
-                                 'language': None})
-        repos = self.g.search_repos('github3.py', sort='stars')
-        self.mock_assertions()
-
-        repos = self.g.search_repos('github3.py', sort='stars',
-                                    order='Foobar')
-        self.mock_assertions()
-
-        self.conf.update(params={'order': 'asc', 'start_page': None,
-                                 'language': None})
-        repos = self.g.search_repos('github3.py', order='asc')
-
-    def test_search_users(self):
-        self.response('legacy_user')
-        self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
-                 'legacy', 'user', 'search', 'sigmavirus24'))
-        self.conf.update({'params': {}})
-        users = self.g.search_users('sigmavirus24')
-        assert isinstance(users[0], github3.legacy.LegacyUser)
-        assert repr(users[0]).startswith('<Legacy User')
-        self.mock_assertions()
-
-        users = self.g.search_users('sigmavirus24', sort='Foobar')
-        self.mock_assertions()
-
-        users = self.g.search_users('sigmavirus24', order='Foobar')
-        self.mock_assertions()
-
-        self.conf.update({'params': {'start_page': 2}})
-        self.g.search_users('sigmavirus24', 2)
-        self.mock_assertions()
-
-        self.conf.update({'params': {'sort': 'joined'}})
-        self.g.search_users('sigmavirus24', sort='joined', order='Foobar')
-        self.mock_assertions()
-
-        self.conf.update({'params': {'order': 'asc'}})
-        self.g.search_users('sigmavirus24', order='asc')
-        self.mock_assertions()
-
-    def test_search_email(self):
-        self.response('legacy_email')
-        self.get('https://api.github.com/{0}/{1}/{2}/{3}'.format(
-                 'legacy', 'user', 'email', 'graffatcolmingov@gmail.com'))
-        user = self.g.search_email('graffatcolmingov@gmail.com')
-        assert isinstance(user, github3.legacy.LegacyUser)
         self.mock_assertions()
 
     def test_set_client_id(self):
@@ -818,7 +753,8 @@ class TestGitHub(BaseCase):
                     'sigmavirus24/github3.py')
         self.conf = {}
 
-        self.assertRaises(github3.GitHubError, self.g.unsubscribe, 'foo', 'bar')
+        self.assertRaises(github3.GitHubError, self.g.unsubscribe,
+                          'foo', 'bar')
 
         self.login()
         assert self.g.unsubscribe(None, None) is False

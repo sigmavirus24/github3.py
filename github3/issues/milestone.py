@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from json import dumps
 from github3.decorators import requires_auth
 from github3.issues.label import Label
@@ -66,12 +67,13 @@ class Milestone(GitHubCore):
         return self._iter(int(number), url, Label)
 
     @requires_auth
-    def update(self, title, state='', description='', due_on=''):
+    def update(self, title=None, state=None, description=None, due_on=None):
         """Update this milestone.
 
-        state, description, and due_on are optional
+        All parameters are optional, but it makes no sense to omit all of them
+        at once.
 
-        :param str title: (required), new title of the milestone
+        :param str title: (optional), new title of the milestone
         :param str state: (optional), ('open', 'closed')
         :param str description: (optional)
         :param str due_on: (optional), ISO 8601 time format:
@@ -80,9 +82,10 @@ class Milestone(GitHubCore):
         """
         data = {'title': title, 'state': state,
                 'description': description, 'due_on': due_on}
+        self._remove_none(data)
         json = None
 
-        if title:
+        if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_(json)

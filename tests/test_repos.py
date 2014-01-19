@@ -1,9 +1,4 @@
 import os
-import sys
-if sys.version_info < (3, 0):
-    import unittest2 as unittest
-else:
-    import unittest
 import github3
 from github3 import repos
 from datetime import datetime
@@ -26,7 +21,8 @@ class TestRepository(BaseCase):
         self.put(self.api + 'collaborators/sigmavirus24')
         self.conf = {'data': None}
 
-        self.assertRaises(github3.GitHubError, self.repo.add_collaborator, 'foo')
+        self.assertRaises(github3.GitHubError, self.repo.add_collaborator,
+                          'foo')
 
         self.login()
         assert self.repo.add_collaborator(None) is False
@@ -157,7 +153,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'git/blobs')
         self.conf = {'data': {'content': content, 'encoding': encoding}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_blob, content, encoding)
+        self.assertRaises(github3.GitHubError, self.repo.create_blob,
+                          content, encoding)
 
         self.login()
         assert self.repo.create_blob(None, None) == ''
@@ -174,7 +171,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'commits/{0}/comments'.format(sha))
         self.conf = {'data': {'body': body, 'line': 1}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_comment, body, sha)
+        self.assertRaises(github3.GitHubError, self.repo.create_comment,
+                          body, sha)
 
         self.login()
         assert self.repo.create_comment(None, None) is None
@@ -234,7 +232,8 @@ class TestRepository(BaseCase):
             }
         }
 
-        self.assertRaises(github3.GitHubError, self.repo.create_hook, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.create_hook,
+                          None, None)
 
         self.login()
         assert self.repo.create_hook(None, {'foo': 'bar'}) is None
@@ -261,13 +260,15 @@ class TestRepository(BaseCase):
 
         body = 'Fake body'
         #self.conf['data'].update(body=body)
-        assert isinstance(self.repo.create_issue(title, body), github3.issues.Issue)
+        assert isinstance(self.repo.create_issue(title, body),
+                          github3.issues.Issue)
         self.mock_assertions()
 
         assignee, mile, labels = 'sigmavirus24', 1, ['bug', 'enhancement']
         #self.conf['data'].update({'assignee': assignee, 'milestone': mile,
         #                          'labels': labels})
-        assert isinstance(self.repo.create_issue(title, body, assignee, mile, labels), github3.issues.Issue)
+        issue = self.repo.create_issue(title, body, assignee, mile, labels)
+        assert isinstance(issue, github3.issues.Issue)
         self.mock_assertions()
 
     def test_create_key(self):
@@ -276,12 +277,14 @@ class TestRepository(BaseCase):
         self.conf = {'data': {'key': 'ssh-rsa foobarbogus',
                               'title': 'Fake key'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_key, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_key,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_key(None, None) is None
         self.not_called()
-        assert isinstance(self.repo.create_key(**self.conf['data']), github3.users.Key)
+        assert isinstance(self.repo.create_key(**self.conf['data']),
+                          github3.users.Key)
         self.mock_assertions()
 
     def test_create_label(self):
@@ -289,12 +292,14 @@ class TestRepository(BaseCase):
         self.post(self.api + 'labels')
         self.conf = {'data': {'name': 'foo', 'color': 'f00f00'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_label, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_label,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_label(None, None) is None
         self.not_called()
-        assert isinstance(self.repo.create_label(**self.conf['data']), github3.issues.label.Label)
+        assert isinstance(self.repo.create_label(**self.conf['data']),
+                          github3.issues.label.Label)
         self.mock_assertions()
 
     def test_create_milestone(self):
@@ -302,12 +307,14 @@ class TestRepository(BaseCase):
         self.post(self.api + 'milestones')
         self.conf = {'data': {'title': 'foo'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_milestone, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_milestone,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_milestone(None) is None
         self.not_called()
-        assert isinstance(self.repo.create_milestone('foo'), github3.issues.milestone.Milestone)
+        assert isinstance(self.repo.create_milestone('foo'),
+                          github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_create_pull(self):
@@ -316,12 +323,14 @@ class TestRepository(BaseCase):
         self.conf = {'data': {'title': 'Fake title', 'base': 'master',
                               'head': 'feature_branch'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_pull, **self.conf['data'])
+        self.assertRaises(github3.GitHubError, self.repo.create_pull,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_pull(None, None, None) is None
         self.not_called()
-        assert isinstance(self.repo.create_pull(**self.conf['data']), github3.pulls.PullRequest)
+        assert isinstance(self.repo.create_pull(**self.conf['data']),
+                          github3.pulls.PullRequest)
         self.mock_assertions()
 
     def test_create_pull_from_issue(self):
@@ -330,13 +339,15 @@ class TestRepository(BaseCase):
         self.conf = {'data': {'issue': 1, 'base': 'master',
                               'head': 'feature_branch'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_pull_from_issue, **self.conf['data'])
+        self.assertRaises(github3.GitHubError,
+                          self.repo.create_pull_from_issue,
+                          **self.conf['data'])
 
         self.login()
         assert self.repo.create_pull_from_issue(0, 'foo', 'bar') is None
         self.not_called()
-        assert isinstance(self.repo.create_pull_from_issue(**self.conf['data']),
-                          github3.pulls.PullRequest)
+        pull = self.repo.create_pull_from_issue(**self.conf['data'])
+        assert isinstance(pull, github3.pulls.PullRequest)
         self.mock_assertions()
 
     def test_create_ref(self):
@@ -344,7 +355,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'git/refs')
         self.conf = {'data': {'ref': 'refs/heads/master', 'sha': 'fakesha'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_ref, 'foo', 'bar')
+        self.assertRaises(github3.GitHubError, self.repo.create_ref,
+                          'foo', 'bar')
 
         self.login()
         assert self.repo.create_ref('foo/bar', None) is None
@@ -357,7 +369,8 @@ class TestRepository(BaseCase):
         self.post(self.api + 'statuses/fakesha')
         self.conf = {'data': {'state': 'success'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_status, 'fakesha', 'success')
+        self.assertRaises(github3.GitHubError, self.repo.create_status,
+                          'fakesha', 'success')
 
         self.login()
         assert self.repo.create_status(None, None) is None
@@ -381,7 +394,8 @@ class TestRepository(BaseCase):
         data['sha'] = data['object']
         del(data['type'], data['object'])
 
-        self.assertRaises(github3.GitHubError, self.repo.create_tag, None, None, None, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.create_tag,
+                          None, None, None, None, None)
 
         self.login()
         with patch.object(repos.Repository, 'create_ref'):
@@ -437,15 +451,6 @@ class TestRepository(BaseCase):
         assert self.repo.delete_key(-2) is False
         self.not_called()
         assert self.repo.delete_key(2)
-        self.mock_assertions()
-
-    def test_download(self):
-        self.response('download')
-        self.get(self.api + 'downloads/2')
-
-        assert self.repo.download(-2) is None
-        self.not_called()
-        assert isinstance(self.repo.download(2), repos.download.Download)
         self.mock_assertions()
 
     def test_edit(self):
@@ -537,7 +542,7 @@ class TestRepository(BaseCase):
     def test_iter_assignees(self):
         self.response('user', _iter=True)
         self.get(self.api + 'assignees')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         u = next(self.repo.iter_assignees())
         assert isinstance(u, github3.users.User)
@@ -546,7 +551,7 @@ class TestRepository(BaseCase):
     def test_iter_branches(self):
         self.response('branch', _iter=True)
         self.get(self.api + 'branches')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         b = next(self.repo.iter_branches())
         assert isinstance(b, repos.branch.Branch)
@@ -555,7 +560,7 @@ class TestRepository(BaseCase):
     def test_iter_comments(self):
         self.response('repo_comment', _iter=True)
         self.get(self.api + 'comments')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         c = next(self.repo.iter_comments())
         assert isinstance(c, repos.comment.RepoComment)
@@ -564,7 +569,7 @@ class TestRepository(BaseCase):
     def test_iter_comments_on_commit(self):
         self.response('repo_comment', _iter=True)
         self.get(self.api + 'commits/fakesha/comments')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 1}}
 
         c = next(self.repo.iter_comments_on_commit('fakesha'))
         assert isinstance(c, repos.comment.RepoComment)
@@ -573,59 +578,53 @@ class TestRepository(BaseCase):
     def test_iter_commits(self):
         self.response('commit', _iter=True)
         self.get(self.api + 'commits')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         c = next(self.repo.iter_commits())
         assert isinstance(c, repos.commit.RepoCommit)
         self.mock_assertions()
 
-        self.conf = {'params': {'sha': 'fakesha', 'path': '/'}}
+        self.conf = {'params': {'sha': 'fakesha', 'path': '/',
+                                'per_page': 100}}
         c = next(self.repo.iter_commits('fakesha', '/'))
         self.mock_assertions()
 
         since = datetime(2013, 6, 1, 0, 0, 0)
         until = datetime(2013, 6, 2, 0, 0, 0)
         self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00'}}
+                                'until': '2013-06-02T00:00:00',
+                                'per_page': 100}}
         c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
 
         since = '2013-06-01T00:00:00'
         until = '2013-06-02T00:00:00'
         self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00'}}
+                                'until': '2013-06-02T00:00:00',
+                                'per_page': 100}}
         c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
 
     def test_iter_contributors(self):
         self.response('user', _iter=True)
         self.get(self.api + 'contributors')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         u = next(self.repo.iter_contributors())
         assert isinstance(u, github3.users.User)
         self.mock_assertions()
 
-        self.conf = {'params': {'anon': True}}
+        self.conf = {'params': {'anon': True, 'per_page': 100}}
         next(self.repo.iter_contributors(True))
         self.mock_assertions()
 
         next(self.repo.iter_contributors('true value'))
         self.mock_assertions()
 
-    def test_iter_downloads(self):
-        self.response('download', _iter=True)
-        self.get(self.api + 'downloads')
-        self.conf = {'params': None}
-
-        d = next(self.repo.iter_downloads())
-        assert isinstance(d, repos.download.Download)
-        self.mock_assertions()
-
     def test_iter_events(self):
         self.response('event', _iter=True)
         self.get(self.api + 'events')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         e = next(self.repo.iter_events())
         assert isinstance(e, github3.events.Event)
@@ -634,20 +633,22 @@ class TestRepository(BaseCase):
     def test_iter_forks(self):
         self.response('repo', _iter=True)
         self.get(self.api + 'forks')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         r = next(self.repo.iter_forks())
         assert isinstance(r, repos.Repository)
         self.mock_assertions()
 
         self.conf['params']['sort'] = 'newest'
-        next(self.repo.iter_forks(**self.conf['params']))
+        forks_params = self.conf['params'].copy()
+        forks_params.pop('per_page')
+        next(self.repo.iter_forks(**forks_params))
         self.mock_assertions()
 
     def test_iter_hooks(self):
         self.response('hook', _iter=True)
         self.get(self.api + 'hooks')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         self.assertRaises(github3.GitHubError, self.repo.iter_hooks)
 
@@ -659,7 +660,7 @@ class TestRepository(BaseCase):
     def test_iter_issues(self):
         self.response('issue', _iter=True)
         self.get(self.api + 'issues')
-        params = {}
+        params = {'per_page': 100}
         self.conf = {'params': params}
 
         i = next(self.repo.iter_issues())
@@ -671,13 +672,16 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
         params['state'] = 'open'
-        next(self.repo.iter_issues(**params))
+
+        request_params = params.copy()
+        request_params.pop('per_page')
+        next(self.repo.iter_issues(**request_params))
         self.mock_assertions()
 
     def test_iter_issue_events(self):
         self.response('issue_event', _iter=True)
         self.get(self.api + 'issues/events')
-        self.conf = {'params': None}
+        self.conf = {'params': {'per_page': 100}}
 
         e = next(self.repo.iter_issue_events())
         assert isinstance(e, github3.issues.event.IssueEvent)
@@ -709,6 +713,8 @@ class TestRepository(BaseCase):
 
         l = next(self.repo.iter_languages())
         assert isinstance(l, tuple)
+        self.assertNotIn('ETag', l)
+        self.assertNotIn('Last-Modified', l)
         self.mock_assertions()
 
     def test_iter_milestones(self):
@@ -730,7 +736,7 @@ class TestRepository(BaseCase):
     def test_iter_notifications(self):
         self.response('notification', _iter=True)
         self.get(self.api + 'notifications')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         self.assertRaises(github3.GitHubError, self.repo.iter_notifications)
 
@@ -742,7 +748,7 @@ class TestRepository(BaseCase):
     def test_iter_pulls(self):
         self.response('pull', _iter=True)
         self.get(self.api + 'pulls')
-        self.conf.update(params={})
+        self.conf.update(params={'per_page': 100})
 
         p = next(self.repo.iter_pulls())
         assert isinstance(p, github3.pulls.PullRequest)
@@ -751,15 +757,15 @@ class TestRepository(BaseCase):
         next(self.repo.iter_pulls('foo'))
         self.mock_assertions()
 
-        self.conf.update(params={'state': 'open'})
+        self.conf.update(params={'state': 'open', 'per_page': 100})
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
 
-        self.conf.update(params={'head': 'user:branch'})
+        self.conf.update(params={'head': 'user:branch', 'per_page': 100})
         next(self.repo.iter_pulls(head='user:branch'))
         self.mock_assertions()
 
-        self.conf.update(params={'base': 'branch'})
+        self.conf.update(params={'base': 'branch', 'per_page': 100})
         next(self.repo.iter_pulls(base='branch'))
         self.mock_assertions()
 
@@ -867,7 +873,8 @@ class TestRepository(BaseCase):
         assert self.repo.milestone(0) is None
         self.not_called()
 
-        assert isinstance(self.repo.milestone(2), github3.issues.milestone.Milestone)
+        assert isinstance(self.repo.milestone(2),
+                          github3.issues.milestone.Milestone)
         self.mock_assertions()
 
     def test_parent(self):
@@ -907,7 +914,8 @@ class TestRepository(BaseCase):
         self.response('', 204)
         self.delete(self.api + 'collaborators/login')
 
-        self.assertRaises(github3.GitHubError, self.repo.remove_collaborator, None)
+        self.assertRaises(github3.GitHubError, self.repo.remove_collaborator,
+                          None)
         self.not_called()
 
         self.login()
@@ -931,7 +939,8 @@ class TestRepository(BaseCase):
         self.put(self.api + 'subscription')
         self.conf = {'data': {'subscribed': True, 'ignored': False}}
 
-        self.assertRaises(github3.GitHubError, self.repo.set_subscription, True, False)
+        self.assertRaises(github3.GitHubError, self.repo.set_subscription,
+                          True, False)
         self.not_called()
 
         self.login()
@@ -976,7 +985,8 @@ class TestRepository(BaseCase):
         self.patch(self.api + 'labels/Bug')
         self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.update_label, 'foo', 'bar')
+        self.assertRaises(github3.GitHubError, self.repo.update_label,
+                          'foo', 'bar')
         self.not_called()
 
         self.login()
@@ -1003,7 +1013,8 @@ class TestRepository(BaseCase):
                               'author': {'name': 'Ian', 'email': 'foo'},
                               'committer': {'name': 'Ian', 'email': 'foo'}}}
 
-        self.assertRaises(github3.GitHubError, self.repo.create_file, None, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.create_file,
+                          None, None, None)
 
         self.not_called()
         self.login()
@@ -1028,7 +1039,8 @@ class TestRepository(BaseCase):
             }
         }
 
-        self.assertRaises(github3.GitHubError, self.repo.update_file, None, None, None, None)
+        self.assertRaises(github3.GitHubError, self.repo.update_file,
+                          None, None, None, None)
 
         self.not_called()
         self.login()
@@ -1045,7 +1057,8 @@ class TestRepository(BaseCase):
         self.delete(self.api + 'contents/setup.py')
         self.conf = {'data': {'message': 'foo', 'sha': 'ae02db'}}
 
-        self.assertRaises(github3.GitHubError, self.repo.delete_file, 'setup.py', None, None)
+        self.assertRaises(github3.GitHubError, self.repo.delete_file,
+                          'setup.py', None, None)
 
         self.not_called()
         self.login()
@@ -1153,7 +1166,8 @@ class TestContents(BaseCase):
             }
         }
 
-        self.assertRaises(github3.GitHubError, self.contents.update, None, None)
+        self.assertRaises(github3.GitHubError, self.contents.update,
+                          None, None)
 
         self.not_called()
         self.login()
@@ -1161,65 +1175,6 @@ class TestContents(BaseCase):
         ret = self.contents.update('foo', b'foo bar bogus')
         assert isinstance(ret, github3.git.Commit)
         self.mock_assertions()
-
-
-class TestDownload(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestDownload, self).__init__(methodName)
-        self.dl = repos.download.Download(load('download'))
-        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "downloads/338893")
-
-    def setUp(self):
-        super(TestDownload, self).setUp()
-        self.dl = repos.download.Download(self.dl.to_json(), self.g)
-
-    def test_repr(self):
-        assert repr(self.dl) == '<Download [kr.png]>'
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.dl.delete)
-        self.not_called()
-
-        self.login()
-        assert self.dl.delete()
-        self.mock_assertions()
-
-    def test_saveas(self):
-        self.response('archive', 200)
-        self.get(self.dl.html_url)
-
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
-            with open('archive', 'wb+') as fd:
-                assert self.dl.saveas(fd)
-
-        o.assert_called_once_with('archive', 'wb+')
-        fd = o()
-        fd.write.assert_called_once_with(b'archive_data')
-        self.mock_assertions()
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        self.dl.saveas()
-        assert os.path.isfile(self.dl.name)
-        os.unlink(self.dl.name)
-        assert os.path.isfile(self.dl.name) is False
-
-        self.request.return_value.raw.seek(0)
-        self.request.return_value._content_consumed = False
-
-        self.dl.saveas('tmp')
-        assert os.path.isfile('tmp')
-        os.unlink('tmp')
-        assert os.path.isfile('tmp') is False
-
-        self.response('', 404)
-        assert self.dl.saveas() is False
 
 
 class TestHook(BaseCase):
@@ -1236,7 +1191,7 @@ class TestHook(BaseCase):
     def test_equality(self):
         h = repos.hook.Hook(load('hook'))
         assert self.hook == h
-        h.id = 1
+        h._uniq = 1
         assert self.hook != h
 
     def test_repr(self):
@@ -1361,7 +1316,7 @@ class TestRepoCommit(BaseCase):
     def test_equality(self):
         c = repos.commit.RepoCommit(load('commit'))
         assert self.commit == c
-        c.sha = 'fake'
+        c._uniq = 'fake'
         assert self.commit != c
 
     def test_repr(self):

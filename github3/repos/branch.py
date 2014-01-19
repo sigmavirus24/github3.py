@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from github3.models import GitHubCore
 from github3.repos.commit import RepoCommit
 

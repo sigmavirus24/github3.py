@@ -19,7 +19,7 @@ class TestTeam(BaseCase):
     def test_equality(self):
         t = github3.orgs.Team(load('team'))
         assert self.team == t
-        t.id = 'foo'
+        t._uniq = 'foo'
         assert self.team != t
 
     def test_add_member(self):
@@ -287,7 +287,7 @@ class TestOrganization(BaseCase):
     def test_iter_repos(self):
         self.response('repo', _iter=True)
         self.get(self.api + '/repos')
-        self.conf = {'params': {}}
+        self.conf = {'params': {'per_page': 100}}
 
         assert isinstance(next(self.org.iter_repos()),
                           github3.repos.Repository)
@@ -297,7 +297,7 @@ class TestOrganization(BaseCase):
                           github3.repos.Repository)
         self.mock_assertions()
 
-        self.conf['params'] = {'type': 'all'}
+        self.conf['params'] = {'type': 'all', 'per_page': 100}
         assert isinstance(next(self.org.iter_repos('all')),
                           github3.repos.Repository)
         self.mock_assertions()
@@ -336,7 +336,8 @@ class TestOrganization(BaseCase):
         self.mock_assertions()
 
     def test_remove_repo(self):
-        self.assertRaises(github3.GitHubError, self.org.remove_repo, None, None)
+        self.assertRaises(github3.GitHubError, self.org.remove_repo,
+                          None, None)
 
         self.login()
         with patch.object(github3.orgs.Organization, 'iter_teams') as it:

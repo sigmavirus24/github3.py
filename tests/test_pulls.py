@@ -17,7 +17,15 @@ class TestPullRequest(BaseCase):
     def test_equality(self):
         p = github3.pulls.PullRequest(load('pull'))
         assert self.pull == p
-        p.id = 'foo'
+        p._uniq = 'foo'
+        assert self.pull != p
+
+    def test_hashing(self):
+        p = github3.pulls.PullRequest(load('pull'))
+        s = set()
+        s.add(p)
+        s.add(p)
+        assert len(s) == 1
 
     def test_dest(self):
         assert repr(self.pull.base).startswith('<Base')
@@ -149,4 +157,5 @@ class TestPullRequest(BaseCase):
 
     def test_pull_request_issues(self):
         pr = github3.pulls.PullRequest(load('pull_request'))
-        self.assertTrue(pr.issue_url, 'https://github.com/sigmavirus24/github3.py/pull/135')
+        self.assertEqual(pr.issue_url,
+                         'https://github.com/sigmavirus24/github3.py/pull/135')

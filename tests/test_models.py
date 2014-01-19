@@ -36,13 +36,6 @@ class TestGitHubCore(BaseCase):
 
         self.assertRaises(github3.GitHubError, self.g._boolean, r, 200, 404)
 
-    def test_ratelimit_remaining(self):
-        self.response('ratelimit')
-        self.get(self.github_url + 'rate_limit')
-
-        assert self.g.ratelimit_remaining == 60
-        self.mock_assertions()
-
 
 class TestGitHubError(TestCase):
     def __init__(self, methodName='runTest'):

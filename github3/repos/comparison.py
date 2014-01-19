@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.repos.comparison
 ========================
@@ -56,14 +57,10 @@ class Comparison(GitHubCore):
         #: List of dicts describing the files modified.
         self.files = compare.get('files', [])
 
+        self._uniq = self.commits
+
     def __repr__(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
-
-    def __eq__(self, other):
-        return self.commits == other.commits
-
-    def __ne__(self, other):
-        return self.commits != other.commits
 
     def diff(self):
         """Return the diff"""

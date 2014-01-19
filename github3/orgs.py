@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.orgs
 ============
@@ -54,12 +55,6 @@ class Team(GitHubCore):
 
     def __repr__(self):
         return '<Team [{0}]>'.format(self.name)
-
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
 
     def _update_(self, team):
         self.__init__(team, self._session)

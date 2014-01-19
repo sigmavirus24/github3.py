@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from github3.models import BaseComment
 from github3.users import User
 

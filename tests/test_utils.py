@@ -33,8 +33,8 @@ class TestTimestampParameter(BaseCase):
 
     def test_none_handling(self):
         self.assertTrue(timestamp_parameter(None, allow_none=True) is None)
-        self.assertRaises(ValueError, timestamp_parameter, None, 
-                allow_none=False)
+        self.assertRaises(ValueError, timestamp_parameter, None,
+                          allow_none=False)
 
     def test_invalid_type_handling(self):
         self.assertRaises(ValueError, timestamp_parameter, 1)
