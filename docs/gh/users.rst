@@ -3,15 +3,39 @@ Users
 
 `http://developer.github.com/v3/users/ <http://developer.github.com/v3/users/>`_
 
-.. I'm not sure I like this or if i should use :mod:`users`
+.. toctree::
+    :maxdepth: 1
 
-If you want to manage a user, use the `Users`_ module:
+    users/emails
+    users/followers
+    users/public-keys
 
-.. _Users: ../modules/users.html
 
-but if you want a list of all users in order they signed up to GitHub, use:
+Get a single user
+~~~~~~~~~~~~~~~~~
 
-.. similarly to above, perhaps :func:`iter_all_users` would be better suited inline?
+`http://developer.github.com/v3/users/#get-a-single-user <http://developer.github.com/v3/users/#get-a-single-user>`_
+
+
+Get the authenticated user
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`http://developer.github.com/v3/users/#get-the-authenticated-user <http://developer.github.com/v3/users/#get-the-authenticated-user>`_
+
+Update the authenticated user
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`http://developer.github.com/v3/users/#update-the-authenticated-user <http://developer.github.com/v3/users/#update-the-authenticated-user>`_
+
+Get all users
+~~~~~~~~~~~~~
+
+`http://developer.github.com/v3/users/#get-all-users <http://developer.github.com/v3/users/#get-all-users>`_
+
+
+If you want a list of all users in order they signed up to GitHub, use:
+
 
 .. autofunction:: github3.iter_all_users
+    :noindex:
 
