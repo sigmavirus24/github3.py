@@ -7,4 +7,4 @@ From GitHub's documentation:
 
 .. note::
 
-        The Downloads API (described below) was deprecated on December 11, 2012. It will be removed at a future date.
+        The Downloads API (described below) was deprecated on December 11, 2012. It will be removed at a future date. "It has been effectively replaced by the Releases API and is no longer supported."
