@@ -2,7 +2,12 @@ include README.rst
 include LICENSE
 include HISTORY.rst
 include AUTHORS.rst
+include CONTRIBUTING.rst
+include tox.ini
+include report_issue.py
 prune *.pyc
-recursive-include github3/
-recursive-include docs/
+recursive-include docs *.rst *.py Makefile
+recursive-include tests *.py *.json
+recursive-include tests/json *
+recursive-include images *.png
 prune docs/_build
