@@ -39,3 +39,27 @@ If you want a list of all users in order they signed up to GitHub, use:
 .. autofunction:: github3.iter_all_users
     :noindex:
 
+
+An Example:
+
+.. code-block:: python
+        
+        In [1]: import github3
+
+        In [2]: users = github3.iter_all_users()
+
+        In [3]: type(users)
+        Out[3]: github3.structs.GitHubIterator
+
+        In [4]: user = users.next()
+
+        In [5]: type(user)
+        Out[5]: github3.users.User
+
+        In [6]: user.html_url
+        Out[6]: u'https://github.com/mojombo'
+
+
+
+
+
