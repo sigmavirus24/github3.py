@@ -27,10 +27,18 @@ Create a public key
 Update a public key
 ~~~~~~~~~~~~~~~~~~~
 
+
 `http://developer.github.com/v3/users/keys/#update-a-public-key <http://developer.github.com/v3/users/keys/#update-a-public-key>`_
+
+
+.. automethod:: github3.users.Key.update
+    :noindex:
 
 Delete a public key
 ~~~~~~~~~~~~~~~~~~~
 
 `http://developer.github.com/v3/users/keys/#delete-a-public-key <http://developer.github.com/v3/users/keys/#delete-a-public-key>`_
+
+.. automethod:: github3.users.Key.delete
+    :noindex:
 
