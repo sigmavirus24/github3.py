@@ -246,7 +246,7 @@ def repo_issues(owner, repository, milestone=None, state=None, assignee=None,
     return iter([])
 
 
-def orgs(username, number=-1, etag=None):
+def organizations(username, number=-1, etag=None):
     """List the organizations associated with ``username``.
 
     :param str username: (required), login of the user

@@ -23,7 +23,7 @@ Old name                           New name
 ``github3.iter_following``         ``github3.following``
 ``github3.iter_gists``             ``github3.gists``
 ``github3.iter_repo_issues``       ``github3.repo_issues``
-``github3.iter_orgs``              ``github3.orgs``
+``github3.iter_orgs``              ``github3.organizations``
 ``github3.iter_user_repos``        ``github3.user_repos``
 ``github3.iter_starred``           ``github3.starred``
 ``github3.iter_subscriptions``     ``github3.subscriptions``
