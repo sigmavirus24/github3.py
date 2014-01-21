@@ -18,10 +18,9 @@ Old name                           New name
 ==============================     =========================
 ``github3.iter_all_repos``         ``github3.all_repos``
 ``github3.iter_all_users``         ``github3.all_users``
-``github3.iter_events``            ``github3.events``
+``github3.iter_events``            ``github3.all_events``
 ``github3.iter_followers``         ``github3.followers``
 ``github3.iter_following``         ``github3.following``
-``github3.iter_gists``             ``github3.gists``
 ``github3.iter_repo_issues``       ``github3.repo_issues``
 ``github3.iter_orgs``              ``github3.organizations``
 ``github3.iter_user_repos``        ``github3.user_repos``
@@ -37,6 +36,14 @@ Old name                           New name
 
   - ``github3.enterprise_login`` allows GitHub Enterprise users to log into 
     their service.
+
+- ``github3.iter_gists`` was split into two functions:
+
+  - ``github3.all_gists`` which iterates over all of the public gists on 
+    GitHub
+
+  - ``github3.gists_for`` which iterates over all the public gists of a 
+    specific user
 
 - Remove legacy watching API:
 

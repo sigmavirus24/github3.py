@@ -153,7 +153,7 @@ def all_users(number=-1, etag=None):
     return gh.iter_all_users(number, etag)
 
 
-def events(number=-1, etag=None):
+def all_events(number=-1, etag=None):
     """Iterate over public events.
 
     :param int number: (optional), number of events to return. Default: -1
@@ -195,10 +195,27 @@ def following(username, number=-1, etag=None):
     return gh.iter_following(username, number, etag) if username else []
 
 
-def gists(username=None, number=-1, etag=None):
-    """Iterate over public gists or gists for the provided username.
+def all_gists(number=-1, etag=None):
+    """Iterate over public gists.
 
-    :param str username: (optional), if provided, get the gists for this user
+    .. versionadded:: 1.0
+
+        This was split from ``github3.iter_gists`` before 1.0.
+
+    :param int number: (optional), number of gists to return. Default: -1,
+        return all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
+    :returns: generator of :class:`Gist <github3.gists.Gist>`
+
+    """
+    return gh.iter_gists(None, number, etag)
+
+
+def gists_for(username, number=-1, etag=None):
+    """Iterate over gists for the provided username.
+
+    :param str username: (required), if provided, get the gists for this user
         instead of the authenticated user.
     :param int number: (optional), number of gists to return. Default: -1,
         return all of them
@@ -207,7 +224,9 @@ def gists(username=None, number=-1, etag=None):
     :returns: generator of :class:`Gist <github3.gists.Gist>`
 
     """
-    return gh.iter_gists(username, number, etag)
+    if username:
+        return gh.iter_gists(username, number, etag)
+    return iter([])
 
 
 def repo_issues(owner, repository, milestone=None, state=None, assignee=None,
