@@ -18,6 +18,17 @@ class TestRepository(IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_ignore(self):
+        """Test that a user can ignore the notifications on a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('ignore')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('jnewland',
+                                            'gmond_python_modules')
+            assert repository is not None
+            subscription = repository.ignore()
+            assert subscription.ignore is True
+
     def test_iter_languages(self):
         """Test that a repository's languages can be retrieved."""
         cassette_name = self.cassette_name('iter_languages')
@@ -47,3 +58,13 @@ class TestRepository(IntegrationHelper):
             release = repository.release(76677)
 
         assert isinstance(release, github3.repos.release.Release)
+
+    def test_subscription(self):
+        """Test the ability to subscribe to a repository's notifications."""
+        self.basic_login()
+        cassette_name = self.cassette_name('subscription')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('vcr', 'vcr')
+            assert repository is not None
+            subscription = repository.subscribe()
+            assert subscription.subscribed is True
