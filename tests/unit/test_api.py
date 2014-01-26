@@ -20,10 +20,9 @@ class TestAPI(unittest.TestCase):
     def test_enterprise_login(self):
         args = ('login', 'password', None, 'https://url.com/', None)
         with mock.patch.object(github3.GitHubEnterprise, 'login') as login:
-            g = github3.login(*args)
+            g = github3.enterprise_login(*args)
             assert isinstance(g, github3.GitHubEnterprise)
-            assert not isinstance(g, github3.GitHub)
-            login.assert_called_once_with(*args)
+            login.assert_called_once_with('login', 'password', None, None)
 
     def test_login(self):
         args = ('login', 'password', None, None)
