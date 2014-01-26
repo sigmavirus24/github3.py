@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from json import dumps
 from github3.decorators import requires_auth
 from github3.models import GitHubCore
@@ -17,11 +18,7 @@ class Label(GitHubCore):
         #: Name of the label, e.g., 'bug'
         self.name = label.get('name')
 
-    def __eq__(self, label):
-        return self._api == label._api
-
-    def __ne__(self, label):
-        return self._api != label._api
+        self._uniq = self._api
 
     def __repr__(self):
         return '<Label [{0}]>'.format(self)

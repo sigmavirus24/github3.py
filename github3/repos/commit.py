@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.repos.commit
 ====================
@@ -56,6 +57,8 @@ class RepoCommit(BaseCommit):
 
         #: The files that were modified by this commit.
         self.files = commit.get('files', [])
+
+        self._uniq = self.sha
 
     def __repr__(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])

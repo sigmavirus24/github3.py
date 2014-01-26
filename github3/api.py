@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.api
 ===========
@@ -33,7 +34,8 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
                         client_secret)
 
 
-def login(username=None, password=None, token=None, url=None):
+def login(username=None, password=None, token=None, url=None,
+          two_factor_callback=None):
     """Construct and return an authenticated GitHub session.
 
     This will return a GitHubEnterprise session if a url is provided.
@@ -42,6 +44,8 @@ def login(username=None, password=None, token=None, url=None):
     :param str password: password for the login
     :param str token: OAuth token
     :param str url: (optional), URL of a GitHub Enterprise instance
+    :param func two_factor_callback: (optional), function you implement to
+        provide the Two Factor Authentication code to GitHub when necessary
     :returns: :class:`GitHub <github3.github.GitHub>`
 
     """
@@ -49,9 +53,14 @@ def login(username=None, password=None, token=None, url=None):
 
     if (username and password) or token:
         g = GitHubEnterprise(url) if url is not None else GitHub()
-        g.login(username, password, token)
+        g.login(username, password, token, two_factor_callback)
 
     return g
+
+
+def emojis():
+    return gh.emojis()
+emojis.__doc__ = gh.emojis.__doc__
 
 
 def gist(id_num):
@@ -343,61 +352,14 @@ def pull_request(owner, repository, number):
     return gh.pull_request(owner, repository, number)
 
 
+def rate_limit():
+    return gh.rate_limit()
+rate_limit.__doc__ = gh.rate_limit.__doc__
+
+
 def repository(owner, repository):
     return gh.repository(owner, repository)
 repository.__doc__ = gh.repository.__doc__
-
-
-def search_issues(owner, repo, state, keyword):
-    """Find issues by state and keyword.
-
-    :param str owner: (required)
-    :param str repo: (required)
-    :param str state: (required), accepted values: ('open', 'closed')
-    :param str keyword: (required), what to search for
-    :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyIssue <github3.legacy.LegacyIssue>`
-
-    """
-    return gh.search_issues(owner, repo, state, keyword)
-
-
-def search_repos(keyword, **params):
-    """Search all repositories by keyword.
-
-    :param str keyword: (required)
-    :param str language: (optional), language to filter by
-    :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyRepo <github3.legacy.LegacyRepo>`
-
-    """
-    return gh.search_repos(keyword, **params)
-
-
-def search_users(keyword):
-    """Search all users by keyword.
-
-    :param str keyword: (required)
-    :param int start_page: (optional), page to get (results come 100/page)
-    :returns: list of :class:`LegacyUser <github3.legacy.LegacyUser>`
-
-    """
-    return gh.search_users(keyword)
-
-
-def search_email(email):
-    """Search users by email.
-
-    :param str email: (required)
-    :returns: :class:`LegacyUser <github3.legacy.LegacyUser>`
-
-    """
-    return gh.search_email(email)
-
-
-def user(login):
-    return gh.user(login)
-user.__doc__ = gh.user.__doc__
 
 
 def ratelimit_remaining():
@@ -407,6 +369,219 @@ def ratelimit_remaining():
 
     """
     return gh.ratelimit_remaining
+
+
+def search_code(query, sort=None, order=None, per_page=None,
+                text_match=False, number=-1, etag=None):
+    """Find code via the code search API.
+
+    .. warning::
+
+        You will only be able to make 5 calls with this or other search
+        functions. To raise the rate-limit on this set of endpoints, create an
+        authenticated :class:`GitHub <github3.github.GitHub>` Session with
+        ``login``.
+
+    The query can contain any combination of the following supported
+    qualifiers:
+
+    - ``in`` Qualifies which fields are searched. With this qualifier you
+      can restrict the search to just the file contents, the file path, or
+      both.
+    - ``language`` Searches code based on the language it’s written in.
+    - ``fork`` Specifies that code from forked repositories should be
+      searched.  Repository forks will not be searchable unless the fork
+      has more stars than the parent repository.
+    - ``size`` Finds files that match a certain size (in bytes).
+    - ``path`` Specifies the path that the resulting file must be at.
+    - ``extension`` Matches files with a certain extension.
+    - ``user`` or ``repo`` Limits searches to a specific user or
+      repository.
+
+    For more information about these qualifiers, see: http://git.io/-DvAuA
+
+    :param str query: (required), a valid query as described above, e.g.,
+        ``addClass in:file language:js repo:jquery/jquery``
+    :param str sort: (optional), how the results should be sorted;
+        option(s): ``indexed``; default: best match
+    :param str order: (optional), the direction of the sorted results,
+        options: ``asc``, ``desc``; default: ``desc``
+    :param int per_page: (optional)
+    :param bool text_match: (optional), if True, return matching search
+        terms. See http://git.io/4ct1eQ for more information
+    :param int number: (optional), number of repositories to return.
+        Default: -1, returns all available repositories
+    :param str etag: (optional), previous ETag header value
+    :return: generator of :class:`CodeSearchResult
+        <github3.search.CodeSearchResult>`
+    """
+    return gh.search_code(query, sort, order, per_page, text_match, number,
+                          etag)
+
+
+def search_issues(query, sort=None, order=None, per_page=None,
+                  text_match=False, number=-1, etag=None):
+    """Find issues by state and keyword
+
+    .. warning::
+
+        You will only be able to make 5 calls with this or other search
+        functions. To raise the rate-limit on this set of endpoints, create an
+        authenticated :class:`GitHub <github3.github.GitHub>` Session with
+        ``login``.
+
+    The query can contain any combination of the following supported
+    qualifers:
+
+    - ``type`` With this qualifier you can restrict the search to issues or
+      pull request only.
+    - ``in`` Qualifies which fields are searched. With this qualifier you can
+      restrict the search to just the title, body, comments, or any
+      combination of these.
+    - ``author`` Finds issues created by a certain user.
+    - ``assignee`` Finds issues that are assigned to a certain user.
+    - ``mentions`` Finds issues that mention a certain user.
+    - ``commenter`` Finds issues that a certain user commented on.
+    - ``involves`` Finds issues that were either created by a certain user,
+      assigned to that user, mention that user, or were commented on by that
+      user.
+    - ``state`` Filter issues based on whether they’re open or closed.
+    - ``labels`` Filters issues based on their labels.
+    - ``language`` Searches for issues within repositories that match a
+      certain language.
+    - ``created`` or ``updated`` Filters issues based on times of creation, or
+      when they were last updated.
+    - ``comments`` Filters issues based on the quantity of comments.
+    - ``user`` or ``repo`` Limits searches to a specific user or repository.
+
+    For more information about these qualifiers, see: http://git.io/d1oELA
+
+    :param str query: (required), a valid query as described above, e.g.,
+        ``windows label:bug``
+    :param str sort: (optional), how the results should be sorted;
+        options: ``created``, ``comments``, ``updated``; default: best match
+    :param str order: (optional), the direction of the sorted results,
+        options: ``asc``, ``desc``; default: ``desc``
+    :param int per_page: (optional)
+    :param bool text_match: (optional), if True, return matching search
+        terms. See http://git.io/QLQuSQ for more information
+    :param int number: (optional), number of issues to return.
+        Default: -1, returns all available issues
+    :param str etag: (optional), previous ETag header value
+    :return: generator of :class:`IssueSearchResult
+        <github3.search.IssueSearchResult>`
+    """
+    return gh.search_issues(query, sort, order, per_page, text_match,
+                            number, etag)
+
+
+def search_repositories(query, sort=None, order=None, per_page=None,
+                        text_match=False, number=-1, etag=None):
+    """Find repositories via various criteria.
+
+    .. warning::
+
+        You will only be able to make 5 calls with this or other search
+        functions. To raise the rate-limit on this set of endpoints, create an
+        authenticated :class:`GitHub <github3.github.GitHub>` Session with
+        ``login``.
+
+    The query can contain any combination of the following supported
+    qualifers:
+
+    - ``in`` Qualifies which fields are searched. With this qualifier you
+      can restrict the search to just the repository name, description,
+      readme, or any combination of these.
+    - ``size`` Finds repositories that match a certain size (in
+      kilobytes).
+    - ``forks`` Filters repositories based on the number of forks, and/or
+      whether forked repositories should be included in the results at
+      all.
+    - ``created`` or ``pushed`` Filters repositories based on times of
+      creation, or when they were last updated. Format: ``YYYY-MM-DD``.
+      Examples: ``created:<2011``, ``pushed:<2013-02``,
+      ``pushed:>=2013-03-06``
+    - ``user`` or ``repo`` Limits searches to a specific user or
+      repository.
+    - ``language`` Searches repositories based on the language they're
+      written in.
+    - ``stars`` Searches repositories based on the number of stars.
+
+    For more information about these qualifiers, see: http://git.io/4Z8AkA
+
+    :param str query: (required), a valid query as described above, e.g.,
+        ``tetris language:assembly``
+    :param str sort: (optional), how the results should be sorted;
+        options: ``stars``, ``forks``, ``updated``; default: best match
+    :param str order: (optional), the direction of the sorted results,
+        options: ``asc``, ``desc``; default: ``desc``
+    :param int per_page: (optional)
+    :param bool text_match: (optional), if True, return matching search
+        terms. See http://git.io/4ct1eQ for more information
+    :param int number: (optional), number of repositories to return.
+        Default: -1, returns all available repositories
+    :param str etag: (optional), previous ETag header value
+    :return: generator of :class:`Repository <github3.repos.Repository>`
+    """
+    return gh.search_repositories(query, sort, order, per_page, text_match,
+                                  number, etag)
+
+
+def search_users(query, sort=None, order=None, per_page=None,
+                 text_match=False, number=-1, etag=None):
+    """Find users via the Search API.
+
+    .. warning::
+
+        You will only be able to make 5 calls with this or other search
+        functions. To raise the rate-limit on this set of endpoints, create an
+        authenticated :class:`GitHub <github3.github.GitHub>` Session with
+        ``login``.
+
+    The query can contain any combination of the following supported
+    qualifers:
+
+
+    - ``type`` With this qualifier you can restrict the search to just
+      personal accounts or just organization accounts.
+    - ``in`` Qualifies which fields are searched. With this qualifier you
+      can restrict the search to just the username, public email, full
+      name, or any combination of these.
+    - ``repos`` Filters users based on the number of repositories they
+      have.
+    - ``location`` Filter users by the location indicated in their
+      profile.
+    - ``language`` Search for users that have repositories that match a
+      certain language.
+    - ``created`` Filter users based on when they joined.
+    - ``followers`` Filter users based on the number of followers they
+      have.
+
+    For more information about these qualifiers see: http://git.io/wjVYJw
+
+    :param str query: (required), a valid query as described above, e.g.,
+        ``tom repos:>42 followers:>1000``
+    :param str sort: (optional), how the results should be sorted;
+        options: ``followers``, ``repositories``, or ``joined``; default:
+        best match
+    :param str order: (optional), the direction of the sorted results,
+        options: ``asc``, ``desc``; default: ``desc``
+    :param int per_page: (optional)
+    :param bool text_match: (optional), if True, return matching search
+        terms. See http://git.io/_V1zRwa for more information
+    :param int number: (optional), number of search results to return;
+        Default: -1 returns all available
+    :param str etag: (optional), ETag header value of the last request.
+    :return: generator of :class:`UserSearchResult
+        <github3.search.UserSearchResult>`
+    """
+    return gh.search_users(query, sort, order, per_page, text_match, number,
+                           etag)
+
+
+def user(login):
+    return gh.user(login)
+user.__doc__ = gh.user.__doc__
 
 
 def zen():

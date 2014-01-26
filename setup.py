@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
 import sys
@@ -14,9 +15,10 @@ packages = [
     "github3.gists",
     "github3.repos",
     "github3.issues",
+    "github3.search",
 ]
 
-kwargs['tests_require'] = ['mock==1.0.1', 'betamax', 'pytest==2.3.5']
+kwargs['tests_require'] = ['mock == 1.0.1', 'betamax >=0.1.6', 'pytest']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2==0.5.1')
 packages.append('tests')
@@ -25,7 +27,7 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py bdist_wheel sdist upload")
     sys.exit()
 
-requires.extend(["requests >= 1.2.3", "uritemplate.py >= 0.2.0"])
+requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0"])
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
@@ -43,7 +45,7 @@ if not __version__:
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['-q', 'tests/']
+        self.test_args = []
         self.test_suite = True
 
     def run_tests(self):

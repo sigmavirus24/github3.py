@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.events
 ==============
@@ -57,12 +58,6 @@ class Event(GitHubObject):
     def __repr__(self):
         return '<Event [{0}]>'.format(self.type[:-5])
 
-    def __eq__(self, other):
-        return self.id == other.id
-
-    def __ne__(self, other):
-        return self.id != other.id
-
     @staticmethod
     def list_types():
         """List available payload types"""
@@ -82,13 +77,6 @@ def _commitcomment(payload):
     from github3.repos.comment import RepoComment
     if payload.get('comment'):
         payload['comment'] = RepoComment(payload['comment'], None)
-    return payload
-
-
-def _download(payload):
-    from github3.repos.download import Download
-    if payload.get('download'):
-        payload['download'] = Download(payload['download'], None)
     return payload
 
 
@@ -151,6 +139,14 @@ def _pullreqcomm(payload):
     return payload
 
 
+def _release(payload):
+    from github3.repos.release import Release
+    release = payload.get('release')
+    if release:
+        payload['release'] = Release(release)
+    return payload
+
+
 def _team(payload):
     from github3.orgs import Team
     from github3.repos import Repository
@@ -172,7 +168,6 @@ _payload_handlers = {
     'CommitCommentEvent': _commitcomment,
     'CreateEvent': identity,
     'DeleteEvent': identity,
-    'DownloadEvent': _download,
     'FollowEvent': _follow,
     'ForkEvent': _forkev,
     'ForkApplyEvent': identity,
@@ -185,6 +180,8 @@ _payload_handlers = {
     'PullRequestEvent': _pullreqev,
     'PullRequestReviewCommentEvent': _pullreqcomm,
     'PushEvent': identity,
+    'ReleaseEvent': _release,
+    'StatusEvent': identity,
     'TeamAddEvent': _team,
     'WatchEvent': identity,
 }

@@ -3,6 +3,11 @@ Guidelines for Contributing to github3.py
 
 #. Read the README_
 
+#. Please do **not** use the issue tracker for questions.
+
+#. Please use GitHub's search feature to look for already reported issues 
+   before reporting your own.
+
 #. Regardless of the magnitude your pull request (a couple lines to a couple 
    hundred lines), please add your name to the AUTHORS.rst_ file under the 
    heading Contributors.
@@ -41,7 +46,7 @@ Guidelines for Contributing to github3.py
 
 #. In case you haven't caught on, for anything you add, write tests.
 
-#. Be cordial_. Seriously, if anyone who isn't cordial will be sent packing, 
+#. Be cordial_. Seriously, anyone who isn't cordial will be sent packing, 
    regardless of the value of their contributions. I will not tolerate some 
    contributors creating a hostile environment for others.
 

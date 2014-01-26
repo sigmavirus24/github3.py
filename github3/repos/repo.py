@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 github3.repos.repo
 ==================
@@ -25,10 +26,10 @@ from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
-from github3.repos.download import Download
 from github3.repos.hook import Hook
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
+from github3.repos.release import Release, Asset
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
 from github3.utils import timestamp_parameter
@@ -64,8 +65,11 @@ class Repository(GitHubCore):
         self.description = repo.get('description', '')
 
         # The number of forks
-        #: The number of forks made of this repository.
+        #: The number of forks made of this repository. DEPRECATED
         self.forks = repo.get('forks', 0)
+
+        #: The number of forks of this repository.
+        self.fork_count = repo.get('fork_count')
 
         #: Is this repository a fork?
         self.fork = repo.get('fork')
@@ -101,9 +105,11 @@ class Repository(GitHubCore):
         #: Name of the repository.
         self.name = repo.get('name', '')
 
-        # Number of open issues
-        #: Number of open issues on the repository.
+        #: Number of open issues on the repository. DEPRECATED
         self.open_issues = repo.get('open_issues', 0)
+
+        #: Number of open issues on the repository
+        self.open_issues_count = repo.get('open_issues_count')
 
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
@@ -117,6 +123,10 @@ class Repository(GitHubCore):
         self.pushed_at = self._strptime(repo.get('pushed_at'))
         #: Size of the repository.
         self.size = repo.get('size', 0)
+
+        # The number of stargazers
+        #: Number of users who starred the repository
+        self.stargazers = repo.get('stargazers_count', 0)
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
@@ -263,9 +273,6 @@ class Repository(GitHubCore):
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels) if labels else None
 
-    def __eq__(self, repo):
-        return self.id == repo.id
-
     def __repr__(self):
         return '<Repository [{0}]>'.format(self)
 
@@ -340,6 +347,20 @@ class Repository(GitHubCore):
 
             written = True
         return written
+
+    def asset(self, id):
+        """Returns a single Asset.
+
+        :param int id: (required), id of the asset
+        :returns: :class:`Asset <Asset>`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url('releases', 'assets', str(id),
+                                  base_url=self._api)
+            data = self._json(self._get(url, headers=Release.CUSTOM_HEADERS),
+                              200)
+        return Asset(data, self) if data else None
 
     def blob(self, sha):
         """Get the blob indicated by ``sha``.
@@ -714,6 +735,36 @@ class Repository(GitHubCore):
         return Reference(json, self) if json else None
 
     @requires_auth
+    def create_release(self, tag_name, target_commitish=None, name=None,
+                       body=None, draft=False, prerelease=False):
+        """Create a release for this repository.
+
+        :param str tag_name: (required), name to give to the tag
+        :param str target_commitish: (optional), vague concept of a target,
+            either a SHA or a branch name.
+        :param str name: (optional), name of the release
+        :param str body: (optional), description of the release
+        :param bool draft: (optional), whether this release is a draft or not
+        :param bool prerelease: (optional), whether this is a prerelease or
+            not
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        data = {'tag_name': str(tag_name),
+                'target_commitish': target_commitish,
+                'name': name,
+                'body': body,
+                'draft': draft,
+                'prerelease': prerelease
+                }
+        self._remove_none(data)
+
+        url = self._build_url('releases', base_url=self._api)
+        json = self._json(self._post(
+            url, data=data, headers=Release.CUSTOM_HEADERS
+            ), 201)
+        return Release(json, self)
+
+    @requires_auth
     def create_status(self, sha, state, target_url='', description=''):
         """Create a status object on a commit.
 
@@ -833,24 +884,6 @@ class Repository(GitHubCore):
             return False
         url = self._build_url('keys', str(key_id), base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
-
-    def download(self, id_num):
-        """Get a single download object by its id.
-
-        .. warning::
-
-            On 2012-03-11, GitHub will be deprecating the Downloads API. This
-            method will no longer work.
-
-        :param int id_num: (required), id of the download
-        :returns: :class:`Download <Download>` if successful, else None
-        """
-        json = None
-        if int(id_num) > 0:
-            url = self._build_url('downloads', str(id_num),
-                                  base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return Download(json, self) if json else None
 
     @requires_auth
     def edit(self,
@@ -1156,23 +1189,6 @@ class Repository(GitHubCore):
         url = self._build_url('stats', 'contributors', base_url=self._api)
         return self._iter(int(number), url, ContributorStats, etag=etag)
 
-    def iter_downloads(self, number=-1, etag=None):
-        """Iterate over available downloads for this repository.
-
-        .. warning::
-
-            On 2012-03-11, GitHub will be deprecating the Downloads API. This
-            method will no longer work.
-
-        :param int number: (optional), number of downloads to return. Default:
-            -1 returns all available downloads
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Download <Download>`\ s
-        """
-        url = self._build_url('downloads', base_url=self._api)
-        return self._iter(int(number), url, Download, etag=etag)
-
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
 
@@ -1420,6 +1436,21 @@ class Repository(GitHubCore):
         url = self._build_url(*args, base_url=self._api)
         return self._iter(int(number), url, Reference, etag=etag)
 
+    def iter_releases(self, number=-1, etag=None):
+        """Iterates over releases for this repository.
+
+        :param int number: (optional), number of refs to return. Default: -1
+            returns all available refs
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`Release <github3.repos.release.Release>`\ s
+        """
+        url = self._build_url('releases', base_url=self._api)
+        iterator = self._iter(int(number), url, Release, etag=etag)
+        iterator.headers.update(Release.CUSTOM_HEADERS)
+        return iterator
+
     def iter_stargazers(self, number=-1, etag=None):
         """List users who have starred this repository.
 
@@ -1561,7 +1592,6 @@ class Repository(GitHubCore):
         including notes and stashes (provided they exist on the server).
 
         :param str ref: (required)
-        :type ref: str
         :returns: :class:`Reference <github3.git.Reference>`
         """
         json = None
@@ -1569,6 +1599,18 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'refs', ref, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Reference(json, self) if json else None
+
+    def release(self, id):
+        """Get a single release.
+
+        :param int id: (required), id of release
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        json = None
+        if int(id) > 0:
+            url = self._build_url('releases', str(id), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return Release(json, self) if json else None
 
     @requires_auth
     def remove_collaborator(self, login):
@@ -1666,7 +1708,8 @@ class Repository(GitHubCore):
             content = b64encode(content).decode('utf-8')
             data = {'message': message, 'content': content, 'sha': sha,
                     'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author)}
+                    'author': validate_commmitter(author),
+                    'branch': branch}
             self._remove_none(data)
             json = self._json(self._put(url, data=dumps(data)), 200)
             if 'content' in json and 'commit' in json:

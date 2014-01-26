@@ -12,7 +12,7 @@ class TestThread(BaseCase):
     def test_equality(self):
         t = github3.notifications.Thread(load('notification'))
         assert self.thread == t
-        t.id = 1
+        t._uniq = 1
         assert self.thread != t
 
     def test_last_read_at(self):
@@ -48,14 +48,16 @@ class TestThread(BaseCase):
         self.put(self.api + '/subscription')
         self.conf = {'data': {'subscribed': True, 'ignored': False}}
 
-        assert isinstance(self.thread.set_subscription(True, False), github3.notifications.Subscription)
+        assert isinstance(self.thread.set_subscription(True, False),
+                          github3.notifications.Subscription)
         self.mock_assertions()
 
     def test_subscription(self):
         self.response('subscription')
         self.get(self.api + '/subscription')
 
-        assert isinstance(self.thread.subscription(), github3.notifications.Subscription)
+        assert isinstance(self.thread.subscription(),
+                          github3.notifications.Subscription)
         self.mock_assertions()
 
 

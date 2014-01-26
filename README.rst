@@ -32,15 +32,15 @@ Please read the `CONTRIBUTING`_ document.
 Testing
 ~~~~~~~
 
-You can run either ``pip install -r requirements.txt`` to install the 
+You can run either ``pip install -r dev-requirements.txt`` to install the 
 following before testing or simply ``make test-deps``. It is suggested you do 
 this in a virtual enviroment. These need to be installed for the tests to run.
 
-- expecter_ by Gary Bernhardt
-- mock_ by Michael Foord
+- betamax_
 - coverage_ by Ned Batchelder
+- mock_ by Michael Foord
 
-.. _expecter: https://github.com/garybernhardt/expecter
+.. _betamax: https://github.com/sigmavirus24/betamax
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _mock: http://mock.readthedocs.org/en/latest/
 
@@ -62,11 +62,6 @@ Testing
 ~~~~~~~
 
 Install the dependencies from requirements.txt e.g.:
-
-::
-
-    pip install -r requirements.txt
-    # or make test-deps
 
 ::
 

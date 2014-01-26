@@ -18,7 +18,7 @@ class TestAPI(TestCase):
         self.gh.authorize.assert_called_with(*args)
 
     def test_login(self):
-        args = ('login', 'password', None)
+        args = ('login', 'password', None, None)
         with patch.object(github3.api.GitHub, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHub)
@@ -26,11 +26,11 @@ class TestAPI(TestCase):
             login.assert_called_with(*args)
 
     def test_enterprise_login(self):
-        args = ('login', 'password', None, 'http://ghe.invalid/')
+        args = ('login', 'password', None, 'http://ghe.invalid/', None)
         with patch.object(github3.api.GitHubEnterprise, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHubEnterprise)
-            login.assert_called_with(*args[:3])
+            login.assert_called_with('login', 'password', None, None)
 
     def test_gist(self):
         args = (123,)
@@ -131,29 +131,13 @@ class TestAPI(TestCase):
         github3.repository(*args)
         self.gh.repository.assert_called_with(*args)
 
-    def test_search_issues(self):
-        args = ('owner', 'repo', 'state', 'keyword')
-        github3.search_issues(*args)
-        self.gh.search_issues.assert_called_with(*args)
-
-    def test_search_repos(self):
-        args = ('keyword',)
-        github3.search_repos(*args)
-        self.gh.search_repos.assert_called_with(*args)
-
-    def test_search_users(self):
-        args = ('login',)
-        github3.search_users(*args)
-        self.gh.search_users.assert_called_with(*args)
-
-    def test_search_email(self):
-        args = ('email',)
-        github3.search_email(*args)
-        self.gh.search_email.assert_called_with(*args)
-
     def test_user(self):
         github3.user('login')
         self.gh.user.assert_called_with('login')
+
+    def test_rate_limit(self):
+        github3.rate_limit()
+        self.gh.rate_limit.assert_called_once_with()
 
     def test_ratelimit_remaining(self):
         # This prevents a regression in the API

@@ -44,6 +44,7 @@ More Examples
 .. toctree::
     :maxdepth: 2
 
+    examples/two_factor_auth
     examples/oauth
     examples/gist
     examples/git
@@ -72,11 +73,11 @@ Modules
     git
     github
     issues
-    legacy
     models
     orgs
     pulls
     repos
+    search_structs
     structs
     users
 
@@ -109,8 +110,11 @@ Dependencies
 ~~~~~~~~~~~~
 
 - requests_ by Kenneth Reitz
+- uritemplate.py_ by Ian Cordasco
 
 .. _requests: https://github.com/kennethreitz/requests
+.. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
+
 
 Contributing
 ------------
@@ -148,10 +152,11 @@ Running the Unittests
     mkdir -p /path/to/virtualenv/github3.py
     cd /path/to/virtualenv/github3.py
     virtualenv .
-    cd /path/to/github3.py_repo/requirements.txt
-    pip install -r requirements.txt
+    cd /path/to/github3.py_repo/
+    pip install -r dev-requirements.txt
     # Or you could run make test-deps
     make tests
+
 
 .. toctree::
 
