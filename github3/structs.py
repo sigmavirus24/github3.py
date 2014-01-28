@@ -171,7 +171,7 @@ class NullObject(object):
         return False
 
     def __iter__(self):
-        yield self
+        return iter([])
 
     def __next__(self):
         raise StopIteration
