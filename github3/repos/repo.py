@@ -91,6 +91,15 @@ class Repository(GitHubCore):
         #: URL of the home page for the project.
         self.homepage = repo.get('homepage', '')
 
+        #: URL of the pure diff of the pull request
+        self.diff_url = repo.get('diff_url', '')
+
+        #: URL of the pure patch of the pull request
+        self.patch_url = repo.get('patch_url', '')
+
+        #: API URL of the issue representation of this Pull Request
+        self.issue_url = repo.get('issue_url', '')
+
         # e.g. https://github.com/sigmavirus24/github3.py
         #: URL of the project at GitHub.
         self.html_url = repo.get('html_url', '')
@@ -231,6 +240,14 @@ class Repository(GitHubCore):
         comments = repo.get('comments_url')
         #: Comments URL Template. Expand with ``number``
         self.comments_urlt = URITemplate(comments) if comments else None
+
+        comments = repo.get('review_comments_url')
+        #: Pull Request Review Comments URL
+        self.review_comments_url = URITemplate(comments) if comments else None
+
+        comments = repo.get('review_comment_url')
+        #: Pull Request Review Comments URL Template. Expand with ``number``
+        self.review_comment_urlt = URITemplate(comments) if comments else None
 
         comments = repo.get('issue_comment_url')
         #: Issue comment URL Template. Expand with ``number``
