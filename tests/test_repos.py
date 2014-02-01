@@ -934,20 +934,6 @@ class TestRepository(BaseCase):
         r = repos.Repository(json)
         assert isinstance(r.source, repos.Repository)
 
-    def test_set_subscription(self):
-        self.response('subscription')
-        self.put(self.api + 'subscription')
-        self.conf = {'data': {'subscribed': True, 'ignored': False}}
-
-        self.assertRaises(github3.GitHubError, self.repo.set_subscription,
-                          True, False)
-        self.not_called()
-
-        self.login()
-        s = self.repo.set_subscription(True, False)
-        assert isinstance(s, github3.notifications.Subscription)
-        self.mock_assertions()
-
     def test_subscription(self):
         self.response('subscription')
         self.get(self.api + 'subscription')
