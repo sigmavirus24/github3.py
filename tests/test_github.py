@@ -196,20 +196,6 @@ class TestGitHub(BaseCase):
         assert self.g.is_starred('user', 'repo') is True
         self.mock_assertions()
 
-    def test_is_subscribed(self):
-        self.response(None, 204)
-        self.get('https://api.github.com/user/subscriptions/user/repo')
-
-        self.assertRaises(github3.GitHubError, self.g.is_subscribed,
-                          'user', 'repo')
-
-        self.login()
-        assert self.g.is_subscribed(None, None) is False
-        assert self.request.called is False
-
-        assert self.g.is_subscribed('user', 'repo')
-        self.mock_assertions()
-
     def test_issue(self):
         self.response('issue', 200)
         self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
@@ -708,19 +694,6 @@ class TestGitHub(BaseCase):
         assert self.g.star('sigmavirus24', 'github3.py')
         self.mock_assertions()
 
-    def test_subscribe(self):
-        self.response('', 204)
-        self.put('https://api.github.com/user/subscriptions/'
-                 'sigmavirus24/github3.py')
-        self.conf = {'data': None}
-
-        self.assertRaises(github3.GitHubError, self.g.subscribe, 'foo', 'bar')
-
-        self.login()
-        assert self.g.subscribe(None, None) is False
-        assert self.g.subscribe('sigmavirus24', 'github3.py')
-        self.mock_assertions()
-
     def test_unfollow(self):
         self.response('', 204)
         self.delete('https://api.github.com/user/following/'
@@ -745,20 +718,6 @@ class TestGitHub(BaseCase):
         self.login()
         assert self.g.unstar(None, None) is False
         assert self.g.unstar('sigmavirus24', 'github3.py')
-        self.mock_assertions()
-
-    def test_unsubscribe(self):
-        self.response('', 204)
-        self.delete('https://api.github.com/user/subscriptions/'
-                    'sigmavirus24/github3.py')
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.g.unsubscribe,
-                          'foo', 'bar')
-
-        self.login()
-        assert self.g.unsubscribe(None, None) is False
-        assert self.g.unsubscribe('sigmavirus24', 'github3.py')
         self.mock_assertions()
 
     def test_update_user(self):
