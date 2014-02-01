@@ -105,12 +105,14 @@ class Thread(GitHubCore):
 
 
 class Subscription(GitHubCore):
-    """The :class:`Subscription <Subscription>` object wraps thread and
-    repository subscription information.
+
+    """This object wraps thread and repository subscription information.
 
     See also:
     developer.github.com/v3/activity/notifications/#get-a-thread-subscription
+
     """
+
     def __init__(self, sub, session=None):
         super(Subscription, self).__init__(sub, session)
         self._api = sub.get('url')
