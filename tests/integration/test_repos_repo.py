@@ -27,7 +27,7 @@ class TestRepository(IntegrationHelper):
                                             'gmond_python_modules')
             assert repository is not None
             subscription = repository.ignore()
-            assert subscription.ignore is True
+            assert subscription.ignored is True
 
     def test_iter_languages(self):
         """Test that a repository's languages can be retrieved."""
