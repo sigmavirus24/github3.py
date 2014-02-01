@@ -43,6 +43,9 @@ class GitHubSession(requests.Session):
 
         self.auth = (username, password)
 
+        # Disable token authentication
+        self.headers.pop('Authorization', None)
+
     def build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
         parts = [kwargs.get('base_url') or self.base_url]
@@ -104,3 +107,5 @@ class GitHubSession(requests.Session):
         self.headers.update({
             'Authorization': 'token {0}'.format(token)
             })
+        # Unset username/password so we stop sending them
+        self.auth = None
