@@ -86,4 +86,7 @@ class TestNullObject(UnitHelper):
 
     def test_turns_into_unicode(self):
         unicode_str = b''.decode('utf-8')
-        assert unicode(self.instance) == unicode_str
+        try:
+            assert unicode(self.instance) == unicode_str
+        except NameError:
+            assert str(self.instance) == unicode_str
