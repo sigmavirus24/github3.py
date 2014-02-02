@@ -67,3 +67,17 @@ class TestAPI(unittest.TestCase):
             assert isinstance(g, github3.GitHub)
             assert not isinstance(g, github3.GitHubEnterprise)
             login.assert_called_once_with(*args)
+
+    def test_repo_issues(self):
+        args = ('owner', 'repository', None, None, None, None, None, None,
+                None, None, -1, None)
+        github3.repo_issues(*args)
+        self.gh.iter_repo_issues.assert_called_with(*args)
+
+    def test_starred(self):
+        github3.starred('login')
+        self.gh.iter_starred.assert_called_with('login', -1, None)
+
+    def test_subcriptions(self):
+        github3.subscriptions('login')
+        self.gh.iter_subscriptions.assert_called_with('login', -1, None)

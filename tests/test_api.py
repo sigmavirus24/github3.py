@@ -19,14 +19,6 @@ class TestAPI(TestCase):
         github3.iter_following('login')
         self.gh.iter_following.assert_called_with('login', -1, None)
 
-    def test_iter_repo_issues(self):
-        args = ('owner', 'repository', None, None, None, None, None, None,
-                None, None, -1, None)
-        github3.iter_repo_issues(*args)
-        self.gh.iter_repo_issues.assert_called_with(*args)
-
-        github3.iter_repo_issues(None, None)
-
     def test_iter_orgs(self):
         args = ('login', -1, None)
         github3.iter_orgs(*args)
@@ -38,14 +30,6 @@ class TestAPI(TestCase):
         self.gh.iter_user_repos.assert_called_with(*args)
 
         github3.iter_user_repos(None)
-
-    def test_iter_starred(self):
-        github3.iter_starred('login')
-        self.gh.iter_starred.assert_called_with('login', -1, None)
-
-    def test_iter_subcriptions(self):
-        github3.iter_subscriptions('login')
-        self.gh.iter_subscriptions.assert_called_with('login', -1, None)
 
     def test_create_gist(self):
         args = ('description', {'files': ['files']})
