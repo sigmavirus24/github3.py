@@ -11,26 +11,6 @@ class TestAPI(TestCase):
     def tearDown(self):
         self.mock.stop()
 
-    def test_iter_followers(self):
-        github3.iter_followers('login')
-        self.gh.iter_followers.assert_called_with('login', -1, None)
-
-    def test_iter_following(self):
-        github3.iter_following('login')
-        self.gh.iter_following.assert_called_with('login', -1, None)
-
-    def test_iter_orgs(self):
-        args = ('login', -1, None)
-        github3.iter_orgs(*args)
-        self.gh.iter_orgs.assert_called_with(*args)
-
-    def test_iter_user_repos(self):
-        args = ('login', None, None, None, -1, None)
-        github3.iter_user_repos('login')
-        self.gh.iter_user_repos.assert_called_with(*args)
-
-        github3.iter_user_repos(None)
-
     def test_create_gist(self):
         args = ('description', {'files': ['files']})
         github3.create_gist(*args)

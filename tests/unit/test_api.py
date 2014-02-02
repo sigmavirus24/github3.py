@@ -42,6 +42,14 @@ class TestAPI(unittest.TestCase):
             assert isinstance(g, github3.GitHubEnterprise)
             login.assert_called_once_with('login', 'password', None, None)
 
+    def test_followers_of(self):
+        github3.followers_of('login')
+        self.gh.iter_followers.assert_called_with('login', -1, None)
+
+    def test_followed_by(self):
+        github3.followed_by('login')
+        self.gh.iter_following.assert_called_with('login', -1, None)
+
     def test_gist(self):
         gist_id = 123
         github3.gist(gist_id)
@@ -68,6 +76,11 @@ class TestAPI(unittest.TestCase):
             assert not isinstance(g, github3.GitHubEnterprise)
             login.assert_called_once_with(*args)
 
+    def test_organizations(self):
+        args = ('login', -1, None)
+        github3.organizations(*args)
+        self.gh.iter_orgs.assert_called_with(*args)
+
     def test_repo_issues(self):
         args = ('owner', 'repository', None, None, None, None, None, None,
                 None, None, -1, None)
@@ -81,3 +94,8 @@ class TestAPI(unittest.TestCase):
     def test_subcriptions(self):
         github3.subscriptions('login')
         self.gh.iter_subscriptions.assert_called_with('login', -1, None)
+
+    def test_user_repos(self):
+        args = ('login', None, None, None, -1, None)
+        github3.user_repos('login')
+        self.gh.iter_user_repos.assert_called_with(*args)

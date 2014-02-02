@@ -166,7 +166,7 @@ def all_events(number=-1, etag=None):
     return gh.iter_events(number, etag)
 
 
-def followers(username, number=-1, etag=None):
+def followers_of(username, number=-1, etag=None):
     """List the followers of ``username``.
 
     :param str username: (required), login of the person to list the followers
@@ -181,7 +181,7 @@ def followers(username, number=-1, etag=None):
     return gh.iter_followers(username, number, etag) if username else []
 
 
-def following(username, number=-1, etag=None):
+def followed_by(username, number=-1, etag=None):
     """List the people ``username`` follows.
 
     :param str username: (required), login of the user
