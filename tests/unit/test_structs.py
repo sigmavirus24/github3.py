@@ -90,3 +90,7 @@ class TestNullObject(UnitHelper):
             assert unicode(self.instance) == unicode_str
         except NameError:
             assert str(self.instance) == unicode_str
+
+    def test_instances_are_falsey(self):
+        if self.instance:
+            pytest.fail()
