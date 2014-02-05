@@ -13,9 +13,9 @@ Breaking Changes
 
 - All methods and functions starting with ``iter_`` have been renamed.
 
-==============================     =========================
+==============================     ==============================
 Old name                           New name
-==============================     =========================
+==============================     ==============================
 ``github3.iter_all_repos``         ``github3.all_repos``
 ``github3.iter_all_users``         ``github3.all_users``
 ``github3.iter_events``            ``github3.all_events``
@@ -27,7 +27,28 @@ Old name                           New name
 ``github3.iter_starred``           ``github3.starred``
 ``github3.iter_subscriptions``     ``github3.subscriptions``
 ``github3.iter_subscriptions``     ``github3.subscriptions``
-==============================     =========================
+``GitHub#iter_all_repos``          ``GitHub#all_repos``
+``GitHub#iter_all_users``          ``GitHub#all_users``
+``GitHub#iter_authorizations``     ``GitHub#authorizations``
+``GitHub#iter_emails``             ``GitHub#emails``
+``GitHub#iter_events``             ``GitHub#events``
+``GitHub#iter_followers``          ``GitHub#followers``
+``GitHub#iter_following``          ``GitHub#following``
+``GitHub#iter_gists``              ``GitHub#gists``
+``GitHub#iter_notifications``      ``GitHub#notifications``
+``GitHub#iter_org_issues``         ``GitHub#organization_issues``
+``GitHub#iter_issues``             ``GitHub#issues``
+``GitHub#iter_user_issues``        ``GitHub#user_issues``
+``GitHub#iter_repo_issues``        ``GitHub#repo_issues``
+``GitHub#iter_keys``               ``GitHub#keys``
+``GitHub#iter_orgs``               ``GitHub#organizations``
+``GitHub#iter_repos``              ``GitHub#repos``
+``GitHub#iter_starred``            ``GitHub#starred``
+``GitHub#iter_subscriptions``      ``GitHub#subscriptions``
+``GitHub#iter_user_repos``         ``GitHub#user_repos``
+``GitHub#iter_user_teams``         ``GitHub#user_teams``
+
+==============================     ==============================
 
 - ``github3.login`` has been simplified and split into two functions:
 

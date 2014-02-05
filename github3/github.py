@@ -386,7 +386,7 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def iter_all_repos(self, number=-1, since=None, etag=None, per_page=None):
+    def all_repos(self, number=-1, since=None, etag=None, per_page=None):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.
@@ -404,7 +404,7 @@ class GitHub(GitHubCore):
                           params={'since': since, 'per_page': per_page},
                           etag=etag)
 
-    def iter_all_users(self, number=-1, etag=None, per_page=None):
+    def all_users(self, number=-1, etag=None, per_page=None):
         """Iterate over every user in the order they signed up for GitHub.
 
         :param int number: (optional), number of users to return. Default: -1,
@@ -419,7 +419,7 @@ class GitHub(GitHubCore):
                           params={'per_page': per_page}, etag=etag)
 
     @requires_basic_auth
-    def iter_authorizations(self, number=-1, etag=None):
+    def authorizations(self, number=-1, etag=None):
         """Iterate over authorizations for the authenticated user. This will
         return a 404 if you are using a token for authentication.
 
@@ -433,7 +433,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Authorization, etag=etag)
 
     @requires_auth
-    def iter_emails(self, number=-1, etag=None):
+    def emails(self, number=-1, etag=None):
         """Iterate over email addresses for the authenticated user.
 
         :param int number: (optional), number of email addresses to return.
@@ -445,7 +445,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'emails')
         return self._iter(int(number), url, dict, etag=etag)
 
-    def iter_events(self, number=-1, etag=None):
+    def events(self, number=-1, etag=None):
         """Iterate over public events.
 
         :param int number: (optional), number of events to return. Default: -1
@@ -457,7 +457,7 @@ class GitHub(GitHubCore):
         url = self._build_url('events')
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_followers(self, login=None, number=-1, etag=None):
+    def followers(self, login=None, number=-1, etag=None):
         """If login is provided, iterate over a generator of followers of that
         login name; otherwise return a generator of followers of the
         authenticated user.
@@ -473,7 +473,7 @@ class GitHub(GitHubCore):
             return self.user(login).iter_followers()
         return self._iter_follow('followers', int(number), etag=etag)
 
-    def iter_following(self, login=None, number=-1, etag=None):
+    def following(self, login=None, number=-1, etag=None):
         """If login is provided, iterate over a generator of users being
         followed by login; otherwise return a generator of people followed by
         the authenticated user.
@@ -489,7 +489,7 @@ class GitHub(GitHubCore):
             return self.user(login).iter_following()
         return self._iter_follow('following', int(number), etag=etag)
 
-    def iter_gists(self, username=None, number=-1, etag=None):
+    def gists(self, username=None, number=-1, etag=None):
         """If no username is specified, GET /gists, otherwise GET
         /users/:username/gists
 
@@ -507,8 +507,8 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Gist, etag=etag)
 
     @requires_auth
-    def iter_notifications(self, all=False, participating=False, number=-1,
-                           etag=None):
+    def notifications(self, all=False, participating=False, number=-1,
+                      etag=None):
         """Iterate over the user's notification.
 
         :param bool all: (optional), iterate over all notifications
@@ -530,8 +530,8 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Thread, params, etag=etag)
 
     @requires_auth
-    def iter_org_issues(self, name, filter='', state='', labels='', sort='',
-                        direction='', since=None, number=-1, etag=None):
+    def organization_issues(self, name, filter='', state='', labels='', sort='',
+                            direction='', since=None, number=-1, etag=None):
         """Iterate over the organnization's issues if the authenticated user
         belongs to it.
 
@@ -563,8 +563,8 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Issue, params, etag)
 
     @requires_auth
-    def iter_issues(self, filter='', state='', labels='', sort='',
-                    direction='', since=None, number=-1, etag=None):
+    def issues(self, filter='', state='', labels='', sort='', direction='',
+               since=None, number=-1, etag=None):
         """List all of the authenticated user's (and organization's) issues.
 
         :param str filter: accepted values:
@@ -594,8 +594,8 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Issue, params, etag)
 
     @requires_auth
-    def iter_user_issues(self, filter='', state='', labels='', sort='',
-                         direction='', since=None, number=-1, etag=None):
+    def user_issues(self, filter='', state='', labels='', sort='',
+                    direction='', since=None, number=-1, etag=None):
         """List only the authenticated user's issues. Will not list
         organization's issues
 
@@ -625,10 +625,10 @@ class GitHub(GitHubCore):
         params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params, etag)
 
-    def iter_repo_issues(self, owner, repository, milestone=None,
-                         state=None, assignee=None, mentioned=None,
-                         labels=None, sort=None, direction=None, since=None,
-                         number=-1, etag=None):
+    def repo_issues(self, owner, repository, milestone=None,
+                    state=None, assignee=None, mentioned=None,
+                    labels=None, sort=None, direction=None, since=None,
+                    number=-1, etag=None):
         """List issues on owner/repository. Only owner and repository are
         required.
 
@@ -663,7 +663,7 @@ class GitHub(GitHubCore):
         return iter([])
 
     @requires_auth
-    def iter_keys(self, number=-1, etag=None):
+    def keys(self, number=-1, etag=None):
         """Iterate over public keys for the authenticated user.
 
         :param int number: (optional), number of keys to return. Default: -1
@@ -675,7 +675,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'keys')
         return self._iter(int(number), url, Key, etag=etag)
 
-    def iter_orgs(self, login=None, number=-1, etag=None):
+    def organizations(self, login=None, number=-1, etag=None):
         """Iterate over public organizations for login if provided; otherwise
         iterate over public and private organizations for the authenticated
         user.
@@ -696,8 +696,8 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Organization, etag=etag)
 
     @requires_auth
-    def iter_repos(self, type=None, sort=None, direction=None, number=-1,
-                   etag=None):
+    def repos(self, type=None, sort=None, direction=None, number=-1,
+              etag=None):
         """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
@@ -732,8 +732,8 @@ class GitHub(GitHubCore):
 
         return self._iter(int(number), url, Repository, params, etag)
 
-    def iter_starred(self, login=None, sort=None, direction=None, number=-1,
-                     etag=None):
+    def starred(self, login=None, sort=None, direction=None, number=-1,
+                etag=None):
         """Iterate over repositories starred by ``login`` or the authenticated
         user.
 
@@ -760,7 +760,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'starred')
         return self._iter(int(number), url, Repository, params, etag)
 
-    def iter_subscriptions(self, login=None, number=-1, etag=None):
+    def subscriptions(self, login=None, number=-1, etag=None):
         """Iterate over repositories subscribed to by ``login`` or the
         authenticated user.
 
@@ -778,8 +778,8 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'subscriptions')
         return self._iter(int(number), url, Repository, etag=etag)
 
-    def iter_user_repos(self, login, type=None, sort=None, direction=None,
-                        number=-1, etag=None):
+    def user_repos(self, login, type=None, sort=None, direction=None,
+                   number=-1, etag=None):
         """List public repositories for the specified ``login``.
 
         .. versionadded:: 0.6
@@ -814,7 +814,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
-    def iter_user_teams(self, number=-1, etag=None):
+    def user_teams(self, number=-1, etag=None):
         """Gets the authenticated user's teams across all of organizations.
 
         List all of the teams across all of the organizations to which the
