@@ -68,8 +68,8 @@ class GitHub(GitHubCore):
         pass
 
     @requires_auth
-    def _iter_follow(self, which, number, etag):
-        url = self._build_url('user', which)
+    def _iter_follow(self, follow_path, number, etag):
+        url = self._build_url('user', follow_path)
         return self._iter(number, url, User, etag=etag)
 
     @requires_basic_auth
