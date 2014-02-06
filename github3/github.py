@@ -445,7 +445,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'emails')
         return self._iter(int(number), url, dict, etag=etag)
 
-    def events(self, number=-1, etag=None):
+    def all_events(self, number=-1, etag=None):
         """Iterate over public events.
 
         :param int number: (optional), number of events to return. Default: -1
@@ -457,7 +457,7 @@ class GitHub(GitHubCore):
         url = self._build_url('events')
         return self._iter(int(number), url, Event, etag=etag)
 
-    def followers(self, login=None, number=-1, etag=None):
+    def followers_of(self, login, number=-1, etag=None):
         """If login is provided, iterate over a generator of followers of that
         login name; otherwise return a generator of followers of the
         authenticated user.
@@ -469,11 +469,13 @@ class GitHub(GitHubCore):
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
-        if login:
-            return self.user(login).iter_followers()
+        return self.user(login).iter_followers()
+
+    @requires_auth
+    def followers(self, number=-1, etag=None):
         return self._iter_follow('followers', int(number), etag=etag)
 
-    def following(self, login=None, number=-1, etag=None):
+    def followed_by(self, login, number=-1, etag=None):
         """If login is provided, iterate over a generator of users being
         followed by login; otherwise return a generator of people followed by
         the authenticated user.
@@ -485,25 +487,35 @@ class GitHub(GitHubCore):
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
-        if login:
-            return self.user(login).iter_following()
+        return self.user(login).iter_following()
+
+    @requires_auth
+    def following(self, number=-1, etag=None):
         return self._iter_follow('following', int(number), etag=etag)
 
-    def gists(self, username=None, number=-1, etag=None):
-        """If no username is specified, GET /gists, otherwise GET
-        /users/:username/gists
+    def all_gists(self, number=-1, etag=None):
+        """Retrieve all gists and iterate over them.
 
-        :param str login: (optional), login of the user to check
         :param int number: (optional), number of gists to return. Default: -1
             returns all available gists
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
         """
-        if username:
-            url = self._build_url('users', username, 'gists')
-        else:
-            url = self._build_url('gists')
+        url = self._build_url('gists')
+        return self._iter(int(number), url, Gist, etag=etag)
+
+    def gists_for(self, username, number=-1, etag=None):
+        """Iterate over the gists owned by a user.
+
+        :param str login: login of the user who owns the gists
+        :param int number: (optional), number of gists to return. Default: -1
+            returns all available gists
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        """
+        url = self._build_url('users', username, 'gists')
         return self._iter(int(number), url, Gist, etag=etag)
 
     @requires_auth
