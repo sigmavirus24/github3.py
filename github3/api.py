@@ -209,7 +209,7 @@ def all_gists(number=-1, etag=None):
     :returns: generator of :class:`Gist <github3.gists.Gist>`
 
     """
-    return gh.all_gists(None, number, etag)
+    return gh.all_gists(number, etag)
 
 
 def gists_for(username, number=-1, etag=None):
@@ -259,9 +259,9 @@ def repo_issues(owner, repository, milestone=None, state=None, assignee=None,
 
     """
     if owner and repository:
-        return gh.iter_repo_issues(owner, repository, milestone, state,
-                                   assignee, mentioned, labels, sort,
-                                   direction, since, number, etag)
+        return gh.repo_issues(owner, repository, milestone, state,
+                              assignee, mentioned, labels, sort,
+                              direction, since, number, etag)
     return iter([])
 
 
