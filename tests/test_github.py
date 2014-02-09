@@ -495,23 +495,6 @@ class TestGitHub(BaseCase):
         next(self.g.iter_repos('all', direction='desc'))
         self.mock_assertions()
 
-    def test_iter_user_repos(self):
-        self.response('repo', _iter=True)
-        self.get('https://api.github.com/users/sigmavirus24/repos')
-        self.conf.update(params={'type': 'all', 'direction': 'desc',
-                                 'per_page': 100})
-
-        next(self.g.iter_user_repos('sigmavirus24', 'all', direction='desc'))
-        self.mock_assertions()
-
-        self.conf.update(params={'sort': 'created', 'per_page': 100})
-        self.get('https://api.github.com/users/sigmavirus24/repos')
-
-        assert isinstance(next(self.g.iter_user_repos('sigmavirus24',
-                                                      sort="created")),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
     def test_iter_repos_sort(self):
         self.response('repo', _iter=True)
         self.conf.update(params={'sort': 'created', 'per_page': 100})
