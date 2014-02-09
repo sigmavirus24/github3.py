@@ -50,3 +50,40 @@ class UnitHelper(unittest.TestCase):
         # we can assert things about the call that will be attempted to the
         # internet
         self.described_class._build_url = build_url
+
+
+class UnitIteratorHelper(UnitHelper):
+    def create_session_mock(self, *args):
+        # Retrieve a mocked session object
+        session = super(UnitIteratorHelper, self).create_mocked_session(*args)
+        # Initialize a NullObject
+        null = github3.structs.NullObject()
+        # Set it as the return value for every method
+        session.delete.return_value = null
+        session.get.return_value = null
+        session.patch.return_value = null
+        session.post.return_value = null
+        session.put.return_value = null
+        return session
+
+    def get_next(self, iterator):
+        try:
+            next(iterator)
+        except StopIteration:
+            pass
+
+    def patch_get_json(self):
+        """Patch a GitHubIterator's _get_json method"""
+        self.get_json_mock = mock.patch.object(
+            github3.structs.GitHubIterator, '_get_json'
+        )
+        self.patched_get_json = self.get_json_mock.start()
+        self.patched_get_json.return_value = []
+
+    def setUp(self):
+        super(UnitIteratorHelper, self).setUp()
+        self.patch_get_json()
+
+    def tearDown(self):
+        super(UnitIteratorHelper, self).tearDown()
+        self.get_json_mock.stop()
