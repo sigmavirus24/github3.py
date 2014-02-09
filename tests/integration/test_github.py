@@ -156,12 +156,12 @@ class TestGitHub(IntegrationHelper):
             for u in self.gh.iter_followers('sigmavirus24', number=25):
                 assert isinstance(u, github3.users.User)
 
-    def test_iter_user_teams(self):
+    def test_user_teams(self):
         """Test the ability to iterate over a user's teams"""
         self.basic_login()
         cassette_name = self.cassette_name('iter_user_teams')
         with self.recorder.use_cassette(cassette_name):
-            for t in self.gh.iter_user_teams():
+            for t in self.gh.user_teams():
                 assert isinstance(t, github3.orgs.Team)
 
     def test_meta(self):
