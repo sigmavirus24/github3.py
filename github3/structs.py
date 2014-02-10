@@ -141,6 +141,9 @@ class NullObject(object):
     def __init__(self, initializer=None):
         self.__dict__['initializer'] = initializer
 
+    def __int__(self):
+        return 0
+
     def __bool__(self):
         return False
 
