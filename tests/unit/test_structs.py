@@ -94,3 +94,6 @@ class TestNullObject(UnitHelper):
     def test_instances_are_falsey(self):
         if self.instance:
             pytest.fail()
+
+    def test_instances_can_be_coerced_to_zero(self):
+        assert int(self.instance) == 0
