@@ -1252,7 +1252,7 @@ class GitHub(GitHubCore):
                 'Accept': 'application/vnd.github.v3.full.text-match+json'
                 }
 
-        url = self._build_url('search', 'repositories')
+        url = self._build_url('search', 'users')
         return SearchIterator(number, url, UserSearchResult, self, params,
                               etag, headers)
 
