@@ -12,7 +12,7 @@ class TestGitHubSession(IntegrationHelper):
         cassette_name = self.cassette_name('two_factor_authentication')
         assert isinstance(self.session, github3.session.GitHubSession)
 
-        match = ['method', 'uri', 'headers']
+        match = ['method', 'uri', 'gh3-headers']
         with self.recorder.use_cassette(cassette_name,
                                         match_requests_on=match):
             r = self.session.get('https://api.github.com/users/sigmavirus24')

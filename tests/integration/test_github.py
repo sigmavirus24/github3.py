@@ -17,7 +17,7 @@ SSH_KEY = (
 
 
 class TestGitHub(IntegrationHelper):
-    match_on = ['method', 'uri', 'headers']
+    match_on = ['method', 'uri', 'gh3-headers']
 
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist"""
