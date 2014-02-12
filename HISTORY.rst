@@ -1,6 +1,14 @@
 History/Changelog
 -----------------
 
+0.8.2: 2014-02-11
+~~~~~~~~~~~~~~~~~
+
+- Fix bug in ``GitHub#search_users`` (and ``github3.search_users``). Thanks
+  @abesto
+
+- Expose the stargazers count for repositories. Thanks @seveas
+
 0.8.1: 2014-01-26
 ~~~~~~~~~~~~~~~~~
 
