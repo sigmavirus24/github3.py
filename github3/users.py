@@ -8,7 +8,7 @@ This module contains everything relating to Users.
 """
 
 from json import dumps
-from uritemplate import URITemplate
+from uritemplate import expand
 from github3.events import Event
 from github3.models import GitHubObject, GitHubCore, BaseAccount
 from github3.decorators import requires_auth
@@ -148,18 +148,18 @@ class User(BaseAccount):
 
         events_url = user.get('events_url', '')
         #: Events URL Template. Expands with ``privacy``
-        self.events_urlt = URITemplate(events_url) if events_url else None
+        self.events_urlt = events_url or None
 
         #: Followers URL (not a template)
         self.followers_url = user.get('followers_url', '')
 
         furl = user.get('following_url', '')
         #: Following URL Template. Expands with ``other_user``
-        self.following_urlt = URITemplate(furl) if furl else None
+        self.following_urlt = furl or None
 
         gists_url = user.get('gists_url', '')
         #: Gists URL Template. Expands with ``gist_id``
-        self.gists_urlt = URITemplate(gists_url) if gists_url else None
+        self.gists_urlt = gists_url or None
 
         #: Organizations URL (not a template)
         self.organizations_url = user.get('organizations_url', '')
@@ -172,7 +172,7 @@ class User(BaseAccount):
 
         starred_url = user.get('starred_url', '')
         #: Starred URL Template. Expands with ``owner`` and ``repo``
-        self.starred_urlt = URITemplate(starred_url) if starred_url else None
+        self.starred_urlt = starred_url or None
 
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')
@@ -246,7 +246,7 @@ class User(BaseAccount):
         :returns: bool
 
         """
-        url = self.following_urlt.expand(other_user=login)
+        url = expand(self.following_urlt, {'other_user': login})
         return self._boolean(self._get(url), 204, 404)
 
     def iter_events(self, public=False, number=-1, etag=None):
@@ -374,7 +374,7 @@ class User(BaseAccount):
 
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
-        url = self.starred_urlt.expand(owner=None, repo=None)
+        url = expand(self.starred_urlt, {'owner': None, 'repo': None})
         return self._iter(int(number), url, Repository, params, etag)
 
     def iter_subscriptions(self, number=-1, etag=None):

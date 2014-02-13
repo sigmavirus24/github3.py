@@ -14,7 +14,6 @@ from github3.models import GitHubObject, GitHubCore, BaseComment
 from github3.users import User
 from github3.decorators import requires_auth
 from github3.issues.comment import IssueComment
-from uritemplate import URITemplate
 
 
 class PullDestination(GitHubCore):
@@ -180,7 +179,7 @@ class PullRequest(GitHubCore):
 
         comments = pull.get('review_comment_url')
         #: Review comment URL Template. Expands with ``number``
-        self.review_comment_url = URITemplate(comments) if comments else None
+        self.review_comment_url = comments or None
         #: Number of review comments on the pull request
         self.review_comments = pull.get('review_comments')
         #: GitHub.com url for review comments (not a template)

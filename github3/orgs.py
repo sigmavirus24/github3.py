@@ -13,7 +13,6 @@ from github3.models import BaseAccount, GitHubCore
 from github3.repos import Repository
 from github3.users import User
 from github3.decorators import requires_auth
-from uritemplate import URITemplate
 
 
 class Team(GitHubCore):
@@ -47,7 +46,7 @@ class Team(GitHubCore):
         self.members_count = team.get('members_count')
         members = team.get('members_url')
         #: Members URL Template. Expands with ``member``
-        self.members_urlt = URITemplate(members) if members else None
+        self.members_urlt = members or None
         #: Number of repos owned by this team.
         self.repos_count = team.get('repos_count')
         #: Repositories url (not a template)
@@ -196,11 +195,11 @@ class Organization(BaseAccount):
 
         members = org.get('members_url')
         #: Members URL Template. Expands with ``member``
-        self.members_urlt = URITemplate(members) if members else None
+        self.members_urlt = members or None
 
         members = org.get('public_members_url')
         #: Public Members URL Template. Expands with ``member``
-        self.public_members_urlt = URITemplate(members) if members else None
+        self.public_members_urlt = members or None
         #: Repositories url (not a template)
         self.repos_url = org.get('repos_url')
 

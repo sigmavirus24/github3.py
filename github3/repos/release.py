@@ -3,7 +3,7 @@ import json
 
 from github3.decorators import requires_auth
 from github3.models import GitHubCore, GitHubError
-from uritemplate import URITemplate
+from uritemplate import expand
 
 
 class Release(GitHubCore):
@@ -44,7 +44,7 @@ class Release(GitHubCore):
         self.target_commitish = release.get('target_commitish')
         upload_url = release.get('upload_url')
         #: URITemplate to upload an asset with
-        self.upload_urlt = URITemplate(upload_url) if upload_url else None
+        self.upload_urlt = upload_url or None
 
     def __repr__(self):
         return '<Release [{0}]>'.format(self.name)
@@ -125,7 +125,7 @@ class Release(GitHubCore):
         """
         headers = Release.CUSTOM_HEADERS.copy()
         headers.update({'Content-Type': content_type})
-        url = self.upload_urlt.expand({'name': name})
+        url = expand(self.upload_urlt, {'name': name})
         r = self._post(url, data=asset, json=False, headers=headers,
                        verify=False)
         if r.status_code in (201, 202):
