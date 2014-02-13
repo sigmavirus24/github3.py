@@ -8,7 +8,7 @@ from github3.issues.label import Label
 from github3.issues.milestone import Milestone
 from github3.models import GitHubCore
 from github3.users import User
-from uritemplate import URITemplate
+from uritemplate import expand
 
 
 class Issue(GitHubCore):
@@ -66,7 +66,7 @@ class Issue(GitHubCore):
         self.labels = [Label(l, self._session) for l in issue.get('labels')]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
-        self.labels_urlt = URITemplate(labels_url) if labels_url else None
+        self.labels_urlt = labels_url or None
         #: :class:`Milestone <Milestone>` this issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):

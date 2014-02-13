@@ -1,5 +1,4 @@
 import github3
-import uritemplate
 
 from .helper import IntegrationHelper
 
@@ -76,14 +75,16 @@ class TestGitHub(IntegrationHelper):
             feeds = self.gh.feeds()
 
         for v in feeds['_links'].values():
-            assert isinstance(v['href'], uritemplate.URITemplate)
+            assert v['href'] is not None
+            assert v['href'] != ''
 
         # The processing on _links has been tested. Get rid of it.
         del feeds['_links']
 
         # Test the rest of the response
         for v in feeds.values():
-            assert isinstance(v, uritemplate.URITemplate)
+            assert v is not None
+            assert v != ''
 
     def test_gist(self):
         """Test the ability to retrieve a single gist"""
