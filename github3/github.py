@@ -22,7 +22,6 @@ from github3.search import (CodeSearchResult, IssueSearchResult,
 from github3.structs import SearchIterator
 from github3.users import User, Key
 from github3.notifications import Thread
-from uritemplate import URITemplate
 
 
 class GitHub(GitHubCore):
@@ -287,20 +286,6 @@ class GitHub(GitHubCore):
         json = self._json(self._get(url), 200)
         del json['ETag']
         del json['Last-Modified']
-
-        urls = [
-            'timeline_url', 'user_url', 'current_user_public_url',
-            'current_user_url', 'current_user_actor_url',
-            'current_user_organization_url',
-            ]
-
-        for url in urls:
-            json[url] = URITemplate(json[url])
-
-        links = json.get('_links', {})
-        for d in links.values():
-            d['href'] = URITemplate(d['href'])
-
         return json
 
     @requires_auth
