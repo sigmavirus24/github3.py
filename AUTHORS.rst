@@ -58,3 +58,5 @@ Contributors
 - Vincent Driessen (@nvie)
 
 - Philip Chimento (@ptomato)
+
+- David Fischer (@davidfischer-ch)
