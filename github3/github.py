@@ -720,7 +720,7 @@ class GitHub(GitHubCore):
         """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
-           Removed the login parameter for correctness. Use iter_user_repos
+           Removed the login parameter for correctness. Use user_repos
            instead
 
         :param str type: (optional), accepted values:
