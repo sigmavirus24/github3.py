@@ -542,8 +542,9 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Thread, params, etag=etag)
 
     @requires_auth
-    def organization_issues(self, name, filter='', state='', labels='', sort='',
-                            direction='', since=None, number=-1, etag=None):
+    def organization_issues(self, name, filter='', state='', labels='',
+                            sort='', direction='', since=None, number=-1,
+                            etag=None):
         """Iterate over the organnization's issues if the authenticated user
         belongs to it.
 
