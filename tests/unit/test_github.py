@@ -29,7 +29,6 @@ class TestGitHubIterators(UnitIteratorHelper):
 
     def test_user_issues(self):
         """Test that one can iterate over a user's issues."""
-        self.session.auth = ('test', 'test')
         i = self.instance.user_issues()
         # Get the next item from the iterator
         self.get_next(i)
@@ -44,6 +43,7 @@ class TestGitHubIterators(UnitIteratorHelper):
         """
         Test that one must authenticate to interate over a user's issues.
         """
+        self.session.has_auth.return_value = False
         with pytest.raises(GitHubError):
             self.instance.user_issues()
 
@@ -54,7 +54,6 @@ class TestGitHubIterators(UnitIteratorHelper):
                   'sort': 'created', 'direction': 'asc',
                   'since': '2012-05-20T23:10:27Z', 'per_page': 25}
 
-        self.session.auth = ('test', 'test')
         # Make the call with the paramters
         i = self.instance.user_issues(**params)
         self.get_next(i)
