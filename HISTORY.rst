@@ -56,13 +56,15 @@ Old name                           New name
   - ``github3.enterprise_login`` allows GitHub Enterprise users to log into 
     their service.
 
-- ``github3.iter_gists`` was split into two functions:
+- ``GitHub#iter_gists`` was split into two functions:
 
-  - ``github3.all_gists`` which iterates over all of the public gists on 
+  - ``GitHub#public_gists`` which iterates over all of the public gists on 
     GitHub
 
-  - ``github3.gists_for`` which iterates over all the public gists of a 
+  - ``GitHub#gists_for`` which iterates over all the public gists of a 
     specific user
+
+  - ``GitHub#gists`` which iterates over the authenticated users gists
 
 - ``GitHub#iter_subscriptions`` was split into two functions:
 

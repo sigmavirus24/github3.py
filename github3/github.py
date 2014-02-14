@@ -493,10 +493,27 @@ class GitHub(GitHubCore):
     def following(self, number=-1, etag=None):
         return self._iter_follow('following', int(number), etag=etag)
 
-    def all_gists(self, number=-1, etag=None):
-        """Retrieve all gists and iterate over them.
+    def public_gists(self, number=-1, etag=None):
+        """Retrieve all public gists and iterate over them.
+
+        .. versionadded:: 1.0
 
         :param int number: (optional), number of gists to return. Default: -1
+            returns all available gists
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        """
+        url = self._build_url('gists', 'public')
+        return self._iter(int(number), url, Gist, etag=etag)
+
+    @requires_auth
+    def gists(self, number=-1, etag=None):
+        """Retrieve the authenticated user's gists.
+
+        .. versionadded:: 1.0
+
+        :param int number: (optional), number of gists to return. Default: -1,
             returns all available gists
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
@@ -507,6 +524,8 @@ class GitHub(GitHubCore):
 
     def gists_for(self, username, number=-1, etag=None):
         """Iterate over the gists owned by a user.
+
+        .. versionadded:: 1.0
 
         :param str login: login of the user who owns the gists
         :param int number: (optional), number of gists to return. Default: -1

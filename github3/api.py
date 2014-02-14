@@ -195,7 +195,7 @@ def followed_by(username, number=-1, etag=None):
     return gh.followed_by(username, number, etag) if username else []
 
 
-def all_gists(number=-1, etag=None):
+def public_gists(number=-1, etag=None):
     """Iterate over public gists.
 
     .. versionadded:: 1.0
@@ -209,7 +209,7 @@ def all_gists(number=-1, etag=None):
     :returns: generator of :class:`Gist <github3.gists.Gist>`
 
     """
-    return gh.all_gists(number, etag)
+    return gh.public_gists(number, etag)
 
 
 def gists_for(username, number=-1, etag=None):

@@ -16,9 +16,9 @@ class TestAPI(unittest.TestCase):
         github3.all_events()
         self.gh.all_events.assert_called_once_with(-1, None)
 
-    def test_all_gists(self):
-        github3.all_gists()
-        self.gh.all_gists.assert_called_once_with(-1, None)
+    def test_public_gists(self):
+        github3.public_gists()
+        self.gh.public_gists.assert_called_once_with(-1, None)
 
     def test_all_repos(self):
         github3.all_repos()
