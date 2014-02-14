@@ -325,11 +325,10 @@ def starred(username, number=-1, etag=None):
     return gh.starred(username, number, etag)
 
 
-def subscriptions(username, number=-1, etag=None):
+def subscriptions_for(username, number=-1, etag=None):
     """Iterate over repositories subscribed to by ``username``.
 
-    :param str username: (optional), name of user whose subscriptions you want
-        to see
+    :param str username: name of user whose subscriptions you want to see
     :param int number: (optional), number of repositories to return.
         Default: -1 returns all repositories
     :param str etag: (optional), ETag from a previous request to the same
@@ -337,7 +336,7 @@ def subscriptions(username, number=-1, etag=None):
     :returns: generator of :class:`Repository <github3.repos.Repository>`
 
     """
-    return gh.subscriptions(username, number, etag)
+    return gh.subscriptions_for(username, number, etag)
 
 
 def create_gist(description, files):

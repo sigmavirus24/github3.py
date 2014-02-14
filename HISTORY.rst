@@ -25,8 +25,7 @@ Old name                           New name
 ``github3.iter_orgs``              ``github3.organizations``
 ``github3.iter_user_repos``        ``github3.user_repos``
 ``github3.iter_starred``           ``github3.starred``
-``github3.iter_subscriptions``     ``github3.subscriptions``
-``github3.iter_subscriptions``     ``github3.subscriptions``
+``github3.iter_subscriptions``     ``github3.subscriptions_for``
 ``GitHub#iter_all_repos``          ``GitHub#all_repos``
 ``GitHub#iter_all_users``          ``GitHub#all_users``
 ``GitHub#iter_authorizations``     ``GitHub#authorizations``
@@ -44,7 +43,6 @@ Old name                           New name
 ``GitHub#iter_orgs``               ``GitHub#organizations``
 ``GitHub#iter_repos``              ``GitHub#repos``
 ``GitHub#iter_starred``            ``GitHub#starred``
-``GitHub#iter_subscriptions``      ``GitHub#subscriptions``
 ``GitHub#iter_user_repos``         ``GitHub#user_repos``
 ``GitHub#iter_user_teams``         ``GitHub#user_teams``
 
@@ -65,6 +63,14 @@ Old name                           New name
 
   - ``github3.gists_for`` which iterates over all the public gists of a 
     specific user
+
+- ``GitHub#iter_subscriptions`` was split into two functions:
+
+  - ``GitHub#subscriptions_for`` which iterates over an arbitrary user's
+    subscriptions
+
+  - ``GitHub#subscriptions`` which iterates over the authenticated user's 
+    subscriptions
 
 - Remove legacy watching API:
 

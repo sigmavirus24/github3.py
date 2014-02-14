@@ -27,6 +27,17 @@ class TestGitHubIterators(UnitIteratorHelper):
     described_class = GitHub
     example_data = None
 
+    def test_subscriptions(self):
+        """Show that one can iterate over a user's subscriptions."""
+        i = self.instance.subscriptions()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user', 'subscriptions'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_user_issues(self):
         """Test that one can iterate over a user's issues."""
         i = self.instance.user_issues()
