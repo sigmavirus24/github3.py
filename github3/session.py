@@ -65,6 +65,9 @@ class GitHubSession(requests.Session):
         kwargs.update(headers=headers)
         return super(GitHubSession, self).request(*args, **kwargs)
 
+    def has_auth(self):
+        return (self.auth or self.headers.get('Authorization'))
+
     def oauth2_auth(self, client_id, client_secret):
         """Use OAuth2 for authentication.
 
