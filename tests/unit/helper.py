@@ -16,7 +16,8 @@ class UnitHelper(unittest.TestCase):
     example_data = {}
 
     def create_mocked_session(self):
-        MockedSession = mock.create_autospec(github3.session.GitHubSession)
+        MockedSession = mock.create_autospec(github3.session.GitHubSession,
+                                             auth=None)
         return MockedSession()
 
     def create_session_mock(self, *args):
@@ -31,6 +32,7 @@ class UnitHelper(unittest.TestCase):
         session.patch.return_value = None
         session.post.return_value = None
         session.put.return_value = None
+        session.auth = None
         return session
 
     def create_instance_of_described_class(self):

@@ -17,6 +17,8 @@ def requires_2fa(response):
 
 
 class GitHubSession(requests.Session):
+    auth = None
+
     def __init__(self):
         super(GitHubSession, self).__init__()
         self.headers.update({
