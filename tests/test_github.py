@@ -501,24 +501,6 @@ class TestGitHub(BaseCase):
                               github3.repos.Repository)
             self.mock_assertions()
 
-    def test_iter_subscriptions(self):
-        self.response('repo', _iter=True)
-        self.get('https://api.github.com/user/subscriptions')
-        self.conf.update(params={'per_page': 100})
-
-        self.login()
-        assert isinstance(next(self.g.iter_subscriptions()),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
-        with patch.object(github3.github.GitHub, 'user') as user:
-            user.return_value = github3.users.User(load('user'))
-            self.get('https://api.github.com/users/sigmavirus24/'
-                     'subscriptions')
-            assert isinstance(next(self.g.iter_subscriptions('sigmavirus24')),
-                              github3.repos.Repository)
-            self.mock_assertions()
-
     def test_login(self):
         self.g.login('user', 'password')
         assert self.g._session.auth == ('user', 'password')

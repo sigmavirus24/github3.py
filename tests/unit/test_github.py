@@ -28,12 +28,25 @@ class TestGitHubIterators(UnitIteratorHelper):
     example_data = None
 
     def test_subscriptions(self):
-        """Show that one can iterate over a user's subscriptions."""
+        """
+        Show that one can iterate over an authenticated user's subscriptions.
+        """
         i = self.instance.subscriptions()
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('user', 'subscriptions'),
+            url_for('user/subscriptions'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_subscriptions_for(self):
+        """Show that one can iterate over a user's subscriptions."""
+        i = self.instance.subscriptions_for('sigmavirus24')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('users/sigmavirus24/subscriptions'),
             params={'per_page': 100},
             headers={}
         )
