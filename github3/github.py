@@ -608,9 +608,14 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def user_issues(self, filter='', state='', labels='', sort='',
-                    direction='', since=None, number=-1, etag=None):
+                    direction='', since=None, per_page=None, number=-1,
+                    etag=None):
         """List only the authenticated user's issues. Will not list
         organization's issues
+
+        .. versionchanged:: 1.0
+
+            ``per_page`` parameter added before ``number``
 
         :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
@@ -636,6 +641,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
+        params.update(per_page=per_page)
         return self._iter(int(number), url, Issue, params, etag)
 
     def repo_issues(self, owner, repository, milestone=None,

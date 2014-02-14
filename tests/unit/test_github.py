@@ -1,3 +1,6 @@
+import pytest
+
+from github3 import GitHubError
 from github3.github import GitHub
 
 from .helper import UnitHelper, UnitIteratorHelper
@@ -23,6 +26,45 @@ class TestGitHub(UnitHelper):
 class TestGitHubIterators(UnitIteratorHelper):
     described_class = GitHub
     example_data = None
+
+    def test_user_issues(self):
+        """Test that one can iterate over a user's issues."""
+        self.instance.login('test', 'test')
+        i = self.instance.user_issues()
+        # Get the next item from the iterator
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/issues'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    @pytest.xfail
+    def test_user_issues_requires_auth(self):
+        """
+        Test that one must authenticate to interate over a user's issues.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.user_issues()
+
+    def test_user_issues_with_parameters(self):
+        """Test that one may pass parameters to GitHub#user_issues."""
+        # Set up the parameters to be sent
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                  'sort': 'created', 'direction': 'asc',
+                  'since': '2012-05-20T23:10:27Z', 'per_page': 25}
+
+        self.instance.login('test', 'test')
+        # Make the call with the paramters
+        i = self.instance.user_issues(**params)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/issues'),
+            params=params,
+            headers={}
+        )
 
     def test_user_repos(self):
         """Test that one can iterate over a user's repositories."""

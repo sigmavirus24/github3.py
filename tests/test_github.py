@@ -413,27 +413,6 @@ class TestGitHub(BaseCase):
                           github3.issues.Issue)
         self.mock_assertions()
 
-    def test_iter_user_issues(self):
-        self.response('issue', _iter=True)
-        self.get('https://api.github.com/user/issues')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_user_issues)
-
-        self.login()
-        assert isinstance(next(self.g.iter_user_issues()),
-                          github3.issues.Issue)
-        self.mock_assertions()
-
-        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
-                  'sort': 'created', 'direction': 'asc',
-                  'since': '2012-05-20T23:10:27Z'}
-        request_params = merge(params, per_page=100)
-        self.conf.update(params=request_params)
-        assert isinstance(next(self.g.iter_user_issues(**params)),
-                          github3.issues.Issue)
-        self.mock_assertions()
-
     def test_iter_repo_issues(self):
         self.response('issue', _iter=True)
         self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
