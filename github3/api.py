@@ -311,7 +311,7 @@ def user_repos(login, type=None, sort=None, direction=None, number=-1,
     return iter([])
 
 
-def starred(username, number=-1, etag=None):
+def starred_by(username, number=-1, etag=None):
     """Iterate over repositories starred by ``username``.
 
     :param str username: (optional), name of user whose stars you want to see
@@ -322,7 +322,7 @@ def starred(username, number=-1, etag=None):
     :returns: generator of :class:`Repository <github3.repos.Repository>`
 
     """
-    return gh.starred(username, number, etag)
+    return gh.starred_by(username, number, etag)
 
 
 def subscriptions_for(username, number=-1, etag=None):

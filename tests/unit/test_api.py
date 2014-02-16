@@ -88,8 +88,8 @@ class TestAPI(unittest.TestCase):
         self.gh.repo_issues.assert_called_with(*args)
 
     def test_starred(self):
-        github3.starred('login')
-        self.gh.starred.assert_called_with('login', -1, None)
+        github3.starred_by('login')
+        self.gh.starred_by.assert_called_with('login', -1, None)
 
     def test_subcriptions_for(self):
         github3.subscriptions_for('login')

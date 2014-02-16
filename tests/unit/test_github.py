@@ -27,6 +27,36 @@ class TestGitHubIterators(UnitIteratorHelper):
     described_class = GitHub
     example_data = None
 
+    def test_starred(self):
+        """
+        Show that one can iterate over an authenticated user's stars.
+        """
+        i = self.instance.starred()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/starred'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_starred_requires_auth(self):
+        """Show that one needs to authenticate to use #starred."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.starred()
+
+    def test_starred_by(self):
+        """Show that one can iterate over a user's stars."""
+        i = self.instance.starred_by('sigmavirus24')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('users/sigmavirus24/starred'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_subscriptions(self):
         """
         Show that one can iterate over an authenticated user's subscriptions.

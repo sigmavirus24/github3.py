@@ -24,7 +24,7 @@ Old name                           New name
 ``github3.iter_repo_issues``       ``github3.repo_issues``
 ``github3.iter_orgs``              ``github3.organizations``
 ``github3.iter_user_repos``        ``github3.user_repos``
-``github3.iter_starred``           ``github3.starred``
+``github3.iter_starred``           ``github3.starred_by``
 ``github3.iter_subscriptions``     ``github3.subscriptions_for``
 ``GitHub#iter_all_repos``          ``GitHub#all_repos``
 ``GitHub#iter_all_users``          ``GitHub#all_users``
@@ -42,7 +42,6 @@ Old name                           New name
 ``GitHub#iter_keys``               ``GitHub#keys``
 ``GitHub#iter_orgs``               ``GitHub#organizations``
 ``GitHub#iter_repos``              ``GitHub#repos``
-``GitHub#iter_starred``            ``GitHub#starred``
 ``GitHub#iter_user_repos``         ``GitHub#user_repos``
 ``GitHub#iter_user_teams``         ``GitHub#user_teams``
 
@@ -73,6 +72,12 @@ Old name                           New name
 
   - ``GitHub#subscriptions`` which iterates over the authenticated user's 
     subscriptions
+
+- ``GitHub#iter_starred`` was split into two functions:
+
+  - ``GitHub#starred_by`` which iterates over an arbitrary user's stars
+
+  - ``GitHub#starred`` which iterates over the authenticated user's stars
 
 - Remove legacy watching API:
 
