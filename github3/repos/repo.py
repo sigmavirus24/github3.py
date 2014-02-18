@@ -886,6 +886,15 @@ class Repository(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
+    def delete_subscription(self):
+        """Delete the user's subscription to this repository.
+
+        :returns: bool
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
     def edit(self,
              name,
              description=None,
