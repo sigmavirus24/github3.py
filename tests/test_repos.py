@@ -453,6 +453,17 @@ class TestRepository(BaseCase):
         assert self.repo.delete_key(2)
         self.mock_assertions()
 
+    def test_delete_subscription(self):
+        self.response('', 204)
+        self.delete(self.api + 'subscription')
+
+        self.assertRaises(github3.GitHubError, self.repo.delete_subscription)
+        self.not_called()
+
+        self.login()
+        assert self.repo.delete_subscription()
+        self.mock_assertions()
+
     def test_edit(self):
         self.response('repo')
         self.patch(self.api[:-1])
@@ -1215,17 +1226,6 @@ class TestHook(BaseCase):
 
         self.login()
         assert self.hook.delete()
-        self.mock_assertions()
-
-    def test_delete_subscription(self):
-        self.response('', 204)
-        self.delete(self.api + '/subscription')
-
-        self.assertRaises(github3.GitHubError, self.hook.delete_subscription)
-        self.not_called()
-
-        self.login()
-        assert self.hook.delete_subscription()
         self.mock_assertions()
 
     def test_edit(self):
