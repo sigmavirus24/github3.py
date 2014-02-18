@@ -7,8 +7,6 @@ This module contains the main GitHub session object.
 
 """
 
-from json import dumps
-from requests import session
 from github3.auths import Authorization
 from github3.decorators import requires_auth, requires_basic_auth
 from github3.events import Event
@@ -103,6 +101,7 @@ class GitHub(GitHubCore):
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
+        # TODO: Break this behaviour in 1.0 (Don't rely on self._session.auth)
         auth = self._session.auth or (login and password)
         if auth:
             url = self._build_url('authorizations')
@@ -110,12 +109,18 @@ class GitHub(GitHubCore):
                     'client_id': client_id, 'client_secret': client_secret}
             if scopes:
                 data['scopes'] = scopes
-            if self._session.auth:
-                json = self._json(self._post(url, data=data), 201)
-            else:
-                ses = session()
-                ses.auth = (login, password)
-                json = self._json(ses.post(url, data=dumps(data)), 201)
+            # TODO: Unconditionally use the login and password, e.g.,
+            # old_auth = self._session.auth
+            # self.login(login, password)
+            # json = self._json(...)
+            # self._session.auth = old_auth
+            do_logout = False
+            if not self._session.auth:
+                do_logout = True
+                self.login(login, password)
+            json = self._json(self._post(url, data=data), 201)
+            if do_logout:
+                self._session.auth = None
         return Authorization(json, self) if json else None
 
     def check_authorization(self, access_token):
