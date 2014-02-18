@@ -1272,6 +1272,19 @@ class TestHook(BaseCase):
         assert self.hook.test()
         self.mock_assertions()
 
+    def test_ping(self):
+        # Funny name, no?
+        self.response('', 204)
+        self.post(self.api + '/pings')
+        self.conf = {}
+
+        self.assertRaises(github3.GitHubError, self.hook.ping)
+        self.not_called()
+
+        self.login()
+        assert self.hook.ping()
+        self.mock_assertions()
+
 
 class TestRepoComment(BaseCase):
     def __init__(self, methodName='runTest'):
