@@ -84,7 +84,7 @@ class GitHub(GitHubCore):
         return Authorization(json, self) if json else None
 
     def authorize(self, login, password, scopes=None, note='', note_url='',
-                  client_id='', client_secret=''):
+                  client_id='', client_secret='', two_factor_callback=None):
         """Obtain an authorization token from the GitHub API for the GitHub
         API.
 
@@ -98,6 +98,8 @@ class GitHub(GitHubCore):
             which to create a token
         :param str client_secret: (optional), 40 character OAuth client secret
             for which to create the token
+        :param func two_factor_callback: (optional), function you implement to
+            provide the Two Factor Authentication code to GitHub when necessary
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
@@ -117,7 +119,7 @@ class GitHub(GitHubCore):
             do_logout = False
             if not self._session.auth:
                 do_logout = True
-                self.login(login, password)
+                self.login(login, password, two_factor_callback)
             json = self._json(self._post(url, data=data), 201)
             if do_logout:
                 self._session.auth = None
