@@ -15,6 +15,12 @@ class TestGitHub(UnitHelper):
         self.instance.login('username', 'password')
         self.instance.login(token='token')
 
+    def test_revoke_authorization(self):
+        self.instance.revoke_authorization('client_id', 'access_token')
+        self.session.delete.assert_called_once_with(
+            'https://api.github.com/applications/client_id/tokens/access_token'
+        )
+
     def test_revoke_authorizations(self):
         self.instance.revoke_authorizations('client_id')
         self.session.delete.assert_called_once_with(
