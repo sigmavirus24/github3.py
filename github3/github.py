@@ -1022,6 +1022,17 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
+    def revoke_authorizations(self, client_id):
+        """Revoke all authorizations for an OAuth application.
+
+        Revoke all authorization tokens created by your application.
+
+        :param str client_id: (required), the client_id of your application
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('applications', str(client_id), 'tokens')
+        return self._boolean(self._delete(url), 204, 404)
+
     def search_code(self, query, sort=None, order=None, per_page=None,
                     text_match=False, number=-1, etag=None):
         """Find code via the code search API.

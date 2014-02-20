@@ -14,3 +14,9 @@ class TestGitHub(UnitHelper):
     def test_can_login_without_two_factor_callback(self):
         self.instance.login('username', 'password')
         self.instance.login(token='token')
+
+    def test_revoke_authorizations(self):
+        self.instance.revoke_authorizations('client_id')
+        self.session.delete.assert_called_once_with(
+            'https://api.github.com/applications/client_id/tokens'
+        )
