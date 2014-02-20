@@ -1416,6 +1416,27 @@ class Repository(GitHubCore):
                 del params[k]
         return self._iter(int(number), url, Thread, params, etag)
 
+
+    @requires_auth
+    def iter_pages(self):
+        """Iterate over pages of this repository.
+
+        :returns: generator of :class:`Repository <Repository>`
+        """
+        url = self._build_url('pages', base_url=self._api)
+        return self._iter(url, Repository)
+
+
+    @requires_auth
+    def iter_pages_build(self):
+        """Iterate over pages builds of this repository.
+
+        :returns: generator of :class:`Repository <Repository>`
+        """
+        url = self._build_url('pages', 'builds', base_url=self._api)
+        return self._iter(url, Repository)
+
+
     def iter_pulls(self, state=None, head=None, base=None, number=-1,
                    etag=None):
         """List pull requests on repository.
