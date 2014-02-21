@@ -102,25 +102,22 @@ class GitHub(GitHubCore):
         """
         json = None
         # TODO: Break this behaviour in 1.0 (Don't rely on self._session.auth)
-        auth = self._session.auth or (login and password)
+        auth = None
+        if self._session.auth:
+            auth = self._session.auth
+        elif login and password:
+            auth = (login, password)
+
         if auth:
             url = self._build_url('authorizations')
             data = {'note': note, 'note_url': note_url,
                     'client_id': client_id, 'client_secret': client_secret}
             if scopes:
                 data['scopes'] = scopes
-            # TODO: Unconditionally use the login and password, e.g.,
-            # old_auth = self._session.auth
-            # self.login(login, password)
-            # json = self._json(...)
-            # self._session.auth = old_auth
-            do_logout = False
-            if not self._session.auth:
-                do_logout = True
-                self.login(login, password)
-            json = self._json(self._post(url, data=data), 201)
-            if do_logout:
-                self._session.auth = None
+
+            with self._session.temporary_basic_auth(*auth):
+                json = self._json(self._post(url, data=data), 201)
+
         return Authorization(json, self) if json else None
 
     def check_authorization(self, access_token):
