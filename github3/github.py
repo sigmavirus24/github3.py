@@ -1019,20 +1019,38 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
-    def revoke_authorization(self, client_id, access_token):
+    def _revoke_authorization(self, access_token=None):
+        """Helper method for revoking application authorization keys.
+
+        :param str access_token: (optional), the access token to delete; if
+            not provided, revoke all access tokens for this application
+
+        """
+        p = self._session.params
+        client_id = p.get('client_id')
+        client_secret = p.get('client_secret')
+        if client_id and client_secret:
+            auth = (client_id, client_secret)
+            url_parts = ['applications', str(auth[0]), 'tokens']
+            if access_token:
+                url_parts.append(access_token)
+            url = self._build_url(*url_parts)
+            return self._delete(url, auth=auth, params={
+                'client_id': None, 'client_secret': None
+            })
+        return False
+
+    def revoke_authorization(self, access_token):
         """Revoke specified authorization for an OAuth application.
 
         Revoke all authorization tokens created by your application.
 
-        :param str client_id: (required), the client_id of your application
-        :param str acess_token: (required), the access_token to revoke
+        :param str access_token: (required), the access_token to revoke
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('applications', str(client_id), 'tokens',
-                              str(access_token))
-        return self._boolean(self._delete(url), 204, 404)
+        self._revoke_authorization(access_token)
 
-    def revoke_authorizations(self, client_id):
+    def revoke_authorizations(self):
         """Revoke all authorizations for an OAuth application.
 
         Revoke all authorization tokens created by your application.
@@ -1040,8 +1058,7 @@ class GitHub(GitHubCore):
         :param str client_id: (required), the client_id of your application
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('applications', str(client_id), 'tokens')
-        return self._boolean(self._delete(url), 204, 404)
+        self._revoke_authorization()
 
     def search_code(self, query, sort=None, order=None, per_page=None,
                     text_match=False, number=-1, etag=None):
