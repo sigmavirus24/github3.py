@@ -184,3 +184,19 @@ class TestGitHubSession:
         """Test that GitHubSession is a subclass of requests.Session"""
         assert issubclass(session.GitHubSession,
                           requests.Session)
+
+    def test_can_use_temporary_basic_auth(self):
+        """Test that temporary_basic_auth resets old auth."""
+        s = self.build_session()
+        s.basic_auth('foo', 'bar')
+        with s.temporary_basic_auth('temp', 'pass'):
+            assert s.auth != ('foo', 'bar')
+
+        assert s.auth == ('foo', 'bar')
+
+    def test_temporary_basic_auth_replaces_auth(self):
+        """Test that temporary_basic_auth sets the proper credentials."""
+        s = self.build_session()
+        s.basic_auth('foo', 'bar')
+        with s.temporary_basic_auth('temp', 'pass'):
+            assert s.auth == ('temp', 'pass')

@@ -4,6 +4,7 @@ import requests
 from collections import Callable
 from github3 import __version__
 from logging import getLogger
+from contextlib import contextmanager
 
 __url_cache__ = {}
 __logs__ = getLogger(__package__)
@@ -109,3 +110,15 @@ class GitHubSession(requests.Session):
             })
         # Unset username/password so we stop sending them
         self.auth = None
+
+    @contextmanager
+    def temporary_basic_auth(self, *auth):
+        old_basic_auth = self.auth
+        old_token_auth = self.headers.get('Authorization')
+
+        self.basic_auth(*auth)
+        yield
+
+        self.auth = old_basic_auth
+        if old_token_auth:
+            self.headers['Authorization'] = old_token_auth
