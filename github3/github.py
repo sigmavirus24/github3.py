@@ -8,7 +8,8 @@ This module contains the main GitHub session object.
 """
 
 from github3.auths import Authorization
-from github3.decorators import requires_auth, requires_basic_auth
+from github3.decorators import (requires_auth, requires_basic_auth,
+                                requires_app_credentials)
 from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
@@ -1040,6 +1041,7 @@ class GitHub(GitHubCore):
             })
         return False
 
+    @requires_app_credentials
     def revoke_authorization(self, access_token):
         """Revoke specified authorization for an OAuth application.
 
@@ -1050,6 +1052,7 @@ class GitHub(GitHubCore):
         """
         self._revoke_authorization(access_token)
 
+    @requires_app_credentials
     def revoke_authorizations(self):
         """Revoke all authorizations for an OAuth application.
 
