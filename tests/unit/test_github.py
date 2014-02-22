@@ -27,17 +27,29 @@ class TestGitHubAuthorizations(UnitHelper):
         return session
 
     def test_revoke_authorization(self):
-        self.instance.set_client_id('id', 'secret')
+        """Test that GitHub#revoke_authorization calls the expected methods.
+
+        It should use the session's delete and temporary_basic_auth methods.
+        """
         self.instance.revoke_authorization('access_token')
         self.session.delete.assert_called_once_with(
             'https://api.github.com/applications/id/tokens/access_token',
             params={'client_id': None, 'client_secret': None}
         )
+        self.session.temporary_basic_auth.assert_called_once_with(
+            'id', 'secret'
+        )
 
     def test_revoke_authorizations(self):
-        self.instance.set_client_id('id', 'secret')
+        """Test that GitHub#revoke_authorizations calls the expected methods.
+
+        It should use the session's delete and temporary_basic_auth methods.
+        """
         self.instance.revoke_authorizations()
         self.session.delete.assert_called_once_with(
             'https://api.github.com/applications/id/tokens',
             params={'client_id': None, 'client_secret': None}
+        )
+        self.session.temporary_basic_auth.assert_called_once_with(
+            'id', 'secret'
         )
