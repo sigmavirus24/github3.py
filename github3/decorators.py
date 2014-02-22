@@ -67,6 +67,28 @@ def requires_basic_auth(func):
     return auth_wrapper
 
 
+def requires_app_credentials(func):
+    """Require client_id and client_secret to be associated.
+
+    This is used to note and enforce which methods require a client_id and
+    client_secret to be used.
+
+    """
+    @wraps(func)
+    def auth_wrapper(self, *args, **kwargs):
+        if hasattr(self, '_session') and self._session.params:
+            return func(self, *args, **kwargs)
+        else:
+            from github3.models import GitHubError
+            # Mock a 401 response
+            r = generate_fake_error_response(
+                '{"message": "Requires username/password authentication"}'
+            )
+            raise GitHubError(r)
+
+    return auth_wrapper
+
+
 def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
     r = Response()
     r.status_code = status_code
