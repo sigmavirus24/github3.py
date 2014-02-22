@@ -76,7 +76,8 @@ def requires_app_credentials(func):
     """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        if hasattr(self, '_session') and self._session.params:
+        client_id, client_secret = self._session.retrieve_client_credentials()
+        if client_id and client_secret:
             return func(self, *args, **kwargs)
         else:
             from github3.models import GitHubError
