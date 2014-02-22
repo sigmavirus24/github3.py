@@ -72,6 +72,18 @@ class TestGitHubSession:
         s.basic_auth('username', 'password')
         assert s.auth == ('username', 'password')
 
+    def test_basic_login_disables_token_auth(self):
+        """Test that basic auth will remove the Authorization header.
+
+        Token and basic authentication will conflict so remove the token
+        authentication.
+        """
+        s = self.build_session()
+        s.token_auth('token goes here')
+        assert 'Authorization' in s.headers
+        s.basic_auth('username', 'password')
+        assert 'Authorization' not in s.headers
+
     @patch.object(requests.Session, 'request')
     def test_handle_two_factor_auth(self, request_mock):
         """Test the method that handles getting the 2fa code"""
@@ -121,6 +133,16 @@ class TestGitHubSession:
         s.token_auth('token goes here')
         assert s.headers['Authorization'] == 'token token goes here'
 
+    def test_token_auth_disables_basic_auth(self):
+        """Test that using token auth removes the value of the auth attribute.
+
+        If `GitHubSession.auth` is set then it conflicts with the token value.
+        """
+        s = self.build_session()
+        s.auth = ('foo', 'bar')
+        s.token_auth('token goes here')
+        assert s.auth is None
+
     def test_token_auth_does_not_use_falsey_values(self):
         """Test that token auth will not authenticate with falsey values"""
         bad_tokens = [None, '']
@@ -162,3 +184,37 @@ class TestGitHubSession:
         """Test that GitHubSession is a subclass of requests.Session"""
         assert issubclass(session.GitHubSession,
                           requests.Session)
+
+    def test_can_use_temporary_basic_auth(self):
+        """Test that temporary_basic_auth resets old auth."""
+        s = self.build_session()
+        s.basic_auth('foo', 'bar')
+        with s.temporary_basic_auth('temp', 'pass'):
+            assert s.auth != ('foo', 'bar')
+
+        assert s.auth == ('foo', 'bar')
+
+    def test_temporary_basic_auth_replaces_auth(self):
+        """Test that temporary_basic_auth sets the proper credentials."""
+        s = self.build_session()
+        s.basic_auth('foo', 'bar')
+        with s.temporary_basic_auth('temp', 'pass'):
+            assert s.auth == ('temp', 'pass')
+
+    def test_retrieve_client_credentials_when_set(self):
+        """Test that retrieve_client_credentials will return the credentials.
+
+        We must assert that when set, this function will return them.
+        """
+        s = self.build_session()
+        s.params = {'client_id': 'id', 'client_secret': 'secret'}
+        assert s.retrieve_client_credentials() == ('id', 'secret')
+
+    def test_retrieve_client_credentials_returns_none(self):
+        """Test that retrieve_client_credentials will return (None, None).
+
+        Namely, then the necessary parameters are set, it will not raise an
+        error.
+        """
+        s = self.build_session()
+        assert s.retrieve_client_credentials() == (None, None)

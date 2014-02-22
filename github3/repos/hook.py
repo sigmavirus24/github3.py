@@ -63,15 +63,6 @@ class Hook(GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def delete_subscription(self):
-        """Delete the user's subscription to this repository.
-
-        :returns: bool
-        """
-        url = self._build_url('subscription', base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
-
-    @requires_auth
     def edit(self, config={}, events=[], add_events=[], rm_events=[],
              active=True):
         """Edit this hook.
@@ -104,6 +95,15 @@ class Hook(GitHubCore):
             return True
 
         return False
+
+    @requires_auth
+    def ping(self):
+        """Ping this hook.
+
+        :returns: bool
+        """
+        url = self._build_url('pings', base_url=self._api)
+        return self._boolean(self._post(url), 204, 404)
 
     @requires_auth
     def test(self):
