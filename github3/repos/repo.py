@@ -1428,7 +1428,7 @@ class Repository(GitHubCore):
 
 
     @requires_auth
-    def iter_pages_build(self):
+    def iter_pages_builds(self):
         """Iterate over pages builds of this repository.
 
         :returns: generator of :class:`Repository <Repository>`
