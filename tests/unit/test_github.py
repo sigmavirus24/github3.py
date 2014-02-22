@@ -15,20 +15,29 @@ class TestGitHub(UnitHelper):
         self.instance.login('username', 'password')
         self.instance.login(token='token')
 
+
+class TestGitHubAuthorizations(UnitHelper):
+    described_class = GitHub
+    example_data = None
+
+    def create_session_mock(self, *args):
+        session = super(TestGitHubAuthorizations,
+                        self).create_session_mock(*args)
+        session.retrieve_client_credentials.return_value = ('id', 'secret')
+        return session
+
     def test_revoke_authorization(self):
-        self.instance.set_client_id('key', 'secret')
+        self.instance.set_client_id('id', 'secret')
         self.instance.revoke_authorization('access_token')
         self.session.delete.assert_called_once_with(
-            'https://api.github.com/applications/key/tokens/access_token',
-            auth=('key', 'secret'),
+            'https://api.github.com/applications/id/tokens/access_token',
             params={'client_id': None, 'client_secret': None}
         )
 
     def test_revoke_authorizations(self):
-        self.instance.set_client_id('key', 'secret')
+        self.instance.set_client_id('id', 'secret')
         self.instance.revoke_authorizations()
         self.session.delete.assert_called_once_with(
-            'https://api.github.com/applications/key/tokens',
-            auth=('key', 'secret'),
+            'https://api.github.com/applications/id/tokens',
             params={'client_id': None, 'client_secret': None}
         )

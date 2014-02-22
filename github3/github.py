@@ -1020,48 +1020,42 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
-    def _revoke_authorization(self, access_token=None):
-        """Helper method for revoking application authorization keys.
-
-        :param str access_token: (optional), the access token to delete; if
-            not provided, revoke all access tokens for this application
-
-        """
-        p = self._session.params
-        client_id = p.get('client_id')
-        client_secret = p.get('client_secret')
-        if client_id and client_secret:
-            auth = (client_id, client_secret)
-            url_parts = ['applications', str(auth[0]), 'tokens']
-            if access_token:
-                url_parts.append(access_token)
-            url = self._build_url(*url_parts)
-            return self._delete(url, auth=auth, params={
-                'client_id': None, 'client_secret': None
-            })
-        return False
-
     @requires_app_credentials
     def revoke_authorization(self, access_token):
         """Revoke specified authorization for an OAuth application.
 
-        Revoke all authorization tokens created by your application.
+        Revoke all authorization tokens created by your application. This will
+        only work if you have already called ``set_client_id``.
 
         :param str access_token: (required), the access_token to revoke
         :returns: bool -- True if successful, False otherwise
         """
-        self._revoke_authorization(access_token)
+        client_id, client_secret = self._session.retrieve_client_credentials()
+        url = self._build_url('applications', str(client_id), 'tokens',
+                              access_token)
+        with self._session.temporary_basic_auth(client_id, client_secret):
+            response = self._delete(url, params={'client_id': None,
+                                                 'client_secret': None})
+
+        return self._boolean(response, 204, 404)
 
     @requires_app_credentials
     def revoke_authorizations(self):
         """Revoke all authorizations for an OAuth application.
 
-        Revoke all authorization tokens created by your application.
+        Revoke all authorization tokens created by your application. This will
+        only work if you have already called ``set_client_id``.
 
         :param str client_id: (required), the client_id of your application
         :returns: bool -- True if successful, False otherwise
         """
-        self._revoke_authorization()
+        client_id, client_secret = self._session.retrieve_client_credentials()
+        url = self._build_url('applications', str(client_id), 'tokens')
+        with self._session.temporary_basic_auth(client_id, client_secret):
+            response = self._delete(url, params={'client_id': None,
+                                                 'client_secret': None})
+
+        return self._boolean(response, 204, 404)
 
     def search_code(self, query, sort=None, order=None, per_page=None,
                     text_match=False, number=-1, etag=None):
