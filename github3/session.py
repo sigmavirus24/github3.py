@@ -87,6 +87,15 @@ class GitHubSession(requests.Session):
             response = new_response
         return response
 
+    def retrieve_client_credentials(self):
+        """Return the client credentials.
+
+        :returns: tuple(client_id, client_secret)
+        """
+        client_id = self.params.get('client_id')
+        client_secret = self.params.get('client_secret')
+        return (client_id, client_secret)
+
     def two_factor_auth_callback(self, callback):
         if not callback:
             return

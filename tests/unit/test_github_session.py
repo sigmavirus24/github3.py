@@ -200,3 +200,21 @@ class TestGitHubSession:
         s.basic_auth('foo', 'bar')
         with s.temporary_basic_auth('temp', 'pass'):
             assert s.auth == ('temp', 'pass')
+
+    def test_retrieve_client_credentials_when_set(self):
+        """Test that retrieve_client_credentials will return the credentials.
+
+        We must assert that when set, this function will return them.
+        """
+        s = self.build_session()
+        s.params = {'client_id': 'id', 'client_secret': 'secret'}
+        assert s.retrieve_client_credentials() == ('id', 'secret')
+
+    def test_retrieve_client_credentials_returns_none(self):
+        """Test that retrieve_client_credentials will return (None, None).
+
+        Namely, then the necessary parameters are set, it will not raise an
+        error.
+        """
+        s = self.build_session()
+        assert s.retrieve_client_credentials() == (None, None)
