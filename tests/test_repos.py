@@ -765,6 +765,22 @@ class TestRepository(BaseCase):
         assert isinstance(n, github3.notifications.Thread)
         self.mock_assertions()
 
+    def test_iter_pages(self):
+        self.response('pages', _iter=True)
+        self.get(self.api + 'pages')
+
+        e = next(self.repo.iter_pages())
+        assert isinstance(e, github3.repos.Repository)
+        self.mock_assertions()
+
+    def test_iter_pages_build(self):
+        self.response('pages', 'builds', _iter=True)
+        self.get(self.api + 'pages', 'builds')
+
+        e = next(self.repo.iter_pages_builds())
+        assert isinstance(e, github3.repos.Repository)
+        self.mock_assertions()
+
     def test_iter_pulls(self):
         self.response('pull', _iter=True)
         self.get(self.api + 'pulls')
