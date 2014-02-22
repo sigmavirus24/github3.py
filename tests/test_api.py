@@ -14,8 +14,9 @@ class TestAPI(TestCase):
     def test_authorize(self):
         args = ('login', 'password', ['scope1'], 'note', 'note_url.com', '',
                 '')
-        github3.authorize(*args)
-        self.gh.authorize.assert_called_with(*args)
+        with patch.object(github3.api.GitHub, 'authorize') as authorize:
+            github3.authorize(*args)
+            authorize.assert_called_once_with(*args)
 
     def test_login(self):
         args = ('login', 'password', None, None)

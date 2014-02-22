@@ -14,7 +14,7 @@ gh = GitHub()
 
 
 def authorize(login, password, scopes, note='', note_url='', client_id='',
-              client_secret=''):
+              client_secret='', two_factor_callback=None):
     """Obtain an authorization token for the GitHub API.
 
     :param str login: (required)
@@ -27,9 +27,13 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
         to create a token
     :param str client_secret: (optional), 40 character OAuth client secret for
         which to create the token
+    :param func two_factor_callback: (optional), function to call when a
+        Two-Factor Authentication code needs to be provided by the user.
     :returns: :class:`Authorization <Authorization>`
 
     """
+    gh = GitHub()
+    gh.login(two_factor_callback=two_factor_callback)
     return gh.authorize(login, password, scopes, note, note_url, client_id,
                         client_secret)
 
