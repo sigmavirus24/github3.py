@@ -41,6 +41,11 @@ Let's get information about a user::
 More Examples
 ~~~~~~~~~~~~~
 
+.. note::
+
+    We would love for you to submit more examples to the documentation. Just 
+    send a `pull request <https://github.com/sigmavirus24/github3.py>`_!
+
 .. toctree::
     :maxdepth: 2
 
@@ -55,31 +60,58 @@ More Examples
     examples/octocat
 
 
+In depth documentation
+----------------------
+
+Organized using GitHub's documentation
+--------------------------------------
+
+This follows the outline that exists on `http://developer.github.com/v3/ <http://developer.github.com/v3/>`_
+
+.. toctree::
+    :maxdepth: 1
+    
+    gh/activity
+    gh/gists
+    gh/git
+    gh/issues
+    gh/misc
+    gh/orgs
+    gh/pull 
+    gh/repos
+    gh/search
+    gh/users
+
+
+.. one-to-one correspondence with developer.github.com/v3
+
 .. links
 
 .. _GitHub API: http://developer.github.com
 
 
 Modules
--------
+~~~~~~~
+
+.. TODO: Move these to modules/*.rst
 
 .. toctree::
     :maxdepth: 1
 
-    api
-    auths
-    events
-    gists
-    git
-    github
-    issues
-    models
-    orgs
-    pulls
-    repos
-    search_structs
-    structs
-    users
+    modules/api
+    modules/auths
+    modules/events
+    modules/gists
+    modules/git
+    modules/github
+    modules/issues
+    modules/models
+    modules/orgs
+    modules/pulls
+    modules/repos
+    modules/search_structs
+    modules/structs
+    modules/users
 
 Internals
 ~~~~~~~~~
@@ -90,7 +122,7 @@ feel the need to contribute to the project.
 .. toctree::
     :maxdepth: 1
 
-    models
+    modules/models
     decorators
 
 
