@@ -1223,8 +1223,9 @@ class Repository(GitHubCore):
             :class:`Deployment <github3.repos.deployment.Deployment>`\ s
         """
         url = self._build_url('deployments', base_url=self._api)
-        return self._iter(int(number), url, Deployment, etag=etag,
-                          headers=Deployment.CUSTOM_HEADERS)
+        i = self._iter(int(number), url, Deployment, etag=etag)
+        i.headers.update(Deployment.CUSTOM_HEADERS)
+        return i
 
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
