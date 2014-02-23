@@ -535,7 +535,9 @@ class Repository(GitHubCore):
             url = self._build_url('deployments', base_url=self._api)
             data = {'ref': ref, 'force': force, 'payload': payload,
                     'auto_merge': auto_merge, 'description': description}
-            json = self._json(self._post(url, data=data), 201)
+            headers = Deployment.CUSTOM_HEADERS
+            json = self._json(self._post(url, data=data, headers=headers),
+                              201)
         return Deployment(json, self) if json else None
 
     @requires_auth
@@ -1221,7 +1223,8 @@ class Repository(GitHubCore):
             :class:`Deployment <github3.repos.deployment.Deployment>`\ s
         """
         url = self._build_url('deployments', base_url=self._api)
-        return self._iter(int(number), url, Deployment, etag=etag)
+        return self._iter(int(number), url, Deployment, etag=etag,
+                          headers=Deployment.CUSTOM_HEADERS)
 
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
