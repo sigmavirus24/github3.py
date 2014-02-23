@@ -26,6 +26,7 @@ from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
+from github3.repos.deployment import Deployment
 from github3.repos.hook import Hook
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
@@ -1184,6 +1185,19 @@ class Repository(GitHubCore):
         """
         url = self._build_url('stats', 'contributors', base_url=self._api)
         return self._iter(int(number), url, ContributorStats, etag=etag)
+
+    def iter_deployments(self, number=-1, etag=None):
+        """Iterate over deployments for this repository.
+
+        :param int number: (optional), number of deployments to return.
+            Default: -1, returns all available deployments
+        :param str etag: (optional), ETag from a previous request for all
+            deployments
+        :returns: generator of
+            :class:`Deployment <github3.repos.deployment.Deployment>`\ s
+        """
+        url = self._build_url('deployments', base_url=self._api)
+        return self._iter(int(number), url, Deployment, etag=etag)
 
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
