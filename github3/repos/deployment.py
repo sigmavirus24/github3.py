@@ -44,3 +44,22 @@ class Deployment(GitHubCore):
 
     def __repr__(self):
         return '<Deployment [{0} @ {1}]>'.format(self.id, self.sha)
+
+    def iter_statuses(self, number=-1, etag=None):
+        """Iterate over the deployment statuses for this deployment.
+
+        :param int number: (optional), the number of statuses to return.
+            Default: -1, returns all statuses.
+        :param str etag: (optional), the ETag header value from the last time
+            you iterated over the statuses.
+        :returns: generator of :class:`DeploymentStatus`\ es
+        """
+        i = self._iter(int(number), self.statuses_url, DeploymentStatus,
+                       etag=etag)
+        i.headers = Deployment.CUSTOM_HEADERS
+        return i
+
+
+class DeploymentStatus(GitHubCore):
+    def __init__(self, status, session=None):
+        pass
