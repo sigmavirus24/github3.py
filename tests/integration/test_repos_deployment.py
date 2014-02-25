@@ -4,7 +4,7 @@ from .helper import IntegrationHelper
 
 
 def find(func, iterable):
-    return filter(func, iterable)[0]
+    return next(filter(func, iterable))
 
 
 class TestDeployment(IntegrationHelper):
