@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from json import loads
+
 from github3.models import GitHubCore
 from github3.users import User
 
@@ -45,6 +47,29 @@ class Deployment(GitHubCore):
     def __repr__(self):
         return '<Deployment [{0} @ {1}]>'.format(self.id, self.sha)
 
+    def create_status(self, state, target_url='', description=''):
+        """Create a new deployment status for this deployment.
+
+        :param str state: (required), The state of the status. Can be one of
+            ``pending``, ``success``, ``error``, or ``failure``.
+        :param str target_url: The target URL to associate with this status.
+            This URL should contain output to keep the user updated while the
+            task is running or serve as historical information for what
+            happened in the deployment. Default: ''.
+        :param str description: A short description of the status. Default: ''.
+        :return: partial :class:`DeploymentStatus <DeploymentStatus>`
+        """
+        json = None
+
+        if state in ('pending', 'success', 'error', 'failure'):
+            data = {'state': state, 'target_url': target_url,
+                    'description': description}
+            response = self._post(self.statuses_url, data=data,
+                                  headers=Deployment.CUSTOM_HEADERS)
+            json = self._json(response, 201)
+
+        return DeploymentStatus(json, self) if json else None
+
     def iter_statuses(self, number=-1, etag=None):
         """Iterate over the deployment statuses for this deployment.
 
@@ -62,4 +87,41 @@ class Deployment(GitHubCore):
 
 class DeploymentStatus(GitHubCore):
     def __init__(self, status, session=None):
-        pass
+        super(DeploymentStatus, self).__init__(status, session)
+        self._api = status.get('url')
+
+        #: GitHub's id for this deployment status
+        self.id = status.get('id')
+
+        #: State of the deployment status
+        self.state = status.get('state')
+
+        #: Creater of the deployment status
+        self.creator = status.get('creator')
+        if self.creator:
+            self.creator = User(self.creator, self)
+
+        #: JSON payload as a string
+        self.payload = status.get('payload', '')
+
+        #: Parsed JSON payload
+        self.json_payload = loads(self.payload)
+
+        #: Target URL of the deployment
+        self.target_url = status.get('target_url')
+
+        #: Date the deployment status was created
+        self.created_at = status.get('created_at')
+        if self.created_at:
+            self.created_at = self._strptime(self.created_at)
+
+        #: Date the deployment status was updated
+        self.updated_at = status.get('updated_at')
+        if self.updated_at:
+            self.updated_at = self._strptime(self.updated_at)
+
+        #: Description of the deployment
+        self.description = status.get('description')
+
+    def __repr__(self):
+        return '<DeploymentStatus [{0}]>'.format(self.id)
