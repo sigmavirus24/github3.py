@@ -8,6 +8,8 @@ This part of the documentation covers:
 - :class:`Repository <github3.repos.repo.Repository>`
 - :class:`Branch <github3.repos.branch.Branch>`
 - :class:`Contents <github3.repos.contents.Contents>`
+- :class:`Deployment <github3.repos.deployment.Deployment>`
+- :class:`DeploymentStatus <github3.repos.deployment.DeploymentStatus>`
 - :class:`Hook <github3.repos.hook.Hook>`
 - :class:`RepoTag <github3.repos.tag.RepoTag>`
 - :class:`RepoComment <github3.repos.comment.RepoComment>`
@@ -42,6 +44,16 @@ Repository Objects
 ---------
 
 .. autoclass:: github3.repos.contents.Contents
+    :members:
+
+---------
+
+.. autoclass:: github3.repos.deployment.Deployment
+    :members:
+
+---------
+
+.. autoclass:: github3.repos.deployment.DeploymentStatus
     :members:
 
 ---------
