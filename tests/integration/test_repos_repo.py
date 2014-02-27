@@ -4,6 +4,17 @@ from .helper import IntegrationHelper
 
 
 class TestRepository(IntegrationHelper):
+    def test_create_deployment(self):
+        """Test the ability to create a deployment for a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_deployment')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            deployment = repository.create_deployment('0.8.2')
+
+        assert isinstance(deployment, github3.repos.deployment.Deployment)
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()
@@ -17,6 +28,15 @@ class TestRepository(IntegrationHelper):
                 )
 
         assert isinstance(release, github3.repos.release.Release)
+
+    def test_iter_deployments(self):
+        """Test that a repository's deployments may be retrieved."""
+        cassette_name = self.cassette_name('iter_deployments')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            for d in repository.iter_deployments():
+                assert isinstance(d, github3.repos.deployment.Deployment)
 
     def test_iter_languages(self):
         """Test that a repository's languages can be retrieved."""

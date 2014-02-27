@@ -26,6 +26,7 @@ from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
+from github3.repos.deployment import Deployment
 from github3.repos.hook import Hook
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
@@ -516,6 +517,32 @@ class Repository(GitHubCore):
                     'author': author, 'committer': committer}
             json = self._json(self._post(url, data=data), 201)
         return Commit(json, self) if json else None
+
+    @requires_auth
+    def create_deployment(self, ref, force=False, payload='',
+                          auto_merge=False, description=''):
+        """Create a deployment.
+
+        :param str ref: (required), The ref to deploy. This can be a branch,
+            tag, or sha.
+        :param bool force: Optional parameter to bypass any ahead/behind
+            checks or commit status checks. Default: False
+        :param str payload: Optional JSON payload with extra information about
+            the deployment. Default: ""
+        :param bool auto_merge: Optional parameter to merge the default branch
+            into the requested deployment branch if necessary. Default: False
+        :param str description: Optional short description. Default: ""
+        :returns: :class:`Deployment <github3.repos.deployment.Deployment>`
+        """
+        json = None
+        if ref:
+            url = self._build_url('deployments', base_url=self._api)
+            data = {'ref': ref, 'force': force, 'payload': payload,
+                    'auto_merge': auto_merge, 'description': description}
+            headers = Deployment.CUSTOM_HEADERS
+            json = self._json(self._post(url, data=data, headers=headers),
+                              201)
+        return Deployment(json, self) if json else None
 
     @requires_auth
     def create_file(self, path, message, content, branch=None,
@@ -1209,6 +1236,21 @@ class Repository(GitHubCore):
         """
         url = self._build_url('stats', 'contributors', base_url=self._api)
         return self._iter(int(number), url, ContributorStats, etag=etag)
+
+    def iter_deployments(self, number=-1, etag=None):
+        """Iterate over deployments for this repository.
+
+        :param int number: (optional), number of deployments to return.
+            Default: -1, returns all available deployments
+        :param str etag: (optional), ETag from a previous request for all
+            deployments
+        :returns: generator of
+            :class:`Deployment <github3.repos.deployment.Deployment>`\ s
+        """
+        url = self._build_url('deployments', base_url=self._api)
+        i = self._iter(int(number), url, Deployment, etag=etag)
+        i.headers.update(Deployment.CUSTOM_HEADERS)
+        return i
 
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
