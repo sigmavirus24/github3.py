@@ -1312,7 +1312,8 @@ class Repository(GitHubCore):
         :param str assignee: (optional), 'none', '*', or login name
         :param str mentioned: (optional), user's login name
         :param str labels: (optional), comma-separated list of labels, e.g.
-            'bug,ui,@high' :param sort: accepted values:
+            'bug,ui,@high'
+        :param sort: (optional), accepted values:
             ('created', 'updated', 'comments', 'created')
         :param str direction: (optional), accepted values: ('asc', 'desc')
         :param since: (optional), Only issues after this date will
