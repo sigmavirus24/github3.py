@@ -1307,8 +1307,14 @@ class Repository(GitHubCore):
                     etag=None):
         """Iterate over issues on this repo based upon parameters passed.
 
+        .. versionchanged:: 0.9.0
+
+            The ``state`` parameter now accepts 'all' in addition to 'open'
+            and 'closed'.
+
         :param int milestone: (optional), 'none', or '*'
-        :param str state: (optional), accepted values: ('open', 'closed')
+        :param str state: (optional), accepted values: ('all', 'open',
+            'closed')
         :param str assignee: (optional), 'none', '*', or login name
         :param str mentioned: (optional), user's login name
         :param str labels: (optional), comma-separated list of labels, e.g.
@@ -1463,7 +1469,17 @@ class Repository(GitHubCore):
                    direction='desc', number=-1, etag=None):
         """List pull requests on repository.
 
-        :param str state: (optional), accepted values: ('open', 'closed')
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
+            - The ``sort`` parameter was added.
+
+            - The ``direction`` parameter was added.
+
+        :param str state: (optional), accepted values: ('all', 'open',
+            'closed')
         :param str head: (optional), filters pulls by head user and branch
             name in the format ``user:ref-name``, e.g., ``seveas:debian``
         :param str base: (optional), filter pulls by base branch name.
@@ -1481,7 +1497,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('pulls', base_url=self._api)
         params = {}
-        if state and state.lower() in ('open', 'closed'):
+        if state and state.lower() in ('all', 'open', 'closed'):
             params['state'] = state.lower()
         params.update(head=head, base=base, sort=sort, direction=direction)
         self._remove_none(params)

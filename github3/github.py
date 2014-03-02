@@ -584,10 +584,15 @@ class GitHub(GitHubCore):
                     direction='', since=None, number=-1, etag=None):
         """List all of the authenticated user's (and organization's) issues.
 
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
         :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
             api-default: 'assigned'
-        :param str state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('all', 'open', 'closed')
             api-default: 'open'
         :param str labels: comma-separated list of label names, e.g.,
             'bug,ui,@high'
@@ -616,10 +621,15 @@ class GitHub(GitHubCore):
         """List only the authenticated user's issues. Will not list
         organization's issues
 
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
         :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
             api-default: 'assigned'
-        :param str state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('all', 'open', 'closed')
             api-default: 'open'
         :param str labels: comma-separated list of label names, e.g.,
             'bug,ui,@high'
@@ -649,10 +659,15 @@ class GitHub(GitHubCore):
         """List issues on owner/repository. Only owner and repository are
         required.
 
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
         :param str owner: login of the owner of the repository
         :param str repository: name of the repository
         :param int milestone: None, '*', or ID of milestone
-        :param str state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('all', 'open', 'closed')
             api-default: 'open'
         :param str assignee: '*' or login of the user
         :param str mentioned: login of the user
