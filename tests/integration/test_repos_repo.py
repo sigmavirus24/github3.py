@@ -38,6 +38,15 @@ class TestRepository(IntegrationHelper):
             for d in repository.iter_deployments():
                 assert isinstance(d, github3.repos.deployment.Deployment)
 
+    def test_iter_issues_accepts_state_all(self):
+        """Test that the state parameter accets 'all'."""
+        cassette_name = self.cassette_name('issues_state_all')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'betamax')
+            assert repository is not None
+            for issue in repository.iter_issues(state='all'):
+                assert issue.state in ('open', 'closed')
+
     def test_iter_languages(self):
         """Test that a repository's languages can be retrieved."""
         cassette_name = self.cassette_name('iter_languages')

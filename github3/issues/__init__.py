@@ -15,10 +15,10 @@ __all__ = [Issue]
 
 def issue_params(filter, state, labels, sort, direction, since):
     params = {}
-    if filter in ('assigned', 'created', 'mentioned', 'subscribed'):
+    if filter in ('assigned', 'created', 'mentioned', 'subscribed', 'all'):
         params['filter'] = filter
 
-    if state in ('open', 'closed'):
+    if state in ('open', 'closed', 'all'):
         params['state'] = state
 
     if labels:
