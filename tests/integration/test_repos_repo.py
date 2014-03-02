@@ -58,6 +58,19 @@ class TestRepository(IntegrationHelper):
                 assert 'Last-Modified' not in l
                 assert isinstance(l, tuple)
 
+    def test_iter_pulls_accepts_sort_and_direction(self):
+        """Test that iter_pulls now takes a sort parameter."""
+        cassette_name = self.cassette_name('pull_requests_accept_sort')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'betamax')
+            assert repository is not None
+            last_pr = None
+            for pr in repository.iter_pulls(sort='updated', direction='asc'):
+                assert pr
+                if last_pr:
+                    assert last_pr.updated_at < pr.updated_at
+                last_pr = pr
+
     def test_iter_releases(self):
         """Test the ability to iterate over releases on a repository."""
         cassette_name = self.cassette_name('iter_releases')
