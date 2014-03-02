@@ -768,7 +768,8 @@ class TestRepository(BaseCase):
     def test_iter_pulls(self):
         self.response('pull', _iter=True)
         self.get(self.api + 'pulls')
-        self.conf.update(params={'per_page': 100})
+        base_params = {'per_page': 100, 'sort': 'created', 'direction': 'desc'}
+        self.conf.update(params=base_params)
 
         p = next(self.repo.iter_pulls())
         assert isinstance(p, github3.pulls.PullRequest)
@@ -777,15 +778,21 @@ class TestRepository(BaseCase):
         next(self.repo.iter_pulls('foo'))
         self.mock_assertions()
 
-        self.conf.update(params={'state': 'open', 'per_page': 100})
+        params = {'state': 'open'}
+        params.update(base_params)
+        self.conf.update(params=params)
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
 
-        self.conf.update(params={'head': 'user:branch', 'per_page': 100})
+        params = {'head': 'user:branch'}
+        params.update(base_params)
+        self.conf.update(params=params)
         next(self.repo.iter_pulls(head='user:branch'))
         self.mock_assertions()
 
-        self.conf.update(params={'base': 'branch', 'per_page': 100})
+        params = {'base': 'branch'}
+        params.update(base_params)
+        self.conf.update(params=params)
         next(self.repo.iter_pulls(base='branch'))
         self.mock_assertions()
 
