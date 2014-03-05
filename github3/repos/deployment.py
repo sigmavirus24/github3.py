@@ -103,10 +103,7 @@ class DeploymentStatus(GitHubCore):
             self.creator = User(self.creator, self)
 
         #: JSON payload as a string
-        self.payload = status.get('payload', '')
-
-        #: Parsed JSON payload
-        self.json_payload = loads(self.payload)
+        self.payload = status.get('payload', {})
 
         #: Target URL of the deployment
         self.target_url = status.get('target_url')
