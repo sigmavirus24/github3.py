@@ -1,6 +1,21 @@
 History/Changelog
 -----------------
 
+0.8.2: 2014-02-11
+~~~~~~~~~~~~~~~~~
+
+- Fix bug in ``GitHub#search_users`` (and ``github3.search_users``). Thanks
+  @abesto
+
+- Expose the stargazers count for repositories. Thanks @seveas
+
+0.8.1: 2014-01-26
+~~~~~~~~~~~~~~~~~
+
+- Add documentation for using Two Factor Authentication
+
+- Fix oversight where ``github3.login`` could not be used for 2FA
+
 0.8.0: 2014-01-03
 ~~~~~~~~~~~~~~~~~
 

@@ -18,7 +18,7 @@ class TestAPI(TestCase):
         self.gh.authorize.assert_called_with(*args)
 
     def test_login(self):
-        args = ('login', 'password', None)
+        args = ('login', 'password', None, None)
         with patch.object(github3.api.GitHub, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHub)
@@ -26,11 +26,11 @@ class TestAPI(TestCase):
             login.assert_called_with(*args)
 
     def test_enterprise_login(self):
-        args = ('login', 'password', None, 'http://ghe.invalid/')
+        args = ('login', 'password', None, 'http://ghe.invalid/', None)
         with patch.object(github3.api.GitHubEnterprise, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHubEnterprise)
-            login.assert_called_with(*args[:3])
+            login.assert_called_with('login', 'password', None, None)
 
     def test_gist(self):
         args = (123,)
