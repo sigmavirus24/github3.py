@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from json import dumps
 from github3.decorators import requires_auth
 from github3.models import GitHubCore

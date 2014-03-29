@@ -6,6 +6,8 @@ github3.repos.comment
 This module contains the RepoComment class
 
 """
+from __future__ import unicode_literals
+
 from github3.decorators import requires_auth
 from github3.models import BaseComment
 from github3.users import User

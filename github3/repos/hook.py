@@ -6,6 +6,7 @@ github3.repos.hook
 This module contains only the Hook object for GitHub's Hook API.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from github3.decorators import requires_auth

@@ -6,6 +6,7 @@ github3.gists.comment
 Module containing the logic for a GistComment
 
 """
+from __future__ import unicode_literals
 
 from github3.models import BaseComment
 from github3.users import User

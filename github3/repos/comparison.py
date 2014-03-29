@@ -7,6 +7,7 @@ This module contains the Comparison object for comparing two commits via the
 GitHub API.
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubCore
 from github3.repos.commit import RepoCommit

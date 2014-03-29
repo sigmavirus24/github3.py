@@ -6,6 +6,7 @@ github3.orgs
 This module contains all of the classes related to organizations.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from github3.events import Event

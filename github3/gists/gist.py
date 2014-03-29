@@ -6,6 +6,8 @@ github3.gists.gist
 This module contains the Gist class alone for simplicity.
 
 """
+from __future__ import unicode_literals
+
 from json import dumps
 from github3.models import GitHubCore
 from github3.decorators import requires_auth

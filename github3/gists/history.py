@@ -6,6 +6,7 @@ github3.gists.history
 Module containing the logic for the GistHistory object.
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubCore
 from github3.users import User

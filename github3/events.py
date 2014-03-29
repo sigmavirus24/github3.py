@@ -6,6 +6,7 @@ github3.events
 This module contains the class(es) related to Events
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubObject
 

@@ -6,6 +6,7 @@ github3.models
 This module provides the basic models used in github3.py
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from requests.compat import urlparse

@@ -6,6 +6,7 @@ github3.repos.commit
 This module contains the RepoCommit class alone
 
 """
+from __future__ import unicode_literals
 
 from github3.git import Commit
 from github3.models import BaseCommit

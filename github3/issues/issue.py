@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from re import match
 from json import dumps
 from github3.decorators import requires_auth

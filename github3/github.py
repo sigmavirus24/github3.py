@@ -6,6 +6,7 @@ github3.github
 This module contains the main GitHub session object.
 
 """
+from __future__ import unicode_literals
 
 from github3.auths import Authorization
 from github3.decorators import (requires_auth, requires_basic_auth,

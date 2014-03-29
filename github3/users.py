@@ -6,6 +6,7 @@ github3.users
 This module contains everything relating to Users.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from uritemplate import URITemplate

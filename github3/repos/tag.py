@@ -6,6 +6,7 @@ github3.repos.tag
 This module contains the RepoTag object for GitHub's tag API.
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubObject
 

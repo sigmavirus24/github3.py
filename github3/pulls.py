@@ -6,6 +6,7 @@ github3.pulls
 This module contains all the classes relating to pull requests.
 
 """
+from __future__ import unicode_literals
 
 from re import match
 from json import dumps
