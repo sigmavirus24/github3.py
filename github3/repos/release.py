@@ -38,7 +38,7 @@ class Release(GitHubCore):
         #; Boolean whether release is a prelease
         self.prerelease = release.get('prerelease')
         #: Date the release was published
-        self.published_at = release.get('published_at')
+        self.published_at = self._strptime(release.get('published_at'))
         #: Name of the tag
         self.tag_name = release.get('tag_name')
         #: "Commit" that this release targets
