@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64encode
-from collections import Callable
 from github3.decorators import requires_auth
 from github3.events import Event
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -322,33 +321,14 @@ class Repository(GitHubCore):
 
         """
         resp = None
-        written = False
         if format in ('tarball', 'zipball'):
             url = self._build_url(format, ref, base_url=self._api)
             resp = self._get(url, allow_redirects=True, stream=True)
 
-        pre_opened = False
         if resp and self._boolean(resp, 200, 404):
-            fd = None
-            if path:
-                if isinstance(getattr(path, 'write', None), Callable):
-                    pre_opened = True
-                    fd = path
-                else:
-                    fd = open(path, 'wb')
-            else:
-                header = resp.headers['content-disposition']
-                i = header.find('filename=') + len('filename=')
-                fd = open(header[i:], 'wb')
-
-            for chunk in resp.iter_content(chunk_size=512):
-                fd.write(chunk)
-
-            if not pre_opened:
-                fd.close()
-
-            written = True
-        return written
+            self._stream_response_to_file(resp, path)
+            return True
+        return False
 
     def asset(self, id):
         """Returns a single Asset.
