@@ -14,7 +14,6 @@ IGNORE = (
     'commit_activity',
     'contributor_statistics',
     'create_content',
-    'download',
     'emails',
     'event',
     'language',
