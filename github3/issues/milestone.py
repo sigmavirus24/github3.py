@@ -26,10 +26,10 @@ class Milestone(GitHubCore):
         #: Description of this milestone.
         self.description = mile.get('description')
         #: :class:`User <github3.users.User>` object representing the creator
-        #  of the milestone.
+        #: of the milestone.
         self.creator = User(mile.get('creator'), self._session)
         #: Number of issues associated with this milestone which are still
-        #  open.
+        #: open.
         self.open_issues = mile.get('open_issues')
         #: The number of closed issues associated with this milestone.
         self.closed_issues = mile.get('closed_issues')

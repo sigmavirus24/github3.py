@@ -198,12 +198,12 @@ class PullRequest(GitHubCore):
         #: datetime object representing the last time the object was changed
         self.updated_at = self._strptime(pull.get('updated_at'))
         #: :class:`User <github3.users.User>` object representing the creator
-        #  of the pull request
+        #: of the pull request
         self.user = pull.get('user')
         if self.user:
             self.user = User(self.user, self)
         #: :class:`User <github3.users.User>` object representing the assignee
-        #  of the pull request
+        #: of the pull request
         self.assignee = pull.get('assignee')
         if self.assignee:
             self.assignee = User(self.assignee, self)

@@ -35,7 +35,7 @@ class Issue(GitHubCore):
         super(Issue, self).__init__(issue, session)
         self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
-        #  was assigned to.
+        #: was assigned to.
         self.assignee = issue.get('assignee')
         if self.assignee:
             self.assignee = User(issue.get('assignee'), self._session)

@@ -220,7 +220,7 @@ class BaseComment(GitHubCore):
         #: Body of the comment. (As written by the commenter)
         self.body = comment.get('body')
         #: Body of the comment formatted as plain-text. (Stripped of markdown,
-        #  etc.)
+        #: etc.)
         self.body_text = comment.get('body_text')
         #: Body of the comment formatted as html.
         self.body_html = comment.get('body_html')

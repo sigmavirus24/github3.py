@@ -76,7 +76,7 @@ class Gist(GitHubCore):
 
         owner = data.get('owner')
         #: :class:`User <github3.users.User>` object representing the owner of
-        #  the gist.
+        #: the gist.
         self.owner = User(owner, self) if owner else None
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
