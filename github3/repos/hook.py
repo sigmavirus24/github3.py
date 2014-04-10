@@ -33,9 +33,7 @@ class Hook(GitHubCore):
         super(Hook, self).__init__(hook, session)
         self._api = hook.get('url', '')
         #: datetime object representing when this hook was last updated.
-        self.updated_at = None
-        if hook.get('updated_at'):
-            self.updated_at = self._strptime(hook.get('updated_at'))
+        self.updated_at = self._strptime(hook.get('updated_at'))
         #: datetime object representing the date the hook was created.
         self.created_at = self._strptime(hook.get('created_at'))
         #: The name of the hook.

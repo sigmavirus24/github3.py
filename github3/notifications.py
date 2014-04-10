@@ -49,9 +49,7 @@ class Thread(GitHubCore):
         #: Dictionary of urls for the thread
         self.urls = notif.get('urls')
         #: datetime object representing the last time the user read the thread
-        self.last_read_at = notif.get('last_read_at')
-        if self.last_read_at:
-            self.last_read_at = self._strptime(self.last_read_at)
+        self.last_read_at = self._strptime(notif.get('last_read_at'))
         #: The reason you're receiving the notification
         self.reason = notif.get('reason')
         #: Subject of the Notification, e.g., which issue/pull/diff is this in

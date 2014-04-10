@@ -310,9 +310,7 @@ class BaseAccount(GitHubCore):
         self.company = acct.get('company', '')
 
         #: datetime object representing the date the account was created
-        self.created_at = None
-        if acct.get('created_at'):
-            self.created_at = self._strptime(acct.get('created_at'))
+        self.created_at = self._strptime(acct.get('created_at'))
 
         #: E-mail address of the user/org
         self.email = acct.get('email')

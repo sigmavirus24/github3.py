@@ -112,10 +112,8 @@ class PullRequest(GitHubCore):
         #: Number of deletions on this pull request
         self.deletions = pull.get('deletions')
 
-        closed = pull.get('closed_at')
-        # If the pull request has been closed
         #: datetime object representing when the pull was closed
-        self.closed_at = self._strptime(closed) if closed else None
+        self.closed_at = self._strptime(pull.get('closed_at'))
         #: Number of comments
         self.comments = pull.get('comments')
         #: Comments url (not a template)
@@ -162,9 +160,7 @@ class PullRequest(GitHubCore):
         }
 
         #: datetime object representing when the pull was merged
-        merged = pull.get('merged_at')
-        # If the pull request has been merged
-        self.merged_at = self._strptime(merged) if merged else None
+        self.merged_at = self._strptime(pull.get('merged_at'))
         #: Whether the pull is deemed mergeable by GitHub
         self.mergeable = pull.get('mergeable', False)
         #: Whether it would be a clean merge or not

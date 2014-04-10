@@ -48,9 +48,7 @@ class Issue(GitHubCore):
 
         # If an issue is still open, this field will be None
         #: datetime object representing when the issue was closed.
-        self.closed_at = None
-        if issue.get('closed_at'):
-            self.closed_at = self._strptime(issue.get('closed_at'))
+        self.closed_at = self._strptime(issue.get('closed_at'))
 
         #: Number of comments on this issue.
         self.comments = issue.get('comments')
