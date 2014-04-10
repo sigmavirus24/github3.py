@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from github3.models import GitHubCore
+from github3.users import User
 
 
 class IssueEvent(GitHubCore):
@@ -37,6 +38,11 @@ class IssueEvent(GitHubCore):
         if event.get('issue'):
             from github3.issues import Issue
             self.issue = Issue(event.get('issue'), self)
+
+        #: :class:`User <github3.users.User>` that generated the event.
+        self.actor = event.get('actor')
+        if self.actor:
+            self.actor = User(self.actor, self._session)
 
         #: Number of comments
         self.comments = event.get('comments', 0)
