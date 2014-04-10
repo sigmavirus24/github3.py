@@ -16,7 +16,7 @@ class GitHubIterator(GitHubCore, Iterator):
         #: URL the class used to make it's first GET
         self.url = url
         self._api = self.url
-        #: Class being used to cast all items to
+        #: Class or factory function for constructing an item to return
         self.cls = cls
         #: Parameters of the query string
         self.params = params or {}
@@ -76,7 +76,10 @@ class GitHubIterator(GitHubCore, Iterator):
                 json = json.items()
 
             for i in json:
-                yield cls(i, self) if issubclass(cls, GitHubCore) else cls(i)
+                if isinstance(cls, type) and issubclass(cls, GitHubCore):
+                    yield cls(i, self)
+                else:
+                    yield cls(i)
                 self.count -= 1 if self.count > 0 else 0
                 if self.count == 0:
                     break
