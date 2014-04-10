@@ -335,7 +335,7 @@ class BaseAccount(GitHubCore):
         ## e.g. first_name last_name
         #: Real name of the user/org
         self.name = acct.get('name') or ''
-        self.name = self.name.encode('utf-8')
+        self.name = self.name
 
         ## The number of public_repos
         #: Number of public repos owned by the user/org
@@ -349,7 +349,7 @@ class BaseAccount(GitHubCore):
         self.bio = acct.get('bio')
 
     def __repr__(self):
-        return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
+        return '<{s.type} [{s.login}:{s.name}]>'.format(s=self).encode('utf-8')
 
     def _update_(self, acct):
         self.__init__(acct, self._session)
