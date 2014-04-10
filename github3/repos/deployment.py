@@ -45,7 +45,7 @@ class Deployment(GitHubCore):
         #: URL to get the statuses of this deployment
         self.statuses_url = deployment.get('statuses_url')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Deployment [{0} @ {1}]>'.format(self.id, self.sha)
 
     def create_status(self, state, target_url='', description=''):
@@ -124,5 +124,5 @@ class DeploymentStatus(GitHubCore):
         #: Description of the deployment
         self.description = status.get('description')
 
-    def __repr__(self):
+    def _repr(self):
         return '<DeploymentStatus [{0}]>'.format(self.id)

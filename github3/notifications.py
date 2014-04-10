@@ -59,7 +59,7 @@ class Thread(GitHubCore):
         self.subject = notif.get('subject')
         self.unread = notif.get('unread')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
 
     def delete_subscription(self):
@@ -126,7 +126,7 @@ class Subscription(GitHubCore):
         self.ignored = sub.get('ignored', False)
         self.subscribed = sub.get('subscribed', False)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Subscription [{0}]>'.format(self.subscribed)
 
     def delete(self):

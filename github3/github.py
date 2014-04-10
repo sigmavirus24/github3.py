@@ -56,7 +56,7 @@ class GitHub(GitHubCore):
         elif login and password:
             self.login(login, password)
 
-    def __repr__(self):
+    def _repr(self):
         if self._session.auth:
             return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
@@ -1461,7 +1461,7 @@ class GitHubEnterprise(GitHub):
         super(GitHubEnterprise, self).__init__(login, password, token)
         self._session.base_url = url.rstrip('/') + '/api/v3'
 
-    def __repr__(self):
+    def _repr(self):
         return '<GitHub Enterprise [0.url]>'.format(self)
 
     @requires_auth
@@ -1490,7 +1490,7 @@ class GitHubStatus(GitHubCore):
         super(GitHubStatus, self).__init__({})
         self._session.base_url = 'https://status.github.com'
 
-    def __repr__(self):
+    def _repr(self):
         return '<GitHub Status>'
 
     def _recipe(self, *args):

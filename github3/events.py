@@ -56,7 +56,7 @@ class Event(GitHubObject):
         #: Indicates whether the Event is public or not.
         self.public = event.get('public')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Event [{0}]>'.format(self.type[:-5])
 
     @staticmethod

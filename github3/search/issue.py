@@ -15,5 +15,5 @@ class IssueSearchResult(GitHubCore):
         #: Issue object
         self.issue = Issue(result, self)
 
-    def __repr__(self):
+    def _repr(self):
         return '<IssueSearchResult [{0}]>'.format(self.repository)

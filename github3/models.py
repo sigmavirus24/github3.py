@@ -9,7 +9,7 @@ This module provides the basic models used in github3.py
 from __future__ import unicode_literals
 
 from json import dumps
-from requests.compat import urlparse
+from requests.compat import urlparse, is_py2
 from github3.decorators import requires_auth
 from github3.session import GitHubSession
 from datetime import datetime
@@ -40,6 +40,15 @@ class GitHubObject(object):
         if time_str:
             return datetime.strptime(time_str, __timeformat__)
         return None
+
+    def _repr(self):
+        return ''
+
+    def __repr__(self):
+        repr_string = self._repr()
+        if is_py2:
+            return repr_string.encode('utf-8')
+        return repr_string
 
     @classmethod
     def from_json(cls, json):
@@ -72,7 +81,7 @@ class GitHubCore(GitHubObject):
         # set a sane default
         self._github_url = 'https://api.github.com'
 
-    def __repr__(self):
+    def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
     def _remove_none(self, data):
@@ -348,8 +357,8 @@ class BaseAccount(GitHubCore):
         #: Markdown formatted biography
         self.bio = acct.get('bio')
 
-    def __repr__(self):
-        return '<{s.type} [{s.login}:{s.name}]>'.format(s=self).encode('utf-8')
+    def _repr(self):
+        return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
 
     def _update_(self, acct):
         self.__init__(acct, self._session)

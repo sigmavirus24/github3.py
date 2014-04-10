@@ -47,7 +47,7 @@ class Release(GitHubCore):
         #: URITemplate to upload an asset with
         self.upload_urlt = URITemplate(upload_url) if upload_url else None
 
-    def __repr__(self):
+    def _repr(self):
         return '<Release [{0}]>'.format(self.name)
 
     @requires_auth

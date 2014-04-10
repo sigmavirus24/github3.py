@@ -38,5 +38,5 @@ class ContributorStats(GitHubCore):
         #: 'd' -> 'Number of deletions', 'c' -> 'Number of commits'
         self.alt_weeks = [alternate_week(w) for w in self.weeks]
 
-    def __repr__(self):
+    def _repr(self):
         return '<Contributor Statistics [{0}]>'.format(self.author)

@@ -22,7 +22,7 @@ class Label(GitHubCore):
 
         self._uniq = self._api
 
-    def __repr__(self):
+    def _repr(self):
         return '<Label [{0}]>'.format(self)
 
     def __str__(self):

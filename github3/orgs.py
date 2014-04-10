@@ -54,7 +54,7 @@ class Team(GitHubCore):
         #: Repositories url (not a template)
         self.repositories_url = team.get('repositories_url')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Team [{0}]>'.format(self.name)
 
     def _update_(self, team):

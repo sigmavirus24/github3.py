@@ -100,7 +100,7 @@ class Gist(GitHubCore):
     def __str__(self):
         return self.id
 
-    def __repr__(self):
+    def _repr(self):
         return '<Gist [{0}]>'.format(self.id)
 
     def _update_(self, data):

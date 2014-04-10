@@ -54,7 +54,7 @@ class GistHistory(GitHubCore):
         #: datetime representation of when the commit was made
         self.committed_at = self._strptime(history.get('committed_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Gist History [{0}]>'.format(self.version)
 
     def get_gist(self):

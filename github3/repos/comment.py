@@ -49,7 +49,7 @@ class RepoComment(BaseComment):
         if comment.get('user'):
             self.user = User(comment.get('user'), self)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Comment [{0}/{1}]>'.format(
             self.commit_id[:7], self.user.login or ''
         )

@@ -49,7 +49,7 @@ class Hook(GitHubCore):
         #: Unique id of the hook.
         self.id = hook.get('id')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Hook [{0}]>'.format(self.name)
 
     def _update_(self, hook):

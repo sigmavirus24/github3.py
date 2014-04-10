@@ -275,7 +275,7 @@ class Repository(GitHubCore):
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels) if labels else None
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository [{0}]>'.format(self)
 
     def __str__(self):

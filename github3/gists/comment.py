@@ -39,5 +39,5 @@ class GistComment(BaseComment):
         if comment.get('user'):
             self.user = User(comment.get('user'), self)  # (No coverage)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Gist Comment [{0}]>'.format(self.user.login)

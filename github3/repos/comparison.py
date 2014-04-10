@@ -60,7 +60,7 @@ class Comparison(GitHubCore):
 
         self._uniq = self.commits
 
-    def __repr__(self):
+    def _repr(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
 
     def diff(self):

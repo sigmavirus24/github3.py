@@ -84,7 +84,7 @@ class Contents(GitHubCore):
 
         self._uniq = self.sha
 
-    def __repr__(self):
+    def _repr(self):
         return '<Content [{0}]>'.format(self.path)
 
     def __eq__(self, other):

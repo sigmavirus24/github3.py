@@ -22,5 +22,5 @@ class Branch(GitHubCore):
         #: Returns '_links' attribute.
         self.links = branch.get('_links', {})
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Branch [{0}]>'.format(self.name)

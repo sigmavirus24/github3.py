@@ -15,5 +15,5 @@ class RepositorySearchResult(GitHubCore):
         #: Repository object
         self.repository = Repository(result, self)
 
-    def __repr__(self):
+    def _repr(self):
         return '<RepositorySearchResult [{0}]>'.format(self.repository)

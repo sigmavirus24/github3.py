@@ -56,7 +56,7 @@ class Authorization(GitHubCore):
         if auth.get('updated_at'):
             self.updated_at = self._strptime(auth.get('updated_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Authorization [{0}]>'.format(self.name)
 
     def _update_(self, auth):

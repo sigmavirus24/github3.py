@@ -37,5 +37,5 @@ class Status(GitHubObject):
         if status.get('updated_at'):
             self.updated_at = self._strptime(status.get('updated_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Status [{s.id}:{s.state}]>'.format(s=self)

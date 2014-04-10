@@ -26,5 +26,5 @@ class CodeSearchResult(GitHubCore):
         #: Text matches
         self.text_matches = data.get('text_matches', [])
 
-    def __repr__(self):
+    def _repr(self):
         return '<CodeSearchResult [{0}]>'.format(self.path)

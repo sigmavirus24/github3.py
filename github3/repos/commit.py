@@ -61,7 +61,7 @@ class RepoCommit(BaseCommit):
 
         self._uniq = self.sha
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
     def diff(self):

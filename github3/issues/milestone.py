@@ -40,7 +40,7 @@ class Milestone(GitHubCore):
         if mile.get('due_on'):
             self.due_on = self._strptime(mile.get('due_on'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Milestone [{0}]>'.format(self)
 
     def __str__(self):

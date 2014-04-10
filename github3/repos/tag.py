@@ -28,7 +28,7 @@ class RepoTag(GitHubObject):
         #: Dictionary containing the SHA and URL of the commit.
         self.commit = tag.get('commit', {})
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Tag [{0}]>'.format(self)
 
     def __str__(self):
