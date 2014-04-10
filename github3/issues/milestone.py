@@ -39,6 +39,8 @@ class Milestone(GitHubCore):
         self.due_on = None
         if mile.get('due_on'):
             self.due_on = self._strptime(mile.get('due_on'))
+        #: datetime object representing when the milestone was updated.
+        self.updated_at = self._strptime(mile.get('updated_at'))
 
     def __repr__(self):
         return '<Milestone [{0}]>'.format(self)
