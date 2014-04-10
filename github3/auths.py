@@ -49,7 +49,7 @@ class Authorization(GitHubCore):
         self._api = self._build_url('authorizations', str(self.id))
         #: datetime object representing when the authorization was created.
         self.created_at = self._strptime(auth.get('created_at'))
-        #: datetime object representing when the authorization was created.
+        #: datetime object representing when the authorization was updated.
         self.updated_at = self._strptime(auth.get('updated_at'))
 
     def __repr__(self):
