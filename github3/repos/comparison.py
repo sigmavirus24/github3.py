@@ -43,7 +43,7 @@ class Comparison(GitHubCore):
         #: Patch URL at GitHub for the comparison.
         self.patch_url = compare.get('patch_url')
         #: :class:`RepoCommit <RepoCommit>` object representing the base of
-        #  comparison.
+        #: comparison.
         self.base_commit = RepoCommit(compare.get('base_commit'), None)
         #: Behind or ahead.
         self.status = compare.get('status')

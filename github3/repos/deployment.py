@@ -30,14 +30,10 @@ class Deployment(GitHubCore):
         self.payload = deployment.get('payload')
 
         #: Date the Deployment was created
-        self.created_at = deployment.get('created_at')
-        if self.created_at:
-            self.created_at = self._strptime(self.created_at)
+        self.created_at = self._strptime(deployment.get('created_at'))
 
         #: Date the Deployment was updated
-        self.updated_at = deployment.get('updated_at')
-        if self.updated_at:
-            self.updated_at = self._strptime(self.updated_at)
+        self.updated_at = self._strptime(deployment.get('updated_at'))
 
         #: Description of the deployment
         self.description = deployment.get('description')
@@ -109,14 +105,10 @@ class DeploymentStatus(GitHubCore):
         self.target_url = status.get('target_url')
 
         #: Date the deployment status was created
-        self.created_at = status.get('created_at')
-        if self.created_at:
-            self.created_at = self._strptime(self.created_at)
+        self.created_at = self._strptime(status.get('created_at'))
 
         #: Date the deployment status was updated
-        self.updated_at = status.get('updated_at')
-        if self.updated_at:
-            self.updated_at = self._strptime(self.updated_at)
+        self.updated_at = self._strptime(status.get('updated_at'))
 
         #: Description of the deployment
         self.description = status.get('description')

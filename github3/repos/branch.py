@@ -15,7 +15,7 @@ class Branch(GitHubCore):
         #: Name of the branch.
         self.name = branch.get('name')
         #: Returns the branch's :class:`RepoCommit <RepoCommit>` or
-        #  ``None``.
+        #: ``None``.
         self.commit = branch.get('commit')
         if self.commit:
             self.commit = RepoCommit(self.commit, self._session)

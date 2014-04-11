@@ -76,7 +76,7 @@ class Commit(BaseCommit):
         super(Commit, self).__init__(commit, session)
 
         #: dict containing at least the name, email and date the commit was
-        #  created
+        #: created
         self.author = commit.get('author', {}) or {}
         # If GH returns nil/None then make sure author is a dict
         self._author_name = self.author.get('name', '')

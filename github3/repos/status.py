@@ -33,9 +33,7 @@ class Status(GitHubObject):
         #: URL to view more information about the status
         self.target_url = status.get('target_url')
         #: datetime object representing the last time the status was updated
-        self.updated_at = None
-        if status.get('updated_at'):
-            self.updated_at = self._strptime(status.get('updated_at'))
+        self.updated_at = self._strptime(status.get('updated_at'))
 
     def _repr(self):
         return '<Status [{s.id}:{s.state}]>'.format(s=self)

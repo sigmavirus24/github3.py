@@ -115,13 +115,13 @@ class Repository(GitHubCore):
 
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
-        #  repository owner.
+        #: repository owner.
         self.owner = User(repo.get('owner', {}), self._session)
 
         #: Is this repository private?
         self.private = repo.get('private')
         #: ``datetime`` object representing the last time commits were pushed
-        #  to the repository.
+        #: to the repository.
         self.pushed_at = self._strptime(repo.get('pushed_at'))
         #: Size of the repository.
         self.size = repo.get('size', 0)
@@ -136,7 +136,7 @@ class Repository(GitHubCore):
         #: If it exists, url to clone the repository via SVN.
         self.svn_url = repo.get('svn_url', '')
         #: ``datetime`` object representing the last time the repository was
-        #  updated.
+        #: updated.
         self.updated_at = self._strptime(repo.get('updated_at'))
         self._api = repo.get('url', '')
 
