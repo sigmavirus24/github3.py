@@ -157,7 +157,7 @@ class Asset(GitHubCore):
         #: Date the asset was updated
         self.updated_at = self._strptime(asset.get('updated_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Asset [{0}]>'.format(self.name)
 
     def edit(self, name, label=None):
