@@ -1057,6 +1057,16 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Label(json, self) if json else None
 
+    @requires_auth
+    def latest_pages_build(self):
+        """Get the build information for the most recent Pages build.
+
+        :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return PagesBuild(json, self) if json else None
+
     def iter_assignees(self, number=-1, etag=None):
         """Iterate over all available assignees to which an issue may be
         assigned.
@@ -1471,7 +1481,8 @@ class Repository(GitHubCore):
     def iter_pages_builds(self, number=-1, etag=None):
         """Iterate over pages builds of this repository.
 
-        :returns: generator of :class:`Repository <Repository>`
+        :returns: generator of :class:`PagesBuild
+            <github3.repos.pages.PagesBuild>`
         """
         url = self._build_url('pages', 'builds', base_url=self._api)
         return self._iter(int(number), url, PagesBuild, etag=etag)
