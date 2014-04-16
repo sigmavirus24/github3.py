@@ -1065,7 +1065,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return PagesBuild(json, self) if json else None
+        return PagesBuild(json) if json else None
 
     def iter_assignees(self, number=-1, etag=None):
         """Iterate over all available assignees to which an issue may be

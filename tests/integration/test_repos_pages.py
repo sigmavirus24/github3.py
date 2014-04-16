@@ -4,6 +4,17 @@ from .helper import IntegrationHelper
 
 
 class TestRepositoryPages(IntegrationHelper):
+    def test_latest_pages_build(self):
+        """Test the ability to retrieve the latest pages build for a repo."""
+        self.basic_login()
+        cassette_name = self.cassette_name('latest_pages_build')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            latest_build = repository.latest_pages_build()
+
+        assert isinstance(latest_build, github3.repos.pages.PagesBuild)
+
     def test_pages(self):
         """
         Test the ability to retrieve information about a repository's pages.
