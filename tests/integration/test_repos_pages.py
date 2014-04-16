@@ -4,6 +4,19 @@ from .helper import IntegrationHelper
 
 
 class TestRepositoryPages(IntegrationHelper):
+    def test_pages(self):
+        """
+        Test the ability to retrieve information about a repository's pages.
+        """
+        self.basic_login()
+        cassette_name = self.cassette_name('pages')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            pages_info = repository.pages()
+
+        assert isinstance(pages_info, github3.repos.pages.PagesInfo)
+
     def test_iter_pages_builds(self):
         """Test the ability to list the pages builds."""
         self.basic_login()

@@ -1657,6 +1657,7 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Milestone(json, self) if json else None
 
+    @requires_auth
     def pages(self):
         """Get information about this repository's pages site.
 
