@@ -458,7 +458,7 @@ class Repository(GitHubCore):
         :returns: string of the SHA returned
         """
         sha = ''
-        if encoding in ('base64', 'utf-8') and content:
+        if encoding in ('base64', 'utf-8'):
             url = self._build_url('git', 'blobs', base_url=self._api)
             data = {'content': content, 'encoding': encoding}
             json = self._json(self._post(url, data=data), 201)

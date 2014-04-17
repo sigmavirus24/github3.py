@@ -161,6 +161,21 @@ class TestRepository(BaseCase):
         assert self.repo.create_blob(content, encoding) == sha
         self.mock_assertions()
 
+    def test_create_empty_blob(self):
+        self.response('empty_blob', 201)
+        content = ''
+        encoding = 'base64'
+        sha = 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391'
+        self.post(self.api + 'git/blobs')
+        self.conf = {'data': {'content': content, 'encoding': encoding}}
+
+        self.assertRaises(github3.GitHubError, self.repo.create_blob,
+                          content, encoding)
+
+        self.login()
+        assert self.repo.create_blob(content, encoding) == sha
+        self.mock_assertions()
+
     def test_create_comment(self):
         self.response('commit_comment', 201)
         body = ('Late night commits are never a good idea. I refactored a '
