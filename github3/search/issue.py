@@ -7,6 +7,7 @@ from github3.issues import Issue
 
 class IssueSearchResult(GitHubCore):
     def __init__(self, data, session=None):
+        super(IssueSearchResult, self).__init__(data, session)
         result = data.copy()
         #: Score of the result
         self.score = result.pop('score')
@@ -16,4 +17,4 @@ class IssueSearchResult(GitHubCore):
         self.issue = Issue(result, self)
 
     def _repr(self):
-        return '<IssueSearchResult [{0}]>'.format(self.repository)
+        return '<IssueSearchResult [{0}]>'.format(self.issue)
