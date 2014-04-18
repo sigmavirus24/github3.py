@@ -136,3 +136,9 @@ class TestRepository(UnitHelper):
         self.session.get.assert_called_once_with(
             url, headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
+
+    def test_latest_pages_build(self):
+        """Test retrieving the most recent pages build."""
+        url = self.example_data['url'] + '/pages/builds/latest'
+        self.instance.latest_pages_build()
+        self.session.get.assert_called_once_with(url)
