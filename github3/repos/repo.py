@@ -1676,7 +1676,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('pages', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return PagesInfo(json)
+        return PagesInfo(json) if json else None
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
