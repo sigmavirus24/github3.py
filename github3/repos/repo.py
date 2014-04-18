@@ -33,7 +33,7 @@ from github3.repos.stats import ContributorStats
 from github3.repos.release import Release, Asset
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
-from github3.utils import timestamp_parameter
+from github3.utils import stream_response_to_file, timestamp_parameter
 from uritemplate import URITemplate
 
 
@@ -326,7 +326,7 @@ class Repository(GitHubCore):
             resp = self._get(url, allow_redirects=True, stream=True)
 
         if resp and self._boolean(resp, 200, 404):
-            self._stream_response_to_file(resp, path)
+            stream_response_to_file(resp, path)
             return True
         return False
 

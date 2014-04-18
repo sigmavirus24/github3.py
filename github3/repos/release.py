@@ -4,6 +4,7 @@ import json
 
 from github3.decorators import requires_auth
 from github3.models import GitHubCore, GitHubError
+from github3.utils import stream_response_to_file
 from uritemplate import URITemplate
 
 
@@ -212,6 +213,6 @@ class Asset(GitHubCore):
                              headers=headers)
 
         if self._boolean(resp, 200, 404):
-            self._stream_response_to_file(resp, path)
+            stream_response_to_file(resp, path)
             return True
         return False

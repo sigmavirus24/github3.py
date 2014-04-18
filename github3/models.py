@@ -8,7 +8,6 @@ This module provides the basic models used in github3.py
 """
 from __future__ import unicode_literals
 
-from collections import Callable
 from json import dumps
 from requests.compat import urlparse
 from github3.decorators import requires_auth
@@ -139,26 +138,6 @@ class GitHubCore(GitHubObject):
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
         return self._session.build_url(*args, **kwargs)
-
-    def _stream_response_to_file(self, resp, path=None):
-        pre_opened = False
-        fd = None
-        if path:
-            if isinstance(getattr(path, 'write', None), Callable):
-                pre_opened = True
-                fd = path
-            else:
-                fd = open(path, 'wb')
-        else:
-            header = resp.headers['content-disposition']
-            i = header.find('filename=') + len('filename=')
-            fd = open(header[i:], 'wb')
-
-        for chunk in resp.iter_content(chunk_size=512):
-            fd.write(chunk)
-
-        if not pre_opened:
-            fd.close()
 
     @property
     def _api(self):
