@@ -72,6 +72,8 @@ class TestStreamingDownloads:
             stream_response_to_file(response, 'some_file')
 
         mocked_open.assert_called_once_with('some_file', 'wb')
+        mocked_open().write.assert_called_once_with(b'fake data')
+        mocked_open().close.assert_called_once_with()
 
     def test_uses_existing_file(self, response):
         fd = OpenFile()
@@ -84,3 +86,5 @@ class TestStreamingDownloads:
             stream_response_to_file(response)
 
         mocked_open.assert_called_once_with('a_file_name', 'wb')
+        mocked_open().write.assert_called_once_with(b'fake data')
+        mocked_open().close.assert_called_once_with()
