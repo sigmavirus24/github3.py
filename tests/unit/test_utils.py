@@ -1,7 +1,10 @@
 from datetime import datetime
-from github3.utils import timestamp_parameter
+from github3.utils import stream_response_to_file, timestamp_parameter
 
+import io
+import mock
 import pytest
+import requests
 
 
 class TestTimestampConverter:
@@ -38,3 +41,46 @@ class TestTimestampConverter:
 
     def test_invalid_type_handling(self):
         pytest.raises(ValueError, timestamp_parameter, 1)
+
+
+@pytest.fixture
+def mocked_open():
+    return mock.mock_open()
+
+
+@pytest.fixture
+def response():
+    r = requests.Response()
+    r.raw = io.BytesIO(b'fake data')
+    r.headers.update({'content-disposition': 'filename=a_file_name'})
+    return r
+
+
+class OpenFile:
+    def __init__(self):
+        self.data = b''
+        self.written_to = False
+
+    def write(self, data):
+        self.written_to = True
+        self.data += data
+
+
+class TestStreamingDownloads:
+    def test_opens_a_new_file(self, mocked_open, response):
+        with mock.patch('github3.utils.open', mocked_open, create=True):
+            stream_response_to_file(response, 'some_file')
+
+        mocked_open.assert_called_once_with('some_file', 'wb')
+
+    def test_uses_existing_file(self, response):
+        fd = OpenFile()
+        stream_response_to_file(response, fd)
+        assert fd.written_to is True
+        assert fd.data == b'fake data'
+
+    def test_finds_filename_in_headers(self, mocked_open, response):
+        with mock.patch('github3.utils.open', mocked_open, create=True):
+            stream_response_to_file(response)
+
+        mocked_open.assert_called_once_with('a_file_name', 'wb')
