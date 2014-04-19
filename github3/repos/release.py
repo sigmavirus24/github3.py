@@ -195,7 +195,6 @@ class Asset(GitHubCore):
             it can take a file-like object as well
         :type path: str, file
         :returns: bool -- True if successful, False otherwise
-
         """
         headers = {
             'Accept': 'application/octet-stream'
