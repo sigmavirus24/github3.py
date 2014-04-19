@@ -6,7 +6,10 @@ from github3.issues.milestone import Milestone
 from github3.issues import Issue
 import datetime
 from tests.utils import BaseCase, load
-from mock import patch
+try:
+   from unittest.mock import patch
+except ImportError:
+   from mock import patch
 
 
 class TestLabel(BaseCase):

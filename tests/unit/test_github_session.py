@@ -3,7 +3,10 @@ import pytest
 import requests
 
 from github3 import session
-from mock import patch, Mock
+try:
+   from unittest.mock import patch, Mock
+except ImportError:
+   from mock import patch, Mock
 
 
 class TestGitHubSession:

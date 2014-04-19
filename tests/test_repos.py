@@ -3,7 +3,10 @@ import github3
 from github3 import repos
 from datetime import datetime
 from tests.utils import (BaseCase, load)
-from mock import patch, mock_open
+try:
+   from unittest.mock import patch, mock_open
+except ImportError:
+   from mock import patch, mock_open
 
 
 class TestRepository(BaseCase):
