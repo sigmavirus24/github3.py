@@ -13,6 +13,8 @@ History/Changelog
 
 - Allow users to list a `Repository's collaborators`_
 
+- Allow users to create an empty blob on a Repository
+
 - Update how users can list issues and pull requests. See:
   http://developer.github.com/changes/2014-02-28-issue-and-pull-query-enhancements/
   This includes breaking changes to ``Repository#iter_pulls``.
