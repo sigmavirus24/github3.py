@@ -4,6 +4,18 @@ from .helper import IntegrationHelper
 
 
 class TestRepository(IntegrationHelper):
+    def test_create_empty_blob(self):
+        """Test the ability to create an empty blob on a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_empty_blob')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'fork_this')
+            assert repository is not None
+            blob_sha = repository.create_blob('', 'utf-8')
+
+        assert blob_sha is not None
+        assert blob_sha != ''
+
     def test_create_deployment(self):
         """Test the ability to create a deployment for a repository."""
         self.basic_login()
