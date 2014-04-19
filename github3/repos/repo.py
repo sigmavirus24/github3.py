@@ -29,6 +29,7 @@ from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
 from github3.repos.deployment import Deployment
 from github3.repos.hook import Hook
+from github3.repos.pages import PagesBuild, PagesInfo
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
 from github3.repos.release import Release, Asset
@@ -1056,6 +1057,16 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Label(json, self) if json else None
 
+    @requires_auth
+    def latest_pages_build(self):
+        """Get the build information for the most recent Pages build.
+
+        :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return PagesBuild(json) if json else None
+
     def iter_assignees(self, number=-1, etag=None):
         """Iterate over all available assignees to which an issue may be
         assigned.
@@ -1466,6 +1477,16 @@ class Repository(GitHubCore):
                 del params[k]
         return self._iter(int(number), url, Thread, params, etag)
 
+    @requires_auth
+    def iter_pages_builds(self, number=-1, etag=None):
+        """Iterate over pages builds of this repository.
+
+        :returns: generator of :class:`PagesBuild
+            <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', base_url=self._api)
+        return self._iter(int(number), url, PagesBuild, etag=etag)
+
     def iter_pulls(self, state=None, head=None, base=None, sort='created',
                    direction='desc', number=-1, etag=None):
         """List pull requests on repository.
@@ -1646,6 +1667,16 @@ class Repository(GitHubCore):
                                   base_url=self._api)
             json = self._json(self._get(url), 200)
         return Milestone(json, self) if json else None
+
+    @requires_auth
+    def pages(self):
+        """Get information about this repository's pages site.
+
+        :returns: :class:`PagesInfo <github3.repos.pages.PagesInfo>`
+        """
+        url = self._build_url('pages', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return PagesInfo(json) if json else None
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
