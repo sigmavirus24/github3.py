@@ -58,7 +58,7 @@ class TestAsset(UnitHelper):
         self.instance.edit('new name')
         self.session.patch.assert_called_once_with(
             self.example_data['url'],
-            data={'name': 'new name'},
+            data='{"name": "new name"}',
             headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
 
@@ -66,6 +66,6 @@ class TestAsset(UnitHelper):
         self.instance.edit('new name', 'label')
         self.session.patch.assert_called_once_with(
             self.example_data['url'],
-            data={'name': 'new name', 'label': 'label'},
+            data='{"name": "new name", "label": "label"}',
             headers={'Accept': 'application/vnd.github.manifold-preview'}
         )

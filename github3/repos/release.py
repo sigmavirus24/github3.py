@@ -207,7 +207,7 @@ class Asset(GitHubCore):
         self._remove_none(edit_data)
         r = self._patch(
             self._api,
-            data=edit_data,
+            data=json.dumps(edit_data),
             headers=Release.CUSTOM_HEADERS
         )
         successful = self._boolean(r, 200, 404)
