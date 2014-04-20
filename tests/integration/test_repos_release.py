@@ -1,4 +1,6 @@
 import github3
+import os
+import tempfile
 
 from .helper import IntegrationHelper
 
@@ -53,3 +55,21 @@ class TestRelease(IntegrationHelper):
                     )
             assert isinstance(asset, github3.repos.release.Asset)
             release.delete()
+
+
+class TestAsset(IntegrationHelper):
+    def test_download(self):
+        """Test the ability to download an asset."""
+        cassette_name = self.cassette_name('download')
+        with self.recorder.use_cassette(cassette_name,
+                                        preserve_exact_body_bytes=True):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            release = repository.release(76677)
+            asset = next(release.iter_assets())
+            _, filename = tempfile.mkstemp()
+            asset.download(filename)
+
+        with open(filename) as fd:
+            assert len(fd.read(1024)) > 0
+
+        os.unlink(filename)
