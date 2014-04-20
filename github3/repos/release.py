@@ -4,6 +4,7 @@ import json
 
 from github3.decorators import requires_auth
 from github3.models import GitHubCore, GitHubError
+from github3.utils import stream_response_to_file
 from uritemplate import URITemplate
 
 
@@ -144,6 +145,9 @@ class Asset(GitHubCore):
         self.created_at = self._strptime(asset.get('created_at'))
         #: Number of times the asset was downloaded
         self.download_count = asset.get('download_count')
+        #: URL to download the asset.
+        #: Request headers must include ``Accept: application/octet-stream``.
+        self.download_url = self._api
         #: GitHub id of the asset
         self.id = asset.get('id')
         #: Short description of the asset
@@ -160,6 +164,36 @@ class Asset(GitHubCore):
     def _repr(self):
         return '<Asset [{0}]>'.format(self.name)
 
+    def download(self, path=''):
+        """Download the data for this asset.
+
+        :param path: (optional), path where the file should be saved
+            to, default is the filename provided in the headers and will be
+            written in the current directory.
+            it can take a file-like object as well
+        :type path: str, file
+        :returns: bool -- True if successful, False otherwise
+        """
+        headers = {
+            'Accept': 'application/octet-stream'
+            }
+        resp = self._get(self._api, allow_redirects=False, stream=True,
+                         headers=headers)
+        if resp.status_code == 302:
+            # Amazon S3 will reject the redirected request unless we omit
+            # certain request headers
+            headers.update({
+                'Authorization': None,
+                'Content-Type': None,
+                })
+            resp = self._get(resp.headers['location'], stream=True,
+                             headers=headers)
+
+        if self._boolean(resp, 200, 404):
+            stream_response_to_file(resp, path)
+            return True
+        return False
+
     def edit(self, name, label=None):
         """Edit this asset.
 
@@ -173,7 +207,7 @@ class Asset(GitHubCore):
         self._remove_none(edit_data)
         r = self._patch(
             self._api,
-            data=edit_data,
+            data=json.dumps(edit_data),
             headers=Release.CUSTOM_HEADERS
         )
         successful = self._boolean(r, 200, 404)

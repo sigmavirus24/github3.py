@@ -6,11 +6,13 @@ Repository
 This part of the documentation covers:
 
 - :class:`Repository <github3.repos.repo.Repository>`
+- :class:`Asset <github3.repos.release.Asset>`
 - :class:`Branch <github3.repos.branch.Branch>`
 - :class:`Contents <github3.repos.contents.Contents>`
 - :class:`Deployment <github3.repos.deployment.Deployment>`
 - :class:`DeploymentStatus <github3.repos.deployment.DeploymentStatus>`
 - :class:`Hook <github3.repos.hook.Hook>`
+- :class:`Release <github3.repos.release.Release>`
 - :class:`RepoTag <github3.repos.tag.RepoTag>`
 - :class:`RepoComment <github3.repos.comment.RepoComment>`
 - :class:`RepoCommit <github3.repos.commit.RepoCommit>`
@@ -61,6 +63,10 @@ Repository Objects
 .. autoclass:: github3.repos.release.Release
     :members:
 
+---------
+
+.. autoclass:: github3.repos.release.Asset
+    :members:
 
 ---------
 
