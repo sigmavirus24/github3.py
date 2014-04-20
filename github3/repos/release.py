@@ -164,28 +164,6 @@ class Asset(GitHubCore):
     def __repr__(self):
         return '<Asset [{0}]>'.format(self.name)
 
-    def edit(self, name, label=None):
-        """Edit this asset.
-
-        :param str name: (required), The file name of the asset
-        :param str label: (optional), An alternate description of the asset
-        :returns: boolean
-        """
-        if not name:
-            return False
-        edit_data = {'name': name, 'label': label}
-        self._remove_none(edit_data)
-        r = self._patch(
-            self._api,
-            data=edit_data,
-            headers=Release.CUSTOM_HEADERS
-        )
-        successful = self._boolean(r, 200, 404)
-        if successful:
-            self.__init__(r.json(), self)
-
-        return successful
-
     def download(self, path=''):
         """Download the data for this asset.
 
@@ -215,3 +193,25 @@ class Asset(GitHubCore):
             stream_response_to_file(resp, path)
             return True
         return False
+
+    def edit(self, name, label=None):
+        """Edit this asset.
+
+        :param str name: (required), The file name of the asset
+        :param str label: (optional), An alternate description of the asset
+        :returns: boolean
+        """
+        if not name:
+            return False
+        edit_data = {'name': name, 'label': label}
+        self._remove_none(edit_data)
+        r = self._patch(
+            self._api,
+            data=edit_data,
+            headers=Release.CUSTOM_HEADERS
+        )
+        successful = self._boolean(r, 200, 404)
+        if successful:
+            self.__init__(r.json(), self)
+
+        return successful
