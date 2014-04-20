@@ -226,7 +226,7 @@ class Issue(GitHubCore):
         :returns: generator of :class:`IssueEvent <IssueEvent>`\ s
         """
         url = self._build_url('events', base_url=self._api)
-        return self._iter(int(number), url, IssueEvent)
+        return self._iter(int(number), url, lambda e: IssueEvent(e, self))
 
     @requires_auth
     def remove_label(self, name):
