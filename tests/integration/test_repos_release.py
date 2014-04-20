@@ -69,7 +69,7 @@ class TestAsset(IntegrationHelper):
             _, filename = tempfile.mkstemp()
             asset.download(filename)
 
-        with open(filename) as fd:
+        with open(filename, 'rb') as fd:
             assert len(fd.read(1024)) > 0
 
         os.unlink(filename)

@@ -2,6 +2,8 @@ from github3.repos.release import Release, Asset
 
 from .helper import UnitHelper
 
+import json
+
 
 def releases_url(path=''):
     url = "https://api.github.com/repos/octocat/Hello-World/releases"
@@ -64,8 +66,10 @@ class TestAsset(UnitHelper):
 
     def test_edit_with_label(self):
         self.instance.edit('new name', 'label')
-        self.session.patch.assert_called_once_with(
-            self.example_data['url'],
-            data='{"name": "new name", "label": "label"}',
-            headers={'Accept': 'application/vnd.github.manifold-preview'}
-        )
+        headers = {'Accept': 'application/vnd.github.manifold-preview'}
+        _, args, kwargs = list(self.session.patch.mock_calls[0])
+        assert self.example_data['url'] in args
+        assert kwargs['headers'] == headers
+        assert json.loads(kwargs['data']) == {
+            'name': 'new name', 'label': 'label'
+            }
