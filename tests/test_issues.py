@@ -328,6 +328,11 @@ class TestIssueEvent(BaseCase):
         super(TestIssueEvent, self).setUp()
         self.ev = IssueEvent(load('issue_event'))
 
+    def test_repr(self):
+        assert repr(self.ev) == '<Issue Event [{0} by {1}]>'.format(
+            'closed', 'sigmavirus24'
+        )
+
     def test_equality(self):
         e = IssueEvent(load('issue_event'))
         assert self.ev == e
