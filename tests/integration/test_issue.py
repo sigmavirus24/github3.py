@@ -13,5 +13,5 @@ class TestIssue(IntegrationHelper):
             issue = repository.issue(218)
             for event in issue.iter_events():
                 assert isinstance(event, github3.issues.event.IssueEvent)
-                event.issue is None
+                assert event.issue is None
                 assert isinstance(event.actor, github3.users.User)
