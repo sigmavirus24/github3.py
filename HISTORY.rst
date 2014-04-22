@@ -19,10 +19,13 @@ History/Changelog
   http://developer.github.com/changes/2014-02-28-issue-and-pull-query-enhancements/
   This includes breaking changes to ``Repository#iter_pulls``.
 
+- Update methods to handle the `pagination changes`_.
+
 .. _single authorization: https://github3py.readthedocs.org/en/latest/github.html#github3.github.GitHub.revoke_authorization
 .. _all authorizations: https://github3py.readthedocs.org/en/latest/github.html#github3.github.GitHub.revoke_authorizations
 .. _ping: https://github3py.readthedocs.org/en/latest/repos.html?highlight=ping#github3.repos.hook.Hook.ping
 .. _Repository's collaborators: https://github3py.readthedocs.org/en/latest/repos.html#github3.repos.repo.Repository.iter_collaborators
+.. _pagination changes: https://developer.github.com/changes/2014-03-18-paginating-method-changes/
 
 0.8.2: 2014-02-11
 ~~~~~~~~~~~~~~~~~
