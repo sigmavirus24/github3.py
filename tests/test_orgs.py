@@ -214,7 +214,7 @@ class TestOrganization(BaseCase):
             'data': {
                 'name': 'team',
                 'repo_names': [],
-                'permissions': 'push'
+                'permission': 'push'
             }
         }
 
@@ -222,7 +222,7 @@ class TestOrganization(BaseCase):
 
         self.not_called()
         self.login()
-        assert isinstance(self.org.create_team('team', permissions='push'),
+        assert isinstance(self.org.create_team('team', permission='push'),
                           github3.orgs.Team)
         self.mock_assertions()
 
