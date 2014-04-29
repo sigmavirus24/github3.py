@@ -198,7 +198,7 @@ class Gist(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment, etag=etag)
 
-    def iter_commits(self, number=-1):
+    def iter_commits(self, number=-1, etag=None):
         """Iter over the commits on this gist.
 
         These commits will be requested from the API and should be the same as
@@ -206,9 +206,15 @@ class Gist(GitHubCore):
 
         .. versionadded:: 0.6
 
+        .. versionchanged:: 0.9
+
+            Added param ``etag``.
+
         :param int number: (optional), number of commits to iterate over.
             Default: -1 will iterate over all commits associated with this
             gist.
+        :param str etag: (optional), ETag from a previous request to this
+            endpoint.
         :returns: generator of
             :class:`GistHistory <github3.gists.history.GistHistory>`
 
@@ -224,13 +230,22 @@ class Gist(GitHubCore):
         """
         return iter(self._files)
 
-    def iter_forks(self):
+    def iter_forks(self, number=-1, etag=None):
         """Iterator of forks of this gist.
 
+        .. versionchanged:: 0.9
+
+            Added params ``number`` and ``etag``.
+
+        :param int number: (optional), number of forks to iterate over.
+            Default: -1 will iterate over all forks of this gist.
+        :param str etag: (optional), ETag from a previous request to this
+            endpoint.
         :returns: generator of :class:`Gist <Gist>`
 
         """
-        return iter(self._forks)  # (No coverage)
+        url = self._build_url('forks', base_url=self._api)
+        return self._iter(int(number), url, Gist, etag=etag)
 
     @requires_auth
     def star(self):

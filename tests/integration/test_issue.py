@@ -15,3 +15,12 @@ class TestIssue(IntegrationHelper):
                 assert isinstance(event, github3.issues.event.IssueEvent)
                 assert event.issue is None
                 assert isinstance(event.actor, github3.users.User)
+
+    def test_iter_labels(self):
+        """Test the ability to iterate over issue labels."""
+        cassette_name = self.cassette_name('iter_labels')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue('sigmavirus24', 'github3.py', 187)
+            assert issue is not None
+            for label in issue.iter_labels():
+                assert isinstance(label, github3.issues.label.Label)

@@ -228,6 +228,17 @@ class Issue(GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent)
 
+    def iter_labels(self, number=-1, etag=None):
+        """Iterate over the labels associated with this issue.
+
+        :param int number: (optional), number of labels to return. Default: -1
+            returns all labels applied to this issue.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        """
+        url = self._build_url('labels', base_url=self._api)
+        return self._iter(int(number), url, Label, etag=etag)
+
     @requires_auth
     def remove_label(self, name):
         """Removes label ``name`` from this issue.
