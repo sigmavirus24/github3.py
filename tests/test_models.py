@@ -36,6 +36,12 @@ class TestGitHubCore(BaseCase):
 
         self.assertRaises(github3.GitHubError, self.g._boolean, r, 200, 404)
 
+    def test_strptime(self):
+        dt = self.g._strptime('2013-06-18T19:53:04Z')
+        assert dt.tzname() == 'UTC'
+        assert dt.dst().total_seconds() == 0
+        assert dt.utcoffset().total_seconds() == 0
+
 
 class TestGitHubError(TestCase):
     def __init__(self, methodName='runTest'):
