@@ -12,6 +12,7 @@ from json import dumps
 from requests.compat import urlparse, is_py2
 from github3.decorators import requires_auth
 from github3.session import GitHubSession
+from github3.utils import UTC
 from datetime import datetime
 from logging import getLogger
 
@@ -36,9 +37,12 @@ class GitHubObject(object):
         return self._json_data
 
     def _strptime(self, time_str):
-        """Converts an ISO 8601 formatted string into a datetime object."""
+        """Convert an ISO 8601 formatted string in UTC into a
+        timezone-aware datetime object."""
         if time_str:
-            return datetime.strptime(time_str, __timeformat__)
+            # Parse UTC string into naive datetime, then add timezone
+            dt = datetime.strptime(time_str, __timeformat__)
+            return dt.replace(tzinfo=UTC())
         return None
 
     def _repr(self):
