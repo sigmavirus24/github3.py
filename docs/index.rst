@@ -74,6 +74,7 @@ Modules
     github
     issues
     models
+    notifications
     orgs
     pulls
     repos

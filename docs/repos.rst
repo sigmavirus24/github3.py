@@ -12,6 +12,8 @@ This part of the documentation covers:
 - :class:`Deployment <github3.repos.deployment.Deployment>`
 - :class:`DeploymentStatus <github3.repos.deployment.DeploymentStatus>`
 - :class:`Hook <github3.repos.hook.Hook>`
+- :class:`PagesInfo <github3.repos.pages.PagesInfo>`
+- :class:`PagesBuild <github3.repos.pages.PagesBuild>`
 - :class:`Release <github3.repos.release.Release>`
 - :class:`RepoTag <github3.repos.tag.RepoTag>`
 - :class:`RepoComment <github3.repos.comment.RepoComment>`
@@ -83,6 +85,18 @@ Repository Objects
 .. module:: github3.repos.hook
 
 .. autoclass:: Hook
+    :members:
+
+---------
+
+.. module:: github3.repos.pages
+
+.. autoclass:: PagesInfo
+    :members:
+
+---------
+
+.. autoclass:: PagesBuild
     :members:
 
 ---------

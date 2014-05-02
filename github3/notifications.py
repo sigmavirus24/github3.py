@@ -108,7 +108,7 @@ class Subscription(GitHubCore):
     repository subscription information.
 
     See also:
-    developer.github.com/v3/activity/notifications/#get-a-thread-subscription
+    http://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
     """
     def __init__(self, sub, session=None):
         super(Subscription, self).__init__(sub, session)
