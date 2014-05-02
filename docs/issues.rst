@@ -14,25 +14,35 @@ This part of the documentation covers the module which handles :class:`Issue
 Issue Objects
 -------------
 
-.. autoclass:: github3.issues.issue.Issue
+.. module:: github3.issues.issue
+
+.. autoclass:: Issue
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.issues.comment.IssueComment
+.. module:: github3.issues.comment
+
+.. autoclass:: IssueComment
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.issues.event.IssueEvent
+.. module:: github3.issues.event
+
+.. autoclass:: IssueEvent
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.issues.milestone.Milestone
+.. module:: github3.issues.milestone
+
+.. autoclass:: Milestone
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.issues.label.Label
+.. module:: github3.issues.label
+
+.. autoclass:: Label
     :inherited-members:

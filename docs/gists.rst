@@ -17,20 +17,28 @@ classes should never be instantiated by the user (developer) directly.
 Gist Objects
 ------------
 
-.. autoclass:: github3.gists.gist.Gist
+.. module:: github3.gists.gist
+
+.. autoclass:: Gist
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.gists.comment.GistComment
+.. module:: github3.gists.comment
+
+.. autoclass:: GistComment
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.gists.file.GistFile
+.. module:: github3.gists.file
+
+.. autoclass:: GistFile
     :inherited-members:
 
 ------
 
-.. autoclass:: github3.gists.history.GistHistory
+.. module:: github3.gists.history
+
+.. autoclass:: GistHistory
     :inherited-members:

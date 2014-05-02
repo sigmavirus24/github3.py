@@ -35,73 +35,97 @@ sections of the GitHub documentation.
 Repository Objects
 ------------------
 
-.. autoclass:: github3.repos.repo.Repository
+.. module:: github3.repos.repo
+
+.. autoclass:: Repository
     :inherited-members:
 
 ---------
 
-.. autoclass:: github3.repos.branch.Branch
+.. module:: github3.repos.branch
+
+.. autoclass:: Branch
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.contents.Contents
+.. module:: github3.repos.contents
+
+.. autoclass:: Contents
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.deployment.Deployment
+.. module:: github3.repos.deployment
+
+.. autoclass:: Deployment
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.deployment.DeploymentStatus
+.. autoclass:: DeploymentStatus
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.release.Release
+.. module:: github3.repos.release
+
+.. autoclass:: Release
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.release.Asset
+.. autoclass:: Asset
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.hook.Hook
+.. module:: github3.repos.hook
+
+.. autoclass:: Hook
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.tag.RepoTag
+.. module:: github3.repos.tag
+
+.. autoclass:: RepoTag
     :members:
 
 ---------
+
+.. module:: github3.repos.comment
 
 More information about this class can be found in the official documentation
 about `comments <http://developer.github.com/v3/repos/comments/>`_.
 
-.. autoclass:: github3.repos.comment.RepoComment
+.. autoclass:: RepoComment
     :inherited-members:
 
 ---------
 
-.. autoclass:: github3.repos.commit.RepoCommit
+.. module:: github3.repos.commit
+
+.. autoclass:: RepoCommit
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.comparison.Comparison
+.. module:: github3.repos.comparison
+
+.. autoclass:: Comparison
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.status.Status
+.. module:: github3.repos.status
+
+.. autoclass:: Status
     :members:
 
 ---------
 
-.. autoclass:: github3.repos.stats.ContributorStats
+.. module:: github3.repos.stats
+
+.. autoclass:: ContributorStats
     :members:
