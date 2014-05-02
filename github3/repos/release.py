@@ -22,6 +22,8 @@ class Release(GitHubCore):
     def __init__(self, release, session=None):
         super(Release, self).__init__(release, session)
         self._api = release.get('url')
+        #: List of :class:`Asset <Asset>` objects for this release
+        self.assets = [Asset(i, self) for i in release.get('assets', [])]
         #: URL for uploaded assets
         self.assets_url = release.get('assets_url')
         #: Body of the release (the description)
@@ -104,7 +106,9 @@ class Release(GitHubCore):
         return successful
 
     def iter_assets(self, number=-1, etag=None):
-        """Iterate over the assets available for this release.
+        """Iterate over the assets available for this release.  The same
+        information is available, without an additional network access,
+        from the :attr:`assets` attribute.
 
         :param int number: (optional), Number of assets to return
         :param str etag: (optional), last ETag header sent
