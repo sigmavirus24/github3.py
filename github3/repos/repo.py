@@ -144,7 +144,7 @@ class Repository(GitHubCore):
         #: Number of users watching the repository.
         self.watchers = repo.get('watchers', 0)
 
-        #: Parent of this fork, if it exists :class;`Repository`
+        #: Parent of this fork, if it exists :class:`Repository`
         self.source = repo.get('source')
         if self.source:
             self.source = Repository(self.source, self)
@@ -335,7 +335,7 @@ class Repository(GitHubCore):
         """Returns a single Asset.
 
         :param int id: (required), id of the asset
-        :returns: :class:`Asset <Asset>`
+        :returns: :class:`Asset <github3.repos.release.Asset>`
         """
         data = None
         if int(id) > 0:
@@ -361,7 +361,7 @@ class Repository(GitHubCore):
 
         :param str name: (required), branch name
         :type name: str
-        :returns: :class:`Branch <Branch>`
+        :returns: :class:`Branch <github3.repos.branch.Branch>`
         """
         json = None
         if name:
@@ -374,8 +374,8 @@ class Repository(GitHubCore):
         Commit.
 
         :param str sha: (required), sha of the commit
-        :returns: :class:`RepoCommit <RepoCommit>` if successful, otherwise
-            None
+        :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>` if
+            successful, otherwise None
         """
         url = self._build_url('commits', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -385,8 +385,8 @@ class Repository(GitHubCore):
         """Get a single commit comment.
 
         :param int comment_id: (required), id of the comment used by GitHub
-        :returns: :class:`RepoComment <RepoComment>` if successful, otherwise
-            None
+        :returns: :class:`RepoComment <github3.repos.comment.RepoComment>` if
+            successful, otherwise None
         """
         url = self._build_url('comments', str(comment_id), base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -397,7 +397,8 @@ class Repository(GitHubCore):
 
         :param str base: (required), base for the comparison
         :param str head: (required), compare this against base
-        :returns: :class:`Comparison <Comparison>` if successful, else None
+        :returns: :class:`Comparison <github3.repos.comparison.Comparison>` if
+            successful, else None
         """
         url = self._build_url('compare', base + '...' + head,
                               base_url=self._api)
@@ -419,8 +420,8 @@ class Repository(GitHubCore):
             github3/repo.py
         :param str ref: (optional), the string name of a commit/branch/tag.
             Default: master
-        :returns: :class:`Contents <Contents>` or dict if successful, else
-            None
+        :returns: :class:`Contents <github3.repos.contents.Contents>` or dict
+            if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
@@ -458,7 +459,8 @@ class Repository(GitHubCore):
         :param str position: (optional), line index in the diff to comment on
         :param int line: (optional), line number of the file to comment on,
             default: 1
-        :returns: :class:`RepoComment <RepoComment>` if successful else None
+        :returns: :class:`RepoComment <github3.repos.comment.RepoComment>` if
+            successful, otherwise None
 
         """
         json = None
@@ -545,7 +547,7 @@ class Repository(GitHubCore):
             committer information. If passed, you must specify both a name and
             email.
         :returns: {
-            'content': :class:`Contents <github3.repos.contents.Content>`:,
+            'content': :class:`Contents <github3.repos.contents.Contents>`:,
             'commit': :class:`Commit <github3.git.Commit>`}
 
         """
@@ -594,7 +596,8 @@ class Repository(GitHubCore):
         :param list events: (optional), events the hook is triggered for
         :param bool active: (optional), whether the hook is actually
             triggered
-        :returns: :class:`Hook <Hook>` if successful, else None
+        :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
+            otherwise None
         """
         json = None
         if name and config and isinstance(config, dict):
@@ -619,13 +622,13 @@ class Repository(GitHubCore):
             issue to
         :param int milestone: (optional), id number of the milestone to
             attribute this issue to (e.g. ``m`` is a :class:`Milestone
-            <github3.issues.Milestone>` object, ``m.number`` is what you pass
-            here.)
+            <github3.issues.milestone.Milestone>` object, ``m.number`` is
+            what you pass here.)
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
-        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
-            None
+        :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
+            otherwise None
         """
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels}
@@ -680,8 +683,8 @@ class Repository(GitHubCore):
             values: ('open', 'closed'), default: 'open'
         :param str description: (optional), description of the milestone
         :param str due_on: (optional), ISO 8601 formatted due date
-        :returns: :class:`Milestone <github3.issues.Milestone>` if successful,
-            else None
+        :returns: :class:`Milestone <github3.issues.milestone.Milestone>` if
+            successful, otherwise None
         """
         url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
@@ -807,7 +810,7 @@ class Repository(GitHubCore):
             tag, otherwise create a lightweight tag (a Reference).
         :returns: If lightweight == False: :class:`Tag <github3.git.Tag>` if
             successful, else None. If lightweight == True: :class:`Reference
-            <Reference>`
+            <github3.git.Reference>`
         """
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
@@ -979,7 +982,8 @@ class Repository(GitHubCore):
         """Get a single hook.
 
         :param int id_num: (required), id of the hook
-        :returns: :class:`Hook <Hook>` if successful, else None
+        :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
+            otherwise None
         """
         json = None
         if int(id_num) > 0:
@@ -1002,8 +1006,8 @@ class Repository(GitHubCore):
         """Get the issue specified by ``number``.
 
         :param int number: (required), number of the issue on this repository
-        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
-            None
+        :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
+            otherwise None
         """
         json = None
         if int(number) > 0:
@@ -1016,7 +1020,7 @@ class Repository(GitHubCore):
         """Get the specified deploy key.
 
         :param int id_num: (required), id of the key
-        :returns: :class:`Key <Key>` if successful, else None
+        :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
         json = None
         if int(id_num) > 0:
@@ -1067,7 +1071,8 @@ class Repository(GitHubCore):
             -1 returns all branches
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Branch <Branch>`\ es
+        :returns: generator of
+            :class:`Branch <github3.repos.branch.Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch, etag=etag)
@@ -1115,7 +1120,8 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of
+            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -1129,7 +1135,8 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of
+            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -1179,7 +1186,8 @@ class Repository(GitHubCore):
             date string.
         :type until: datetime or string
 
-        :returns: generator of :class:`RepoCommit <RepoCommit>`\ s
+        :returns: generator of
+            :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
         """
         params = {'sha': sha, 'path': path, 'author': author,
                   'since': timestamp_parameter(since),
@@ -1281,7 +1289,7 @@ class Repository(GitHubCore):
             returns all hooks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Hook <Hook>`\ s
+        :returns: generator of :class:`Hook <github3.repos.hook.Hook>`\ s
         """
         url = self._build_url('hooks', base_url=self._api)
         return self._iter(int(number), url, Hook, etag=etag)
@@ -1322,7 +1330,7 @@ class Repository(GitHubCore):
             By default all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of :class:`Issue <github3.issues.issue.Issue>`\ s
         """
         url = self._build_url('issues', base_url=self._api)
 
@@ -1345,7 +1353,7 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`IssueEvent <github3.issues.IssueEvent>`\ s
+            :class:`IssueEvent <github3.issues.event.IssueEvent>`\ s
         """
         url = self._build_url('issues', 'events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent, etag=etag)
@@ -1402,7 +1410,7 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Milestone <github3.issues.Milestone>`\ s
+            :class:`Milestone <github3.issues.milestone.Milestone>`\ s
         """
         url = self._build_url('milestones', base_url=self._api)
         accepted = {'state': ('open', 'closed'),
@@ -1569,7 +1577,7 @@ class Repository(GitHubCore):
             -1 returns all available statuses.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Status <Status>`
+        :returns: generator of :class:`Status <github3.repos.status.Status>`
         """
         url = ''
         if sha:
@@ -1583,7 +1591,7 @@ class Repository(GitHubCore):
             Default: -1 returns all available tags.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`RepoTag <RepoTag>`\ s
+        :returns: generator of :class:`RepoTag <github3.repos.tag.RepoTag>`\ s
         """
         url = self._build_url('tags', base_url=self._api)
         return self._iter(int(number), url, RepoTag, etag=etag)
@@ -1626,7 +1634,7 @@ class Repository(GitHubCore):
         :param str base: (required), where you're merging into
         :param str head: (required), where you're merging from
         :param str message: (optional), message to be used for the commit
-        :returns: :class:`RepoCommit <RepoCommit>`
+        :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>`
         """
         url = self._build_url('merges', base_url=self._api)
         data = {'base': base, 'head': head}
@@ -1639,7 +1647,7 @@ class Repository(GitHubCore):
         """Get the milestone indicated by ``number``.
 
         :param int number: (required), unique id number of the milestone
-        :returns: :class:`Milestone <github3.issues.Milestone>`
+        :returns: :class:`Milestone <github3.issues.milestone.Milestone>`
         """
         json = None
         if int(number) > 0:
@@ -1673,7 +1681,7 @@ class Repository(GitHubCore):
     def readme(self):
         """Get the README for this repository.
 
-        :returns: :class:`Contents <Contents>`
+        :returns: :class:`Contents <github3.repos.contents.Contents>`
         """
         url = self._build_url('readme', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -1729,7 +1737,7 @@ class Repository(GitHubCore):
             be received from this repository.
         :param bool ignored: (required), determines if notifications should be
             ignored from this repository.
-        :returns: :class;`Subscription <Subscription>`
+        :returns: :class:`Subscription <github3.notifications.Subscription>`
         """
         sub = {'subscribed': subscribed, 'ignored': ignored}
         url = self._build_url('subscription', base_url=self._api)

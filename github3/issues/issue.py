@@ -62,12 +62,14 @@ class Issue(GitHubCore):
         self.html_url = issue.get('html_url')
         #: Unique ID for the issue.
         self.id = issue.get('id')
-        #: Returns the list of :class:`Label <Label>`\ s on this issue.
+        #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
+        #: on this issue.
         self.labels = [Label(l, self._session) for l in issue.get('labels')]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels_url) if labels_url else None
-        #: :class:`Milestone <Milestone>` this issue was assigned to.
+        #: :class:`Milestone <github3.issues.milestone.Milestone>` this
+        #: issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):
             self.milestone = Milestone(issue.get('milestone'), self._session)
@@ -145,7 +147,7 @@ class Issue(GitHubCore):
         sigmavirus24/Todo.txt-python, the first comment's id is 4150787.
 
         :param int id_num: (required), comment id, see example above
-        :returns: :class:`IssueComment <IssueComment>`
+        :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
         json = None
         if int(id_num) > 0:  # Might as well check that it's positive
@@ -160,7 +162,7 @@ class Issue(GitHubCore):
         """Create a comment on this issue.
 
         :param str body: (required), comment body
-        :returns: :class:`IssueComment <IssueComment>`
+        :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
         json = None
         if body:
@@ -213,7 +215,8 @@ class Issue(GitHubCore):
         """Iterate over the comments on this issue.
 
         :param int number: (optional), number of comments to iterate over
-        :returns: iterator of :class:`IssueComment <IssueComment>`
+        :returns: iterator of
+            :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, IssueComment)
@@ -223,7 +226,8 @@ class Issue(GitHubCore):
 
         :param int number: (optional), number of events to return. Default: -1
             returns all events available.
-        :returns: generator of :class:`IssueEvent <IssueEvent>`\ s
+        :returns: generator of
+            :class:`IssueEvent <github3.issues.event.IssueEvent>`\ s
         """
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent)
@@ -235,6 +239,7 @@ class Issue(GitHubCore):
             returns all labels applied to this issue.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
+        :returns: generator of :class:`Label <github3.issues.label.Label>`\ s
         """
         url = self._build_url('labels', base_url=self._api)
         return self._iter(int(number), url, Label, etag=etag)
