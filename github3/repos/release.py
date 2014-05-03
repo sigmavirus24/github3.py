@@ -22,6 +22,8 @@ class Release(GitHubCore):
     def __init__(self, release, session=None):
         super(Release, self).__init__(release, session)
         self._api = release.get('url')
+        #: List of :class:`Asset <Asset>` objects for this release
+        self.assets = [Asset(i, self) for i in release.get('assets', [])]
         #: URL for uploaded assets
         self.assets_url = release.get('assets_url')
         #: Body of the release (the description)

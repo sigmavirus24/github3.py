@@ -15,6 +15,18 @@ class TestRelease(UnitHelper):
     example_data = {
         "url": releases_url("/1"),
         "html_url": "https://github.com/octocat/Hello-World/releases/v1.0.0",
+        "assets": [{
+            "url": releases_url("/assets/1"),
+            "id": 1,
+            "name": "example.zip",
+            "label": "short description",
+            "state": "uploaded",
+            "content_type": "application/zip",
+            "size": 1024,
+            "download_count": 42,
+            "created_at": "2013-02-27T19:35:32Z",
+            "updated_at": "2013-02-27T19:35:32Z"
+            }],
         "assets_url": releases_url("/1/assets"),
         "upload_url": releases_url("/1/assets{?name}"),
         "id": 1,
@@ -29,6 +41,10 @@ class TestRelease(UnitHelper):
         }
 
     # Attribute tests
+    def test_assets(self):
+        assert self.instance.assets is not None
+        assert isinstance(self.instance.assets[0], Asset)
+
     def test_has_upload_urlt(self):
         assert self.instance.upload_urlt is not None
 
