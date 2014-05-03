@@ -106,9 +106,7 @@ class Release(GitHubCore):
         return successful
 
     def iter_assets(self, number=-1, etag=None):
-        """Iterate over the assets available for this release.  The same
-        information is available, without an additional network access,
-        from the :attr:`assets` attribute.
+        """Iterate over the assets available for this release.
 
         :param int number: (optional), Number of assets to return
         :param str etag: (optional), last ETag header sent
