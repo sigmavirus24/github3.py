@@ -19,26 +19,26 @@ Gist Objects
 
 .. module:: github3.gists.gist
 
-.. autoclass:: Gist
+.. autoclass:: github3.gists.gist.Gist
     :inherited-members:
 
 ------
 
 .. module:: github3.gists.comment
 
-.. autoclass:: GistComment
+.. autoclass:: github3.gists.comment.GistComment
     :inherited-members:
 
 ------
 
 .. module:: github3.gists.file
 
-.. autoclass:: GistFile
+.. autoclass:: github3.gists.file.GistFile
     :inherited-members:
 
 ------
 
 .. module:: github3.gists.history
 
-.. autoclass:: GistHistory
+.. autoclass:: github3.gists.history.GistHistory
     :inherited-members:

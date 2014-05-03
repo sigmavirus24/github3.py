@@ -39,71 +39,71 @@ Repository Objects
 
 .. module:: github3.repos.repo
 
-.. autoclass:: Repository
+.. autoclass:: github3.repos.repo.Repository
     :inherited-members:
 
 ---------
 
 .. module:: github3.repos.branch
 
-.. autoclass:: Branch
+.. autoclass:: github3.repos.branch.Branch
     :members:
 
 ---------
 
 .. module:: github3.repos.contents
 
-.. autoclass:: Contents
+.. autoclass:: github3.repos.contents.Contents
     :members:
 
 ---------
 
 .. module:: github3.repos.deployment
 
-.. autoclass:: Deployment
+.. autoclass:: github3.repos.deployment.Deployment
     :members:
 
 ---------
 
-.. autoclass:: DeploymentStatus
+.. autoclass:: github3.repos.deployment.DeploymentStatus
     :members:
 
 ---------
 
 .. module:: github3.repos.release
 
-.. autoclass:: Release
+.. autoclass:: github3.repos.release.Release
     :members:
 
 ---------
 
-.. autoclass:: Asset
+.. autoclass:: github3.repos.release.Asset
     :members:
 
 ---------
 
 .. module:: github3.repos.hook
 
-.. autoclass:: Hook
+.. autoclass:: github3.repos.hook.Hook
     :members:
 
 ---------
 
 .. module:: github3.repos.pages
 
-.. autoclass:: PagesInfo
+.. autoclass:: github3.repos.pages.PagesInfo
     :members:
 
 ---------
 
-.. autoclass:: PagesBuild
+.. autoclass:: github3.repos.pages.PagesBuild
     :members:
 
 ---------
 
 .. module:: github3.repos.tag
 
-.. autoclass:: RepoTag
+.. autoclass:: github3.repos.tag.RepoTag
     :members:
 
 ---------
@@ -113,33 +113,33 @@ Repository Objects
 More information about this class can be found in the official documentation
 about `comments <http://developer.github.com/v3/repos/comments/>`_.
 
-.. autoclass:: RepoComment
+.. autoclass:: github3.repos.comment.RepoComment
     :inherited-members:
 
 ---------
 
 .. module:: github3.repos.commit
 
-.. autoclass:: RepoCommit
+.. autoclass:: github3.repos.commit.RepoCommit
     :members:
 
 ---------
 
 .. module:: github3.repos.comparison
 
-.. autoclass:: Comparison
+.. autoclass:: github3.repos.comparison.Comparison
     :members:
 
 ---------
 
 .. module:: github3.repos.status
 
-.. autoclass:: Status
+.. autoclass:: github3.repos.status.Status
     :members:
 
 ---------
 
 .. module:: github3.repos.stats
 
-.. autoclass:: ContributorStats
+.. autoclass:: github3.repos.stats.ContributorStats
     :members:

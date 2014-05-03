@@ -16,33 +16,33 @@ Issue Objects
 
 .. module:: github3.issues.issue
 
-.. autoclass:: Issue
+.. autoclass:: github3.issues.issue.Issue
     :inherited-members:
 
 ------
 
 .. module:: github3.issues.comment
 
-.. autoclass:: IssueComment
+.. autoclass:: github3.issues.comment.IssueComment
     :inherited-members:
 
 ------
 
 .. module:: github3.issues.event
 
-.. autoclass:: IssueEvent
+.. autoclass:: github3.issues.event.IssueEvent
     :inherited-members:
 
 ------
 
 .. module:: github3.issues.milestone
 
-.. autoclass:: Milestone
+.. autoclass:: github3.issues.milestone.Milestone
     :inherited-members:
 
 ------
 
 .. module:: github3.issues.label
 
-.. autoclass:: Label
+.. autoclass:: github3.issues.label.Label
     :inherited-members:
