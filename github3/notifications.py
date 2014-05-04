@@ -86,7 +86,7 @@ class Thread(GitHubCore):
             be received from this thread.
         :param bool ignored: (required), determines if notifications should be
             ignored from this thread.
-        :returns: :class;`Subscription <Subscription>`
+        :returns: :class:`Subscription <Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)
         sub = {'subscribed': subscribed, 'ignored': ignored}
@@ -108,7 +108,7 @@ class Subscription(GitHubCore):
     repository subscription information.
 
     See also:
-    developer.github.com/v3/activity/notifications/#get-a-thread-subscription
+    http://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
     """
     def __init__(self, sub, session=None):
         super(Subscription, self).__init__(sub, session)

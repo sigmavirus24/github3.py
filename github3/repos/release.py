@@ -38,7 +38,7 @@ class Release(GitHubCore):
         self.id = release.get('id')
         #: Name given to the release
         self.name = release.get('name')
-        #; Boolean whether release is a prelease
+        #; Boolean whether release is a prerelease
         self.prerelease = release.get('prerelease')
         #: Date the release was published
         self.published_at = self._strptime(release.get('published_at'))

@@ -83,7 +83,8 @@ class Gist(GitHubCore):
         #: Number of files in this gist.
         self.files = len(self._files)
 
-        #: History of this gist, list of :class:`GistHistory <GistHistory>`
+        #: History of this gist, list of
+        #: :class:`GistHistory <github3.gists.history.GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
         ## New urls
