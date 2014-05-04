@@ -176,7 +176,7 @@ class Repository(GitHubCore):
         self.languages_url = repo.get('languages_url', '')
 
         #: Stargazers url (not a template)
-        self.stargarzers_url = repo.get('stargazers_url', '')
+        self.stargazers_url = repo.get('stargazers_url', '')
 
         #: Contributors url (not a template)
         self.contributors_url = repo.get('contributors_url', '')
