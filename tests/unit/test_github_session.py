@@ -3,7 +3,7 @@ import pytest
 import requests
 
 from github3 import session
-from mock import patch, Mock
+from .helper import mock
 
 
 class TestGitHubSession:
@@ -84,7 +84,7 @@ class TestGitHubSession:
         s.basic_auth('username', 'password')
         assert 'Authorization' not in s.headers
 
-    @patch.object(requests.Session, 'request')
+    @mock.patch.object(requests.Session, 'request')
     def test_handle_two_factor_auth(self, request_mock):
         """Test the method that handles getting the 2fa code"""
         s = self.build_session()
@@ -96,11 +96,11 @@ class TestGitHubSession:
             headers={'X-GitHub-OTP': 'fake'}
             )
 
-    @patch.object(requests.Session, 'request')
+    @mock.patch.object(requests.Session, 'request')
     def test_request_ignores_responses_that_do_not_require_2fa(self,
                                                                request_mock):
         """Test that request does not try to handle 2fa when it should not"""
-        response = Mock()
+        response = mock.Mock()
         response.configure_mock(status_code=200, headers={})
         request_mock.return_value = response
         s = self.build_session()
@@ -111,10 +111,10 @@ class TestGitHubSession:
             'GET', 'http://example.com', allow_redirects=True
             )
 
-    @patch.object(requests.Session, 'request')
+    @mock.patch.object(requests.Session, 'request')
     def test_creates_history_while_handling_2fa(self, request_mock):
         """Test that the overridden request method will create history"""
-        response = Mock()
+        response = mock.Mock()
         response.configure_mock(
             status_code=401,
             headers={'X-GitHub-OTP': 'required;2fa'},

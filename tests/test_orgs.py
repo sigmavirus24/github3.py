@@ -1,6 +1,5 @@
 import github3
-from mock import patch, Mock
-from tests.utils import BaseCase, load
+from tests.utils import BaseCase, load, mock
 
 
 class TestTeam(BaseCase):
@@ -146,10 +145,10 @@ class TestOrganization(BaseCase):
         self.assertRaises(github3.GitHubError, self.org.add_member, None, None)
 
         self.login()
-        with patch.object(github3.orgs.Organization, 'iter_teams') as it:
+        with mock.patch.object(github3.orgs.Organization, 'iter_teams') as it:
             it.return_value = iter([])
             assert self.org.add_member('foo', 'bar') is False
-            team = Mock()
+            team = mock.Mock()
             team.name = 'bar'
             team.add_member.return_value = True
             it.return_value = iter([team])
@@ -160,10 +159,10 @@ class TestOrganization(BaseCase):
         self.assertRaises(github3.GitHubError, self.org.add_repo, None, None)
 
         self.login()
-        with patch.object(github3.orgs.Organization, 'iter_teams') as it:
+        with mock.patch.object(github3.orgs.Organization, 'iter_teams') as it:
             it.return_value = iter([])
             assert self.org.add_repo('foo', 'bar') is False
-            team = Mock()
+            team = mock.Mock()
             team.name = 'bar'
             team.add_repo.return_value = True
             it.return_value = iter([team])
@@ -340,10 +339,10 @@ class TestOrganization(BaseCase):
                           None, None)
 
         self.login()
-        with patch.object(github3.orgs.Organization, 'iter_teams') as it:
+        with mock.patch.object(github3.orgs.Organization, 'iter_teams') as it:
             it.return_value = iter([])
             assert self.org.remove_repo('foo', 'bar') is False
-            team = Mock()
+            team = mock.Mock()
             team.name = 'bar'
             team.remove_repo.return_value = True
             it.return_value = iter([team])
