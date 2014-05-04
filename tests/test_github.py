@@ -1,5 +1,8 @@
 import github3
-from mock import patch, Mock
+try:
+   from unittest.mock import patch, Mock
+except ImportError:
+   from mock import patch, Mock
 from tests.utils import (BaseCase, load)
 
 

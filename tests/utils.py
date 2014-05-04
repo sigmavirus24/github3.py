@@ -9,7 +9,10 @@ else:
 
 import requests
 import github3
-from mock import patch
+try:
+   from unittest.mock import patch
+except ImportError:
+   from mock import patch
 from io import BytesIO
 from requests.structures import CaseInsensitiveDict
 

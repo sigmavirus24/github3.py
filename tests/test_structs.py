@@ -1,7 +1,10 @@
 import github3
 from github3.structs import GitHubIterator
 from tests.utils import BaseCase
-from mock import patch
+try:
+   from unittest.mock import patch
+except ImportError:
+   from mock import patch
 
 
 class TestGitHubIterator(BaseCase):

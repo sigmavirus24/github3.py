@@ -1,5 +1,8 @@
 import github3
-from mock import patch
+try:
+   from unittest.mock import patch
+except ImportError:
+   from mock import patch
 from tests.utils import (BaseCase, load)
 from datetime import datetime
 

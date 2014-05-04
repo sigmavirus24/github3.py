@@ -1,7 +1,10 @@
 from .helper import UnitHelper
 from github3.structs import GitHubIterator
 
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestGitHubIterator(UnitHelper):

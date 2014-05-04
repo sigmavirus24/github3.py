@@ -1,6 +1,9 @@
 import github3
 from unittest import TestCase
-from mock import patch, NonCallableMock
+try:
+   from unittest.mock import patch, NonCallableMock
+except ImportError:
+   from mock import patch, NonCallableMock
 
 
 class TestAPI(TestCase):
