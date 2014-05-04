@@ -1442,8 +1442,8 @@ class TestAsset(BaseCase):
         self.request.return_value._content_consumed = False
 
         # 200, to file-like object
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
+        o = mock.mock_open()
+        with mock.patch('{0}.open'.format(__name__), o, create=True):
             with open('download', 'wb+') as fd:
                 self.asset.download(fd)
         o.assert_called_once_with('download', 'wb+')
@@ -1465,8 +1465,8 @@ class TestAsset(BaseCase):
             'Content-Type': None,
             })
         del self.conf['allow_redirects']
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
+        o = mock.mock_open()
+        with mock.patch('{0}.open'.format(__name__), o, create=True):
             with open('download', 'wb+') as fd:
                 self.asset.download(fd)
         o.assert_called_once_with('download', 'wb+')
