@@ -18,11 +18,11 @@ packages = [
     "github3.search",
 ]
 
-kwargs['tests_require'] = ['betamax >=0.1.6', 'pytest']
+kwargs['tests_require'] = ['betamax >=0.2.0', 'pytest']
 if sys.version_info < (3, 0):
-    kwargs['tests_require'].append('unittest2==0.5.1')
+    kwargs['tests_require'].append('unittest2 ==0.5.1')
 if sys.version_info < (3, 3):
-    kwargs['tests_require'].append('mock == 1.0.1')
+    kwargs['tests_require'].append('mock ==1.0.1')
 
 if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py bdist_wheel sdist upload")
