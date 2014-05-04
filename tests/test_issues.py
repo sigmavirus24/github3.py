@@ -5,11 +5,7 @@ from github3.issues.label import Label
 from github3.issues.milestone import Milestone
 from github3.issues import Issue
 import datetime
-from tests.utils import BaseCase, load
-try:
-   from unittest.mock import patch
-except ImportError:
-   from mock import patch
+from tests.utils import BaseCase, load, mock
 
 
 class TestLabel(BaseCase):
@@ -171,7 +167,7 @@ class TestIssue(BaseCase):
 
         self.login()
 
-        with patch.object(Issue, 'edit') as ed:
+        with mock.patch.object(Issue, 'edit') as ed:
             ed.return_value = True
             assert self.i.assign(None) is False
             self.not_called()
@@ -189,7 +185,7 @@ class TestIssue(BaseCase):
         self.not_called()
         self.login()
 
-        with patch.object(Issue, 'edit') as ed:
+        with mock.patch.object(Issue, 'edit') as ed:
             ed.return_value = True
             assert self.i.close()
             u = self.i.assignee.login if self.i.assignee else ''
@@ -277,7 +273,7 @@ class TestIssue(BaseCase):
 
         self.login()
 
-        with patch.object(Issue, 'replace_labels') as rl:
+        with mock.patch.object(Issue, 'replace_labels') as rl:
             rl.return_value = []
             assert self.i.remove_all_labels() == []
             rl.assert_called_once_with([])
@@ -303,7 +299,7 @@ class TestIssue(BaseCase):
         n = self.i.milestone.number if self.i.milestone else None
         u = self.i.assignee.login if self.i.assignee else None
 
-        with patch.object(Issue, 'edit') as ed:
+        with mock.patch.object(Issue, 'edit') as ed:
             ed.return_value = True
             assert self.i.reopen()
             labels = [str(l) for l in self.i.labels]
