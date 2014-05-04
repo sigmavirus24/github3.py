@@ -180,10 +180,13 @@ class GitHub(GitHubCore):
             formatted
         :param str assignee: (optional), Login of person to assign
             the issue to
-        :param str milestone: (optional), Which milestone to assign
-            the issue to
+        :param int milestone: (optional), id number of the milestone to
+            attribute this issue to (e.g. ``m`` is a :class:`Milestone
+            <github3.issues.Milestone>` object, ``m.number`` is what you pass
+            here.)
         :param list labels: (optional), List of label names.
-        :returns: :class:`Issue <github3.issues.Issue>`
+        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
+            None
         """
         repo = None
         if owner and repository and title:
