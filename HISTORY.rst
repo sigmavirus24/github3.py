@@ -1,10 +1,12 @@
 History/Changelog
 -----------------
 
-0.9.0: 2014-03-xx
+0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 
 - Add Deployments API
+
+- Add Pages API
 
 - Add support so applications can revoke a `single authorization`_ or `all
   authorizations`_ created by the application
@@ -21,11 +23,26 @@ History/Changelog
 
 - Update methods to handle the `pagination changes`_.
 
+- Fix typo `stargarzers_url`_
+
+- Add ``assets`` attribute to ``Release`` object.
+
+- Fix wrong argument to ``Organization#create_team`` (``permissions`` versus 
+  ``permission``)
+
+- Fix Issue Search Result's representation and initialization
+
+- Fix Repository Search Result's initialization
+
+- Allow users to pass a two-factor authentication callback to 
+  ``GitHub#authorize``.
+
 .. _single authorization: https://github3py.readthedocs.org/en/latest/github.html#github3.github.GitHub.revoke_authorization
 .. _all authorizations: https://github3py.readthedocs.org/en/latest/github.html#github3.github.GitHub.revoke_authorizations
 .. _ping: https://github3py.readthedocs.org/en/latest/repos.html?highlight=ping#github3.repos.hook.Hook.ping
 .. _Repository's collaborators: https://github3py.readthedocs.org/en/latest/repos.html#github3.repos.repo.Repository.iter_collaborators
 .. _pagination changes: https://developer.github.com/changes/2014-03-18-paginating-method-changes/
+.. _stargarzers_url: https://github.com/sigmavirus24/github3.py/pull/240
 
 0.8.2: 2014-02-11
 ~~~~~~~~~~~~~~~~~
