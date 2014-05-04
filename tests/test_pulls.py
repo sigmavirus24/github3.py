@@ -1,9 +1,5 @@
 import github3
-try:
-   from unittest.mock import patch
-except ImportError:
-   from mock import patch
-from tests.utils import BaseCase, load
+from tests.utils import BaseCase, load, mock
 
 
 class TestPullRequest(BaseCase):
@@ -41,7 +37,7 @@ class TestPullRequest(BaseCase):
 
         self.login()
 
-        with patch.object(github3.pulls.PullRequest, 'update') as up:
+        with mock.patch.object(github3.pulls.PullRequest, 'update') as up:
             up.return_value = True
             assert self.pull.close()
             up.assert_called_once_with(
@@ -136,7 +132,7 @@ class TestPullRequest(BaseCase):
         self.assertRaises(github3.GitHubError, self.pull.reopen)
 
         self.login()
-        with patch.object(github3.pulls.PullRequest, 'update') as up:
+        with mock.patch.object(github3.pulls.PullRequest, 'update') as up:
             self.pull.reopen()
             up.assert_called_once_with(
                 self.pull.title, self.pull.body, 'open')
