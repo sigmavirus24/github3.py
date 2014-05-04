@@ -7,6 +7,7 @@ from github3.repos import Repository
 
 class RepositorySearchResult(GitHubCore):
     def __init__(self, data, session=None):
+        super(RepositorySearchResult, self).__init__(data, session)
         result = data.copy()
         #: Score of the result
         self.score = result.pop('score')
