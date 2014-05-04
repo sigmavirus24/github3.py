@@ -9,10 +9,12 @@ else:
 
 import requests
 import github3
+
 try:
-   from unittest.mock import patch
+    from unittest import mock
 except ImportError:
-   from mock import patch
+    import mock
+
 from io import BytesIO
 from requests.structures import CaseInsensitiveDict
 
@@ -39,7 +41,7 @@ class BaseCase(TestCase):
             self.g.login(token=os.environ['GH_AUTH'])
         self.args = ()
         self.conf = {'allow_redirects': True}
-        self.mock = patch.object(requests.sessions.Session, 'request')
+        self.mock = mock.patch.object(requests.sessions.Session, 'request')
         self.request = self.mock.start()
 
     def tearDown(self):
