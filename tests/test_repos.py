@@ -2,11 +2,7 @@ import os
 import github3
 from github3 import repos
 from datetime import datetime
-from tests.utils import (BaseCase, load)
-try:
-   from unittest.mock import patch, mock_open
-except ImportError:
-   from mock import patch, mock_open
+from tests.utils import (BaseCase, load, mock)
 
 
 class TestRepository(BaseCase):
@@ -64,8 +60,8 @@ class TestRepository(BaseCase):
         self.request.return_value.raw.seek(0)
         self.request.return_value._content_consumed = False
 
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
+        o = mock.mock_open()
+        with mock.patch('{0}.open'.format(__name__), o, create=True):
             with open('archive', 'wb+') as fd:
                 self.repo.archive('tarball', fd)
 
@@ -401,7 +397,7 @@ class TestRepository(BaseCase):
                           None, None, None, None, None)
 
         self.login()
-        with patch.object(repos.Repository, 'create_ref'):
+        with mock.patch.object(repos.Repository, 'create_ref'):
             assert self.repo.create_tag(None, None, None, None,
                                         None) is None
             tag = self.repo.create_tag(**data)
@@ -409,7 +405,7 @@ class TestRepository(BaseCase):
             assert repr(tag).startswith('<Tag')
         self.mock_assertions()
 
-        with patch.object(repos.Repository, 'create_ref') as cr:
+        with mock.patch.object(repos.Repository, 'create_ref') as cr:
             self.repo.create_tag('tag', '', 'fakesha', '', '',
                                  lightweight=True)
             cr.assert_called_once_with('refs/tags/tag', 'fakesha')
@@ -1020,12 +1016,12 @@ class TestRepository(BaseCase):
         self.not_called()
 
         self.login()
-        with patch.object(repos.Repository, 'label') as l:
+        with mock.patch.object(repos.Repository, 'label') as l:
             l.return_value = None
             assert self.repo.update_label('foo', 'bar') is False
             self.not_called()
 
-        with patch.object(repos.Repository, 'label') as l:
+        with mock.patch.object(repos.Repository, 'label') as l:
             l.return_value = github3.issues.label.Label(load('label'), self.g)
             assert self.repo.update_label('big_bug', 'fafafa')
 
