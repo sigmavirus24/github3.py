@@ -616,10 +616,11 @@ class Repository(GitHubCore):
                      labels=None):
         """Creates an issue on this repository.
 
-        :param str title: (required), title of the issue
-        :param str body: (optional), body of the issue
-        :param str assignee: (optional), login of the user to assign the
-            issue to
+        :param str title: (required), title of issue to be created
+        :param str body: (optional), the text of the issue, markdown
+            formatted
+        :param str assignee: (optional), login of person to assign
+            the issue to
         :param int milestone: (optional), id number of the milestone to
             attribute this issue to (e.g. ``m`` is a :class:`Milestone
             <github3.issues.milestone.Milestone>` object, ``m.number`` is

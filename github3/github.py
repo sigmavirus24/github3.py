@@ -171,20 +171,13 @@ class GitHub(GitHubCore):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
-        body, assignee, milestone, labels are all optional.
+        See the documentation for
+        :py:meth:`github3.repos.repo.Repository.create_issue` for a complete
+        listing of parameters.
 
         :param str owner: (required), login of the owner
         :param str repository: (required), repository name
-        :param str title: (required), Title of issue to be created
-        :param str body: (optional), The text of the issue, markdown
-            formatted
-        :param str assignee: (optional), Login of person to assign
-            the issue to
-        :param int milestone: (optional), id number of the milestone to
-            attribute this issue to (e.g. ``m`` is a :class:`Milestone
-            <github3.issues.Milestone>` object, ``m.number`` is what you pass
-            here.)
-        :param list labels: (optional), List of label names.
+        :param str title: (required), title of issue to be created
         :returns: :class:`Issue <github3.issues.Issue>` if successful, else
             None
         """
