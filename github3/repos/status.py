@@ -6,6 +6,7 @@ github3.repos.status
 This module contains the Status object for GitHub's commit status API
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubObject
 from github3.users import User
@@ -32,9 +33,7 @@ class Status(GitHubObject):
         #: URL to view more information about the status
         self.target_url = status.get('target_url')
         #: datetime object representing the last time the status was updated
-        self.updated_at = None
-        if status.get('updated_at'):
-            self.updated_at = self._strptime(status.get('updated_at'))
+        self.updated_at = self._strptime(status.get('updated_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Status [{s.id}:{s.state}]>'.format(s=self)

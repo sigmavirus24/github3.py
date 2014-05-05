@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from collections import Callable
+from datetime import datetime, timedelta, tzinfo
 from requests.compat import basestring
 import re
 
@@ -27,3 +28,43 @@ def timestamp_parameter(timestamp, allow_none=True):
         return timestamp
 
     raise ValueError("Cannot accept type %s for timestamp" % type(timestamp))
+
+
+class UTC(tzinfo):
+    """Yet another UTC reimplementation, to avoid a dependency on pytz or
+    dateutil."""
+
+    ZERO = timedelta(0)
+
+    def __repr__(self):
+        return 'UTC()'
+
+    def dst(self, dt):
+        return self.ZERO
+
+    def tzname(self, dt):
+        return 'UTC'
+
+    def utcoffset(self, dt):
+        return self.ZERO
+
+
+def stream_response_to_file(response, path=None):
+    pre_opened = False
+    fd = None
+    if path:
+        if isinstance(getattr(path, 'write', None), Callable):
+            pre_opened = True
+            fd = path
+        else:
+            fd = open(path, 'wb')
+    else:
+        header = response.headers['content-disposition']
+        i = header.find('filename=') + len('filename=')
+        fd = open(header[i:], 'wb')
+
+    for chunk in response.iter_content(chunk_size=512):
+        fd.write(chunk)
+
+    if not pre_opened:
+        fd.close()

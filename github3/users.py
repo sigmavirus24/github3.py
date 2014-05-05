@@ -6,6 +6,7 @@ github3.users
 This module contains everything relating to Users.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from uritemplate import URITemplate
@@ -38,7 +39,7 @@ class Key(GitHubCore):
         #: The title the user gave to the key
         self.title = key.get('title')
 
-    def __repr__(self):
+    def _repr(self):
         return '<User Key [{0}]>'.format(self.title)
 
     def __str__(self):
@@ -87,7 +88,7 @@ class Plan(GitHubObject):
         #: Space allowed
         self.space = plan.get('space')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Plan [{0}]>'.format(self.name)  # (No coverage)
 
     def __str__(self):

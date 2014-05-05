@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from json import dumps
 from github3.decorators import requires_auth
 from github3.issues.label import Label
@@ -24,21 +26,21 @@ class Milestone(GitHubCore):
         #: Description of this milestone.
         self.description = mile.get('description')
         #: :class:`User <github3.users.User>` object representing the creator
-        #  of the milestone.
+        #: of the milestone.
         self.creator = User(mile.get('creator'), self._session)
         #: Number of issues associated with this milestone which are still
-        #  open.
+        #: open.
         self.open_issues = mile.get('open_issues')
         #: The number of closed issues associated with this milestone.
         self.closed_issues = mile.get('closed_issues')
         #: datetime object representing when the milestone was created.
         self.created_at = self._strptime(mile.get('created_at'))
         #: datetime representing when this milestone is due.
-        self.due_on = None
-        if mile.get('due_on'):
-            self.due_on = self._strptime(mile.get('due_on'))
+        self.due_on = self._strptime(mile.get('due_on'))
+        #: datetime object representing when the milestone was updated.
+        self.updated_at = self._strptime(mile.get('updated_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Milestone [{0}]>'.format(self)
 
     def __str__(self):
@@ -55,16 +57,21 @@ class Milestone(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    def iter_labels(self, number=-1):
+    def iter_labels(self, number=-1, etag=None):
         """Iterate over the labels for every issue associated with this
         milestone.
 
+        .. versionchanged:: 0.9
+
+            Add etag parameter.
+
         :param int number: (optional), number of labels to return. Default: -1
             returns all available labels.
-        :returns: generator of :class:`Label <Label>`\ s
+        :param str etag: (optional), ETag header from a previous response
+        :returns: generator of :class:`Label <github3.issues.label.Label>`\ s
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, Label)
+        return self._iter(int(number), url, Label, etag=etag)
 
     @requires_auth
     def update(self, title=None, state=None, description=None, due_on=None):

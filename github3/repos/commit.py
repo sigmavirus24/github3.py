@@ -6,6 +6,7 @@ github3.repos.commit
 This module contains the RepoCommit class alone
 
 """
+from __future__ import unicode_literals
 
 from github3.git import Commit
 from github3.models import BaseCommit
@@ -60,7 +61,7 @@ class RepoCommit(BaseCommit):
 
         self._uniq = self.sha
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
     def diff(self):

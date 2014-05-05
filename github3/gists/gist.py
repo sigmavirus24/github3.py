@@ -6,6 +6,8 @@ github3.gists.gist
 This module contains the Gist class alone for simplicity.
 
 """
+from __future__ import unicode_literals
+
 from json import dumps
 from github3.models import GitHubCore
 from github3.decorators import requires_auth
@@ -74,14 +76,15 @@ class Gist(GitHubCore):
 
         owner = data.get('owner')
         #: :class:`User <github3.users.User>` object representing the owner of
-        #  the gist.
+        #: the gist.
         self.owner = User(owner, self) if owner else None
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
         #: Number of files in this gist.
         self.files = len(self._files)
 
-        #: History of this gist, list of :class:`GistHistory <GistHistory>`
+        #: History of this gist, list of
+        #: :class:`GistHistory <github3.gists.history.GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
         ## New urls
@@ -98,7 +101,7 @@ class Gist(GitHubCore):
     def __str__(self):
         return self.id
 
-    def __repr__(self):
+    def _repr(self):
         return '<Gist [{0}]>'.format(self.id)
 
     def _update_(self, data):
@@ -196,7 +199,7 @@ class Gist(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment, etag=etag)
 
-    def iter_commits(self, number=-1):
+    def iter_commits(self, number=-1, etag=None):
         """Iter over the commits on this gist.
 
         These commits will be requested from the API and should be the same as
@@ -204,9 +207,15 @@ class Gist(GitHubCore):
 
         .. versionadded:: 0.6
 
+        .. versionchanged:: 0.9
+
+            Added param ``etag``.
+
         :param int number: (optional), number of commits to iterate over.
             Default: -1 will iterate over all commits associated with this
             gist.
+        :param str etag: (optional), ETag from a previous request to this
+            endpoint.
         :returns: generator of
             :class:`GistHistory <github3.gists.history.GistHistory>`
 
@@ -222,13 +231,22 @@ class Gist(GitHubCore):
         """
         return iter(self._files)
 
-    def iter_forks(self):
+    def iter_forks(self, number=-1, etag=None):
         """Iterator of forks of this gist.
 
+        .. versionchanged:: 0.9
+
+            Added params ``number`` and ``etag``.
+
+        :param int number: (optional), number of forks to iterate over.
+            Default: -1 will iterate over all forks of this gist.
+        :param str etag: (optional), ETag from a previous request to this
+            endpoint.
         :returns: generator of :class:`Gist <Gist>`
 
         """
-        return iter(self._forks)  # (No coverage)
+        url = self._build_url('forks', base_url=self._api)
+        return self._iter(int(number), url, Gist, etag=etag)
 
     @requires_auth
     def star(self):

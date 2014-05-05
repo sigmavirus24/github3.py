@@ -116,9 +116,6 @@ class TestGist(BaseCase):
         assert isinstance(gist_file, gists.file.GistFile)
         assert repr(gist_file).startswith('<Gist File')
 
-    def test_iter_forks(self):
-        self.assertRaises(StopIteration, next, self.gist.iter_forks())
-
     def test_refresh(self):
         self.response('gist', 200)
         self.get(self.api)

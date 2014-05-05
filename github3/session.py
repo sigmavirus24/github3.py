@@ -4,6 +4,7 @@ import requests
 from collections import Callable
 from github3 import __version__
 from logging import getLogger
+from contextlib import contextmanager
 
 __url_cache__ = {}
 __logs__ = getLogger(__package__)
@@ -42,6 +43,9 @@ class GitHubSession(requests.Session):
             return
 
         self.auth = (username, password)
+
+        # Disable token authentication
+        self.headers.pop('Authorization', None)
 
     def build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
@@ -83,6 +87,15 @@ class GitHubSession(requests.Session):
             response = new_response
         return response
 
+    def retrieve_client_credentials(self):
+        """Return the client credentials.
+
+        :returns: tuple(client_id, client_secret)
+        """
+        client_id = self.params.get('client_id')
+        client_secret = self.params.get('client_secret')
+        return (client_id, client_secret)
+
     def two_factor_auth_callback(self, callback):
         if not callback:
             return
@@ -104,3 +117,17 @@ class GitHubSession(requests.Session):
         self.headers.update({
             'Authorization': 'token {0}'.format(token)
             })
+        # Unset username/password so we stop sending them
+        self.auth = None
+
+    @contextmanager
+    def temporary_basic_auth(self, *auth):
+        old_basic_auth = self.auth
+        old_token_auth = self.headers.get('Authorization')
+
+        self.basic_auth(*auth)
+        yield
+
+        self.auth = old_basic_auth
+        if old_token_auth:
+            self.headers['Authorization'] = old_token_auth

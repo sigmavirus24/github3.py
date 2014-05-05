@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from github3.models import GitHubCore
+from github3.users import User
 
 
 class IssueEvent(GitHubCore):
@@ -19,8 +22,8 @@ class IssueEvent(GitHubCore):
         e1.commit_id != e2.commit_id
 
     """
-    def __init__(self, event, issue=None):
-        super(IssueEvent, self).__init__(event, None)
+    def __init__(self, event, session=None):
+        super(IssueEvent, self).__init__(event, session)
         # The type of event:
         #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
         #    'mentioned', 'assigned')
@@ -30,11 +33,21 @@ class IssueEvent(GitHubCore):
         self.commit_id = event.get('commit_id')
         self._api = event.get('url', '')
 
-        #: :class:`Issue <github3.issue.Issue>` where this comment was made.
-        self.issue = issue
-        if event.get('issue'):
+        #: :class:`Issue <github3.issues.Issue>` where this comment was made.
+        self.issue = event.get('issue')
+        if self.issue:
             from github3.issues import Issue
-            self.issue = Issue(event.get('issue'), self)
+            self.issue = Issue(self.issue, self)
+
+        #: :class:`User <github3.users.User>` who caused this event.
+        self.actor = event.get('actor')
+        if self.actor:
+            self.actor = User(self.actor, self)
+
+        #: :class:`User <github3.users.User>` that generated the event.
+        self.actor = event.get('actor')
+        if self.actor:
+            self.actor = User(self.actor, self._session)
 
         #: Number of comments
         self.comments = event.get('comments', 0)
@@ -48,6 +61,6 @@ class IssueEvent(GitHubCore):
         self._uniq = self.commit_id
 
     def __repr__(self):
-        return '<Issue Event [#{0} - {1}]>'.format(
-            self.issue.number, self.event
-        )
+        return '<Issue Event [{0} by {1}]>'.format(
+            self.event, self.actor
+            )

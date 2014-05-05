@@ -7,6 +7,7 @@ This module contains the classes relating to notifications.
 
 See also: http://developer.github.com/v3/activity/notifications/
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from github3.models import GitHubCore
@@ -48,9 +49,7 @@ class Thread(GitHubCore):
         #: Dictionary of urls for the thread
         self.urls = notif.get('urls')
         #: datetime object representing the last time the user read the thread
-        self.last_read_at = notif.get('last_read_at')
-        if self.last_read_at:
-            self.last_read_at = self._strptime(self.last_read_at)
+        self.last_read_at = self._strptime(notif.get('last_read_at'))
         #: The reason you're receiving the notification
         self.reason = notif.get('reason')
         #: Subject of the Notification, e.g., which issue/pull/diff is this in
@@ -58,7 +57,7 @@ class Thread(GitHubCore):
         self.subject = notif.get('subject')
         self.unread = notif.get('unread')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
 
     def delete_subscription(self):
@@ -87,7 +86,7 @@ class Thread(GitHubCore):
             be received from this thread.
         :param bool ignored: (required), determines if notifications should be
             ignored from this thread.
-        :returns: :class;`Subscription <Subscription>`
+        :returns: :class:`Subscription <Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)
         sub = {'subscribed': subscribed, 'ignored': ignored}
@@ -109,7 +108,7 @@ class Subscription(GitHubCore):
     repository subscription information.
 
     See also:
-    developer.github.com/v3/activity/notifications/#get-a-thread-subscription
+    http://developer.github.com/v3/activity/notifications/#get-a-thread-subscription
     """
     def __init__(self, sub, session=None):
         super(Subscription, self).__init__(sub, session)
@@ -125,7 +124,7 @@ class Subscription(GitHubCore):
         self.ignored = sub.get('ignored', False)
         self.subscribed = sub.get('subscribed', False)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Subscription [{0}]>'.format(self.subscribed)
 
     def delete(self):

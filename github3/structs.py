@@ -16,7 +16,7 @@ class GitHubIterator(GitHubCore, Iterator):
         #: URL the class used to make it's first GET
         self.url = url
         self._api = self.url
-        #: Class being used to cast all items to
+        #: Class for constructing an item to return
         self.cls = cls
         #: Parameters of the query string
         self.params = params or {}
@@ -39,7 +39,7 @@ class GitHubIterator(GitHubCore, Iterator):
 
         self.path = urlparse(self.url).path
 
-    def __repr__(self):
+    def _repr(self):
         return '<GitHubIterator [{0}, {1}]>'.format(self.count, self.path)
 
     def __iter__(self):
@@ -122,7 +122,7 @@ class SearchIterator(GitHubIterator):
         #: Items array returned in the last request
         self.items = []
 
-    def __repr__(self):
+    def _repr(self):
         return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
                                                         urlencode(self.params))
 

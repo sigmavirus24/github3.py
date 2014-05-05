@@ -7,6 +7,7 @@ This module contains the Contents object pertaining to READMEs and other files
 that can be accessed via the GitHub API.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64decode, b64encode
@@ -83,7 +84,7 @@ class Contents(GitHubCore):
 
         self._uniq = self.sha
 
-    def __repr__(self):
+    def _repr(self):
         return '<Content [{0}]>'.format(self.path)
 
     def __eq__(self, other):

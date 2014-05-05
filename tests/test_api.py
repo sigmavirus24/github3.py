@@ -1,11 +1,12 @@
 import github3
 from unittest import TestCase
-from mock import patch, NonCallableMock
+#from .utils.mock import patch, NonCallableMock
+from .utils import mock
 
 
 class TestAPI(TestCase):
     def setUp(self):
-        self.mock = patch('github3.api.gh', autospec=github3.GitHub)
+        self.mock = mock.patch('github3.api.gh', autospec=github3.GitHub)
         self.gh = self.mock.start()
 
     def tearDown(self):
@@ -14,12 +15,13 @@ class TestAPI(TestCase):
     def test_authorize(self):
         args = ('login', 'password', ['scope1'], 'note', 'note_url.com', '',
                 '')
-        github3.authorize(*args)
-        self.gh.authorize.assert_called_with(*args)
+        with mock.patch.object(github3.api.GitHub, 'authorize') as authorize:
+            github3.authorize(*args)
+            authorize.assert_called_once_with(*args)
 
     def test_login(self):
         args = ('login', 'password', None, None)
-        with patch.object(github3.api.GitHub, 'login') as login:
+        with mock.patch.object(github3.api.GitHub, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHub)
             assert not isinstance(g, github3.github.GitHubEnterprise)
@@ -27,7 +29,7 @@ class TestAPI(TestCase):
 
     def test_enterprise_login(self):
         args = ('login', 'password', None, 'http://ghe.invalid/', None)
-        with patch.object(github3.api.GitHubEnterprise, 'login') as login:
+        with mock.patch.object(github3.api.GitHubEnterprise, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.github.GitHubEnterprise)
             login.assert_called_with('login', 'password', None, None)
@@ -142,7 +144,7 @@ class TestAPI(TestCase):
     def test_ratelimit_remaining(self):
         # This prevents a regression in the API
         # See 81c800658db43f86419b9c0764fc16aad3d60007
-        self.gh.ratelimit_remaining = NonCallableMock()
+        self.gh.ratelimit_remaining = mock.NonCallableMock()
         github3.ratelimit_remaining()
 
     def test_zen(self):

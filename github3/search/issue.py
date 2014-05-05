@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from github3.models import GitHubCore
 from github3.issues import Issue
 
 
 class IssueSearchResult(GitHubCore):
     def __init__(self, data, session=None):
+        super(IssueSearchResult, self).__init__(data, session)
         result = data.copy()
         #: Score of the result
         self.score = result.pop('score')
@@ -13,5 +16,5 @@ class IssueSearchResult(GitHubCore):
         #: Issue object
         self.issue = Issue(result, self)
 
-    def __repr__(self):
-        return '<IssueSearchResult [{0}]>'.format(self.repository)
+    def _repr(self):
+        return '<IssueSearchResult [{0}]>'.format(self.issue)
