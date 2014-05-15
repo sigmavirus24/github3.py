@@ -1459,10 +1459,14 @@ class GitHubEnterprise(GitHub):
 
     There is no need to provide the end of the url (e.g., /api/v3/), that will
     be taken care of by us.
+    
+    If you have a self signed SSL for your local github enterprise you can 
+    override the validation by passing `verify=False`.
     """
-    def __init__(self, url, login='', password='', token=''):
+    def __init__(self, url, login='', password='', token='', verify=True):
         super(GitHubEnterprise, self).__init__(login, password, token)
         self._session.base_url = url.rstrip('/') + '/api/v3'
+        self._session.verify = verify
 
     def _repr(self):
         return '<GitHub Enterprise [0.url]>'.format(self)
