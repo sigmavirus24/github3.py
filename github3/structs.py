@@ -99,6 +99,7 @@ class GitHubIterator(GitHubCore, Iterator):
         self.count = self.original
         if conditional:
             self.headers['If-None-Match'] = self.etag
+        self.etag = None
         self.__i__ = self.__iter__()
         return self
 
