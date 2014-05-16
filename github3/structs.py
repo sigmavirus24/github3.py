@@ -15,6 +15,8 @@ class GitHubIterator(GitHubCore, Iterator):
         self.count = count
         #: URL the class used to make it's first GET
         self.url = url
+        #: Last URL that was requested
+        self.last_url = None
         self._api = self.url
         #: Class for constructing an item to return
         self.cls = cls
@@ -43,7 +45,7 @@ class GitHubIterator(GitHubCore, Iterator):
         return '<GitHubIterator [{0}, {1}]>'.format(self.count, self.path)
 
     def __iter__(self):
-        url, params, cls = self.url, self.params, self.cls
+        self.last_url, params, cls = self.url, self.params, self.cls
         headers = self.headers
 
         if 0 < self.count <= 100 and self.count != -1:
@@ -52,8 +54,9 @@ class GitHubIterator(GitHubCore, Iterator):
         if 'per_page' not in params and self.count == -1:
             params['per_page'] = 100
 
-        while (self.count == -1 or self.count > 0) and url:
-            response = self._get(url, params=params, headers=headers)
+        while (self.count == -1 or self.count > 0) and self.last_url:
+            response = self._get(self.last_url, params=params,
+                                 headers=headers)
             self.last_response = response
             self.last_status = response.status_code
             if params:
@@ -82,7 +85,7 @@ class GitHubIterator(GitHubCore, Iterator):
                     break
 
             rel_next = response.links.get('next', {})
-            url = rel_next.get('url', '')
+            self.last_url = rel_next.get('url', '')
 
     def __next__(self):
         if not hasattr(self, '__i__'):
