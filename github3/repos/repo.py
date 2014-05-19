@@ -1313,22 +1313,23 @@ class Repository(GitHubCore):
             The ``state`` parameter now accepts 'all' in addition to 'open'
             and 'closed'.
 
-        :param int milestone: (optional), 'none', or '*'
+        :param int milestone: (optional), 'none', or '*' or ID of milestone
         :param str state: (optional), accepted values: ('all', 'open',
-            'closed')
+            'closed') api-default: 'open'
         :param str assignee: (optional), 'none', '*', or login name
         :param str mentioned: (optional), user's login name
         :param str labels: (optional), comma-separated list of labels, e.g.
             'bug,ui,@high'
         :param sort: (optional), accepted values:
-            ('created', 'updated', 'comments', 'created')
+            ('created', 'updated', 'comments', 'created') api-default: created
         :param str direction: (optional), accepted values: ('asc', 'desc')
+            api-default: desc
         :param since: (optional), Only issues after this date will
             be returned. This can be a `datetime` or an `ISO8601` formatted
             date string, e.g., 2012-05-20T23:10:27Z
         :type since: datetime or string
         :param int number: (optional), Number of issues to return.
-            By default all issues are returned
+            By default (-1) all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`Issue <github3.issues.issue.Issue>`\ s
