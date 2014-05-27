@@ -62,3 +62,5 @@ Contributors
 - Benjamin Gilbert (@bgilbert)
 
 - Daniel Johnson (@danielj7)
+
+- David Moss (@damoss007)

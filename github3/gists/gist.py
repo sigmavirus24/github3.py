@@ -98,6 +98,9 @@ class Gist(GitHubCore):
         #: Forks URL (not a template)
         self.forks_url = data.get('forks_url', '')
 
+        #: Whether the content of this Gist has been truncated or not
+        self.truncated = data.get('truncated')
+
     def __str__(self):
         return self.id
 

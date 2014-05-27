@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from json import loads
 
 from github3.models import GitHubCore
 from github3.users import User
@@ -21,6 +20,10 @@ class Deployment(GitHubCore):
         #: SHA of the branch on GitHub
         self.sha = deployment.get('sha')
 
+        #: The reference used to create the Deployment, e.g.,
+        #: `deploy-20140526`
+        self.ref = deployment.get('ref')
+
         #: User object representing the creator of the deployment
         self.creator = deployment.get('creator')
         if self.creator:
@@ -37,6 +40,9 @@ class Deployment(GitHubCore):
 
         #: Description of the deployment
         self.description = deployment.get('description')
+
+        #: Target for the deployment, e.g., 'production', 'staging'
+        self.environment = deployment.get('environment')
 
         #: URL to get the statuses of this deployment
         self.statuses_url = deployment.get('statuses_url')
@@ -112,6 +118,15 @@ class DeploymentStatus(GitHubCore):
 
         #: Description of the deployment
         self.description = status.get('description')
+
+        #: :class:`Deployment` representing the deployment this status is
+        #: associated with
+        self.deployment = status.get('deployment')
+        if self.deployment:
+            self.deployment = Deployment(self.deployment, self)
+
+        #: URL for the deployment this status is associated with
+        self.deployment_url = status.get('deployment_url')
 
     def _repr(self):
         return '<DeploymentStatus [{0}]>'.format(self.id)
