@@ -46,7 +46,7 @@ Creating an anonymous gist
             'content': 'What... is the air-speed velocity of an unladen swallow?'
             }
         }
-    gist = create_gist('Answer this to cross the bridge', files, public=False)
+    gist = create_gist('Answer this to cross the bridge', files)
     comments = [c for c in gist.iter_comments()]
     # []
     comment = gist.create_comment('Bogus. This will not work.')
@@ -59,3 +59,5 @@ file type based on extension provided. ``'What... is the air-speed velocity of
 an unladen swallow?'`` is the file's content or body. ``'Answer this to cross
 the bridge'`` is the gists's description. While required by github3.py, it is
 allowed to be empty, e.g., ``''`` is accepted by GitHub.
+
+Note that anonymous gists are always public.
