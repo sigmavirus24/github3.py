@@ -1109,7 +1109,7 @@ class Repository(GitHubCore):
         """Iterate over the collaborators of this repository.
 
         :param int number: (optional), number of collaborators to return.
-            Default: -1 returns all comments
+            Default: -1 returns all collaborators
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
