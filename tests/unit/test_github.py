@@ -142,6 +142,36 @@ class TestGitHubIterators(UnitIteratorHelper):
         with pytest.raises(GitHubError):
             self.instance.emails()
 
+    def test_followers(self):
+        """
+        Show that an authenticated user can iterate over their followers.
+        """
+        i = self.instance.followers()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/followers'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_followers_require_auth(self):
+        """Show that one needs to authenticate to use #followers."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.followers()
+
+    def test_followers_of(self):
+        """Show that one can authenticate over the followers of a user."""
+        i = self.instance.followers_of('sigmavirus24')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('users/sigmavirus24/followers'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_starred(self):
         """
         Show that one can iterate over an authenticated user's stars.
