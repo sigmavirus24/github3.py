@@ -216,8 +216,8 @@ def public_gists(number=-1, etag=None):
     return gh.public_gists(number, etag)
 
 
-def gists_for(username, number=-1, etag=None):
-    """Iterate over gists for the provided username.
+def gists_by(username, number=-1, etag=None):
+    """Iterate over gists created by the provided username.
 
     :param str username: (required), if provided, get the gists for this user
         instead of the authenticated user.
@@ -229,7 +229,7 @@ def gists_for(username, number=-1, etag=None):
 
     """
     if username:
-        return gh.gists_for(username, number, etag)
+        return gh.gists_by(username, number, etag)
     return iter([])
 
 

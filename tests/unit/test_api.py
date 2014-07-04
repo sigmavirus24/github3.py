@@ -55,9 +55,9 @@ class TestAPI(unittest.TestCase):
         github3.gist(gist_id)
         self.gh.gist.assert_called_once_with(gist_id)
 
-    def test_gists_for(self):
-        github3.gists_for('username')
-        self.gh.gists_for.assert_called_once_with('username', -1, None)
+    def test_gists_by(self):
+        github3.gists_by('username')
+        self.gh.gists_by.assert_called_once_with('username', -1, None)
 
     def test_gitignore_template(self):
         language = 'Python'
