@@ -218,21 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_gists(self):
-        self.response('gist', _iter=True)
-        self.get('https://api.github.com/users/sigmavirus24/gists')
-        self.conf.update(params={'per_page': 100})
-
-        g = next(self.g.iter_gists('sigmavirus24'))
-        assert isinstance(g, github3.gists.Gist)
-        self.mock_assertions()
-
-        self.login()
-        h = next(self.g.iter_gists())
-        assert isinstance(h, github3.gists.Gist)
-        self.get('https://api.github.com/gists')
-        self.mock_assertions()
-
     def test_iter_notifications(self):
         self.response('notification', _iter=True)
         self.get('https://api.github.com/notifications')

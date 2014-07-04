@@ -561,7 +561,7 @@ class GitHub(GitHubCore):
         url = self._build_url('gists')
         return self._iter(int(number), url, Gist, etag=etag)
 
-    def gists_for(self, username, number=-1, etag=None):
+    def gists_by(self, username, number=-1, etag=None):
         """Iterate over the gists owned by a user.
 
         .. versionadded:: 1.0

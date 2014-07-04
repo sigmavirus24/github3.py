@@ -205,6 +205,45 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_gists(self):
+        """Show that an authenticated user can iterate over their gists."""
+        i = self.instance.gists()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('gists'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_gists_requires_auth(self):
+        """Show that one needs to authenticate to use #gists."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.gists()
+
+    def test_gists_by(self):
+        """Show that an user's gists can be iterated over."""
+        i = self.instance.gists_by('sigmavirus24')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('users/sigmavirus24/gists'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_public_gists(self):
+        """Show that all public gists can be iterated over."""
+        i = self.instance.public_gists()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('gists/public'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_starred(self):
         """
         Show that one can iterate over an authenticated user's stars.
