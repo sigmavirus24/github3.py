@@ -31,8 +31,8 @@ Old name                           New name
 ``GitHub#iter_authorizations``     ``GitHub#authorizations``
 ``GitHub#iter_emails``             ``GitHub#emails``
 ``GitHub#iter_events``             ``GitHub#events``
-``GitHub#iter_followers``          ``GitHub#followers``
-``GitHub#iter_following``          ``GitHub#following``
+``GitHub#iter_followers``          ``GitHub#{followers,followers_of}``
+``GitHub#iter_following``          ``GitHub#{following,followed_by}``
 ``GitHub#iter_gists``              ``GitHub#gists``
 ``GitHub#iter_notifications``      ``GitHub#notifications``
 ``GitHub#iter_org_issues``         ``GitHub#organization_issues``
