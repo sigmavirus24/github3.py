@@ -27,6 +27,40 @@ class TestGitHubIterators(UnitIteratorHelper):
     described_class = GitHub
     example_data = None
 
+    def test_all_repos(self):
+        """Show that one can iterate over all repositories."""
+        i = self.instance.all_repos()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('repositories'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_all_repos_per_page(self):
+        """Show that one can iterate over all repositories with per_page."""
+        i = self.instance.all_repos(per_page=25)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('repositories'),
+            params={'per_page': 25},
+            headers={}
+        )
+
+    def test_all_repos_since(self):
+        """Show that one can limit the repositories returned."""
+        since = 100000
+        i = self.instance.all_repos(since=since)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('repositories'),
+            params={'per_page': 100, 'since': since},
+            headers={}
+        )
+
     def test_starred(self):
         """
         Show that one can iterate over an authenticated user's stars.

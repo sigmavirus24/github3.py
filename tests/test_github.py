@@ -218,28 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_all_repos(self):
-        self.response('repo', _iter=True)
-        self.get('https://api.github.com/repositories')
-        self.conf.update(params={'per_page': 100})
-
-        repo = next(self.g.iter_all_repos())
-        assert isinstance(repo, github3.repos.Repository)
-        self.mock_assertions()
-
-        self.response('repo', _iter=True)
-        self.get('https://api.github.com/repositories')
-        self.conf.update(params={'since': 100000, 'per_page': 100})
-        repo = next(self.g.iter_all_repos(since=100000))
-        assert isinstance(repo, github3.repos.Repository)
-        assert(repo.id > 100000)
-        self.mock_assertions()
-
-        repo = next(self.g.iter_all_repos(per_page=100))
-        self.conf.update(params={'per_page': 100})
-        assert isinstance(repo, github3.repos.Repository)
-        self.mock_assertions()
-
     def test_iter_all_users(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users')
