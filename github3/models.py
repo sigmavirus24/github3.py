@@ -6,11 +6,13 @@ github3.models
 This module provides the basic models used in github3.py
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
-from requests.compat import urlparse
+from requests.compat import urlparse, is_py2
 from github3.decorators import requires_auth
 from github3.session import GitHubSession
+from github3.utils import UTC
 from datetime import datetime
 from logging import getLogger
 
@@ -35,10 +37,22 @@ class GitHubObject(object):
         return self._json_data
 
     def _strptime(self, time_str):
-        """Converts an ISO 8601 formatted string into a datetime object."""
+        """Convert an ISO 8601 formatted string in UTC into a
+        timezone-aware datetime object."""
         if time_str:
-            return datetime.strptime(time_str, __timeformat__)
+            # Parse UTC string into naive datetime, then add timezone
+            dt = datetime.strptime(time_str, __timeformat__)
+            return dt.replace(tzinfo=UTC())
         return None
+
+    def _repr(self):
+        return ''
+
+    def __repr__(self):
+        repr_string = self._repr()
+        if is_py2:
+            return repr_string.encode('utf-8')
+        return repr_string
 
     @classmethod
     def from_json(cls, json):
@@ -71,7 +85,7 @@ class GitHubCore(GitHubObject):
         # set a sane default
         self._github_url = 'https://api.github.com'
 
-    def __repr__(self):
+    def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
     def _remove_none(self, data):
@@ -219,7 +233,7 @@ class BaseComment(GitHubCore):
         #: Body of the comment. (As written by the commenter)
         self.body = comment.get('body')
         #: Body of the comment formatted as plain-text. (Stripped of markdown,
-        #  etc.)
+        #: etc.)
         self.body_text = comment.get('body_text')
         #: Body of the comment formatted as html.
         self.body_html = comment.get('body_html')
@@ -309,9 +323,7 @@ class BaseAccount(GitHubCore):
         self.company = acct.get('company', '')
 
         #: datetime object representing the date the account was created
-        self.created_at = None
-        if acct.get('created_at'):
-            self.created_at = self._strptime(acct.get('created_at'))
+        self.created_at = self._strptime(acct.get('created_at'))
 
         #: E-mail address of the user/org
         self.email = acct.get('email')
@@ -334,7 +346,7 @@ class BaseAccount(GitHubCore):
         ## e.g. first_name last_name
         #: Real name of the user/org
         self.name = acct.get('name') or ''
-        self.name = self.name.encode('utf-8')
+        self.name = self.name
 
         ## The number of public_repos
         #: Number of public repos owned by the user/org
@@ -347,7 +359,7 @@ class BaseAccount(GitHubCore):
         #: Markdown formatted biography
         self.bio = acct.get('bio')
 
-    def __repr__(self):
+    def _repr(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
 
     def _update_(self, acct):

@@ -1,6 +1,6 @@
 import github3
-from mock import patch, Mock
-from tests.utils import (BaseCase, load)
+
+from tests.utils import (BaseCase, load, mock)
 
 
 def merge(first, second=None, **kwargs):
@@ -20,7 +20,7 @@ class TestGitHub(BaseCase):
 
     def test_context_manager(self):
         with github3.GitHub() as gh:
-            gh.__exit__ = Mock()
+            gh.__exit__ = mock.Mock()
             assert isinstance(gh, github3.GitHub)
 
         gh.__exit__.assert_called()
@@ -74,11 +74,6 @@ class TestGitHub(BaseCase):
         g = self.g.create_gist('description', 'files')
         assert isinstance(g, github3.gists.Gist)
         assert self.request.called is True
-        #with Betamax(self.session).use_cassette('GitHub_create_gist'):
-        #    self.g.create_gist(
-        #        'description of test_gist', {
-        #            'filename': 'contents'
-        #        })
 
     def test_create_issue(self):
         self.response('issue', 201)
@@ -92,7 +87,7 @@ class TestGitHub(BaseCase):
         assert i is None
         assert self.request.called is False
 
-        with patch.object(github3.GitHub, 'repository') as repo:
+        with mock.patch.object(github3.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(
                 load('repo'), self.g)
             i = self.g.create_issue('user', 'repo', 'Title')
@@ -125,7 +120,7 @@ class TestGitHub(BaseCase):
         self.response(None, 204)
 
         self.login()
-        with patch.object(github3.github.GitHub, 'key') as key:
+        with mock.patch.object(github3.github.GitHub, 'key') as key:
             key.return_value = github3.users.Key(load('key'), self.g)
             assert self.g.delete_key(10) is True
             key.return_value = None
@@ -202,7 +197,7 @@ class TestGitHub(BaseCase):
                  'issues/1')
 
         assert self.g.issue(None, None, 0) is None
-        with patch.object(github3.github.GitHub, 'repository') as repo:
+        with mock.patch.object(github3.github.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(load('repo'))
             i = self.g.issue('user', 'repo', 1)
 
@@ -301,7 +296,7 @@ class TestGitHub(BaseCase):
 
         self.assertRaises(github3.GitHubError, self.g.iter_followers)
 
-        with patch.object(github3.github.GitHub, 'user') as ghuser:
+        with mock.patch.object(github3.github.GitHub, 'user') as ghuser:
             ghuser.return_value = github3.users.User(load('user'))
             u = next(self.g.iter_followers('sigmavirus24'))
             assert isinstance(u, github3.users.User)
@@ -323,7 +318,7 @@ class TestGitHub(BaseCase):
         self.assertRaises(github3.GitHubError, self.g.iter_following)
         assert self.request.called is False
 
-        with patch.object(github3.github.GitHub, 'user') as ghuser:
+        with mock.patch.object(github3.github.GitHub, 'user') as ghuser:
             ghuser.return_value = github3.users.User(load('user'))
             u = next(self.g.iter_following('sigmavirus24'))
             assert isinstance(u, github3.users.User)
@@ -418,7 +413,7 @@ class TestGitHub(BaseCase):
         self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
                  'issues')
 
-        with patch.object(github3.GitHub, 'repository') as repo:
+        with mock.patch.object(github3.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(load('repo'),
                                                          self.g)
             i = next(self.g.iter_repo_issues('sigmavirus24', 'github3.py'))
@@ -576,7 +571,7 @@ class TestGitHub(BaseCase):
                  'github3.py/pulls/18')
         pr = None
 
-        with patch.object(github3.github.GitHub, 'repository') as repo:
+        with mock.patch.object(github3.github.GitHub, 'repository') as repo:
             repo.return_value = github3.repos.Repository(load('repo'))
             pr = self.g.pull_request('sigmavirus24', 'github3.py', 18)
 
@@ -652,8 +647,8 @@ class TestGitHub(BaseCase):
         args = ('Ian Cordasco', 'example@mail.com', 'www.blog.com', 'company',
                 'loc', True, 'bio')
 
-        with patch.object(github3.github.GitHub, 'user') as user:
-            with patch.object(github3.users.User, 'update') as upd:
+        with mock.patch.object(github3.github.GitHub, 'user') as user:
+            with mock.patch.object(github3.users.User, 'update') as upd:
                 user.return_value = github3.users.User(load('user'), self.g)
                 upd.return_value = True
                 assert self.g.update_user(*args)
@@ -737,6 +732,20 @@ class TestGitHubEnterprise(BaseCase):
         assert 'data' in kwargs
         assert body == kwargs['data']
         self.mock_assertions()
+
+
+class TestUnsecureGitHubEnterprise(BaseCase):
+    def setUp(self):
+        super(TestUnsecureGitHubEnterprise, self).setUp()
+        self.g = github3.GitHubEnterprise('https://github.example.com:8080/',
+                                          verify=False)
+
+    def test_skip_ssl_validation(self):
+        self.response('pull_enterprise')
+        self.g.pull_request('sigmavirus24', 'github3.py', 19)
+
+        assert False == self.g._session.verify
+        assert self.request.called
 
 
 class TestGitHubStatus(BaseCase):

@@ -1,7 +1,6 @@
-from .helper import UnitHelper
+from .helper import UnitHelper, mock
 from github3.structs import GitHubIterator, NullObject
 
-import mock
 import pytest
 
 

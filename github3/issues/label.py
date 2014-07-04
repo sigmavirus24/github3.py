@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from json import dumps
 from github3.decorators import requires_auth
 from github3.models import GitHubCore
@@ -20,7 +22,7 @@ class Label(GitHubCore):
 
         self._uniq = self._api
 
-    def __repr__(self):
+    def _repr(self):
         return '<Label [{0}]>'.format(self)
 
     def __str__(self):

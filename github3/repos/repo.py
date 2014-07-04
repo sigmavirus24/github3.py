@@ -7,10 +7,10 @@ This module contains the Repository object which is used to access the various
 parts of GitHub's Repository API.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64encode
-from collections import Callable
 from github3.decorators import requires_auth
 from github3.events import Event
 from github3.git import Blob, Commit, Reference, Tag, Tree
@@ -26,13 +26,15 @@ from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
+from github3.repos.deployment import Deployment
 from github3.repos.hook import Hook
+from github3.repos.pages import PagesBuild, PagesInfo
 from github3.repos.status import Status
 from github3.repos.stats import ContributorStats
 from github3.repos.release import Release, Asset
 from github3.repos.tag import RepoTag
 from github3.users import User, Key
-from github3.utils import timestamp_parameter
+from github3.utils import stream_response_to_file, timestamp_parameter
 from uritemplate import URITemplate
 
 
@@ -122,16 +124,20 @@ class Repository(GitHubCore):
 
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
-        #  repository owner.
+        #: repository owner.
         self.owner = User(repo.get('owner', {}), self._session)
 
         #: Is this repository private?
         self.private = repo.get('private')
         #: ``datetime`` object representing the last time commits were pushed
-        #  to the repository.
+        #: to the repository.
         self.pushed_at = self._strptime(repo.get('pushed_at'))
         #: Size of the repository.
         self.size = repo.get('size', 0)
+
+        # The number of stargazers
+        #: Number of users who starred the repository
+        self.stargazers = repo.get('stargazers_count', 0)
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
@@ -139,7 +145,7 @@ class Repository(GitHubCore):
         #: If it exists, url to clone the repository via SVN.
         self.svn_url = repo.get('svn_url', '')
         #: ``datetime`` object representing the last time the repository was
-        #  updated.
+        #: updated.
         self.updated_at = self._strptime(repo.get('updated_at'))
         self._api = repo.get('url', '')
 
@@ -147,7 +153,7 @@ class Repository(GitHubCore):
         #: Number of users watching the repository.
         self.watchers = repo.get('watchers', 0)
 
-        #: Parent of this fork, if it exists :class;`Repository`
+        #: Parent of this fork, if it exists :class:`Repository`
         self.source = repo.get('source')
         if self.source:
             self.source = Repository(self.source, self)
@@ -179,7 +185,7 @@ class Repository(GitHubCore):
         self.languages_url = repo.get('languages_url', '')
 
         #: Stargazers url (not a template)
-        self.stargarzers_url = repo.get('stargazers_url', '')
+        self.stargazers_url = repo.get('stargazers_url', '')
 
         #: Contributors url (not a template)
         self.contributors_url = repo.get('contributors_url', '')
@@ -196,7 +202,7 @@ class Repository(GitHubCore):
         #: Downloads url (not a template)
         self.download_url = repo.get('downloads_url', '')
 
-        ## Template URLS
+        # Template URLS
         ie_url_t = repo.get('issue_events_url')
         #: Issue events URL Template. Expand with ``number``
         self.issue_events_urlt = URITemplate(ie_url_t) if ie_url_t else None
@@ -286,7 +292,7 @@ class Repository(GitHubCore):
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels) if labels else None
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository [{0}]>'.format(self)
 
     def __str__(self):
@@ -333,39 +339,20 @@ class Repository(GitHubCore):
 
         """
         resp = None
-        written = False
         if format in ('tarball', 'zipball'):
             url = self._build_url(format, ref, base_url=self._api)
             resp = self._get(url, allow_redirects=True, stream=True)
 
-        pre_opened = False
         if resp and self._boolean(resp, 200, 404):
-            fd = None
-            if path:
-                if isinstance(getattr(path, 'write', None), Callable):
-                    pre_opened = True
-                    fd = path
-                else:
-                    fd = open(path, 'wb')
-            else:
-                header = resp.headers['content-disposition']
-                i = header.find('filename=') + len('filename=')
-                fd = open(header[i:], 'wb')
-
-            for chunk in resp.iter_content(chunk_size=512):
-                fd.write(chunk)
-
-            if not pre_opened:
-                fd.close()
-
-            written = True
-        return written
+            stream_response_to_file(resp, path)
+            return True
+        return False
 
     def asset(self, id):
         """Returns a single Asset.
 
         :param int id: (required), id of the asset
-        :returns: :class:`Asset <Asset>`
+        :returns: :class:`Asset <github3.repos.release.Asset>`
         """
         data = None
         if int(id) > 0:
@@ -391,7 +378,7 @@ class Repository(GitHubCore):
 
         :param str name: (required), branch name
         :type name: str
-        :returns: :class:`Branch <Branch>`
+        :returns: :class:`Branch <github3.repos.branch.Branch>`
         """
         json = None
         if name:
@@ -404,8 +391,8 @@ class Repository(GitHubCore):
         Commit.
 
         :param str sha: (required), sha of the commit
-        :returns: :class:`RepoCommit <RepoCommit>` if successful, otherwise
-            None
+        :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>` if
+            successful, otherwise None
         """
         url = self._build_url('commits', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -415,8 +402,8 @@ class Repository(GitHubCore):
         """Get a single commit comment.
 
         :param int comment_id: (required), id of the comment used by GitHub
-        :returns: :class:`RepoComment <RepoComment>` if successful, otherwise
-            None
+        :returns: :class:`RepoComment <github3.repos.comment.RepoComment>` if
+            successful, otherwise None
         """
         url = self._build_url('comments', str(comment_id), base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -427,7 +414,8 @@ class Repository(GitHubCore):
 
         :param str base: (required), base for the comparison
         :param str head: (required), compare this against base
-        :returns: :class:`Comparison <Comparison>` if successful, else None
+        :returns: :class:`Comparison <github3.repos.comparison.Comparison>` if
+            successful, else None
         """
         url = self._build_url('compare', base + '...' + head,
                               base_url=self._api)
@@ -449,8 +437,8 @@ class Repository(GitHubCore):
             github3/repo.py
         :param str ref: (optional), the string name of a commit/branch/tag.
             Default: master
-        :returns: :class:`Contents <Contents>` or dict if successful, else
-            None
+        :returns: :class:`Contents <github3.repos.contents.Contents>` or dict
+            if successful, else None
         """
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
@@ -469,7 +457,7 @@ class Repository(GitHubCore):
         :returns: string of the SHA returned
         """
         sha = ''
-        if encoding in ('base64', 'utf-8') and content:
+        if encoding in ('base64', 'utf-8'):
             url = self._build_url('git', 'blobs', base_url=self._api)
             data = {'content': content, 'encoding': encoding}
             json = self._json(self._post(url, data=data), 201)
@@ -488,7 +476,8 @@ class Repository(GitHubCore):
         :param str position: (optional), line index in the diff to comment on
         :param int line: (optional), line number of the file to comment on,
             default: 1
-        :returns: :class:`RepoComment <RepoComment>` if successful else None
+        :returns: :class:`RepoComment <github3.repos.comment.RepoComment>` if
+            successful, otherwise None
 
         """
         json = None
@@ -531,6 +520,36 @@ class Repository(GitHubCore):
         return Commit(json, self) if json else None
 
     @requires_auth
+    def create_deployment(self, ref, force=False, payload='',
+                          auto_merge=False, description='', environment=None):
+        """Create a deployment.
+
+        :param str ref: (required), The ref to deploy. This can be a branch,
+            tag, or sha.
+        :param bool force: Optional parameter to bypass any ahead/behind
+            checks or commit status checks. Default: False
+        :param str payload: Optional JSON payload with extra information about
+            the deployment. Default: ""
+        :param bool auto_merge: Optional parameter to merge the default branch
+            into the requested deployment branch if necessary. Default: False
+        :param str description: Optional short description. Default: ""
+        :param str environment: Optional name for the target deployment
+            environment (e.g., production, staging, qa). Default: "production"
+        :returns: :class:`Deployment <github3.repos.deployment.Deployment>`
+        """
+        json = None
+        if ref:
+            url = self._build_url('deployments', base_url=self._api)
+            data = {'ref': ref, 'force': force, 'payload': payload,
+                    'auto_merge': auto_merge, 'description': description,
+                    'environment': environment}
+            self._remove_none(data)
+            headers = Deployment.CUSTOM_HEADERS
+            json = self._json(self._post(url, data=data, headers=headers),
+                              201)
+        return Deployment(json, self) if json else None
+
+    @requires_auth
     def create_file(self, path, message, content, branch=None,
                     committer=None, author=None):
         """Create a file in this repository.
@@ -549,7 +568,7 @@ class Repository(GitHubCore):
             committer information. If passed, you must specify both a name and
             email.
         :returns: {
-            'content': :class:`Contents <github3.repos.contents.Content>`:,
+            'content': :class:`Contents <github3.repos.contents.Contents>`:,
             'commit': :class:`Commit <github3.git.Commit>`}
 
         """
@@ -598,7 +617,8 @@ class Repository(GitHubCore):
         :param list events: (optional), events the hook is triggered for
         :param bool active: (optional), whether the hook is actually
             triggered
-        :returns: :class:`Hook <Hook>` if successful, else None
+        :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
+            otherwise None
         """
         json = None
         if name and config and isinstance(config, dict):
@@ -623,13 +643,13 @@ class Repository(GitHubCore):
             issue to
         :param int milestone: (optional), id number of the milestone to
             attribute this issue to (e.g. ``m`` is a :class:`Milestone
-            <github3.issues.Milestone>` object, ``m.number`` is what you pass
-            here.)
+            <github3.issues.milestone.Milestone>` object, ``m.number`` is
+            what you pass here.)
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
-        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
-            None
+        :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
+            otherwise None
         """
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels}
@@ -684,8 +704,8 @@ class Repository(GitHubCore):
             values: ('open', 'closed'), default: 'open'
         :param str description: (optional), description of the milestone
         :param str due_on: (optional), ISO 8601 formatted due date
-        :returns: :class:`Milestone <github3.issues.Milestone>` if successful,
-            else None
+        :returns: :class:`Milestone <github3.issues.milestone.Milestone>` if
+            successful, otherwise None
         """
         url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
@@ -811,7 +831,7 @@ class Repository(GitHubCore):
             tag, otherwise create a lightweight tag (a Reference).
         :returns: If lightweight == False: :class:`Tag <github3.git.Tag>` if
             successful, else None. If lightweight == True: :class:`Reference
-            <Reference>`
+            <github3.git.Reference>`
         """
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
@@ -899,6 +919,15 @@ class Repository(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
+    def delete_subscription(self):
+        """Delete the user's subscription to this repository.
+
+        :returns: bool
+        """
+        url = self._build_url('subscription', base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
     def edit(self,
              name,
              description=None,
@@ -974,7 +1003,8 @@ class Repository(GitHubCore):
         """Get a single hook.
 
         :param int id_num: (required), id of the hook
-        :returns: :class:`Hook <Hook>` if successful, else None
+        :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
+            otherwise None
         """
         json = None
         if int(id_num) > 0:
@@ -1011,8 +1041,8 @@ class Repository(GitHubCore):
         """Get the issue specified by ``number``.
 
         :param int number: (required), number of the issue on this repository
-        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
-            None
+        :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
+            otherwise None
         """
         json = None
         if int(number) > 0:
@@ -1025,7 +1055,7 @@ class Repository(GitHubCore):
         """Get the specified deploy key.
 
         :param int id_num: (required), id of the key
-        :returns: :class:`Key <Key>` if successful, else None
+        :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
         json = None
         if int(id_num) > 0:
@@ -1045,6 +1075,16 @@ class Repository(GitHubCore):
             url = self._build_url('labels', name, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Label(json, self) if json else None
+
+    @requires_auth
+    def latest_pages_build(self):
+        """Get the build information for the most recent Pages build.
+
+        :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return PagesBuild(json) if json else None
 
     def iter_assignees(self, number=-1, etag=None):
         """Iterate over all available assignees to which an issue may be
@@ -1066,7 +1106,8 @@ class Repository(GitHubCore):
             -1 returns all branches
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Branch <Branch>`\ es
+        :returns: generator of
+            :class:`Branch <github3.repos.branch.Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
         return self._iter(int(number), url, Branch, etag=etag)
@@ -1095,6 +1136,18 @@ class Repository(GitHubCore):
         url = self._build_url('stats', 'code_frequency', base_url=self._api)
         return self._iter(int(number), url, list, etag=etag)
 
+    def iter_collaborators(self, number=-1, etag=None):
+        """Iterate over the collaborators of this repository.
+
+        :param int number: (optional), number of collaborators to return.
+            Default: -1 returns all comments
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('collaborators', base_url=self._api)
+        return self._iter(int(number), url, User, etag=etag)
+
     def iter_comments(self, number=-1, etag=None):
         """Iterate over comments on all commits in the repository.
 
@@ -1102,7 +1155,8 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of
+            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -1116,7 +1170,8 @@ class Repository(GitHubCore):
             -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`RepoComment <RepoComment>`\ s
+        :returns: generator of
+            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
         """
         url = self._build_url('commits', sha, 'comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
@@ -1166,7 +1221,8 @@ class Repository(GitHubCore):
             date string.
         :type until: datetime or string
 
-        :returns: generator of :class:`RepoCommit <RepoCommit>`\ s
+        :returns: generator of
+            :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
         """
         params = {'sha': sha, 'path': path, 'author': author,
                   'since': timestamp_parameter(since),
@@ -1216,6 +1272,21 @@ class Repository(GitHubCore):
         url = self._build_url('stats', 'contributors', base_url=self._api)
         return self._iter(int(number), url, ContributorStats, etag=etag)
 
+    def iter_deployments(self, number=-1, etag=None):
+        """Iterate over deployments for this repository.
+
+        :param int number: (optional), number of deployments to return.
+            Default: -1, returns all available deployments
+        :param str etag: (optional), ETag from a previous request for all
+            deployments
+        :returns: generator of
+            :class:`Deployment <github3.repos.deployment.Deployment>`\ s
+        """
+        url = self._build_url('deployments', base_url=self._api)
+        i = self._iter(int(number), url, Deployment, etag=etag)
+        i.headers.update(Deployment.CUSTOM_HEADERS)
+        return i
+
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.
 
@@ -1253,7 +1324,7 @@ class Repository(GitHubCore):
             returns all hooks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Hook <Hook>`\ s
+        :returns: generator of :class:`Hook <github3.repos.hook.Hook>`\ s
         """
         url = self._build_url('hooks', base_url=self._api)
         return self._iter(int(number), url, Hook, etag=etag)
@@ -1271,12 +1342,19 @@ class Repository(GitHubCore):
                     etag=None):
         """Iterate over issues on this repo based upon parameters passed.
 
+        .. versionchanged:: 0.9.0
+
+            The ``state`` parameter now accepts 'all' in addition to 'open'
+            and 'closed'.
+
         :param int milestone: (optional), 'none', or '*'
-        :param str state: (optional), accepted values: ('open', 'closed')
+        :param str state: (optional), accepted values: ('all', 'open',
+            'closed')
         :param str assignee: (optional), 'none', '*', or login name
         :param str mentioned: (optional), user's login name
         :param str labels: (optional), comma-separated list of labels, e.g.
-            'bug,ui,@high' :param sort: accepted values:
+            'bug,ui,@high'
+        :param sort: (optional), accepted values:
             ('created', 'updated', 'comments', 'created')
         :param str direction: (optional), accepted values: ('asc', 'desc')
         :param since: (optional), Only issues after this date will
@@ -1287,7 +1365,7 @@ class Repository(GitHubCore):
             By default all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of :class:`Issue <github3.issues.issue.Issue>`\ s
         """
         url = self._build_url('issues', base_url=self._api)
 
@@ -1310,7 +1388,7 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`IssueEvent <github3.issues.IssueEvent>`\ s
+            :class:`IssueEvent <github3.issues.event.IssueEvent>`\ s
         """
         url = self._build_url('issues', 'events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent, etag=etag)
@@ -1367,7 +1445,7 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Milestone <github3.issues.Milestone>`\ s
+            :class:`Milestone <github3.issues.milestone.Milestone>`\ s
         """
         url = self._build_url('milestones', base_url=self._api)
         accepted = {'state': ('open', 'closed'),
@@ -1422,15 +1500,39 @@ class Repository(GitHubCore):
                 del params[k]
         return self._iter(int(number), url, Thread, params, etag)
 
-    def iter_pulls(self, state=None, head=None, base=None, number=-1,
-                   etag=None):
+    @requires_auth
+    def iter_pages_builds(self, number=-1, etag=None):
+        """Iterate over pages builds of this repository.
+
+        :returns: generator of :class:`PagesBuild
+            <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', base_url=self._api)
+        return self._iter(int(number), url, PagesBuild, etag=etag)
+
+    def iter_pulls(self, state=None, head=None, base=None, sort='created',
+                   direction='desc', number=-1, etag=None):
         """List pull requests on repository.
 
-        :param str state: (optional), accepted values: ('open', 'closed')
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
+            - The ``sort`` parameter was added.
+
+            - The ``direction`` parameter was added.
+
+        :param str state: (optional), accepted values: ('all', 'open',
+            'closed')
         :param str head: (optional), filters pulls by head user and branch
             name in the format ``user:ref-name``, e.g., ``seveas:debian``
         :param str base: (optional), filter pulls by base branch name.
             Example: ``develop``.
+        :param str sort: (optional), Sort pull requests by ``created``,
+            ``updated``, ``popularity``, ``long-running``. Default: 'created'
+        :param str direction: (optional), Choose the direction to list pull
+            requests. Accepted values: ('desc', 'asc'). Default: 'desc'
         :param int number: (optional), number of pulls to return. Default: -1
             returns all available pull requests
         :param str etag: (optional), ETag from a previous request to the same
@@ -1440,9 +1542,9 @@ class Repository(GitHubCore):
         """
         url = self._build_url('pulls', base_url=self._api)
         params = {}
-        if state and state.lower() in ('open', 'closed'):
+        if state and state.lower() in ('all', 'open', 'closed'):
             params['state'] = state.lower()
-        params.update(head=head, base=base)
+        params.update(head=head, base=base, sort=sort, direction=direction)
         self._remove_none(params)
         return self._iter(int(number), url, PullRequest, params, etag)
 
@@ -1510,7 +1612,7 @@ class Repository(GitHubCore):
             -1 returns all available statuses.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Status <Status>`
+        :returns: generator of :class:`Status <github3.repos.status.Status>`
         """
         url = ''
         if sha:
@@ -1524,7 +1626,7 @@ class Repository(GitHubCore):
             Default: -1 returns all available tags.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`RepoTag <RepoTag>`\ s
+        :returns: generator of :class:`RepoTag <github3.repos.tag.RepoTag>`\ s
         """
         url = self._build_url('tags', base_url=self._api)
         return self._iter(int(number), url, RepoTag, etag=etag)
@@ -1567,7 +1669,7 @@ class Repository(GitHubCore):
         :param str base: (required), where you're merging into
         :param str head: (required), where you're merging from
         :param str message: (optional), message to be used for the commit
-        :returns: :class:`RepoCommit <RepoCommit>`
+        :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>`
         """
         url = self._build_url('merges', base_url=self._api)
         data = {'base': base, 'head': head}
@@ -1580,7 +1682,7 @@ class Repository(GitHubCore):
         """Get the milestone indicated by ``number``.
 
         :param int number: (required), unique id number of the milestone
-        :returns: :class:`Milestone <github3.issues.Milestone>`
+        :returns: :class:`Milestone <github3.issues.milestone.Milestone>`
         """
         json = None
         if int(number) > 0:
@@ -1588,6 +1690,16 @@ class Repository(GitHubCore):
                                   base_url=self._api)
             json = self._json(self._get(url), 200)
         return Milestone(json, self) if json else None
+
+    @requires_auth
+    def pages(self):
+        """Get information about this repository's pages site.
+
+        :returns: :class:`PagesInfo <github3.repos.pages.PagesInfo>`
+        """
+        url = self._build_url('pages', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return PagesInfo(json) if json else None
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
@@ -1604,7 +1716,7 @@ class Repository(GitHubCore):
     def readme(self):
         """Get the README for this repository.
 
-        :returns: :class:`Contents <Contents>`
+        :returns: :class:`Contents <github3.repos.contents.Contents>`
         """
         url = self._build_url('readme', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -1660,6 +1772,10 @@ class Repository(GitHubCore):
 
         This replaces ``Repository#set_subscription``
 
+        :param bool subscribed: (required), determines if notifications should
+            be received from this repository.
+        :param bool ignored: (required), determines if notifications should be
+            ignored from this repository.
         :returns: :class:`Subscription <github3.notifications.Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)

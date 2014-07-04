@@ -7,6 +7,7 @@ This module contains all the classes relating to Git Data.
 
 See also: http://developer.github.com/v3/git/
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64decode
@@ -43,7 +44,7 @@ class Blob(GitHubObject):
         #: SHA1 of the blob
         self.sha = blob.get('sha')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Blob [{0:.10}]>'.format(self.sha)
 
 
@@ -75,7 +76,7 @@ class Commit(BaseCommit):
         super(Commit, self).__init__(commit, session)
 
         #: dict containing at least the name, email and date the commit was
-        #  created
+        #: created
         self.author = commit.get('author', {}) or {}
         # If GH returns nil/None then make sure author is a dict
         self._author_name = self.author.get('name', '')
@@ -91,7 +92,7 @@ class Commit(BaseCommit):
         if commit.get('tree'):
             self.tree = Tree(commit.get('tree'), self._session)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
 
     def author_as_User(self):
@@ -128,7 +129,7 @@ class Reference(GitHubCore):
         #: :class:`GitObject <GitObject>` the reference points to
         self.object = GitObject(ref.get('object', {}))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Reference [{0}]>'.format(self.ref)
 
     def _update_(self, ref):
@@ -169,7 +170,7 @@ class GitObject(GitData):
         #: The type of object.
         self.type = obj.get('type')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Git Object [{0}]>'.format(self.sha)
 
 
@@ -192,7 +193,7 @@ class Tag(GitData):
         #: :class:`GitObject <GitObject>` for the tag
         self.object = GitObject(tag.get('object', {}))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Tag [{0}]>'.format(self.tag)
 
 
@@ -209,7 +210,7 @@ class Tree(GitData):
         #: list of :class:`Hash <Hash>` objects
         self.tree = [Hash(t) for t in tree.get('tree', [])]
 
-    def __repr__(self):
+    def _repr(self):
         return '<Tree [{0}]>'.format(self.sha)
 
     def recurse(self):
@@ -245,5 +246,5 @@ class Hash(GitHubObject):
         #: URL of this object in the GitHub API
         self.url = info.get('url')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Hash [{0}]>'.format(self.sha)

@@ -6,6 +6,7 @@ github3.events
 This module contains the class(es) related to Events
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubObject
 
@@ -55,7 +56,7 @@ class Event(GitHubObject):
         #: Indicates whether the Event is public or not.
         self.public = event.get('public')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Event [{0}]>'.format(self.type[:-5])
 
     @staticmethod

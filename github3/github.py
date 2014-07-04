@@ -6,11 +6,11 @@ github3.github
 This module contains the main GitHub session object.
 
 """
+from __future__ import unicode_literals
 
-from json import dumps
-from requests import session
 from github3.auths import Authorization
-from github3.decorators import requires_auth, requires_basic_auth
+from github3.decorators import (requires_auth, requires_basic_auth,
+                                requires_app_credentials)
 from github3.events import Event
 from github3.gists import Gist
 from github3.issues import Issue, issue_params
@@ -56,7 +56,7 @@ class GitHub(GitHubCore):
         elif login and password:
             self.login(login, password)
 
-    def __repr__(self):
+    def _repr(self):
         if self._session.auth:
             return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
@@ -103,19 +103,23 @@ class GitHub(GitHubCore):
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
-        auth = self._session.auth or (login and password)
+        # TODO: Break this behaviour in 1.0 (Don't rely on self._session.auth)
+        auth = None
+        if self._session.auth:
+            auth = self._session.auth
+        elif login and password:
+            auth = (login, password)
+
         if auth:
             url = self._build_url('authorizations')
             data = {'note': note, 'note_url': note_url,
                     'client_id': client_id, 'client_secret': client_secret}
             if scopes:
                 data['scopes'] = scopes
-            if self._session.auth:
+
+            with self._session.temporary_basic_auth(*auth):
                 json = self._json(self._post(url, data=data), 201)
-            else:
-                ses = session()
-                ses.auth = (login, password)
-                json = self._json(ses.post(url, data=dumps(data)), 201)
+
         return Authorization(json, self) if json else None
 
     def check_authorization(self, access_token):
@@ -176,10 +180,13 @@ class GitHub(GitHubCore):
             formatted
         :param str assignee: (optional), Login of person to assign
             the issue to
-        :param str milestone: (optional), Which milestone to assign
-            the issue to
+        :param int milestone: (optional), id number of the milestone to
+            attribute this issue to (e.g. ``m`` is a :class:`Milestone
+            <github3.issues.Milestone>` object, ``m.number`` is what you pass
+            here.)
         :param list labels: (optional), List of label names.
-        :returns: :class:`Issue <github3.issues.Issue>`
+        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
+            None
         """
         repo = None
         if owner and repository and title:
@@ -599,10 +606,15 @@ class GitHub(GitHubCore):
                since=None, number=-1, etag=None):
         """List all of the authenticated user's (and organization's) issues.
 
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
         :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
             api-default: 'assigned'
-        :param str state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('all', 'open', 'closed')
             api-default: 'open'
         :param str labels: comma-separated list of label names, e.g.,
             'bug,ui,@high'
@@ -636,10 +648,15 @@ class GitHub(GitHubCore):
 
             ``per_page`` parameter added before ``number``
 
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
         :param str filter: accepted values:
             ('assigned', 'created', 'mentioned', 'subscribed')
             api-default: 'assigned'
-        :param str state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('all', 'open', 'closed')
             api-default: 'open'
         :param str labels: comma-separated list of label names, e.g.,
             'bug,ui,@high'
@@ -670,10 +687,15 @@ class GitHub(GitHubCore):
         """List issues on owner/repository. Only owner and repository are
         required.
 
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
         :param str owner: login of the owner of the repository
         :param str repository: name of the repository
         :param int milestone: None, '*', or ID of milestone
-        :param str state: accepted values: ('open', 'closed')
+        :param str state: accepted values: ('all', 'open', 'closed')
             api-default: 'open'
         :param str assignee: '*' or login of the user
         :param str mentioned: login of the user
@@ -1072,6 +1094,43 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
+    @requires_app_credentials
+    def revoke_authorization(self, access_token):
+        """Revoke specified authorization for an OAuth application.
+
+        Revoke all authorization tokens created by your application. This will
+        only work if you have already called ``set_client_id``.
+
+        :param str access_token: (required), the access_token to revoke
+        :returns: bool -- True if successful, False otherwise
+        """
+        client_id, client_secret = self._session.retrieve_client_credentials()
+        url = self._build_url('applications', str(client_id), 'tokens',
+                              access_token)
+        with self._session.temporary_basic_auth(client_id, client_secret):
+            response = self._delete(url, params={'client_id': None,
+                                                 'client_secret': None})
+
+        return self._boolean(response, 204, 404)
+
+    @requires_app_credentials
+    def revoke_authorizations(self):
+        """Revoke all authorizations for an OAuth application.
+
+        Revoke all authorization tokens created by your application. This will
+        only work if you have already called ``set_client_id``.
+
+        :param str client_id: (required), the client_id of your application
+        :returns: bool -- True if successful, False otherwise
+        """
+        client_id, client_secret = self._session.retrieve_client_credentials()
+        url = self._build_url('applications', str(client_id), 'tokens')
+        with self._session.temporary_basic_auth(client_id, client_secret):
+            response = self._delete(url, params={'client_id': None,
+                                                 'client_secret': None})
+
+        return self._boolean(response, 204, 404)
+
     def search_code(self, query, sort=None, order=None, per_page=None,
                     text_match=False, number=-1, etag=None):
         """Find code via the code search API.
@@ -1307,7 +1366,7 @@ class GitHub(GitHubCore):
                 'Accept': 'application/vnd.github.v3.full.text-match+json'
                 }
 
-        url = self._build_url('search', 'repositories')
+        url = self._build_url('search', 'users')
         return SearchIterator(number, url, UserSearchResult, self, params,
                               etag, headers)
 
@@ -1427,12 +1486,16 @@ class GitHubEnterprise(GitHub):
 
     There is no need to provide the end of the url (e.g., /api/v3/), that will
     be taken care of by us.
+
+    If you have a self signed SSL for your local github enterprise you can
+    override the validation by passing `verify=False`.
     """
-    def __init__(self, url, login='', password='', token=''):
+    def __init__(self, url, login='', password='', token='', verify=True):
         super(GitHubEnterprise, self).__init__(login, password, token)
         self._session.base_url = url.rstrip('/') + '/api/v3'
+        self._session.verify = verify
 
-    def __repr__(self):
+    def _repr(self):
         return '<GitHub Enterprise [0.url]>'.format(self)
 
     @requires_auth
@@ -1461,7 +1524,7 @@ class GitHubStatus(GitHubCore):
         super(GitHubStatus, self).__init__({})
         self._session.base_url = 'https://status.github.com'
 
-    def __repr__(self):
+    def _repr(self):
         return '<GitHub Status>'
 
     def _recipe(self, *args):

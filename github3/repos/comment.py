@@ -6,6 +6,8 @@ github3.repos.comment
 This module contains the RepoComment class
 
 """
+from __future__ import unicode_literals
+
 from github3.decorators import requires_auth
 from github3.models import BaseComment
 from github3.users import User
@@ -39,15 +41,13 @@ class RepoComment(BaseComment):
         #: The position in the diff where the comment was made.
         self.position = comment.get('position')
         #: datetime object representing when the comment was updated.
-        self.updated_at = comment.get('updated_at')
-        if self.updated_at:
-            self.updated_at = self._strptime(self.updated_at)
+        self.updated_at = self._strptime(comment.get('updated_at'))
         #: Login of the user who left the comment.
         self.user = None
         if comment.get('user'):
             self.user = User(comment.get('user'), self)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Comment [{0}/{1}]>'.format(
             self.commit_id[:7], self.user.login or ''
         )

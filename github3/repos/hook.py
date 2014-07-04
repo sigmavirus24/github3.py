@@ -6,6 +6,7 @@ github3.repos.hook
 This module contains only the Hook object for GitHub's Hook API.
 
 """
+from __future__ import unicode_literals
 
 from json import dumps
 from github3.decorators import requires_auth
@@ -32,9 +33,7 @@ class Hook(GitHubCore):
         super(Hook, self).__init__(hook, session)
         self._api = hook.get('url', '')
         #: datetime object representing when this hook was last updated.
-        self.updated_at = None
-        if hook.get('updated_at'):
-            self.updated_at = self._strptime(hook.get('updated_at'))
+        self.updated_at = self._strptime(hook.get('updated_at'))
         #: datetime object representing the date the hook was created.
         self.created_at = self._strptime(hook.get('created_at'))
         #: The name of the hook.
@@ -48,7 +47,7 @@ class Hook(GitHubCore):
         #: Unique id of the hook.
         self.id = hook.get('id')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Hook [{0}]>'.format(self.name)
 
     def _update_(self, hook):
@@ -61,15 +60,6 @@ class Hook(GitHubCore):
         :returns: bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
-
-    @requires_auth
-    def delete_subscription(self):
-        """Delete the user's subscription to this repository.
-
-        :returns: bool
-        """
-        url = self._build_url('subscription', base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def edit(self, config={}, events=[], add_events=[], rm_events=[],
@@ -104,6 +94,15 @@ class Hook(GitHubCore):
             return True
 
         return False
+
+    @requires_auth
+    def ping(self):
+        """Ping this hook.
+
+        :returns: bool
+        """
+        url = self._build_url('pings', base_url=self._api)
+        return self._boolean(self._post(url), 204, 404)
 
     @requires_auth
     def test(self):

@@ -7,6 +7,7 @@ This module contains the Comparison object for comparing two commits via the
 GitHub API.
 
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubCore
 from github3.repos.commit import RepoCommit
@@ -41,8 +42,8 @@ class Comparison(GitHubCore):
         self.diff_url = compare.get('diff_url')
         #: Patch URL at GitHub for the comparison.
         self.patch_url = compare.get('patch_url')
-        #: :class:`RepoCommit <RepoCommit>` object representing the base of
-        #  comparison.
+        #: :class:`RepoCommit <github3.repos.commit.RepoCommit>` object
+        #: representing the base of comparison.
         self.base_commit = RepoCommit(compare.get('base_commit'), None)
         #: Behind or ahead.
         self.status = compare.get('status')
@@ -52,14 +53,15 @@ class Comparison(GitHubCore):
         self.behind_by = compare.get('behind_by')
         #: Number of commits difference in the comparison.
         self.total_commits = compare.get('total_commits')
-        #: List of :class:`RepoCommit <RepoCommit>` objects.
+        #: List of :class:`RepoCommit <github3.repos.commit.RepoCommit>`
+        #: objects.
         self.commits = [RepoCommit(com) for com in compare.get('commits')]
         #: List of dicts describing the files modified.
         self.files = compare.get('files', [])
 
         self._uniq = self.commits
 
-    def __repr__(self):
+    def _repr(self):
         return '<Comparison of {0} commits>'.format(self.total_commits)
 
     def diff(self):

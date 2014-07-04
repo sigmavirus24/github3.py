@@ -15,8 +15,10 @@ class GitHubIterator(GitHubCore, Iterator):
         self.count = count
         #: URL the class used to make it's first GET
         self.url = url
+        #: Last URL that was requested
+        self.last_url = None
         self._api = self.url
-        #: Class being used to cast all items to
+        #: Class for constructing an item to return
         self.cls = cls
         #: Parameters of the query string
         self.params = params or {}
@@ -39,11 +41,11 @@ class GitHubIterator(GitHubCore, Iterator):
 
         self.path = urlparse(self.url).path
 
-    def __repr__(self):
+    def _repr(self):
         return '<GitHubIterator [{0}, {1}]>'.format(self.count, self.path)
 
     def __iter__(self):
-        url, params, cls = self.url, self.params, self.cls
+        self.last_url, params, cls = self.url, self.params, self.cls
         headers = self.headers
 
         if 0 < self.count <= 100 and self.count != -1:
@@ -52,8 +54,9 @@ class GitHubIterator(GitHubCore, Iterator):
         if 'per_page' not in params and self.count == -1:
             params['per_page'] = 100
 
-        while (self.count == -1 or self.count > 0) and url:
-            response = self._get(url, params=params, headers=headers)
+        while (self.count == -1 or self.count > 0) and self.last_url:
+            response = self._get(self.last_url, params=params,
+                                 headers=headers)
             self.last_response = response
             self.last_status = response.status_code
             if params:
@@ -82,7 +85,7 @@ class GitHubIterator(GitHubCore, Iterator):
                     break
 
             rel_next = response.links.get('next', {})
-            url = rel_next.get('url', '')
+            self.last_url = rel_next.get('url', '')
 
     def __next__(self):
         if not hasattr(self, '__i__'):
@@ -96,6 +99,7 @@ class GitHubIterator(GitHubCore, Iterator):
         self.count = self.original
         if conditional:
             self.headers['If-None-Match'] = self.etag
+        self.etag = None
         self.__i__ = self.__iter__()
         return self
 
@@ -122,7 +126,7 @@ class SearchIterator(GitHubIterator):
         #: Items array returned in the last request
         self.items = []
 
-    def __repr__(self):
+    def _repr(self):
         return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
                                                         urlencode(self.params))
 

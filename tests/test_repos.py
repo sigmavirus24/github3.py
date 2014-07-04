@@ -2,8 +2,7 @@ import os
 import github3
 from github3 import repos
 from datetime import datetime
-from tests.utils import (BaseCase, load)
-from mock import patch, mock_open
+from tests.utils import (BaseCase, load, mock)
 
 
 class TestRepository(BaseCase):
@@ -61,8 +60,8 @@ class TestRepository(BaseCase):
         self.request.return_value.raw.seek(0)
         self.request.return_value._content_consumed = False
 
-        o = mock_open()
-        with patch('{0}.open'.format(__name__), o, create=True):
+        o = mock.mock_open()
+        with mock.patch('{0}.open'.format(__name__), o, create=True):
             with open('archive', 'wb+') as fd:
                 self.repo.archive('tarball', fd)
 
@@ -398,7 +397,7 @@ class TestRepository(BaseCase):
                           None, None, None, None, None)
 
         self.login()
-        with patch.object(repos.Repository, 'create_ref'):
+        with mock.patch.object(repos.Repository, 'create_ref'):
             assert self.repo.create_tag(None, None, None, None,
                                         None) is None
             tag = self.repo.create_tag(**data)
@@ -406,7 +405,7 @@ class TestRepository(BaseCase):
             assert repr(tag).startswith('<Tag')
         self.mock_assertions()
 
-        with patch.object(repos.Repository, 'create_ref') as cr:
+        with mock.patch.object(repos.Repository, 'create_ref') as cr:
             self.repo.create_tag('tag', '', 'fakesha', '', '',
                                  lightweight=True)
             cr.assert_called_once_with('refs/tags/tag', 'fakesha')
@@ -451,6 +450,17 @@ class TestRepository(BaseCase):
         assert self.repo.delete_key(-2) is False
         self.not_called()
         assert self.repo.delete_key(2)
+        self.mock_assertions()
+
+    def test_delete_subscription(self):
+        self.response('', 204)
+        self.delete(self.api + 'subscription')
+
+        self.assertRaises(github3.GitHubError, self.repo.delete_subscription)
+        self.not_called()
+
+        self.login()
+        assert self.repo.delete_subscription()
         self.mock_assertions()
 
     def test_edit(self):
@@ -555,6 +565,15 @@ class TestRepository(BaseCase):
 
         b = next(self.repo.iter_branches())
         assert isinstance(b, repos.branch.Branch)
+        self.mock_assertions()
+
+    def test_iter_collaborators(self):
+        self.response('user', _iter=True)
+        self.get(self.api + 'collaborators')
+        self.conf = {'params': {'per_page': 100}}
+
+        u = next(self.repo.iter_collaborators())
+        assert isinstance(u, github3.users.User)
         self.mock_assertions()
 
     def test_iter_comments(self):
@@ -748,7 +767,8 @@ class TestRepository(BaseCase):
     def test_iter_pulls(self):
         self.response('pull', _iter=True)
         self.get(self.api + 'pulls')
-        self.conf.update(params={'per_page': 100})
+        base_params = {'per_page': 100, 'sort': 'created', 'direction': 'desc'}
+        self.conf.update(params=base_params)
 
         p = next(self.repo.iter_pulls())
         assert isinstance(p, github3.pulls.PullRequest)
@@ -757,15 +777,21 @@ class TestRepository(BaseCase):
         next(self.repo.iter_pulls('foo'))
         self.mock_assertions()
 
-        self.conf.update(params={'state': 'open', 'per_page': 100})
+        params = {'state': 'open'}
+        params.update(base_params)
+        self.conf.update(params=params)
         next(self.repo.iter_pulls('Open'))
         self.mock_assertions()
 
-        self.conf.update(params={'head': 'user:branch', 'per_page': 100})
+        params = {'head': 'user:branch'}
+        params.update(base_params)
+        self.conf.update(params=params)
         next(self.repo.iter_pulls(head='user:branch'))
         self.mock_assertions()
 
-        self.conf.update(params={'base': 'branch', 'per_page': 100})
+        params = {'base': 'branch'}
+        params.update(base_params)
+        self.conf.update(params=params)
         next(self.repo.iter_pulls(base='branch'))
         self.mock_assertions()
 
@@ -976,12 +1002,12 @@ class TestRepository(BaseCase):
         self.not_called()
 
         self.login()
-        with patch.object(repos.Repository, 'label') as l:
+        with mock.patch.object(repos.Repository, 'label') as l:
             l.return_value = None
             assert self.repo.update_label('foo', 'bar') is False
             self.not_called()
 
-        with patch.object(repos.Repository, 'label') as l:
+        with mock.patch.object(repos.Repository, 'label') as l:
             l.return_value = github3.issues.label.Label(load('label'), self.g)
             assert self.repo.update_label('big_bug', 'fafafa')
 
@@ -1194,17 +1220,6 @@ class TestHook(BaseCase):
         assert self.hook.delete()
         self.mock_assertions()
 
-    def test_delete_subscription(self):
-        self.response('', 204)
-        self.delete(self.api + '/subscription')
-
-        self.assertRaises(github3.GitHubError, self.hook.delete_subscription)
-        self.not_called()
-
-        self.login()
-        assert self.hook.delete_subscription()
-        self.mock_assertions()
-
     def test_edit(self):
         self.response('hook', 200)
         self.patch(self.api)
@@ -1247,6 +1262,19 @@ class TestHook(BaseCase):
 
         self.login()
         assert self.hook.test()
+        self.mock_assertions()
+
+    def test_ping(self):
+        # Funny name, no?
+        self.response('', 204)
+        self.post(self.api + '/pings')
+        self.conf = {}
+
+        self.assertRaises(github3.GitHubError, self.hook.ping)
+        self.not_called()
+
+        self.login()
+        assert self.hook.ping()
         self.mock_assertions()
 
 
@@ -1357,3 +1385,82 @@ class TestComparison(BaseCase):
 
         assert self.comp.patch().startswith(b'archive_data')
         self.mock_assertions()
+
+
+class TestAsset(BaseCase):
+    def __init__(self, methodName='runTest'):
+        super(TestAsset, self).__init__(methodName)
+        self.asset = repos.release.Asset(load('asset'))
+        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
+                    "releases/assets/37945")
+
+    def test_repr(self):
+        assert repr(self.asset) == '<Asset [github3.py-0.7.1.tar.gz]>'
+
+    def test_download(self):
+        headers = {'content-disposition': 'filename=foo'}
+        self.response('archive', 200, **headers)
+        self.get(self.api)
+        self.conf.update({
+            'stream': True,
+            'allow_redirects': False,
+            'headers': {'Accept': 'application/octet-stream'}
+            })
+
+        # 200, to default location
+        assert os.path.isfile('foo') is False
+        assert self.asset.download()
+        assert os.path.isfile('foo')
+        os.unlink('foo')
+        self.mock_assertions()
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        # 200, to path
+        assert os.path.isfile('path_to_file') is False
+        assert self.asset.download('path_to_file')
+        assert os.path.isfile('path_to_file')
+        os.unlink('path_to_file')
+        self.mock_assertions()
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        # 200, to file-like object
+        o = mock.mock_open()
+        with mock.patch('{0}.open'.format(__name__), o, create=True):
+            with open('download', 'wb+') as fd:
+                self.asset.download(fd)
+        o.assert_called_once_with('download', 'wb+')
+        fd = o()
+        fd.write.assert_called_once_with(b'archive_data')
+        self.mock_assertions()
+
+        self.request.return_value.raw.seek(0)
+        self.request.return_value._content_consumed = False
+
+        # 302, to file-like object
+        r = self.request.return_value
+        target = 'http://github.s3.example.com/foo'
+        self.response('', 302, location=target)
+        self.get(target)
+        self.request.side_effect = [self.request.return_value, r]
+        self.conf['headers'].update({
+            'Authorization': None,
+            'Content-Type': None,
+            })
+        del self.conf['allow_redirects']
+        o = mock.mock_open()
+        with mock.patch('{0}.open'.format(__name__), o, create=True):
+            with open('download', 'wb+') as fd:
+                self.asset.download(fd)
+        o.assert_called_once_with('download', 'wb+')
+        fd = o()
+        fd.write.assert_called_once_with(b'archive_data')
+        self.mock_assertions()
+
+        # 404
+        self.response('', 404)
+        self.request.side_effect = None
+        assert self.asset.download() is False

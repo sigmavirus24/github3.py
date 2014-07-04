@@ -39,7 +39,7 @@ def requires_auth(func):
             from github3.models import GitHubError
             # Mock a 401 response
             r = generate_fake_error_response(
-                '{"message": "Requires authentication"}'.encode()
+                '{"message": "Requires authentication"}'
             )
             raise GitHubError(r)
     return auth_wrapper
@@ -60,10 +60,32 @@ def requires_basic_auth(func):
             from github3.models import GitHubError
             # Mock a 401 response
             r = generate_fake_error_response(
-                ('{"message": "Requires username/password authentication"}'
-                 ).encode()
+                '{"message": "Requires username/password authentication"}'
             )
             raise GitHubError(r)
+    return auth_wrapper
+
+
+def requires_app_credentials(func):
+    """Require client_id and client_secret to be associated.
+
+    This is used to note and enforce which methods require a client_id and
+    client_secret to be used.
+
+    """
+    @wraps(func)
+    def auth_wrapper(self, *args, **kwargs):
+        client_id, client_secret = self._session.retrieve_client_credentials()
+        if client_id and client_secret:
+            return func(self, *args, **kwargs)
+        else:
+            from github3.models import GitHubError
+            # Mock a 401 response
+            r = generate_fake_error_response(
+                '{"message": "Requires username/password authentication"}'
+            )
+            raise GitHubError(r)
+
     return auth_wrapper
 
 
@@ -71,7 +93,7 @@ def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
     r = Response()
     r.status_code = status_code
     r.encoding = encoding
-    r.raw = RequestsStringIO(msg)
+    r.raw = RequestsStringIO(msg.encode())
     r._content_consumed = True
     r._content = r.raw.read()
     return r

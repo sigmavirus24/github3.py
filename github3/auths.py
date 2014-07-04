@@ -6,6 +6,7 @@ github3.auths
 This module contains the Authorization object.
 
 """
+from __future__ import unicode_literals
 
 from github3.decorators import requires_basic_auth
 from github3.models import GitHubCore
@@ -47,15 +48,11 @@ class Authorization(GitHubCore):
         self.id = auth.get('id', 0)
         self._api = self._build_url('authorizations', str(self.id))
         #: datetime object representing when the authorization was created.
-        self.created_at = None
-        if auth.get('created_at'):
-            self.created_at = self._strptime(auth.get('created_at'))
-        #: datetime object representing when the authorization was created.
-        self.updated_at = None
-        if auth.get('updated_at'):
-            self.updated_at = self._strptime(auth.get('updated_at'))
+        self.created_at = self._strptime(auth.get('created_at'))
+        #: datetime object representing when the authorization was updated.
+        self.updated_at = self._strptime(auth.get('updated_at'))
 
-    def __repr__(self):
+    def _repr(self):
         return '<Authorization [{0}]>'.format(self.name)
 
     def _update_(self, auth):
