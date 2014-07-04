@@ -218,26 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_following(self):
-        self.response('user', _iter=True)
-        self.get('https://api.github.com/users/sigmavirus24/following')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_following)
-        assert self.request.called is False
-
-        with mock.patch.object(github3.github.GitHub, 'user') as ghuser:
-            ghuser.return_value = github3.users.User(load('user'))
-            u = next(self.g.iter_following('sigmavirus24'))
-            assert isinstance(u, github3.users.User)
-            self.mock_assertions()
-
-            self.login()
-            v = next(self.g.iter_following())
-            assert isinstance(v, github3.users.User)
-            self.get('https://api.github.com/user/following')
-            self.mock_assertions()
-
     def test_iter_gists(self):
         self.response('gist', _iter=True)
         self.get('https://api.github.com/users/sigmavirus24/gists')

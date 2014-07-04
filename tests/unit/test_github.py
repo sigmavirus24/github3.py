@@ -172,6 +172,39 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_following(self):
+        """
+        Show that an authenticated user can iterate the users they are
+        following.
+        """
+        i = self.instance.following()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/following'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_following_require_auth(self):
+        """Show that one needs to authenticate to use #following."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.following()
+
+    def test_followed_by(self):
+        """
+        Show that one can authenticate over the users followed by another.
+        """
+        i = self.instance.followed_by('sigmavirus24')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('users/sigmavirus24/following'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_starred(self):
         """
         Show that one can iterate over an authenticated user's stars.
