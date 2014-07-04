@@ -218,19 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_authorizations(self):
-        self.response('authorization', _iter=True)
-        self.get('https://api.github.com/authorizations')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_authorizations)
-        assert self.request.called is False
-
-        self.login()
-        auth = next(self.g.iter_authorizations())
-        assert isinstance(auth, github3.auths.Authorization)
-        self.mock_assertions()
-
     def test_iter_emails(self):
         self.response('emails', _iter=True)
         self.get('https://api.github.com/user/emails')

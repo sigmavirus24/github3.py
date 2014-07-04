@@ -95,6 +95,25 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_authorizations(self):
+        """
+        Show that an authenticated user can iterate over their authorizations.
+        """
+        i = self.instance.authorizations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('authorizations'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_authorizations_requires_auth(self):
+        """Show that one needs to authenticate to use #authorizations."""
+        self.session.auth = None
+        with pytest.raises(GitHubError):
+            self.instance.authorizations()
+
     def test_starred(self):
         """
         Show that one can iterate over an authenticated user's stars.
