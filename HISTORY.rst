@@ -55,6 +55,22 @@ Old name                           New name
   - ``github3.enterprise_login`` allows GitHub Enterprise users to log into 
     their service.
 
+- ``GitHub#iter_followers`` was split into two functions:
+
+  - ``GitHub#followers_of`` which iterates over all of the followers of a user
+    whose username you provide
+
+  - ``GitHub#followers`` which iterates over all of the followers of the
+    authenticated user
+
+- ``GitHub#iter_following`` was split into two functions:
+
+  - ``GitHub#followed_by`` which iterates over all of the users followed by
+    the username you provide
+
+  - ``GitHub#following`` which iterates over all of the users followed by the
+    authenticated user
+
 - ``GitHub#iter_gists`` was split into two functions:
 
   - ``GitHub#public_gists`` which iterates over all of the public gists on 
