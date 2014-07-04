@@ -27,6 +27,17 @@ class TestGitHubIterators(UnitIteratorHelper):
     described_class = GitHub
     example_data = None
 
+    def test_all_events(self):
+        """Show that one can iterate over all public events."""
+        i = self.instance.all_events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_all_repos(self):
         """Show that one can iterate over all repositories."""
         i = self.instance.all_repos()
@@ -113,6 +124,23 @@ class TestGitHubIterators(UnitIteratorHelper):
         self.session.auth = None
         with pytest.raises(GitHubError):
             self.instance.authorizations()
+
+    def test_emails(self):
+        """Show that an authenticated user can iterate over their emails."""
+        i = self.instance.emails()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/emails'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_emails_require_auth(self):
+        """Show that one needs to authenticate to use #emails."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.emails()
 
     def test_starred(self):
         """

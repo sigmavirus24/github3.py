@@ -218,28 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_emails(self):
-        self.response('emails', _iter=True)
-        self.get('https://api.github.com/user/emails')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_emails)
-        assert self.request.called is False
-
-        self.login()
-        email = next(self.g.iter_emails())
-        assert email['email'] == 'graffatcolmingov@gmail.com'
-        self.mock_assertions()
-
-    def test_iter_events(self):
-        self.response('event', _iter=True)
-        self.get('https://api.github.com/events')
-        self.conf.update(params={'per_page': 100})
-
-        event = next(self.g.iter_events())
-        assert isinstance(event, github3.events.Event)
-        self.mock_assertions()
-
     def test_iter_followers(self):
         self.response('user', _iter=True)
         self.get('https://api.github.com/users/sigmavirus24/followers')
