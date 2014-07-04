@@ -13,9 +13,9 @@ Breaking Changes
 
 - All methods and functions starting with ``iter_`` have been renamed.
 
-==============================     ==============================
+==============================     ========================================
 Old name                           New name
-==============================     ==============================
+==============================     ========================================
 ``github3.iter_all_repos``         ``github3.all_repos``
 ``github3.iter_all_users``         ``github3.all_users``
 ``github3.iter_events``            ``github3.all_events``
@@ -33,7 +33,7 @@ Old name                           New name
 ``GitHub#iter_events``             ``GitHub#events``
 ``GitHub#iter_followers``          ``GitHub#{followers,followers_of}``
 ``GitHub#iter_following``          ``GitHub#{following,followed_by}``
-``GitHub#iter_gists``              ``GitHub#gists``
+``GitHub#iter_gists``              ``GitHub#{gists,gists_by,public_gists}``
 ``GitHub#iter_notifications``      ``GitHub#notifications``
 ``GitHub#iter_org_issues``         ``GitHub#organization_issues``
 ``GitHub#iter_issues``             ``GitHub#issues``
@@ -45,7 +45,7 @@ Old name                           New name
 ``GitHub#iter_user_repos``         ``GitHub#user_repos``
 ``GitHub#iter_user_teams``         ``GitHub#user_teams``
 
-==============================     ==============================
+==============================     ========================================
 
 - ``github3.login`` has been simplified and split into two functions:
 
@@ -71,7 +71,7 @@ Old name                           New name
   - ``GitHub#following`` which iterates over all of the users followed by the
     authenticated user
 
-- ``GitHub#iter_gists`` was split into two functions:
+- ``GitHub#iter_gists`` was split into three functions:
 
   - ``GitHub#public_gists`` which iterates over all of the public gists on 
     GitHub
