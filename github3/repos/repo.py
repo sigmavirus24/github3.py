@@ -720,12 +720,11 @@ class Repository(GitHubCore):
 
     @requires_auth
     def create_pull(self, title, base, head, body=None):
-        """Create a pull request using commits from ``head`` and comparing
-        against ``base``.
+        """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
         :param str title: (required)
-        :param str base: (required), e.g., 'username:branch', or a sha
-        :param str head: (required), e.g., 'master', or a sha
+        :param str base: (required), e.g., 'master'
+        :param str head: (required), e.g., 'username:branch'
         :param str body: (optional), markdown formatted description
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
@@ -739,8 +738,8 @@ class Repository(GitHubCore):
         """Create a pull request from issue #``issue``.
 
         :param int issue: (required), issue number
-        :param str base: (required), e.g., 'username:branch', or a sha
-        :param str head: (required), e.g., 'master', or a sha
+        :param str base: (required), e.g., 'master'
+        :param str head: (required), e.g., 'username:branch'
         :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
             successful, else None
         """
