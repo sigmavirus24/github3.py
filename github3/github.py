@@ -67,11 +67,6 @@ class GitHub(GitHubCore):
     def __exit__(self, *args):
         pass
 
-    @requires_auth
-    def _iter_follow(self, follow_path, number, etag):
-        url = self._build_url('user', follow_path)
-        return self._iter(number, url, User, etag=etag)
-
     @requires_basic_auth
     def authorization(self, id_num):
         """Get information about authorization ``id``.
@@ -470,40 +465,72 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Event, etag=etag)
 
     def followers_of(self, login, number=-1, etag=None):
-        """If login is provided, iterate over a generator of followers of that
-        login name; otherwise return a generator of followers of the
-        authenticated user.
+        """Iterate over followers of ``login``.
 
-        :param str login: (optional), login of the user to check
+        .. versionadded:: 1.0.0
+
+            This replaces iter_followers('sigmavirus24').
+
+        :param str login: (required), login of the user to check
         :param int number: (optional), number of followers to return. Default:
             -1 returns all followers
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
-        return self.user(login).iter_followers()
+        url = self._build_url('users', login, 'followers')
+        return self._iter(int(number), url, User, etag=etag)
 
     @requires_auth
     def followers(self, number=-1, etag=None):
-        return self._iter_follow('followers', int(number), etag=etag)
+        """Iterate over followers of the authenticated user.
+
+        .. versionadded:: 1.0.0
+
+            This replaces iter_followers().
+
+        :param int number: (optional), number of followers to return. Default:
+            -1 returns all followers
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('user', 'followers')
+        return self._iter(int(number), url, User, etag=etag)
 
     def followed_by(self, login, number=-1, etag=None):
-        """If login is provided, iterate over a generator of users being
-        followed by login; otherwise return a generator of people followed by
-        the authenticated user.
+        """Iterate over users being followed by ``login``.
 
-        :param str login: (optional), login of the user to check
+        .. versionadded:: 1.0.0
+
+            This replaces iter_following('sigmavirus24').
+
+        :param str login: (required), login of the user to check
         :param int number: (optional), number of people to return. Default: -1
             returns all people you follow
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
-        return self.user(login).iter_following()
+        url = self._build_url('users', login, 'following')
+        return self._iter(int(number), url, User, etag=etag)
 
     @requires_auth
     def following(self, number=-1, etag=None):
-        return self._iter_follow('following', int(number), etag=etag)
+        """Iterate over users the authenticated user is following.
+
+        .. versionadded:: 1.0.0
+
+            This replaces iter_following().
+
+        :param int number: (optional), number of people to return. Default: -1
+            returns all people you follow
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('user', 'following')
+        return self._iter(int(number), url, User, etag=etag)
 
     def public_gists(self, number=-1, etag=None):
         """Retrieve all public gists and iterate over them.
