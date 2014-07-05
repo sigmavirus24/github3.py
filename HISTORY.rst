@@ -21,7 +21,7 @@ Old name                           New name
 ``github3.iter_events``            ``github3.all_events``
 ``github3.iter_followers``         ``github3.followers_of``
 ``github3.iter_following``         ``github3.followed_by``
-``github3.iter_repo_issues``       ``github3.repo_issues``
+``github3.iter_repo_issues``       ``github3.repository_issues``
 ``github3.iter_orgs``              ``github3.organizations``
 ``github3.iter_user_repos``        ``github3.user_repos``
 ``github3.iter_starred``           ``github3.starred_by``
@@ -38,7 +38,7 @@ Old name                           New name
 ``GitHub#iter_org_issues``         ``GitHub#organization_issues``
 ``GitHub#iter_issues``             ``GitHub#issues``
 ``GitHub#iter_user_issues``        ``GitHub#user_issues``
-``GitHub#iter_repo_issues``        ``GitHub#repo_issues``
+``GitHub#iter_repo_issues``        ``GitHub#repository_issues``
 ``GitHub#iter_keys``               ``GitHub#keys``
 ``GitHub#iter_orgs``               ``GitHub#organizations``
 ``GitHub#iter_repos``              ``GitHub#repos``

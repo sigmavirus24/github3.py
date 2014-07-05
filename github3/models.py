@@ -88,7 +88,8 @@ class GitHubCore(GitHubObject):
     def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
-    def _remove_none(self, data):
+    @staticmethod
+    def _remove_none(data):
         if not data:
             return
         for (k, v) in list(data.items()):

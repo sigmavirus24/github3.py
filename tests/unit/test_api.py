@@ -81,11 +81,11 @@ class TestAPI(unittest.TestCase):
         github3.organizations(*args)
         self.gh.organizations.assert_called_with(*args)
 
-    def test_repo_issues(self):
+    def test_repository_issues(self):
         args = ('owner', 'repository', None, None, None, None, None, None,
                 None, None, -1, None)
-        github3.repo_issues(*args)
-        self.gh.repo_issues.assert_called_with(*args)
+        github3.repository_issues(*args)
+        self.gh.repository_issues.assert_called_with(*args)
 
     def test_starred(self):
         github3.starred_by('login')

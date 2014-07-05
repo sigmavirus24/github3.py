@@ -233,9 +233,9 @@ def gists_by(username, number=-1, etag=None):
     return iter([])
 
 
-def repo_issues(owner, repository, milestone=None, state=None, assignee=None,
-                mentioned=None, labels=None, sort=None, direction=None,
-                since=None, number=-1, etag=None):
+def repository_issues(owner, repository, milestone=None, state=None,
+                      assignee=None, mentioned=None, labels=None, sort=None,
+                      direction=None, since=None, number=-1, etag=None):
     """Iterate over issues on owner/repository.
 
     .. versionchanged:: 0.9.0
@@ -268,9 +268,9 @@ def repo_issues(owner, repository, milestone=None, state=None, assignee=None,
 
     """
     if owner and repository:
-        return gh.repo_issues(owner, repository, milestone, state,
-                              assignee, mentioned, labels, sort,
-                              direction, since, number, etag)
+        return gh.repository_issues(owner, repository, milestone, state,
+                                    assignee, mentioned, labels, sort,
+                                    direction, since, number, etag)
     return iter([])
 
 

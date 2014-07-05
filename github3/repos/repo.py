@@ -1368,14 +1368,8 @@ class Repository(GitHubCore):
         """
         url = self._build_url('issues', base_url=self._api)
 
-        params = {'assignee': assignee, 'mentioned': mentioned}
-        if milestone in ('*', 'none') or isinstance(milestone, int):
-            params['milestone'] = milestone
-        self._remove_none(params)
-        params.update(
-            issue_params(None, state, labels, sort, direction,
-                         since)
-        )
+        params = repo_issue_params(milestone, state, assignee, mentioned,
+                                   labels, sort, direction, since)
 
         return self._iter(int(number), url, Issue, params, etag)
 
@@ -1903,3 +1897,24 @@ class Repository(GitHubCore):
         if json.get('Last-Modified'):
             del json['Last-Modified']
         return json
+
+
+def repo_issue_params(milestone=None,
+                      state=None,
+                      assignee=None,
+                      mentioned=None,
+                      labels=None,
+                      sort=None,
+                      direction=None,
+                      since=None,
+                      number=-1,
+                      etag=None):
+    params = {'assignee': assignee, 'mentioned': mentioned}
+    if milestone in ('*', 'none') or isinstance(milestone, int):
+        params['milestone'] = milestone
+    Repository._remove_none(params)
+    params.update(
+        issue_params(None, state, labels, sort, direction,
+                     since)
+    )
+    return params
