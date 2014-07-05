@@ -267,6 +267,25 @@ class TestGitHubIterators(UnitIteratorHelper):
         with pytest.raises(GitHubError):
             self.instance.issues()
 
+    def test_keys(self):
+        """
+        Show that an authenticated user can iterate over their public keys.
+        """
+        i = self.instance.keys()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/keys'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_keys_requires_auth(self):
+        """Show that one needs to authenticate to use #keys."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.keys()
+
     def test_notifications(self):
         """
         Show that an authenticated user can iterate over their notifications.
