@@ -16,7 +16,7 @@ from github3.gists import Gist
 from github3.issues import Issue, issue_params
 from github3.models import GitHubCore
 from github3.orgs import Organization, Team
-from github3.repos import Repository, repo_issue_params
+from github3.repos.repo import Repository, repo_issue_params
 from github3.search import (CodeSearchResult, IssueSearchResult,
                             RepositorySearchResult, UserSearchResult)
 from github3.structs import SearchIterator

@@ -354,6 +354,32 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_repository_issues(self):
+        """Show that a user can iterate over a repository's issues."""
+        i = self.instance.repository_issues('owner', 'repo')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('repos/owner/repo/issues'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_repository_issues_with_params(self):
+        """Show that #repository_issues accepts multiple parameters."""
+        params = {'milestone': 1, 'state': 'all', 'assignee': 'owner',
+                  'mentioned': 'someone', 'labels': 'bug,high'}
+        i = self.instance.repository_issues('owner', 'repo', **params)
+        self.get_next(i)
+
+        params.update(per_page=100)
+
+        self.session.get.assert_called_once_with(
+            url_for('repos/owner/repo/issues'),
+            params=params,
+            headers={}
+        )
+
     def test_starred(self):
         """
         Show that one can iterate over an authenticated user's stars.

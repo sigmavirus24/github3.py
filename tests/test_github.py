@@ -218,22 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_repo_issues(self):
-        self.response('issue', _iter=True)
-        self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
-                 'issues')
-
-        with mock.patch.object(github3.GitHub, 'repository') as repo:
-            repo.return_value = github3.repos.Repository(load('repo'),
-                                                         self.g)
-            i = next(self.g.iter_repo_issues('sigmavirus24', 'github3.py'))
-
-        assert isinstance(i, github3.issues.Issue)
-        self.mock_assertions()
-
-        with self.assertRaises(StopIteration):
-            next(self.g.iter_repo_issues(None, None))
-
     def test_iter_keys(self):
         self.response('key', _iter=True)
         self.get('https://api.github.com/user/keys')
