@@ -233,6 +233,40 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_issues(self):
+        """Show that an authenticated user can iterate over their issues."""
+        i = self.instance.issues()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('issues'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_issues_with_params(self):
+        """Show that issues can be filtered."""
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                  'sort': 'created', 'direction': 'asc',
+                  'since': '2012-05-20T23:10:27Z'}
+        p = {'per_page': 100}
+        p.update(params)
+
+        i = self.instance.issues(**params)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('issues'),
+            params=p,
+            headers={}
+        )
+
+    def test_issues_requires_auth(self):
+        """Show that one needs to authenticate to use #issues."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.issues()
+
     def test_notifications(self):
         """
         Show that an authenticated user can iterate over their notifications.
