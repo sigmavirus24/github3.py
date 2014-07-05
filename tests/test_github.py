@@ -218,49 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_notifications(self):
-        self.response('notification', _iter=True)
-        self.get('https://api.github.com/notifications')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_notifications)
-
-        self.not_called()
-        self.login()
-        thread = next(self.g.iter_notifications())
-        assert isinstance(thread, github3.notifications.Thread)
-        self.mock_assertions()
-
-        self.conf.update(params={'all': True, 'per_page': 100})
-        next(self.g.iter_notifications(True))
-        self.mock_assertions()
-
-        self.conf.update(params={'participating': True, 'per_page': 100})
-        next(self.g.iter_notifications(participating=True))
-        self.mock_assertions()
-
-    def test_iter_org_issues(self):
-        self.response('issue', _iter=True)
-        self.get('https://api.github.com/orgs/github3py/issues')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_org_issues,
-                          'github3py')
-
-        self.login()
-        i = next(self.g.iter_org_issues('github3py'))
-        assert isinstance(i, github3.issues.Issue)
-        self.mock_assertions()
-
-        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
-                  'sort': 'created', 'direction': 'asc',
-                  'since': '2012-05-20T23:10:27Z'}
-        request_params = merge(params, per_page=100)
-        self.conf.update(params=request_params)
-        j = next(self.g.iter_org_issues('github3py', **params))
-        assert isinstance(j, github3.issues.Issue)
-        self.mock_assertions()
-
     def test_iter_issues(self):
         self.response('issue', _iter=True)
         self.get('https://api.github.com/issues')

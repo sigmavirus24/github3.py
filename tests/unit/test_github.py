@@ -233,6 +233,82 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_notifications(self):
+        """
+        Show that an authenticated user can iterate over their notifications.
+        """
+        i = self.instance.notifications()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('notifications'),
+            params={'per_page': 100},
+            headers={},
+        )
+
+    def test_notifications_participating_in(self):
+        """Show that the user can filter by pariticpating."""
+        i = self.instance.notifications(participating=True)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('notifications'),
+            params={'per_page': 100, 'participating': True},
+            headers={}
+        )
+
+    def test_notifications_all(self):
+        """Show that the user can iterate over all of their notifications."""
+        i = self.instance.notifications(all=True)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('notifications'),
+            params={'per_page': 100, 'all': True},
+            headers={}
+        )
+
+    def test_notifications_requires_auth(self):
+        """Show that one needs to authenticate to use #gists."""
+        self.session.has_auth.return_value = False
+        with pytest.raises(GitHubError):
+            self.instance.notifications()
+
+    def test_organization_issues(self):
+        """Show that one can iterate over an organization's issues."""
+        i = self.instance.organization_issues('org')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('orgs/org/issues'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_organization_issues_with_params(self):
+        """Show that one can pass parameters to #organization_issues."""
+        params = {'filter': 'assigned', 'state': 'closed', 'labels': 'bug',
+                  'sort': 'created', 'direction': 'asc',
+                  'since': '2012-05-20T23:10:27Z'}
+        i = self.instance.organization_issues('org', **params)
+        self.get_next(i)
+
+        p = {'per_page': 100}
+        p.update(params)
+
+        self.session.get.assert_called_once_with(
+            url_for('orgs/org/issues'),
+            params=p,
+            headers={}
+        )
+
+    def test_organization_issues_requires_auth(self):
+        """Show that one needs to authenticate to use #organization_issues."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.organization_issues('org')
+
     def test_public_gists(self):
         """Show that all public gists can be iterated over."""
         i = self.instance.public_gists()
