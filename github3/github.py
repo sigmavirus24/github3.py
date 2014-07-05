@@ -807,8 +807,8 @@ class GitHub(GitHubCore):
         return iter([])
 
     @requires_auth
-    def repos(self, type=None, sort=None, direction=None, number=-1,
-              etag=None):
+    def repositories(self, type=None, sort=None, direction=None, number=-1,
+                     etag=None):
         """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
