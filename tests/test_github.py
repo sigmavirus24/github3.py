@@ -218,19 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_orgs(self):
-        self.response('org', _iter=True)
-        self.get('https://api.github.com/users/login/orgs')
-
-        assert isinstance(next(self.g.iter_orgs('login')),
-                          github3.orgs.Organization)
-        self.mock_assertions()
-
-        self.get('https://api.github.com/user/orgs')
-        self.login()
-        assert isinstance(next(self.g.iter_orgs()), github3.orgs.Organization)
-        self.mock_assertions()
-
     def test_iter_repos(self):
         self.response('repo', _iter=True)
         self.get('https://api.github.com/user/repos')

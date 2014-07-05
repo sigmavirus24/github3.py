@@ -362,6 +362,37 @@ class TestGitHubIterators(UnitIteratorHelper):
         with pytest.raises(GitHubError):
             self.instance.organization_issues('org')
 
+    def test_organizations(self):
+        """
+        Show that one can iterate over all of the authenticated user's orgs.
+        """
+        i = self.instance.organizations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/orgs'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_organizations_requires_auth(self):
+        """Show that one needs to authenticate to use #organizations."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.organizations()
+
+    def test_organizations_with(self):
+        """Show that one can iterate over all of a user's orgs."""
+        i = self.instance.organizations_with('sigmavirus24')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('users/sigmavirus24/orgs'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_public_gists(self):
         """Show that all public gists can be iterated over."""
         i = self.instance.public_gists()
