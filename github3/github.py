@@ -603,7 +603,7 @@ class GitHub(GitHubCore):
     def organization_issues(self, name, filter='', state='', labels='',
                             sort='', direction='', since=None, number=-1,
                             etag=None):
-        """Iterate over the organnization's issues if the authenticated user
+        """Iterate over the organization's issues if the authenticated user
         belongs to it.
 
         :param str name: (required), name of the organization
