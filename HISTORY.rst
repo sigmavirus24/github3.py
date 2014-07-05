@@ -1,3 +1,4 @@
+.. vim: set tw=100
 History/Changelog
 -----------------
 
@@ -13,16 +14,16 @@ Breaking Changes
 
 - All methods and functions starting with ``iter_`` have been renamed.
 
-==============================     ========================================
+==============================     ==============================================
 Old name                           New name
-==============================     ========================================
+==============================     ==============================================
 ``github3.iter_all_repos``         ``github3.all_repos``
 ``github3.iter_all_users``         ``github3.all_users``
 ``github3.iter_events``            ``github3.all_events``
 ``github3.iter_followers``         ``github3.followers_of``
 ``github3.iter_following``         ``github3.followed_by``
 ``github3.iter_repo_issues``       ``github3.repository_issues``
-``github3.iter_orgs``              ``github3.organizations``
+``github3.iter_orgs``              ``github3.{organizations,organizations_with}``
 ``github3.iter_user_repos``        ``github3.user_repos``
 ``github3.iter_starred``           ``github3.starred_by``
 ``github3.iter_subscriptions``     ``github3.subscriptions_for``
@@ -45,7 +46,7 @@ Old name                           New name
 ``GitHub#iter_user_repos``         ``GitHub#user_repos``
 ``GitHub#iter_user_teams``         ``GitHub#user_teams``
 
-==============================     ========================================
+==============================     ==============================================
 
 - ``github3.login`` has been simplified and split into two functions:
 
@@ -80,6 +81,14 @@ Old name                           New name
     specific user
 
   - ``GitHub#gists`` which iterates over the authenticated users gists
+
+- ``GitHub#iter_orgs`` was split into two functions:
+
+  - ``GitHub#organizations`` which iterates over the authenticated user's
+    organization memberships
+
+  - ``GitHub#organizations_with`` which iterates over the given user's
+    organization memberships
 
 - ``GitHub#iter_subscriptions`` was split into two functions:
 
