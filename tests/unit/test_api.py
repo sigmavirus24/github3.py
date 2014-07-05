@@ -76,10 +76,10 @@ class TestAPI(unittest.TestCase):
             assert not isinstance(g, github3.GitHubEnterprise)
             login.assert_called_once_with(*args)
 
-    def test_organizations(self):
+    def test_organizations_with(self):
         args = ('login', -1, None)
-        github3.organizations(*args)
-        self.gh.organizations.assert_called_with(*args)
+        github3.organizations_with(*args)
+        self.gh.organizations_with.assert_called_with(*args)
 
     def test_repository_issues(self):
         args = ('owner', 'repository', None, None, None, None, None, None,

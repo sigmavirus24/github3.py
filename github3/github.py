@@ -786,14 +786,14 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'orgs')
         return self._iter(int(number), url, Organization, etag=etag)
 
-    def organizations_with(self, login, number=-1, etag=None):
+    def organizations_with(self, username, number=-1, etag=None):
         """Iterate over organizations with ``login`` as a public member.
 
         .. versionadded:: 1.0.0
 
             Replaces ``iter_orgs('sigmavirus24')``.
 
-        :param str login: (optional), user whose orgs you wish to list
+        :param str username: (optional), user whose orgs you wish to list
         :param int number: (optional), number of organizations to return.
             Default: -1 returns all available organizations
         :param str etag: (optional), ETag from a previous request to the same
@@ -801,8 +801,10 @@ class GitHub(GitHubCore):
         :returns: generator of
             :class:`Organization <github3.orgs.Organization>`\ s
         """
-        url = self._build_url('users', login, 'orgs')
-        return self._iter(int(number), url, Organization, etag=etag)
+        if username:
+            url = self._build_url('users', username, 'orgs')
+            return self._iter(int(number), url, Organization, etag=etag)
+        return iter([])
 
     @requires_auth
     def repos(self, type=None, sort=None, direction=None, number=-1,

@@ -274,8 +274,8 @@ def repository_issues(owner, repository, milestone=None, state=None,
     return iter([])
 
 
-def organizations(username, number=-1, etag=None):
-    """List the organizations associated with ``username``.
+def organizations_with(username, number=-1, etag=None):
+    """List the organizations with ``username`` as a member.
 
     :param str username: (required), login of the user
     :param int number: (optional), number of orgs to return. Default: -1,
@@ -286,7 +286,7 @@ def organizations(username, number=-1, etag=None):
         :class:`Organization <github3.orgs.Organization>`
 
     """
-    return gh.organizations(username, number, etag) if username else []
+    return gh.organizations_with(username, number, etag)
 
 
 def user_repos(login, type=None, sort=None, direction=None, number=-1,
