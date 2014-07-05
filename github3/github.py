@@ -769,10 +769,29 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'keys')
         return self._iter(int(number), url, Key, etag=etag)
 
+    @requires_auth
     def organizations(self, login=None, number=-1, etag=None):
-        """Iterate over public organizations for login if provided; otherwise
-        iterate over public and private organizations for the authenticated
-        user.
+        """Iterate over all organizations the authenticated user belongs to.
+
+        This will display both the private memberships and the publicized
+        memberships.
+
+        :param int number: (optional), number of organizations to return.
+            Default: -1 returns all available organizations
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`Organization <github3.orgs.Organization>`\ s
+        """
+        url = self._build_url('user', 'orgs')
+        return self._iter(int(number), url, Organization, etag=etag)
+
+    def organizations_with(self, login, number=-1, etag=None):
+        """Iterate over organizations with ``login`` as a public member.
+
+        .. versionadded:: 1.0.0
+
+            Replaces ``iter_orgs('sigmavirus24')``.
 
         :param str login: (optional), user whose orgs you wish to list
         :param int number: (optional), number of organizations to return.
@@ -782,11 +801,7 @@ class GitHub(GitHubCore):
         :returns: generator of
             :class:`Organization <github3.orgs.Organization>`\ s
         """
-        if login:
-            url = self._build_url('users', login, 'orgs')
-        else:
-            url = self._build_url('user', 'orgs')
-
+        url = self._build_url('users', login, 'orgs')
         return self._iter(int(number), url, Organization, etag=etag)
 
     @requires_auth
