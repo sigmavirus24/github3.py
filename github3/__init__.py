@@ -14,11 +14,28 @@ __title__ = 'github3'
 __author__ = 'Ian Cordasco'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012-2014 Ian Cordasco'
-__version__ = '0.9.0'
+__version__ = '1.0.0'
 __version_info__ = tuple(int(i) for i in __version__.split('.'))
 
-from github3.api import *
+from github3.api import (
+    authorize, login, enterprise_login, emojis, gist, gitignore_template,
+    create_gist, issue, markdown, octocat, organization, pull_request,
+    followers_of, followed_by, public_gists, gists_by, repository_issues,
+    gitignore_templates, all_repositories, all_users, all_events,
+    organizations_with, repositories_by, starred_by, subscriptions_for,
+    rate_limit, repository, search_code, search_repositories, search_users,
+    user, zen
+)
 from github3.github import GitHub, GitHubEnterprise, GitHubStatus
 from github3.models import GitHubError
 
-# flake8: noqa
+__all__ = (
+    'GitHub', 'GitHubEnterprise', 'GitHubError', 'GitHubStatus', 'authorize',
+    'login', 'enterprise_login', 'emojis', 'gist', 'gitignore_template',
+    'create_gist', 'issue', 'markdown', 'octocat', 'organization',
+    'pull_request', 'followers_of', 'followed_by', 'public_gists', 'gists_by',
+    'repository_issues', 'gitignore_templates', 'all_repositories',
+    'all_users', 'all_events', 'organizations_with', 'repositories_by',
+    'starred_by', 'subscriptions_for', 'rate_limit', 'repository',
+    'search_code', 'search_repositories', 'search_users', 'user', 'zen',
+)
