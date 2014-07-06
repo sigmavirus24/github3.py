@@ -218,37 +218,6 @@ class TestGitHub(BaseCase):
         assert isinstance(self.g.key(10), github3.users.Key)
         self.mock_assertions()
 
-    def test_iter_repos(self):
-        self.response('repo', _iter=True)
-        self.get('https://api.github.com/user/repos')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.g.iter_repos)
-
-        self.login()
-        assert isinstance(next(self.g.iter_repos()), github3.repos.Repository)
-        self.mock_assertions()
-
-        assert isinstance(next(self.g.iter_repos('sigmavirus24')),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
-        self.conf.update(params={'type': 'all', 'direction': 'desc',
-                                 'per_page': 100})
-
-        next(self.g.iter_repos('all', direction='desc'))
-        self.mock_assertions()
-
-    def test_iter_repos_sort(self):
-        self.response('repo', _iter=True)
-        self.conf.update(params={'sort': 'created', 'per_page': 100})
-
-        self.login()
-        self.get('https://api.github.com/user/repos')
-        assert isinstance(next(self.g.iter_repos(sort="created")),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
     def test_login(self):
         self.g.login('user', 'password')
         assert self.g._session.auth == ('user', 'password')

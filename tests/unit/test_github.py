@@ -404,6 +404,40 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_respositories(self):
+        """
+        Show that an authenticated user can iterate over their repositories.
+        """
+        i = self.instance.repositories()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/repos'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_respositories_accepts_params(self):
+        """Show that an #repositories accepts params."""
+        i = self.instance.repositories(type='all',
+                                       direction='desc',
+                                       sort='created')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/repos'),
+            params={'per_page': 100, 'type': 'all', 'direction': 'desc',
+                    'sort': 'created'},
+            headers={}
+        )
+
+    def test_repositories_requires_auth(self):
+        """Show that one needs to authenticate to use #repositories."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.repositories()
+
     def test_repository_issues(self):
         """Show that a user can iterate over a repository's issues."""
         i = self.instance.repository_issues('owner', 'repo')
