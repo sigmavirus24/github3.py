@@ -425,15 +425,6 @@ def repository(owner, repository):
 repository.__doc__ = gh.repository.__doc__
 
 
-def ratelimit_remaining():
-    """Get the remaining number of requests allowed.
-
-    :returns: int
-
-    """
-    return gh.ratelimit_remaining
-
-
 def search_code(query, sort=None, order=None, per_page=None,
                 text_match=False, number=-1, etag=None):
     """Find code via the code search API.

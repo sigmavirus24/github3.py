@@ -120,6 +120,8 @@ Old name                           New name
   - ``Repository#ignore`` ignores notifications from the repository for the 
     authenticated user
 
+- ``github3.ratelimit_remaining`` was removed
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 
