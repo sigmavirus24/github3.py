@@ -52,12 +52,6 @@ class TestAPI(TestCase):
         github3.rate_limit()
         self.gh.rate_limit.assert_called_once_with()
 
-    def test_ratelimit_remaining(self):
-        # This prevents a regression in the API
-        # See 81c800658db43f86419b9c0764fc16aad3d60007
-        self.gh.ratelimit_remaining = mock.NonCallableMock()
-        github3.ratelimit_remaining()
-
     def test_zen(self):
         github3.zen()
         assert self.gh.zen.called is True
