@@ -37,6 +37,11 @@ class TestAPI(unittest.TestCase):
             github3.authorize(*args)
             gh().authorize.assert_called_once_with(*args)
 
+    def test_create_gist(self):
+        args = ('description', {'files': ['file']})
+        github3.create_gist(*args)
+        self.gh.create_gist.assert_called_once_with(*args)
+
     def test_enterprise_login(self):
         args = ('login', 'password', None, 'https://url.com/', None)
         with mock.patch.object(github3.GitHubEnterprise, 'login') as login:

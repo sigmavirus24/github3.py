@@ -11,11 +11,6 @@ class TestAPI(TestCase):
     def tearDown(self):
         self.mock.stop()
 
-    def test_create_gist(self):
-        args = ('description', {'files': ['files']})
-        github3.create_gist(*args)
-        self.gh.create_gist.assert_called_with(*args)
-
     def test_issue(self):
         args = ('owner', 'repo', 1)
         github3.issue(*args)
