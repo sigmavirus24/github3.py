@@ -1,6 +1,7 @@
 import github3
-import mock
 import unittest
+
+from .helper import mock
 
 
 class TestAPI(unittest.TestCase):
