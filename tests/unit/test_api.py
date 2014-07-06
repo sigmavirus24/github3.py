@@ -75,6 +75,10 @@ class TestAPI(unittest.TestCase):
         github3.gitignore_templates()
         assert self.gh.gitignore_templates.called is True
 
+    def test_issue(self):
+        github3.issue('sigmavirus24', 'github3.py', 100)
+        self.gh.issue.assert_called_with('sigmavirus24', 'github3.py', 100)
+
     def test_login(self):
         args = ('login', 'password', None, None)
         with mock.patch.object(github3.GitHub, 'login') as login:
@@ -82,6 +86,18 @@ class TestAPI(unittest.TestCase):
             assert isinstance(g, github3.GitHub)
             assert not isinstance(g, github3.GitHubEnterprise)
             login.assert_called_once_with(*args)
+
+    def test_markdown(self):
+        github3.markdown('text', '', '', False)
+        self.gh.markdown.assert_called_once_with('text', '', '', False)
+
+    def test_octocat(self):
+        github3.octocat()
+        self.gh.octocat.assert_called_once_with()
+
+    def test_organization(self):
+        github3.organization('orgname')
+        self.gh.organization.assert_called_once_with('orgname')
 
     def test_organizations_with(self):
         args = ('login', -1, None)
