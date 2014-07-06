@@ -388,7 +388,8 @@ class GitHub(GitHubCore):
             return repo.issue(number)
         return None
 
-    def all_repos(self, number=-1, since=None, etag=None, per_page=None):
+    def all_repositories(self, number=-1, since=None, etag=None,
+                         per_page=None):
         """Iterate over every repository in the order they were created.
 
         :param int number: (optional), number of repositories to return.

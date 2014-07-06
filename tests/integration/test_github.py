@@ -128,11 +128,11 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(i, github3.issues.Issue)
 
-    def test_all_repos(self):
+    def test_all_repositories(self):
         """Test the ability to iterate over all of the repositories"""
         cassette_name = self.cassette_name('iter_all_repos')
         with self.recorder.use_cassette(cassette_name):
-            for r in self.gh.all_repos(number=25):
+            for r in self.gh.all_repositories(number=25):
                 assert isinstance(r, github3.repos.repo.Repository)
 
     def test_all_users(self):

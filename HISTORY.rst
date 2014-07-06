@@ -17,7 +17,7 @@ Breaking Changes
 ==============================     ==============================================
 Old name                           New name
 ==============================     ==============================================
-``github3.iter_all_repos``         ``github3.all_repos``
+``github3.iter_all_repos``         ``github3.all_repositories``
 ``github3.iter_all_users``         ``github3.all_users``
 ``github3.iter_events``            ``github3.all_events``
 ``github3.iter_followers``         ``github3.followers_of``
@@ -27,7 +27,7 @@ Old name                           New name
 ``github3.iter_user_repos``        ``github3.user_repos``
 ``github3.iter_starred``           ``github3.starred_by``
 ``github3.iter_subscriptions``     ``github3.subscriptions_for``
-``GitHub#iter_all_repos``          ``GitHub#all_repos``
+``GitHub#iter_all_repos``          ``GitHub#all_repositories``
 ``GitHub#iter_all_users``          ``GitHub#all_users``
 ``GitHub#iter_authorizations``     ``GitHub#authorizations``
 ``GitHub#iter_emails``             ``GitHub#emails``

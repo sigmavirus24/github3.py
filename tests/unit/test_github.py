@@ -38,9 +38,9 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_all_repos(self):
+    def test_all_repositories(self):
         """Show that one can iterate over all repositories."""
-        i = self.instance.all_repos()
+        i = self.instance.all_repositories()
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
@@ -49,9 +49,9 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_all_repos_per_page(self):
+    def test_all_repositories_per_page(self):
         """Show that one can iterate over all repositories with per_page."""
-        i = self.instance.all_repos(per_page=25)
+        i = self.instance.all_repositories(per_page=25)
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
@@ -60,10 +60,10 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_all_repos_since(self):
+    def test_all_repositories_since(self):
         """Show that one can limit the repositories returned."""
         since = 100000
-        i = self.instance.all_repos(since=since)
+        i = self.instance.all_repositories(since=since)
         self.get_next(i)
 
         self.session.get.assert_called_once_with(

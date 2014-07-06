@@ -20,10 +20,10 @@ class TestAPI(unittest.TestCase):
         github3.public_gists()
         self.gh.public_gists.assert_called_once_with(-1, None)
 
-    def test_all_repos(self):
-        github3.all_repos()
+    def test_all_repositories(self):
+        github3.all_repositories()
         # TODO(Ian): When you fix GitHub, fix this test too
-        self.gh.all_repos.assert_called_once_with(-1, None)
+        self.gh.all_repositories.assert_called_once_with(-1, None)
 
     def test_all_users(self):
         github3.all_users()

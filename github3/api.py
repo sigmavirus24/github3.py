@@ -131,7 +131,7 @@ def gitignore_templates():
     return gh.gitignore_templates()
 
 
-def all_repos(number=-1, etag=None):
+def all_repositories(number=-1, etag=None):
     """Iterate over every repository in the order they were created.
 
     :param int number: (optional), number of repositories to return.
@@ -141,7 +141,7 @@ def all_repos(number=-1, etag=None):
     :returns: generator of :class:`Repository <github3.repos.Repository>`
 
     """
-    return gh.all_repos(number, etag)
+    return gh.all_repositories(number, etag)
 
 
 def all_users(number=-1, etag=None):
