@@ -200,7 +200,7 @@ def followed_by(username, number=-1, etag=None):
 
 
 def public_gists(number=-1, etag=None):
-    """Iterate over public gists.
+    """Iterate over all public gists.
 
     .. versionadded:: 1.0
 
