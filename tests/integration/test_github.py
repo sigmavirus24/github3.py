@@ -151,7 +151,7 @@ class TestGitHub(IntegrationHelper):
 
     def test_followers_of(self):
         """Test the ability to iterate over a user's followers"""
-        cassette_name = self.cassette_name('iter_followers')
+        cassette_name = self.cassette_name('followers_of')
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.followers_of('sigmavirus24', number=25):
                 assert isinstance(u, github3.users.User)
