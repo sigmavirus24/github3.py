@@ -813,7 +813,8 @@ class GitHub(GitHubCore):
         """List public repositories for the authenticated user.
 
         .. versionchanged:: 0.6
-           Removed the login parameter for correctness. Use user_repos
+
+           Removed the login parameter for correctness. Use repositories_by
            instead
 
         :param str type: (optional), accepted values:
@@ -921,8 +922,8 @@ class GitHub(GitHubCore):
         url = self._build_url('users', str(login), 'subscriptions')
         return self._iter(int(number), url, Repository, etag=etag)
 
-    def user_repos(self, login, type=None, sort=None, direction=None,
-                   number=-1, etag=None):
+    def repositories_by(self, login, type=None, sort=None, direction=None,
+                        number=-1, etag=None):
         """List public repositories for the specified ``login``.
 
         .. versionadded:: 0.6

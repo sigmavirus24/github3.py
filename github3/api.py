@@ -289,8 +289,8 @@ def organizations_with(username, number=-1, etag=None):
     return gh.organizations_with(username, number, etag)
 
 
-def user_repos(login, type=None, sort=None, direction=None, number=-1,
-               etag=None):
+def repositories_by(login, type=None, sort=None, direction=None, number=-1,
+                    etag=None):
     """List public repositories for the specified ``login``.
 
     .. versionadded:: 0.6
@@ -316,7 +316,7 @@ def user_repos(login, type=None, sort=None, direction=None, number=-1,
 
     """
     if login:
-        return gh.user_repos(login, type, sort, direction, number, etag)
+        return gh.repositories_by(login, type, sort, direction, number, etag)
     return iter([])
 
 

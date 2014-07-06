@@ -555,9 +555,9 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_user_repos(self):
+    def test_repositories_by(self):
         """Test that one can iterate over a user's repositories."""
-        i = self.instance.user_repos('sigmavirus24')
+        i = self.instance.repositories_by('sigmavirus24')
 
         # Get the next item from the iterator
         self.get_next(i)
@@ -568,11 +568,11 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_user_repos_with_type(self):
+    def test_repositories_by_with_type(self):
         """
         Test that one can iterate over a user's repositories with a type.
         """
-        i = self.instance.user_repos('sigmavirus24', 'all')
+        i = self.instance.repositories_by('sigmavirus24', 'all')
 
         self.get_next(i)
 
