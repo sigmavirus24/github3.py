@@ -32,8 +32,9 @@ class TestAPI(unittest.TestCase):
 
     def test_authorize(self):
         args = ('login',  'password', ['scope'], 'note', 'url.com', '', '')
-        github3.authorize(*args)
-        self.gh.authorize.assert_called_once_with(*args)
+        with mock.patch('github3.api.GitHub') as gh:
+            github3.authorize(*args)
+            gh().authorize.assert_called_once_with(*args)
 
     def test_enterprise_login(self):
         args = ('login', 'password', None, 'https://url.com/', None)
