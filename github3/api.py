@@ -398,8 +398,8 @@ def octocat(say=None):
     return gh.octocat(say)
 
 
-def organization(login):
-    return gh.organization(login)
+def organization(name):
+    return gh.organization(name)
 organization.__doc__ = gh.organization.__doc__
 
 
