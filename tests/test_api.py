@@ -11,11 +11,6 @@ class TestAPI(TestCase):
     def tearDown(self):
         self.mock.stop()
 
-    def test_repository(self):
-        args = ('owner', 'repo')
-        github3.repository(*args)
-        self.gh.repository.assert_called_with(*args)
-
     def test_user(self):
         github3.user('login')
         self.gh.user.assert_called_with('login')
