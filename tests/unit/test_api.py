@@ -110,6 +110,10 @@ class TestAPI(unittest.TestCase):
                                                      'github3.py',
                                                      24)
 
+    def test_rate_limit(self):
+        github3.rate_limit()
+        self.gh.rate_limit.assert_called_once_with()
+
     def test_repository(self):
         github3.repository('sigmavirus24', 'github3.py')
         self.gh.repository.assert_called_once_with('sigmavirus24',

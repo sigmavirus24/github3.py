@@ -11,10 +11,6 @@ class TestAPI(TestCase):
     def tearDown(self):
         self.mock.stop()
 
-    def test_rate_limit(self):
-        github3.rate_limit()
-        self.gh.rate_limit.assert_called_once_with()
-
     def test_zen(self):
         github3.zen()
         assert self.gh.zen.called is True
