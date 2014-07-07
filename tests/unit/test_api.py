@@ -141,3 +141,7 @@ class TestAPI(unittest.TestCase):
     def test_user(self):
         github3.user('sigmavirus24')
         self.gh.user.assert_called_once_with('sigmavirus24')
+
+    def test_zen(self):
+        github3.zen()
+        assert self.gh.zen.called is True
