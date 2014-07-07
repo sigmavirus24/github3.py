@@ -121,6 +121,11 @@ class TestAPI(unittest.TestCase):
         github3.repository_issues(*args)
         self.gh.repository_issues.assert_called_with(*args)
 
+    def test_repositories_by(self):
+        args = ('login', None, None, None, -1, None)
+        github3.repositories_by('login')
+        self.gh.repositories_by.assert_called_with(*args)
+
     def test_starred(self):
         github3.starred_by('login')
         self.gh.starred_by.assert_called_with('login', -1, None)
@@ -128,8 +133,3 @@ class TestAPI(unittest.TestCase):
     def test_subcriptions_for(self):
         github3.subscriptions_for('login')
         self.gh.subscriptions_for.assert_called_with('login', -1, None)
-
-    def test_repositories_by(self):
-        args = ('login', None, None, None, -1, None)
-        github3.repositories_by('login')
-        self.gh.repositories_by.assert_called_with(*args)
