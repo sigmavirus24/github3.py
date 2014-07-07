@@ -11,11 +11,6 @@ class TestAPI(TestCase):
     def tearDown(self):
         self.mock.stop()
 
-    def test_pull_request(self):
-        args = ('owner', 'repo', 1)
-        github3.pull_request(*args)
-        self.gh.pull_request.assert_called_with(*args)
-
     def test_repository(self):
         args = ('owner', 'repo')
         github3.repository(*args)

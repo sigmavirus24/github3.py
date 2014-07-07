@@ -104,6 +104,12 @@ class TestAPI(unittest.TestCase):
         github3.organizations_with(*args)
         self.gh.organizations_with.assert_called_with(*args)
 
+    def test_pull_request(self):
+        github3.pull_request('sigmavirus24', 'github3.py', 24)
+        self.gh.pull_request.assert_called_once_with('sigmavirus24',
+                                                     'github3.py',
+                                                     24)
+
     def test_repository_issues(self):
         args = ('owner', 'repository', None, None, None, None, None, None,
                 None, None, -1, None)
