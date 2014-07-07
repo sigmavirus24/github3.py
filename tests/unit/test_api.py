@@ -93,7 +93,7 @@ class TestAPI(unittest.TestCase):
 
     def test_octocat(self):
         github3.octocat()
-        self.gh.octocat.assert_called_once_with()
+        self.gh.octocat.assert_called_once_with(None)
 
     def test_organization(self):
         github3.organization('orgname')
