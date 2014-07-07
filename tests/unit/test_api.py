@@ -133,3 +133,7 @@ class TestAPI(unittest.TestCase):
     def test_subcriptions_for(self):
         github3.subscriptions_for('login')
         self.gh.subscriptions_for.assert_called_with('login', -1, None)
+
+    def test_user(self):
+        github3.user('sigmavirus24')
+        self.gh.user.assert_called_once_with('sigmavirus24')

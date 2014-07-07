@@ -11,10 +11,6 @@ class TestAPI(TestCase):
     def tearDown(self):
         self.mock.stop()
 
-    def test_user(self):
-        github3.user('login')
-        self.gh.user.assert_called_with('login')
-
     def test_rate_limit(self):
         github3.rate_limit()
         self.gh.rate_limit.assert_called_once_with()
