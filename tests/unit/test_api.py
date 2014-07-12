@@ -1,3 +1,4 @@
+"""Unit tests for github3.api."""
 import github3
 import unittest
 
@@ -5,6 +6,7 @@ from .helper import mock
 
 
 class TestAPI(unittest.TestCase):
+    """All tests for the github3.api module."""
     def setUp(self):
         self.mocked_github = mock.patch('github3.api.gh',
                                         autospec=github3.GitHub)
