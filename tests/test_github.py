@@ -18,13 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_context_manager(self):
-        with github3.GitHub() as gh:
-            gh.__exit__ = mock.Mock()
-            assert isinstance(gh, github3.GitHub)
-
-        gh.__exit__.assert_called()
-
     def test_authorization(self):
         self.response('authorization')
         self.get('https://api.github.com/authorizations/10')

@@ -5,9 +5,8 @@ History/Changelog
 1.0.0: 2014-xx-xx
 ~~~~~~~~~~~~~~~~~
 
-1.0.0 is a huge release. It includes a great deal of changes to 
-``github3.py``.  It is suggested you read the following release notes *very* 
-carefully.
+1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
+It is suggested you read the following release notes *very* carefully.
 
 Breaking Changes
 ````````````````
@@ -121,6 +120,8 @@ Old name                           New name
     authenticated user
 
 - ``github3.ratelimit_remaining`` was removed
+
+- ``GitHub`` instances can no longer be used as context managers
 
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~

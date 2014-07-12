@@ -26,6 +26,7 @@ from uritemplate import URITemplate
 
 
 class GitHub(GitHubCore):
+
     """Stores all the session information.
 
     There are two ways to log into the GitHub API
@@ -49,6 +50,7 @@ class GitHub(GitHubCore):
     This is simple backward compatibility since originally there was no way to
     call the GitHub object with authentication parameters.
     """
+
     def __init__(self, login='', password='', token=''):
         super(GitHub, self).__init__({})
         if token:
@@ -60,12 +62,6 @@ class GitHub(GitHubCore):
         if self._session.auth:
             return '<GitHub [{0[0]}]>'.format(self._session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        pass
 
     @requires_basic_auth
     def authorization(self, id_num):
