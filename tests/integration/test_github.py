@@ -108,7 +108,7 @@ class TestGitHub(IntegrationHelper):
         assert t != ''
 
     def test_non_existent_gitignore_template(self):
-        """Test the ability to retrieve a single gitignore template"""
+        """Test the ability to retrieve a single gitignore template."""
         cassette_name = self.cassette_name('non_existent_gitignore_template')
         with self.recorder.use_cassette(cassette_name):
             t = self.gh.gitignore_template('i_donut_exist')
@@ -117,7 +117,7 @@ class TestGitHub(IntegrationHelper):
         assert t == ''
 
     def test_gitignore_templates(self):
-        """Test the ability to retrieve a list of gitignore templates"""
+        """Test the ability to retrieve a list of gitignore templates."""
         cassette_name = self.cassette_name('gitignore_templates')
         with self.recorder.use_cassette(cassette_name):
             l = self.gh.gitignore_templates()
@@ -126,7 +126,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(l, list)
 
     def test_issue(self):
-        """Test the ability to retrieve a single issue"""
+        """Test the ability to retrieve a single issue."""
         cassette_name = self.cassette_name('issue')
         with self.recorder.use_cassette(cassette_name):
             i = self.gh.issue('sigmavirus24', 'github3.py', 1)
@@ -134,28 +134,28 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(i, github3.issues.Issue)
 
     def test_all_repositories(self):
-        """Test the ability to iterate over all of the repositories"""
+        """Test the ability to iterate over all of the repositories."""
         cassette_name = self.cassette_name('iter_all_repos')
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.all_repositories(number=25):
                 assert isinstance(r, github3.repos.repo.Repository)
 
     def test_all_users(self):
-        """Test the ability to iterate over all of the users"""
+        """Test the ability to iterate over all of the users."""
         cassette_name = self.cassette_name('iter_all_users')
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.all_users(number=25):
                 assert isinstance(u, github3.users.User)
 
     def test_all_events(self):
-        """Test the ability to iterate over all public events"""
+        """Test the ability to iterate over all public events."""
         cassette_name = self.cassette_name('iter_events')
         with self.recorder.use_cassette(cassette_name):
             for e in self.gh.all_events(number=25):
                 assert isinstance(e, github3.events.Event)
 
     def test_followers_of(self):
-        """Test the ability to iterate over a user's followers"""
+        """Test the ability to iterate over a user's followers."""
         cassette_name = self.cassette_name('followers_of')
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.followers_of('sigmavirus24', number=25):
