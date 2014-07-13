@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+"""Integration tests for methods implemented on GitHub."""
 import github3
 import uritemplate
 
