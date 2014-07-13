@@ -19,10 +19,13 @@ SSH_KEY = (
 
 
 class TestGitHub(IntegrationHelper):
+
+    """GitHub integration tests."""
+
     match_on = ['method', 'uri', 'gh3-headers']
 
     def test_create_gist(self):
-        """Test the ability of a GitHub instance to create a new gist"""
+        """Test the ability of a GitHub instance to create a new gist."""
         self.token_login()
         cassette_name = self.cassette_name('create_gist')
         with self.recorder.use_cassette(cassette_name):
@@ -35,7 +38,7 @@ class TestGitHub(IntegrationHelper):
         assert g.is_public() is True
 
     def test_create_issue(self):
-        """Test the ability of a GitHub instance to create a new issue"""
+        """Test the ability of a GitHub instance to create a new issue."""
         self.token_login()
         cassette_name = self.cassette_name('create_issue')
         with self.recorder.use_cassette(cassette_name):
