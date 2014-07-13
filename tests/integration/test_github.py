@@ -247,7 +247,7 @@ class TestGitHub(IntegrationHelper):
                 assert isinstance(r, github3.repos.Repository)
 
     def test_search_code(self):
-        """Test the ability to use the code search endpoint"""
+        """Test the ability to use the code search endpoint."""
         cassette_name = self.cassette_name('search_code')
         with self.recorder.use_cassette(cassette_name):
             result_iterator = self.gh.search_code(
@@ -259,7 +259,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(code_result, github3.search.CodeSearchResult)
 
     def test_search_code_with_text_match(self):
-        """Test the ability to use the code search endpoint"""
+        """Test the ability to use the code search endpoint."""
         cassette_name = self.cassette_name('search_code_with_text_match')
         with self.recorder.use_cassette(cassette_name,
                                         match_requests_on=self.match_on):
@@ -274,7 +274,7 @@ class TestGitHub(IntegrationHelper):
         assert len(code_result.text_matches) > 0
 
     def test_search_users(self):
-        """Test the ability to use the user search endpoint"""
+        """Test the ability to use the user search endpoint."""
         cassette_name = self.cassette_name('search_users')
         with self.recorder.use_cassette(cassette_name):
             users = self.gh.search_users('tom followers:>1000')
@@ -284,7 +284,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(users, github3.structs.SearchIterator)
 
     def test_search_users_with_text_match(self):
-        """Test the ability to use the user search endpoint"""
+        """Test the ability to use the user search endpoint."""
         cassette_name = self.cassette_name('search_users_with_text_match')
         with self.recorder.use_cassette(cassette_name,
                                         match_requests_on=self.match_on):
@@ -298,7 +298,7 @@ class TestGitHub(IntegrationHelper):
         assert len(user_result.text_matches) > 0
 
     def test_search_issues(self):
-        """Test the ability to use the issues search endpoint"""
+        """Test the ability to use the issues search endpoint."""
         cassette_name = self.cassette_name('search_issues')
         with self.recorder.use_cassette(cassette_name):
             issues = self.gh.search_issues('github3 labels:bugs')
@@ -307,7 +307,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(issues, github3.structs.SearchIterator)
 
     def test_search_repositories(self):
-        """Test the ability to use the repository search endpoint"""
+        """Test the ability to use the repository search endpoint."""
         cassette_name = self.cassette_name('search_repositories')
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories('github3 language:python')
@@ -317,7 +317,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(repos, github3.structs.SearchIterator)
 
     def test_search_repositories_with_text_match(self):
-        """Test the ability to use the repository search endpoint"""
+        """Test the ability to use the repository search endpoint."""
         self.token_login()
         cassette_name = self.cassette_name('search_repositories_text_match')
         with self.recorder.use_cassette(cassette_name,
@@ -332,7 +332,7 @@ class TestGitHub(IntegrationHelper):
         assert len(repo_result.text_matches) > 0
 
     def test_user(self):
-        """Test the ability to retrieve a User"""
+        """Test the ability to retrieve a User."""
         self.token_login()
         cassette_name = self.cassette_name('user')
         with self.recorder.use_cassette(cassette_name):
@@ -344,7 +344,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(u, github3.users.User)
 
     def test_zen(self):
-        """Test the ability to retrieve tidbits of Zen"""
+        """Test the ability to retrieve tidbits of Zen."""
         cassette_name = self.cassette_name('zen')
         with self.recorder.use_cassette(cassette_name):
             z = self.gh.zen()
