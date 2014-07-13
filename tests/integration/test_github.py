@@ -164,6 +164,8 @@ class TestGitHub(IntegrationHelper):
     def test_followers(self):
         """
         Test the ability to iterate over an authenticated user's followers.
+
+        Show the difference between GitHub#followers_of and GitHub#followers.
         """
         self.basic_login()
         cassette_name = self.cassette_name('followers_auth')
