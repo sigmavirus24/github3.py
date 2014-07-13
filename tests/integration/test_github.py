@@ -174,7 +174,7 @@ class TestGitHub(IntegrationHelper):
                 assert isinstance(u, github3.users.User)
 
     def test_user_teams(self):
-        """Test the ability to iterate over a user's teams"""
+        """Test the ability to iterate over a user's teams."""
         self.basic_login()
         cassette_name = self.cassette_name('iter_user_teams')
         with self.recorder.use_cassette(cassette_name):
@@ -182,14 +182,14 @@ class TestGitHub(IntegrationHelper):
                 assert isinstance(t, github3.orgs.Team)
 
     def test_meta(self):
-        """Test the ability to get the CIDR formatted addresses"""
+        """Test the ability to get the CIDR formatted addresses."""
         cassette_name = self.cassette_name('meta')
         with self.recorder.use_cassette(cassette_name):
             m = self.gh.meta()
             assert isinstance(m, dict)
 
     def test_octocat(self):
-        """Test the ability to use the octocat endpoint"""
+        """Test the ability to use the octocat endpoint."""
         cassette_name = self.cassette_name('octocat')
         say = 'github3.py is awesome'
         with self.recorder.use_cassette(cassette_name):
@@ -200,7 +200,7 @@ class TestGitHub(IntegrationHelper):
             assert say in o.decode()
 
     def test_organization(self):
-        """Test the ability to retrieve an Organization"""
+        """Test the ability to retrieve an Organization."""
         cassette_name = self.cassette_name('organization')
         with self.recorder.use_cassette(cassette_name):
             o = self.gh.organization('github3py')
@@ -208,7 +208,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(o, github3.orgs.Organization)
 
     def test_pull_request(self):
-        """Test the ability to retrieve a Pull Request"""
+        """Test the ability to retrieve a Pull Request."""
         cassette_name = self.cassette_name('pull_request')
         with self.recorder.use_cassette(cassette_name):
             p = self.gh.pull_request('sigmavirus24', 'github3.py', 119)
@@ -224,7 +224,7 @@ class TestGitHub(IntegrationHelper):
         assert 'resources' in r
 
     def test_repository(self):
-        """Test the ability to retrieve a Repository"""
+        """Test the ability to retrieve a Repository."""
         cassette_name = self.cassette_name('repository')
         with self.recorder.use_cassette(cassette_name):
             r = self.gh.repository('sigmavirus24', 'github3.py')
