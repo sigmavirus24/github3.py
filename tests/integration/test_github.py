@@ -64,7 +64,7 @@ class TestGitHub(IntegrationHelper):
         assert k.key == SSH_KEY
 
     def test_emojis(self):
-        """Test the ability to retrieve from /emojis"""
+        """Test the ability to retrieve from /emojis."""
         cassette_name = self.cassette_name('emojis')
         with self.recorder.use_cassette(cassette_name):
             emojis = self.gh.emojis()
@@ -74,7 +74,7 @@ class TestGitHub(IntegrationHelper):
         assert emojis['+1'].startswith('https://github')
 
     def test_feeds(self):
-        """Test the ability to retrieve a user's timelime URLs"""
+        """Test the ability to retrieve a user's timelime URLs."""
         self.basic_login()
         cassette_name = self.cassette_name('feeds')
         with self.recorder.use_cassette(cassette_name):
@@ -91,7 +91,7 @@ class TestGitHub(IntegrationHelper):
             assert isinstance(v, uritemplate.URITemplate)
 
     def test_gist(self):
-        """Test the ability to retrieve a single gist"""
+        """Test the ability to retrieve a single gist."""
         cassette_name = self.cassette_name('gist')
         with self.recorder.use_cassette(cassette_name):
             g = self.gh.gist(7160899)
@@ -99,7 +99,7 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(g, github3.gists.Gist)
 
     def test_gitignore_template(self):
-        """Test the ability to retrieve a single gitignore template"""
+        """Test the ability to retrieve a single gitignore template."""
         cassette_name = self.cassette_name('gitignore_template')
         with self.recorder.use_cassette(cassette_name):
             t = self.gh.gitignore_template('Python')
