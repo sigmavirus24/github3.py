@@ -30,10 +30,12 @@ class TestGitHub(UnitHelper):
             self.instance.authorization(1)
 
     def test_two_factor_login(self):
+        """Test the ability to pass two_factor_callback."""
         self.instance.login('username', 'password',
                             two_factor_callback=lambda *args: 'foo')
 
     def test_can_login_without_two_factor_callback(self):
+        """Test that two_factor_callback is not required."""
         self.instance.login('username', 'password')
         self.instance.login(token='token')
 
