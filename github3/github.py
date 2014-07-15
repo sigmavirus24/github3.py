@@ -78,8 +78,10 @@ class GitHub(GitHubCore):
 
     def authorize(self, login, password, scopes=None, note='', note_url='',
                   client_id='', client_secret=''):
-        """Obtain an authorization token from the GitHub API for the GitHub
-        API.
+        """Obtain an authorization token.
+
+        The retrieved token will allow future consumers to use the API without
+        a login and password.
 
         :param str login: (required)
         :param str password: (required)
@@ -94,21 +96,15 @@ class GitHub(GitHubCore):
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
-        # TODO: Break this behaviour in 1.0 (Don't rely on self._session.auth)
-        auth = None
-        if self._session.auth:
-            auth = self._session.auth
-        elif login and password:
-            auth = (login, password)
 
-        if auth:
+        if login and password:
             url = self._build_url('authorizations')
             data = {'note': note, 'note_url': note_url,
                     'client_id': client_id, 'client_secret': client_secret}
             if scopes:
                 data['scopes'] = scopes
 
-            with self._session.temporary_basic_auth(*auth):
+            with self._session.temporary_basic_auth(login, password):
                 json = self._json(self._post(url, data=data), 201)
 
         return Authorization(json, self) if json else None
