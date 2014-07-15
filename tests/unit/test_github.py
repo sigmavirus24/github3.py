@@ -14,6 +14,21 @@ class TestGitHub(UnitHelper):
     described_class = GitHub
     example_data = None
 
+    def test_authorization(self):
+        """Show that a user can retrieve a specific authorization by id."""
+        self.instance.authorization(10)
+
+        self.session.get.assert_called_once_with(
+            url_for('authorizations/10'),
+        )
+
+    def test_authorization_requires_auth(self):
+        """A user must be authenticated to retrieve an authorization."""
+        self.session.auth = None
+
+        with pytest.raises(GitHubError):
+            self.instance.authorization(1)
+
     def test_two_factor_login(self):
         self.instance.login('username', 'password',
                             two_factor_callback=lambda *args: 'foo')
