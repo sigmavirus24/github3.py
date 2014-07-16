@@ -7,6 +7,7 @@ from .helper import UnitHelper, UnitIteratorHelper
 
 
 def url_for(path=''):
+    """Simple function to generate URLs with the base GitHub URL."""
     return 'https://api.github.com/' + path.strip('/')
 
 
