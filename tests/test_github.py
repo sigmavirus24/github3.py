@@ -18,22 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_check_authorization(self):
-        self.response('', 200)
-        self.get('https://api.github.com/applications/fake_id/tokens/'
-                 'access_token')
-        self.conf = {
-            'params': {'client_id': None, 'client_secret': None},
-            'auth': ('fake_id', 'fake_secret'),
-        }
-
-        assert self.g.check_authorization(None) is False
-        self.not_called()
-
-        self.g.set_client_id('fake_id', 'fake_secret')
-        assert self.g.check_authorization('access_token')
-        self.mock_assertions()
-
     def test_create_gist(self):
         self.response('gist', 201)
 
