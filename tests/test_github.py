@@ -18,22 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_authorize(self):
-        self.response('authorization', 201)
-        scopes = ['scope1', 'scope2']
-
-        self.g.authorize(None, None, scopes)
-        self.not_called()
-
-        a = self.g.authorize('user', 'password', scopes)
-        assert isinstance(a, github3.auths.Authorization)
-        assert self.request.called is True
-
-        self.request.reset_mock()
-
-        self.login()
-        a = self.g.authorize(None, None, scopes=scopes)
-
     def test_check_authorization(self):
         self.response('', 200)
         self.get('https://api.github.com/applications/fake_id/tokens/'
