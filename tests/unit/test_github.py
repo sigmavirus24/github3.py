@@ -29,6 +29,19 @@ class TestGitHub(UnitHelper):
         with pytest.raises(GitHubError):
             self.instance.authorization(1)
 
+    def test_authorize(self):
+        """Show an authorization can be created for a user."""
+        self.instance.authorize('username', 'password', ['user', 'repo'])
+
+        self.session.temporary_basic_auth.assert_called_once_with(
+            'username', 'password'
+        )
+        self.post_called_with(
+            url_for('authorizations'),
+            data={'note': '', 'note_url': '', 'client_id': '',
+                  'client_secret': '', 'scopes': ['user', 'repo']}
+        )
+
     def test_two_factor_login(self):
         """Test the ability to pass two_factor_callback."""
         self.instance.login('username', 'password',
