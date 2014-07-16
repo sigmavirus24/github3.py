@@ -43,6 +43,17 @@ class TestGitHub(UnitHelper):
                   'client_secret': '', 'scopes': ['user', 'repo']}
         )
 
+    def test_check_authorization(self):
+        """Test an app's ability to check a authorization token."""
+        self.instance.set_client_id('client-id', 'client-secret')
+        self.instance.check_authorization('super-fake-access-token')
+
+        self.session.get.assert_called_once_with(
+            url_for('applications/client-id/tokens/super-fake-access-token'),
+            params={'client_id': None, 'client_secret': None},
+            auth=('client-id', 'client-secret')
+        )
+
     def test_two_factor_login(self):
         """Test the ability to pass two_factor_callback."""
         self.instance.login('username', 'password',
