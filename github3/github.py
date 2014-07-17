@@ -110,7 +110,9 @@ class GitHub(GitHubCore):
         return Authorization(json, self) if json else None
 
     def check_authorization(self, access_token):
-        """OAuth applications can use this method to check token validity
+        """Check an authorization created by a registered application.
+
+        OAuth applications can use this method to check token validity
         without hitting normal rate limits because of failed login attempts.
         If the token is valid, it will return True, otherwise it will return
         False.
