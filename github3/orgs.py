@@ -396,7 +396,7 @@ class Organization(BaseAccount):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_public_members(self, number=-1, etag=None):
+    def public_members(self, number=-1, etag=None):
         """Iterate over public members of this organization.
 
         :param int number: (optional), number of members to return. Default:

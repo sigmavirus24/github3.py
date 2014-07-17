@@ -27,3 +27,14 @@ class TestOrganizationIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_public_members(self):
+        """Show that one can iterate over all public members."""
+        i = self.instance.public_members()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('public_members'),
+            params={'per_page': 100},
+            headers={}
+        )

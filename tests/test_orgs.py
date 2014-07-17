@@ -268,14 +268,6 @@ class TestOrganization(BaseCase):
         assert isinstance(next(self.org.iter_events()), github3.events.Event)
         self.mock_assertions()
 
-    def test_iter_public_members(self):
-        self.response('user', _iter=True)
-        self.get(self.api + '/public_members')
-
-        assert isinstance(next(self.org.iter_public_members()),
-                          github3.users.User)
-        self.mock_assertions()
-
     def test_iter_repos(self):
         self.response('repo', _iter=True)
         self.get(self.api + '/repos')
