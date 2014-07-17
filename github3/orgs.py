@@ -384,7 +384,7 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_members(self, number=-1, etag=None):
+    def members(self, number=-1, etag=None):
         """Iterate over members of this organization.
 
         :param int number: (optional), number of members to return. Default:
