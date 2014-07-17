@@ -84,11 +84,11 @@ class TestTeam(BaseCase):
         assert self.team.is_member('user') is False
         self.mock_assertions()
 
-    def test_iter_members(self):
+    def test_members(self):
         self.response('user', _iter=True)
         self.get(self.api + '/members')
 
-        assert isinstance(next(self.team.iter_members()), github3.users.User)
+        assert isinstance(next(self.team.members()), github3.users.User)
         self.mock_assertions()
 
     def test_iter_repos(self):

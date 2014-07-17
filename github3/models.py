@@ -195,12 +195,12 @@ class GitHubCore(GitHubObject):
 
         The reasoning for the return value is the following example: ::
 
-            repos = [r.refresh() for r in g.iter_repos('kennethreitz')]
+            repos = [r.refresh() for r in g.repositories_by('kennethreitz')]
 
         Without the return value, that would be an array of ``None``'s and you
         would otherwise have to do: ::
 
-            repos = [r for i in g.iter_repos('kennethreitz')]
+            repos = [r for i in g.repositories_by('kennethreitz')]
             [r.refresh() for r in repos]
 
         Which is really an anti-pattern.

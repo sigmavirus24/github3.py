@@ -44,6 +44,7 @@ Old name                           New name
 ``GitHub#iter_repos``              ``GitHub#reposistories``
 ``GitHub#iter_user_repos``         ``GitHub#repositories_by``
 ``GitHub#iter_user_teams``         ``GitHub#user_teams``
+``Organization#iter_members``      ``Organization#members``
 
 ==============================     ==============================================
 
