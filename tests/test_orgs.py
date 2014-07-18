@@ -268,24 +268,6 @@ class TestOrganization(BaseCase):
         assert isinstance(next(self.org.iter_events()), github3.events.Event)
         self.mock_assertions()
 
-    def test_iter_repos(self):
-        self.response('repo', _iter=True)
-        self.get(self.api + '/repos')
-        self.conf = {'params': {'per_page': 100}}
-
-        assert isinstance(next(self.org.iter_repos()),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
-        assert isinstance(next(self.org.iter_repos('foo')),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
-        self.conf['params'] = {'type': 'all', 'per_page': 100}
-        assert isinstance(next(self.org.iter_repos('all')),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
     def test_iter_teams(self):
         self.response('team', _iter=True)
         self.get(self.api + '/teams')

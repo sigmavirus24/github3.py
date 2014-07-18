@@ -408,7 +408,7 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_repos(self, type='', number=-1, etag=None):
+    def repositories(self, type='', number=-1, etag=None):
         """Iterate over repos for this organization.
 
         :param str type: (optional), accepted values:

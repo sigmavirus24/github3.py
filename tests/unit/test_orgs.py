@@ -38,3 +38,25 @@ class TestOrganizationIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_repositories(self):
+        """Show that one can iterate over an organization's repositories."""
+        i = self.instance.repositories()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('repos'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_respositories_accepts_type(self):
+        """Show that one can pass a repository type."""
+        i = self.instance.repositories('all')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('repos'),
+            params={'type': 'all', 'per_page': 100},
+            headers={}
+        )
