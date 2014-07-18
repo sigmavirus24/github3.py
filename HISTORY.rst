@@ -1,4 +1,5 @@
 .. vim: set tw=100
+
 History/Changelog
 -----------------
 
@@ -46,6 +47,7 @@ Old name                                 New name
 ``GitHub#iter_user_teams``               ``GitHub#user_teams``
 ``Organization#iter_members``            ``Organization#members``
 ``Organization#iter_public_members``     ``Organization#public_members``
+``Organization#iter_repos``              ``Organization#repositories``
 
 ====================================     ==============================================
 
