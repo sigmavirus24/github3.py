@@ -223,7 +223,7 @@ class Organization(BaseAccount):
         :param str team: (required), team name
         :returns: bool
         """
-        for t in self.iter_teams():
+        for t in self.teams():
             if team == t.name:
                 return t.add_member(login)
         return False
@@ -242,7 +242,7 @@ class Organization(BaseAccount):
         :param str repo: (required), form: 'user/repo'
         :param str team: (required), team name
         """
-        for t in self.iter_teams():
+        for t in self.teams():
             if team == t.name:
                 return t.add_repo(repo)
         return False
@@ -427,7 +427,7 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
-    def iter_teams(self, number=-1, etag=None):
+    def teams(self, number=-1, etag=None):
         """Iterate over teams that are part of this organization.
 
         :param int number: (optional), number of teams to return. Default: -1
@@ -466,7 +466,7 @@ class Organization(BaseAccount):
         :param str team: (required)
         :returns: bool
         """
-        for t in self.iter_teams():
+        for t in self.teams():
             if team == t.name:
                 return t.remove_repo(repo)
         return False

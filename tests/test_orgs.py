@@ -145,7 +145,7 @@ class TestOrganization(BaseCase):
         self.assertRaises(github3.GitHubError, self.org.add_member, None, None)
 
         self.login()
-        with mock.patch.object(github3.orgs.Organization, 'iter_teams') as it:
+        with mock.patch.object(github3.orgs.Organization, 'teams') as it:
             it.return_value = iter([])
             assert self.org.add_member('foo', 'bar') is False
             team = mock.Mock()
@@ -159,7 +159,7 @@ class TestOrganization(BaseCase):
         self.assertRaises(github3.GitHubError, self.org.add_repo, None, None)
 
         self.login()
-        with mock.patch.object(github3.orgs.Organization, 'iter_teams') as it:
+        with mock.patch.object(github3.orgs.Organization, 'teams') as it:
             it.return_value = iter([])
             assert self.org.add_repo('foo', 'bar') is False
             team = mock.Mock()
@@ -268,17 +268,6 @@ class TestOrganization(BaseCase):
         assert isinstance(next(self.org.iter_events()), github3.events.Event)
         self.mock_assertions()
 
-    def test_iter_teams(self):
-        self.response('team', _iter=True)
-        self.get(self.api + '/teams')
-
-        self.assertRaises(github3.GitHubError, self.org.iter_teams)
-
-        self.not_called()
-        self.login()
-        assert isinstance(next(self.org.iter_teams()), github3.orgs.Team)
-        self.mock_assertions()
-
     def test_publicize_member(self):
         self.response('', 204)
         self.put(self.api + '/public_members/user')
@@ -306,7 +295,7 @@ class TestOrganization(BaseCase):
                           None, None)
 
         self.login()
-        with mock.patch.object(github3.orgs.Organization, 'iter_teams') as it:
+        with mock.patch.object(github3.orgs.Organization, 'teams') as it:
             it.return_value = iter([])
             assert self.org.remove_repo('foo', 'bar') is False
             team = mock.Mock()

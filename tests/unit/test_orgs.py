@@ -1,3 +1,6 @@
+import pytest
+
+from github3 import GitHubError
 from github3.orgs import Organization
 
 from .helper import UnitIteratorHelper
@@ -60,3 +63,21 @@ class TestOrganizationIterator(UnitIteratorHelper):
             params={'type': 'all', 'per_page': 100},
             headers={}
         )
+
+    def test_teams(self):
+        """Show that one can iterate over an organization's teams."""
+        i = self.instance.teams()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('teams'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_teams_requires_auth(self):
+        """Show that one must be authenticated to retrieve an org's teams."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.teams()
