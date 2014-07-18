@@ -133,7 +133,7 @@ class Team(GitHubCore):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_repos(self, number=-1, etag=None):
+    def repositories(self, number=-1, etag=None):
         """Iterate over the repositories this team has access to.
 
         :param int number: (optional), number of repos to iterate over.

@@ -49,6 +49,8 @@ Old name                                 New name
 ``Organization#iter_public_members``     ``Organization#public_members``
 ``Organization#iter_repos``              ``Organization#repositories``
 ``Organization#iter_teams``              ``Organization#teams``
+``Team#iter_members``                    ``Team#members``
+``Team#iter_repos``                      ``Team#repositories``
 
 ====================================     ==============================================
 

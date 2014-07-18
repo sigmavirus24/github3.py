@@ -91,14 +91,6 @@ class TestTeam(BaseCase):
         assert isinstance(next(self.team.members()), github3.users.User)
         self.mock_assertions()
 
-    def test_iter_repos(self):
-        self.response('repo', _iter=True)
-        self.get(self.api + '/repos')
-
-        assert isinstance(next(self.team.iter_repos()),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
     def test_remove_member(self):
         self.response('', 204)
         self.delete(self.api + '/members/user')
