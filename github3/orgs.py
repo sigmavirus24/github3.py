@@ -249,19 +249,14 @@ class Organization(BaseAccount):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def create_repo(self,
-                    name,
-                    description='',
-                    homepage='',
-                    private=False,
-                    has_issues=True,
-                    has_wiki=True,
-                    has_downloads=True,
-                    team_id=0,
-                    auto_init=False,
-                    gitignore_template=''):
-        """Create a repository for this organization if the authenticated user
-        is a member.
+    def create_repository(self, name, description='', homepage='',
+                          private=False, has_issues=True, has_wiki=True,
+                          team_id=0, auto_init=False, gitignore_template='',
+                          license_template=''):
+        """Create a repository for this organization.
+
+        If the client is authenticated and a member of the organization, this
+        will create a new repository in the organization.
 
         :param str name: (required), name of the repository
         :param str description: (optional)
@@ -287,9 +282,9 @@ class Organization(BaseAccount):
         data = {'name': name, 'description': description,
                 'homepage': homepage, 'private': private,
                 'has_issues': has_issues, 'has_wiki': has_wiki,
-                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'license_template': license_template, 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
-        if team_id > 0:
+        if int(team_id) > 0:
             data.update({'team_id': team_id})
         json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None

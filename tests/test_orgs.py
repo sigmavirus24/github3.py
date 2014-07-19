@@ -121,32 +121,6 @@ class TestOrganization(BaseCase):
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
 
-    def test_create_repo(self):
-        self.response('repo', 201)
-        self.post(self.api + '/repos')
-        self.conf = {
-            'data': {
-                'name': 'repo',
-                'description': 'desc',
-                'homepage': '',
-                'private': False,
-                'has_issues': True,
-                'has_wiki': True,
-                'has_downloads': True,
-                'auto_init': False,
-                'team_id': 1,
-                'gitignore_template': '',
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.org.create_repo, None)
-
-        self.not_called()
-        self.login()
-        assert isinstance(self.org.create_repo('repo', 'desc', team_id=1),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
     def test_conceal_member(self):
         self.response('', 204)
         self.delete(self.api + '/public_members/user')

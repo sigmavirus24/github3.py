@@ -64,6 +64,33 @@ class TestOrganization(UnitHelper):
         with pytest.raises(GitHubError):
             self.instance.add_repository('foo', 10)
 
+    def test_create_repository(self):
+        """Show that one can create a repository in an organization."""
+        self.instance.create_repository('repo-name', 'description', team_id=1)
+
+        self.post_called_with(
+            url_for('repos'),
+            data={
+                'name': 'repo-name',
+                'description': 'description',
+                'homepage': '',
+                'private': False,
+                'has_issues': True,
+                'has_wiki': True,
+                'auto_init': False,
+                'team_id': 1,
+                'gitignore_template': '',
+                'license_template': ''
+            }
+        )
+
+    def test_create_repository_requires_auth(self):
+        """Show that one must be authenticated to create a repo for an org."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.create_repository('foo')
+
 
 class TestOrganizationIterator(UnitIteratorHelper):
     described_class = Organization
