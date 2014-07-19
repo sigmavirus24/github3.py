@@ -159,13 +159,13 @@ class Team(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def remove_repo(self, repo):
-        """Remove ``repo`` from this team.
+    def remove_repository(self, repository):
+        """Remove ``repository`` from this team.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :returns: bool
         """
-        url = self._build_url('repos', repo, base_url=self._api)
+        url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
 

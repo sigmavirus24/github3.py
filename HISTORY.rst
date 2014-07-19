@@ -139,6 +139,9 @@ Old name                                 New name
   ``Organization#create_repository``. It no longer accepts ``has_downloads``.
   It now accepts ``license_template``.
 
+- ``Organization#remove_repo`` has been renamed to
+  ``Organization#remove_repository``.
+
 - ``github3.ratelimit_remaining`` was removed
 
 - ``GitHub`` instances can no longer be used as context managers
