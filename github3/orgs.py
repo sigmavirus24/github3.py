@@ -189,8 +189,7 @@ class Organization(BaseAccount):
 
     def __init__(self, org, session=None):
         super(Organization, self).__init__(org, session)
-        if not self.type:
-            self.type = 'Organization'
+        self.type = self.type or 'Organization'
 
         #: Events url (not a template)
         self.events_url = org.get('events_url')
