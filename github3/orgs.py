@@ -245,8 +245,7 @@ class Organization(BaseAccount):
         if int(team_id) < 0:
             return False
 
-        url = self._build_url('teams', str(team_id), 'members',
-                              str(repository))
+        url = self._build_url('teams', str(team_id), 'repos', str(repository))
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
