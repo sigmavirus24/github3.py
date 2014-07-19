@@ -267,12 +267,12 @@ class Organization(BaseAccount):
             this repository. API default: ``True``
         :param bool has_wiki: (optional), If ``True``, enable the wiki for
             this repository. API default: ``True``
-        :param bool has_downloads: (optional), If ``True``, enable downloads
-            for this repository. API default: ``True``
         :param int team_id: (optional), id of the team that will be granted
             access to this repository
         :param bool auto_init: (optional), auto initialize the repository.
         :param str gitignore_template: (optional), name of the template; this
+            is ignored if auto_int = False.
+        :param str license_template: (optional), name of the license; this
             is ignored if auto_int = False.
         :returns: :class:`Repository <github3.repos.Repository>`
 
