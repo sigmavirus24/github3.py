@@ -12,6 +12,12 @@ It is suggested you read the following release notes *very* carefully.
 Breaking Changes
 ````````````````
 
+- ``Organization#add_member`` has been changed. The second parameter has been
+  changed to ``team_id`` and now expects an integer.
+
+- ``Organization#add_repository`` has been changed. The second parameter has been
+  changed to ``team_id`` and now expects an integer.
+
 - All methods and functions starting with ``iter_`` have been renamed.
 
 ====================================     ==============================================
@@ -125,6 +131,9 @@ Old name                                 New name
 
   - ``Repository#ignore`` ignores notifications from the repository for the 
     authenticated user
+
+- ``Organization#add_repo`` and ``Team#add_repo`` have been renamed to
+  ``Organization#add_repository`` and ``Team#add_repository`` respectively.
 
 - ``github3.ratelimit_remaining`` was removed
 

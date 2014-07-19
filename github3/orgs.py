@@ -70,13 +70,13 @@ class Team(GitHubCore):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_repo(self, repo):
+    def add_repository(self, repository):
         """Add ``repo`` to this team.
 
         :param str repo: (required), form: 'user/repo'
         :returns: bool
         """
-        url = self._build_url('repos', repo, base_url=self._api)
+        url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
@@ -206,46 +206,48 @@ class Organization(BaseAccount):
         self.repos_url = org.get('repos_url')
 
     @requires_auth
-    def add_member(self, login, team):
+    def add_member(self, login, team_id):
         """Add ``login`` to ``team`` and thereby to this organization.
 
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
 
-        .. note::
-            This method is of complexity O(n). This iterates over all teams in
-            your organization and only adds the user when the team name
-            matches the team parameter above. If you want constant time, you
-            should retrieve the team and call ``add_member`` on that team
-            directly.
+        .. versionchanged:: 1.0
+
+            The second parameter used to be ``team`` but has been changed to
+            ``team_id``. This parameter is now required to be an integer to
+            improve performance of this method.
 
         :param str login: (required), login name of the user to be added
-        :param str team: (required), team name
+        :param int team_id: (required), team id
         :returns: bool
         """
-        for t in self.teams():
-            if team == t.name:
-                return t.add_member(login)
-        return False
+        if int(team_id, base=10) < 0:
+            return False
+
+        url = self._build_url('teams', str(team_id), 'members', str(login))
+        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_repo(self, repo, team):
-        """Add ``repo`` to ``team``.
+    def add_repository(self, repository, team_id):
+        """Add ``repository`` to ``team``.
 
-        .. note::
-            This method is of complexity O(n). This iterates over all teams in
-            your organization and only adds the repo when the team name
-            matches the team parameter above. If you want constant time, you
-            should retrieve the team and call ``add_repo`` on that team
-            directly.
+        .. versionchanged:: 1.0
+
+            The second parameter used to be ``team`` but has been changed to
+            ``team_id``. This parameter is now required to be an integer to
+            improve performance of this method.
 
         :param str repo: (required), form: 'user/repo'
-        :param str team: (required), team name
+        :param int team_id: (required), team id
+        :returns: bool
         """
-        for t in self.teams():
-            if team == t.name:
-                return t.add_repo(repo)
-        return False
+        if int(team_id, base=10) < 0:
+            return False
+
+        url = self._build_url('teams', str(team_id), 'members',
+                              str(repository))
+        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
     def create_repo(self,
