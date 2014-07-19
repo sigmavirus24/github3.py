@@ -222,7 +222,7 @@ class Organization(BaseAccount):
         :param int team_id: (required), team id
         :returns: bool
         """
-        if int(team_id, base=10) < 0:
+        if int(team_id) < 0:
             return False
 
         url = self._build_url('teams', str(team_id), 'members', str(login))
@@ -242,7 +242,7 @@ class Organization(BaseAccount):
         :param int team_id: (required), team id
         :returns: bool
         """
-        if int(team_id, base=10) < 0:
+        if int(team_id) < 0:
             return False
 
         url = self._build_url('teams', str(team_id), 'members',
