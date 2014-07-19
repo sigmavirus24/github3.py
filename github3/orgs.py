@@ -291,12 +291,13 @@ class Organization(BaseAccount):
         return Repository(json, self) if json else None
 
     @requires_auth
-    def conceal_member(self, login):
-        """Conceal ``login``'s membership in this organization.
+    def conceal_member(self, username):
+        """Conceal ``username``'s membership in this organization.
 
+        :param str username: username of the organization member to conceal
         :returns: bool
         """
-        url = self._build_url('public_members', login, base_url=self._api)
+        url = self._build_url('public_members', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
