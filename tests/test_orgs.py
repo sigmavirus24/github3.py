@@ -33,18 +33,6 @@ class TestTeam(BaseCase):
         assert self.team.add_member('foo')
         self.mock_assertions()
 
-    def test_add_repo(self):
-        self.response('', 204)
-        self.put(self.api + '/repos/repo')
-        self.conf = {'data': None}
-
-        self.assertRaises(github3.GitHubError, self.team.add_repo, 'repo')
-
-        self.not_called()
-        self.login()
-        assert self.team.add_repo('repo')
-        self.mock_assertions()
-
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
@@ -132,34 +120,6 @@ class TestOrganization(BaseCase):
         del json['type']
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
-
-    def test_add_member(self):
-        self.assertRaises(github3.GitHubError, self.org.add_member, None, None)
-
-        self.login()
-        with mock.patch.object(github3.orgs.Organization, 'teams') as it:
-            it.return_value = iter([])
-            assert self.org.add_member('foo', 'bar') is False
-            team = mock.Mock()
-            team.name = 'bar'
-            team.add_member.return_value = True
-            it.return_value = iter([team])
-            assert self.org.add_member('foo', 'bar')
-            team.add_member.assert_called_once_with('foo')
-
-    def test_add_repo(self):
-        self.assertRaises(github3.GitHubError, self.org.add_repo, None, None)
-
-        self.login()
-        with mock.patch.object(github3.orgs.Organization, 'teams') as it:
-            it.return_value = iter([])
-            assert self.org.add_repo('foo', 'bar') is False
-            team = mock.Mock()
-            team.name = 'bar'
-            team.add_repo.return_value = True
-            it.return_value = iter([team])
-            assert self.org.add_repo('foo', 'bar')
-            team.add_repo.assert_called_once_with('foo')
 
     def test_create_repo(self):
         self.response('repo', 201)
