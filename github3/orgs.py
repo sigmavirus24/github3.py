@@ -149,13 +149,13 @@ class Team(GitHubCore):
         return self._iter(int(number), url, Repository, etag=etag)
 
     @requires_auth
-    def remove_member(self, login):
-        """Remove ``login`` from this team.
+    def remove_member(self, username):
+        """Remove ``username`` from this team.
 
-        :param str login: (required), login of the member to remove
+        :param str username: (required), username of the member to remove
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
