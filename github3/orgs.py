@@ -73,9 +73,9 @@ class Team(GitHubCore):
 
     @requires_auth
     def add_repository(self, repository):
-        """Add ``repo`` to this team.
+        """Add ``repository`` to this team.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :returns: bool
         """
         url = self._build_url('repos', repository, base_url=self._api)
