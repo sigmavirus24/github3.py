@@ -372,7 +372,7 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', login, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_events(self, number=-1, etag=None):
+    def events(self, number=-1, etag=None):
         """Iterate over events for this org.
 
         :param int number: (optional), number of events to return. Default: -1

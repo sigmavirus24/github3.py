@@ -253,13 +253,6 @@ class TestOrganization(BaseCase):
         assert self.org.is_public_member('user') is True
         self.mock_assertions()
 
-    def test_iter_events(self):
-        self.response('event', _iter=True)
-        self.get(self.api + '/events')
-
-        assert isinstance(next(self.org.iter_events()), github3.events.Event)
-        self.mock_assertions()
-
     def test_publicize_member(self):
         self.response('', 204)
         self.put(self.api + '/public_members/user')

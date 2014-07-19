@@ -20,6 +20,17 @@ class TestOrganizationIterator(UnitIteratorHelper):
         'url': url_for()
     }
 
+    def test_events(self):
+        """Show that one can iterate over an organization's events."""
+        i = self.instance.events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_members(self):
         """Show that one can iterate over all members."""
         i = self.instance.members()
