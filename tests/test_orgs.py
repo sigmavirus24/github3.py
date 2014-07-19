@@ -90,17 +90,6 @@ class TestTeam(BaseCase):
         assert self.team.remove_member('user')
         self.mock_assertions()
 
-    def test_remove_repo(self):
-        self.response('', 204)
-        self.delete(self.api + '/repos/repo')
-
-        self.assertRaises(github3.GitHubError, self.team.remove_repo, None)
-
-        self.not_called()
-        self.login()
-        assert self.team.remove_repo('repo')
-        self.mock_assertions()
-
 
 class TestOrganization(BaseCase):
     def __init__(self, methodName='runTest'):
