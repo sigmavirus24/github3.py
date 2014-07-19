@@ -239,7 +239,7 @@ class Organization(BaseAccount):
             ``team_id``. This parameter is now required to be an integer to
             improve performance of this method.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :param int team_id: (required), team id
         :returns: bool
         """
