@@ -69,3 +69,15 @@ class TestOrganization(IntegrationHelper):
             assert o.conceal_member(public_member) is True
             # Re-publicize their membership
             assert o.publicize_member(public_member) is True
+
+    def test_create_team(self):
+        """Test teh ability to create a new team."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_team')
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            t = o.create_team('temp-team')
+            assert isinstance(t, github3.orgs.Team)
+            assert t.delete() is True
