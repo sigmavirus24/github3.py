@@ -91,3 +91,12 @@ class TestOrganization(IntegrationHelper):
             assert isinstance(o, github3.orgs.Organization)
 
             assert o.edit(location='Madison, WI') is True
+
+    def test_is_member(self):
+        """Test the ability to check if a User is a member of the org."""
+        cassette_name = self.cassette_name('is_member')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            assert o.is_member('sigmavirus24') is True
