@@ -302,8 +302,9 @@ class Organization(BaseAccount):
 
     @requires_auth
     def create_team(self, name, repo_names=[], permission=''):
-        """Assuming the authenticated user owns this organization,
-        create and return a new team.
+        """Create a new team and return it.
+
+        This only works if the authenticated user owns this organization.
 
         :param str name: (required), name to be given to the team
         :param list repo_names: (optional) repositories, e.g.
