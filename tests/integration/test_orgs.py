@@ -81,3 +81,13 @@ class TestOrganization(IntegrationHelper):
             t = o.create_team('temp-team')
             assert isinstance(t, github3.orgs.Team)
             assert t.delete() is True
+
+    def test_edit(self):
+        """Test the ability to edit an organization."""
+        self.basic_login()
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            assert o.edit(location='Madison, WI') is True
