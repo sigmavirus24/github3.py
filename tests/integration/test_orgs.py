@@ -40,3 +40,15 @@ class TestOrganization(IntegrationHelper):
                 assert False, 'Could not find team'
 
             assert o.add_repository('github3py/urllib3', team.id) is True
+
+    def test_create_repository(self):
+        """Test the ability to create a repository in an organization."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_repository')
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            r = o.create_repository('test-repository', description='hi')
+            assert isinstance(r, github3.repos.Repository)
+            assert r.delete() is True
