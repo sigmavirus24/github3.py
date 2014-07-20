@@ -52,3 +52,20 @@ class TestOrganization(IntegrationHelper):
             r = o.create_repository('test-repository', description='hi')
             assert isinstance(r, github3.repos.Repository)
             assert r.delete() is True
+
+    def test_conceal_member(self):
+        """Test the ability to conceal a User's membership."""
+        self.basic_login()
+        cassette_name = self.cassette_name('conceal_member')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            # Get a public member of the organization
+            public_member = next(o.public_members())
+            assert isinstance(public_member, github3.users.User)
+
+            # Conceal their membership
+            assert o.conceal_member(public_member) is True
+            # Re-publicize their membership
+            assert o.publicize_member(public_member) is True
