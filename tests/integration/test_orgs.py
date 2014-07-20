@@ -109,3 +109,13 @@ class TestOrganization(IntegrationHelper):
             assert isinstance(o, github3.orgs.Organization)
 
             assert o.is_public_member('defunkt') is False
+
+    def test_events(self):
+        """Test the ability to retrieve an organization's event stream."""
+        cassette_name = self.cassette_name('events')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            for event in o.events():
+                assert isinstance(event, github3.events.Event)
