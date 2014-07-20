@@ -91,6 +91,27 @@ class TestOrganization(UnitHelper):
         with pytest.raises(GitHubError):
             self.instance.create_repository('foo')
 
+    def test_remove_repository(self):
+        """Show that one can remove a repository from a team."""
+        self.instance.remove_repository('repo-name', 10)
+
+        self.session.delete.assert_called_once_with(
+            'https://api.github.com/teams/10/repos/repo-name'
+        )
+
+    def test_remove_repository_requires_positive_team_id(self):
+        """Show that remove_repository requires a team_id greater than 0."""
+        assert self.instance.remove_repository('name', -1) is False
+
+        assert self.session.delete.called is False
+
+    def test_remove_repository_requires_auth(self):
+        """Show that a user must be authenticated to remove a repository."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.remove_repository('repo-name', 10)
+
 
 class TestOrganizationIterator(UnitIteratorHelper):
     described_class = Organization

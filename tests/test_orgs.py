@@ -1,5 +1,5 @@
 import github3
-from tests.utils import BaseCase, load, mock
+from tests.utils import BaseCase, load
 
 
 class TestTeam(BaseCase):
@@ -197,21 +197,6 @@ class TestOrganization(BaseCase):
         self.login()
         assert self.org.remove_member('user') is False
         self.mock_assertions()
-
-    def test_remove_repo(self):
-        self.assertRaises(github3.GitHubError, self.org.remove_repo,
-                          None, None)
-
-        self.login()
-        with mock.patch.object(github3.orgs.Organization, 'teams') as it:
-            it.return_value = iter([])
-            assert self.org.remove_repo('foo', 'bar') is False
-            team = mock.Mock()
-            team.name = 'bar'
-            team.remove_repo.return_value = True
-            it.return_value = iter([team])
-            assert self.org.remove_repo('foo', 'bar') is True
-            team.remove_repo.assert_called_once_with('foo')
 
     def test_team(self):
         self.response('team')
