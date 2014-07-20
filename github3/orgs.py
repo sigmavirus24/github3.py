@@ -106,7 +106,7 @@ class Team(GitHubCore):
         return False
 
     def has_repo(self, repo):
-        """Checks if this team has access to ``repo``
+        """Check if this team has access to ``repo``.
 
         :param str repo: (required), form: 'user/repo'
         :returns: bool
@@ -124,7 +124,7 @@ class Team(GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     def members(self, number=-1, etag=None):
-        """Iterate over the members of this team.
+        r"""Iterate over the members of this team.
 
         :param int number: (optional), number of users to iterate over.
             Default: -1 iterates over all values
@@ -370,7 +370,7 @@ class Organization(BaseAccount):
         return self._boolean(self._get(url), 204, 404)
 
     def events(self, number=-1, etag=None):
-        """Iterate over events for this org.
+        r"""Iterate over events for this org.
 
         :param int number: (optional), number of events to return. Default: -1
             iterates over all events available.
@@ -382,7 +382,7 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, Event, etag=etag)
 
     def members(self, number=-1, etag=None):
-        """Iterate over members of this organization.
+        r"""Iterate over members of this organization.
 
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
@@ -394,7 +394,7 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, User, etag=etag)
 
     def public_members(self, number=-1, etag=None):
-        """Iterate over public members of this organization.
+        r"""Iterate over public members of this organization.
 
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
@@ -406,7 +406,7 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, User, etag=etag)
 
     def repositories(self, type='', number=-1, etag=None):
-        """Iterate over repos for this organization.
+        r"""Iterate over repos for this organization.
 
         :param str type: (optional), accepted values:
             ('all', 'public', 'member', 'private', 'forks', 'sources'), API
@@ -425,7 +425,7 @@ class Organization(BaseAccount):
 
     @requires_auth
     def teams(self, number=-1, etag=None):
-        """Iterate over teams that are part of this organization.
+        r"""Iterate over teams that are part of this organization.
 
         :param int number: (optional), number of teams to return. Default: -1
             returns all available teams.
@@ -447,8 +447,7 @@ class Organization(BaseAccount):
 
     @requires_auth
     def remove_member(self, login):
-        """Remove the user with login ``login`` from this
-        organization.
+        """Remove the user with login ``login`` from this organization.
 
         :returns: bool
         """
@@ -470,8 +469,7 @@ class Organization(BaseAccount):
 
     @requires_auth
     def team(self, team_id):
-        """Returns Team object with information about team specified by
-        ``team_id``.
+        """Return the team specified by ``team_id``.
 
         :param int team_id: (required), unique id for the team
         :returns: :class:`Team <Team>`
