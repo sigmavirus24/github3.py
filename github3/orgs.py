@@ -327,11 +327,7 @@ class Organization(BaseAccount):
         return Team(json, self._session) if json else None
 
     @requires_auth
-    def edit(self,
-             billing_email=None,
-             company=None,
-             email=None,
-             location=None,
+    def edit(self, billing_email=None, company=None, email=None, location=None,
              name=None):
         """Edit this organization.
 
