@@ -458,16 +458,17 @@ class Organization(BaseAccount):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def remove_repo(self, repo, team):
-        """Remove ``repo`` from ``team``.
+    def remove_repository(self, repository, team_id):
+        """Remove ``repository`` from the team with ``team_id``.
 
-        :param str repo: (required), form: 'user/repo'
-        :param str team: (required)
+        :param str repository: (required), form: 'user/repo'
+        :param int team_id: (required)
         :returns: bool
         """
-        for t in self.teams():
-            if team == t.name:
-                return t.remove_repo(repo)
+        if int(team_id) > 0:
+            url = self._build_url('teams', str(team_id), 'repos',
+                                  str(repository))
+            return self._boolean(self._delete(url), 204, 404)
         return False
 
     @requires_auth

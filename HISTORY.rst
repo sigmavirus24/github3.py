@@ -140,7 +140,8 @@ Old name                                 New name
   It now accepts ``license_template``.
 
 - ``Organization#remove_repo`` has been renamed to
-  ``Organization#remove_repository``.
+  ``Organization#remove_repository``. It now accepts ``team_id`` instead of
+  ``team``.
 
 - ``github3.ratelimit_remaining`` was removed
 
