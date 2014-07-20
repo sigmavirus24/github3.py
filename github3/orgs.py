@@ -437,12 +437,14 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, Team, etag=etag)
 
     @requires_auth
-    def publicize_member(self, login):
-        """Make ``login``'s membership in this organization public.
+    def publicize_member(self, username):
+        """Make ``username``'s membership in this organization public.
 
+        :param str username: the name of the user whose membership you wish to
+            publicize
         :returns: bool
         """
-        url = self._build_url('public_members', login, base_url=self._api)
+        url = self._build_url('public_members', username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
