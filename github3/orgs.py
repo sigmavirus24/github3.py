@@ -114,13 +114,13 @@ class Team(GitHubCore):
         url = self._build_url('repos', repo, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def is_member(self, login):
-        """Check if ``login`` is a member of this team.
+    def is_member(self, username):
+        """Check if ``username`` is a member of this team.
 
-        :param str login: (required), login name of the user
+        :param str username: (required), username name of the user
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def members(self, number=-1, etag=None):
@@ -207,8 +207,8 @@ class Organization(BaseAccount):
         self.repos_url = org.get('repos_url')
 
     @requires_auth
-    def add_member(self, login, team_id):
-        """Add ``login`` to ``team`` and thereby to this organization.
+    def add_member(self, username, team_id):
+        """Add ``username`` to ``team`` and thereby to this organization.
 
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
@@ -219,14 +219,14 @@ class Organization(BaseAccount):
             ``team_id``. This parameter is now required to be an integer to
             improve performance of this method.
 
-        :param str login: (required), login name of the user to be added
+        :param str username: (required), login name of the user to be added
         :param int team_id: (required), team id
         :returns: bool
         """
         if int(team_id) < 0:
             return False
 
-        url = self._build_url('teams', str(team_id), 'members', str(login))
+        url = self._build_url('teams', str(team_id), 'members', str(username))
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
