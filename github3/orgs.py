@@ -351,12 +351,13 @@ class Organization(BaseAccount):
             return True
         return False
 
-    def is_member(self, login):
-        """Check if the user with login ``login`` is a member.
+    def is_member(self, username):
+        """Check if the user named ``username`` is a member.
 
+        :param str username: name of the user you'd like to check
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def is_public_member(self, login):
