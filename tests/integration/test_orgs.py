@@ -9,6 +9,8 @@ class TestOrganization(IntegrationHelper):
 
     """Organization integration tests."""
 
+    betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
+
     def test_add_member(self):
         """Test the ability to add a member to an organization."""
         self.basic_login()
