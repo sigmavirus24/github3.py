@@ -100,3 +100,12 @@ class TestOrganization(IntegrationHelper):
             assert isinstance(o, github3.orgs.Organization)
 
             assert o.is_member('sigmavirus24') is True
+
+    def test_is_public_member(self):
+        """Test the ability to check if a User is a public member."""
+        cassette_name = self.cassette_name('is_public_member')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            assert o.is_public_member('defunkt') is False
