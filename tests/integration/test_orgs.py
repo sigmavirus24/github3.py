@@ -71,7 +71,7 @@ class TestOrganization(IntegrationHelper):
             assert o.publicize_member(public_member) is True
 
     def test_create_team(self):
-        """Test teh ability to create a new team."""
+        """Test the ability to create a new team."""
         self.basic_login()
         cassette_name = self.cassette_name('create_team')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
