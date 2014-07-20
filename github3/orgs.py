@@ -448,12 +448,13 @@ class Organization(BaseAccount):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def remove_member(self, login):
-        """Remove the user with login ``login`` from this organization.
+    def remove_member(self, username):
+        """Remove the user named ``username`` from this organization.
 
+        :param str username: name of the user to remove from the org
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
