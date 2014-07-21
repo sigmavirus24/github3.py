@@ -141,3 +141,13 @@ class TestOrganization(IntegrationHelper):
 
             for member in o.public_members():
                 assert isinstance(member, github3.users.User)
+
+    def test_repositories(self):
+        """Test the ability to retrieve an organization's repositories."""
+        cassette_name = self.cassette_name('repositories')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            for repo in o.repositories():
+                assert isinstance(repo, github3.repos.Repository)
