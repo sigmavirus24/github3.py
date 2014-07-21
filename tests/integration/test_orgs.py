@@ -119,3 +119,14 @@ class TestOrganization(IntegrationHelper):
 
             for event in o.events():
                 assert isinstance(event, github3.events.Event)
+
+    def test_members(self):
+        """Test the ability to retrieve an organization's members."""
+        self.basic_login()
+        cassette_name = self.cassette_name('members')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            for member in o.members():
+                assert isinstance(member, github3.users.User)
