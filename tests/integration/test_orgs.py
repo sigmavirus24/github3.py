@@ -151,3 +151,14 @@ class TestOrganization(IntegrationHelper):
 
             for repo in o.repositories():
                 assert isinstance(repo, github3.repos.Repository)
+
+    def test_teams(self):
+        """Test the ability to retrieve an organization's teams."""
+        self.basic_login()
+        cassette_name = self.cassette_name('teams')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            for team in o.teams():
+                assert isinstance(team, github3.orgs.Team)
