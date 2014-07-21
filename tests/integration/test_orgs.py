@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Organization."""
+import pytest
+
 import github3
 
 from .helper import IntegrationHelper
@@ -162,3 +164,18 @@ class TestOrganization(IntegrationHelper):
 
             for team in o.teams():
                 assert isinstance(team, github3.orgs.Team)
+
+    def test_publicize_member(self):
+        """Test the ability to publicize a member of the organization."""
+        self.basic_login()
+        cassette_name = self.cassette_name('publicize_member')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            # Show that we cannot publicize someone other than the current
+            # user
+            with pytest.raises(github3.GitHubError):
+                o.publicize_member('esacteksab')
+
+            assert o.publicize_member('sigmavirus24') is True
