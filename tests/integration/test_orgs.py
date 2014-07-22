@@ -216,3 +216,17 @@ class TestOrganization(IntegrationHelper):
                 assert False, 'Could not find team'
 
             assert o.remove_repository('github3py/urllib3', team.id) is True
+
+    def test_team(self):
+        """Test the ability retrieve an individual team by id."""
+        self.basic_login()
+        cassette_name = self.cassette_name('team')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            # Grab a team, any team
+            first_team = next(o.teams())
+
+            fetched_team = o.team(first_team.id)
+            assert first_team == fetched_team
