@@ -179,3 +179,23 @@ class TestOrganization(IntegrationHelper):
                 o.publicize_member('esacteksab')
 
             assert o.publicize_member('sigmavirus24') is True
+
+    def test_remove_member(self):
+        """Test the ability to remove a member of the organization."""
+        self.basic_login()
+        cassette_name = self.cassette_name('remove_member')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            # First find the team we want to use
+            for team in o.teams():
+                if team.name == 'Do Not Delete':
+                    break
+            else:
+                assert False, 'Could not find team'
+
+            # First add the user
+            assert o.add_member('gh3test', team.id) is True
+            # Now remove them
+            assert o.remove_member('gh3test') is True
