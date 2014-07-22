@@ -199,3 +199,20 @@ class TestOrganization(IntegrationHelper):
             assert o.add_member('gh3test', team.id) is True
             # Now remove them
             assert o.remove_member('gh3test') is True
+
+    def test_remove_repository(self):
+        """Test the ability to remove a repository from a team."""
+        self.basic_login()
+        cassette_name = self.cassette_name('remove_repository')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization('github3py')
+            assert isinstance(o, github3.orgs.Organization)
+
+            # First find the team we want to use
+            for team in o.teams():
+                if team.name == 'Do Not Delete':
+                    break
+            else:
+                assert False, 'Could not find team'
+
+            assert o.remove_repository('github3py/urllib3', team.id) is True
