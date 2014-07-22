@@ -29,6 +29,14 @@ class TestTeam(IntegrationHelper):
             team = self.get_team()
             assert team.add_member('esacteksab') is True
 
+    def test_add_repository(self):
+        """Show that a user can add a repository to a team."""
+        self.basic_login()
+        cassette_name = self.cassette_name('add_repository')
+        with self.recorder.use_cassette(cassette_name):
+            team = self.get_team()
+            assert team.add_repository('github3py/urllib3') is True
+
     def test_remove_member(self):
         """Show a user can remove a member from a team."""
         self.basic_login()
