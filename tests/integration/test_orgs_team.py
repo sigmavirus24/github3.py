@@ -28,3 +28,11 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team()
             assert team.add_member('esacteksab') is True
+
+    def test_remove_member(self):
+        """Show a user can remove a member from a team."""
+        self.basic_login()
+        cassette_name = self.cassette_name('remove_member')
+        with self.recorder.use_cassette(cassette_name):
+            team = self.get_team()
+            assert team.remove_member('esacteksab') is True
