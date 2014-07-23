@@ -30,6 +30,12 @@ class TestTeam(UnitHelper):
         }
     }
 
+    def test_add_member(self):
+        """Show that one can add a member to an organization team."""
+        self.instance.add_member('user')
+
+        self.session.put.assert_called_once_with(url_for('members/user'))
+
     def test_add_repository(self):
         """Show that one can add a repository to an organization team."""
         self.instance.add_repository('name-of-repo')
@@ -76,6 +82,11 @@ class TestTeamRequiresAuth(UnitHelper):
         """Set up for test cases in TestTeamRequiresAuth."""
         super(TestTeamRequiresAuth, self).setUp()
         self.session.has_auth.return_value = False
+
+    def test_add_member_requires_auth(self):
+        """Show that adding a repo to a team requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.add_member('user')
 
     def test_add_repository_requires_auth(self):
         """Show that adding a repo to a team requires authentication."""

@@ -21,18 +21,6 @@ class TestTeam(BaseCase):
         t._uniq = 'foo'
         assert self.team != t
 
-    def test_add_member(self):
-        self.response('', 204)
-        self.put(self.api + '/members/foo')
-        self.conf = {'data': None}
-
-        self.assertRaises(github3.GitHubError, self.team.add_member, 'foo')
-
-        self.not_called()
-        self.login()
-        assert self.team.add_member('foo')
-        self.mock_assertions()
-
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
