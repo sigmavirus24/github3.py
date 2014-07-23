@@ -67,6 +67,14 @@ class TestTeam(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('members/username'))
 
+    def test_remove_member(self):
+        """Show that a user can check if another user is a team member."""
+        self.instance.remove_member('username')
+
+        self.session.delete.assert_called_once_with(
+            url_for('members/username')
+        )
+
     def test_remove_repository(self):
         """Show that a user can remove a repository from a team."""
         self.instance.remove_repository('repo')
@@ -125,6 +133,11 @@ class TestTeamRequiresAuth(UnitHelper):
         """Show that checking a user's team membership requires auth."""
         with pytest.raises(GitHubError):
             self.instance.is_member('user')
+
+    def test_remove_member_requires_auth(self):
+        """Show that removing a team member requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.remove_member('user')
 
     def test_remove_repository_requires_auth(self):
         """Show that removing a repo from a team requires authentication."""

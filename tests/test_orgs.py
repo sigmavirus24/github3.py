@@ -21,17 +21,6 @@ class TestTeam(BaseCase):
         t._uniq = 'foo'
         assert self.team != t
 
-    def test_remove_member(self):
-        self.response('', 204)
-        self.delete(self.api + '/members/user')
-
-        self.assertRaises(github3.GitHubError, self.team.remove_member, None)
-
-        self.not_called()
-        self.login()
-        assert self.team.remove_member('user')
-        self.mock_assertions()
-
 
 class TestOrganization(BaseCase):
     def __init__(self, methodName='runTest'):
