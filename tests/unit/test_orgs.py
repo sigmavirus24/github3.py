@@ -42,13 +42,6 @@ class TestOrganization(UnitHelper):
             'https://api.github.com/teams/10/members/user'
         )
 
-    def test_add_member_requires_auth(self):
-        """Show that one must be authenticated to add a member to an org."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.add_member('user', 10)
-
     def test_add_repository(self):
         """Show that one can add a repository to an organization."""
         self.instance.add_repository('name-of-repo', 10)
@@ -111,6 +104,38 @@ class TestOrganization(UnitHelper):
 
         with pytest.raises(GitHubError):
             self.instance.remove_repository('repo-name', 10)
+
+
+class TestOrganizationRequiresAuth(UnitHelper):
+    described_class = Organization
+    example_data = {
+        'login': 'hapy',
+        'id': 1,
+        'url': 'https://api.github.com/orgs/hapy',
+        'avatar_url': 'https://github.com/images/error/octocat_happy.gif',
+        'name': 'github',
+        'company': 'GitHub',
+        'blog': 'https://github.com/blog',
+        'location': 'San Francisco',
+        'email': 'octocat@github.com',
+        'public_repos': 2,
+        'public_gists': 1,
+        'followers': 20,
+        'following': 0,
+        'html_url': 'https://github.com/hapy',
+        'created_at': '2008-01-14T04:33:35Z',
+        'type': 'Organization'
+    }
+
+    def setUp(self):
+        """Set MockedSession#has_auth.return_value to False."""
+        super(TestOrganizationIterator, self).setUp()
+        self.session.has_auth.return_value = False
+
+    def test_add_member_requires_auth(self):
+        """Show that one must be authenticated to add a member to an org."""
+        with pytest.raises(GitHubError):
+            self.instance.add_member('user', 10)
 
 
 class TestOrganizationIterator(UnitIteratorHelper):
