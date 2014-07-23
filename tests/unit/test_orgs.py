@@ -50,13 +50,6 @@ class TestOrganization(UnitHelper):
             'https://api.github.com/teams/10/repos/name-of-repo'
         )
 
-    def test_add_repository_requires_auth(self):
-        """Show that one must be authenticated to add a repo to an org."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.add_repository('foo', 10)
-
     def test_create_repository(self):
         """Show that one can create a repository in an organization."""
         self.instance.create_repository('repo-name', 'description', team_id=1)
@@ -136,6 +129,11 @@ class TestOrganizationRequiresAuth(UnitHelper):
         """Show that one must be authenticated to add a member to an org."""
         with pytest.raises(GitHubError):
             self.instance.add_member('user', 10)
+
+    def test_add_repository_requires_auth(self):
+        """Show that one must be authenticated to add a repo to an org."""
+        with pytest.raises(GitHubError):
+            self.instance.add_repository('foo', 10)
 
 
 class TestOrganizationIterator(UnitIteratorHelper):
