@@ -15,6 +15,9 @@ def build_url(self, *args, **kwargs):
 
 
 class UnitHelper(unittest.TestCase):
+
+    """Base class for unittests."""
+
     # Sub-classes must assign the class to this during definition
     described_class = None
     # Sub-classes must also assign a dictionary to this during definition
@@ -107,10 +110,19 @@ class UnitHelper(unittest.TestCase):
 
 
 class UnitIteratorHelper(UnitHelper):
+
+    """Base class for iterator based unit tests."""
+
     def create_session_mock(self, *args):
+        """Override UnitHelper's create_session_mock method.
+
+        We want all methods to return an instance of the NullObject. This
+        class has a dummy ``__iter__`` implementation which we want for
+        methods that iterate over the results of a response.
+        """
         # Retrieve a mocked session object
         session = super(UnitIteratorHelper, self).create_mocked_session(*args)
-        # Initialize a NullObject
+        # Initialize a NullObject which has magical properties
         null = github3.structs.NullObject()
         # Set it as the return value for every method
         session.delete.return_value = null
@@ -121,13 +133,14 @@ class UnitIteratorHelper(UnitHelper):
         return session
 
     def get_next(self, iterator):
+        """Nicely wrap up a call to the iterator."""
         try:
             next(iterator)
         except StopIteration:
             pass
 
     def patch_get_json(self):
-        """Patch a GitHubIterator's _get_json method"""
+        """Patch a GitHubIterator's _get_json method."""
         self.get_json_mock = mock.patch.object(
             github3.structs.GitHubIterator, '_get_json'
         )
@@ -135,9 +148,11 @@ class UnitIteratorHelper(UnitHelper):
         self.patched_get_json.return_value = []
 
     def setUp(self):
+        """Use UnitHelper's setUp but also patch _get_json."""
         super(UnitIteratorHelper, self).setUp()
         self.patch_get_json()
 
     def tearDown(self):
+        """Stop mocking _get_json."""
         super(UnitIteratorHelper, self).tearDown()
         self.get_json_mock.stop()
