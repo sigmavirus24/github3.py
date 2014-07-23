@@ -50,6 +50,14 @@ class TestOrganization(UnitHelper):
             'https://api.github.com/teams/10/repos/name-of-repo'
         )
 
+    def test_conceal_member(self):
+        """Show that one can conceal an organization member."""
+        self.instance.conceal_member('concealed')
+
+        self.session.delete.assert_called_once_with(
+            url_for('public_members/concealed')
+        )
+
     def test_create_repository(self):
         """Show that one can create a repository in an organization."""
         self.instance.create_repository('repo-name', 'description', team_id=1)

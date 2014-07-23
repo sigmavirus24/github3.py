@@ -41,17 +41,6 @@ class TestOrganization(BaseCase):
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
 
-    def test_conceal_member(self):
-        self.response('', 204)
-        self.delete(self.api + '/public_members/user')
-
-        self.assertRaises(github3.GitHubError, self.org.conceal_member, None)
-
-        self.not_called()
-        self.login()
-        assert self.org.conceal_member('user')
-        self.mock_assertions()
-
     def test_create_team(self):
         self.response('team', 201)
         self.post(self.api + '/teams')
