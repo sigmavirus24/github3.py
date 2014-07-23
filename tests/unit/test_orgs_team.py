@@ -42,6 +42,12 @@ class TestTeam(UnitHelper):
 
         self.session.put.assert_called_once_with(url_for('repos/name-of-repo'))
 
+    def test_delete(self):
+        """Show that a user can delete an organization team."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(url_for())
+
     def test_has_repository(self):
         """Show that a user can check if a team has access to a repository."""
         self.instance.has_repository('org/repo')
@@ -92,6 +98,11 @@ class TestTeamRequiresAuth(UnitHelper):
         """Show that adding a repo to a team requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.add_repository('repo')
+
+    def test_delete_requires_auth(self):
+        """Show that deleteing a team requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.delete()
 
     def test_has_repository_requires_auth(self):
         """Show that checking a team's access to a repo needs auth."""
