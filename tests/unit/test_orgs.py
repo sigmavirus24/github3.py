@@ -111,22 +111,22 @@ class TestOrganizationRequiresAuth(UnitHelper):
         super(TestOrganizationRequiresAuth, self).setUp()
         self.session.has_auth.return_value = False
 
-    def test_add_member_requires_auth(self):
+    def test_add_member(self):
         """Show that one must be authenticated to add a member to an org."""
         with pytest.raises(GitHubError):
             self.instance.add_member('user', 10)
 
-    def test_add_repository_requires_auth(self):
+    def test_add_repository(self):
         """Show that one must be authenticated to add a repo to an org."""
         with pytest.raises(GitHubError):
             self.instance.add_repository('foo', 10)
 
-    def test_create_repository_requires_auth(self):
+    def test_create_repository(self):
         """Show that one must be authenticated to create a repo for an org."""
         with pytest.raises(GitHubError):
             self.instance.create_repository('foo')
 
-    def test_remove_repository_requires_auth(self):
+    def test_remove_repository(self):
         """Show that a user must be authenticated to remove a repository."""
         with pytest.raises(GitHubError):
             self.instance.remove_repository('repo-name', 10)
