@@ -48,6 +48,26 @@ class UnitHelper(unittest.TestCase):
 
         return instance
 
+    def patch_called_with(self, *args, **kwargs):
+        assert self.session.patch.called is True
+        call_args, call_kwargs = self.session.patch.call_args
+
+        # Data passed to assertion
+        data = kwargs.pop('data', None)
+        # Data passed to patch
+        call_data = call_kwargs.pop('data', None)
+        # Data passed by the call to post positionally
+        #                                URL, 'json string'
+        if call_data is None:
+            call_args, call_data = call_args[:1], call_args[1]
+        # If data is a dictionary (or list) and call_data exists
+        if not isinstance(data, str) and call_data:
+            call_data = json.loads(call_data)
+
+        assert args == call_args
+        assert data == call_data
+        assert kwargs == call_kwargs
+
     def post_called_with(self, *args, **kwargs):
         assert self.session.post.called is True
         call_args, call_kwargs = self.session.post.call_args

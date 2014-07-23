@@ -21,20 +21,6 @@ class TestTeam(BaseCase):
         t._uniq = 'foo'
         assert self.team != t
 
-    def test_edit(self):
-        self.response('team', 200)
-        self.patch(self.api)
-        self.conf = {'data': {'name': 'Collab', 'permission': 'admin'}}
-
-        self.assertRaises(github3.GitHubError, self.team.edit, None)
-
-        self.login()
-        assert self.team.edit(None) is False
-        self.not_called()
-
-        assert self.team.edit('Collab', 'admin')
-        self.mock_assertions()
-
     def test_remove_member(self):
         self.response('', 204)
         self.delete(self.api + '/members/user')
