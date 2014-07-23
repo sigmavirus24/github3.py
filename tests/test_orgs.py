@@ -32,36 +32,11 @@ class TestOrganization(BaseCase):
         super(TestOrganization, self).setUp()
         self.org = github3.orgs.Organization(self.org.to_json(), self.g)
 
-    def test_repr(self):
-        assert repr(self.org).startswith('<Organization ')
-
     def test_set_type(self):
         json = self.org.to_json().copy()
         del json['type']
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
-
-    def test_edit(self):
-        self.response('org', 200)
-        self.patch(self.api)
-        self.conf = {
-            'data': {
-                'billing_email': 'foo',
-                'company': 'foo',
-                'email': 'foo',
-                'location': 'foo',
-                'name': 'foo',
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.org.edit)
-
-        self.login()
-        assert self.org.edit() is False
-        self.not_called()
-
-        assert self.org.edit('foo', 'foo', 'foo', 'foo', 'foo')
-        self.mock_assertions()
 
     def test_is_member(self):
         self.response('', 404)

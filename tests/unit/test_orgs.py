@@ -91,6 +91,20 @@ class TestOrganization(UnitHelper):
             }
         )
 
+    def test_edit(self):
+        """Show that one can edit the organization."""
+        email = 'billing@cordas.co'
+        corp = 'Company, LLC'
+        self.instance.edit(email, company=corp)
+
+        self.patch_called_with(
+            url_for(),
+            data={
+                'billing_email': email,
+                'company': corp
+            }
+        )
+
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
         self.instance.remove_repository('repo-name', 10)
@@ -156,6 +170,11 @@ class TestOrganizationRequiresAuth(UnitHelper):
         """Show that one must be authenticated to create a team for an org."""
         with pytest.raises(GitHubError):
             self.instance.create_team('foo')
+
+    def test_edit(self):
+        """Show that a user can edit an organization."""
+        with pytest.raises(GitHubError):
+            self.instance.edit('foo')
 
     def test_remove_repository(self):
         """Show that a user must be authenticated to remove a repository."""
