@@ -58,27 +58,6 @@ class TestTeam(BaseCase):
         assert self.team.edit('Collab', 'admin')
         self.mock_assertions()
 
-    def test_has_repo(self):
-        self.response('', 204)
-        self.get(self.api + '/repos/repo')
-
-        assert self.team.has_repo('repo')
-        self.mock_assertions()
-
-    def test_is_member(self):
-        self.response('', 404)
-        self.get(self.api + '/members/user')
-
-        assert self.team.is_member('user') is False
-        self.mock_assertions()
-
-    def test_members(self):
-        self.response('user', _iter=True)
-        self.get(self.api + '/members')
-
-        assert isinstance(next(self.team.members()), github3.users.User)
-        self.mock_assertions()
-
     def test_remove_member(self):
         self.response('', 204)
         self.delete(self.api + '/members/user')
