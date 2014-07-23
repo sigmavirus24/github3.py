@@ -75,6 +75,13 @@ class TestTeam(IntegrationHelper):
             t = self.get_team()
             assert t.has_repository('github3py/urllib3') is True
 
+    def test_is_member(self):
+        """Show that a user can check if another user is a team member."""
+        cassette_name = self.cassette_name('is_member')
+        with self.recorder.use_cassette(cassette_name):
+            t = self.get_team()
+            assert t.is_member('sigmavirus24') is True
+
     def test_remove_member(self):
         """Show a user can remove a member from a team."""
         cassette_name = self.cassette_name('remove_member')
