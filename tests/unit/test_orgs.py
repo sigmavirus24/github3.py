@@ -70,13 +70,6 @@ class TestOrganization(UnitHelper):
             }
         )
 
-    def test_create_repository_requires_auth(self):
-        """Show that one must be authenticated to create a repo for an org."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.create_repository('foo')
-
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
         self.instance.remove_repository('repo-name', 10)
@@ -90,13 +83,6 @@ class TestOrganization(UnitHelper):
         assert self.instance.remove_repository('name', -1) is False
 
         assert self.session.delete.called is False
-
-    def test_remove_repository_requires_auth(self):
-        """Show that a user must be authenticated to remove a repository."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.remove_repository('repo-name', 10)
 
 
 class TestOrganizationRequiresAuth(UnitHelper):
@@ -122,7 +108,7 @@ class TestOrganizationRequiresAuth(UnitHelper):
 
     def setUp(self):
         """Set MockedSession#has_auth.return_value to False."""
-        super(TestOrganizationIterator, self).setUp()
+        super(TestOrganizationRequiresAuth, self).setUp()
         self.session.has_auth.return_value = False
 
     def test_add_member_requires_auth(self):
@@ -134,6 +120,16 @@ class TestOrganizationRequiresAuth(UnitHelper):
         """Show that one must be authenticated to add a repo to an org."""
         with pytest.raises(GitHubError):
             self.instance.add_repository('foo', 10)
+
+    def test_create_repository_requires_auth(self):
+        """Show that one must be authenticated to create a repo for an org."""
+        with pytest.raises(GitHubError):
+            self.instance.create_repository('foo')
+
+    def test_remove_repository_requires_auth(self):
+        """Show that a user must be authenticated to remove a repository."""
+        with pytest.raises(GitHubError):
+            self.instance.remove_repository('repo-name', 10)
 
 
 class TestOrganizationIterator(UnitIteratorHelper):
