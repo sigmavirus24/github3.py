@@ -8,6 +8,7 @@ import unittest
 
 
 def build_url(self, *args, **kwargs):
+    """A function to proxy to the actual GitHubSession#build_url method."""
     # We want to assert what is happening with the actual calls to the
     # Internet. We can proxy this.
     return github3.session.GitHubSession().build_url(*args, **kwargs)
@@ -20,10 +21,12 @@ class UnitHelper(unittest.TestCase):
     example_data = {}
 
     def create_mocked_session(self):
+        """Use mock to auto-spec a GitHubSession and return an instance."""
         MockedSession = mock.create_autospec(github3.session.GitHubSession)
         return MockedSession()
 
     def create_session_mock(self, *args):
+        """Create a mocked session and add headers and auth attributes."""
         session = self.create_mocked_session()
         base_attrs = ['headers', 'auth']
         attrs = dict(
@@ -39,6 +42,12 @@ class UnitHelper(unittest.TestCase):
         return session
 
     def create_instance_of_described_class(self):
+        """
+        Use cls.example_data to create an instance of the described class.
+
+        If cls.example_data is None, just create a simple instance of the
+        class.
+        """
         if self.example_data:
             instance = self.described_class(self.example_data,
                                             self.session)
@@ -49,6 +58,7 @@ class UnitHelper(unittest.TestCase):
         return instance
 
     def patch_called_with(self, *args, **kwargs):
+        """Use to assert patch was called with JSON."""
         assert self.session.patch.called is True
         call_args, call_kwargs = self.session.patch.call_args
 
@@ -69,6 +79,7 @@ class UnitHelper(unittest.TestCase):
         assert kwargs == call_kwargs
 
     def post_called_with(self, *args, **kwargs):
+        """Use to assert post was called with JSON."""
         assert self.session.post.called is True
         call_args, call_kwargs = self.session.post.call_args
 
@@ -86,6 +97,7 @@ class UnitHelper(unittest.TestCase):
         assert kwargs == call_kwargs
 
     def setUp(self):
+        """Use to set up attributes on self before each test."""
         self.session = self.create_session_mock()
         self.instance = self.create_instance_of_described_class()
         # Proxy the build_url method to the class so it can build the URL and
