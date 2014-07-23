@@ -105,15 +105,17 @@ class Team(GitHubCore):
                 return True
         return False
 
-    def has_repo(self, repo):
-        """Check if this team has access to ``repo``.
+    @requires_auth
+    def has_repository(self, repository):
+        """Check if this team has access to ``repository``.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :returns: bool
         """
-        url = self._build_url('repos', repo, base_url=self._api)
+        url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    @requires_auth
     def is_member(self, username):
         """Check if ``username`` is a member of this team.
 
@@ -123,6 +125,7 @@ class Team(GitHubCore):
         url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    @requires_auth
     def members(self, number=-1, etag=None):
         r"""Iterate over the members of this team.
 
@@ -135,6 +138,7 @@ class Team(GitHubCore):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
+    @requires_auth
     def repositories(self, number=-1, etag=None):
         """Iterate over the repositories this team has access to.
 
