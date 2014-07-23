@@ -36,25 +36,11 @@ class TestTeam(UnitHelper):
 
         self.session.put.assert_called_once_with(url_for('repos/name-of-repo'))
 
-    def test_add_repository_requires_auth(self):
-        """Show that adding a repo to a team requires authentication."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.add_repository('repo')
-
     def test_has_repository(self):
         """Show that a user can check if a team has access to a repository."""
         self.instance.has_repository('org/repo')
 
         self.session.get.assert_called_once_with(url_for('repos/org/repo'))
-
-    def test_has_repository_requires_auth(self):
-        """Show that checking a team's access to a repo needs auth."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.has_repository('org/repo')
 
     def test_is_member(self):
         """Show that a user can check if another user is a team member."""
@@ -81,6 +67,39 @@ class TestTeam(UnitHelper):
 
         with pytest.raises(GitHubError):
             self.instance.remove_repository('repo')
+
+
+class TestTeamRequiresAuth(UnitHelper):
+    described_class = Team
+    example_data = {
+        'url': 'https://api.github.com/teams/10',
+        'name': 'Owners',
+        'id': 10,
+        'permission': 'admin',
+        'members_count': 3,
+        'repos_count': 10,
+        'organization': {
+            'login': 'github',
+            'id': 1,
+            'url': 'https://api.github.com/orgs/github',
+            'avatar_url': 'https://github.com/images/error/octocat_happy.gif'
+        }
+    }
+
+    def setUp(self):
+        """Set up for test cases in TestTeamRequiresAuth."""
+        super(TestTeamRequiresAuth, self).setUp()
+        self.session.has_auth.return_value = False
+
+    def test_add_repository_requires_auth(self):
+        """Show that adding a repo to a team requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.add_repository('repo')
+
+    def test_has_repository_requires_auth(self):
+        """Show that checking a team's access to a repo needs auth."""
+        with pytest.raises(GitHubError):
+            self.instance.has_repository('org/repo')
 
 
 class TestTeamIterator(UnitIteratorHelper):
