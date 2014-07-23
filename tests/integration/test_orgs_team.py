@@ -51,6 +51,22 @@ class TestTeam(IntegrationHelper):
             assert isinstance(t, github3.orgs.Team)
             assert t.delete() is True
 
+    def test_edit(self):
+        """Show that a user can edit a team."""
+        self.basic_login()
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+            # Create a new team to play with
+            t = o.create_team('edit-me')
+            assert isinstance(t, github3.orgs.Team)
+            # Edit the new team
+            assert t.edit('delete-me', permission='admin') is True
+            # Assert that the name has changed
+            assert t.name == 'delete-me'
+            # Get rid of it, we don't need it.
+            assert t.delete() is True
+
     def test_remove_member(self):
         """Show a user can remove a member from a team."""
         self.basic_login()
