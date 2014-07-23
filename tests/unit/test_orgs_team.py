@@ -48,25 +48,11 @@ class TestTeam(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('members/username'))
 
-    def test_is_member_requires_auth(self):
-        """Show that checking a user's team membership requires auth."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.is_member('user')
-
     def test_remove_repository(self):
         """Show that a user can remove a repository from a team."""
         self.instance.remove_repository('repo')
 
         self.session.delete.assert_called_once_with(url_for('/repos/repo'))
-
-    def test_remove_repository_requires_auth(self):
-        """Show that removing a repo from a team requires authentication."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.remove_repository('repo')
 
 
 class TestTeamRequiresAuth(UnitHelper):
@@ -100,6 +86,16 @@ class TestTeamRequiresAuth(UnitHelper):
         """Show that checking a team's access to a repo needs auth."""
         with pytest.raises(GitHubError):
             self.instance.has_repository('org/repo')
+
+    def test_is_member_requires_auth(self):
+        """Show that checking a user's team membership requires auth."""
+        with pytest.raises(GitHubError):
+            self.instance.is_member('user')
+
+    def test_remove_repository_requires_auth(self):
+        """Show that removing a repo from a team requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.remove_repository('repo')
 
 
 class TestTeamIterator(UnitIteratorHelper):
