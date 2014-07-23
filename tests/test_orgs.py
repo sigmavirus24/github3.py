@@ -38,13 +38,6 @@ class TestOrganization(BaseCase):
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
 
-    def test_is_member(self):
-        self.response('', 404)
-        self.get(self.api + '/members/user')
-
-        assert self.org.is_member('user') is False
-        self.mock_assertions()
-
     def test_is_public_member(self):
         self.response('', 204)
         self.get(self.api + '/public_members/user')

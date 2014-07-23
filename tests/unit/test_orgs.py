@@ -105,6 +105,12 @@ class TestOrganization(UnitHelper):
             }
         )
 
+    def test_is_member(self):
+        """Show that a user can if another user is an organization member."""
+        self.instance.is_member('username')
+
+        self.session.get.assert_called_once_with(url_for('members/username'))
+
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
         self.instance.remove_repository('repo-name', 10)
