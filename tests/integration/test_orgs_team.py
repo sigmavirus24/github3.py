@@ -13,7 +13,12 @@ class TestTeam(IntegrationHelper):
 
     betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
 
+    def setUp(self):
+        super(TestTeam, self).setUp()
+        self.basic_login()
+
     def get_organization(self, organization='github3py'):
+        """Get the desired organization."""
         o = self.gh.organization(organization)
         assert isinstance(o, github3.orgs.Organization)
         return o
@@ -27,7 +32,6 @@ class TestTeam(IntegrationHelper):
 
     def test_add_member(self):
         """Show a user can add a member to a team."""
-        self.basic_login()
         cassette_name = self.cassette_name('add_member')
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team()
@@ -35,7 +39,6 @@ class TestTeam(IntegrationHelper):
 
     def test_add_repository(self):
         """Show that a user can add a repository to a team."""
-        self.basic_login()
         cassette_name = self.cassette_name('add_repository')
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team()
@@ -43,7 +46,6 @@ class TestTeam(IntegrationHelper):
 
     def test_delete(self):
         """Show that a user can delete a team."""
-        self.basic_login()
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -53,7 +55,6 @@ class TestTeam(IntegrationHelper):
 
     def test_edit(self):
         """Show that a user can edit a team."""
-        self.basic_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -67,9 +68,12 @@ class TestTeam(IntegrationHelper):
             # Get rid of it, we don't need it.
             assert t.delete() is True
 
+    def test_has_repository(self):
+        """Show that a user can check of a team has access to a repository."""
+        pass
+
     def test_remove_member(self):
         """Show a user can remove a member from a team."""
-        self.basic_login()
         cassette_name = self.cassette_name('remove_member')
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team()
