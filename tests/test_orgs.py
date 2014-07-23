@@ -41,25 +41,6 @@ class TestOrganization(BaseCase):
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
 
-    def test_create_team(self):
-        self.response('team', 201)
-        self.post(self.api + '/teams')
-        self.conf = {
-            'data': {
-                'name': 'team',
-                'repo_names': [],
-                'permission': 'push'
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.org.create_team, None)
-
-        self.not_called()
-        self.login()
-        assert isinstance(self.org.create_team('team', permission='push'),
-                          github3.orgs.Team)
-        self.mock_assertions()
-
     def test_edit(self):
         self.response('org', 200)
         self.patch(self.api)

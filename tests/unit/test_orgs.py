@@ -78,6 +78,19 @@ class TestOrganization(UnitHelper):
             }
         )
 
+    def test_create_team(self):
+        """Show that one can create a team in an organization."""
+        self.instance.create_team('team-name', permission='push')
+
+        self.post_called_with(
+            url_for('teams'),
+            data={
+                'name': 'team-name',
+                'repo_names': [],
+                'permission': 'push'
+            }
+        )
+
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
         self.instance.remove_repository('repo-name', 10)
@@ -138,6 +151,11 @@ class TestOrganizationRequiresAuth(UnitHelper):
         """Show that one must be authenticated to create a repo for an org."""
         with pytest.raises(GitHubError):
             self.instance.create_repository('foo')
+
+    def test_create_team(self):
+        """Show that one must be authenticated to create a team for an org."""
+        with pytest.raises(GitHubError):
+            self.instance.create_team('foo')
 
     def test_remove_repository(self):
         """Show that a user must be authenticated to remove a repository."""
