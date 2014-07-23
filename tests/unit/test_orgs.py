@@ -113,6 +113,9 @@ class TestOrganization(UnitHelper):
             'https://api.github.com/teams/10/repos/repo-name'
         )
 
+    def test_repr(self):
+        assert 'github' in repr(self.instance)
+
     def test_remove_repository_requires_positive_team_id(self):
         """Show that remove_repository requires a team_id greater than 0."""
         assert self.instance.remove_repository('name', -1) is False
