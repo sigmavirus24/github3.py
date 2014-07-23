@@ -13,10 +13,14 @@ class TestTeam(IntegrationHelper):
 
     betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
 
-    def get_team(self, organization='github3py', id=189901):
-        """Get our desired team."""
+    def get_organization(self, organization='github3py'):
         o = self.gh.organization(organization)
         assert isinstance(o, github3.orgs.Organization)
+        return o
+
+    def get_team(self, organization='github3py', id=189901):
+        """Get our desired team."""
+        o = self.get_organization(organization)
         t = o.team(id)
         assert isinstance(t, github3.orgs.Team)
         return t
@@ -36,6 +40,16 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team()
             assert team.add_repository('github3py/urllib3') is True
+
+    def test_delete(self):
+        """Show that a user can delete a team."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+            t = o.create_team('delete-me')
+            assert isinstance(t, github3.orgs.Team)
+            assert t.delete() is True
 
     def test_remove_member(self):
         """Show a user can remove a member from a team."""
