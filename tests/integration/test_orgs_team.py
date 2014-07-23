@@ -104,3 +104,10 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team()
             assert team.remove_member('esacteksab') is True
+
+    def test_remove_repository(self):
+        """Show a user can remove a repository from a team."""
+        cassette_name = self.cassette_name('remove_repository')
+        with self.recorder.use_cassette(cassette_name):
+            team = self.get_team(id=923595)
+            assert team.remove_repository('github3py/urllib3') is True
