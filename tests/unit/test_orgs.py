@@ -121,6 +121,11 @@ class TestOrganizationRequiresAuth(UnitHelper):
         with pytest.raises(GitHubError):
             self.instance.add_repository('foo', 10)
 
+    def test_conceal_member(self):
+        """Show that one must be authenticated to conceal a member."""
+        with pytest.raises(GitHubError):
+            self.instance.conceal_member('user')
+
     def test_create_repository(self):
         """Show that one must be authenticated to create a repo for an org."""
         with pytest.raises(GitHubError):
