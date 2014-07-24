@@ -153,6 +153,20 @@ class TestOrganization(UnitHelper):
 
         assert self.session.delete.called is False
 
+    def test_team(self):
+        """Show that a user can retrieve a team by id."""
+        self.instance.team(10)
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/teams/10'
+        )
+
+    def test_team_requires_positive_team_id(self):
+        """Show that team requires a team_id greater than 0."""
+        self.instance.team(-1)
+
+        assert self.session.get.called is False
+
 
 class TestOrganizationRequiresAuth(UnitHelper):
     described_class = Organization
@@ -224,6 +238,11 @@ class TestOrganizationRequiresAuth(UnitHelper):
         """Show that a user must be authenticated to remove a repository."""
         with pytest.raises(GitHubError):
             self.instance.remove_repository('repo-name', 10)
+
+    def test_team(self):
+        """Show that a user must be authenticated to retrieve a team."""
+        with pytest.raises(GitHubError):
+            self.instance.team(10)
 
 
 class TestOrganizationIterator(UnitIteratorHelper):

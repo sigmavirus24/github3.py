@@ -38,18 +38,5 @@ class TestOrganization(BaseCase):
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
 
-    def test_team(self):
-        self.response('team')
-        self.get(self.github_url + 'teams/1')
-
-        self.assertRaises(github3.GitHubError, self.org.team, 0)
-
-        self.login()
-        assert self.org.team(-1) is None
-        self.not_called()
-
-        assert isinstance(self.org.team(1), github3.orgs.Team)
-        self.mock_assertions()
-
     def test_equality(self):
         assert self.org == github3.orgs.Organization(load('org'))
