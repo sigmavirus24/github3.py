@@ -144,6 +144,7 @@ class TestOrganization(UnitHelper):
         )
 
     def test_repr(self):
+        """Assert the Organization name is in the repr."""
         assert 'github' in repr(self.instance)
 
     def test_remove_repository_requires_positive_team_id(self):
