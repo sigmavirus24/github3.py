@@ -111,6 +111,14 @@ class TestOrganization(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('members/username'))
 
+    def test_is_public_member(self):
+        """Show that a user can if another user is a public org member."""
+        self.instance.is_public_member('username')
+
+        self.session.get.assert_called_once_with(
+            url_for('public_members/username')
+        )
+
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
         self.instance.remove_repository('repo-name', 10)
