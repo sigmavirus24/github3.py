@@ -38,17 +38,6 @@ class TestOrganization(BaseCase):
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
 
-    def test_remove_member(self):
-        self.response('', 404)
-        self.delete(self.api + '/members/user')
-
-        self.assertRaises(github3.GitHubError, self.org.remove_member, None)
-
-        self.not_called()
-        self.login()
-        assert self.org.remove_member('user') is False
-        self.mock_assertions()
-
     def test_team(self):
         self.response('team')
         self.get(self.github_url + 'teams/1')
