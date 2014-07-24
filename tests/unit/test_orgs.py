@@ -197,7 +197,7 @@ class TestOrganizationRequiresAuth(UnitHelper):
             self.instance.create_team('foo')
 
     def test_edit(self):
-        """Show that a user can edit an organization."""
+        """Show that a user must be authenticated to edit an organization."""
         with pytest.raises(GitHubError):
             self.instance.edit('foo')
 
