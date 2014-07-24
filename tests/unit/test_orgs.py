@@ -119,6 +119,14 @@ class TestOrganization(UnitHelper):
             url_for('public_members/username')
         )
 
+    def test_publicize_member(self):
+        """Show that a user can publicize their own membership."""
+        self.instance.publicize_member('username')
+
+        self.session.put.assert_called_once_with(
+            url_for('public_members/username')
+        )
+
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
         self.instance.remove_repository('repo-name', 10)
@@ -192,6 +200,11 @@ class TestOrganizationRequiresAuth(UnitHelper):
         """Show that a user can edit an organization."""
         with pytest.raises(GitHubError):
             self.instance.edit('foo')
+
+    def test_publicize_member(self):
+        """Show that a user must be authenticated to publicize membership."""
+        with pytest.raises(GitHubError):
+            self.instance.publicize_member('foo')
 
     def test_remove_repository(self):
         """Show that a user must be authenticated to remove a repository."""
