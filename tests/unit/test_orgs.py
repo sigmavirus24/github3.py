@@ -105,6 +105,11 @@ class TestOrganization(UnitHelper):
             }
         )
 
+    def test_equality(self):
+        """Show that a user can compare teams."""
+        team = self.create_instance_of_described_class()
+        assert team == self.instance
+
     def test_is_member(self):
         """Show that a user can if another user is an organization member."""
         self.instance.is_member('username')

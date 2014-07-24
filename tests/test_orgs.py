@@ -37,6 +37,3 @@ class TestOrganization(BaseCase):
         del json['type']
         o = github3.orgs.Organization(json)
         assert o.type == 'Organization'
-
-    def test_equality(self):
-        assert self.org == github3.orgs.Organization(load('org'))
