@@ -36,6 +36,17 @@ class TestPullRequestIterator(UnitIteratorHelper):
     described_class = PullRequest
     example_data = get_pr_example_data()
 
+    def test_commits(self):
+        """Show that a user can retrieve the commits in a Pull Request."""
+        i = self.instance.commits()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('commits'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_issue_comments(self):
         """Show that a user can retrieve the issue-like comments on a PR."""
         i = self.instance.issue_comments()

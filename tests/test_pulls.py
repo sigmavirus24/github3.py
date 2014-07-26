@@ -66,13 +66,6 @@ class TestPullRequest(BaseCase):
         assert self.pull.is_merged() is False
         self.mock_assertions()
 
-    def test_iter_comits(self):
-        self.response('commit', _iter=True)
-        self.get(self.api + '/commits')
-
-        assert isinstance(next(self.pull.iter_commits()), github3.git.Commit)
-        self.mock_assertions()
-
     def test_iter_files(self):
         self.response('pull_file', _iter=True)
         self.get(self.api + '/files')
