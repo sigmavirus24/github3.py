@@ -70,7 +70,7 @@ class TestPullRequest(BaseCase):
         self.response('review_comment', _iter=True)
         self.get(self.api + '/comments')
 
-        c = next(self.pull.iter_comments())
+        c = next(self.pull.review_comments())
         assert isinstance(c, github3.pulls.ReviewComment)
         self.mock_assertions()
 

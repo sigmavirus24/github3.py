@@ -212,8 +212,8 @@ class PullRequest(GitHubCore):
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1, etag=None):
-        """Iterate over the comments on this pull request.
+    def review_comments(self, number=-1, etag=None):
+        """Iterate over the review comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
