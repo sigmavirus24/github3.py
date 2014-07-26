@@ -2,7 +2,7 @@
 import json
 import os
 
-from .helper import UnitHelper, UnitIteratorHelper
+from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
 
 from github3.pulls import PullRequest
 
@@ -14,6 +14,11 @@ def get_pr_example_data():
     with open(example) as fd:
         data = json.load(fd)
     return data
+
+
+url_for = create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/pulls/1'
+)
 
 
 class TestPullRequest(UnitHelper):

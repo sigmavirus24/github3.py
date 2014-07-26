@@ -8,6 +8,18 @@ import json
 import unittest
 
 
+def create_url_helper(base_url):
+    """A function to generate ``url_for`` helpers."""
+    base_url = base_url.rstrip('/')
+
+    def url_for(path=''):
+        if path:
+            path = '/' + path.strip('/')
+        return base_url + path
+
+    return url_for
+
+
 def build_url(self, *args, **kwargs):
     """A function to proxy to the actual GitHubSession#build_url method."""
     # We want to assert what is happening with the actual calls to the
