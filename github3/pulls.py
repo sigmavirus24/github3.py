@@ -65,11 +65,11 @@ class PullFile(GitHubObject):
         #: Status of the file, e.g., 'added'
         self.status = pfile.get('status')
         #: Number of additions on this file
-        self.additions = pfile.get('additions')
+        self.additions_count = pfile.get('additions')
         #: Number of deletions on this file
-        self.deletions = pfile.get('deletions')
+        self.deletions_count = pfile.get('deletions')
         #: Number of changes made to this file
-        self.changes = pfile.get('changes')
+        self.changes_count = pfile.get('changes')
         #: URL to view the blob for this file
         self.blob_url = pfile.get('blob_url')
         #: URL to view the raw diff of this file
@@ -108,18 +108,18 @@ class PullRequest(GitHubCore):
         #: Body of the pull request as plain text
         self.body_text = pull.get('body_text', '')
         #: Number of additions on this pull request
-        self.additions = pull.get('additions')
+        self.additions_count = pull.get('additions')
         #: Number of deletions on this pull request
-        self.deletions = pull.get('deletions')
+        self.deletions_count = pull.get('deletions')
 
         #: datetime object representing when the pull was closed
         self.closed_at = self._strptime(pull.get('closed_at'))
         #: Number of comments
-        self.comments = pull.get('comments')
+        self.comments_count = pull.get('comments')
         #: Comments url (not a template)
         self.comments_url = pull.get('comments_url')
         #: Number of commits
-        self.commits = pull.get('commits')
+        self.commits_count = pull.get('commits')
         #: GitHub.com url of commits in this pull request
         self.commits_url = pull.get('commits_url')
         #: datetime object representing when the pull was created
@@ -179,7 +179,7 @@ class PullRequest(GitHubCore):
         #: Review comment URL Template. Expands with ``number``
         self.review_comment_url = URITemplate(comments) if comments else None
         #: Number of review comments on the pull request
-        self.review_comments = pull.get('review_comments')
+        self.review_comments_count = pull.get('review_comments')
         #: GitHub.com url for review comments (not a template)
         self.review_comments_url = pull.get('review_comments_url')
 
