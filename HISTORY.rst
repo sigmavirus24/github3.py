@@ -147,6 +147,22 @@ Old name                                 New name
 
 - ``GitHub`` instances can no longer be used as context managers
 
+- The pull request API has changed. To present a more consistent universal
+  API, certain attributes have been renamed.
+
+===============================     ==========================
+Old name                            New attribute name
+===============================     ==========================
+``PullFile.additions``              ``additions_count``
+``PullFile.deletions``              ``deletions_count``
+``PullFile.changes``                ``changes_count``
+``PullRequest.additions``           ``additions_count``
+``PullRequest.comments``            ``comments_count``
+``PullRequest.commits``             ``commits_count``
+``PullRequest.deletions``           ``deletions_count``
+``PullRequest.review_comments``     ``review_comments_count``
+===============================     ==========================
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 
