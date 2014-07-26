@@ -18,10 +18,18 @@ class TestPullRequest(IntegrationHelper):
         return p
 
     def test_issue_comments(self):
-        """Show that one can iterate over a PRs issue comments."""
+        """Show that one can iterate over a PR's issue comments."""
         cassette_name = self.cassette_name('issue_comments')
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for comment in p.issue_comments():
                 assert isinstance(comment,
                                   github3.issues.comment.IssueComment)
+
+    def test_review_comments(self):
+        """Show that one can iterate over a PR's review comments."""
+        cassette_name = self.cassette_name('review_comments')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            for comment in p.review_comments():
+                assert isinstance(comment, github3.pulls.ReviewComment)
