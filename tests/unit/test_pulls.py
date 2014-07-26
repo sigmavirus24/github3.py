@@ -33,4 +33,16 @@ class TestPullRequestIterator(UnitIteratorHelper):
 
     """Test PullRequest methods that return Iterators."""
 
-    pass
+    described_class = PullRequest
+    example_data = get_pr_example_data()
+
+    def test_issue_comments(self):
+        """Show that a user can retrieve the issue-like comments on a PR."""
+        i = self.instance.issue_comments()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('comments').replace('pulls', 'issues'),
+            params={'per_page': 100},
+            headers={}
+        )

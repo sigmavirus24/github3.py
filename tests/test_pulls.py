@@ -76,17 +76,6 @@ class TestPullRequest(BaseCase):
 
         assert repr(c).startswith('<Review Comment')
 
-    def test_iter_issue_comments(self):
-        pull = github3.pulls.PullRequest(load('pull19'))
-        self.response('pull19_comment', _iter=True)
-        self.get(pull.links['comments'])
-
-        c = next(pull.iter_issue_comments())
-        assert isinstance(c, github3.issues.comment.IssueComment)
-        self.mock_assertions()
-
-        assert repr(c).startswith('<Issue Comment')
-
     def test_iter_comits(self):
         self.response('commit', _iter=True)
         self.get(self.api + '/commits')
