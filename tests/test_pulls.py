@@ -66,16 +66,6 @@ class TestPullRequest(BaseCase):
         assert self.pull.is_merged() is False
         self.mock_assertions()
 
-    def test_iter_comments(self):
-        self.response('review_comment', _iter=True)
-        self.get(self.api + '/comments')
-
-        c = next(self.pull.review_comments())
-        assert isinstance(c, github3.pulls.ReviewComment)
-        self.mock_assertions()
-
-        assert repr(c).startswith('<Review Comment')
-
     def test_iter_comits(self):
         self.response('commit', _iter=True)
         self.get(self.api + '/commits')

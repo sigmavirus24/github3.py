@@ -46,3 +46,14 @@ class TestPullRequestIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_review_comments(self):
+        """Show that a user can retrieve the review comments on a PR."""
+        i = self.instance.review_comments()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('comments'),
+            params={'per_page': 100},
+            headers={}
+        )
