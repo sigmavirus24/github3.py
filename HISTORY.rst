@@ -56,6 +56,7 @@ Old name                                 New name
 ``Organization#iter_repos``              ``Organization#repositories``
 ``Organization#iter_teams``              ``Organization#teams``
 ``PullRequest#iter_comments``            ``PullRequest#review_comments``
+``PullRequest#iter_commits``             ``PullRequest#commits``
 ``PullRequest#iter_issue_comments``      ``PullRequest#issue_comments``
 ``Team#iter_members``                    ``Team#members``
 ``Team#iter_repos``                      ``Team#repositories``

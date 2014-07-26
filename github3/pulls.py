@@ -224,7 +224,7 @@ class PullRequest(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, ReviewComment, etag=etag)
 
-    def iter_commits(self, number=-1, etag=None):
+    def commits(self, number=-1, etag=None):
         """Iterates over the commits on this pull request.
 
         :param int number: (optional), number of commits to return. Default:
