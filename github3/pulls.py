@@ -248,7 +248,7 @@ class PullRequest(GitHubCore):
         url = self._build_url('files', base_url=self._api)
         return self._iter(int(number), url, PullFile, etag=etag)
 
-    def iter_issue_comments(self, number=-1, etag=None):
+    def issue_comments(self, number=-1, etag=None):
         """Iterate over the issue comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
@@ -257,7 +257,12 @@ class PullRequest(GitHubCore):
             endpoint
         :returns: generator of :class:`IssueComment <IssueComment>`\ s
         """
-        url = self._build_url(base_url=self.links['comments'])
+        comments = self.links.get('comments', {})
+        url = comments.get('href')
+        if not url:
+            url = self._build_url(
+                'comments', base_url=self._api.replace('pulls', 'issues')
+            )
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
