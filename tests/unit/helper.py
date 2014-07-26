@@ -108,6 +108,11 @@ class UnitHelper(unittest.TestCase):
         # we can assert things about the call that will be attempted to the
         # internet
         self.described_class._build_url = build_url
+        self.after_setup()
+
+    def after_setup(self):
+        """No-op method to avoid people having to override setUp."""
+        pass
 
 
 class UnitIteratorHelper(UnitHelper):

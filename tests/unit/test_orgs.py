@@ -194,9 +194,8 @@ class TestOrganizationRequiresAuth(UnitHelper):
         'type': 'Organization'
     }
 
-    def setUp(self):
+    def after_setup(self):
         """Set MockedSession#has_auth.return_value to False."""
-        super(TestOrganizationRequiresAuth, self).setUp()
         self.session.has_auth.return_value = False
 
     def test_add_member(self):

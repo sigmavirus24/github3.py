@@ -99,9 +99,8 @@ class TestTeamRequiresAuth(UnitHelper):
         }
     }
 
-    def setUp(self):
+    def after_setup(self):
         """Set up for test cases in TestTeamRequiresAuth."""
-        super(TestTeamRequiresAuth, self).setUp()
         self.session.has_auth.return_value = False
 
     def test_add_member_requires_auth(self):
