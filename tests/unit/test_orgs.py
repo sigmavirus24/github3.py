@@ -3,14 +3,9 @@ import pytest
 from github3 import GitHubError
 from github3.orgs import Organization
 
-from .helper import UnitHelper, UnitIteratorHelper
+from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
 
-
-def url_for(path=''):
-    """Simple function to generate URLs with the base Org URL."""
-    if path:
-        path = '/' + path.strip('/')
-    return 'https://api.github.com/orgs/hapy' + path
+url_for = create_url_helper('https://api.github.com/orgs/hapy')
 
 
 class TestOrganization(UnitHelper):
