@@ -137,28 +137,8 @@ class PullRequest(GitHubCore):
         #: Statuses URL
         self.statuses_url = pull.get('statuses_url')
 
-        # These are the links provided by the dictionary in the json called
-        # '_links'. It's structure is horrific, so to make this look a lot
-        # cleaner, I reconstructed what the links would be:
-        #  - ``self`` is just the api url, e.g.,
-        #    https://api.github.com/repos/:user/:repo/pulls/:number
-        #  - ``comments`` is just the api url for comments on the issue, e.g.,
-        #    https://api.github.com/repos/:user/:repo/issues/:number/comments
-        #  - ``issue`` is the api url for the issue, e.g.,
-        #    https://api.github.com/repos/:user/:repo/issues/:number
-        #  - ``html`` is just the html_url attribute
-        #  - ``review_comments`` is just the api url for the pull, e.g.,
-        #    https://api.github.com/repos/:user/:repo/pulls/:number/comments
-        #: Dictionary of _links
-        self.links = {
-            'self': self._api,
-            'comments': '/'.join([self._api.replace('pulls', 'issues'),
-                                  'comments']),
-            'issue': self._api.replace('pulls', 'issues'),
-            'html': self.html_url,
-            'review_comments': self._api + '/comments'
-        }
-
+        #: Dictionary of _links. Changed in 1.0
+        self.links = pull.get('_links')
         #: datetime object representing when the pull was merged
         self.merged_at = self._strptime(pull.get('merged_at'))
         #: Whether the pull is deemed mergeable by GitHub

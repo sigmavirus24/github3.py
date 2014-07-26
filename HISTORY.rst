@@ -147,8 +147,13 @@ Old name                                 New name
 
 - ``GitHub`` instances can no longer be used as context managers
 
-- The pull request API has changed. To present a more consistent universal
-  API, certain attributes have been renamed.
+- The pull request API has changed.
+
+  - The ``links`` attribute now contains the raw ``_links`` attribute from the
+    API.
+
+  - To present a more consistent universal API, certain attributes have been
+    renamed.
 
 ===============================     ==========================
 Old name                            New attribute name
