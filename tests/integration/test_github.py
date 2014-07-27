@@ -188,6 +188,14 @@ class TestGitHub(IntegrationHelper):
             m = self.gh.meta()
             assert isinstance(m, dict)
 
+    def test_notifications(self):
+        """Test the ability to retrieve unread notifications."""
+        self.basic_login()
+        cassette_name = self.cassette_name('unread_notifications')
+        with self.recorder.use_cassette(cassette_name):
+            for notification in self.gh.notifications():
+                assert isinstance(notification, github3.notifications.Thread)
+
     def test_octocat(self):
         """Test the ability to use the octocat endpoint."""
         cassette_name = self.cassette_name('octocat')
