@@ -195,6 +195,24 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             for notification in self.gh.notifications():
                 assert isinstance(notification, github3.notifications.Thread)
+                assert notification.unread is True
+
+    def test_notifications_all(self):
+        """Test the ability to retrieve read notifications as well."""
+        self.basic_login()
+        cassette_name = self.cassette_name('all_notifications')
+        with self.recorder.use_cassette(cassette_name):
+            read_notifications = []
+            unread_notifications = []
+            for notification in self.gh.notifications(all=True):
+                assert isinstance(notification, github3.notifications.Thread)
+                if notification.unread:
+                    unread_notifications.append(notification)
+                else:
+                    read_notifications.append(notification)
+
+            assert len(read_notifications) > 0
+            assert len(unread_notifications) > 0
 
     def test_octocat(self):
         """Test the ability to use the octocat endpoint."""
