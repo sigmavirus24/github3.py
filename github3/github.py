@@ -586,10 +586,10 @@ class GitHub(GitHubCore):
             :class:`Thread <github3.notifications.Thread>`
         """
         params = None
-        if all:
-            params = {'all': all}
-        elif participating:
-            params = {'participating': participating}
+        if all in (True, False):
+            params = {'all': str(all).lower()}
+        elif participating in (True, False):
+            params = {'participating': str(participating).lower()}
 
         url = self._build_url('notifications')
         return self._iter(int(number), url, Thread, params, etag=etag)
