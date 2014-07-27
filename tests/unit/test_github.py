@@ -348,7 +348,7 @@ class TestGitHubIterators(UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('notifications'),
-            params={'per_page': 100, 'participating': True},
+            params={'per_page': 100, 'participating': 'true'},
             headers={}
         )
 
@@ -359,7 +359,7 @@ class TestGitHubIterators(UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('notifications'),
-            params={'per_page': 100, 'all': True},
+            params={'per_page': 100, 'all': 'true'},
             headers={}
         )
 
