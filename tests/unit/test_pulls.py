@@ -1,9 +1,11 @@
 """Unit tests for the github3.pulls module."""
 import json
 import os
+import pytest
 
 from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
 
+from github3 import GitHubError
 from github3.pulls import PullRequest
 
 
@@ -36,6 +38,24 @@ class TestPullRequest(UnitHelper):
             url_for(),
             headers={'Accept': 'application/vnd.github.diff'}
         )
+
+
+class TestPullRequestRequiresAuthentication(UnitHelper):
+
+    """PullRequest unit tests that demonstrate which methods require auth."""
+
+    described_class = PullRequest
+    example_data = get_pr_example_data()
+
+    def after_setup(self):
+        """Make it appear as if the user has not authenticated."""
+        self.session.has_auth.return_value = False
+
+    def test_close(self):
+        """Show that you must be authenticated to close a Pull Request."""
+        with pytest.raises(GitHubError):
+            self.instance.close()
+
 
 class TestPullRequestIterator(UnitIteratorHelper):
 
