@@ -288,7 +288,10 @@ class PullRequest(GitHubCore):
         return json['merged']
 
     def patch(self):
-        """Return the patch"""
+        """Return the patch.
+
+        :returns: bytestring representation of the patch
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.patch'})
         return resp.content if self._boolean(resp, 200, 404) else None
@@ -324,8 +327,10 @@ class PullRequest(GitHubCore):
 
 
 class ReviewComment(BaseComment):
-    """The :class:`ReviewComment <ReviewComment>` object. This is used to
-    represent comments on pull requests.
+
+    """The :class:`ReviewComment <ReviewComment>` object.
+
+    This is used to represent comments on pull requests.
 
     Two comment instances can be checked like so::
 
@@ -339,6 +344,7 @@ class ReviewComment(BaseComment):
 
     See also: http://developer.github.com/v3/pulls/comments/
     """
+
     def __init__(self, comment, session=None):
         super(ReviewComment, self).__init__(comment, session)
 
