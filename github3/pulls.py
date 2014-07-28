@@ -23,7 +23,6 @@ class PullDestination(GitHubCore):
     """The :class:`PullDestination <PullDestination>` object.
 
     See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
-
     """
 
     def __init__(self, dest, direction):
@@ -52,10 +51,12 @@ class PullDestination(GitHubCore):
 
 
 class PullFile(GitHubObject):
+
     """The :class:`PullFile <PullFile>` object.
 
     See also: http://developer.github.com/v3/pulls/#list-pull-requests-files
     """
+
     def __init__(self, pfile):
         super(PullFile, self).__init__(pfile)
         #: SHA of the commit
@@ -82,6 +83,7 @@ class PullFile(GitHubObject):
 
 
 class PullRequest(GitHubCore):
+
     """The :class:`PullRequest <PullRequest>` object.
 
     Two pull request instances can be checked like so::
@@ -96,6 +98,7 @@ class PullRequest(GitHubCore):
 
     See also: http://developer.github.com/v3/pulls/
     """
+
     def __init__(self, pull, session=None):
         super(PullRequest, self).__init__(pull, session)
         self._api = pull.get('url', '')
@@ -192,20 +195,23 @@ class PullRequest(GitHubCore):
 
     @requires_auth
     def close(self):
-        """Closes this Pull Request without merging.
+        """Close this Pull Request without merging.
 
         :returns: bool
         """
         return self.update(self.title, self.body, 'closed')
 
     def diff(self):
-        """Return the diff"""
+        """Return the diff.
+
+        :returns: bytestring representation of the diff.
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.diff'})
         return resp.content if self._boolean(resp, 200, 404) else None
 
     def is_merged(self):
-        """Checks to see if the pull request was merged.
+        """Check to see if the pull request was merged.
 
         :returns: bool
         """
@@ -213,7 +219,7 @@ class PullRequest(GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     def review_comments(self, number=-1, etag=None):
-        """Iterate over the review comments on this pull request.
+        r"""Iterate over the review comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
@@ -225,7 +231,7 @@ class PullRequest(GitHubCore):
         return self._iter(int(number), url, ReviewComment, etag=etag)
 
     def commits(self, number=-1, etag=None):
-        """Iterates over the commits on this pull request.
+        r"""Iterate over the commits on this pull request.
 
         :param int number: (optional), number of commits to return. Default:
             -1 returns all available commits.
@@ -237,7 +243,7 @@ class PullRequest(GitHubCore):
         return self._iter(int(number), url, Commit, etag=etag)
 
     def files(self, number=-1, etag=None):
-        """Iterate over the files associated with this pull request.
+        r"""Iterate over the files associated with this pull request.
 
         :param int number: (optional), number of files to return. Default:
             -1 returns all available files.
@@ -249,7 +255,7 @@ class PullRequest(GitHubCore):
         return self._iter(int(number), url, PullFile, etag=etag)
 
     def issue_comments(self, number=-1, etag=None):
-        """Iterate over the issue comments on this pull request.
+        r"""Iterate over the issue comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
