@@ -236,7 +236,7 @@ class PullRequest(GitHubCore):
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, Commit, etag=etag)
 
-    def iter_files(self, number=-1, etag=None):
+    def files(self, number=-1, etag=None):
         """Iterate over the files associated with this pull request.
 
         :param int number: (optional), number of files to return. Default:

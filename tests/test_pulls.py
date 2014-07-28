@@ -66,16 +66,6 @@ class TestPullRequest(BaseCase):
         assert self.pull.is_merged() is False
         self.mock_assertions()
 
-    def test_iter_files(self):
-        self.response('pull_file', _iter=True)
-        self.get(self.api + '/files')
-
-        f = next(self.pull.iter_files())
-        assert isinstance(f, github3.pulls.PullFile)
-        self.mock_assertions()
-
-        assert repr(f).startswith('<Pull Request File')
-
     def test_merge(self):
         self.response('merge', 200)
         self.put(self.api + '/merge')
