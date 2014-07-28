@@ -28,6 +28,14 @@ class TestPullRequest(UnitHelper):
     described_class = PullRequest
     example_data = get_pr_example_data()
 
+    def test_diff(self):
+        """Show that a user can request the diff of a Pull Request."""
+        self.instance.diff()
+
+        self.session.get.assert_called_once_with(
+            url_for(),
+            headers={'Accept': 'application/vnd.github.diff'}
+        )
 
 class TestPullRequestIterator(UnitIteratorHelper):
 

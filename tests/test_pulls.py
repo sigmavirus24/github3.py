@@ -43,18 +43,6 @@ class TestPullRequest(BaseCase):
             up.assert_called_once_with(
                 self.pull.title, self.pull.body, 'closed')
 
-    def test_diff(self):
-        self.response('archive')
-        self.get(self.api)
-        self.conf = {
-            'headers': {
-                'Accept': 'application/vnd.github.diff'
-            }
-        }
-
-        assert self.pull.diff() != ''
-        self.mock_assertions()
-
     def test_is_merged(self):
         self.response('', 204)
         self.get(self.api + '/merge')
