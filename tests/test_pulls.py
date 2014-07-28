@@ -43,17 +43,6 @@ class TestPullRequest(BaseCase):
             up.assert_called_once_with(
                 self.pull.title, self.pull.body, 'closed')
 
-    def test_is_merged(self):
-        self.response('', 204)
-        self.get(self.api + '/merge')
-
-        assert self.pull.is_merged()
-        self.mock_assertions()
-
-        self.response('', 404)
-        assert self.pull.is_merged() is False
-        self.mock_assertions()
-
     def test_merge(self):
         self.response('merge', 200)
         self.put(self.api + '/merge')

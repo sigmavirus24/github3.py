@@ -39,6 +39,12 @@ class TestPullRequest(UnitHelper):
             headers={'Accept': 'application/vnd.github.diff'}
         )
 
+    def test_is_merged(self):
+        """Show that a user can request the merge status of a PR."""
+        self.instance.is_merged()
+
+        self.session.get.assert_called_once_with(url_for('merge'))
+
 
 class TestPullRequestRequiresAuthentication(UnitHelper):
 
