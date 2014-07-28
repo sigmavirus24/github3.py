@@ -25,6 +25,15 @@ class TestPullRequest(IntegrationHelper):
             for commit in p.commits():
                 assert isinstance(commit, github3.git.Commit)
 
+    def test_diff(self):
+        """Show that one can retrieve a bytestring diff of a PR."""
+        cassette_name = self.cassette_name('diff')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            diff = p.diff()
+            assert isinstance(diff, bytes)
+            assert len(diff) > 0
+
     def test_files(self):
         """Show that one can iterate over a PR's files."""
         cassette_name = self.cassette_name('files')
