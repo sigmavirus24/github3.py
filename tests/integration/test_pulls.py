@@ -58,6 +58,15 @@ class TestPullRequest(IntegrationHelper):
                 assert isinstance(comment,
                                   github3.issues.comment.IssueComment)
 
+    def test_patch(self):
+        """Show that a user can get the patch from a PR."""
+        cassette_name = self.cassette_name('patch')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            patch = p.patch()
+            assert isinstance(patch, bytes)
+            assert len(patch) > 0
+
     def test_review_comments(self):
         """Show that one can iterate over a PR's review comments."""
         cassette_name = self.cassette_name('review_comments')
