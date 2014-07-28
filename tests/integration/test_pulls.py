@@ -25,6 +25,14 @@ class TestPullRequest(IntegrationHelper):
             for commit in p.commits():
                 assert isinstance(commit, github3.git.Commit)
 
+    def test_files(self):
+        """Show that one can iterate over a PR's files."""
+        cassette_name = self.cassette_name('files')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            for pr_file in p.files():
+                assert isinstance(pr_file, github3.pulls.PullFile)
+
     def test_issue_comments(self):
         """Show that one can iterate over a PR's issue comments."""
         cassette_name = self.cassette_name('issue_comments')
