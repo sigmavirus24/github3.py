@@ -42,6 +42,13 @@ class TestPullRequest(IntegrationHelper):
             for pr_file in p.files():
                 assert isinstance(pr_file, github3.pulls.PullFile)
 
+    def test_is_merged(self):
+        """Show that one can check if a PR was merged."""
+        cassette_name = self.cassette_name('is_merged')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            assert p.is_merged() is True
+
     def test_issue_comments(self):
         """Show that one can iterate over a PR's issue comments."""
         cassette_name = self.cassette_name('issue_comments')
