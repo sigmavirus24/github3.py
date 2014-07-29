@@ -32,17 +32,6 @@ class TestPullRequest(BaseCase):
     def test_repr(self):
         assert repr(self.pull).startswith('<Pull Request')
 
-    def test_close(self):
-        self.assertRaises(github3.GitHubError, self.pull.close)
-
-        self.login()
-
-        with mock.patch.object(github3.pulls.PullRequest, 'update') as up:
-            up.return_value = True
-            assert self.pull.close()
-            up.assert_called_once_with(
-                self.pull.title, self.pull.body, 'closed')
-
     def test_update(self):
         self.response('pull', 200)
         self.patch(self.api)

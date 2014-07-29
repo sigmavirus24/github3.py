@@ -30,6 +30,19 @@ class TestPullRequest(UnitHelper):
     described_class = PullRequest
     example_data = get_pr_example_data()
 
+    def test_close(self):
+        """Show that a user can close a Pull Request."""
+        self.instance.close()
+
+        self.patch_called_with(
+            url_for(),
+            data={
+                'title': self.instance.title,
+                'body': self.instance.body,
+                'state': 'closed'
+            }
+        )
+
     def test_diff(self):
         """Show that a user can request the diff of a Pull Request."""
         self.instance.diff()
