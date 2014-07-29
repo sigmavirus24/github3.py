@@ -60,6 +60,19 @@ class TestPullRequest(UnitHelper):
             headers={'Accept': 'application/vnd.github.patch'}
         )
 
+    def test_reopen(self):
+        """Show that a user can reopen a Pull Request that was closed."""
+        self.instance.reopen()
+
+        self.patch_called_with(
+            url_for(),
+            data={
+                'title': self.instance.title,
+                'body': self.instance.body,
+                'state': 'open'
+            }
+        )
+
 
 class TestPullRequestRequiresAuthentication(UnitHelper):
 
@@ -81,6 +94,11 @@ class TestPullRequestRequiresAuthentication(UnitHelper):
         """Show that you must be authenticated to merge a Pull Request."""
         with pytest.raises(GitHubError):
             self.instance.merge()
+
+    def test_reopen(self):
+        """Show that you must be authenticated to reopen a Pull Request."""
+        with pytest.raises(GitHubError):
+            self.instance.reopen()
 
 
 class TestPullRequestIterator(UnitIteratorHelper):

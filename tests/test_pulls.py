@@ -43,15 +43,6 @@ class TestPullRequest(BaseCase):
             up.assert_called_once_with(
                 self.pull.title, self.pull.body, 'closed')
 
-    def test_reopen(self):
-        self.assertRaises(github3.GitHubError, self.pull.reopen)
-
-        self.login()
-        with mock.patch.object(github3.pulls.PullRequest, 'update') as up:
-            self.pull.reopen()
-            up.assert_called_once_with(
-                self.pull.title, self.pull.body, 'open')
-
     def test_update(self):
         self.response('pull', 200)
         self.patch(self.api)
