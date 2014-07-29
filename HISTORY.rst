@@ -156,6 +156,9 @@ Old name                                 New name
   - The ``links`` attribute now contains the raw ``_links`` attribute from the
     API.
 
+  - The ``merge_commit_sha`` attribute has been removed since it was deprecated
+    in the GitHub API.
+
   - To present a more consistent universal API, certain attributes have been
     renamed.
 

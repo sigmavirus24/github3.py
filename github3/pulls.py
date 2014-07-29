@@ -148,8 +148,7 @@ class PullRequest(GitHubCore):
         self.mergeable = pull.get('mergeable', False)
         #: Whether it would be a clean merge or not
         self.mergeable_state = pull.get('mergeable_state', '')
-        #: SHA of the merge commit. DEPRECATED
-        self.merge_commit_sha = pull.get('merge_commit_sha', '')
+
         user = pull.get('merged_by')
         #: :class:`User <github3.users.User>` who merged this pull
         self.merged_by = User(user, self) if user else None
@@ -286,7 +285,6 @@ class PullRequest(GitHubCore):
         json = self._json(self._put(url, data=data), 200)
         if not json:
             return False
-        self.merge_commit_sha = json['sha']
         return json['merged']
 
     def patch(self):
