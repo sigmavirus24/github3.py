@@ -51,6 +51,15 @@ class TestPullRequest(UnitHelper):
 
         self.session.put.assert_called_once_with(url_for('merge'), data=None)
 
+    def test_patch(self):
+        """Show that a user can fetch the patch from a Pull Request."""
+        self.instance.patch()
+
+        self.session.get.assert_called_once_with(
+            url_for(),
+            headers={'Accept': 'application/vnd.github.patch'}
+        )
+
 
 class TestPullRequestRequiresAuthentication(UnitHelper):
 

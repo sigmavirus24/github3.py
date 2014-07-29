@@ -43,14 +43,6 @@ class TestPullRequest(BaseCase):
             up.assert_called_once_with(
                 self.pull.title, self.pull.body, 'closed')
 
-    def test_patch(self):
-        self.response('archive', 200)
-        self.get(self.api)
-        self.conf = {'headers': {'Accept': 'application/vnd.github.patch'}}
-
-        assert self.pull.patch() != ''
-        self.mock_assertions()
-
     def test_reopen(self):
         self.assertRaises(github3.GitHubError, self.pull.reopen)
 
