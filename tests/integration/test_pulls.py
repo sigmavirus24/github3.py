@@ -75,6 +75,14 @@ class TestPullRequest(IntegrationHelper):
             assert isinstance(patch, bytes)
             assert len(patch) > 0
 
+    def test_reopen(self):
+        """Show that one can reopen an open Pull Request."""
+        self.basic_login()
+        cassette_name = self.cassette_name('reopen')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=241)
+            assert p.reopen() is True
+
     def test_review_comments(self):
         """Show that one can iterate over a PR's review comments."""
         cassette_name = self.cassette_name('review_comments')
