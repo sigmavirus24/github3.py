@@ -90,3 +90,11 @@ class TestPullRequest(IntegrationHelper):
             p = self.get_pull_request()
             for comment in p.review_comments():
                 assert isinstance(comment, github3.pulls.ReviewComment)
+
+    def test_update(self):
+        """Show that one can update an open Pull Request."""
+        self.basic_login()
+        cassette_name = self.cassette_name('update')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=241)
+            assert p.update(p.title) is True
