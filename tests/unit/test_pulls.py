@@ -45,6 +45,12 @@ class TestPullRequest(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('merge'))
 
+    def test_merge(self):
+        """Show that a user can merge a Pull Request."""
+        self.instance.merge()
+
+        self.session.put.assert_called_once_with(url_for('merge'), data=None)
+
 
 class TestPullRequestRequiresAuthentication(UnitHelper):
 
@@ -61,6 +67,11 @@ class TestPullRequestRequiresAuthentication(UnitHelper):
         """Show that you must be authenticated to close a Pull Request."""
         with pytest.raises(GitHubError):
             self.instance.close()
+
+    def test_merge(self):
+        """Show that you must be authenticated to merge a Pull Request."""
+        with pytest.raises(GitHubError):
+            self.instance.merge()
 
 
 class TestPullRequestIterator(UnitIteratorHelper):

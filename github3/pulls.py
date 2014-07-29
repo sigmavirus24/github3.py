@@ -284,6 +284,8 @@ class PullRequest(GitHubCore):
             data = dumps({'commit_message': commit_message})
         url = self._build_url('merge', base_url=self._api)
         json = self._json(self._put(url, data=data), 200)
+        if not json:
+            return False
         self.merge_commit_sha = json['sha']
         return json['merged']
 

@@ -43,22 +43,6 @@ class TestPullRequest(BaseCase):
             up.assert_called_once_with(
                 self.pull.title, self.pull.body, 'closed')
 
-    def test_merge(self):
-        self.response('merge', 200)
-        self.put(self.api + '/merge')
-        self.conf = {'data': None}
-
-        self.assertRaises(github3.GitHubError, self.pull.merge)
-
-        self.not_called()
-        self.login()
-        assert self.pull.merge()
-        self.mock_assertions()
-
-        self.conf['data'] = {'commit_message': 'Merged'}
-        assert self.pull.merge('Merged')
-        self.mock_assertions()
-
     def test_patch(self):
         self.response('archive', 200)
         self.get(self.api)
