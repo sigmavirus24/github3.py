@@ -17,6 +17,14 @@ class TestPullRequest(IntegrationHelper):
         assert isinstance(p, github3.pulls.PullRequest)
         return p
 
+    def test_close(self):
+        """Show that one can close an open Pull Request."""
+        self.basic_login()
+        cassette_name = self.cassette_name('close')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=241)
+            assert p.close() is True
+
     def test_commits(self):
         """Show that one can iterate over a PR's commits."""
         cassette_name = self.cassette_name('commits')
