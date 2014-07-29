@@ -32,20 +32,6 @@ class TestPullRequest(BaseCase):
     def test_repr(self):
         assert repr(self.pull).startswith('<Pull Request')
 
-    def test_update(self):
-        self.response('pull', 200)
-        self.patch(self.api)
-        self.conf = {'data': {'title': 't', 'body': 'b', 'state': 'open'}}
-
-        self.assertRaises(github3.GitHubError, self.pull.update)
-
-        self.login()
-        assert self.pull.update() is False
-        self.not_called()
-
-        assert self.pull.update('t', 'b', 'open')
-        self.mock_assertions()
-
     def test_enterprise(self):
         github3.pulls.PullRequest(load('pull_enterprise'))
 

@@ -86,6 +86,21 @@ class TestPullRequest(UnitHelper):
             }
         )
 
+    def test_update(self):
+        """Show that a user can update a Pull Request."""
+        self.instance.update('my new title',
+                             'my new body',
+                             'open')
+
+        self.patch_called_with(
+            url_for(),
+            data={
+                'title': 'my new title',
+                'body': 'my new body',
+                'state': 'open'
+            }
+        )
+
 
 class TestPullRequestRequiresAuthentication(UnitHelper):
 
@@ -112,6 +127,11 @@ class TestPullRequestRequiresAuthentication(UnitHelper):
         """Show that you must be authenticated to reopen a Pull Request."""
         with pytest.raises(GitHubError):
             self.instance.reopen()
+
+    def test_update(self):
+        """Show that you must be authenticated to update a Pull Request."""
+        with pytest.raises(GitHubError):
+            self.instance.update('foo', 'bar', 'bogus')
 
 
 class TestPullRequestIterator(UnitIteratorHelper):
