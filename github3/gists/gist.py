@@ -184,7 +184,7 @@ class Gist(GitHubCore):
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1, etag=None):
+    def comments(self, number=-1, etag=None):
         """List comments on this gist.
 
         :param int number: (optional), number of comments to iterate over.

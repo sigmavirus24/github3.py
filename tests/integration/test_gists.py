@@ -4,6 +4,15 @@ import github3
 
 
 class TestGist(IntegrationHelper):
+    def test_comments(self):
+        """Show that a user can iterate over the comments on a gist."""
+        cassette_name = self.cassette_name('comments')
+        with self.recorder.use_cassette(cassette_name):
+            gist = self.gh.gist(3342247)
+            assert gist is not None
+            for comment in gist.comments():
+                assert isinstance(comment, github3.gists.comment.GistComment)
+
     def test_iter_commits(self):
         cassette_name = self.cassette_name('commits')
         with self.recorder.use_cassette(cassette_name,
