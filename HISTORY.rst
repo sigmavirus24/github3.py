@@ -175,6 +175,14 @@ Old name                            New attribute name
 ``PullRequest.review_comments``     ``review_comments_count``
 ===============================     ==========================
 
+- The Gist API has changed.
+
+  - The ``forks`` and ``files`` attributes that used to keep count of the
+    number of ``forks`` and ``files`` have been **removed**.
+
+  - The ``comments`` attribute which provided the number of comments on a
+    gist, has been **renamed** to ``comments_count``.
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 

@@ -42,7 +42,7 @@ class Gist(GitHubCore):
     def __init__(self, data, session=None):
         super(Gist, self).__init__(data, session)
         #: Number of comments on this gist
-        self.comments = data.get('comments', 0)
+        self.comments_count = data.get('comments', 0)
 
         #: Unique id for this gist.
         self.id = '{0}'.format(data.get('id', ''))
@@ -59,8 +59,6 @@ class Gist(GitHubCore):
         self.public = data.get('public')
 
         self._forks = data.get('forks', [])
-        #: The number of forks of this gist.
-        self.forks = len(self._forks)
 
         #: Git URL to pull this gist, e.g., git://gist.github.com/1.git
         self.git_pull_url = data.get('git_pull_url', '')
@@ -80,14 +78,12 @@ class Gist(GitHubCore):
         self.owner = User(owner, self) if owner else None
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
-        #: Number of files in this gist.
-        self.files = len(self._files)
 
         #: History of this gist, list of
         #: :class:`GistHistory <github3.gists.history.GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
-        ## New urls
+        # New urls
 
         #: Comments URL (not a template)
         self.comments_url = data.get('comments_url', '')
