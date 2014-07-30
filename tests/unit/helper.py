@@ -24,7 +24,7 @@ def create_url_helper(base_url):
 def create_example_data_helper(example_filename):
     """A function to generate example data helpers."""
     directory = os.path.dirname(__file__)
-    example = os.path.join(directory, 'pull_request_example')
+    example = os.path.join(directory, example_filename)
 
     def data_helper():
         with open(example) as fd:

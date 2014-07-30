@@ -1,6 +1,5 @@
 """Unit tests for the github3.gists module."""
 import github3
-import pytest
 
 from .helper import (create_example_data_helper, create_url_helper,
                      UnitIteratorHelper)
@@ -19,7 +18,6 @@ class TestGistIterators(UnitIteratorHelper):
     described_class = github3.gists.Gist
     example_data = gist_example_data()
 
-    @pytest.mark.xfail
     def test_comments(self):
         """Show a user can iterate over the comments on a gist."""
         i = self.instance.comments()
