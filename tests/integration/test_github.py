@@ -34,7 +34,6 @@ class TestGitHub(IntegrationHelper):
                 )
 
         assert isinstance(g, github3.gists.Gist)
-        assert g.files == 1
         assert g.is_public() is True
 
     def test_create_issue(self):
