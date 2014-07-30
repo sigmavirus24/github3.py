@@ -5,6 +5,7 @@ except ImportError:
     import mock
 import github3
 import json
+import os.path
 import unittest
 
 
@@ -18,6 +19,19 @@ def create_url_helper(base_url):
         return base_url + path
 
     return url_for
+
+
+def create_example_data_helper(example_filename):
+    """A function to generate example data helpers."""
+    directory = os.path.dirname(__file__)
+    example = os.path.join(directory, 'pull_request_example')
+
+    def data_helper():
+        with open(example) as fd:
+            data = json.load(fd)
+        return data
+
+    return data_helper
 
 
 def build_url(self, *args, **kwargs):
