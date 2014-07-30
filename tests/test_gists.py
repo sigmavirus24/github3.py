@@ -91,16 +91,6 @@ class TestGist(BaseCase):
         assert self.gist.is_starred()
         self.mock_assertions()
 
-    def test_iter_comments(self):
-        self.response('gist_comment', _iter=True)
-        self.get(self.api + '/comments')
-        self.conf = {'params': {'per_page': 100}}
-
-        c = next(self.gist.iter_comments())
-
-        assert isinstance(c, gists.comment.GistComment)
-        self.mock_assertions()
-
     def test_iter_commits(self):
         self.response('gist_history', _iter=True)
         self.get(self.api + '/commits')
