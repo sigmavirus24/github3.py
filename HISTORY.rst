@@ -33,6 +33,7 @@ Old name                                 New name
 ``github3.iter_user_repos``              ``github3.repositories_by``
 ``github3.iter_starred``                 ``github3.starred_by``
 ``github3.iter_subscriptions``           ``github3.subscriptions_for``
+``Gist#iter_comments``                   ``Gist#comments``
 ``GitHub#iter_all_repos``                ``GitHub#all_repositories``
 ``GitHub#iter_all_users``                ``GitHub#all_users``
 ``GitHub#iter_authorizations``           ``GitHub#authorizations``
