@@ -93,3 +93,12 @@ class TestGist(IntegrationHelper):
             assert gist is not None
             for commit in gist.forks():
                 assert isinstance(commit, github3.gists.gist.Gist)
+
+    def test_is_starred(self):
+        """Show that a user can check if they've starred a gist."""
+        self.basic_login()
+        cassette_name = self.cassette_name('is_starred')
+        with self.recorder.use_cassette(cassette_name):
+            gist = self.gh.gist(1834570)
+            assert gist is not None
+            assert gist.is_starred() is True
