@@ -185,7 +185,7 @@ class Gist(GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     def comments(self, number=-1, etag=None):
-        """List comments on this gist.
+        """Iterate over comments on this gist.
 
         :param int number: (optional), number of comments to iterate over.
             Default: -1 will iterate over all comments on the gist
@@ -198,8 +198,8 @@ class Gist(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment, etag=etag)
 
-    def iter_commits(self, number=-1, etag=None):
-        """Iter over the commits on this gist.
+    def commits(self, number=-1, etag=None):
+        """Iterate over the commits on this gist.
 
         These commits will be requested from the API and should be the same as
         what is in ``Gist.history``.

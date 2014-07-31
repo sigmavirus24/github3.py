@@ -91,15 +91,6 @@ class TestGist(BaseCase):
         assert self.gist.is_starred()
         self.mock_assertions()
 
-    def test_iter_commits(self):
-        self.response('gist_history', _iter=True)
-        self.get(self.api + '/commits')
-        self.conf = {'params': {'per_page': 100}}
-
-        h = next(self.gist.iter_commits())
-        assert isinstance(h, gists.history.GistHistory)
-        self.mock_assertions()
-
     def test_iter_files(self):
         gist_file = next(self.gist.iter_files())
         assert gist_file == self.gist._files[0]

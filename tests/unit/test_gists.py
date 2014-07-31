@@ -28,3 +28,15 @@ class TestGistIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_commits(self):
+        """Show a user can iterate over the commits on a gist."""
+        i = self.instance.commits()
+        self.get_next(i)
+
+
+        self.session.get.assert_called_once_with(
+            url_for('commits'),
+            params={'per_page': 100},
+            headers={}
+        )
