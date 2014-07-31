@@ -35,6 +35,7 @@ Old name                                 New name
 ``github3.iter_subscriptions``           ``github3.subscriptions_for``
 ``Gist#iter_comments``                   ``Gist#comments``
 ``Gist#iter_commits``                    ``Gist#commits``
+``Gist#iter_files``                      ``Gist#files``
 ``GitHub#iter_all_repos``                ``GitHub#all_repositories``
 ``GitHub#iter_all_users``                ``GitHub#all_users``
 ``GitHub#iter_authorizations``           ``GitHub#authorizations``
