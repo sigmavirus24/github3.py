@@ -1,4 +1,5 @@
 """Unit tests for the github3.gists module."""
+import pytest
 import github3
 
 from .helper import (create_example_data_helper, create_url_helper,
@@ -24,6 +25,23 @@ class TestGist(UnitHelper):
 
         self.post_called_with(url_for('comments'),
                               data={'body': 'some comment text'})
+
+
+class TestGistRequiresAuth(UnitHelper):
+
+    """Test Gist methods which require authentication."""
+
+    described_class = github3.gists.Gist
+    example_data = gist_example_data()
+
+    def after_setup(self):
+        """Disable authentication."""
+        self.session.has_auth.return_value = False
+
+    def test_create_comment(self):
+        """Show that a user needs to authenticate to create a comment."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.create_comment('foo')
 
 
 class TestGistIterators(UnitIteratorHelper):

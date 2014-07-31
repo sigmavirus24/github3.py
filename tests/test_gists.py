@@ -19,21 +19,6 @@ class TestGist(BaseCase):
     def test_repr(self):
         assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
-    def test_create_comment(self):
-        self.response('gist_comment', 201)
-        self.post(self.api + '/comments')
-        self.conf = {'data': {'body': 'bar'}}
-
-        self.assertRaises(github3.GitHubError, self.gist.create_comment)
-        self.login()
-
-        assert self.gist.create_comment(None) is None
-        assert self.gist.create_comment('') is None
-        self.not_called()
-        assert isinstance(self.gist.create_comment('bar'),
-                          gists.comment.GistComment)
-        self.mock_assertions()
-
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
