@@ -26,6 +26,12 @@ class TestGist(UnitHelper):
         self.post_called_with(url_for('comments'),
                               data={'body': 'some comment text'})
 
+    def test_delete(self):
+        """Show that a user can delete a gist."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(url_for())
+
 
 class TestGistRequiresAuth(UnitHelper):
 
@@ -42,6 +48,11 @@ class TestGistRequiresAuth(UnitHelper):
         """Show that a user needs to authenticate to create a comment."""
         with pytest.raises(github3.GitHubError):
             self.instance.create_comment('foo')
+
+    def test_delete(self):
+        """Show that a user needs to authenticate to delete a gist."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.delete()
 
 
 class TestGistIterators(UnitIteratorHelper):

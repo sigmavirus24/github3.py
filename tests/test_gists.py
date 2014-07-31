@@ -19,18 +19,6 @@ class TestGist(BaseCase):
     def test_repr(self):
         assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.gist.delete)
-
-        self.not_called()
-        self.login()
-        assert self.gist.delete()
-        self.mock_assertions()
-
     def test_edit(self):
         self.response('gist', 200)
         self.patch(self.api)
