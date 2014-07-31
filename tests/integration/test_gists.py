@@ -57,6 +57,22 @@ class TestGist(IntegrationHelper):
             assert isinstance(gist, github3.gists.Gist)
             assert gist.delete() is True
 
+    def test_edit(self):
+        """Show that a user can edit the contents of a gist."""
+        self.basic_login()
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name):
+            gist = self.gh.gist(6647085)
+            assert gist is not None
+            assert gist.edit('Updated description', files={
+                'filename.py': {
+                    'content': '# New content',
+                },
+                'new_file.py': {
+                    'content': '# New file content',
+                },
+            }) is True
+
     def test_forks(self):
         """Show that a user can iterate over the forks of a gist."""
         cassette_name = self.cassette_name('forks')
