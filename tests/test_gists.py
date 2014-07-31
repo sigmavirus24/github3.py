@@ -19,18 +19,6 @@ class TestGist(BaseCase):
     def test_repr(self):
         assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
-    def test_unstar(self):
-        self.response('', 204)
-        self.delete(self.api + '/star')
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.gist.unstar)
-
-        self.not_called()
-        self.login()
-        assert self.gist.unstar()
-        self.mock_assertions()
-
     # As opposed to creating an all new class for this
     def test_history(self):
         hist = self.gist.history[0]
