@@ -187,6 +187,9 @@ Old name                            New attribute name
   - The ``comments`` attribute which provided the number of comments on a
     gist, has been **renamed** to ``comments_count``.
 
+  - The ``is_public`` method has been removed since it just returned the
+    ``Gist.public`` attribute.
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 

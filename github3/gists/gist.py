@@ -166,14 +166,6 @@ class Gist(GitHubCore):
         json = self._json(self._post(url), 201)
         return Gist(json, self) if json else None
 
-    def is_public(self):
-        """Check to see if this gist is public or not.
-
-        :returns: bool -- True if public, False if private
-
-        """
-        return self.public
-
     @requires_auth
     def is_starred(self):
         """Check to see if this gist is starred by the authenticated user.

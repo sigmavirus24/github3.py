@@ -77,9 +77,6 @@ class TestGist(BaseCase):
         assert isinstance(self.gist.fork(), gists.Gist)
         self.mock_assertions()
 
-    def test_is_public(self):
-        assert self.gist.is_public() == self.gist.public
-
     def test_is_starred(self):
         self.response('', 204)
         self.get(self.api + '/star')

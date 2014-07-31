@@ -34,7 +34,7 @@ class TestGitHub(IntegrationHelper):
                 )
 
         assert isinstance(g, github3.gists.Gist)
-        assert g.is_public() is True
+        assert g.public is True
 
     def test_create_issue(self):
         """Test the ability of a GitHub instance to create a new issue."""
