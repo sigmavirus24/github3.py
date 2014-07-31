@@ -2,13 +2,28 @@
 import github3
 
 from .helper import (create_example_data_helper, create_url_helper,
-                     UnitIteratorHelper)
+                     UnitHelper, UnitIteratorHelper)
 
 gist_example_data = create_example_data_helper('gist_example_data')
 
 url_for = create_url_helper(
     'https://api.github.com/gists/b4c7ac7be6e591d0d155'
 )
+
+
+class TestGist(UnitHelper):
+
+    """Test regular Gist methods."""
+
+    described_class = github3.gists.Gist
+    example_data = gist_example_data()
+
+    def test_create_comment(self):
+        """Show that a user can create a comment."""
+        self.instance.create_comment('some comment text')
+
+        self.post_called_with(url_for('comments'),
+                              data={'body': 'some comment text'})
 
 
 class TestGistIterators(UnitIteratorHelper):
