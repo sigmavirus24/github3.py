@@ -52,6 +52,12 @@ class TestGist(UnitHelper):
 
         assert self.session.patch.called is False
 
+    def test_fork(self):
+        """Show that a user can fork a gist."""
+        self.instance.fork()
+
+        self.session.post.assert_called_once_with(url_for('forks'), None)
+
 
 class TestGistRequiresAuth(UnitHelper):
 
@@ -78,6 +84,11 @@ class TestGistRequiresAuth(UnitHelper):
         """Show that a user needs to authenticate to edit a gist."""
         with pytest.raises(github3.GitHubError):
             self.instance.edit()
+
+    def test_fork(self):
+        """Show that a user needs to authenticate to fork a gist."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.fork()
 
 
 class TestGistIterators(UnitIteratorHelper):

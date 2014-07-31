@@ -19,18 +19,6 @@ class TestGist(BaseCase):
     def test_repr(self):
         assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
-    def test_fork(self):
-        self.response('gist', 201)
-        self.post(self.api + '/forks')
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.gist.fork)
-
-        self.not_called()
-        self.login()
-        assert isinstance(self.gist.fork(), gists.Gist)
-        self.mock_assertions()
-
     def test_is_starred(self):
         self.response('', 204)
         self.get(self.api + '/star')
