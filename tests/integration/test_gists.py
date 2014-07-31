@@ -42,6 +42,21 @@ class TestGist(IntegrationHelper):
             for commit in gist.commits():
                 assert isinstance(commit, github3.gists.history.GistHistory)
 
+    def test_delete(self):
+        """Show that a user can delete a gist."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            gist = self.gh.create_gist(
+                'Title', {
+                    'filename.py': {
+                        'content': '# -*- coding: utf-8 -*-'
+                    }
+                }
+            )
+            assert isinstance(gist, github3.gists.Gist)
+            assert gist.delete() is True
+
     def test_forks(self):
         """Show that a user can iterate over the forks of a gist."""
         cassette_name = self.cassette_name('forks')
