@@ -111,3 +111,12 @@ class TestGist(IntegrationHelper):
             gist = self.gh.gist('8de9b9b0ae2e45383d85')
             assert gist is not None
             assert gist.star() is True
+
+    def test_unstar(self):
+        """Show that a user can unstar a gist."""
+        self.basic_login()
+        cassette_name = self.cassette_name('unstar')
+        with self.recorder.use_cassette(cassette_name):
+            gist = self.gh.gist('8de9b9b0ae2e45383d85')
+            assert gist is not None
+            assert gist.unstar() is True
