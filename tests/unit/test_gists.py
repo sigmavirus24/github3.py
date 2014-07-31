@@ -58,6 +58,12 @@ class TestGist(UnitHelper):
 
         self.session.post.assert_called_once_with(url_for('forks'), None)
 
+    def test_is_starred(self):
+        """Show that a user can check if they starred a gist."""
+        self.instance.is_starred()
+
+        self.session.get.assert_called_once_with(url_for('star'))
+
 
 class TestGistRequiresAuth(UnitHelper):
 
@@ -89,6 +95,11 @@ class TestGistRequiresAuth(UnitHelper):
         """Show that a user needs to authenticate to fork a gist."""
         with pytest.raises(github3.GitHubError):
             self.instance.fork()
+
+    def test_is_starred(self):
+        """Show that a user needs to auth to check if they starred a gist."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.is_starred()
 
 
 class TestGistIterators(UnitIteratorHelper):
