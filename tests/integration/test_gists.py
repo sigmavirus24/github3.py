@@ -28,12 +28,12 @@ class TestGist(IntegrationHelper):
             for commit in gist.commits():
                 assert isinstance(commit, github3.gists.history.GistHistory)
 
-    def test_iter_forks(self):
+    def test_forks(self):
         """Show that a user can iterate over the forks of a gist."""
         cassette_name = self.cassette_name('forks')
         with self.recorder.use_cassette(cassette_name,
                                         preserve_exact_body_bytes=True):
             gist = self.gh.gist(1834570)
             assert gist is not None
-            for commit in gist.iter_forks():
+            for commit in gist.forks():
                 assert isinstance(commit, github3.gists.gist.Gist)

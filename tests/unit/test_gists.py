@@ -46,3 +46,14 @@ class TestGistIterators(UnitIteratorHelper):
         assert len(files) > 0
 
         assert self.session.get.called is False
+
+    def test_forks(self):
+        """Show that a user can iterate over a gist's forks."""
+        i = self.instance.forks()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('forks'),
+            params={'per_page': 100},
+            headers={}
+        )
