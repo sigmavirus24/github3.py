@@ -222,7 +222,7 @@ class Gist(GitHubCore):
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, GistHistory)
 
-    def iter_files(self):
+    def files(self):
         """Iterator over the files stored in this gist.
 
         :returns: generator of :class`GistFile <github3.gists.file.GistFile>`
