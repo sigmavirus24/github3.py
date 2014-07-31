@@ -91,12 +91,6 @@ class TestGist(BaseCase):
         assert self.gist.is_starred()
         self.mock_assertions()
 
-    def test_iter_files(self):
-        gist_file = next(self.gist.iter_files())
-        assert gist_file == self.gist._files[0]
-        assert isinstance(gist_file, gists.file.GistFile)
-        assert repr(gist_file).startswith('<Gist File')
-
     def test_refresh(self):
         self.response('gist', 200)
         self.get(self.api)

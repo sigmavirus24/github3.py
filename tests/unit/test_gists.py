@@ -34,9 +34,15 @@ class TestGistIterators(UnitIteratorHelper):
         i = self.instance.commits()
         self.get_next(i)
 
-
         self.session.get.assert_called_once_with(
             url_for('commits'),
             params={'per_page': 100},
             headers={}
         )
+
+    def test_files(self):
+        """Show that iterating over a gist's files does not make a request."""
+        files = list(self.instance.files())
+        assert len(files) > 0
+
+        assert self.session.get.called is False
