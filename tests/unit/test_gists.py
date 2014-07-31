@@ -26,6 +26,12 @@ class TestGist(UnitHelper):
         self.post_called_with(url_for('comments'),
                               data={'body': 'some comment text'})
 
+    def test_create_comment_requires_a_body(self):
+        """Show that a user cannot create an empty comment."""
+        self.instance.create_comment(None)
+
+        assert self.session.post.called is False
+
     def test_delete(self):
         """Show that a user can delete a gist."""
         self.instance.delete()
