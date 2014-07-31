@@ -38,6 +38,20 @@ class TestGist(UnitHelper):
 
         self.session.delete.assert_called_once_with(url_for())
 
+    def test_edit(self):
+        """Show that a user can edit a gist."""
+        desc = 'description'
+        files = {'file': {'content': 'foo content bar'}}
+        self.instance.edit(desc, files)
+
+        self.patch_called_with(url_for(), data={desc: desc, 'files': files})
+
+    def test_edit_requires_changes(self):
+        """Show that a user must change something to edit a gist."""
+        self.instance.edit()
+
+        assert self.session.patch.called is False
+
 
 class TestGistRequiresAuth(UnitHelper):
 
@@ -59,6 +73,11 @@ class TestGistRequiresAuth(UnitHelper):
         """Show that a user needs to authenticate to delete a gist."""
         with pytest.raises(github3.GitHubError):
             self.instance.delete()
+
+    def test_edit(self):
+        """Show that a user needs to authenticate to edit a gist."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.edit()
 
 
 class TestGistIterators(UnitIteratorHelper):

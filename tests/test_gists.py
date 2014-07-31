@@ -19,25 +19,6 @@ class TestGist(BaseCase):
     def test_repr(self):
         assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
-    def test_edit(self):
-        self.response('gist', 200)
-        self.patch(self.api)
-        self.conf = {
-            'data': {
-                'description': 'desc',
-                'files': {'file1': {'content': 'foo bar'}}
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.gist.edit)
-
-        self.login()
-        assert self.gist.edit() is False
-        self.not_called()
-
-        assert self.gist.edit(**self.conf['data'])
-        self.mock_assertions()
-
     def test_fork(self):
         self.response('gist', 201)
         self.post(self.api + '/forks')
