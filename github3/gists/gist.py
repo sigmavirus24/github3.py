@@ -230,7 +230,7 @@ class Gist(GitHubCore):
         """
         return iter(self._files)
 
-    def iter_forks(self, number=-1, etag=None):
+    def forks(self, number=-1, etag=None):
         """Iterator of forks of this gist.
 
         .. versionchanged:: 0.9

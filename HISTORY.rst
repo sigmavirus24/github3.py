@@ -36,6 +36,7 @@ Old name                                 New name
 ``Gist#iter_comments``                   ``Gist#comments``
 ``Gist#iter_commits``                    ``Gist#commits``
 ``Gist#iter_files``                      ``Gist#files``
+``Gist#iter_forks``                      ``Gist#forks``
 ``GitHub#iter_all_repos``                ``GitHub#all_repositories``
 ``GitHub#iter_all_users``                ``GitHub#all_users``
 ``GitHub#iter_authorizations``           ``GitHub#authorizations``
