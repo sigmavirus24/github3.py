@@ -19,25 +19,6 @@ class TestGist(BaseCase):
     def test_repr(self):
         assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
 
-    def test_refresh(self):
-        self.response('gist', 200)
-        self.get(self.api)
-
-        assert self.gist.refresh() is self.gist
-        self.mock_assertions()
-
-    def test_star(self):
-        self.response('', 204)
-        self.put(self.api + '/star')
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.gist.star)
-
-        self.not_called()
-        self.login()
-        assert self.gist.star()
-        self.mock_assertions()
-
     def test_unstar(self):
         self.response('', 204)
         self.delete(self.api + '/star')

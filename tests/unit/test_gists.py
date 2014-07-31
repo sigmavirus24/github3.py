@@ -64,6 +64,12 @@ class TestGist(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('star'))
 
+    def test_star(self):
+        """Show that a user can star a gist."""
+        self.instance.star()
+
+        self.session.put.assert_called_once_with(url_for('star'))
+
 
 class TestGistRequiresAuth(UnitHelper):
 
@@ -100,6 +106,11 @@ class TestGistRequiresAuth(UnitHelper):
         """Show that a user needs to auth to check if they starred a gist."""
         with pytest.raises(github3.GitHubError):
             self.instance.is_starred()
+
+    def test_star(self):
+        """Show that a user needs to be authenticated to star a gist."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.star()
 
 
 class TestGistIterators(UnitIteratorHelper):
