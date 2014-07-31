@@ -73,6 +73,17 @@ class TestGist(IntegrationHelper):
                 },
             }) is True
 
+    def test_fork(self):
+        """Show that a user can fork another user's gist."""
+        self.basic_login()
+        cassette_name = self.cassette_name('fork')
+        with self.recorder.use_cassette(cassette_name):
+            gist = self.gh.gist('8de9b9b0ae2e45383d85')
+            assert gist is not None
+            forked = gist.fork()
+            assert isinstance(forked, github3.gists.Gist)
+            assert str(forked.owner) == 'sigmavirus24'
+
     def test_forks(self):
         """Show that a user can iterate over the forks of a gist."""
         cassette_name = self.cassette_name('forks')
