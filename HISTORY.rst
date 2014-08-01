@@ -65,6 +65,7 @@ Old name                                 New name
 ``PullRequest#iter_issue_comments``      ``PullRequest#issue_comments``
 ``Team#iter_members``                    ``Team#members``
 ``Team#iter_repos``                      ``Team#repositories``
+``Repository#iter_assignees``            ``Repository#assignees``
 
 ====================================     ==============================================
 

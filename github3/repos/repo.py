@@ -362,6 +362,18 @@ class Repository(GitHubCore):
                               200)
         return Asset(data, self) if data else None
 
+    def assignees(self, number=-1, etag=None):
+        """Iterate over all assignees to which an issue may be assigned.
+
+        :param int number: (optional), number of assignees to return. Default:
+            -1 returns all available assignees
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('assignees', base_url=self._api)
+        return self._iter(int(number), url, User, etag=etag)
+
     def blob(self, sha):
         """Get the blob indicated by ``sha``.
 
@@ -1084,19 +1096,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_assignees(self, number=-1, etag=None):
-        """Iterate over all available assignees to which an issue may be
-        assigned.
-
-        :param int number: (optional), number of assignees to return. Default:
-            -1 returns all available assignees
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
-        """
-        url = self._build_url('assignees', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
 
     def iter_branches(self, number=-1, etag=None):
         """Iterate over the branches in this repository.
