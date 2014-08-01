@@ -154,9 +154,7 @@ class TestRepository(IntegrationHelper):
                 assert isinstance(release, github3.repos.release.Release)
 
     def test_milestone(self):
-        """
-        Test the ability to retrieve a specific milestone on a repository.
-        """
+        """Test the ability to retrieve a milestone on a repository."""
         cassette_name = self.cassette_name('milestone')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
