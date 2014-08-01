@@ -13,12 +13,6 @@ class TestGist(BaseCase):
         super(TestGist, self).setUp()
         self.gist = gists.Gist(self.gist.to_json(), self.g)
 
-    def test_str(self):
-        assert str(self.gist) == str(self.gist.id)
-
-    def test_repr(self):
-        assert repr(self.gist) == '<Gist [{0}]>'.format(self.gist)
-
     # As opposed to creating an all new class for this
     def test_history(self):
         hist = self.gist.history[0]
@@ -30,12 +24,6 @@ class TestGist(BaseCase):
         self.mock_assertions()
 
         assert repr(hist).startswith('<Gist History')
-
-    def test_equality(self):
-        g = gists.Gist(load('gist'))
-        assert self.gist == g
-        g._uniq = 1
-        assert self.gist != g
 
 
 class TestGistComment(BaseCase):

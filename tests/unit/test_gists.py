@@ -76,6 +76,10 @@ class TestGist(UnitHelper):
 
         self.session.delete.assert_called_once_with(url_for('star'))
 
+    def test_to_str(self):
+        """Show that a str(gist) is the same as the gist's id."""
+        assert str(self.instance) == str(self.instance.id)
+
 
 class TestGistRequiresAuth(UnitHelper):
 
