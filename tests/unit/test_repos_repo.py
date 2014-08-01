@@ -1,7 +1,11 @@
 """Unit tests for Repositories."""
 from github3.repos.repo import Repository
 
-from .helper import UnitHelper, UnitIteratorHelper
+from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper)
+
+url_for = create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World'
+)
 
 repo_example_data = {
     "id": 1296269,
@@ -162,3 +166,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
 
     described_class = Repository
     example_data = repo_example_data
+
+    def test_assignees(self):
+        """Test the ability to iterate over the assignees in a Repository."""
+        i = self.instance.assignees()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('assignees'),
+            params={'per_page': 100},
+            headers={}
+        )
