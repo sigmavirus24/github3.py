@@ -1,9 +1,22 @@
+"""Integration tests for Repositories."""
 import github3
 
 from .helper import IntegrationHelper
 
 
 class TestRepository(IntegrationHelper):
+
+    """Integration tests for the Repository object."""
+
+    def test_assignees(self):
+        """Test the ability to retrieve assignees of issues on a repo."""
+        cassette_name = self.cassette_name('assignees')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('kennethreitz', 'requests')
+            assert repository is not None
+            for assignee in repository.assignees():
+                assert isinstance(assignee, github3.users.User)
+
     def test_create_empty_blob(self):
         """Test the ability to create an empty blob on a repository."""
         self.basic_login()
