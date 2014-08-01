@@ -1,3 +1,4 @@
+"""Unit tests for Repositories."""
 from github3.repos.repo import Repository
 
 from .helper import UnitHelper, UnitIteratorHelper
@@ -121,11 +122,14 @@ repo_example_data = {
 
 
 class TestRepository(UnitHelper):
+
+    """Unit test for regular Repository methods."""
+
     described_class = Repository
     example_data = repo_example_data
 
     def test_asset(self):
-        """Test retrieving an asset uses the right headers
+        """Test retrieving an asset uses the right headers.
 
         The Releases section of the API is still in Beta and uses custom
         headers
@@ -153,5 +157,8 @@ class TestRepository(UnitHelper):
 
 
 class TestRepositoryIterator(UnitIteratorHelper):
+
+    """Unit tests for Repository methods that return iterators."""
+
     described_class = Repository
     example_data = repo_example_data
