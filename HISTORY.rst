@@ -20,9 +20,9 @@ Breaking Changes
 
 - All methods and functions starting with ``iter_`` have been renamed.
 
-====================================     ==============================================
+======================================   ==============================================
 Old name                                 New name
-====================================     ==============================================
+======================================   ==============================================
 ``github3.iter_all_repos``               ``github3.all_repositories``
 ``github3.iter_all_users``               ``github3.all_users``
 ``github3.iter_events``                  ``github3.all_events``
@@ -70,8 +70,9 @@ Old name                                 New name
 ``Repository#iter_code_frequency``       ``Repository#code_frequency``
 ``Repository#iter_collaborators``        ``Repository#collaborators``
 ``Repository#iter_comments``             ``Repository#comments``
+``Repository#iter_comments_on_commit``   ``Repository#comments_on_commit``
 
-====================================     ==============================================
+======================================   ==============================================
 
 - ``github3.login`` has been simplified and split into two functions:
 
