@@ -40,8 +40,9 @@ from uritemplate import URITemplate
 
 class Repository(GitHubCore):
 
-    """The :class:`Repository <Repository>` object. It represents how GitHub
-    sends information about repositories.
+    """The :class:`Repository <Repository>` object.
+
+    It represents how GitHub sends information about repositories.
 
     Two repository instances can be checked like so::
 
