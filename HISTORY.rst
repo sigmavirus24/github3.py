@@ -66,6 +66,7 @@ Old name                                 New name
 ``Team#iter_members``                    ``Team#members``
 ``Team#iter_repos``                      ``Team#repositories``
 ``Repository#iter_assignees``            ``Repository#assignees``
+``Repository#iter_branches``             ``Repository#branches``
 
 ====================================     ==============================================
 

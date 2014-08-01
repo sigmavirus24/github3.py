@@ -398,6 +398,19 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Branch(json, self) if json else None
 
+    def branches(self, number=-1, etag=None):
+        """Iterate over the branches in this repository.
+
+        :param int number: (optional), number of branches to return. Default:
+            -1 returns all branches
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`Branch <github3.repos.branch.Branch>`\ es
+        """
+        url = self._build_url('branches', base_url=self._api)
+        return self._iter(int(number), url, Branch, etag=etag)
+
     def commit(self, sha):
         """Get a single (repo) commit. See :func:`git_commit` for the Git Data
         Commit.
@@ -1096,19 +1109,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_branches(self, number=-1, etag=None):
-        """Iterate over the branches in this repository.
-
-        :param int number: (optional), number of branches to return. Default:
-            -1 returns all branches
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`Branch <github3.repos.branch.Branch>`\ es
-        """
-        url = self._build_url('branches', base_url=self._api)
-        return self._iter(int(number), url, Branch, etag=etag)
 
     def iter_code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.
