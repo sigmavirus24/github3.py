@@ -436,6 +436,18 @@ class Repository(GitHubCore):
         url = self._build_url('stats', 'code_frequency', base_url=self._api)
         return self._iter(int(number), url, list, etag=etag)
 
+    def collaborators(self, number=-1, etag=None):
+        """Iterate over the collaborators of this repository.
+
+        :param int number: (optional), number of collaborators to return.
+            Default: -1 returns all comments
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('collaborators', base_url=self._api)
+        return self._iter(int(number), url, User, etag=etag)
+
     def commit(self, sha):
         """Get a single (repo) commit. See :func:`git_commit` for the Git Data
         Commit.
@@ -1134,18 +1146,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_collaborators(self, number=-1, etag=None):
-        """Iterate over the collaborators of this repository.
-
-        :param int number: (optional), number of collaborators to return.
-            Default: -1 returns all comments
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
-        """
-        url = self._build_url('collaborators', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
 
     def iter_comments(self, number=-1, etag=None):
         """Iterate over comments on all commits in the repository.

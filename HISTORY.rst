@@ -68,6 +68,7 @@ Old name                                 New name
 ``Repository#iter_assignees``            ``Repository#assignees``
 ``Repository#iter_branches``             ``Repository#branches``
 ``Repository#iter_code_frequency``       ``Repository#code_frequency``
+``Repository#iter_collaborators``        ``Repository#collaborators``
 
 ====================================     ==============================================
 
