@@ -1094,15 +1094,6 @@ class TestRepository(BaseCase):
 
         self.mock_assertions()
 
-    def test_iter_code_frequency(self):
-        self.response('code_frequency', _iter=True)
-        self.get(self.api + 'stats/code_frequency')
-
-        s = next(self.repo.iter_code_frequency())
-        assert isinstance(s, list)
-
-        self.mock_assertions()
-
 
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):

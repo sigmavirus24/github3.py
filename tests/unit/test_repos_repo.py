@@ -188,3 +188,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_code_frequency(self):
+        """Test the ability to iterate over the statistics in a Repository."""
+        i = self.instance.code_frequency()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('stats/code_frequency'),
+            params={'per_page': 100},
+            headers={}
+        )
