@@ -199,3 +199,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_collaborators(self):
+        """Test the ability to iterate over the collaborators on a repo."""
+        i = self.instance.collaborators()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('collaborators'),
+            params={'per_page': 100},
+            headers={}
+        )

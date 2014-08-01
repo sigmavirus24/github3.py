@@ -549,15 +549,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_collaborators(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'collaborators')
-        self.conf = {'params': {'per_page': 100}}
-
-        u = next(self.repo.iter_collaborators())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
     def test_iter_comments(self):
         self.response('repo_comment', _iter=True)
         self.get(self.api + 'comments')
