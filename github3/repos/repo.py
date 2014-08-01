@@ -461,7 +461,7 @@ class Repository(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
 
-    def comments_on_commit(self, sha, number=1, etag=None):
+    def comments_on_commit(self, sha, number=-1, etag=None):
         """Iterate over comments for a single commit.
 
         :param sha: (required), sha of the commit to list comments on

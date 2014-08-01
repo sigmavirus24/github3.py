@@ -549,15 +549,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_comments_on_commit(self):
-        self.response('repo_comment', _iter=True)
-        self.get(self.api + 'commits/fakesha/comments')
-        self.conf = {'params': {'per_page': 1}}
-
-        c = next(self.repo.iter_comments_on_commit('fakesha'))
-        assert isinstance(c, repos.comment.RepoComment)
-        self.mock_assertions()
-
     def test_iter_commits(self):
         self.response('commit', _iter=True)
         self.get(self.api + 'commits')
