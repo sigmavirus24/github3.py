@@ -210,3 +210,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_comments(self):
+        """Test the ability to iterate over the comments on a repository."""
+        i = self.instance.comments()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('comments'),
+            params={'per_page': 100},
+            headers={}
+        )
