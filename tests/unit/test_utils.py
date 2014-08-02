@@ -10,7 +10,7 @@ import requests
 class TestTimestampConverter:
     def test_datetimes(self):
         timestamp = datetime(2010, 6, 1, 12, 15, 30)
-        assert '2010-06-01T12:15:30' == timestamp_parameter(timestamp)
+        assert '2010-06-01T12:15:30Z' == timestamp_parameter(timestamp)
 
     def test_valid_datestring(self):
         testvals = (
