@@ -232,3 +232,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_commit_activity(self):
+        """Test the ability to iterate over commit activity on a repo."""
+        i = self.instance.commit_activity()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('stats/commit_activity'),
+            params={'per_page': 100},
+            headers={}
+        )

@@ -1049,15 +1049,6 @@ class TestRepository(BaseCase):
         self.assertEqual(w, {})
         self.mock_assertions()
 
-    def test_iter_commit_activity(self):
-        self.response('commit_activity', _iter=True)
-        self.get(self.api + 'stats/commit_activity')
-
-        w = next(self.repo.iter_commit_activity())
-        assert isinstance(w, dict)
-
-        self.mock_assertions()
-
     def test_iter_contributor_statistics(self):
         self.response('contributor_statistics', _iter=True)
         self.get(self.api + 'stats/contributors')
