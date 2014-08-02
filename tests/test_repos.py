@@ -1,5 +1,4 @@
 import os
-import pytest
 import github3
 from github3 import repos
 from datetime import datetime
@@ -548,37 +547,6 @@ class TestRepository(BaseCase):
         assert self.repo.label(None) is None
         self.not_called()
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
-        self.mock_assertions()
-
-    @pytest.mark.xfail
-    def test_iter_commits(self):
-        self.response('commit', _iter=True)
-        self.get(self.api + 'commits')
-        self.conf = {'params': {'per_page': 100}}
-
-        c = next(self.repo.iter_commits())
-        assert isinstance(c, repos.commit.RepoCommit)
-        self.mock_assertions()
-
-        self.conf = {'params': {'sha': 'fakesha', 'path': '/',
-                                'per_page': 100}}
-        c = next(self.repo.iter_commits('fakesha', '/'))
-        self.mock_assertions()
-
-        since = datetime(2013, 6, 1, 0, 0, 0)
-        until = datetime(2013, 6, 2, 0, 0, 0)
-        self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00',
-                                'per_page': 100}}
-        c = next(self.repo.iter_commits(since=since, until=until))
-        self.mock_assertions()
-
-        since = '2013-06-01T00:00:00'
-        until = '2013-06-02T00:00:00'
-        self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00',
-                                'per_page': 100}}
-        c = next(self.repo.iter_commits(since=since, until=until))
         self.mock_assertions()
 
     def test_iter_contributors(self):

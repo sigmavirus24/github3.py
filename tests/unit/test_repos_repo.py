@@ -257,13 +257,26 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
-    def test_commits_since_datetime(self):
-        """Test the ability to iterate over commits in a repo since a date."""
-        i = self.instance.commits(since=datetime.datetime(2014, 8, 1))
+    def test_commits_since_until_datetime(self):
+        """Test the ability to iterate over repo's commits in a date range."""
+        i = self.instance.commits(since=datetime.datetime(2014, 8, 1),
+                                  until='2014-09-01T00:00:00Z')
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
             url_for('commits'),
-            params={'per_page': 100, 'since': '2014-08-01T00:00:00Z'},
+            params={'per_page': 100, 'since': '2014-08-01T00:00:00Z',
+                    'until': '2014-09-01T00:00:00Z'},
+            headers={}
+        )
+
+    def test_commits_sha_path(self):
+        """Test the ability to filter commits by branch and path."""
+        i = self.instance.commits(sha='branch', path='tests/')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('commits'),
+            params={'per_page': 100, 'sha': 'branch', 'path': 'tests/'},
             headers={}
         )
