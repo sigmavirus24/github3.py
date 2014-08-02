@@ -1,7 +1,6 @@
 import os
 import github3
 from github3 import repos
-from datetime import datetime
 from tests.utils import (BaseCase, load, mock)
 
 
