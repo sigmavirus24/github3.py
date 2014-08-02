@@ -1,6 +1,5 @@
 """Unit tests for Repositories."""
 import datetime
-import pytest
 
 from github3.repos.repo import Repository
 
@@ -258,7 +257,6 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
-    @pytest.mark.xfail
     def test_commits_since_datetime(self):
         """Test the ability to iterate over commits in a repo since a date."""
         i = self.instance.commits(since=datetime.datetime(2014, 8, 1))
