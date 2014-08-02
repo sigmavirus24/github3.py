@@ -65,6 +65,15 @@ class TestRepository(IntegrationHelper):
             for comment in repository.comments_on_commit(sha):
                 assert isinstance(comment, github3.repos.comment.RepoComment)
 
+    def test_commit_activity(self):
+        """Test the ability to retrieve commit activity on a repo."""
+        cassette_name = self.cassette_name('commit_activity')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            for activity in repository.commit_activity():
+                assert isinstance(activity, dict)
+
     def test_create_empty_blob(self):
         """Test the ability to create an empty blob on a repository."""
         self.basic_login()
