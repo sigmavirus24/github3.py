@@ -72,6 +72,7 @@ Old name                                 New name
 ``Repository#iter_comments``             ``Repository#comments``
 ``Repository#iter_comments_on_commit``   ``Repository#comments_on_commit``
 ``Repository#iter_commit_activity``      ``Repository#commit_activity``
+``Repository#iter_commits``              ``Repository#commits``
 
 ======================================   ==============================================
 

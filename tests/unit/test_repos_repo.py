@@ -1,4 +1,7 @@
 """Unit tests for Repositories."""
+import datetime
+import pytest
+
 from github3.repos.repo import Repository
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper)
@@ -241,5 +244,28 @@ class TestRepositoryIterator(UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('stats/commit_activity'),
             params={'per_page': 100},
+            headers={}
+        )
+
+    def test_commits(self):
+        """Test the ability to iterate over commits in a repo."""
+        i = self.instance.commits()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('commits'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    @pytest.mark.xfail
+    def test_commits_since_datetime(self):
+        """Test the ability to iterate over commits in a repo since a date."""
+        i = self.instance.commits(since=datetime.datetime(2014, 8, 1))
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('commits'),
+            params={'per_page': 100, 'since': '2014-08-01T00:00:00Z'},
             headers={}
         )

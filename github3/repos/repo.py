@@ -520,6 +520,40 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return RepoComment(json, self) if json else None
 
+    def commits(self, sha=None, path=None, author=None, number=-1, etag=None,
+                since=None, until=None):
+        r"""Iterate over commits in this repository.
+
+        :param str sha: (optional), sha or branch to start listing commits
+            from
+        :param str path: (optional), commits containing this path will be
+            listed
+        :param str author: (optional), GitHub login, real name, or email to
+            filter commits by (using commit author)
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all comments
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :param since: (optional), Only commits after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :type since: datetime or string
+        :param until: (optional), Only commits before this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :type until: datetime or string
+
+        :returns: generator of
+            :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
+        """
+        params = {'sha': sha, 'path': path, 'author': author,
+                  'since': timestamp_parameter(since),
+                  'until': timestamp_parameter(until)}
+
+        self._remove_none(params)
+        url = self._build_url('commits', base_url=self._api)
+        return self._iter(int(number), url, RepoCommit, params, etag)
+
     def compare_commits(self, base, head):
         """Compare two commits.
 
@@ -1195,40 +1229,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_commits(self, sha=None, path=None, author=None, number=-1,
-                     etag=None, since=None, until=None):
-        """Iterate over commits in this repository.
-
-        :param str sha: (optional), sha or branch to start listing commits
-            from
-        :param str path: (optional), commits containing this path will be
-            listed
-        :param str author: (optional), GitHub login, real name, or email to
-            filter commits by (using commit author)
-        :param int number: (optional), number of comments to return. Default:
-            -1 returns all comments
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :param since: (optional), Only commits after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
-            date string.
-        :type since: datetime or string
-        :param until: (optional), Only commits before this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
-            date string.
-        :type until: datetime or string
-
-        :returns: generator of
-            :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
-        """
-        params = {'sha': sha, 'path': path, 'author': author,
-                  'since': timestamp_parameter(since),
-                  'until': timestamp_parameter(until)}
-
-        self._remove_none(params)
-        url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, RepoCommit, params, etag)
 
     def iter_contributors(self, anon=False, number=-1, etag=None):
         """Iterate over the contributors to this repository.
