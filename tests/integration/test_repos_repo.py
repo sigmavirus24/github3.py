@@ -83,6 +83,15 @@ class TestRepository(IntegrationHelper):
             for commit in repository.commits(number=25):
                 assert isinstance(commit, github3.repos.commit.RepoCommit)
 
+    def test_contributor_statistics(self):
+        """Test the ability to retrieve contributor statistics for a repo."""
+        cassette_name = self.cassette_name('contributor_statistics')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            for stat in repository.contributor_statistics():
+                assert isinstance(stat, github3.repos.stats.ContributorStats)
+
     def test_contributors(self):
         """Test the ability to retrieve the contributors to a repository."""
         cassette_name = self.cassette_name('contributors')

@@ -1002,15 +1002,6 @@ class TestRepository(BaseCase):
         self.assertEqual(w, {})
         self.mock_assertions()
 
-    def test_iter_contributor_statistics(self):
-        self.response('contributor_statistics', _iter=True)
-        self.get(self.api + 'stats/contributors')
-
-        s = next(self.repo.iter_contributor_statistics())
-        assert isinstance(s, repos.stats.ContributorStats)
-
-        self.mock_assertions()
-
 
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):

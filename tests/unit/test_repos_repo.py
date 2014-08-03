@@ -281,6 +281,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_contributor_statistics(self):
+        """Test the ability to iterate over contributor statistics."""
+        i = self.instance.contributor_statistics()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('stats/contributors'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_contributors(self):
         """Test the ability to iterate over contributors to a repository."""
         i = self.instance.contributors()
