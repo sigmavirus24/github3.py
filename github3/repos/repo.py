@@ -593,6 +593,23 @@ class Repository(GitHubCore):
             return dict((j.get('name'), Contents(j, self)) for j in json)
         return None
 
+    def contributors(self, anon=False, number=-1, etag=None):
+        r"""Iterate over the contributors to this repository.
+
+        :param bool anon: (optional), True lists anonymous contributors as
+            well
+        :param int number: (optional), number of contributors to return.
+            Default: -1 returns all contributors
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('contributors', base_url=self._api)
+        params = {}
+        if anon:
+            params = {'anon': 'true'}
+        return self._iter(int(number), url, User, params, etag)
+
     @requires_auth
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
@@ -1229,23 +1246,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_contributors(self, anon=False, number=-1, etag=None):
-        """Iterate over the contributors to this repository.
-
-        :param bool anon: (optional), True lists anonymous contributors as
-            well
-        :param int number: (optional), number of contributors to return.
-            Default: -1 returns all contributors
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
-        """
-        url = self._build_url('contributors', base_url=self._api)
-        params = {}
-        if anon:
-            params = {'anon': True}
-        return self._iter(int(number), url, User, params, etag)
 
     def iter_contributor_statistics(self, number=-1, etag=None):
         """Iterate over the contributors list.

@@ -548,22 +548,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_contributors(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'contributors')
-        self.conf = {'params': {'per_page': 100}}
-
-        u = next(self.repo.iter_contributors())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
-        self.conf = {'params': {'anon': True, 'per_page': 100}}
-        next(self.repo.iter_contributors(True))
-        self.mock_assertions()
-
-        next(self.repo.iter_contributors('true value'))
-        self.mock_assertions()
-
     def test_iter_events(self):
         self.response('event', _iter=True)
         self.get(self.api + 'events')

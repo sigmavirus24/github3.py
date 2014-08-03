@@ -280,3 +280,25 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100, 'sha': 'branch', 'path': 'tests/'},
             headers={}
         )
+
+    def test_contributors(self):
+        """Test the ability to iterate over contributors to a repository."""
+        i = self.instance.contributors()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('contributors'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_contributors_with_anon(self):
+        """Test the ability to iterate over anonymous contributors."""
+        i = self.instance.contributors(anon=True)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('contributors'),
+            params={'per_page': 100, 'anon': 'true'},
+            headers={}
+        )
