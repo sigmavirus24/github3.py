@@ -311,17 +311,18 @@ class Repository(GitHubCore):
         return PullRequest(json, self._session) if json else None
 
     @requires_auth
-    def add_collaborator(self, login):
-        """Add ``login`` as a collaborator to a repository.
+    def add_collaborator(self, username):
+        """Add ``username`` as a collaborator to a repository.
 
-        :param str login: (required), login of the user
+        :param username: (required), username of the user
+        :type username: str or :class:`User <github3.users.User>`
         :returns: bool -- True if successful, False otherwise
         """
-        resp = False
-        if login:
-            url = self._build_url('collaborators', login, base_url=self._api)
-            resp = self._boolean(self._put(url), 204, 404)
-        return resp
+        if not username:
+            return False
+        url = self._build_url('collaborators', str(username),
+                              base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
 
     def archive(self, format, path='', ref='master'):
         """Get the tarball or zipball archive for this repo at ref.
@@ -1179,16 +1180,18 @@ class Repository(GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def is_collaborator(self, login):
-        """Check to see if ``login`` is a collaborator on this repository.
+    def is_collaborator(self, username):
+        """Check to see if ``username`` is a collaborator on this repository.
 
-        :param str login: (required), login for the user
+        :param username: (required), login for the user
+        :type username: str or :class:`User <github3.users.User>`
         :returns: bool -- True if successful, False otherwise
         """
-        if login:
-            url = self._build_url('collaborators', login, base_url=self._api)
-            return self._boolean(self._get(url), 204, 404)
-        return False
+        if not username:
+            return False
+        url = self._build_url('collaborators', str(username),
+                              base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     def git_commit(self, sha):
         """Get a single (git) commit.
@@ -1739,17 +1742,19 @@ class Repository(GitHubCore):
         return Release(json, self) if json else None
 
     @requires_auth
-    def remove_collaborator(self, login):
-        """Remove collaborator ``login`` from the repository.
+    def remove_collaborator(self, username):
+        """Remove collaborator ``username`` from the repository.
 
-        :param str login: (required), login name of the collaborator
+        :param username: (required), login name of the collaborator
+        :type username: str or :class:`User <github3.users.User>`
         :returns: bool
         """
-        resp = False
-        if login:
-            url = self._build_url('collaborators', login, base_url=self._api)
-            resp = self._boolean(self._delete(url), 204, 404)
-        return resp
+        if not username:
+            return False
+
+        url = self._build_url('collaborators', str(username),
+                              base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def subscribe(self):

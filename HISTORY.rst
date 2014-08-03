@@ -207,7 +207,10 @@ Old name                            New attribute name
     - ``Organization#is_member``
     - ``Organization#is_public_member``
     - ``Organization#remove_member``
+    - ``Repository#add_collaborator``
     - ``Repository#is_assignee``
+    - ``Repository#is_collaborator``
+    - ``Repository#remove_collaborator``
     - ``Team#add_member``
     - ``Team#is_member``
 
