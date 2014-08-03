@@ -1110,6 +1110,21 @@ class Repository(GitHubCore):
         url = self._build_url('subscription', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
+    def deployments(self, number=-1, etag=None):
+        """Iterate over deployments for this repository.
+
+        :param int number: (optional), number of deployments to return.
+            Default: -1, returns all available deployments
+        :param str etag: (optional), ETag from a previous request for all
+            deployments
+        :returns: generator of
+            :class:`Deployment <github3.repos.deployment.Deployment>`\ s
+        """
+        url = self._build_url('deployments', base_url=self._api)
+        i = self._iter(int(number), url, Deployment, etag=etag)
+        i.headers.update(Deployment.CUSTOM_HEADERS)
+        return i
+
     @requires_auth
     def edit(self,
              name,
@@ -1268,21 +1283,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_deployments(self, number=-1, etag=None):
-        """Iterate over deployments for this repository.
-
-        :param int number: (optional), number of deployments to return.
-            Default: -1, returns all available deployments
-        :param str etag: (optional), ETag from a previous request for all
-            deployments
-        :returns: generator of
-            :class:`Deployment <github3.repos.deployment.Deployment>`\ s
-        """
-        url = self._build_url('deployments', base_url=self._api)
-        i = self._iter(int(number), url, Deployment, etag=etag)
-        i.headers.update(Deployment.CUSTOM_HEADERS)
-        return i
 
     def iter_events(self, number=-1, etag=None):
         """Iterate over events on this repository.

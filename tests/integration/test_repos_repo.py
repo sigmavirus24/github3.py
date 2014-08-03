@@ -138,6 +138,15 @@ class TestRepository(IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_deployments(self):
+        """Test that a repository's deployments may be retrieved."""
+        cassette_name = self.cassette_name('deployments')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            for d in repository.deployments():
+                assert isinstance(d, github3.repos.deployment.Deployment)
+
     def test_ignore(self):
         """Test that a user can ignore the notifications on a repository."""
         self.basic_login()
@@ -148,15 +157,6 @@ class TestRepository(IntegrationHelper):
             assert repository is not None
             subscription = repository.ignore()
             assert subscription.ignored is True
-
-    def test_iter_deployments(self):
-        """Test that a repository's deployments may be retrieved."""
-        cassette_name = self.cassette_name('iter_deployments')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            assert repository is not None
-            for d in repository.iter_deployments():
-                assert isinstance(d, github3.repos.deployment.Deployment)
 
     def test_iter_issues_accepts_state_all(self):
         """Test that the state parameter accets 'all'."""

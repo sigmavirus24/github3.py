@@ -313,3 +313,16 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100, 'anon': 'true'},
             headers={}
         )
+
+    def test_deployments(self):
+        """Test the ability to iterate over deployments."""
+        i = self.instance.deployments()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('deployments'),
+            params={'per_page': 100},
+            headers={
+                'Accept': 'application/vnd.github.cannonball-preview+json'
+            }
+        )

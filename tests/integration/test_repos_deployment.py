@@ -18,7 +18,7 @@ class TestDeployment(IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             deployment = find(lambda d: d.id == 801,
-                              repository.iter_deployments())
+                              repository.deployments())
             assert deployment is not None
             status = deployment.create_status('success')
 
@@ -33,7 +33,7 @@ class TestDeployment(IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             deployment = find(lambda d: d.id == 801,
-                              repository.iter_deployments())
+                              repository.deployments())
             assert deployment is not None
             statuses = list(deployment.iter_statuses(5))
 
