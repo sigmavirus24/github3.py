@@ -326,3 +326,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
                 'Accept': 'application/vnd.github.cannonball-preview+json'
             }
         )
+
+    def test_events(self):
+        """Test the ability to iterate over events from a repository."""
+        i = self.instance.events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events'),
+            params={'per_page': 100},
+            headers={}
+        )

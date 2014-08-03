@@ -147,6 +147,18 @@ class TestRepository(IntegrationHelper):
             for d in repository.deployments():
                 assert isinstance(d, github3.repos.deployment.Deployment)
 
+    def test_events(self):
+        """Test that a user can iterate over the events from a repository."""
+        cassette_name = self.cassette_name('events')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            events = list(repository.events(number=100))
+
+        assert len(events) > 0
+        for event in events:
+            assert isinstance(event, github3.events.Event)
+
     def test_ignore(self):
         """Test that a user can ignore the notifications on a repository."""
         self.basic_login()

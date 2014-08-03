@@ -1127,14 +1127,8 @@ class Repository(GitHubCore):
         return i
 
     @requires_auth
-    def edit(self,
-             name,
-             description=None,
-             homepage=None,
-             private=None,
-             has_issues=None,
-             has_wiki=None,
-             has_downloads=None,
+    def edit(self, name, description=None, homepage=None, private=None,
+             has_issues=None, has_wiki=None, has_downloads=None,
              default_branch=None):
         """Edit this repository.
 
@@ -1172,6 +1166,18 @@ class Repository(GitHubCore):
             self._update_(json)
             return True
         return False
+
+    def events(self, number=-1, etag=None):
+        r"""Iterate over events on this repository.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        url = self._build_url('events', base_url=self._api)
+        return self._iter(int(number), url, Event, etag=etag)
 
     def is_collaborator(self, login):
         """Check to see if ``login`` is a collaborator on this repository.
@@ -1285,18 +1291,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_events(self, number=-1, etag=None):
-        r"""Iterate over events on this repository.
-
-        :param int number: (optional), number of events to return. Default: -1
-            returns all available events
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Event <github3.events.Event>`\ s
-        """
-        url = self._build_url('events', base_url=self._api)
-        return self._iter(int(number), url, Event, etag=etag)
 
     def iter_forks(self, sort='', number=-1, etag=None):
         """Iterate over forks of this repository.
