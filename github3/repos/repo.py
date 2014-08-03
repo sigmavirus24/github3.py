@@ -350,7 +350,7 @@ class Repository(GitHubCore):
         return False
 
     def asset(self, id):
-        """Returns a single Asset.
+        """Return a single asset.
 
         :param int id: (required), id of the asset
         :returns: :class:`Asset <github3.repos.release.Asset>`
@@ -364,7 +364,7 @@ class Repository(GitHubCore):
         return Asset(data, self) if data else None
 
     def assignees(self, number=-1, etag=None):
-        """Iterate over all assignees to which an issue may be assigned.
+        r"""Iterate over all assignees to which an issue may be assigned.
 
         :param int number: (optional), number of assignees to return. Default:
             -1 returns all available assignees
@@ -400,7 +400,7 @@ class Repository(GitHubCore):
         return Branch(json, self) if json else None
 
     def branches(self, number=-1, etag=None):
-        """Iterate over the branches in this repository.
+        r"""Iterate over the branches in this repository.
 
         :param int number: (optional), number of branches to return. Default:
             -1 returns all branches
@@ -437,7 +437,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, list, etag=etag)
 
     def collaborators(self, number=-1, etag=None):
-        """Iterate over the collaborators of this repository.
+        r"""Iterate over the collaborators of this repository.
 
         :param int number: (optional), number of collaborators to return.
             Default: -1 returns all comments
@@ -449,7 +449,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, User, etag=etag)
 
     def comments(self, number=-1, etag=None):
-        """Iterate over comments on all commits in the repository.
+        r"""Iterate over comments on all commits in the repository.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all comments
@@ -462,7 +462,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, RepoComment, etag=etag)
 
     def comments_on_commit(self, sha, number=-1, etag=None):
-        """Iterate over comments for a single commit.
+        r"""Iterate over comments for a single commit.
 
         :param sha: (required), sha of the commit to list comments on
         :type sha: str
@@ -477,8 +477,9 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, RepoComment, etag=etag)
 
     def commit(self, sha):
-        """Get a single (repo) commit. See :func:`git_commit` for the Git Data
-        Commit.
+        """Get a single (repo) commit.
+
+        See :func:`git_commit` for the Git Data Commit.
 
         :param str sha: (required), sha of the commit
         :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>` if
@@ -819,7 +820,7 @@ class Repository(GitHubCore):
                      assignee=None,
                      milestone=None,
                      labels=None):
-        """Creates an issue on this repository.
+        """Create an issue on this repository.
 
         :param str title: (required), title of the issue
         :param str body: (optional), body of the issue
@@ -1111,7 +1112,7 @@ class Repository(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     def deployments(self, number=-1, etag=None):
-        """Iterate over deployments for this repository.
+        r"""Iterate over deployments for this repository.
 
         :param int number: (optional), number of deployments to return.
             Default: -1, returns all available deployments
@@ -1224,15 +1225,16 @@ class Repository(GitHubCore):
         json = self._json(self._put(url, data=dumps({'ignored': True})), 200)
         return Subscription(json, self) if json else None
 
-    def is_assignee(self, login):
-        """Check if the user is a possible assignee for an issue on this
-        repository.
+    def is_assignee(self, username):
+        """Check if the user can be assigned an issue on this repository.
 
+        :param username: name of the user to check
+        :type username: str or :class:`User <github3.users.User>`
         :returns: :class:`bool`
         """
-        if not login:
+        if not username:
             return False
-        url = self._build_url('assignees', login, base_url=self._api)
+        url = self._build_url('assignees', str(username), base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def issue(self, number):
@@ -1262,7 +1264,7 @@ class Repository(GitHubCore):
         return Key(json, self) if json else None
 
     def label(self, name):
-        """Get the label specified by ``name``
+        """Get the label specified by ``name``.
 
         :param str name: (required), name of the label
         :returns: :class:`Label <github3.issues.label.Label>` if successful,
@@ -1285,7 +1287,7 @@ class Repository(GitHubCore):
         return PagesBuild(json) if json else None
 
     def iter_events(self, number=-1, etag=None):
-        """Iterate over events on this repository.
+        r"""Iterate over events on this repository.
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
@@ -1315,7 +1317,7 @@ class Repository(GitHubCore):
 
     @requires_auth
     def iter_hooks(self, number=-1, etag=None):
-        """Iterate over hooks registered on this repository.
+        r"""Iterate over hooks registered on this repository.
 
         :param int number: (optional), number of hoks to return. Default: -1
             returns all hooks
@@ -1337,7 +1339,7 @@ class Repository(GitHubCore):
                     since=None,
                     number=-1,
                     etag=None):
-        """Iterate over issues on this repo based upon parameters passed.
+        r"""Iterate over issues on this repo based upon parameters passed.
 
         .. versionchanged:: 0.9.0
 
@@ -1372,7 +1374,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Issue, params, etag)
 
     def iter_issue_events(self, number=-1, etag=None):
-        """Iterates over issue events on this repository.
+        r"""Iterate over issue events on this repository.
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
@@ -1386,7 +1388,7 @@ class Repository(GitHubCore):
 
     @requires_auth
     def iter_keys(self, number=-1, etag=None):
-        """Iterates over deploy keys on this repository.
+        r"""Iterate over deploy keys on this repository.
 
         :param int number: (optional), number of keys to return. Default: -1
             returns all available keys
@@ -1398,7 +1400,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Key, etag=etag)
 
     def iter_labels(self, number=-1, etag=None):
-        """Iterates over labels on this repository.
+        r"""Iterate over labels on this repository.
 
         :param int number: (optional), number of labels to return. Default: -1
             returns all available labels
@@ -1423,7 +1425,7 @@ class Repository(GitHubCore):
 
     def iter_milestones(self, state=None, sort=None, direction=None,
                         number=-1, etag=None):
-        """Iterates over the milestones on this repository.
+        r"""Iterate over the milestones on this repository.
 
         :param str state: (optional), state of the milestones, accepted
             values: ('open', 'closed')
@@ -1451,7 +1453,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Milestone, params, etag)
 
     def iter_network_events(self, number=-1, etag=None):
-        """Iterates over events on a network of repositories.
+        r"""Iterate over events on a network of repositories.
 
         :param int number: (optional), number of events to return. Default: -1
             returns all available events
@@ -1466,7 +1468,7 @@ class Repository(GitHubCore):
     @requires_auth
     def iter_notifications(self, all=False, participating=False, since=None,
                            number=-1, etag=None):
-        """Iterates over the notifications for this repository.
+        r"""Iterate over the notifications for this repository.
 
         :param bool all: (optional), show all notifications, including ones
             marked as read
@@ -1503,7 +1505,7 @@ class Repository(GitHubCore):
 
     def iter_pulls(self, state=None, head=None, base=None, sort='created',
                    direction='desc', number=-1, etag=None):
-        """List pull requests on repository.
+        r"""List pull requests on repository.
 
         .. versionchanged:: 0.9.0
 
@@ -1540,7 +1542,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, PullRequest, params, etag)
 
     def iter_refs(self, subspace='', number=-1, etag=None):
-        """Iterates over references for this repository.
+        r"""Iterate over references for this repository.
 
         :param str subspace: (optional), e.g. 'tags', 'stashes', 'notes'
         :param int number: (optional), number of refs to return. Default: -1
@@ -1557,7 +1559,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Reference, etag=etag)
 
     def iter_releases(self, number=-1, etag=None):
-        """Iterates over releases for this repository.
+        r"""Iterate over releases for this repository.
 
         :param int number: (optional), number of refs to return. Default: -1
             returns all available refs
@@ -1572,7 +1574,7 @@ class Repository(GitHubCore):
         return iterator
 
     def iter_stargazers(self, number=-1, etag=None):
-        """List users who have starred this repository.
+        r"""List users who have starred this repository.
 
         :param int number: (optional), number of stargazers to return.
             Default: -1 returns all subscribers available
@@ -1584,7 +1586,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, User, etag=etag)
 
     def iter_subscribers(self, number=-1, etag=None):
-        """Iterates over users subscribed to this repository.
+        r"""Iterate over users subscribed to this repository.
 
         :param int number: (optional), number of subscribers to return.
             Default: -1 returns all subscribers available
@@ -1596,7 +1598,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, User, etag=etag)
 
     def iter_statuses(self, sha, number=-1, etag=None):
-        """Iterates over the statuses for a specific SHA.
+        r"""Iterate over the statuses for a specific SHA.
 
         :param str sha: SHA of the commit to list the statuses of
         :param int number: (optional), return up to number statuses. Default:
@@ -1611,7 +1613,7 @@ class Repository(GitHubCore):
         return self._iter(int(number), url, Status, etag=etag)
 
     def iter_tags(self, number=-1, etag=None):
-        """Iterates over tags on this repository.
+        r"""Iterate over tags on this repository.
 
         :param int number: (optional), return up to at most number tags.
             Default: -1 returns all available tags.
@@ -1624,7 +1626,7 @@ class Repository(GitHubCore):
 
     @requires_auth
     def iter_teams(self, number=-1, etag=None):
-        """Iterates over teams with access to this repository.
+        r"""Iterate over teams with access to this repository.
 
         :param int number: (optional), return up to number Teams. Default: -1
             returns all Teams.
@@ -1868,14 +1870,7 @@ class Repository(GitHubCore):
         return resp
 
     def weekly_commit_count(self):
-        """Returns the total commit counts.
-
-        The dictionary returned has two entries: ``all`` and ``owner``. Each
-        has a fifty-two element long list of commit counts. (Note: ``all``
-        includes the owner.) ``d['all'][0]`` will be the oldest week,
-        ``d['all'][51]`` will be the most recent.
-
-        :returns: dict
+        """Retrieve the total commit counts.
 
         .. note:: All statistics methods may return a 202. If github3.py
             receives a 202 in this case, it will return an emtpy dictionary.
@@ -1884,6 +1879,12 @@ class Repository(GitHubCore):
 
         ..versionadded:: 0.7
 
+        The dictionary returned has two entries: ``all`` and ``owner``. Each
+        has a fifty-two element long list of commit counts. (Note: ``all``
+        includes the owner.) ``d['all'][0]`` will be the oldest week,
+        ``d['all'][51]`` will be the most recent.
+
+        :returns: dict
         """
         url = self._build_url('stats', 'participation', base_url=self._api)
         resp = self._get(url)
@@ -1907,6 +1908,7 @@ def repo_issue_params(milestone=None,
                       since=None,
                       number=-1,
                       etag=None):
+    """Validate and filter issue method parameters in one place."""
     params = {'assignee': assignee, 'mentioned': mentioned}
     if milestone in ('*', 'none') or isinstance(milestone, int):
         params['milestone'] = milestone

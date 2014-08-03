@@ -200,6 +200,17 @@ Old name                            New attribute name
   - The ``is_public`` method has been removed since it just returned the
     ``Gist.public`` attribute.
 
+- Most instances of ``login`` as a parameter have been changed to ``username``
+  for clarity and consistency. This affects the following methods:
+
+    - ``Organization#add_member``
+    - ``Organization#is_member``
+    - ``Organization#is_public_member``
+    - ``Organization#remove_member``
+    - ``Repository#is_assignee``
+    - ``Team#add_member``
+    - ``Team#is_member``
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 
