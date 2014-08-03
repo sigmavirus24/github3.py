@@ -1,17 +1,20 @@
+"""Deployment integration tests."""
 import github3
 
 from .helper import IntegrationHelper
 
 
 def find(func, iterable):
+    """Helper function to find the first item in an interable."""
     return next(iter(filter(func, iterable)))
 
 
 class TestDeployment(IntegrationHelper):
+
+    """Integration tests for the Deployment class."""
+
     def test_create_status(self):
-        """
-        Test that using a Deployment instance, a user can create a status.
-        """
+        """Show that a user can create a deployment status."""
         self.basic_login()
         cassette_name = self.cassette_name('create_status')
         with self.recorder.use_cassette(cassette_name):
@@ -25,9 +28,7 @@ class TestDeployment(IntegrationHelper):
         assert isinstance(status, github3.repos.deployment.DeploymentStatus)
 
     def test_iter_statuses(self):
-        """
-        Test that using a Deployment instance, a user can retrieve statuses.
-        """
+        """Show that a user can retrieve deployment statuses."""
         cassette_name = self.cassette_name('statuses')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
