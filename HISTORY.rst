@@ -75,6 +75,7 @@ Old name                                      New name
 ``Repository#iter_commits``                   ``Repository#commits``
 ``Repository#iter_contributor_statistics``    ``Repository#contributor_statistics``
 ``Repository#iter_contributors``              ``Repository#contributors``
+``Repository#iter_forks``                     ``Repository#forks``
 
 ==========================================    ==============================================
 

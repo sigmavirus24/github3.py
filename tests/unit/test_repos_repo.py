@@ -337,3 +337,14 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_forks(self):
+        """Test the ability to iterate over forks of a repository."""
+        i = self.instance.forks()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('forks'),
+            params={'per_page': 100},
+            headers={}
+        )

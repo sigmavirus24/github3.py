@@ -67,13 +67,9 @@ class Repository(GitHubCore):
         #: Description of the repository.
         self.description = repo.get('description', '')
 
-        # The number of forks
-        #: The number of forks made of this repository. DEPRECATED
-        self.forks = repo.get('forks', 0)
-
         #: The number of forks of this repository.
         self.forks_count = repo.get('forks_count')
-        # For backward compatibility
+        #: The number of forks of this repository. For backward compatibility
         self.fork_count = self.forks_count
 
         #: Is this repository a fork?
@@ -1182,6 +1178,23 @@ class Repository(GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
+    def forks(self, sort='', number=-1, etag=None):
+        """Iterate over forks of this repository.
+
+        :param str sort: (optional), accepted values:
+            ('newest', 'oldest', 'watchers'), API default: 'newest'
+        :param int number: (optional), number of forks to return. Default: -1
+            returns all forks
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <Repository>`
+        """
+        url = self._build_url('forks', base_url=self._api)
+        params = {}
+        if sort in ('newest', 'oldest', 'watchers'):
+            params = {'sort': sort}
+        return self._iter(int(number), url, Repository, params, etag)
+
     def git_commit(self, sha):
         """Get a single (git) commit.
 
@@ -1296,23 +1309,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_forks(self, sort='', number=-1, etag=None):
-        """Iterate over forks of this repository.
-
-        :param str sort: (optional), accepted values:
-            ('newest', 'oldest', 'watchers'), API default: 'newest'
-        :param int number: (optional), number of forks to return. Default: -1
-            returns all forks
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Repository <Repository>`
-        """
-        url = self._build_url('forks', base_url=self._api)
-        params = {}
-        if sort in ('newest', 'oldest', 'watchers'):
-            params = {'sort': sort}
-        return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
     def iter_hooks(self, number=-1, etag=None):

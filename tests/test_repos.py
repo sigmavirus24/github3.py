@@ -548,21 +548,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_forks(self):
-        self.response('repo', _iter=True)
-        self.get(self.api + 'forks')
-        self.conf = {'params': {'per_page': 100}}
-
-        r = next(self.repo.iter_forks())
-        assert isinstance(r, repos.Repository)
-        self.mock_assertions()
-
-        self.conf['params']['sort'] = 'newest'
-        forks_params = self.conf['params'].copy()
-        forks_params.pop('per_page')
-        next(self.repo.iter_forks(**forks_params))
-        self.mock_assertions()
-
     def test_iter_hooks(self):
         self.response('hook', _iter=True)
         self.get(self.api + 'hooks')
