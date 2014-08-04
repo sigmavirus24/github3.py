@@ -1182,19 +1182,6 @@ class Repository(GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def is_collaborator(self, username):
-        """Check to see if ``username`` is a collaborator on this repository.
-
-        :param username: (required), login for the user
-        :type username: str or :class:`User <github3.users.User>`
-        :returns: bool -- True if successful, False otherwise
-        """
-        if not username:
-            return False
-        url = self._build_url('collaborators', str(username),
-                              base_url=self._api)
-        return self._boolean(self._get(url), 204, 404)
-
     def git_commit(self, sha):
         """Get a single (git) commit.
 
@@ -1246,6 +1233,19 @@ class Repository(GitHubCore):
         if not username:
             return False
         url = self._build_url('assignees', str(username), base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
+
+    def is_collaborator(self, username):
+        """Check to see if ``username`` is a collaborator on this repository.
+
+        :param username: (required), login for the user
+        :type username: str or :class:`User <github3.users.User>`
+        :returns: bool -- True if successful, False otherwise
+        """
+        if not username:
+            return False
+        url = self._build_url('collaborators', str(username),
+                              base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def issue(self, number):
