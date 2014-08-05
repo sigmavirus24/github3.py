@@ -548,18 +548,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_hooks(self):
-        self.response('hook', _iter=True)
-        self.get(self.api + 'hooks')
-        self.conf = {'params': {'per_page': 100}}
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_hooks)
-
-        self.login()
-        h = next(self.repo.iter_hooks())
-        assert isinstance(h, repos.hook.Hook)
-        self.mock_assertions()
-
     def test_iter_issues(self):
         self.response('issue', _iter=True)
         self.get(self.api + 'issues')

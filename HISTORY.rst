@@ -76,6 +76,7 @@ Old name                                      New name
 ``Repository#iter_contributor_statistics``    ``Repository#contributor_statistics``
 ``Repository#iter_contributors``              ``Repository#contributors``
 ``Repository#iter_forks``                     ``Repository#forks``
+``Repository#iter_hooks``                     ``Repository#hooks``
 
 ==========================================    ==============================================
 

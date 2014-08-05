@@ -1223,6 +1223,19 @@ class Repository(GitHubCore):
         return Hook(json, self) if json else None
 
     @requires_auth
+    def hooks(self, number=-1, etag=None):
+        r"""Iterate over hooks registered on this repository.
+
+        :param int number: (optional), number of hoks to return. Default: -1
+            returns all hooks
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Hook <github3.repos.hook.Hook>`\ s
+        """
+        url = self._build_url('hooks', base_url=self._api)
+        return self._iter(int(number), url, Hook, etag=etag)
+
+    @requires_auth
     def ignore(self):
         """Ignore notifications from this repository for the user.
 
@@ -1309,19 +1322,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    @requires_auth
-    def iter_hooks(self, number=-1, etag=None):
-        r"""Iterate over hooks registered on this repository.
-
-        :param int number: (optional), number of hoks to return. Default: -1
-            returns all hooks
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Hook <github3.repos.hook.Hook>`\ s
-        """
-        url = self._build_url('hooks', base_url=self._api)
-        return self._iter(int(number), url, Hook, etag=etag)
 
     def iter_issues(self,
                     milestone=None,

@@ -171,6 +171,19 @@ class TestRepository(IntegrationHelper):
         for fork in forks:
             assert isinstance(fork, github3.repos.Repository)
 
+    def test_hooks(self):
+        """Test that a user can iterate over the hooks of a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('hooks')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            hooks = list(repository.hooks())
+
+        assert len(hooks) > 0
+        for hook in hooks:
+            assert isinstance(hook, github3.repos.hook.Hook)
+
     def test_ignore(self):
         """Test that a user can ignore the notifications on a repository."""
         self.basic_login()

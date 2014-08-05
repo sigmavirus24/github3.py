@@ -1,6 +1,8 @@
 """Unit tests for Repositories."""
 import datetime
+import pytest
 
+from github3 import GitHubError
 from github3.repos.repo import Repository
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper)
@@ -348,3 +350,31 @@ class TestRepositoryIterator(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_hooks(self):
+        """Test the ability to iterate over hooks of a repository."""
+        i = self.instance.hooks()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('hooks'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+
+class TestRepositoryRequiresAuth(UnitHelper):
+
+    """Unit test for regular Repository methods."""
+
+    described_class = Repository
+    example_data = repo_example_data
+
+    def after_setup(self):
+        """Set-up the session to not be authenticated."""
+        self.session.has_auth.return_value = False
+
+    def test_hooks(self):
+        """Show that a user must be authenticated to list hooks."""
+        with pytest.raises(GitHubError):
+            self.instance.hooks()
