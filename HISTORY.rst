@@ -77,6 +77,7 @@ Old name                                      New name
 ``Repository#iter_contributors``              ``Repository#contributors``
 ``Repository#iter_forks``                     ``Repository#forks``
 ``Repository#iter_hooks``                     ``Repository#hooks``
+``Repository#iter_issues``                    ``Repository#issues``
 
 ==========================================    ==============================================
 

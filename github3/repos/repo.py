@@ -1287,6 +1287,43 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return Issue(json, self) if json else None
 
+    def issues(self, milestone=None, state=None, assignee=None, mentioned=None,
+               labels=None, sort=None, direction=None, since=None, number=-1,
+               etag=None):
+        r"""Iterate over issues on this repo based upon parameters passed.
+
+        .. versionchanged:: 0.9.0
+
+            The ``state`` parameter now accepts 'all' in addition to 'open'
+            and 'closed'.
+
+        :param int milestone: (optional), 'none', or '*'
+        :param str state: (optional), accepted values: ('all', 'open',
+            'closed')
+        :param str assignee: (optional), 'none', '*', or login name
+        :param str mentioned: (optional), user's login name
+        :param str labels: (optional), comma-separated list of labels, e.g.
+            'bug,ui,@high'
+        :param sort: (optional), accepted values:
+            ('created', 'updated', 'comments', 'created')
+        :param str direction: (optional), accepted values: ('asc', 'desc')
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
+        :param int number: (optional), Number of issues to return.
+            By default all issues are returned
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Issue <github3.issues.issue.Issue>`\ s
+        """
+        url = self._build_url('issues', base_url=self._api)
+
+        params = repo_issue_params(milestone, state, assignee, mentioned,
+                                   labels, sort, direction, since)
+
+        return self._iter(int(number), url, Issue, params, etag)
+
     @requires_auth
     def key(self, id_num):
         """Get the specified deploy key.
@@ -1322,51 +1359,6 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
-
-    def iter_issues(self,
-                    milestone=None,
-                    state=None,
-                    assignee=None,
-                    mentioned=None,
-                    labels=None,
-                    sort=None,
-                    direction=None,
-                    since=None,
-                    number=-1,
-                    etag=None):
-        r"""Iterate over issues on this repo based upon parameters passed.
-
-        .. versionchanged:: 0.9.0
-
-            The ``state`` parameter now accepts 'all' in addition to 'open'
-            and 'closed'.
-
-        :param int milestone: (optional), 'none', or '*'
-        :param str state: (optional), accepted values: ('all', 'open',
-            'closed')
-        :param str assignee: (optional), 'none', '*', or login name
-        :param str mentioned: (optional), user's login name
-        :param str labels: (optional), comma-separated list of labels, e.g.
-            'bug,ui,@high'
-        :param sort: (optional), accepted values:
-            ('created', 'updated', 'comments', 'created')
-        :param str direction: (optional), accepted values: ('asc', 'desc')
-        :param since: (optional), Only issues after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
-            date string, e.g., 2012-05-20T23:10:27Z
-        :type since: datetime or string
-        :param int number: (optional), Number of issues to return.
-            By default all issues are returned
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Issue <github3.issues.issue.Issue>`\ s
-        """
-        url = self._build_url('issues', base_url=self._api)
-
-        params = repo_issue_params(milestone, state, assignee, mentioned,
-                                   labels, sort, direction, since)
-
-        return self._iter(int(number), url, Issue, params, etag)
 
     def iter_issue_events(self, number=-1, etag=None):
         r"""Iterate over issue events on this repository.

@@ -195,13 +195,29 @@ class TestRepository(IntegrationHelper):
             subscription = repository.ignore()
             assert subscription.ignored is True
 
-    def test_iter_issues_accepts_state_all(self):
+    def test_issues_sorts_ascendingly(self):
+        """Test that issues will be returned in ascending order."""
+        cassette_name = self.cassette_name('issues_ascending')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'betamax')
+            assert repository is not None
+            issues = list(repository.issues(direction='asc'))
+
+        assert len(issues) > 0
+        last_issue = None
+        for issue in issues:
+            assert isinstance(issue, github3.issues.Issue)
+            if last_issue:
+                assert last_issue.number < issue.number
+            last_issue = issue
+
+    def test_issues_accepts_state_all(self):
         """Test that the state parameter accets 'all'."""
         cassette_name = self.cassette_name('issues_state_all')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'betamax')
             assert repository is not None
-            for issue in repository.iter_issues(state='all'):
+            for issue in repository.issues(state='all'):
                 assert issue.state in ('open', 'closed')
 
     def test_iter_languages(self):

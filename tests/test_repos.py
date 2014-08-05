@@ -548,27 +548,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_issues(self):
-        self.response('issue', _iter=True)
-        self.get(self.api + 'issues')
-        params = {'per_page': 100}
-        self.conf = {'params': params}
-
-        i = next(self.repo.iter_issues())
-        assert isinstance(i, github3.issues.Issue)
-        self.mock_assertions()
-
-        params['milestone'] = 'none'
-        next(self.repo.iter_issues('none'))
-        self.mock_assertions()
-
-        params['state'] = 'open'
-
-        request_params = params.copy()
-        request_params.pop('per_page')
-        next(self.repo.iter_issues(**request_params))
-        self.mock_assertions()
-
     def test_iter_issue_events(self):
         self.response('issue_event', _iter=True)
         self.get(self.api + 'issues/events')
