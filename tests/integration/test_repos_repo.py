@@ -195,6 +195,17 @@ class TestRepository(IntegrationHelper):
             subscription = repository.ignore()
             assert subscription.ignored is True
 
+    def test_issue_events(self):
+        """Test that a user can iterate over issue events in a repo."""
+        cassette_name = self.cassette_name('issue_events')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            events = list(repository.issue_events(number=50))
+
+        for ev in events:
+            assert isinstance(ev, github3.issues.event.IssueEvent)
+
     def test_issues_sorts_ascendingly(self):
         """Test that issues will be returned in ascending order."""
         cassette_name = self.cassette_name('issues_ascending')

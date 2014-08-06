@@ -78,6 +78,7 @@ Old name                                      New name
 ``Repository#iter_forks``                     ``Repository#forks``
 ``Repository#iter_hooks``                     ``Repository#hooks``
 ``Repository#iter_issues``                    ``Repository#issues``
+``Repository#iter_issue_events``              ``Repository#issue_events``
 
 ==========================================    ==============================================
 

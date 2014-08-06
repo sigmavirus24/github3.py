@@ -362,6 +362,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_issue_events(self):
+        """Test the ability to iterate over a repository's issue events."""
+        i = self.instance.issue_events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('issues/events'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_issues(self):
         """Test the ability to iterate over a repository's issues."""
         i = self.instance.issues()
