@@ -151,6 +151,18 @@ class TestRepository(UnitHelper):
             url, headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
 
+    def test_key(self):
+        """Test the ability to fetch a deploy key."""
+        self.instance.key(10)
+
+        self.session.get.assert_called_once_with(url_for('keys/10'))
+
+    def test_key_requires_positive_id(self):
+        """Test that a positive key id is required."""
+        self.instance.key(-10)
+
+        assert self.session.get.called is False
+
     def test_latest_pages_build(self):
         """Test retrieving the most recent pages build."""
         url = self.example_data['url'] + '/pages/builds/latest'
@@ -384,6 +396,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_keys(self):
+        """Test the ability to iterate over a repository's keys."""
+        i = self.instance.keys()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('keys'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 
@@ -400,3 +423,13 @@ class TestRepositoryRequiresAuth(UnitHelper):
         """Show that a user must be authenticated to list hooks."""
         with pytest.raises(GitHubError):
             self.instance.hooks()
+
+    def test_key(self):
+        """Show that a user must be authenticated to fetch a key."""
+        with pytest.raises(GitHubError):
+            self.instance.key(10)
+
+    def test_keys(self):
+        """Show that a user must be authenticated to list keys."""
+        with pytest.raises(GitHubError):
+            self.instance.keys()

@@ -231,6 +231,29 @@ class TestRepository(IntegrationHelper):
             for issue in repository.issues(state='all'):
                 assert issue.state in ('open', 'closed')
 
+    def test_key(self):
+        self.basic_login()
+        cassette_name = self.cassette_name('key')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            key = repository.key(8820641)
+
+        assert isinstance(key, github3.users.Key)
+
+    def test_keys(self):
+        """Test that the user can retrieve all deploy keys."""
+        self.basic_login()
+        cassette_name = self.cassette_name('keys')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            keys = list(repository.keys())
+
+        assert len(keys) > 0
+        for key in keys:
+            assert isinstance(key, github3.users.Key)
+
     def test_iter_languages(self):
         """Test that a repository's languages can be retrieved."""
         cassette_name = self.cassette_name('iter_languages')

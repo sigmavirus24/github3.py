@@ -527,18 +527,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.issue(2), github3.issues.Issue)
         self.mock_assertions()
 
-    def test_key(self):
-        self.response('key')
-        self.get(self.api + 'keys/2')
-
-        self.assertRaises(github3.GitHubError, self.repo.key, 2)
-
-        self.login()
-        assert self.repo.key(-2) is None
-        self.not_called()
-        assert isinstance(self.repo.key(2), github3.users.Key)
-        self.mock_assertions()
-
     def test_label(self):
         self.response('label')
         self.get(self.api + 'labels/name')
@@ -546,17 +534,6 @@ class TestRepository(BaseCase):
         assert self.repo.label(None) is None
         self.not_called()
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
-        self.mock_assertions()
-
-    def test_iter_keys(self):
-        self.response('key', _iter=True)
-        self.get(self.api + 'keys')
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_keys)
-
-        self.login()
-        k = next(self.repo.iter_keys())
-        assert isinstance(k, github3.users.Key)
         self.mock_assertions()
 
     def test_iter_labels(self):

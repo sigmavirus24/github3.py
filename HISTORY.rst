@@ -79,6 +79,7 @@ Old name                                      New name
 ``Repository#iter_hooks``                     ``Repository#hooks``
 ``Repository#iter_issues``                    ``Repository#issues``
 ``Repository#iter_issue_events``              ``Repository#issue_events``
+``Repository#iter_keys``                      ``Repository#keys``
 
 ==========================================    ==============================================
 
