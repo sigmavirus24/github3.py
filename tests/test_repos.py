@@ -536,14 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_network_events(self):
-        self.response('event', _iter=True)
-        self.get(self.api.replace('repos', 'networks', 1) + 'events')
-
-        e = next(self.repo.iter_network_events())
-        assert isinstance(e, github3.events.Event)
-        self.mock_assertions()
-
     def test_iter_notifications(self):
         self.response('notification', _iter=True)
         self.get(self.api + 'notifications')

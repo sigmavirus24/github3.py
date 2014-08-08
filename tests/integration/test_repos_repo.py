@@ -298,6 +298,18 @@ class TestRepository(IntegrationHelper):
         for milestone in milestones:
             assert isinstance(milestone, github3.issues.milestone.Milestone)
 
+    def test_network_events(self):
+        """Test that a user can retrieve the events of a repo's network."""
+        cassette_name = self.cassette_name('network_events')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            events = list(repository.network_events())
+
+        assert len(events) > 0
+        for event in events:
+            assert isinstance(event, github3.events.Event)
+
     def test_iter_pulls_accepts_sort_and_direction(self):
         """Test that iter_pulls now takes a sort parameter."""
         cassette_name = self.cassette_name('pull_requests_accept_sort')

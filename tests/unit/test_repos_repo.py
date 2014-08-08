@@ -452,6 +452,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_network_events(self):
+        """Test the ability to iterate over the network events for a repo."""
+        i = self.instance.network_events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events').replace('repos', 'networks'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

@@ -83,6 +83,7 @@ Old name                                      New name
 ``Repository#iter_labels``                    ``Repository#labels``
 ``Repository#iter_languages``                 ``Repository#languages``
 ``Repository#iter_milestones``                ``Repository#milestones``
+``Repository#iter_network_events``            ``Repository#network_events``
 
 ==========================================    ==============================================
 

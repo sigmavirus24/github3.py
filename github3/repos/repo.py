@@ -1410,19 +1410,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
 
-    def iter_network_events(self, number=-1, etag=None):
-        r"""Iterate over events on a network of repositories.
-
-        :param int number: (optional), number of events to return. Default: -1
-            returns all available events
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Event <github3.events.Event>`\ s
-        """
-        base = self._api.replace('repos', 'networks', 1)
-        url = self._build_url('events', base_url=base)
-        return self._iter(int(number), url, Event, etag)
-
     @requires_auth
     def iter_notifications(self, all=False, participating=False, since=None,
                            number=-1, etag=None):
@@ -1670,6 +1657,19 @@ class Repository(GitHubCore):
         if not params:
             params = None
         return self._iter(int(number), url, Milestone, params, etag)
+
+    def network_events(self, number=-1, etag=None):
+        r"""Iterate over events on a network of repositories.
+
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        base = self._api.replace('repos', 'networks', 1)
+        url = self._build_url('events', base_url=base)
+        return self._iter(int(number), url, Event, etag)
 
     @requires_auth
     def pages(self):
