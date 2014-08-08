@@ -142,14 +142,18 @@ class TestRepository(UnitHelper):
         The Releases section of the API is still in Beta and uses custom
         headers
         """
-        assert self.instance.asset(0) is None
-        assert self.session.get.call_count == 0
-
         self.instance.asset(1)
-        url = self.example_data['url'] + '/releases/assets/1'
+
         self.session.get.assert_called_once_with(
-            url, headers={'Accept': 'application/vnd.github.manifold-preview'}
+            url_for('releases/assets/1'),
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
+
+    def test_asset_requires_a_positive_id(self):
+        """Test that a positive asset id is required."""
+        self.instance.asset(0)
+
+        assert self.session.get.called is False
 
     def test_key(self):
         """Test the ability to fetch a deploy key."""
@@ -165,9 +169,11 @@ class TestRepository(UnitHelper):
 
     def test_latest_pages_build(self):
         """Test retrieving the most recent pages build."""
-        url = self.example_data['url'] + '/pages/builds/latest'
         self.instance.latest_pages_build()
-        self.session.get.assert_called_once_with(url)
+
+        self.session.get.assert_called_once_with(
+            url_for('pages/builds/latest')
+        )
 
     def test_milestone(self):
         """Test retrieving a specific milestone."""
@@ -183,9 +189,9 @@ class TestRepository(UnitHelper):
 
     def test_pages(self):
         """Test retrieving information about a repository's page."""
-        url = self.example_data['url'] + '/pages'
         self.instance.pages()
-        self.session.get.assert_called_once_with(url)
+
+        self.session.get.assert_called_once_with(url_for('pages'))
 
 
 class TestRepositoryIterator(UnitIteratorHelper):
