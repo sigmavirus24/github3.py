@@ -536,14 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_labels(self):
-        self.response('label', _iter=True)
-        self.get(self.api + 'labels')
-
-        l = next(self.repo.iter_labels())
-        assert isinstance(l, github3.issues.label.Label)
-        self.mock_assertions()
-
     def test_iter_languages(self):
         #: repos/:login/:repo/languages is just a dictionary, so _iter=False
         self.response('language')

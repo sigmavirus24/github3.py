@@ -254,6 +254,18 @@ class TestRepository(IntegrationHelper):
         for key in keys:
             assert isinstance(key, github3.users.Key)
 
+    def test_labels(self):
+        """Test that a user can retrieve a repository's labels."""
+        cassette_name = self.cassette_name('labels')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            labels = list(repository.labels())
+
+        assert len(labels) > 0
+        for label in labels:
+            assert isinstance(label, github3.issues.label.Label)
+
     def test_iter_languages(self):
         """Test that a repository's languages can be retrieved."""
         cassette_name = self.cassette_name('iter_languages')

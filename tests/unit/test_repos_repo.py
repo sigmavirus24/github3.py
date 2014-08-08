@@ -407,6 +407,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_labels(self):
+        """Test the ability to iterate over a repository's labels."""
+        i = self.instance.labels()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('labels'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 
