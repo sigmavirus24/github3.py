@@ -82,6 +82,7 @@ Old name                                      New name
 ``Repository#iter_keys``                      ``Repository#keys``
 ``Repository#iter_labels``                    ``Repository#labels``
 ``Repository#iter_languages``                 ``Repository#languages``
+``Repository#iter_milestones``                ``Repository#milestones``
 
 ==========================================    ==============================================
 

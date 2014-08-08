@@ -169,6 +169,18 @@ class TestRepository(UnitHelper):
         self.instance.latest_pages_build()
         self.session.get.assert_called_once_with(url)
 
+    def test_milestone(self):
+        """Test retrieving a specific milestone."""
+        self.instance.milestone(20)
+
+        self.session.get.assert_called_once_with(url_for('milestones/20'))
+
+    def test_milestone_requires_positive_id(self):
+        """Test that a positive milestone id is required."""
+        self.instance.milestone(-1)
+
+        assert self.session.get.called is False
+
     def test_pages(self):
         """Test retrieving information about a repository's page."""
         url = self.example_data['url'] + '/pages'
@@ -425,6 +437,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('languages'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_milestones(self):
+        """Test the ability to iterate over the milestones in a repo."""
+        i = self.instance.milestones()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('milestones'),
             params={'per_page': 100},
             headers={}
         )

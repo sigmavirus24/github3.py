@@ -277,6 +277,27 @@ class TestRepository(IntegrationHelper):
                 assert 'Last-Modified' not in l
                 assert isinstance(l, tuple)
 
+    def test_milestone(self):
+        """Test the ability to retrieve a milestone on a repository."""
+        cassette_name = self.cassette_name('milestone')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            milestone = repository.milestone(7)
+        assert isinstance(milestone, github3.issues.milestone.Milestone)
+
+    def test_milestones(self):
+        """Test the ability to retrieve the milestones in a repository."""
+        cassette_name = self.cassette_name('milestones')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            milestones = list(repository.milestones())
+
+        assert len(milestones) > 0
+        for milestone in milestones:
+            assert isinstance(milestone, github3.issues.milestone.Milestone)
+
     def test_iter_pulls_accepts_sort_and_direction(self):
         """Test that iter_pulls now takes a sort parameter."""
         cassette_name = self.cassette_name('pull_requests_accept_sort')
@@ -298,15 +319,6 @@ class TestRepository(IntegrationHelper):
             assert repository is not None
             for release in repository.iter_releases():
                 assert isinstance(release, github3.repos.release.Release)
-
-    def test_milestone(self):
-        """Test the ability to retrieve a milestone on a repository."""
-        cassette_name = self.cassette_name('milestone')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            assert repository is not None
-            milestone = repository.milestone(7)
-        assert isinstance(milestone, github3.issues.milestone.Milestone)
 
     def test_release(self):
         """Test the ability to retrieve a single release."""
