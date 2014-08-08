@@ -26,6 +26,7 @@ from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents, validate_commmitter
+from github3.repos.contributor import Contributor
 from github3.repos.deployment import Deployment
 from github3.repos.hook import Hook
 from github3.repos.pages import PagesBuild, PagesInfo
@@ -1209,13 +1210,14 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of
+            :class:`Contributor <github3.repos.contributor.Contributor>`\ s
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
             params = {'anon': True}
-        return self._iter(int(number), url, User, params, etag)
+        return self._iter(int(number), url, Contributor, params, etag)
 
     def iter_contributor_statistics(self, number=-1, etag=None):
         """Iterate over the contributors list.
