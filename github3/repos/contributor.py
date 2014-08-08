@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-github3.repo.contributors
-=============
+github3.repos.contributor
+=========================
 
-This module contains a subclass of User with contribution-specific attributes.
+This module contains a subclass of User with contributor-specific attributes.
 
 """
 from __future__ import unicode_literals
