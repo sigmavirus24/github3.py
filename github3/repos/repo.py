@@ -1211,7 +1211,7 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Contributor <github3.repos.Contributor>`\ s
+            :class:`Contributor <github3.repos.contributor.Contributor>`\ s
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
