@@ -1388,17 +1388,7 @@ class Repository(GitHubCore):
         url = self._build_url('labels', base_url=self._api)
         return self._iter(int(number), url, Label, etag=etag)
 
-    @requires_auth
-    def latest_pages_build(self):
-        """Get the build information for the most recent Pages build.
-
-        :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
-        """
-        url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return PagesBuild(json) if json else None
-
-    def iter_languages(self, number=-1, etag=None):
+    def languages(self, number=-1, etag=None):
         """Iterate over the programming languages used in the repository.
 
         :param int number: (optional), number of languages to return. Default:
@@ -1409,6 +1399,16 @@ class Repository(GitHubCore):
         """
         url = self._build_url('languages', base_url=self._api)
         return self._iter(int(number), url, tuple, etag=etag)
+
+    @requires_auth
+    def latest_pages_build(self):
+        """Get the build information for the most recent Pages build.
+
+        :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return PagesBuild(json) if json else None
 
     def iter_milestones(self, state=None, sort=None, direction=None,
                         number=-1, etag=None):

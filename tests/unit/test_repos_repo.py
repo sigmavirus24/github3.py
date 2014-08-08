@@ -418,6 +418,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_languages(self):
+        """Test the ability to iterate over the languages used in a repo."""
+        i = self.instance.languages()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('languages'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

@@ -266,13 +266,13 @@ class TestRepository(IntegrationHelper):
         for label in labels:
             assert isinstance(label, github3.issues.label.Label)
 
-    def test_iter_languages(self):
+    def test_languages(self):
         """Test that a repository's languages can be retrieved."""
-        cassette_name = self.cassette_name('iter_languages')
+        cassette_name = self.cassette_name('languages')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
-            for l in repository.iter_languages():
+            for l in repository.languages():
                 assert 'ETag' not in l
                 assert 'Last-Modified' not in l
                 assert isinstance(l, tuple)
