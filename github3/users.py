@@ -178,6 +178,15 @@ class User(BaseAccount):
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')
 
+        #: Number of repo contributions. Only appears in ``repo.contributors``
+        contributions = user.get('contributions')
+        # The refresh method uses __init__ to replace the attributes on the
+        # instance with what it receives from the /users/:username endpoint.
+        # What that means is that contributions is no longer returned and as
+        # such is changed because it doesn't exist. This guards against that.
+        if contributions is not None:
+            self.contributions = contributions
+
         self._uniq = user.get('id', None)
 
     def __str__(self):
