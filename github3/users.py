@@ -179,7 +179,10 @@ class User(BaseAccount):
         self.subscriptions_url = user.get('subscriptions_url', '')
 
         #: Number of repo contributions. Only appears in ``repo.contributors``
-        self.contributions = user.get('contributions', 0)
+        contributions = user.get('contributions')
+        # Guard against this attribute being overwritten by refresh method
+        if contributions is not None:
+            self.contributions = contributions
 
         self._uniq = user.get('id', None)
 
