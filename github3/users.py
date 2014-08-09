@@ -180,7 +180,10 @@ class User(BaseAccount):
 
         #: Number of repo contributions. Only appears in ``repo.contributors``
         contributions = user.get('contributions')
-        # Guard against this attribute being overwritten by refresh method
+        # The refresh method uses __init__ to replace the attributes on the
+        # instance with what it receives from the /users/:username endpoint.
+        # What that means is that contributions is no longer returned and as
+        # such is changed because it doesn't exist. This guards against that.
         if contributions is not None:
             self.contributions = contributions
 
