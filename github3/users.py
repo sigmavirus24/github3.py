@@ -178,6 +178,9 @@ class User(BaseAccount):
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')
 
+        #: Number of repo contributions. Only appears in ``repo.contributors``
+        self.contributions = user.get('contributions', 0)
+
         self._uniq = user.get('id', None)
 
     def __str__(self):

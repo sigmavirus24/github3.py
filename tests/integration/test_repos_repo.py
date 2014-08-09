@@ -100,6 +100,7 @@ class TestRepository(IntegrationHelper):
             assert repository is not None
             for contributor in repository.contributors():
                 assert isinstance(contributor, github3.users.User)
+                assert contributor.contributions > 0
 
     def test_create_empty_blob(self):
         """Test the ability to create an empty blob on a repository."""
