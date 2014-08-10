@@ -324,15 +324,28 @@ class TestRepository(IntegrationHelper):
         for notification in notifications:
             assert isinstance(notification, github3.notifications.Thread)
 
-    def test_iter_pulls_accepts_sort_and_direction(self):
-        """Test that iter_pulls now takes a sort parameter."""
+    def test_pull_requests(self):
+        """Test that a user can retrieve the pull requests from a repo."""
+        cassette_name = self.cassette_name('pull_requests')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            pulls = list(repository.pull_requests())
+
+        assert len(pulls) > 0
+        for pull in pulls:
+            assert isinstance(pull, github3.pulls.PullRequest)
+
+    def test_pull_requests_accepts_sort_and_direction(self):
+        """Test that pull_requests now takes a sort parameter."""
         cassette_name = self.cassette_name('pull_requests_accept_sort')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'betamax')
             assert repository is not None
             last_pr = None
-            for pr in repository.iter_pulls(sort='updated', direction='asc'):
-                assert pr
+            for pr in repository.pull_requests(sort='updated',
+                                               direction='asc'):
+                assert pr is not None
                 if last_pr:
                     assert last_pr.updated_at < pr.updated_at
                 last_pr = pr

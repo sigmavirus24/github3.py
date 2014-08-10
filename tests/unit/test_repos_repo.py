@@ -491,6 +491,28 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_pull_requests(self):
+        """Test the request for the retrieving pull requests."""
+        i = self.instance.pull_requests()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('pulls'),
+            params={'per_page': 100, 'sort': 'created', 'direction': 'desc'},
+            headers={}
+        )
+
+    def test_pull_requests_ignore_invalid_state(self):
+        """Test the method ignores invalid pull request states."""
+        i = self.instance.pull_requests(state='invalid')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('pulls'),
+            params={'per_page': 100, 'sort': 'created', 'direction': 'desc'},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

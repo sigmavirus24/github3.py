@@ -536,37 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_pulls(self):
-        self.response('pull', _iter=True)
-        self.get(self.api + 'pulls')
-        base_params = {'per_page': 100, 'sort': 'created', 'direction': 'desc'}
-        self.conf.update(params=base_params)
-
-        p = next(self.repo.iter_pulls())
-        assert isinstance(p, github3.pulls.PullRequest)
-        self.mock_assertions()
-
-        next(self.repo.iter_pulls('foo'))
-        self.mock_assertions()
-
-        params = {'state': 'open'}
-        params.update(base_params)
-        self.conf.update(params=params)
-        next(self.repo.iter_pulls('Open'))
-        self.mock_assertions()
-
-        params = {'head': 'user:branch'}
-        params.update(base_params)
-        self.conf.update(params=params)
-        next(self.repo.iter_pulls(head='user:branch'))
-        self.mock_assertions()
-
-        params = {'base': 'branch'}
-        params.update(base_params)
-        self.conf.update(params=params)
-        next(self.repo.iter_pulls(base='branch'))
-        self.mock_assertions()
-
     def test_iter_refs(self):
         self.response('ref', _iter=True)
         self.get(self.api + 'git/refs')
