@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from github3.models import GitHubObject
 
 
@@ -14,6 +16,13 @@ class PagesInfo(GitHubObject):
 
         #: Boolean indicating whether there is a custom 404 for the pages site
         self.custom_404 = info.get('custom_404')
+
+    def _repr(self):
+        info = self.cname or ''
+        if info:
+            info += '/'
+        info += self.status or ''
+        return '<Pages Info [{0}]>'.format(info)
 
 
 class PagesBuild(GitHubObject):
@@ -43,3 +52,6 @@ class PagesBuild(GitHubObject):
 
         #: Datetime the build was updated
         self.updated_at = self._strptime(build.get('updated_at'))
+
+    def _repr(self):
+        return '<Pages Build [{0}/{1}]>'.format(self.commit, self.status)
