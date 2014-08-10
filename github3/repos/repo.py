@@ -71,7 +71,7 @@ class Repository(GitHubCore):
         self.forks = repo.get('forks', 0)
 
         #: The number of forks of this repository.
-        self.fork_count = repo.get('fork_count')
+        self.forks_count = repo.get('forks_count')
 
         #: Is this repository a fork?
         self.fork = repo.get('fork')
