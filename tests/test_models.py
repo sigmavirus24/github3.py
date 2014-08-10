@@ -1,3 +1,4 @@
+from datetime import timedelta
 import github3
 import requests
 from tests.utils import BaseCase, TestCase, RequestsBytesIO, is_py3
@@ -35,6 +36,12 @@ class TestGitHubCore(BaseCase):
         r.raw = RequestsBytesIO('{}'.encode() if is_py3 else '{}')
 
         self.assertRaises(github3.GitHubError, self.g._boolean, r, 200, 404)
+
+    def test_strptime(self):
+        dt = self.g._strptime('2013-06-18T19:53:04Z')
+        assert dt.tzname() == 'UTC'
+        assert dt.dst() == timedelta(0)
+        assert dt.utcoffset() == timedelta(0)
 
 
 class TestGitHubError(TestCase):

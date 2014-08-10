@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from re import match
 from json import dumps
 from github3.decorators import requires_auth
@@ -33,7 +35,7 @@ class Issue(GitHubCore):
         super(Issue, self).__init__(issue, session)
         self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
-        #  was assigned to.
+        #: was assigned to.
         self.assignee = issue.get('assignee')
         if self.assignee:
             self.assignee = User(issue.get('assignee'), self._session)
@@ -46,9 +48,7 @@ class Issue(GitHubCore):
 
         # If an issue is still open, this field will be None
         #: datetime object representing when the issue was closed.
-        self.closed_at = None
-        if issue.get('closed_at'):
-            self.closed_at = self._strptime(issue.get('closed_at'))
+        self.closed_at = self._strptime(issue.get('closed_at'))
 
         #: Number of comments on this issue.
         self.comments = issue.get('comments')
@@ -62,12 +62,14 @@ class Issue(GitHubCore):
         self.html_url = issue.get('html_url')
         #: Unique ID for the issue.
         self.id = issue.get('id')
-        #: Returns the list of :class:`Label <Label>`\ s on this issue.
+        #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
+        #: on this issue.
         self.labels = [Label(l, self._session) for l in issue.get('labels')]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels_url) if labels_url else None
-        #: :class:`Milestone <Milestone>` this issue was assigned to.
+        #: :class:`Milestone <github3.issues.milestone.Milestone>` this
+        #: issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):
             self.milestone = Milestone(issue.get('milestone'), self._session)
@@ -92,7 +94,7 @@ class Issue(GitHubCore):
         #: :class:`User <github3.users.User>` who closed the issue.
         self.closed_by = User(closed_by, self) if closed_by else None
 
-    def __repr__(self):
+    def _repr(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)
 
@@ -145,7 +147,7 @@ class Issue(GitHubCore):
         sigmavirus24/Todo.txt-python, the first comment's id is 4150787.
 
         :param int id_num: (required), comment id, see example above
-        :returns: :class:`IssueComment <IssueComment>`
+        :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
         json = None
         if int(id_num) > 0:  # Might as well check that it's positive
@@ -160,7 +162,7 @@ class Issue(GitHubCore):
         """Create a comment on this issue.
 
         :param str body: (required), comment body
-        :returns: :class:`IssueComment <IssueComment>`
+        :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
         json = None
         if body:
@@ -213,7 +215,8 @@ class Issue(GitHubCore):
         """Iterate over the comments on this issue.
 
         :param int number: (optional), number of comments to iterate over
-        :returns: iterator of :class:`IssueComment <IssueComment>`
+        :returns: iterator of
+            :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, IssueComment)
@@ -223,10 +226,23 @@ class Issue(GitHubCore):
 
         :param int number: (optional), number of events to return. Default: -1
             returns all events available.
-        :returns: generator of :class:`IssueEvent <IssueEvent>`\ s
+        :returns: generator of
+            :class:`IssueEvent <github3.issues.event.IssueEvent>`\ s
         """
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent)
+
+    def iter_labels(self, number=-1, etag=None):
+        """Iterate over the labels associated with this issue.
+
+        :param int number: (optional), number of labels to return. Default: -1
+            returns all labels applied to this issue.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Label <github3.issues.label.Label>`\ s
+        """
+        url = self._build_url('labels', base_url=self._api)
+        return self._iter(int(number), url, Label, etag=etag)
 
     @requires_auth
     def remove_label(self, name):

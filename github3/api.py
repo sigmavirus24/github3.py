@@ -14,7 +14,7 @@ gh = GitHub()
 
 
 def authorize(login, password, scopes, note='', note_url='', client_id='',
-              client_secret=''):
+              client_secret='', two_factor_callback=None):
     """Obtain an authorization token for the GitHub API.
 
     :param str login: (required)
@@ -27,9 +27,13 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
         to create a token
     :param str client_secret: (optional), 40 character OAuth client secret for
         which to create the token
+    :param func two_factor_callback: (optional), function to call when a
+        Two-Factor Authentication code needs to be provided by the user.
     :returns: :class:`Authorization <Authorization>`
 
     """
+    gh = GitHub()
+    gh.login(two_factor_callback=two_factor_callback)
     return gh.authorize(login, password, scopes, note, note_url, client_id,
                         client_secret)
 
@@ -177,12 +181,18 @@ def iter_gists(username=None, number=-1, etag=None):
 def iter_repo_issues(owner, repository, milestone=None, state=None,
                      assignee=None, mentioned=None, labels=None, sort=None,
                      direction=None, since=None, number=-1, etag=None):
-    """Iterate over issues on owner/repository.
+    """List issues on owner/repository. Only owner and repository are
+    required.
+
+    .. versionchanged:: 0.9.0
+
+        - The ``state`` parameter now accepts 'all' in addition to 'open'
+          and 'closed'.
 
     :param str owner: login of the owner of the repository
     :param str repository: name of the repository
     :param int milestone: None, '*', or ID of milestone
-    :param str state: accepted values: ('open', 'closed')
+    :param str state: accepted values: ('all', 'open', 'closed')
         api-default: 'open'
     :param str assignee: '*' or login of the user
     :param str mentioned: login of the user
@@ -200,7 +210,7 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
         Default: -1 returns all issues
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
-    :returns: generator of :class:`Issue <github3.issues.Issue>`
+    :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
 
     """
     if owner and repository:

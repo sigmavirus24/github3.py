@@ -5,6 +5,7 @@ github3.gists.file
 
 Module containing the logic for the GistFile object.
 """
+from __future__ import unicode_literals
 
 from github3.models import GitHubObject
 
@@ -34,5 +35,5 @@ class GistFile(GitHubObject):
         #: The content of the file.
         self.content = attributes.get('content')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Gist File [{0}]>'.format(self.name)

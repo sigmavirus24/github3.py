@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from github3.models import GitHubCore
 from github3.users import User
 
@@ -14,5 +16,5 @@ class UserSearchResult(GitHubCore):
         #: User object matching the search
         self.user = User(result, self)
 
-    def __repr__(self):
+    def _repr(self):
         return '<UserSearchResult [{0}]>'.format(self.user)

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import json
 
 from github3.decorators import requires_auth
 from github3.models import GitHubCore, GitHubError
+from github3.utils import stream_response_to_file
 from uritemplate import URITemplate
 
 
@@ -20,6 +22,8 @@ class Release(GitHubCore):
     def __init__(self, release, session=None):
         super(Release, self).__init__(release, session)
         self._api = release.get('url')
+        #: List of :class:`Asset <Asset>` objects for this release
+        self.assets = [Asset(i, self) for i in release.get('assets', [])]
         #: URL for uploaded assets
         self.assets_url = release.get('assets_url')
         #: Body of the release (the description)
@@ -34,10 +38,10 @@ class Release(GitHubCore):
         self.id = release.get('id')
         #: Name given to the release
         self.name = release.get('name')
-        #; Boolean whether release is a prelease
+        #; Boolean whether release is a prerelease
         self.prerelease = release.get('prerelease')
         #: Date the release was published
-        self.published_at = release.get('published_at')
+        self.published_at = self._strptime(release.get('published_at'))
         #: Name of the tag
         self.tag_name = release.get('tag_name')
         #: "Commit" that this release targets
@@ -46,7 +50,7 @@ class Release(GitHubCore):
         #: URITemplate to upload an asset with
         self.upload_urlt = URITemplate(upload_url) if upload_url else None
 
-    def __repr__(self):
+    def _repr(self):
         return '<Release [{0}]>'.format(self.name)
 
     @requires_auth
@@ -143,6 +147,9 @@ class Asset(GitHubCore):
         self.created_at = self._strptime(asset.get('created_at'))
         #: Number of times the asset was downloaded
         self.download_count = asset.get('download_count')
+        #: URL to download the asset.
+        #: Request headers must include ``Accept: application/octet-stream``.
+        self.download_url = self._api
         #: GitHub id of the asset
         self.id = asset.get('id')
         #: Short description of the asset
@@ -155,6 +162,39 @@ class Asset(GitHubCore):
         self.state = asset.get('state')
         #: Date the asset was updated
         self.updated_at = self._strptime(asset.get('updated_at'))
+
+    def _repr(self):
+        return '<Asset [{0}]>'.format(self.name)
+
+    def download(self, path=''):
+        """Download the data for this asset.
+
+        :param path: (optional), path where the file should be saved
+            to, default is the filename provided in the headers and will be
+            written in the current directory.
+            it can take a file-like object as well
+        :type path: str, file
+        :returns: bool -- True if successful, False otherwise
+        """
+        headers = {
+            'Accept': 'application/octet-stream'
+            }
+        resp = self._get(self._api, allow_redirects=False, stream=True,
+                         headers=headers)
+        if resp.status_code == 302:
+            # Amazon S3 will reject the redirected request unless we omit
+            # certain request headers
+            headers.update({
+                'Authorization': None,
+                'Content-Type': None,
+                })
+            resp = self._get(resp.headers['location'], stream=True,
+                             headers=headers)
+
+        if self._boolean(resp, 200, 404):
+            stream_response_to_file(resp, path)
+            return True
+        return False
 
     def edit(self, name, label=None):
         """Edit this asset.
@@ -169,7 +209,7 @@ class Asset(GitHubCore):
         self._remove_none(edit_data)
         r = self._patch(
             self._api,
-            data=edit_data,
+            data=json.dumps(edit_data),
             headers=Release.CUSTOM_HEADERS
         )
         successful = self._boolean(r, 200, 404)

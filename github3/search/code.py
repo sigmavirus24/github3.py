@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from github3.models import GitHubCore
 from github3.repos import Repository
 
@@ -24,5 +26,5 @@ class CodeSearchResult(GitHubCore):
         #: Text matches
         self.text_matches = data.get('text_matches', [])
 
-    def __repr__(self):
+    def _repr(self):
         return '<CodeSearchResult [{0}]>'.format(self.path)

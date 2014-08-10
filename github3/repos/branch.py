@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from github3.models import GitHubCore
 from github3.repos.commit import RepoCommit
 
@@ -12,13 +14,13 @@ class Branch(GitHubCore):
         super(Branch, self).__init__(branch, session)
         #: Name of the branch.
         self.name = branch.get('name')
-        #: Returns the branch's :class:`RepoCommit <RepoCommit>` or
-        #  ``None``.
+        #: Returns the branch's
+        #: :class:`RepoCommit <github3.repos.commit.RepoCommit>` or ``None``.
         self.commit = branch.get('commit')
         if self.commit:
             self.commit = RepoCommit(self.commit, self._session)
         #: Returns '_links' attribute.
         self.links = branch.get('_links', {})
 
-    def __repr__(self):
+    def _repr(self):
         return '<Repository Branch [{0}]>'.format(self.name)

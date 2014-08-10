@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 from github3.models import BaseComment
 from github3.users import User
 
@@ -29,5 +31,5 @@ class IssueComment(BaseComment):
         #: Issue url (not a template)
         self.issue_url = comment.get('issue_url')
 
-    def __repr__(self):
+    def _repr(self):
         return '<Issue Comment [{0}]>'.format(self.user.login)

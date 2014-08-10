@@ -6,6 +6,7 @@ github3.gists.comment
 Module containing the logic for a GistComment
 
 """
+from __future__ import unicode_literals
 
 from github3.models import BaseComment
 from github3.users import User
@@ -38,5 +39,5 @@ class GistComment(BaseComment):
         if comment.get('user'):
             self.user = User(comment.get('user'), self)  # (No coverage)
 
-    def __repr__(self):
+    def _repr(self):
         return '<Gist Comment [{0}]>'.format(self.user.login)
