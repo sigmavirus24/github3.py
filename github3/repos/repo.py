@@ -1410,16 +1410,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
 
-    @requires_auth
-    def iter_pages_builds(self, number=-1, etag=None):
-        """Iterate over pages builds of this repository.
-
-        :returns: generator of :class:`PagesBuild
-            <github3.repos.pages.PagesBuild>`
-        """
-        url = self._build_url('pages', 'builds', base_url=self._api)
-        return self._iter(int(number), url, PagesBuild, etag=etag)
-
     def iter_pulls(self, state=None, head=None, base=None, sort='created',
                    direction='desc', number=-1, etag=None):
         r"""List pull requests on repository.
@@ -1678,6 +1668,16 @@ class Repository(GitHubCore):
         url = self._build_url('pages', base_url=self._api)
         json = self._json(self._get(url), 200)
         return PagesInfo(json) if json else None
+
+    @requires_auth
+    def pages_builds(self, number=-1, etag=None):
+        """Iterate over pages builds of this repository.
+
+        :returns: generator of :class:`PagesBuild
+            <github3.repos.pages.PagesBuild>`
+        """
+        url = self._build_url('pages', 'builds', base_url=self._api)
+        return self._iter(int(number), url, PagesBuild, etag=etag)
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.

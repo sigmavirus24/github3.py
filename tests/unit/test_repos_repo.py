@@ -480,6 +480,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_pages_builds(self):
+        """Test the request for the GitHub Pages builds for a repo."""
+        i = self.instance.pages_builds()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('pages/builds'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 
@@ -511,3 +522,8 @@ class TestRepositoryRequiresAuth(UnitHelper):
         """Show that a user must be authenticated to list notifications."""
         with pytest.raises(GitHubError):
             self.instance.notifications()
+
+    def test_pages_builds(self):
+        """Show that a user must be authenticated to list their builds."""
+        with pytest.raises(GitHubError):
+            self.instance.pages_builds()

@@ -85,6 +85,7 @@ Old name                                      New name
 ``Repository#iter_milestones``                ``Repository#milestones``
 ``Repository#iter_network_events``            ``Repository#network_events``
 ``Repository#iter_notifications``             ``Repository#notifications``
+``Repository#iter_pages_builds``              ``Repository#pages_builds``
 
 ==========================================    ==============================================
 
