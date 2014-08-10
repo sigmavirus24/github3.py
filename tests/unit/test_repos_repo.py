@@ -469,6 +469,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_notifications(self):
+        """Test the ability to iterate over the notifications for a repo."""
+        i = self.instance.notifications()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('notifications'),
+            params={'per_page': 100, 'participating': False, 'all': False},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 
@@ -495,3 +506,8 @@ class TestRepositoryRequiresAuth(UnitHelper):
         """Show that a user must be authenticated to list keys."""
         with pytest.raises(GitHubError):
             self.instance.keys()
+
+    def test_notifications(self):
+        """Show that a user must be authenticated to list notifications."""
+        with pytest.raises(GitHubError):
+            self.instance.notifications()

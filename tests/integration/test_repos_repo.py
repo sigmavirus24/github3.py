@@ -311,6 +311,19 @@ class TestRepository(IntegrationHelper):
         for event in events:
             assert isinstance(event, github3.events.Event)
 
+    def test_notifications(self):
+        """Test that a user can retrieve their repo notifications."""
+        self.basic_login()
+        cassette_name = self.cassette_name('notifications')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            notifications = list(repository.notifications())
+
+        assert len(notifications) > 0
+        for notification in notifications:
+            assert isinstance(notification, github3.notifications.Thread)
+
     def test_iter_pulls_accepts_sort_and_direction(self):
         """Test that iter_pulls now takes a sort parameter."""
         cassette_name = self.cassette_name('pull_requests_accept_sort')

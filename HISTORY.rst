@@ -84,6 +84,7 @@ Old name                                      New name
 ``Repository#iter_languages``                 ``Repository#languages``
 ``Repository#iter_milestones``                ``Repository#milestones``
 ``Repository#iter_network_events``            ``Repository#network_events``
+``Repository#iter_notifications``             ``Repository#notifications``
 
 ==========================================    ==============================================
 
