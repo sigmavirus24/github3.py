@@ -64,3 +64,5 @@ Contributors
 - Daniel Johnson (@danielj7)
 
 - David Moss (@damoss007)
+
+- John Barbuto (@jbarbuto)
