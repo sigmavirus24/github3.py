@@ -1410,23 +1410,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
 
-    def iter_refs(self, subspace='', number=-1, etag=None):
-        r"""Iterate over references for this repository.
-
-        :param str subspace: (optional), e.g. 'tags', 'stashes', 'notes'
-        :param int number: (optional), number of refs to return. Default: -1
-            returns all available refs
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Reference <github3.git.Reference>`\ s
-        """
-        if subspace:
-            args = ('git', 'refs', subspace)
-        else:
-            args = ('git', 'refs')
-        url = self._build_url(*args, base_url=self._api)
-        return self._iter(int(number), url, Reference, etag=etag)
-
     def iter_releases(self, number=-1, etag=None):
         r"""Iterate over releases for this repository.
 
@@ -1720,6 +1703,23 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'refs', ref, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Reference(json, self) if json else None
+
+    def refs(self, subspace='', number=-1, etag=None):
+        r"""Iterate over references for this repository.
+
+        :param str subspace: (optional), e.g. 'tags', 'stashes', 'notes'
+        :param int number: (optional), number of refs to return. Default: -1
+            returns all available refs
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Reference <github3.git.Reference>`\ s
+        """
+        if subspace:
+            args = ('git', 'refs', subspace)
+        else:
+            args = ('git', 'refs')
+        url = self._build_url(*args, base_url=self._api)
+        return self._iter(int(number), url, Reference, etag=etag)
 
     def release(self, id):
         """Get a single release.

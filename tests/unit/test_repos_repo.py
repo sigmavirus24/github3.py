@@ -513,6 +513,28 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_refs(self):
+        """Test the request for retrieving references."""
+        i = self.instance.refs()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('git/refs'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_refs_with_a_subspace(self):
+        """Test the request for retrieivng refs in a subspace."""
+        i = self.instance.refs('a-subspace')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('git/refs/a-subspace'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

@@ -87,6 +87,7 @@ Old name                                      New name
 ``Repository#iter_notifications``             ``Repository#notifications``
 ``Repository#iter_pages_builds``              ``Repository#pages_builds``
 ``Repository#iter_pulls``                     ``Repository#pull_requests``
+``Repository#iter_refs``                      ``Repository#refs``
 
 ==========================================    ==============================================
 

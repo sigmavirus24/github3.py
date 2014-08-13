@@ -536,19 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_refs(self):
-        self.response('ref', _iter=True)
-        self.get(self.api + 'git/refs')
-
-        r = next(self.repo.iter_refs())
-        assert isinstance(r, github3.git.Reference)
-        self.mock_assertions()
-
-        self.get(self.api + 'git/refs/subspace')
-        r = next(self.repo.iter_refs('subspace'))
-        assert isinstance(r, github3.git.Reference)
-        self.mock_assertions()
-
     def test_iter_stargazers(self):
         self.response('user', _iter=True)
         self.get(self.api + 'stargazers')

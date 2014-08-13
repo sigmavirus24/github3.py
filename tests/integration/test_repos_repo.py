@@ -369,6 +369,18 @@ class TestRepository(IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_refs(self):
+        """Test the ability to retrieve the references from a repository."""
+        cassette_name = self.cassette_name('refs')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            references = list(repository.refs())
+
+        assert len(references) > 0
+        for ref in references:
+            assert isinstance(ref, github3.git.Reference)
+
     def test_subscription(self):
         """Test the ability to subscribe to a repository's notifications."""
         self.basic_login()
