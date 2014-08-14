@@ -535,6 +535,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_releases(self):
+        """Test the request for retrieving releases from a repository."""
+        i = self.instance.releases()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('releases'),
+            params={'per_page': 100},
+            headers={'Accept': 'application/vnd.github.manifold-preview'}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

@@ -350,15 +350,6 @@ class TestRepository(IntegrationHelper):
                     assert last_pr.updated_at < pr.updated_at
                 last_pr = pr
 
-    def test_iter_releases(self):
-        """Test the ability to iterate over releases on a repository."""
-        cassette_name = self.cassette_name('iter_releases')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            assert repository is not None
-            for release in repository.iter_releases():
-                assert isinstance(release, github3.repos.release.Release)
-
     def test_release(self):
         """Test the ability to retrieve a single release."""
         cassette_name = self.cassette_name('release')
@@ -368,6 +359,15 @@ class TestRepository(IntegrationHelper):
             release = repository.release(76677)
 
         assert isinstance(release, github3.repos.release.Release)
+
+    def test_releases(self):
+        """Test the ability to iterate over releases on a repository."""
+        cassette_name = self.cassette_name('releases')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            for release in repository.releases():
+                assert isinstance(release, github3.repos.release.Release)
 
     def test_refs(self):
         """Test the ability to retrieve the references from a repository."""
