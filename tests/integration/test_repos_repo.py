@@ -381,6 +381,18 @@ class TestRepository(IntegrationHelper):
         for ref in references:
             assert isinstance(ref, github3.git.Reference)
 
+    def test_stargazers(self):
+        """Test the ability to retrieve the stargazers on a repository."""
+        cassette_name = self.cassette_name('stargazers')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'betamax')
+            assert repository is not None
+            stargazers = list(repository.stargazers())
+
+        assert len(stargazers) > 0
+        for user in stargazers:
+            assert isinstance(user, github3.users.User)
+
     def test_subscription(self):
         """Test the ability to subscribe to a repository's notifications."""
         self.basic_login()

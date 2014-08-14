@@ -136,7 +136,7 @@ class Repository(GitHubCore):
 
         # The number of stargazers
         #: Number of users who starred the repository
-        self.stargazers = repo.get('stargazers_count', 0)
+        self.stargazers_count = repo.get('stargazers_count', 0)
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
@@ -1410,18 +1410,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
 
-    def iter_stargazers(self, number=-1, etag=None):
-        r"""List users who have starred this repository.
-
-        :param int number: (optional), number of stargazers to return.
-            Default: -1 returns all subscribers available
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
-        """
-        url = self._build_url('stargazers', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
-
     def iter_subscribers(self, number=-1, etag=None):
         r"""Iterate over users subscribed to this repository.
 
@@ -1747,6 +1735,18 @@ class Repository(GitHubCore):
         url = self._build_url('collaborators', str(username),
                               base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
+
+    def stargazers(self, number=-1, etag=None):
+        r"""List users who have starred this repository.
+
+        :param int number: (optional), number of stargazers to return.
+            Default: -1 returns all subscribers available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('stargazers', base_url=self._api)
+        return self._iter(int(number), url, User, etag=etag)
 
     @requires_auth
     def subscribe(self):

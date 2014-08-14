@@ -546,6 +546,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
 
+    def test_stargazers(self):
+        """Test the request for retrieving stargazers of a repository."""
+        i = self.instance.stargazers()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('stargazers'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

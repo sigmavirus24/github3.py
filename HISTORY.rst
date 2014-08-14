@@ -89,6 +89,7 @@ Old name                                      New name
 ``Repository#iter_pulls``                     ``Repository#pull_requests``
 ``Repository#iter_refs``                      ``Repository#refs``
 ``Repository#iter_releases``                  ``Repository#releases``
+``Repository#iter_stargazers``                ``Repository#stargazers``
 
 ==========================================    ==============================================
 
@@ -227,6 +228,9 @@ Old name                            New attribute name
     - ``Repository#remove_collaborator``
     - ``Team#add_member``
     - ``Team#is_member``
+
+- ``Repository.stargazers`` is now ``Repository.stargazers_count`` (conforming
+  with the attribute name returned by the API).
 
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
