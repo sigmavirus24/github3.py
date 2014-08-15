@@ -557,6 +557,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_subscribers(self):
+        """Test the request for retrieving subscribers to a repository."""
+        i = self.instance.subscribers()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('subscribers'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

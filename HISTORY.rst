@@ -90,6 +90,7 @@ Old name                                      New name
 ``Repository#iter_refs``                      ``Repository#refs``
 ``Repository#iter_releases``                  ``Repository#releases``
 ``Repository#iter_stargazers``                ``Repository#stargazers``
+``Repository#iter_subscribers``               ``Repository#subscribers``
 
 ==========================================    ==============================================
 

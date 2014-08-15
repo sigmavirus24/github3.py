@@ -1410,18 +1410,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
 
-    def iter_subscribers(self, number=-1, etag=None):
-        r"""Iterate over users subscribed to this repository.
-
-        :param int number: (optional), number of subscribers to return.
-            Default: -1 returns all subscribers available
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`
-        """
-        url = self._build_url('subscribers', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
-
     def iter_statuses(self, sha, number=-1, etag=None):
         r"""Iterate over the statuses for a specific SHA.
 
@@ -1766,6 +1754,18 @@ class Repository(GitHubCore):
         json = self._json(self._put(url, data=dumps({'subcribed': True})),
                           200)
         return Subscription(json, self) if json else None
+
+    def subscribers(self, number=-1, etag=None):
+        r"""Iterate over users subscribed to this repository.
+
+        :param int number: (optional), number of subscribers to return.
+            Default: -1 returns all subscribers available
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`
+        """
+        url = self._build_url('subscribers', base_url=self._api)
+        return self._iter(int(number), url, User, etag=etag)
 
     @requires_auth
     def subscription(self):
