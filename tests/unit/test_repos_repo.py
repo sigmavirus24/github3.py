@@ -557,6 +557,24 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_statuses(self):
+        """Test the request for retrieiving statuses of a commit."""
+        i = self.instance.statuses('fake-sha')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('statuses/fake-sha'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_statuses_requires_a_sha(self):
+        """Test the request is made only if given a SHA."""
+        i = self.instance.statuses('')
+        self.get_next(i)
+
+        assert self.session.get.called is False
+
     def test_subscribers(self):
         """Test the request for retrieving subscribers to a repository."""
         i = self.instance.subscribers()

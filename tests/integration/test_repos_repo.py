@@ -393,6 +393,20 @@ class TestRepository(IntegrationHelper):
         for user in stargazers:
             assert isinstance(user, github3.users.User)
 
+    def test_statuses(self):
+        """Test the ability to retrieve a commit's statuses."""
+        cassette_name = self.cassette_name('statuses')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            statuses = list(repository.statuses(
+                '0cea3860f91717272a5edb3961e9723b70769084'
+            ))
+
+        assert len(statuses) > 0
+        for status in statuses:
+            assert isinstance(status, github3.repos.status.Status)
+
     def test_subscribers(self):
         """Test the ability to retrieve a repository's subscribers."""
         cassette_name = self.cassette_name('subscribers')

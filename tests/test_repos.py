@@ -536,18 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_statuses(self):
-        self.response('status', _iter=True)
-        self.get(self.api + 'statuses/fakesha')
-
-        with self.assertRaises(StopIteration):
-            next(self.repo.iter_statuses(None))
-        self.not_called()
-
-        s = next(self.repo.iter_statuses('fakesha'))
-        assert isinstance(s, repos.status.Status)
-        self.mock_assertions()
-
     def test_iter_tags(self):
         self.response('tag', _iter=True)
         self.get(self.api + 'tags')
