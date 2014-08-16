@@ -93,6 +93,7 @@ Old name                                      New name
 ``Repository#iter_subscribers``               ``Repository#subscribers``
 ``Repository#iter_statuses``                  ``Repository#statuses``
 ``Repository#iter_tags``                      ``Repository#tags``
+``Repository#iter_teams``                     ``Repository#teams``
 
 ==========================================    ==============================================
 

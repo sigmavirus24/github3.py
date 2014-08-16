@@ -536,18 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_teams(self):
-        self.response('team', _iter=True)
-        self.get(self.api + 'teams')
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_teams)
-        self.not_called()
-
-        self.login()
-        t = next(self.repo.iter_teams())
-        assert isinstance(t, github3.orgs.Team)
-        self.mock_assertions()
-
     def test_mark_notifications(self):
         self.response('', 205)
         self.put(self.api + 'notifications')

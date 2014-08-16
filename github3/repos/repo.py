@@ -1411,20 +1411,6 @@ class Repository(GitHubCore):
         return PagesBuild(json) if json else None
 
     @requires_auth
-    def iter_teams(self, number=-1, etag=None):
-        r"""Iterate over teams with access to this repository.
-
-        :param int number: (optional), return up to number Teams. Default: -1
-            returns all Teams.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Team <github3.orgs.Team>`\ s
-        """
-        from github3.orgs import Team
-        url = self._build_url('teams', base_url=self._api)
-        return self._iter(int(number), url, Team, etag=etag)
-
-    @requires_auth
     def mark_notifications(self, last_read=''):
         """Mark all notifications in this repository as read.
 
@@ -1790,6 +1776,20 @@ class Repository(GitHubCore):
         """
         url = self._build_url('tags', base_url=self._api)
         return self._iter(int(number), url, RepoTag, etag=etag)
+
+    @requires_auth
+    def teams(self, number=-1, etag=None):
+        r"""Iterate over teams with access to this repository.
+
+        :param int number: (optional), return up to number Teams. Default: -1
+            returns all Teams.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Team <github3.orgs.Team>`\ s
+        """
+        from github3.orgs import Team
+        url = self._build_url('teams', base_url=self._api)
+        return self._iter(int(number), url, Team, etag=etag)
 
     def tree(self, sha):
         """Get a tree.

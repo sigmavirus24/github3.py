@@ -597,6 +597,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_teams(self):
+        """Test the request for retrieving teams on a repository."""
+        i = self.instance.teams()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('teams'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 
@@ -633,3 +644,8 @@ class TestRepositoryRequiresAuth(UnitHelper):
         """Show that a user must be authenticated to list their builds."""
         with pytest.raises(GitHubError):
             self.instance.pages_builds()
+
+    def test_teams(self):
+        """Show that a user must be authenticated to list teams on a repo."""
+        with pytest.raises(GitHubError):
+            self.instance.teams()

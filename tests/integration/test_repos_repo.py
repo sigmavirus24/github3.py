@@ -441,3 +441,16 @@ class TestRepository(IntegrationHelper):
         assert len(tags) > 0
         for tag in tags:
             assert isinstance(tag, github3.repos.tag.RepoTag)
+
+    def test_teams(self):
+        """Test the ability to retrieve teams assigned to a repo."""
+        self.basic_login()
+        cassette_name = self.cassette_name('teams')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'github3.py')
+            assert repository is not None
+            teams = list(repository.teams())
+
+        assert len(teams) > 0
+        for team in teams:
+            assert isinstance(team, github3.orgs.Team)
