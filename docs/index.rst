@@ -178,6 +178,12 @@ Latest Version's Changes
 
 .. include:: ../LATEST_VERSION_NOTES.rst
 
+The full history of the project is available as well.
+
+.. toctree::
+
+    project_changelog
+
 Testimonials
 ------------
 
