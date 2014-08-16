@@ -236,6 +236,22 @@ Old name                            New attribute name
 - ``Repository.stargazers`` is now ``Repository.stargazers_count`` (conforming
   with the attribute name returned by the API).
 
+
+- The ``Issue`` API has changed in order to provide a more consistent attribute
+  API. ``Issue.comments`` is now ``Issue.comments_count`` and returns the
+  number of comments on an issue.
+
+- The ``Issue.labels`` attribute has also been renamed. It is now available from
+  ``Issue.original_labels``. This will provide the user with the list of
+  ``Label`` objects that was returned by the API. To retrieve an updated list
+  of labels, the user can now use ``Issue#labels``, e.g.
+
+  ::
+
+      i = github3.issue('sigmavirus24', 'github3.py', 30)
+      labels = list(i.labels())
+
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 

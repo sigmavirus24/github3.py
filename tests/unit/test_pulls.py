@@ -1,21 +1,13 @@
 """Unit tests for the github3.pulls module."""
-import json
-import os
 import pytest
 
-from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
+from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
+                     create_example_data_helper)
 
 from github3 import GitHubError
 from github3.pulls import PullRequest
 
-
-def get_pr_example_data():
-    """Load the example data for the PullRequest object."""
-    directory = os.path.dirname(__file__)
-    example = os.path.join(directory, 'pull_request_example')
-    with open(example) as fd:
-        data = json.load(fd)
-    return data
+get_pr_example_data = create_example_data_helper('pull_request_example')
 
 
 url_for = create_url_helper(

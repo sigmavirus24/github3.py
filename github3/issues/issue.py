@@ -51,7 +51,7 @@ class Issue(GitHubCore):
         self.closed_at = self._strptime(issue.get('closed_at'))
 
         #: Number of comments on this issue.
-        self.comments = issue.get('comments')
+        self.comments_count = issue.get('comments')
         #: Comments url (not a template)
         self.comments_url = issue.get('comments_url')
         #: datetime object representing when the issue was created.
