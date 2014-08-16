@@ -20,14 +20,14 @@ class TestIssue(IntegrationHelper):
         for comment in comments:
             assert isinstance(comment, github3.issues.comment.IssueComment)
 
-    def test_iter_events(self):
+    def test_events(self):
         """Test the ability to iterate over issue events."""
         self.token_login()
-        cassette_name = self.cassette_name('iter_events')
+        cassette_name = self.cassette_name('events')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             issue = repository.issue(218)
-            for event in issue.iter_events():
+            for event in issue.events():
                 assert isinstance(event, github3.issues.event.IssueEvent)
                 assert event.issue is None
                 assert isinstance(event.actor, github3.users.User)

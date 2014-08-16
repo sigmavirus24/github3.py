@@ -53,6 +53,7 @@ Old name                                      New name
 ``GitHub#iter_user_repos``                    ``GitHub#repositories_by``
 ``GitHub#iter_user_teams``                    ``GitHub#user_teams``
 ``Issue#iter_comments``                       ``Issue#comments``
+``Issue#iter_events``                         ``Issue#events``
 ``Organization#iter_members``                 ``Organization#members``
 ``Organization#iter_public_members``          ``Organization#public_members``
 ``Organization#iter_repos``                   ``Organization#repositories``

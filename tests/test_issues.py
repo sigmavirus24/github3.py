@@ -241,15 +241,6 @@ class TestIssue(BaseCase):
         self.i.state = 'open'
         assert self.i.is_closed() is False
 
-    def test_iter_events(self):
-        self.response('issue_event', _iter=True)
-        self.get(self.api + '/events')
-
-        e = next(self.i.iter_events())
-        assert isinstance(e, IssueEvent)
-        assert repr(e).startswith('<Issue Event')
-        self.mock_assertions()
-
     def test_remove_label(self):
         self.response('', 204)
         self.delete(self.api + '/labels/name')

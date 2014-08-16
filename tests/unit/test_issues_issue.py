@@ -28,3 +28,14 @@ class TestIssueIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_events(self):
+        """Test the request to retrieve an issue's events."""
+        i = self.instance.events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events'),
+            params={'per_page': 100},
+            headers={}
+        )
