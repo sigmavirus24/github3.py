@@ -1410,18 +1410,6 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return PagesBuild(json) if json else None
 
-    def iter_tags(self, number=-1, etag=None):
-        r"""Iterate over tags on this repository.
-
-        :param int number: (optional), return up to at most number tags.
-            Default: -1 returns all available tags.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`RepoTag <github3.repos.tag.RepoTag>`\ s
-        """
-        url = self._build_url('tags', base_url=self._api)
-        return self._iter(int(number), url, RepoTag, etag=etag)
-
     @requires_auth
     def iter_teams(self, number=-1, etag=None):
         r"""Iterate over teams with access to this repository.
@@ -1790,6 +1778,18 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'tags', sha, base_url=self._api)
             json = self._json(self._get(url), 200)
         return Tag(json) if json else None
+
+    def tags(self, number=-1, etag=None):
+        r"""Iterate over tags on this repository.
+
+        :param int number: (optional), return up to at most number tags.
+            Default: -1 returns all available tags.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`RepoTag <github3.repos.tag.RepoTag>`\ s
+        """
+        url = self._build_url('tags', base_url=self._api)
+        return self._iter(int(number), url, RepoTag, etag=etag)
 
     def tree(self, sha):
         """Get a tree.

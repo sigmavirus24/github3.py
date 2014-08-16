@@ -536,17 +536,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
-    def test_iter_tags(self):
-        self.response('tag', _iter=True)
-        self.get(self.api + 'tags')
-
-        t = next(self.repo.iter_tags())
-        assert isinstance(t, repos.tag.RepoTag)
-        self.mock_assertions()
-
-        assert repr(t).startswith('<Repository Tag')
-        assert str(t) > ''
-
     def test_iter_teams(self):
         self.response('team', _iter=True)
         self.get(self.api + 'teams')

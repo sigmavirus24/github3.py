@@ -586,6 +586,17 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_tags(self):
+        """Test the request for retrieving tags in a repository."""
+        i = self.instance.tags()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('tags'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestRepositoryRequiresAuth(UnitHelper):
 

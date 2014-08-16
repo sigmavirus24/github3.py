@@ -428,3 +428,15 @@ class TestRepository(IntegrationHelper):
             assert repository is not None
             subscription = repository.subscribe()
             assert subscription.subscribed is True
+
+    def test_tags(self):
+        """Test the ability to retrieve a repository's tags."""
+        cassette_name = self.cassette_name('tags')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'betamax')
+            assert repository is not None
+            tags = list(repository.tags())
+
+        assert len(tags) > 0
+        for tag in tags:
+            assert isinstance(tag, github3.repos.tag.RepoTag)

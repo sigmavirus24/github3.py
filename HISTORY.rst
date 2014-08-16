@@ -92,6 +92,7 @@ Old name                                      New name
 ``Repository#iter_stargazers``                ``Repository#stargazers``
 ``Repository#iter_subscribers``               ``Repository#subscribers``
 ``Repository#iter_statuses``                  ``Repository#statuses``
+``Repository#iter_tags``                      ``Repository#tags``
 
 ==========================================    ==============================================
 
