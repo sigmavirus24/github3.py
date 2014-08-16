@@ -157,6 +157,16 @@ class Issue(GitHubCore):
             json = self._json(self._get(url), 200)
         return IssueComment(json) if json else None
 
+    def comments(self, number=-1):
+        r"""Iterate over the comments on this issue.
+
+        :param int number: (optional), number of comments to iterate over
+        :returns: iterator of
+            :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
+        """
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, IssueComment)
+
     @requires_auth
     def create_comment(self, body):
         """Create a comment on this issue.
@@ -210,16 +220,6 @@ class Issue(GitHubCore):
         if self.closed_at or (self.state == 'closed'):
             return True
         return False
-
-    def iter_comments(self, number=-1):
-        """Iterate over the comments on this issue.
-
-        :param int number: (optional), number of comments to iterate over
-        :returns: iterator of
-            :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
-        """
-        url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, IssueComment)
 
     def iter_events(self, number=-1):
         """Iterate over events associated with this issue only.

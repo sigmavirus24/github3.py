@@ -1,9 +1,25 @@
+"""Integration tests for Issues."""
 import github3
 
 from .helper import IntegrationHelper
 
 
 class TestIssue(IntegrationHelper):
+
+    """Integration tests for methods on the Issue class."""
+
+    def test_comments(self):
+        """Test the ability to retrieve comments on an issue."""
+        cassette_name = self.cassette_name('comments')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue('sigmavirus24', 'github3.py', 187)
+            assert issue is not None
+            comments = list(issue.comments())
+
+        assert len(comments) > 0
+        for comment in comments:
+            assert isinstance(comment, github3.issues.comment.IssueComment)
+
     def test_iter_events(self):
         """Test the ability to iterate over issue events."""
         self.token_login()
