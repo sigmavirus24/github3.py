@@ -173,7 +173,10 @@ Contact
 
 .. _sigmavirus24: https://twitter.com/sigmavirus24
 
-.. include:: ../HISTORY.rst
+Latest Version's Changes
+------------------------
+
+.. include:: ../LATEST_VERSION_NOTES.rst
 
 Testimonials
 ------------

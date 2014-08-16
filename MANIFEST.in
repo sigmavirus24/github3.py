@@ -1,6 +1,7 @@
 include README.rst
 include LICENSE
 include HISTORY.rst
+include LATEST_VERSION_NOTES.rst
 include AUTHORS.rst
 include CONTRIBUTING.rst
 include tox.ini
