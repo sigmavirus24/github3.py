@@ -233,6 +233,7 @@ class TestRepository(IntegrationHelper):
                 assert issue.state in ('open', 'closed')
 
     def test_key(self):
+        """Test the retrieval of a single key."""
         self.basic_login()
         cassette_name = self.cassette_name('key')
         with self.recorder.use_cassette(cassette_name):
