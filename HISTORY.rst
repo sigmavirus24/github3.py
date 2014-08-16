@@ -3,7 +3,7 @@
 History/Changelog
 -----------------
 
-.. include:: LATEST_VERSION_NOTES.rst
+.. include:: ./LATEST_VERSION_NOTES.rst
 
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
