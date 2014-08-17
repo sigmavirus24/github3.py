@@ -94,15 +94,6 @@ class TestMilestone(BaseCase):
         m = Milestone(json)
         assert isinstance(m.due_on, datetime.datetime)
 
-    def test_iter_labels(self):
-        self.response('label', _iter=True)
-        self.get(self.api + '/labels')
-
-        i = self.m.iter_labels()
-        assert isinstance(i, github3.structs.GitHubIterator)
-        assert isinstance((next(i)), Label)
-        self.mock_assertions()
-
     def test_update(self):
         self.response('milestone', 200)
         self.patch(self.api)
@@ -173,7 +164,7 @@ class TestIssue(BaseCase):
             self.not_called()
             assert self.i.assign('sigmavirus24')
             n = self.i.milestone.number if self.i.milestone else None
-            labels = [str(l) for l in self.i.labels]
+            labels = [str(l) for l in self.i.original_labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, 'sigmavirus24', self.i.state, n,
                 labels
@@ -190,7 +181,7 @@ class TestIssue(BaseCase):
             assert self.i.close()
             u = self.i.assignee.login if self.i.assignee else ''
             n = self.i.milestone.number if self.i.milestone else None
-            l = [str(label) for label in self.i.labels]
+            l = [str(label) for label in self.i.original_labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, self.i.state, n, l
             )
@@ -286,7 +277,7 @@ class TestIssue(BaseCase):
         with mock.patch.object(Issue, 'edit') as ed:
             ed.return_value = True
             assert self.i.reopen()
-            labels = [str(l) for l in self.i.labels]
+            labels = [str(l) for l in self.i.original_labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, 'open', n, labels
             )

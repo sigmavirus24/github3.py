@@ -64,7 +64,9 @@ class Issue(GitHubCore):
         self.id = issue.get('id')
         #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
         #: on this issue.
-        self.labels = [Label(l, self._session) for l in issue.get('labels')]
+        self.original_labels = [
+            Label(l, self._session) for l in issue.get('labels')
+        ]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels_url) if labels_url else None
@@ -123,7 +125,7 @@ class Issue(GitHubCore):
         if not login:
             return False
         number = self.milestone.number if self.milestone else None
-        labels = [str(l) for l in self.labels]
+        labels = [str(l) for l in self.original_labels]
         return self.edit(self.title, self.body, login, self.state, number,
                          labels)
 
@@ -135,7 +137,7 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
-        labels = [str(l) for l in self.labels]
+        labels = [str(l) for l in self.original_labels]
         return self.edit(self.title, self.body, assignee, 'closed',
                          number, labels)
 
@@ -232,7 +234,7 @@ class Issue(GitHubCore):
             return True
         return False
 
-    def iter_labels(self, number=-1, etag=None):
+    def labels(self, number=-1, etag=None):
         """Iterate over the labels associated with this issue.
 
         :param int number: (optional), number of labels to return. Default: -1
@@ -285,6 +287,6 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
-        labels = [str(l) for l in self.labels]
+        labels = [str(l) for l in self.original_labels]
         return self.edit(self.title, self.body, assignee, 'open',
                          number, labels)
