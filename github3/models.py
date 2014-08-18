@@ -29,9 +29,9 @@ class GitHubObject(object):
         if json is not None:
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
+            self._uniq = json.get('url', None)
         self._json_data = json
-        self._uniq = json.get('url', None)
-
+        
     def to_json(self):
         """Return the json representing this object."""
         return self._json_data
