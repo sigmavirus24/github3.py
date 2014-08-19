@@ -55,6 +55,7 @@ Old name                                      New name
 ``Issue#iter_comments``                       ``Issue#comments``
 ``Issue#iter_events``                         ``Issue#events``
 ``Issue#iter_labels``                         ``Issue#labels``
+``Milestone#iter_labels``                     ``Milestone#labels``
 ``Organization#iter_members``                 ``Organization#members``
 ``Organization#iter_public_members``          ``Organization#public_members``
 ``Organization#iter_repos``                   ``Organization#repositories``
