@@ -73,7 +73,7 @@ class Deployment(GitHubCore):
 
         return DeploymentStatus(json, self) if json else None
 
-    def iter_statuses(self, number=-1, etag=None):
+    def statuses(self, number=-1, etag=None):
         """Iterate over the deployment statuses for this deployment.
 
         :param int number: (optional), the number of statuses to return.

@@ -30,6 +30,7 @@ Old name                                      New name
 ``github3.iter_user_repos``                   ``github3.repositories_by``
 ``github3.iter_starred``                      ``github3.starred_by``
 ``github3.iter_subscriptions``                ``github3.subscriptions_for``
+``Deployment#iter_statuses``                  ``Deployment#statuses``
 ``Gist#iter_comments``                        ``Gist#comments``
 ``Gist#iter_commits``                         ``Gist#commits``
 ``Gist#iter_files``                           ``Gist#files``
