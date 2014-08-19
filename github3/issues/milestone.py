@@ -57,9 +57,8 @@ class Milestone(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    def iter_labels(self, number=-1, etag=None):
-        """Iterate over the labels for every issue associated with this
-        milestone.
+    def labels(self, number=-1, etag=None):
+        r"""Iterate over the labels of every associated issue.
 
         .. versionchanged:: 0.9
 
