@@ -11,7 +11,7 @@ class TestEvent(BaseCase):
 
     def setUp(self):
         super(TestEvent, self).setUp()
-        self.ev = github3.events.Event(self.ev.to_json())
+        self.ev = github3.events.Event(self.ev.as_json())
 
     def test_equality(self):
         e = github3.events.Event(load('event'))
@@ -20,7 +20,7 @@ class TestEvent(BaseCase):
         assert self.ev != e
 
     def test_org(self):
-        json = self.ev.to_json().copy()
+        json = self.ev.as_json().copy()
         json['org'] = self.o
         ev = github3.events.Event(json)
         assert isinstance(ev.org, github3.orgs.Organization)

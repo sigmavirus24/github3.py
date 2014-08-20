@@ -32,7 +32,7 @@ class GitHubObject(object):
         self._json_data = json
         self._uniq = json.get('url', None)
 
-    def to_json(self):
+    def as_json(self):
         """Return the json representing this object."""
         return self._json_data
 

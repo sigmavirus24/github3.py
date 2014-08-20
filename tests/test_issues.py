@@ -17,7 +17,7 @@ class TestLabel(BaseCase):
 
     def setUp(self):
         super(TestLabel, self).setUp()
-        self.l = Label(self.l.to_json(), self.g)
+        self.l = Label(self.l.as_json(), self.g)
 
     def test_equality(self):
         l = Label(load('label'))
@@ -69,7 +69,7 @@ class TestMilestone(BaseCase):
 
     def setUp(self):
         super(TestMilestone, self).setUp()
-        self.m = Milestone(self.m.to_json(), self.g)
+        self.m = Milestone(self.m.as_json(), self.g)
 
     def test_repr(self):
         assert repr(self.m) == '<Milestone [v1.0.0]>'
@@ -89,7 +89,7 @@ class TestMilestone(BaseCase):
         self.mock_assertions()
 
     def test_due_on(self):
-        json = self.m.to_json().copy()
+        json = self.m.as_json().copy()
         json['due_on'] = '2012-12-31T23:59:59Z'
         m = Milestone(json)
         assert isinstance(m.due_on, datetime.datetime)
@@ -128,7 +128,7 @@ class TestIssue(BaseCase):
 
     def setUp(self):
         super(TestIssue, self).setUp()
-        self.i = Issue(self.i.to_json(), self.g)
+        self.i = Issue(self.i.as_json(), self.g)
 
     def test_equality(self):
         i = Issue(load('issue'))

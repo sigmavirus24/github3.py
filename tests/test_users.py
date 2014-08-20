@@ -15,10 +15,10 @@ class TestKey(BaseCase):
 
     def setUp(self):
         super(TestKey, self).setUp()
-        self.key = github3.users.Key(self.key.to_json(), self.g)
+        self.key = github3.users.Key(self.key.as_json(), self.g)
 
     def test_equality(self):
-        k = github3.users.Key(self.key.to_json())
+        k = github3.users.Key(self.key.as_json())
         assert self.key == k
         k._uniq += "cruft"
         assert self.key != k
@@ -82,7 +82,7 @@ class TestUser(BaseCase):
 
     def setUp(self):
         super(TestUser, self).setUp()
-        self.user = github3.users.User(self.user.to_json(), self.g)
+        self.user = github3.users.User(self.user.as_json(), self.g)
         if hasattr(self.user.name, 'decode'):
             self.user.name = self.user.name.decode('utf-8')
 
