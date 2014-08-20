@@ -259,7 +259,7 @@ class User(BaseAccount):
         url = self.following_urlt.expand(other_user=login)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_events(self, public=False, number=-1, etag=None):
+    def events(self, public=False, number=-1, etag=None):
         """Iterate over events performed by this user.
 
         :param bool public: (optional), only list public events for the
@@ -276,7 +276,7 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_followers(self, number=-1, etag=None):
+    def followers(self, number=-1, etag=None):
         """Iterate over the followers of this user.
 
         :param int number: (optional), number of followers to return. Default:
@@ -288,7 +288,7 @@ class User(BaseAccount):
         url = self._build_url('followers', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_following(self, number=-1, etag=None):
+    def following(self, number=-1, etag=None):
         """Iterate over the users being followed by this user.
 
         :param int number: (optional), number of users to return. Default: -1
@@ -300,7 +300,7 @@ class User(BaseAccount):
         url = self._build_url('following', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_keys(self, number=-1, etag=None):
+    def keys(self, number=-1, etag=None):
         """Iterate over the public keys of this user.
 
         .. versionadded:: 0.5
@@ -314,7 +314,7 @@ class User(BaseAccount):
         url = self._build_url('keys', base_url=self._api)
         return self._iter(int(number), url, Key, etag=etag)
 
-    def iter_org_events(self, org, number=-1, etag=None):
+    def org_events(self, org, number=-1, etag=None):
         """Iterate over events as they appear on the user's organization
         dashboard. You must be authenticated to view this.
 
@@ -330,7 +330,7 @@ class User(BaseAccount):
             url = self._build_url('events', 'orgs', org, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_received_events(self, public=False, number=-1, etag=None):
+    def received_events(self, public=False, number=-1, etag=None):
         """Iterate over events that the user has received. If the user is the
         authenticated user, you will see private and public events, otherwise
         you will only see public events.
@@ -349,7 +349,7 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_orgs(self, number=-1, etag=None):
+    def orgs(self, number=-1, etag=None):
         """Iterate over organizations the user is member of
 
         :param int number: (optional), number of organizations to return.
@@ -363,7 +363,7 @@ class User(BaseAccount):
         url = self._build_url('orgs', base_url=self._api)
         return self._iter(int(number), url, Organization, etag=etag)
 
-    def iter_starred(self, sort=None, direction=None, number=-1, etag=None):
+    def starred(self, sort=None, direction=None, number=-1, etag=None):
         """Iterate over repositories starred by this user.
 
         .. versionchanged:: 0.5
@@ -387,7 +387,7 @@ class User(BaseAccount):
         url = self.starred_urlt.expand(owner=None, repo=None)
         return self._iter(int(number), url, Repository, params, etag)
 
-    def iter_subscriptions(self, number=-1, etag=None):
+    def subscriptions(self, number=-1, etag=None):
         """Iterate over repositories subscribed to by this user.
 
         :param int number: (optional), number of subscriptions to return.
