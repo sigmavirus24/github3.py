@@ -707,10 +707,9 @@ class GitHub(GitHubCore):
         params.update(per_page=per_page)
         return self._iter(int(number), url, Issue, params, etag)
 
-    def repository_issues(self, owner, repository, milestone=None,
-                          state=None, assignee=None, mentioned=None,
-                          labels=None, sort=None, direction=None, since=None,
-                          number=-1, etag=None):
+    def issues_on(self, owner, repository, milestone=None, state=None,
+                  assignee=None, mentioned=None, labels=None, sort=None,
+                  direction=None, since=None, number=-1, etag=None):
         """List issues on owner/repository. Only owner and repository are
         required.
 

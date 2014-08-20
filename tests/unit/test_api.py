@@ -145,12 +145,12 @@ class TestAPI(unittest.TestCase):
         self.gh.repository.assert_called_once_with('sigmavirus24',
                                                    'github3.py')
 
-    def test_repository_issues(self):
-        """Show that github3.repository_issues proxies to GitHub."""
+    def test_issues_on(self):
+        """Show that github3.issues_on proxies to GitHub."""
         args = ('owner', 'repository', None, None, None, None, None, None,
                 None, None, -1, None)
-        github3.repository_issues(*args)
-        self.gh.repository_issues.assert_called_with(*args)
+        github3.issues_on(*args)
+        self.gh.issues_on.assert_called_with(*args)
 
     def test_repositories_by(self):
         """Show that github3.repositories_by proxies to GitHub."""

@@ -20,7 +20,7 @@ __version_info__ = tuple(int(i) for i in __version__.split('.'))
 from github3.api import (
     authorize, login, enterprise_login, emojis, gist, gitignore_template,
     create_gist, issue, markdown, octocat, organization, pull_request,
-    followers_of, followed_by, public_gists, gists_by, repository_issues,
+    followers_of, followed_by, public_gists, gists_by, issues_on,
     gitignore_templates, all_repositories, all_users, all_events,
     organizations_with, repositories_by, starred_by, subscriptions_for,
     rate_limit, repository, search_code, search_repositories, search_users,
@@ -34,8 +34,8 @@ __all__ = (
     'login', 'enterprise_login', 'emojis', 'gist', 'gitignore_template',
     'create_gist', 'issue', 'markdown', 'octocat', 'organization',
     'pull_request', 'followers_of', 'followed_by', 'public_gists', 'gists_by',
-    'repository_issues', 'gitignore_templates', 'all_repositories',
-    'all_users', 'all_events', 'organizations_with', 'repositories_by',
-    'starred_by', 'subscriptions_for', 'rate_limit', 'repository',
-    'search_code', 'search_repositories', 'search_users', 'user', 'zen',
+    'issues_on', 'gitignore_templates', 'all_repositories', 'all_users',
+    'all_events', 'organizations_with', 'repositories_by', 'starred_by',
+    'subscriptions_for', 'rate_limit', 'repository', 'search_code',
+    'search_repositories', 'search_users', 'user', 'zen',
 )
