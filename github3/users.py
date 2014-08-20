@@ -314,7 +314,7 @@ class User(BaseAccount):
         url = self._build_url('keys', base_url=self._api)
         return self._iter(int(number), url, Key, etag=etag)
 
-    def org_events(self, org, number=-1, etag=None):
+    def organiztion_events(self, org, number=-1, etag=None):
         """Iterate over events as they appear on the user's organization
         dashboard. You must be authenticated to view this.
 
@@ -349,7 +349,7 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def orgs(self, number=-1, etag=None):
+    def organization(self, number=-1, etag=None):
         """Iterate over organizations the user is member of
 
         :param int number: (optional), number of organizations to return.
