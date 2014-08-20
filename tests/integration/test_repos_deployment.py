@@ -27,7 +27,7 @@ class TestDeployment(IntegrationHelper):
 
         assert isinstance(status, github3.repos.deployment.DeploymentStatus)
 
-    def test_iter_statuses(self):
+    def test_statuses(self):
         """Show that a user can retrieve deployment statuses."""
         cassette_name = self.cassette_name('statuses')
         with self.recorder.use_cassette(cassette_name):
@@ -36,7 +36,7 @@ class TestDeployment(IntegrationHelper):
             deployment = find(lambda d: d.id == 801,
                               repository.deployments())
             assert deployment is not None
-            statuses = list(deployment.iter_statuses(5))
+            statuses = list(deployment.statuses(5))
 
         for status in statuses:
             assert isinstance(status,
