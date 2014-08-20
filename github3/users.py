@@ -349,7 +349,7 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def organization(self, number=-1, etag=None):
+    def orgs(self, number=-1, etag=None):
         """Iterate over organizations the user is member of
 
         :param int number: (optional), number of organizations to return.
