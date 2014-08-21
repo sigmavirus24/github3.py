@@ -29,13 +29,13 @@ class TestRelease(IntegrationHelper):
             assert release.edit(body='Test editing a release') is True
             assert release.body == 'Test editing a release'
 
-    def test_iter_assets(self):
+    def test_assets(self):
         """Test the ability to iterate over the assets of a release."""
-        cassette_name = self.cassette_name('iter_assets')
+        cassette_name = self.cassette_name('assets')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
-            for asset in release.iter_assets():
+            for asset in release.assets():
                 assert isinstance(asset, github3.repos.release.Asset)
             assert asset is not None
 
@@ -65,7 +65,7 @@ class TestAsset(IntegrationHelper):
                                         preserve_exact_body_bytes=True):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
-            asset = next(release.iter_assets())
+            asset = next(release.assets())
             _, filename = tempfile.mkstemp()
             asset.download(filename)
 

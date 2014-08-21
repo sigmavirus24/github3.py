@@ -105,7 +105,7 @@ class Release(GitHubCore):
 
         return successful
 
-    def iter_assets(self, number=-1, etag=None):
+    def assets(self, number=-1, etag=None):
         """Iterate over the assets available for this release.
 
         :param int number: (optional), Number of assets to return
