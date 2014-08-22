@@ -158,6 +158,17 @@ class TestUserIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_subscriptions(self):
+        """Test the request to retrieve a user's subscriptions."""
+        i = self.instance.subscriptions()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('subscriptions'),
+            params={'per_page': 100},
+            headers={}
+        )
+
 
 class TestUsersRequiresAuth(UnitHelper):
 

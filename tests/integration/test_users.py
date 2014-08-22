@@ -93,3 +93,14 @@ class TestUser(IntegrationHelper):
         assert len(repos) > 0
         for starred in repos:
             assert isinstance(starred, github3.repos.Repository)
+
+    def test_subscriptions(self):
+        """Show that a user can retrieve the repos subscribed to by a user."""
+        cassette_name = self.cassette_name('subscriptions')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('sigmavirus24')
+            repos = list(user.subscriptions())
+
+        assert len(repos) > 0
+        for repository in repos:
+            assert isinstance(repository, github3.repos.Repository)
