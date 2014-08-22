@@ -1,6 +1,8 @@
+import pytest
+
 import github3
 
-from .helper import (UnitIteratorHelper, create_url_helper,)
+from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,)
 
 url_for = create_url_helper(
     'https://api.github.com/users/octocat'
@@ -94,6 +96,24 @@ class TestUserIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_organization_events(self):
+        """Test the request to retrieve a user's organization events."""
+        i = self.instance.organization_events('org-name')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events/orgs/org-name'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_organization_events_requires_an_org(self):
+        """Test that organization_events will ignore empty org names."""
+        i = self.instance.organization_events(None)
+
+        with pytest.raises(StopIteration):
+            next(i)
+
     def test_organizations(self):
         """Test the request to retrieve the orgs a user belongs to."""
         i = self.instance.organizations()
@@ -115,3 +135,20 @@ class TestUserIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+
+class TestUsersRequiresAuth(UnitHelper):
+
+    """Test that ensure certain methods on the User class requires auth."""
+
+    described_class = github3.users.User
+    example_data = example_data.copy()
+
+    def after_setup(self):
+        """Disable authentication on sessions."""
+        self.session.has_auth.return_value = False
+
+    def test_organization_events(self):
+        """Test that #organization_events requires authentication."""
+        with pytest.raises(github3.GitHubError):
+            self.instance.organization_events('foo')

@@ -52,6 +52,18 @@ class TestUser(IntegrationHelper):
         for key in keys:
             assert isinstance(key, github3.users.Key)
 
+    def test_organization_events(self):
+        """Show that a user can retrieve their events on an organization."""
+        self.basic_login()
+        cassette_name = self.cassette_name('organization_events')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('sigmavirus24')
+            events = list(user.organization_events('pdfkit', 25))
+
+        assert len(events) > 0
+        for event in events:
+            assert isinstance(event, github3.events.Event)
+
     def test_organizations(self):
         """Show that a user can retrieve any user's organizations."""
         cassette_name = self.cassette_name('organizations')
