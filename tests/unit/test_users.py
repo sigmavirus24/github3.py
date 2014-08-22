@@ -50,6 +50,17 @@ class TestUserIterators(UnitIteratorHelper):
     described_class = github3.users.User
     example_data = example_data.copy()
 
+    def test_events(self):
+        """Test the request to retrieve a user's events."""
+        i = self.instance.events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_followers(self):
         """Test the request to retrieve follwers."""
         f = self.instance.followers()

@@ -188,17 +188,6 @@ class TestUser(BaseCase):
         assert self.user.is_following('kennethreitz')
         self.mock_assertions()
 
-    def test_events(self):
-        self.response('event', 200, _iter=True)
-        self.get(self.api + '/events')
-
-        assert isinstance(next(self.user.events()), github3.events.Event)
-        self.mock_assertions()
-
-        self.get(self.api + '/events/public')
-        next(self.user.events(public=True))
-        self.mock_assertions()
-
 #    def test_followers(self):
 #        self.response('user', 200, _iter=True)
 #        self.get(self.api + '/followers')
