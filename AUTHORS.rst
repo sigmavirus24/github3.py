@@ -66,3 +66,5 @@ Contributors
 - David Moss (@damoss007)
 
 - John Barbuto (@jbarbuto)
+
+- Nikolay Bryskin (@nikicat)
