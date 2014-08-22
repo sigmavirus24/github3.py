@@ -129,7 +129,7 @@ class User(BaseAccount):
         #: True -- for hire, False -- not for hire
         self.hireable = user.get('hireable', False)
 
-        ## The number of public_gists
+        # The number of public_gists
         #: Number of public gists
         self.public_gists = user.get('public_gists', 0)
 
