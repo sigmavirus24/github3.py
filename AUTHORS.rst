@@ -72,3 +72,5 @@ Contributors
 - Tomi Äijö (@tomiaijo)
 
 - jnothman (@jnothman)
+
+- Cameron Davidson-Pilon (@CamDavidsonPilon)
