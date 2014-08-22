@@ -94,6 +94,17 @@ class TestUserIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_organizations(self):
+        """Test the request to retrieve the orgs a user belongs to."""
+        i = self.instance.organizations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('orgs'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_starred_repositories(self):
         """Test the request to retrieve a user's starred repos."""
         i = self.instance.starred_repositories()
