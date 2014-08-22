@@ -59,3 +59,14 @@ class TestUser(IntegrationHelper):
             u = self.gh.user('sigmavirus24')
             for o in u.organizations(number=25):
                 assert isinstance(o, github3.orgs.Organization)
+
+    def test_starred_repositories(self):
+        """Show that a user can retrieve the repositories starred by a user."""
+        cassette_name = self.cassette_name('starred_repositories')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('sigmavirus24')
+            repos = list(user.starred_repositories(50))
+
+        assert len(repos) > 0
+        for starred in repos:
+            assert isinstance(starred, github3.repos.Repository)
