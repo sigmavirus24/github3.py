@@ -30,6 +30,17 @@ class TestUser(IntegrationHelper):
         for follower in followers:
             assert isinstance(follower, github3.users.User)
 
+    def test_following(self):
+        """Show that a user can retrieve users that a user is following."""
+        cassette_name = self.cassette_name('following')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('sigmavirus24')
+            following = list(user.following(50))
+
+        assert len(following) > 0
+        for person in following:
+            assert isinstance(person, github3.users.User)
+
     def test_organizations(self):
         """Show that a user can retrieve any user's organizations."""
         cassette_name = self.cassette_name('organizations')
