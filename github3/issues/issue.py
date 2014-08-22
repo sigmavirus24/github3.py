@@ -115,18 +115,18 @@ class Issue(GitHubCore):
         return [Label(l, self) for l in json] if json else []
 
     @requires_auth
-    def assign(self, login):
-        """Assigns user ``login`` to this issue. This is a short cut for
+    def assign(self, username):
+        """Assigns user ``username`` to this issue. This is a short cut for
         ``issue.edit``.
 
-        :param str login: username of the person to assign this issue to
+        :param str username: username of the person to assign this issue to
         :returns: bool
         """
-        if not login:
+        if not username:
             return False
         number = self.milestone.number if self.milestone else None
         labels = [str(l) for l in self.original_labels]
-        return self.edit(self.title, self.body, login, self.state, number,
+        return self.edit(self.title, self.body, username, self.state, number,
                          labels)
 
     @requires_auth

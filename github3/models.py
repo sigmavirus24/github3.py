@@ -341,7 +341,7 @@ class BaseAccount(GitHubCore):
         self.id = acct.get('id', 0)
         #: Location of the user/org
         self.location = acct.get('location', '')
-        #: login name of the user/org
+        #: User name of the user/organization
         self.login = acct.get('login', '')
 
         # e.g. first_name last_name

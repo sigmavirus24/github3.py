@@ -251,6 +251,7 @@ Old name                            New attribute name
     - ``GitHub#subscriptions_for``
     - ``GitHub#user``
     - ``GitHubEnterprise``
+    - ``Issue#assign``
     - ``Organization#add_member``
     - ``Organization#is_member``
     - ``Organization#is_public_member``
