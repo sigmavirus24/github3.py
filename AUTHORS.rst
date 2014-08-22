@@ -74,3 +74,5 @@ Contributors
 - jnothman (@jnothman)
 
 - Cameron Davidson-Pilon (@CamDavidsonPilon)
+
+- Alex Couper (@alexcouper)
