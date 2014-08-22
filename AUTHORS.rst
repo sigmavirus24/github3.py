@@ -68,3 +68,5 @@ Contributors
 - John Barbuto (@jbarbuto)
 
 - Nikolay Bryskin (@nikicat)
+
+- Tomi Äijö (@tomiaijo)
