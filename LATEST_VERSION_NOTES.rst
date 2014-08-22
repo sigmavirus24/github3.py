@@ -236,6 +236,21 @@ Old name                            New attribute name
     - ``github3.authorize``
     - ``github3.repositories_by``
     - ``github3.user``
+    - ``GitHub``
+    - ``GitHub#authorize``
+    - ``GitHub#follow``
+    - ``GitHub#is_following``
+    - ``GitHub#is_starred``
+    - ``GitHub#issue``
+    - ``GitHub#followers_of``
+    - ``GitHub#followed_by``
+    - ``GitHub#gists_by``
+    - ``GitHub#issues_on``
+    - ``GitHub#organizations_with``
+    - ``GitHub#starred_by``
+    - ``GitHub#subscriptions_for``
+    - ``GitHub#user``
+    - ``GitHubEnterprise``
     - ``Organization#add_member``
     - ``Organization#is_member``
     - ``Organization#is_public_member``
