@@ -23,7 +23,9 @@ class Release(GitHubCore):
         super(Release, self).__init__(release, session)
         self._api = release.get('url')
         #: List of :class:`Asset <Asset>` objects for this release
-        self.assets = [Asset(i, self) for i in release.get('assets', [])]
+        self.original_assets = [
+            Asset(i, self) for i in release.get('assets', [])
+        ]
         #: URL for uploaded assets
         self.assets_url = release.get('assets_url')
         #: Body of the release (the description)
@@ -38,7 +40,7 @@ class Release(GitHubCore):
         self.id = release.get('id')
         #: Name given to the release
         self.name = release.get('name')
-        #; Boolean whether release is a prerelease
+        #: Boolean whether release is a prerelease
         self.prerelease = release.get('prerelease')
         #: Date the release was published
         self.published_at = self._strptime(release.get('published_at'))
@@ -52,6 +54,16 @@ class Release(GitHubCore):
 
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
+
+    def assets(self, number=-1, etag=None):
+        """Iterate over the assets available for this release.
+
+        :param int number: (optional), Number of assets to return
+        :param str etag: (optional), last ETag header sent
+        :returns: generator of :class:`Asset <Asset>` objects
+        """
+        url = self._build_url('assets', base_url=self._api)
+        return self._iter(number, url, Asset, etag=etag)
 
     @requires_auth
     def delete(self):
@@ -104,16 +116,6 @@ class Release(GitHubCore):
             self.__init__(r.json(), self)
 
         return successful
-
-    def assets(self, number=-1, etag=None):
-        """Iterate over the assets available for this release.
-
-        :param int number: (optional), Number of assets to return
-        :param str etag: (optional), last ETag header sent
-        :returns: generator of :class:`Asset <Asset>` objects
-        """
-        url = self._build_url('assets', base_url=self._api)
-        return self._iter(number, url, Asset, etag=etag)
 
     @requires_auth
     def upload_asset(self, content_type, name, asset):

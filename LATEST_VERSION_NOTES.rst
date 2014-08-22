@@ -276,3 +276,7 @@ Old name                            New attribute name
 ``User.following``                  ``following_count``
 ``User.public_repos``               ``public_repos_count``
 ===============================     ==========================
+
+- The ``Release.assets`` attribute has been renamed to
+  ``Release.original_assets``. To retrieve up-to-date assets, use the
+  ``Release#assets`` method.
