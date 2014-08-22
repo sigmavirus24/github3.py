@@ -41,6 +41,17 @@ class TestUser(IntegrationHelper):
         for person in following:
             assert isinstance(person, github3.users.User)
 
+    def test_keys(self):
+        """Show that a user can retrieve any user's public keys."""
+        cassette_name = self.cassette_name('keys')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('sigmavirus24')
+            keys = list(user.keys())
+
+        assert len(keys) > 0
+        for key in keys:
+            assert isinstance(key, github3.users.Key)
+
     def test_organizations(self):
         """Show that a user can retrieve any user's organizations."""
         cassette_name = self.cassette_name('organizations')
