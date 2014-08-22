@@ -72,6 +72,17 @@ class TestUser(IntegrationHelper):
             for o in u.organizations(number=25):
                 assert isinstance(o, github3.orgs.Organization)
 
+    def test_received_events(self):
+        """Show that a user can retrieve any user's received events."""
+        cassette_name = self.cassette_name('received_events')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('sigmavirus24')
+            events = list(user.received_events(number=25))
+
+        assert len(events) > 0
+        for event in events:
+            assert isinstance(event, github3.events.Event)
+
     def test_starred_repositories(self):
         """Show that a user can retrieve the repositories starred by a user."""
         cassette_name = self.cassette_name('starred_repositories')

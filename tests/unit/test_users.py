@@ -125,6 +125,28 @@ class TestUserIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_received_events(self):
+        """Test the request to retrieve the events a user receives."""
+        i = self.instance.received_events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('received_events'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_received_events_public_only(self):
+        """Test the public request to retrieve the events a user received."""
+        i = self.instance.received_events(True)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('received_events/public'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_starred_repositories(self):
         """Test the request to retrieve a user's starred repos."""
         i = self.instance.starred_repositories()
