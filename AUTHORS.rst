@@ -70,3 +70,5 @@ Contributors
 - Nikolay Bryskin (@nikicat)
 
 - Tomi Äijö (@tomiaijo)
+
+- jnothman (@jnothman)
