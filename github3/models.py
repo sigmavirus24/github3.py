@@ -329,13 +329,13 @@ class BaseAccount(GitHubCore):
         #: E-mail address of the user/org
         self.email = acct.get('email')
 
-        ## The number of people following this acct
+        # The number of people following this acct
         #: Number of followers
-        self.followers = acct.get('followers', 0)
+        self.followers_count = acct.get('followers', 0)
 
-        ## The number of people this acct follows
+        # The number of people this acct follows
         #: Number of people the user is following
-        self.following = acct.get('following', 0)
+        self.following_count = acct.get('following', 0)
 
         #: Unique ID of the account
         self.id = acct.get('id', 0)
@@ -344,16 +344,16 @@ class BaseAccount(GitHubCore):
         #: login name of the user/org
         self.login = acct.get('login', '')
 
-        ## e.g. first_name last_name
+        # e.g. first_name last_name
         #: Real name of the user/org
         self.name = acct.get('name') or ''
         self.name = self.name
 
-        ## The number of public_repos
+        # The number of public_repos
         #: Number of public repos owned by the user/org
         self.public_repos = acct.get('public_repos', 0)
 
-        ## e.g. https://github.com/self._login
+        # e.g. https://github.com/self._login
         #: URL of the user/org's profile
         self.html_url = acct.get('html_url', '')
 

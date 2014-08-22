@@ -261,3 +261,16 @@ Old name                            New attribute name
 
       i = github3.issue('sigmavirus24', 'github3.py', 30)
       labels = list(i.labels())
+
+- The ``Organization`` and ``User`` APIs have changed to become more
+  consistent with the rest of the library and GitHub API. The following
+  attribute names have been changed
+
+===============================     ==========================
+Old name                            New attribute name
+===============================     ==========================
+``Organization.followers``          ``followers_count``
+``Organization.following``          ``following_count``
+``User.followers``                  ``followers_count``
+``User.following``                  ``following_count``
+===============================     ==========================
