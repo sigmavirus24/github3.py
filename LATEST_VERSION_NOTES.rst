@@ -15,9 +15,6 @@ Breaking Changes
 - ``Organization#add_repository`` has been changed. The second parameter has been
   changed to ``team_id`` and now expects an integer.
 
-- The ``to_json`` method on every object has been replaced by ``as_json``.
-  Thanks `esacteksab <https://github.com/esacteksab>`_.
-
 - All methods and functions starting with ``iter_`` have been renamed.
 
 ==========================================    ==============================================
@@ -246,6 +243,8 @@ Old name                            New attribute name
     - ``Repository#remove_collaborator``
     - ``Team#add_member``
     - ``Team#is_member``
+    - ``User#is_assignee_on``
+    - ``User#is_following``
 
 - ``Repository.stargazers`` is now ``Repository.stargazers_count`` (conforming
   with the attribute name returned by the API).

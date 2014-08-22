@@ -240,23 +240,26 @@ class User(BaseAccount):
         return self._boolean(self._delete(url, data=dumps(addresses)),
                              204, 404)
 
-    def is_assignee_on(self, login, repository):
-        """Checks if this user can be assigned to issues on login/repository.
+    def is_assignee_on(self, username, repository):
+        """Check if this user can be assigned to issues on username/repository.
 
-        :returns: :class:`bool`
+        :param str username: owner's username of the repository
+        :param str repository: name of the repository
+        :returns: True if the use can be assigned, False otherwise
+        :rtype: :class:`bool`
         """
-        url = self._build_url('repos', login, repository, 'assignees',
+        url = self._build_url('repos', username, repository, 'assignees',
                               self.login)
         return self._boolean(self._get(url), 204, 404)
 
-    def is_following(self, login):
-        """Checks if this user is following ``login``.
+    def is_following(self, username):
+        """Checks if this user is following ``username``.
 
-        :param str login: (required)
+        :param str username: (required)
         :returns: bool
 
         """
-        url = self.following_urlt.expand(other_user=login)
+        url = self.following_urlt.expand(other_user=username)
         return self._boolean(self._get(url), 204, 404)
 
     def events(self, public=False, number=-1, etag=None):
