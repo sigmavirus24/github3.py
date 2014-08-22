@@ -43,7 +43,7 @@ class TestRelease(UnitHelper):
     # Attribute tests
     def test_assets(self):
         assert self.instance.assets is not None
-        assert isinstance(self.instance.assets[0], Asset)
+        assert isinstance(self.instance.original_assets[0], Asset)
 
     def test_has_upload_urlt(self):
         assert self.instance.upload_urlt is not None

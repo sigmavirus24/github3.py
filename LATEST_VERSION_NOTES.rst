@@ -99,7 +99,16 @@ Old name                                      New name
 ``Repository#iter_statuses``                  ``Repository#statuses``
 ``Repository#iter_tags``                      ``Repository#tags``
 ``Repository#iter_teams``                     ``Repository#teams``
-
+``Repository#iter_teams``                     ``Repository#teams``
+``User#iter_events``                          ``User#events``
+``User#iter_followers``                       ``User#followers``
+``User#iter_following``                       ``User#following``
+``User#iter_keys``                            ``User#keys``
+``User#iter_org_events``                      ``User#organization_events``
+``User#iter_received_events``                 ``User#received_events``
+``User#iter_orgs``                            ``User#organizations``
+``User#iter_starred``                         ``User#starred_repositories``
+``User#iter_subscriptions``                   ``User#subscriptions``
 ==========================================    ==============================================
 
 - ``github3.login`` has been simplified and split into two functions:
@@ -255,3 +264,22 @@ Old name                            New attribute name
 
       i = github3.issue('sigmavirus24', 'github3.py', 30)
       labels = list(i.labels())
+
+- The ``Organization`` and ``User`` APIs have changed to become more
+  consistent with the rest of the library and GitHub API. The following
+  attribute names have been changed
+
+===============================     ==========================
+Old name                            New attribute name
+===============================     ==========================
+``Organization.followers``          ``followers_count``
+``Organization.following``          ``following_count``
+``Organization.public_repos``       ``public_repos_count``
+``User.followers``                  ``followers_count``
+``User.following``                  ``following_count``
+``User.public_repos``               ``public_repos_count``
+===============================     ==========================
+
+- The ``Release.assets`` attribute has been renamed to
+  ``Release.original_assets``. To retrieve up-to-date assets, use the
+  ``Release#assets`` method.
