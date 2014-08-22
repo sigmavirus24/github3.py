@@ -233,6 +233,9 @@ Old name                            New attribute name
 - Most instances of ``login`` as a parameter have been changed to ``username``
   for clarity and consistency. This affects the following methods:
 
+    - ``github3.authorize``
+    - ``github3.repositories_by``
+    - ``github3.user``
     - ``Organization#add_member``
     - ``Organization#is_member``
     - ``Organization#is_public_member``

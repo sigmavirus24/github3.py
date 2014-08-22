@@ -13,11 +13,11 @@ from .github import GitHub, GitHubEnterprise
 gh = GitHub()
 
 
-def authorize(login, password, scopes, note='', note_url='', client_id='',
+def authorize(username, password, scopes, note='', note_url='', client_id='',
               client_secret='', two_factor_callback=None):
     """Obtain an authorization token for the GitHub API.
 
-    :param str login: (required)
+    :param str username: (required)
     :param str password: (required)
     :param list scopes: (required), areas you want this token to apply to,
         i.e., 'gist', 'user'
@@ -34,7 +34,7 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
     """
     gh = GitHub()
     gh.login(two_factor_callback=two_factor_callback)
-    return gh.authorize(login, password, scopes, note, note_url, client_id,
+    return gh.authorize(username, password, scopes, note, note_url, client_id,
                         client_secret)
 
 
@@ -289,15 +289,15 @@ def organizations_with(username, number=-1, etag=None):
     return gh.organizations_with(username, number, etag)
 
 
-def repositories_by(login, type=None, sort=None, direction=None, number=-1,
+def repositories_by(username, type=None, sort=None, direction=None, number=-1,
                     etag=None):
-    """List public repositories for the specified ``login``.
+    """List public repositories for the specified ``username``.
 
     .. versionadded:: 0.6
 
     .. note:: This replaces github3.iter_repos
 
-    :param str login: (required)
+    :param str username: (required)
     :param str type: (optional), accepted values:
         ('all', 'owner', 'member')
         API default: 'all'
@@ -316,7 +316,8 @@ def repositories_by(login, type=None, sort=None, direction=None, number=-1,
 
     """
     if login:
-        return gh.repositories_by(login, type, sort, direction, number, etag)
+        return gh.repositories_by(username, type, sort, direction, number,
+                                  etag)
     return iter([])
 
 
@@ -633,8 +634,8 @@ def search_users(query, sort=None, order=None, per_page=None,
                            etag)
 
 
-def user(login):
-    return gh.user(login)
+def user(username):
+    return gh.user(username)
 user.__doc__ = gh.user.__doc__
 
 
