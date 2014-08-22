@@ -96,7 +96,16 @@ Old name                                      New name
 ``Repository#iter_statuses``                  ``Repository#statuses``
 ``Repository#iter_tags``                      ``Repository#tags``
 ``Repository#iter_teams``                     ``Repository#teams``
-
+``Repository#iter_teams``                     ``Repository#teams``
+``User#iter_events``                          ``User#events``
+``User#iter_followers``                       ``User#followers``
+``User#iter_following``                       ``User#following``
+``User#iter_keys``                            ``User#keys``
+``User#iter_org_events``                      ``User#organization_events``
+``User#iter_received_events``                 ``User#received_events``
+``User#iter_orgs``                            ``User#organizations``
+``User#iter_starred``                         ``User#starred_repositories``
+``User#iter_subscriptions``                   ``User#subscriptions``
 ==========================================    ==============================================
 
 - ``github3.login`` has been simplified and split into two functions:
