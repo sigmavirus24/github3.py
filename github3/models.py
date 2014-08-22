@@ -351,7 +351,7 @@ class BaseAccount(GitHubCore):
 
         # The number of public_repos
         #: Number of public repos owned by the user/org
-        self.public_repos = acct.get('public_repos', 0)
+        self.public_repos_count = acct.get('public_repos', 0)
 
         # e.g. https://github.com/self._login
         #: URL of the user/org's profile

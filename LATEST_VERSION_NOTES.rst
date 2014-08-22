@@ -271,6 +271,8 @@ Old name                            New attribute name
 ===============================     ==========================
 ``Organization.followers``          ``followers_count``
 ``Organization.following``          ``following_count``
+``Organization.public_repos``       ``public_repos_count``
 ``User.followers``                  ``followers_count``
 ``User.following``                  ``following_count``
+``User.public_repos``               ``public_repos_count``
 ===============================     ==========================
