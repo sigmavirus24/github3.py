@@ -325,11 +325,14 @@ class BaseComment(GitHubCore):
 
 
 class BaseCommit(GitHubCore):
-    """The :class:`BaseCommit <BaseCommit>` object. This serves as the base for
+
+    """This abstracts a lot of the common attributes for commit-like objects.
+
+    The :class:`BaseCommit <BaseCommit>` object serves as the base for
     the various types of commit objects returned by the API.
     """
-    def __init__(self, commit, session):
-        super(BaseCommit, self).__init__(commit, session)
+
+    def _update_attributes(self, commit):
         self._api = commit.get('url', '')
         #: SHA of this commit.
         self.sha = commit.get('sha')
