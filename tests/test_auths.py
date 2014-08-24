@@ -10,7 +10,7 @@ class TestAuthorization(BaseCase):
 
     def setUp(self):
         super(TestAuthorization, self).setUp()
-        self.auth = github3.auths.Authorization(self.auth.as_json(), self.g)
+        self.auth = github3.auths.Authorization(self.auth.as_dict(), self.g)
 
     def test_equality(self):
         a = github3.auths.Authorization(load('authorization'))

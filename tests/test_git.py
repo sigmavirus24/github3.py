@@ -28,7 +28,7 @@ class TestReference(BaseCase):
 
     def setUp(self):
         super(TestReference, self).setUp()
-        self.ref = github3.git.Reference(self.ref.as_json(), self.g)
+        self.ref = github3.git.Reference(self.ref.as_dict(), self.g)
 
     def test_repr(self):
         assert repr(self.ref).startswith('<Reference')
@@ -76,7 +76,7 @@ class TestTree(BaseCase):
 
     def setUp(self):
         super(TestTree, self).setUp()
-        self.tree = github3.git.Tree(self.tree.as_json(), self.g)
+        self.tree = github3.git.Tree(self.tree.as_dict(), self.g)
 
     def test_recurse(self):
         self.response('tree', 200)

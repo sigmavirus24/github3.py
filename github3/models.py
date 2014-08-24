@@ -8,7 +8,7 @@ This module provides the basic models used in github3.py
 """
 from __future__ import unicode_literals
 
-from json import dumps
+from json import dumps, loads
 from requests.compat import urlparse, is_py2
 from github3.decorators import requires_auth
 from github3.session import GitHubSession
@@ -31,14 +31,45 @@ class GitHubObject(object):
             self.last_modified = json.pop('Last-Modified', None)
         self._json_data = json
         self._uniq = json.get('url', None)
+        self._update_attributes(json)
 
-    def as_json(self):
-        """Return the json representing this object."""
+    def _update_attributes(self, json):
+        pass
+
+    def as_dict(self):
+        """Return the attributes for this object as a dictionary.
+
+        This is equivalent to calling::
+
+            json.loads(obj.as_json())
+
+        :returns: this object's attributes serialized to a dictionary
+        :rtype: dict
+        """
         return self._json_data
 
+    def as_json(self):
+        """Return the json data for this object.
+
+        This is equivalent to calling::
+
+            json.dumps(obj.as_dict())
+
+        :returns: this object's attributes as a JSON string
+        :rtype: str
+        """
+        return dumps(self._json_data)
+
     def _strptime(self, time_str):
-        """Convert an ISO 8601 formatted string in UTC into a
-        timezone-aware datetime object."""
+        """Convert an ISO 8601 formatted string to a datetime object.
+
+        We assume that the ISO 8601 formatted string is in UTC and we create
+        the datetime object so that it is timezone-aware.
+
+        :param str time_str: ISO 8601 formatted string
+        :returns: timezone-aware datetime object
+        :rtype: datetime or None
+        """
         if time_str:
             # Parse UTC string into naive datetime, then add timezone
             dt = datetime.strptime(time_str, __timeformat__)
@@ -55,9 +86,14 @@ class GitHubObject(object):
         return repr_string
 
     @classmethod
+    def from_dict(cls, json_dict):
+        """Return an instance of this class formed from ``json_dict``."""
+        return cls(json_dict)
+
+    @classmethod
     def from_json(cls, json):
-        """Return an instance of ``cls`` formed from ``json``."""
-        return cls(json)
+        """Return an instance of this class formed from ``json``."""
+        return cls(loads(json))
 
     def __eq__(self, other):
         return self._uniq == other._uniq
@@ -74,7 +110,6 @@ class GitHubCore(GitHubObject):
     basic attributes to other classes that are very useful to have.
     """
     def __init__(self, json, session=None):
-        super(GitHubCore, self).__init__(json)
         if hasattr(session, 'session'):
             # i.e. session is actually a GitHub object
             session = session.session
@@ -84,6 +119,7 @@ class GitHubCore(GitHubObject):
 
         # set a sane default
         self._github_url = 'https://api.github.com'
+        super(GitHubCore, self).__init__(json)
 
     def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))

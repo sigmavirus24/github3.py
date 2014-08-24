@@ -6,7 +6,7 @@ from tests.utils import BaseCase, TestCase, RequestsBytesIO, is_py3
 
 class TestGitHubObject(TestCase):
     def test_from_json(self):
-        o = github3.models.GitHubObject.from_json({})
+        o = github3.models.GitHubObject.from_json('{}')
         assert isinstance(o, github3.models.GitHubObject)
 
 

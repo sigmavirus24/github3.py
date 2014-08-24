@@ -11,7 +11,7 @@ class TestGist(BaseCase):
 
     def setUp(self):
         super(TestGist, self).setUp()
-        self.gist = gists.Gist(self.gist.as_json(), self.g)
+        self.gist = gists.Gist(self.gist.as_dict(), self.g)
 
     # As opposed to creating an all new class for this
     def test_history(self):
@@ -34,7 +34,7 @@ class TestGistComment(BaseCase):
 
     def setUp(self):
         super(TestGistComment, self).setUp()
-        self.comment = gists.comment.GistComment(self.comment.as_json(),
+        self.comment = gists.comment.GistComment(self.comment.as_dict(),
                                                  self.g)
 
     def test_equality(self):

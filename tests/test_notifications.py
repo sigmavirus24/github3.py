@@ -16,7 +16,7 @@ class TestThread(BaseCase):
         assert self.thread != t
 
     def test_last_read_at(self):
-        json = self.thread.as_json().copy()
+        json = self.thread.as_dict().copy()
         json['last_read_at'] = '2013-12-31T23:59:59Z'
         t = github3.notifications.Thread(json)
         assert isinstance(t.last_read_at, datetime.datetime)

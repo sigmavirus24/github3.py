@@ -11,7 +11,7 @@ class TestRepository(BaseCase):
 
     def setUp(self):
         super(TestRepository, self).setUp()
-        self.repo = repos.Repository(self.repo.as_json(), self.g)
+        self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
     def test_add_collaborator(self):
@@ -581,7 +581,7 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_parent(self):
-        json = self.repo.as_json().copy()
+        json = self.repo.as_dict().copy()
         json['parent'] = json.copy()
         r = repos.Repository(json)
         assert isinstance(r.parent, repos.Repository)
@@ -632,7 +632,7 @@ class TestRepository(BaseCase):
         assert repr(self.repo) == '<Repository [sigmavirus24/github3.py]>'
 
     def test_source(self):
-        json = self.repo.as_json().copy()
+        json = self.repo.as_dict().copy()
         json['source'] = json.copy()
         r = repos.Repository(json)
         assert isinstance(r.source, repos.Repository)
@@ -780,7 +780,7 @@ class TestContents(BaseCase):
 
     def setUp(self):
         super(TestContents, self).setUp()
-        self.contents = repos.contents.Contents(self.contents.as_json(),
+        self.contents = repos.contents.Contents(self.contents.as_dict(),
                                                 self.g)
 
     def test_equality(self):
@@ -848,7 +848,7 @@ class TestHook(BaseCase):
 
     def setUp(self):
         super(TestHook, self).setUp()
-        self.hook = repos.hook.Hook(self.hook.as_json(), self.g)
+        self.hook = repos.hook.Hook(self.hook.as_dict(), self.g)
 
     def test_equality(self):
         h = repos.hook.Hook(load('hook'))
@@ -937,7 +937,7 @@ class TestRepoComment(BaseCase):
 
     def setUp(self):
         super(TestRepoComment, self).setUp()
-        self.comment = repos.comment.RepoComment(self.comment.as_json(),
+        self.comment = repos.comment.RepoComment(self.comment.as_dict(),
                                                  self.g)
 
     def test_delete(self):
