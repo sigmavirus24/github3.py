@@ -271,7 +271,6 @@ class BaseComment(GitHubCore):
 
     """A basic class for Gist, Issue and Pull Request Comments."""
 
-    # def __init__(self, comment, session):
     def _update_attributes(self, comment):
         #: Unique ID of the comment.
         self.id = comment.get('id')
@@ -348,12 +347,15 @@ class BaseCommit(GitHubCore):
 
 
 class BaseAccount(GitHubCore):
-    """The :class:`BaseAccount <BaseAccount>` object. This is used to do the
+
+    """This class holds the commonalities of Organizations and Users.
+
+    The :class:`BaseAccount <BaseAccount>` object is used to do the
     heavy lifting for :class:`Organization <github3.orgs.Organization>` and
     :class:`User <github3.users.User>` objects.
     """
-    def __init__(self, acct, session):
-        super(BaseAccount, self).__init__(acct, session)
+
+    def _update_attributes(self, acct):
         #: Tells you what type of account this is
         self.type = None
         if acct.get('type'):
