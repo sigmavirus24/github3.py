@@ -201,6 +201,7 @@ class GitHubCore(GitHubObject):
     @_api.setter
     def _api(self, uri):
         self._uri = urlparse(uri)
+        self.url = uri
 
     def _iter(self, count, url, cls, params=None, etag=None):
         """Generic iterator for this project.

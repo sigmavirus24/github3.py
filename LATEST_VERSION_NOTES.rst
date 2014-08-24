@@ -309,3 +309,5 @@ New Features
   ``Session`` object from ``requests``. This can now be used in conjunction
   with a third-party caching mechanism. The suggested caching library is
   ``cachecontrol``.
+
+- All object's ``url`` attribute are now available.
