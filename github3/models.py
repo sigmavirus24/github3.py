@@ -10,11 +10,13 @@ from __future__ import unicode_literals
 
 from json import dumps, loads
 from requests.compat import urlparse, is_py2
-from github3.decorators import requires_auth
-from github3.session import GitHubSession
-from github3.utils import UTC
 from datetime import datetime
 from logging import getLogger
+
+from github3.decorators import requires_auth
+from github3.exceptions import GitHubError
+from github3.session import GitHubSession
+from github3.utils import UTC
 
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
@@ -414,31 +416,3 @@ class BaseAccount(GitHubCore):
 
     def _update_(self, acct):
         self.__init__(acct, self.session)
-
-
-class GitHubError(Exception):
-    def __init__(self, resp):
-        super(GitHubError, self).__init__(resp)
-        #: Response code that triggered the error
-        self.response = resp
-        self.code = resp.status_code
-        self.errors = []
-        try:
-            error = resp.json()
-            #: Message associated with the error
-            self.msg = error.get('message')
-            #: List of errors provided by GitHub
-            if error.get('errors'):
-                self.errors = error.get('errors')
-        except:  # Amazon S3 error
-            self.msg = resp.content or '[No message]'
-
-    def __repr__(self):
-        return '<GitHubError [{0}]>'.format(self.msg or self.code)
-
-    def __str__(self):
-        return '{0} {1}'.format(self.code, self.msg)
-
-    @property
-    def message(self):
-        return self.msg
