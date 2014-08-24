@@ -148,4 +148,4 @@ class Subscription(GitHubCore):
         """
         sub = {'subscribed': subscribed, 'ignored': ignored}
         json = self._json(self._put(self._api, data=dumps(sub)), 200)
-        self.__init__(json, self._session)
+        self.__init__(json, self.session)

@@ -54,7 +54,7 @@ class RepoComment(BaseComment):
 
     def _update_(self, comment):
         super(RepoComment, self)._update_(comment)
-        self.__init__(comment, self._session)
+        self.__init__(comment, self.session)
 
     @requires_auth
     def update(self, body):

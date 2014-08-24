@@ -29,7 +29,7 @@ class Label(GitHubCore):
         return self.name
 
     def _update_(self, label):
-        self.__init__(label, self._session)
+        self.__init__(label, self.session)
 
     @requires_auth
     def delete(self):

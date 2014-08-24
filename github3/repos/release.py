@@ -106,7 +106,7 @@ class Release(GitHubCore):
         }
         self._remove_none(data)
 
-        r = self._session.patch(
+        r = self.session.patch(
             url, data=json.dumps(data), headers=Release.CUSTOM_HEADERS
         )
 

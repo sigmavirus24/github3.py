@@ -56,7 +56,7 @@ class Authorization(GitHubCore):
         return '<Authorization [{0}]>'.format(self.name)
 
     def _update_(self, auth):
-        self.__init__(auth, self._session)
+        self.__init__(auth, self.session)
 
     @requires_basic_auth
     def delete(self):

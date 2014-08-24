@@ -38,7 +38,7 @@ class Issue(GitHubCore):
         #: was assigned to.
         self.assignee = issue.get('assignee')
         if self.assignee:
-            self.assignee = User(issue.get('assignee'), self._session)
+            self.assignee = User(issue.get('assignee'), self)
         #: Body (description) of the issue.
         self.body = issue.get('body', '')
         #: HTML formatted body of the issue.
@@ -65,7 +65,7 @@ class Issue(GitHubCore):
         #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
         #: on this issue.
         self.original_labels = [
-            Label(l, self._session) for l in issue.get('labels')
+            Label(l, self) for l in issue.get('labels')
         ]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
@@ -74,7 +74,7 @@ class Issue(GitHubCore):
         #: issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):
-            self.milestone = Milestone(issue.get('milestone'), self._session)
+            self.milestone = Milestone(issue.get('milestone'), self)
         #: Issue number (e.g. #15)
         self.number = issue.get('number')
         #: Dictionary URLs for the pull request (if they exist)
@@ -101,7 +101,7 @@ class Issue(GitHubCore):
                                                      n=self.number)
 
     def _update_(self, issue):
-        self.__init__(issue, self._session)
+        self.__init__(issue, self.session)
 
     @requires_auth
     def add_labels(self, *args):

@@ -18,7 +18,7 @@ class Branch(GitHubCore):
         #: :class:`RepoCommit <github3.repos.commit.RepoCommit>` or ``None``.
         self.commit = branch.get('commit')
         if self.commit:
-            self.commit = RepoCommit(self.commit, self._session)
+            self.commit = RepoCommit(self.commit, self)
         #: Returns '_links' attribute.
         self.links = branch.get('_links', {})
 

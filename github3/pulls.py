@@ -190,7 +190,7 @@ class PullRequest(GitHubCore):
         return '<Pull Request [#{0}]>'.format(self.number)
 
     def _update_(self, pull):
-        self.__init__(pull, self._session)
+        self.__init__(pull, self.session)
 
     @requires_auth
     def close(self):

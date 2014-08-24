@@ -51,7 +51,7 @@ class Hook(GitHubCore):
         return '<Hook [{0}]>'.format(self.name)
 
     def _update_(self, hook):
-        self.__init__(hook, self._session)
+        self.__init__(hook, self.session)
 
     @requires_auth
     def delete(self):

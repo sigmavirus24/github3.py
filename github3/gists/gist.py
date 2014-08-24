@@ -104,7 +104,7 @@ class Gist(GitHubCore):
         return '<Gist [{0}]>'.format(self.id)
 
     def _update_(self, data):
-        self.__init__(data, self._session)
+        self.__init__(data, self.session)
 
     @requires_auth
     def create_comment(self, body):

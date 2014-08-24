@@ -90,7 +90,7 @@ class Commit(BaseCommit):
         #: :class:`Tree <Tree>` the commit belongs to.
         self.tree = None
         if commit.get('tree'):
-            self.tree = Tree(commit.get('tree'), self._session)
+            self.tree = Tree(commit.get('tree'), self)
 
     def _repr(self):
         return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
@@ -101,7 +101,7 @@ class Commit(BaseCommit):
         validity of this object, i.e., having a login or created_at object.
 
         """
-        return User(self.author, self._session)
+        return User(self.author, self)
 
     def committer_as_User(self):
         """Attempt to return the committer attribute as a
@@ -109,7 +109,7 @@ class Commit(BaseCommit):
         about the validity of this object.
 
         """
-        return User(self.committer, self._session)
+        return User(self.committer, self)
 
 
 class Reference(GitHubCore):
@@ -133,7 +133,7 @@ class Reference(GitHubCore):
         return '<Reference [{0}]>'.format(self.ref)
 
     def _update_(self, ref):
-        self.__init__(ref, self._session)
+        self.__init__(ref, self.session)
 
     @requires_auth
     def delete(self):
@@ -220,7 +220,7 @@ class Tree(GitData):
         """
         json = self._json(self._get(self._api, params={'recursive': '1'}),
                           200)
-        return Tree(json, self._session) if json else None
+        return Tree(json, self) if json else None
 
 
 class Hash(GitHubObject):

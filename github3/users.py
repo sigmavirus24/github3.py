@@ -46,7 +46,7 @@ class Key(GitHubCore):
         return self.key
 
     def _update_(self, key):
-        self.__init__(key, self._session)
+        self.__init__(key, self.session)
 
     @requires_auth
     def delete(self):
@@ -193,7 +193,7 @@ class User(BaseAccount):
         return self.login
 
     def _update_(self, user):
-        self.__init__(user, self._session)
+        self.__init__(user, self.session)
 
     @requires_auth
     def add_email_address(self, address):

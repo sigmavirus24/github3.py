@@ -301,3 +301,11 @@ Old name                            New attribute name
 - The ``Release.assets`` attribute has been renamed to
   ``Release.original_assets``. To retrieve up-to-date assets, use the
   ``Release#assets`` method.
+
+New Features
+````````````
+
+- Most objects now have a ``session`` attribute. This is a subclass of a
+  ``Session`` object from ``requests``. This can now be used in conjunction
+  with a third-party caching mechanism. The suggested caching library is
+  ``cachecontrol``.

@@ -36,7 +36,7 @@ class BaseCase(TestCase):
 
     def setUp(self):
         self.g = github3.GitHub()
-        self.session = self.g._session
+        self.session = self.g.session
         if os.environ.get('GH_AUTH'):
             self.g.login(token=os.environ['GH_AUTH'])
         self.args = ()

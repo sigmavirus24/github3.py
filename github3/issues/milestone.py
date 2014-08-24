@@ -27,7 +27,7 @@ class Milestone(GitHubCore):
         self.description = mile.get('description')
         #: :class:`User <github3.users.User>` object representing the creator
         #: of the milestone.
-        self.creator = User(mile.get('creator'), self._session)
+        self.creator = User(mile.get('creator'), self)
         #: Number of issues associated with this milestone which are still
         #: open.
         self.open_issues = mile.get('open_issues')
@@ -47,7 +47,7 @@ class Milestone(GitHubCore):
         return self.title
 
     def _update_(self, mile):
-        self.__init__(mile, self._session)
+        self.__init__(mile, self.session)
 
     @requires_auth
     def delete(self):

@@ -34,15 +34,15 @@ class RepoCommit(BaseCommit):
         #: :class:`User <github3.users.User>` who authored the commit.
         self.author = commit.get('author')
         if self.author:
-            self.author = User(self.author, self._session)
+            self.author = User(self.author, self)
         #: :class:`User <github3.users.User>` who committed the commit.
         self.committer = commit.get('committer')
         if self.committer:
-            self.committer = User(self.committer, self._session)
+            self.committer = User(self.committer, self)
         #: :class:`Commit <github3.git.Commit>`.
         self.commit = commit.get('commit')
         if self.commit:
-            self.commit = Commit(self.commit, self._session)
+            self.commit = Commit(self.commit, self)
 
         self.sha = commit.get('sha')
         #: The number of additions made in the commit.

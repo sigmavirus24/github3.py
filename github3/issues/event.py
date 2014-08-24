@@ -47,7 +47,7 @@ class IssueEvent(GitHubCore):
         #: :class:`User <github3.users.User>` that generated the event.
         self.actor = event.get('actor')
         if self.actor:
-            self.actor = User(self.actor, self._session)
+            self.actor = User(self.actor, self)
 
         #: Number of comments
         self.comments = event.get('comments', 0)

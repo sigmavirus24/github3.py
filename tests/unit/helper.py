@@ -83,7 +83,7 @@ class UnitHelper(unittest.TestCase):
                                             self.session)
         else:
             instance = self.described_class()
-            instance._session = self.session
+            instance.session = self.session
 
         return instance
 

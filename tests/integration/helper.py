@@ -11,7 +11,7 @@ class IntegrationHelper(unittest.TestCase):
         self.password = os.environ.get('GH_PASSWORD', 'bar')
         self.token = os.environ.get('GH_AUTH', 'x' * 20)
         self.gh = self.get_client()
-        self.session = self.gh._session
+        self.session = self.gh.session
         self.recorder = betamax.Betamax(self.session)
 
     def get_client(self):

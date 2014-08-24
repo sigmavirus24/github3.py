@@ -124,7 +124,7 @@ class Repository(GitHubCore):
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
         #: repository owner.
-        self.owner = User(repo.get('owner', {}), self._session)
+        self.owner = User(repo.get('owner', {}), self)
 
         #: Is this repository private?
         self.private = repo.get('private')
@@ -298,7 +298,7 @@ class Repository(GitHubCore):
         return self.full_name
 
     def _update_(self, repo):
-        self.__init__(repo, self._session)
+        self.__init__(repo, self.session)
 
     def _create_pull(self, data):
         self._remove_none(data)
@@ -306,7 +306,7 @@ class Repository(GitHubCore):
         if data:
             url = self._build_url('pulls', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return PullRequest(json, self._session) if json else None
+        return PullRequest(json, self) if json else None
 
     @requires_auth
     def add_collaborator(self, username):

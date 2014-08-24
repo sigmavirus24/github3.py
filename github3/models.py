@@ -75,12 +75,12 @@ class GitHubCore(GitHubObject):
     """
     def __init__(self, json, session=None):
         super(GitHubCore, self).__init__(json)
-        if hasattr(session, '_session'):
+        if hasattr(session, 'session'):
             # i.e. session is actually a GitHub object
-            session = session._session
+            session = session.session
         elif session is None:
             session = GitHubSession()
-        self._session = session
+        self.session = session
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -124,15 +124,15 @@ class GitHubCore(GitHubObject):
 
     def _delete(self, url, **kwargs):
         __logs__.debug('DELETE %s with %s', url, kwargs)
-        return self._session.delete(url, **kwargs)
+        return self.session.delete(url, **kwargs)
 
     def _get(self, url, **kwargs):
         __logs__.debug('GET %s with %s', url, kwargs)
-        return self._session.get(url, **kwargs)
+        return self.session.get(url, **kwargs)
 
     def _patch(self, url, **kwargs):
         __logs__.debug('PATCH %s with %s', url, kwargs)
-        return self._session.patch(url, **kwargs)
+        return self.session.patch(url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
@@ -143,15 +143,15 @@ class GitHubCore(GitHubObject):
                 'Content-Type': None
                 }.update(kwargs['headers'])
         __logs__.debug('POST %s with %s, %s', url, data, kwargs)
-        return self._session.post(url, data, **kwargs)
+        return self.session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
         __logs__.debug('PUT %s with %s', url, kwargs)
-        return self._session.put(url, **kwargs)
+        return self.session.put(url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
-        return self._session.build_url(*args, **kwargs)
+        return self.session.build_url(*args, **kwargs)
 
     @property
     def _api(self):
@@ -220,7 +220,7 @@ class GitHubCore(GitHubObject):
         headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)
         if json is not None:
-            self.__init__(json, self._session)
+            self.__init__(json, self.session)
         return self
 
 
@@ -254,7 +254,7 @@ class BaseComment(GitHubCore):
             self.pull_request_url = self.links.get('pull_request')
 
     def _update_(self, comment):
-        self.__init__(comment, self._session)
+        self.__init__(comment, self.session)
 
     @requires_auth
     def delete(self):
@@ -364,7 +364,7 @@ class BaseAccount(GitHubCore):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
 
     def _update_(self, acct):
-        self.__init__(acct, self._session)
+        self.__init__(acct, self.session)
 
 
 class GitHubError(Exception):

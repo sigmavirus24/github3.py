@@ -30,8 +30,8 @@ def requires_auth(func):
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         auth = False
-        if hasattr(self, '_session'):
-            auth = self._session.has_auth()
+        if hasattr(self, 'session'):
+            auth = self.session.has_auth()
 
         if auth:
             return func(self, *args, **kwargs)
@@ -54,7 +54,7 @@ def requires_basic_auth(func):
     """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        if hasattr(self, '_session') and self._session.auth:
+        if hasattr(self, 'session') and self.session.auth:
             return func(self, *args, **kwargs)
         else:
             from github3.models import GitHubError
@@ -75,7 +75,7 @@ def requires_app_credentials(func):
     """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        client_id, client_secret = self._session.retrieve_client_credentials()
+        client_id, client_secret = self.session.retrieve_client_credentials()
         if client_id and client_secret:
             return func(self, *args, **kwargs)
         else:

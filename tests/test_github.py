@@ -170,10 +170,10 @@ class TestGitHub(BaseCase):
 
     def test_login(self):
         self.g.login('user', 'password')
-        assert self.g._session.auth == ('user', 'password')
+        assert self.g.session.auth == ('user', 'password')
 
         self.g.login(token='FakeOAuthToken')
-        auth = self.g._session.headers.get('Authorization')
+        auth = self.g.session.headers.get('Authorization')
         assert auth == 'token FakeOAuthToken'
 
     # Unwritten test, not entirely sure how to mock this
@@ -282,16 +282,16 @@ class TestGitHub(BaseCase):
     def test_set_client_id(self):
         auth = ('idXXXXXXXXXXXX', 'secretXXXXXXXXXXXXXXXX')
         self.g.set_client_id(*auth)
-        assert self.g._session.params['client_id'] == auth[0]
-        assert self.g._session.params['client_secret'] == auth[1]
+        assert self.g.session.params['client_id'] == auth[0]
+        assert self.g.session.params['client_secret'] == auth[1]
 
     def test_set_user_agent(self):
         ua = 'Fake User Agents'
         self.g.set_user_agent(ua)
-        assert self.g._session.headers['User-Agent'] == ua
+        assert self.g.session.headers['User-Agent'] == ua
 
         self.g.set_user_agent(None)
-        assert self.g._session.headers['User-Agent'] == ua
+        assert self.g.session.headers['User-Agent'] == ua
 
     def test_star(self):
         self.response('', 204)
@@ -433,7 +433,7 @@ class TestUnsecureGitHubEnterprise(BaseCase):
         self.response('pull_enterprise')
         self.g.pull_request('sigmavirus24', 'github3.py', 19)
 
-        assert False == self.g._session.verify
+        assert False == self.g.session.verify
         assert self.request.called
 
 

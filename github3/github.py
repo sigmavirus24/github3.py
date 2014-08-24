@@ -59,8 +59,8 @@ class GitHub(GitHubCore):
             self.login(username, password)
 
     def _repr(self):
-        if self._session.auth:
-            return '<GitHub [{0[0]}]>'.format(self._session.auth)
+        if self.session.auth:
+            return '<GitHub [{0[0]}]>'.format(self.session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
     @requires_basic_auth
@@ -104,7 +104,7 @@ class GitHub(GitHubCore):
             if scopes:
                 data['scopes'] = scopes
 
-            with self._session.temporary_basic_auth(username, password):
+            with self.session.temporary_basic_auth(username, password):
                 json = self._json(self._post(url, data=data), 201)
 
         return Authorization(json, self) if json else None
@@ -119,7 +119,7 @@ class GitHub(GitHubCore):
 
         :returns: bool
         """
-        p = self._session.params
+        p = self.session.params
         auth = (p.get('client_id'), p.get('client_secret'))
         if access_token and auth:
             url = self._build_url('applications', str(auth[0]), 'tokens',
@@ -985,12 +985,12 @@ class GitHub(GitHubCore):
             provide the Two Factor Authentication code to GitHub when necessary
         """
         if username and password:
-            self._session.basic_auth(username, password)
+            self.session.basic_auth(username, password)
         elif token:
-            self._session.token_auth(token)
+            self.session.token_auth(token)
 
         # The Session method handles None for free.
-        self._session.two_factor_auth_callback(two_factor_callback)
+        self.session.two_factor_auth_callback(two_factor_callback)
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.
@@ -1148,10 +1148,10 @@ class GitHub(GitHubCore):
         :param str access_token: (required), the access_token to revoke
         :returns: bool -- True if successful, False otherwise
         """
-        client_id, client_secret = self._session.retrieve_client_credentials()
+        client_id, client_secret = self.session.retrieve_client_credentials()
         url = self._build_url('applications', str(client_id), 'tokens',
                               access_token)
-        with self._session.temporary_basic_auth(client_id, client_secret):
+        with self.session.temporary_basic_auth(client_id, client_secret):
             response = self._delete(url, params={'client_id': None,
                                                  'client_secret': None})
 
@@ -1167,9 +1167,9 @@ class GitHub(GitHubCore):
         :param str client_id: (required), the client_id of your application
         :returns: bool -- True if successful, False otherwise
         """
-        client_id, client_secret = self._session.retrieve_client_credentials()
+        client_id, client_secret = self.session.retrieve_client_credentials()
         url = self._build_url('applications', str(client_id), 'tokens')
-        with self._session.temporary_basic_auth(client_id, client_secret):
+        with self.session.temporary_basic_auth(client_id, client_secret):
             response = self._delete(url, params={'client_id': None,
                                                  'client_secret': None})
 
@@ -1422,7 +1422,7 @@ class GitHub(GitHubCore):
         :param str secret: 40-character hexidecimal client_secret provided by
             GitHub
         """
-        self._session.params = {'client_id': id, 'client_secret': secret}
+        self.session.params = {'client_id': id, 'client_secret': secret}
 
     def set_user_agent(self, user_agent):
         """Allows the user to set their own user agent string to identify with
@@ -1433,7 +1433,7 @@ class GitHub(GitHubCore):
         """
         if not user_agent:
             return
-        self._session.headers.update({'User-Agent': user_agent})
+        self.session.headers.update({'User-Agent': user_agent})
 
     @requires_auth
     def star(self, username, repo):
@@ -1510,7 +1510,7 @@ class GitHub(GitHubCore):
             url = self._build_url('user')
 
         json = self._json(self._get(url), 200)
-        return User(json, self._session) if json else None
+        return User(json, self) if json else None
 
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg
@@ -1536,8 +1536,8 @@ class GitHubEnterprise(GitHub):
     """
     def __init__(self, url, username='', password='', token='', verify=True):
         super(GitHubEnterprise, self).__init__(username, password, token)
-        self._session.base_url = url.rstrip('/') + '/api/v3'
-        self._session.verify = verify
+        self.session.base_url = url.rstrip('/') + '/api/v3'
+        self.session.verify = verify
 
     def _repr(self):
         return '<GitHub Enterprise [0.url]>'.format(self)
@@ -1566,7 +1566,7 @@ class GitHubStatus(GitHubCore):
     """
     def __init__(self):
         super(GitHubStatus, self).__init__({})
-        self._session.base_url = 'https://status.github.com'
+        self.session.base_url = 'https://status.github.com'
 
     def _repr(self):
         return '<GitHub Status>'

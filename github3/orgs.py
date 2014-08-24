@@ -58,7 +58,7 @@ class Team(GitHubCore):
         return '<Team [{0}]>'.format(self.name)
 
     def _update_(self, team):
-        self.__init__(team, self._session)
+        self.__init__(team, self.session)
 
     @requires_auth
     def add_member(self, username):
@@ -328,7 +328,7 @@ class Organization(BaseAccount):
                 'permission': permission}
         url = self._build_url('teams', base_url=self._api)
         json = self._json(self._post(url, data), 201)
-        return Team(json, self._session) if json else None
+        return Team(json, self) if json else None
 
     @requires_auth
     def edit(self, billing_email=None, company=None, email=None, location=None,
@@ -486,4 +486,4 @@ class Organization(BaseAccount):
         if int(team_id) > 0:
             url = self._build_url('teams', str(team_id))
             json = self._json(self._get(url), 200)
-        return Team(json, self._session) if json else None
+        return Team(json, self) if json else None
