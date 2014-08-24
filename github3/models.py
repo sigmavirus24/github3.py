@@ -77,7 +77,7 @@ class GitHubObject(object):
         return None
 
     def _repr(self):
-        return ''
+        return '<github3-object at 0x{0:x}>'.format(id(self))
 
     def __repr__(self):
         repr_string = self._repr()
@@ -106,12 +106,17 @@ class GitHubObject(object):
 
 
 class GitHubCore(GitHubObject):
-    """The :class:`GitHubCore <GitHubCore>` object. This class provides some
-    basic attributes to other classes that are very useful to have.
+
+    """The base object for all objects that require a session.
+
+    The :class:`GitHubCore <GitHubCore>` object provides some
+    basic attributes and methods to other sub-classes that are very useful to
+    have.
     """
+
     def __init__(self, json, session=None):
         if hasattr(session, 'session'):
-            # i.e. session is actually a GitHub object
+            # i.e. session is actually a GitHubCore instance
             session = session.session
         elif session is None:
             session = GitHubSession()
@@ -205,6 +210,8 @@ class GitHubCore(GitHubObject):
         :param class cls: cls to return an object of
         :param params dict: (optional) Parameters for the request
         :param str etag: (optional), ETag from the last call
+        :returns: A lazy iterator over the pagianted resource
+        :rtype: :class:`GitHubIterator <github3.structs.GitHubIterator>`
         """
         from github3.structs import GitHubIterator
         return GitHubIterator(count, url, cls, self, params, etag)
@@ -221,13 +228,7 @@ class GitHubCore(GitHubObject):
         return self._remaining
 
     def refresh(self, conditional=False):
-        """Re-retrieve the information for this object and returns the
-        refreshed instance.
-
-        :param bool conditional: If True, then we will search for a stored
-            header ('Last-Modified', or 'ETag') on the object and send that
-            as described in the `Conditional Requests`_ section of the docs
-        :returns: self
+        """Re-retrieve the information for this object.
 
         The reasoning for the return value is the following example: ::
 
@@ -245,6 +246,11 @@ class GitHubCore(GitHubObject):
 
         .. _Conditional Requests:
             http://developer.github.com/v3/#conditional-requests
+
+        :param bool conditional: If True, then we will search for a stored
+            header ('Last-Modified', or 'ETag') on the object and send that
+            as described in the `Conditional Requests`_ section of the docs
+        :returns: self
         """
         headers = {}
         if conditional:
@@ -261,10 +267,11 @@ class GitHubCore(GitHubObject):
 
 
 class BaseComment(GitHubCore):
-    """The :class:`BaseComment <BaseComment>` object. A basic class for Gist,
-    Issue and Pull Request Comments."""
-    def __init__(self, comment, session):
-        super(BaseComment, self).__init__(comment, session)
+
+    """A basic class for Gist, Issue and Pull Request Comments."""
+
+    # def __init__(self, comment, session):
+    def _update_attributes(self, comment):
         #: Unique ID of the comment.
         self.id = comment.get('id')
         #: Body of the comment. (As written by the commenter)
