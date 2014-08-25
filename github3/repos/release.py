@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 import json
 
 from github3.decorators import requires_auth
-from github3.models import GitHubCore, GitHubError
+from github3.exceptions import error_for
+from github3.models import GitHubCore
 from github3.utils import stream_response_to_file
 from uritemplate import URITemplate
 
@@ -136,7 +137,7 @@ class Release(GitHubCore):
                        verify=False)
         if r.status_code in (201, 202):
             return Asset(r.json(), self)
-        raise GitHubError(r)
+        raise error_for(r)
 
 
 class Asset(GitHubCore):

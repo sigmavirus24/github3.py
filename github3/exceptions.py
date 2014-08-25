@@ -67,3 +67,19 @@ class ServerError(GitHubError):
     """Exception class for 5xx responses."""
 
     pass
+
+
+error_classes = {
+    401: AuthenticationFailed,
+    403: ForbiddenError,
+    404: NotFoundError,
+    422: InvalidRequestError,
+}
+
+
+def error_for(response):
+    """Return the appropriate initialized exception class for a response."""
+    if 500 <= response.status_code < 600:
+        return ServerError(response)
+    klass = error_classes.get(response.status_code, GitHubError)
+    return klass(response)

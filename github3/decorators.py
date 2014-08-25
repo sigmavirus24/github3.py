@@ -36,12 +36,12 @@ def requires_auth(func):
         if auth:
             return func(self, *args, **kwargs)
         else:
-            from github3.models import GitHubError
+            from github3.exceptions import error_for
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires authentication"}'
             )
-            raise GitHubError(r)
+            raise error_for(r)
     return auth_wrapper
 
 
@@ -57,12 +57,12 @@ def requires_basic_auth(func):
         if hasattr(self, 'session') and self.session.auth:
             return func(self, *args, **kwargs)
         else:
-            from github3.models import GitHubError
+            from github3.exceptions import error_for
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires username/password authentication"}'
             )
-            raise GitHubError(r)
+            raise error_for(r)
     return auth_wrapper
 
 
@@ -79,12 +79,12 @@ def requires_app_credentials(func):
         if client_id and client_secret:
             return func(self, *args, **kwargs)
         else:
-            from github3.models import GitHubError
+            from github3.exceptions import error_for
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires username/password authentication"}'
             )
-            raise GitHubError(r)
+            raise error_for(r)
 
     return auth_wrapper
 

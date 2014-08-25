@@ -14,7 +14,7 @@ from datetime import datetime
 from logging import getLogger
 
 from github3.decorators import requires_auth
-from github3.exceptions import GitHubError
+from github3.exceptions import error_for
 from github3.session import GitHubSession
 from github3.utils import UTC
 
@@ -162,7 +162,7 @@ class GitHubCore(GitHubObject):
             if status_code == true_code:
                 return True
             if status_code != false_code and status_code >= 400:
-                raise GitHubError(response)
+                raise error_for(response)
         return False
 
     def _delete(self, url, **kwargs):
