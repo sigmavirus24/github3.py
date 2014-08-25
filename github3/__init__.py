@@ -14,8 +14,8 @@ __title__ = 'github3'
 __author__ = 'Ian Cordasco'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012-2014 Ian Cordasco'
-__version__ = '1.0.0'
-__version_info__ = tuple(int(i) for i in __version__.split('.'))
+__version__ = '1.0.0b1'
+__version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
 
 from github3.api import (
     authorize, login, enterprise_login, emojis, gist, gitignore_template,
