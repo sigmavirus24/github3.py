@@ -34,16 +34,35 @@ class GitHubError(Exception):
         return self.msg
 
 
+class BadRequest(GitHubError):
+
+    """Exception class for 400 responses."""
+
+    pass
+
+
 class AuthenticationFailed(GitHubError):
 
-    """Exception class for 401 responses."""
+    """Exception class for 401 responses.
+
+    Possible reasons:
+
+    - Need one time password (for two-factor authentication)
+    - You are not authorized to access the resource
+    """
 
     pass
 
 
 class ForbiddenError(GitHubError):
 
-    """Exception class for 403 responses."""
+    """Exception class for 403 responses.
+
+    Possible reasons:
+
+    - Too many requests (you've exceeded the ratelimit)
+    - Too many login failures
+    """
 
     pass
 
@@ -55,11 +74,30 @@ class NotFoundError(GitHubError):
     pass
 
 
-class InvalidRequestError(GitHubError):
+class MethodNotAllowed(GitHubError):
+
+    """Exception class for 405 responses."""
+
+    pass
+
+
+class NotAcceptable(GitHubError):
+
+    """Exception class for 406 responses."""
+
+    pass
+
+
+class UnprocessableEntity(GitHubError):
 
     """Exception class for 422 responses."""
 
     pass
+
+
+class ClientError(GitHubError):
+
+    """Catch-all for 400 responses that aren't specific errors."""
 
 
 class ServerError(GitHubError):
@@ -70,16 +108,22 @@ class ServerError(GitHubError):
 
 
 error_classes = {
+    400: BadRequest,
     401: AuthenticationFailed,
     403: ForbiddenError,
     404: NotFoundError,
-    422: InvalidRequestError,
+    405: MethodNotAllowed,
+    406: NotAcceptable,
+    422: UnprocessableEntity,
 }
 
 
 def error_for(response):
     """Return the appropriate initialized exception class for a response."""
-    if 500 <= response.status_code < 600:
-        return ServerError(response)
-    klass = error_classes.get(response.status_code, GitHubError)
+    klass = error_classes.get(response.status_code)
+    if klass is None:
+        if 400 <= response.status_code < 500:
+            klass = ClientError
+        if 500 <= response.status_code < 600:
+            klass = ServerError
     return klass(response)
