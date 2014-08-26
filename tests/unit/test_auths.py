@@ -68,6 +68,21 @@ class TestAuthorizationRequiresAuth(UnitHelper):
         self.session.auth = None
 
     def test_add_scopes(self):
-        """Test that add scopes requires authentication."""
+        """Test that adding scopes requires authentication."""
         with pytest.raises(github3.AuthenticationFailed):
             self.instance.add_scopes()
+
+    def test_delete(self):
+        """Test that deleteing an authorization requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.delete()
+
+    def test_remove_scopes(self):
+        """Test that removing scopes requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.remove_scopes()
+
+    def test_replace_scopes(self):
+        """Test that replacing scopes requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.replace_scopes()
