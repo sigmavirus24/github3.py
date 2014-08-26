@@ -17,6 +17,15 @@ class TestAuthorization(IntegrationHelper):
             assert isinstance(auth, github3.auths.Authorization)
             assert auth.add_scopes(['user']) is True
 
+    def test_delete(self):
+        """Test the ability to delete an authorization."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            auth = self.gh.authorization(10716101)
+            assert isinstance(auth, github3.auths.Authorization)
+            assert auth.delete() is True
+
     def test_remove_scopes(self):
         """Test the ability to remove scopes from an authorization."""
         self.basic_login()
