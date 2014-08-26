@@ -27,15 +27,18 @@ from github3.api import (
     user, zen
 )
 from github3.github import GitHub, GitHubEnterprise, GitHubStatus
-from github3.exceptions import (AuthenticationFailed, ForbiddenError,
-                                GitHubError, InvalidRequestError,
-                                NotFoundError, ServerError)
+from github3.exceptions import (
+    BadRequest, AuthenticationFailed, ForbiddenError, GitHubError,
+    MethodNotAllowed, NotFoundError, ServerError, NotAcceptable,
+    UnprocessableEntity
+)
 
 __all__ = (
-    'AuthenticationFailed', 'ForbiddenError', 'GitHub', 'GitHubEnterprise',
-    'GitHubError', 'GitHubStatus', 'InvalidRequestError', 'NotFoundError',
-    'ServerError', 'authorize', 'login', 'enterprise_login', 'emojis', 'gist',
-    'gitignore_template', 'create_gist', 'issue', 'markdown', 'octocat',
+    'AuthenticationFailed',  'BadRequest', 'ForbiddenError', 'GitHub',
+    'GitHubEnterprise', 'GitHubError', 'GitHubStatus', 'InvalidRequestError',
+    'MethodNotAllowed', 'NotAcceptable', 'NotFoundError', 'ServerError',
+    'UnprocessableEntity', 'authorize', 'login', 'enterprise_login', 'emojis',
+    'gist', 'gitignore_template', 'create_gist', 'issue', 'markdown', 'octocat',
     'organization', 'pull_request', 'followers_of', 'followed_by', 'public_gists',
     'gists_by', 'issues_on', 'gitignore_templates', 'all_repositories',
     'all_users', 'all_events', 'organizations_with', 'repositories_by',
