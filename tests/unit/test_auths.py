@@ -36,3 +36,19 @@ class TestAuthorization(UnitHelper):
         self.post_called_with(url_for(''), data={
             'add_scopes': ['scope-one', 'scope-two'],
         })
+
+    def test_remove_scopes(self):
+        """Test the request to remove scopes from an authorization."""
+        self.instance.remove_scopes(['scope-one', 'scope-two', 'scope-three'])
+
+        self.post_called_with(url_for(''), data={
+            'rm_scopes': ['scope-one', 'scope-two', 'scope-three'],
+        })
+
+    def test_replace_scopes(self):
+        """Test the request to replace the scopes on an authorization."""
+        self.instance.replace_scopes(['scope-one', 'scope-two', 'scope-three'])
+
+        self.post_called_with(url_for(''), data={
+            'scopes': ['scope-one', 'scope-two', 'scope-three'],
+        })
