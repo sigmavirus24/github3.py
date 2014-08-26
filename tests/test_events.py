@@ -33,9 +33,6 @@ class TestEvent(BaseCase):
                            github3.events._payload_handlers)
         assert Event.list_types() == sorted(handlers.keys())
 
-    def test_is_public(self):
-        assert self.ev.is_public() == self.ev.public
-
 
 class TestPayloadHandlers(TestCase):
     def test_commitcomment(self):

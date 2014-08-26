@@ -307,6 +307,9 @@ Old name                            New attribute name
   This highlights the fact that ``Authorization#update`` used to require more
   than one request.
 
+- ``Event#is_public`` has been removed. Simply check the event's ``public``
+  attribute instead.
+
 New Features
 ````````````
 

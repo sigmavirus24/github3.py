@@ -29,8 +29,7 @@ class Event(GitHubObject):
 
     """
 
-    def __init__(self, event):
-        super(Event, self).__init__(event)
+    def _update_attributes(self, event):
         from github3.users import User
         from github3.orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
@@ -61,17 +60,8 @@ class Event(GitHubObject):
 
     @staticmethod
     def list_types():
-        """List available payload types"""
+        """List available payload types."""
         return sorted(_payload_handlers.keys())
-
-    def is_public(self):
-        """Indicates whether the Event is public or not.
-
-        .. warning:: This will be deprecated in 0.6
-
-        :returns: bool -- True if event is pubic, False otherwise
-        """
-        return self.public
 
 
 def _commitcomment(payload):
