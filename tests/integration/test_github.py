@@ -24,6 +24,18 @@ class TestGitHub(IntegrationHelper):
 
     match_on = ['method', 'uri', 'gh3-headers']
 
+    def test_authorize(self):
+        """Test the ability to create an authorization."""
+        from ..conftest import credentials
+        username, password = credentials
+        cassette_name = self.cassette_name('authorize')
+        with self.recorder.use_cassette(cassette_name):
+            auth = self.gh.authorize(username, password,
+                                     note='Test authorization',
+                                     note_url='http://example.com')
+
+        assert isinstance(auth, github3.auths.Authorization)
+
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist."""
         self.token_login()
