@@ -38,6 +38,12 @@ class TestAuthorization(UnitHelper):
             'add_scopes': ['scope-one', 'scope-two'],
         })
 
+    def test_delete(self):
+        """"Test the request to delete an authorization."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(url_for(''))
+
     def test_remove_scopes(self):
         """Test the request to remove scopes from an authorization."""
         self.instance.remove_scopes(['scope-one', 'scope-two', 'scope-three'])
