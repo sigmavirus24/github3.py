@@ -30,8 +30,8 @@ class Authorization(GitHubCore):
 
     """
 
-    def __init__(self, auth, session=None):
-        super(Authorization, self).__init__(auth, session)
+    def _update_attributes(self, auth):
+        self._api = auth.get('url')
         #: Details about the application (name, url)
         self.app = auth.get('app', {})
         #: Returns the Authorization token
@@ -46,7 +46,6 @@ class Authorization(GitHubCore):
         self.scopes = auth.get('scopes', [])
         #: Unique id of the authorization
         self.id = auth.get('id', 0)
-        self._api = self._build_url('authorizations', str(self.id))
         #: datetime object representing when the authorization was created.
         self.created_at = self._strptime(auth.get('created_at'))
         #: datetime object representing when the authorization was updated.
@@ -55,45 +54,71 @@ class Authorization(GitHubCore):
     def _repr(self):
         return '<Authorization [{0}]>'.format(self.name)
 
-    def _update_(self, auth):
-        self.__init__(auth, self.session)
+    def _update(self, scopes_data, note, note_url):
+        """Helper for add_scopes, replace_scopes, remove_scopes."""
+        if note is not None:
+            scopes_data['note'] = note
+        if note_url is not None:
+            scopes_data['note_url'] = note_url
+        json = self._json(self._post(self._api, data=scopes_data), 200)
+
+        if json:
+            self._update_attributes(json)
+            return True
+
+        return False
+
+    @requires_basic_auth
+    def add_scopes(self, scopes, note=None, note_url=None):
+        """Remove the scopes from this authorization.
+
+        .. versionadded:: 1.0
+
+        :param list scopes: Remove these scopes from the ones present on this
+            authorization
+        :param str note: (optional), Note about the authorization
+        :param str note_url: (optional), URL to link to when the user views
+            the authorization
+        :returns: True if successful, False otherwise
+        :rtype: bool
+        """
+        data = {'add_scopes': scopes}
+        return self._update(data, note, note_url)
 
     @requires_basic_auth
     def delete(self):
-        """delete this authorization"""
+        """Delete this authorization."""
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_basic_auth
-    def update(self, scopes=[], add_scopes=[], rm_scopes=[], note='',
-               note_url=''):
-        """Update this authorization.
+    def remove_scopes(self, scopes, note=None, note_url=None):
+        """Remove the scopes from this authorization.
 
-        :param list scopes: (optional), replaces the authorization scopes with
-            these
-        :param list add_scopes: (optional), scopes to be added
-        :param list rm_scopes: (optional), scopes to be removed
-        :param str note: (optional), new note about authorization
-        :param str note_url: (optional), new note URL about this authorization
-        :returns: bool
+        .. versionadded:: 1.0
 
+        :param list scopes: Remove these scopes from the ones present on this
+            authorization
+        :param str note: (optional), Note about the authorization
+        :param str note_url: (optional), URL to link to when the user views
+            the authorization
+        :returns: True if successful, False otherwise
+        :rtype: bool
         """
-        success = False
-        json = None
-        if scopes:
-            d = {'scopes': scopes}
-            json = self._json(self._post(self._api, data=d), 200)
-        if add_scopes:
-            d = {'add_scopes': add_scopes}
-            json = self._json(self._post(self._api, data=d), 200)
-        if rm_scopes:
-            d = {'remove_scopes': rm_scopes}
-            json = self._json(self._post(self._api, data=d), 200)
-        if note or note_url:
-            d = {'note': note, 'note_url': note_url}
-            json = self._json(self._post(self._api, data=d), 200)
+        data = {'rm_scopes': scopes}
+        return self._update(data, note, note_url)
 
-        if json:
-            self._update_(json)
-            success = True
+    @requires_basic_auth
+    def replace_scopes(self, scopes, note=None, note_url=None):
+        """Replace the scopes on this authorization.
 
-        return success
+        .. versionadded:: 1.0
+
+        :param list scopes: Use these scopes instead of the previous list
+        :param str note: (optional), Note about the authorization
+        :param str note_url: (optional), URL to link to when the user views
+            the authorization
+        :returns: True if successful, False otherwise
+        :rtype: bool
+        """
+        data = {'scopes': scopes}
+        return self._update(data, note, note_url)

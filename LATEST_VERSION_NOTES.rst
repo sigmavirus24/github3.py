@@ -302,6 +302,11 @@ Old name                            New attribute name
   ``Release.original_assets``. To retrieve up-to-date assets, use the
   ``Release#assets`` method.
 
+- The ``Authorization`` API has changed. The ``update`` method has been split
+  into three methods: ``add_scopes``, ``remove_scopes``, ``replace_scopes``.
+  This highlights the fact that ``Authorization#update`` used to require more
+  than one request.
+
 New Features
 ````````````
 
