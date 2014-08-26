@@ -31,38 +31,3 @@ class TestAuthorization(BaseCase):
         self.login()
         assert self.auth.delete()
         self.mock_assertions()
-
-    def test_update(self):
-        self.response('authorization', 200)
-        self.post(self.api)
-        data = {
-            'scopes': ['user']
-        }
-        self.conf = {'data': data}
-
-        self.assertRaises(github3.GitHubError, self.auth.update)
-
-        def sub_test():
-            assert self.auth.update(**data)
-            self.mock_assertions()
-
-        self.login()
-        assert self.auth.update() is False
-        self.not_called()
-
-        sub_test()
-
-        del(data['scopes'])
-        data['add_scopes'] = ['repo']
-        sub_test()
-
-        del(data['add_scopes'])
-        data['rm_scopes'] = ['user']
-        self.conf['data'] = {'remove_scopes': ['user']}
-        sub_test()
-        self.conf['data'] = data
-
-        del(data['rm_scopes'])
-        data['note'] = 'GitHub API'
-        data['note_url'] = 'http://example.com'
-        sub_test()
