@@ -30,9 +30,8 @@ class GistComment(BaseComment):
 
     """
 
-    def __init__(self, comment, session=None):
-        super(GistComment, self).__init__(comment, session)
-
+    def _update_attributes(self, comment):
+        self._api = comment.get('url')
         #: :class:`User <github3.users.User>` who made the comment
         #: Unless it is not associated with an account
         self.user = None

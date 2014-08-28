@@ -28,15 +28,14 @@ class GistHistory(GitHubCore):
 
     """
 
-    def __init__(self, history, session=None):
-        super(GistHistory, self).__init__(history, session)
+    def _update_attributes(self, history):
         self._api = history.get('url', '')
 
         #: SHA of the commit associated with this version
         self.version = history.get('version', '')
 
         #: user who made these changes
-        self.user = User(history.get('user') or {}, session)
+        self.user = User(history.get('user') or {}, self)
 
         #: dict containing the change status; see also: deletions, additions,
         #: total

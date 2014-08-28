@@ -39,8 +39,7 @@ class Gist(GitHubCore):
 
     """
 
-    def __init__(self, data, session=None):
-        super(Gist, self).__init__(data, session)
+    def _update_attributes(self, data):
         #: Number of comments on this gist
         self.comments_count = data.get('comments', 0)
 
@@ -103,9 +102,6 @@ class Gist(GitHubCore):
     def _repr(self):
         return '<Gist [{0}]>'.format(self.id)
 
-    def _update_(self, data):
-        self.__init__(data, self.session)
-
     @requires_auth
     def create_comment(self, body):
         """Create a comment on this gist.
@@ -151,7 +147,7 @@ class Gist(GitHubCore):
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
