@@ -71,6 +71,7 @@ class Commit(BaseCommit):
     """
 
     def _update_attributes(self, commit):
+        super(Commit, self)._update_attributes(commit)
         #: dict containing at least the name, email and date the commit was
         #: created
         self.author = commit.get('author', {}) or {}
@@ -158,6 +159,7 @@ class GitObject(GitData):
     """The :class:`GitObject <GitObject>` object."""
 
     def _update_attributes(self, obj):
+        super(GitObject, self)._update_attributes(obj)
         #: The type of object.
         self.type = obj.get('type')
 
@@ -174,6 +176,7 @@ class Tag(GitData):
     """
 
     def _update_attributes(self, tag):
+        super(Tag, self)._update_attributes(tag)
         #: String of the tag
         self.tag = tag.get('tag')
         #: Commit message for the tag
@@ -196,6 +199,7 @@ class Tree(GitData):
     """
 
     def _update_attributes(self, tree):
+        super(Tree, self)._update_attributes(tree)
         #: list of :class:`Hash <Hash>` objects
         self.tree = [Hash(t) for t in tree.get('tree', [])]
 
@@ -220,7 +224,7 @@ class Hash(GitHubObject):
 
     """
 
-    def _update_attribute(self, info):
+    def _update_attributes(self, info):
         #: Path to file
         self.path = info.get('path')
         #: File mode
