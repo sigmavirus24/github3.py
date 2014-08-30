@@ -21,8 +21,8 @@ class IssueComment(BaseComment):
 
     See also: http://developer.github.com/v3/issues/comments/
     """
-    def __init__(self, comment, session=None):
-        super(IssueComment, self).__init__(comment, session)
+    def _update_attributes(self, comment):
+        super(IssueComment, self)._update_attributes(comment)
 
         user = comment.get('user')
         #: :class:`User <github3.users.User>` who made the comment

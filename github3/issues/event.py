@@ -22,8 +22,7 @@ class IssueEvent(GitHubCore):
         e1.commit_id != e2.commit_id
 
     """
-    def __init__(self, event, session=None):
-        super(IssueEvent, self).__init__(event, session)
+    def _update_attributes(self, event):
         # The type of event:
         #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
         #    'mentioned', 'assigned')
@@ -60,7 +59,7 @@ class IssueEvent(GitHubCore):
 
         self._uniq = self.commit_id
 
-    def __repr__(self):
+    def _repr(self):
         return '<Issue Event [{0} by {1}]>'.format(
             self.event, self.actor
             )
