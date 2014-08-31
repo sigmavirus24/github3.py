@@ -31,8 +31,7 @@ class Issue(GitHubCore):
 
     """
 
-    def __init__(self, issue, session=None):
-        super(Issue, self).__init__(issue, session)
+    def _update_attributes(self, issue):
         self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
         #: was assigned to.
@@ -99,9 +98,6 @@ class Issue(GitHubCore):
     def _repr(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)
-
-    def _update_(self, issue):
-        self.__init__(issue, self.session)
 
     @requires_auth
     def add_labels(self, *args):
@@ -210,7 +206,7 @@ class Issue(GitHubCore):
                 data['milestone'] = None
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 

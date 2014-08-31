@@ -12,8 +12,7 @@ class Label(GitHubCore):
 
     See also: http://developer.github.com/v3/issues/labels/
     """
-    def __init__(self, label, session=None):
-        super(Label, self).__init__(label, session)
+    def _update_attributes(self, label):
         self._api = label.get('url', '')
         #: Color of the label, e.g., 626262
         self.color = label.get('color')
@@ -27,9 +26,6 @@ class Label(GitHubCore):
 
     def __str__(self):
         return self.name
-
-    def _update_(self, label):
-        self.__init__(label, self.session)
 
     @requires_auth
     def delete(self):
@@ -56,7 +52,7 @@ class Label(GitHubCore):
                 'name': name, 'color': color})), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
 
         return False
