@@ -31,8 +31,7 @@ class Thread(GitHubCore):
     See also:
     http://developer.github.com/v3/activity/notifications/#view-a-single-thread
     """
-    def __init__(self, notif, session=None):
-        super(Thread, self).__init__(notif, session)
+    def _update_attributes(self, notif):
         self._api = notif.get('url')
         #: Comment responsible for the notification
         self.comment = notif.get('comment', {})
@@ -112,8 +111,7 @@ class Subscription(GitHubCore):
 
     """
 
-    def __init__(self, sub, session=None):
-        super(Subscription, self).__init__(sub, session)
+    def _update_attributes(self, sub):
         self._api = sub.get('url')
         #: reason user is subscribed to this thread/repository
         self.reason = sub.get('reason')
