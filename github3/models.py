@@ -265,7 +265,7 @@ class GitHubCore(GitHubObject):
         headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)
         if json is not None:
-            self.__init__(json, self.session)
+            self._update_attributes(json)
         return self
 
 
@@ -298,9 +298,6 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
-    def _update_(self, comment):
-        self.__init__(comment, self.session)
-
     @requires_auth
     def delete(self):
         """Delete this comment.
@@ -321,7 +318,7 @@ class BaseComment(GitHubCore):
             json = self._json(self._patch(self._api,
                               data=dumps({'body': body})), 200)
             if json:
-                self._update_(json)
+                self._update_attributes(json)
                 return True
         return False
 
@@ -413,6 +410,3 @@ class BaseAccount(GitHubCore):
 
     def _repr(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
-
-    def _update_(self, acct):
-        self.__init__(acct, self.session)

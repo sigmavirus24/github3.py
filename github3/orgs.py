@@ -187,8 +187,7 @@ class Organization(BaseAccount):
 
     """
 
-    def __init__(self, org, session=None):
-        super(Organization, self).__init__(org, session)
+    def _update_attributes(self, org):
         self.type = self.type or 'Organization'
 
         #: Events url (not a template)
