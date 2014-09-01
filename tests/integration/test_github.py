@@ -371,15 +371,11 @@ class TestGitHub(IntegrationHelper):
 
     def test_user(self):
         """Test the ability to retrieve a User."""
-        self.token_login()
         cassette_name = self.cassette_name('user')
         with self.recorder.use_cassette(cassette_name):
-            s = self.gh.user('sigmavirus24')
-            self.basic_login()
-            u = self.gh.user()
+            sigmavirus24 = self.gh.user('sigmavirus24')
 
-        assert isinstance(s, github3.users.User)
-        assert isinstance(u, github3.users.User)
+        assert isinstance(sigmavirus24, github3.users.User)
 
     def test_zen(self):
         """Test the ability to retrieve tidbits of Zen."""

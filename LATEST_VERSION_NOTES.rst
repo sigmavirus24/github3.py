@@ -164,6 +164,12 @@ Old name                                      New name
 
   - ``GitHub#starred`` which iterates over the authenticated user's stars
 
+- ``GitHub#user`` was split into two functions:
+
+  - ``GitHub#user`` which retrieves an arbitrary user's information
+
+  - ``GitHub#me`` which retrieves the authenticated user's information
+
 - Remove legacy watching API:
 
   - ``GitHub#subscribe``

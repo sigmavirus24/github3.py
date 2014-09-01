@@ -345,18 +345,6 @@ class TestGitHub(BaseCase):
                 assert upd.called
                 upd.assert_called_with(*args)
 
-    def test_user(self):
-        self.response('user')
-        self.get('https://api.github.com/users/sigmavirus24')
-
-        assert isinstance(self.g.user('sigmavirus24'), github3.users.User)
-        self.mock_assertions()
-
-        self.get('https://api.github.com/user')
-        self.login()
-        assert isinstance(self.g.user(), github3.users.User)
-        self.mock_assertions()
-
     def test_utf8_user(self):
         self.response('utf8_user')
         self.get('https://api.github.com/users/alejandrogomez')

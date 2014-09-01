@@ -1,6 +1,6 @@
 import pytest
 
-from github3 import GitHubError
+from github3 import AuthenticationFailed, GitHubError
 from github3.github import GitHub
 
 from .helper import UnitHelper, UnitIteratorHelper
@@ -54,6 +54,12 @@ class TestGitHub(UnitHelper):
             auth=('client-id', 'client-secret')
         )
 
+    def test_me(self):
+        """Test the ability to retrieve the authenticated user's info."""
+        self.instance.me()
+
+        self.session.get.assert_called_once_with(url_for('user'))
+
     def test_two_factor_login(self):
         """Test the ability to pass two_factor_callback."""
         self.instance.login('username', 'password',
@@ -63,6 +69,14 @@ class TestGitHub(UnitHelper):
         """Test that two_factor_callback is not required."""
         self.instance.login('username', 'password')
         self.instance.login(token='token')
+
+    def test_user(self):
+        """Test that a user can retrieve information about any user."""
+        self.instance.user('username')
+
+        self.session.get.assert_called_once_with(
+            url_for('users/username'),
+        )
 
 
 class TestGitHubIterators(UnitIteratorHelper):
@@ -623,6 +637,23 @@ class TestGitHubIterators(UnitIteratorHelper):
             params={'per_page': 100, 'type': 'all'},
             headers={}
         )
+
+
+class TestGitHubRequiresAuthentication(UnitHelper):
+
+    """Test methods that require authentication."""
+
+    described_class = GitHub
+    example_data = None
+
+    def after_setup(self):
+        """Disable authentication on the session."""
+        self.session.has_auth.return_value = False
+
+    def test_me(self):
+        """Show that GitHub#me requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.me()
 
 
 class TestGitHubAuthorizations(UnitHelper):
