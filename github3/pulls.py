@@ -57,8 +57,7 @@ class PullFile(GitHubObject):
     See also: http://developer.github.com/v3/pulls/#list-pull-requests-files
     """
 
-    def __init__(self, pfile):
-        super(PullFile, self).__init__(pfile)
+    def _update_attributes(self, pfile):
         #: SHA of the commit
         self.sha = pfile.get('sha')
         #: Name of the file
@@ -99,8 +98,7 @@ class PullRequest(GitHubCore):
     See also: http://developer.github.com/v3/pulls/
     """
 
-    def __init__(self, pull, session=None):
-        super(PullRequest, self).__init__(pull, session)
+    def _update_attributes(self, pull):
         self._api = pull.get('url', '')
         #: Base of the merge
         self.base = PullDestination(pull.get('base'), 'Base')
@@ -188,9 +186,6 @@ class PullRequest(GitHubCore):
 
     def _repr(self):
         return '<Pull Request [#{0}]>'.format(self.number)
-
-    def _update_(self, pull):
-        self.__init__(pull, self.session)
 
     @requires_auth
     def close(self):
@@ -321,7 +316,7 @@ class PullRequest(GitHubCore):
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
@@ -345,9 +340,7 @@ class ReviewComment(BaseComment):
     See also: http://developer.github.com/v3/pulls/comments/
     """
 
-    def __init__(self, comment, session=None):
-        super(ReviewComment, self).__init__(comment, session)
-
+    def _update_attributes(self, comment):
         #: :class:`User <github3.users.User>` who made the comment
         self.user = None
         if comment.get('user'):
