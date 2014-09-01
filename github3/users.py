@@ -29,8 +29,7 @@ class Key(GitHubCore):
         k1.id == k2.id
         k1.id != k2.id
     """
-    def __init__(self, key, session=None):
-        super(Key, self).__init__(key, session)
+    def _update_attributes(self, key, session=None):
         self._api = key.get('url', '')
         #: The text of the actual key
         self.key = key.get('key')
@@ -44,9 +43,6 @@ class Key(GitHubCore):
 
     def __str__(self):
         return self.key
-
-    def _update_(self, key):
-        self.__init__(key, self.session)
 
     @requires_auth
     def delete(self):
@@ -66,7 +62,7 @@ class Key(GitHubCore):
             data = {'title': title, 'key': key}
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
@@ -77,8 +73,7 @@ class Plan(GitHubObject):
     <http://developer.github.com/v3/users/#get-the-authenticated-user>`_
     documentation for more specifics.
     """
-    def __init__(self, plan):
-        super(Plan, self).__init__(plan)
+    def _update_attributes(self, plan):
         #: Number of collaborators
         self.collaborators = plan.get('collaborators')
         #: Name of the plan
@@ -119,8 +114,8 @@ class User(BaseAccount):
 
     """
 
-    def __init__(self, user, session=None):
-        super(User, self).__init__(user, session)
+    def _update_attributes(self, user):
+        super(User, self)._update_attributes(user)
         if not self.type:
             self.type = 'User'
 
@@ -191,9 +186,6 @@ class User(BaseAccount):
 
     def __str__(self):
         return self.login
-
-    def _update_(self, user):
-        self.__init__(user, self.session)
 
     @requires_auth
     def add_email_address(self, address):
@@ -427,6 +419,6 @@ class User(BaseAccount):
         url = self._build_url('user')
         json = self._json(self._patch(url, data=dumps(user)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
