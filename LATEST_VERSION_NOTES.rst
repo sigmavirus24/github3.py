@@ -325,3 +325,6 @@ New Features
   ``cachecontrol``.
 
 - All object's ``url`` attribute are now available.
+
+- You can now retrieve a repository by its id with
+  ``GitHub#repository_with_id``.

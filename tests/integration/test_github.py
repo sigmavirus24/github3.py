@@ -278,6 +278,14 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(r, github3.repos.repo.Repository)
 
+    def test_repository_with_id(self):
+        """Test the ability to retrieve a repository by its id."""
+        cassette_name = self.cassette_name('repository_with_id')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.repository_with_id(11439734)
+
+        assert isinstance(r, github3.repos.repo.Repository)
+
     def test_repositories(self):
         """Test the ability to retrieve an authenticated user's repos."""
         cassette_name = self.cassette_name('repositories')

@@ -60,6 +60,24 @@ class TestGitHub(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('user'))
 
+    def test_repository_with_id(self):
+        """Test the ability to retrieve a repository by its id."""
+        self.instance.repository_with_id(10)
+
+        self.session.get.assert_called_once_with(url_for('repositories/10'))
+
+    def test_repository_with_id_requires_a_positive_id(self):
+        """Test the ability to retrieve a repository by its id."""
+        self.instance.repository_with_id(-10)
+
+        assert self.session.get.called is False
+
+    def test_repository_with_id_accepts_a_string(self):
+        """Test the ability to retrieve a repository by its id."""
+        self.instance.repository_with_id('10')
+
+        self.session.get.assert_called_once_with(url_for('repositories/10'))
+
     def test_two_factor_login(self):
         """Test the ability to pass two_factor_callback."""
         self.instance.login('username', 'password',

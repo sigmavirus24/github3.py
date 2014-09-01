@@ -1153,6 +1153,19 @@ class GitHub(GitHubCore):
             json = self._json(self._get(url), 200)
         return Repository(json, self) if json else None
 
+    def repository_with_id(self, number):
+        """Returns the Repository with id ``number``.
+
+        :param int number: id of the repository
+        :returns: :class:`Repository <github3.repos.Repository>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('repositories', str(number))
+            json = self._json(self._get(url), 200)
+        return Repository(json, self) if json else None
+
     @requires_app_credentials
     def revoke_authorization(self, access_token):
         """Revoke specified authorization for an OAuth application.
