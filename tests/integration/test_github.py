@@ -394,6 +394,14 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(sigmavirus24, github3.users.User)
 
+    def test_user_with_id(self):
+        """Test the ability to retrieve a user by their id."""
+        cassette_name = self.cassette_name('user_with_id')
+        with self.recorder.use_cassette(cassette_name):
+            sigmavirus24 = self.gh.user_with_id(240830)
+
+        assert isinstance(sigmavirus24, github3.users.User)
+
     def test_zen(self):
         """Test the ability to retrieve tidbits of Zen."""
         cassette_name = self.cassette_name('zen')

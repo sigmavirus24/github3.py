@@ -96,6 +96,24 @@ class TestGitHub(UnitHelper):
             url_for('users/username'),
         )
 
+    def test_user_with_id(self):
+        """Test that any user's information can be retrieved by id."""
+        self.instance.user_with_id(10)
+
+        self.session.get.assert_called_once_with(url_for('user/10'))
+
+    def test_user_with_id_requires_a_positive_id(self):
+        """Test that user_with_id requires a positive parameter."""
+        self.instance.user_with_id(-10)
+
+        assert self.session.get.called is False
+
+    def test_user_with_id_accepts_a_string(self):
+        """Test that any user's information can be retrieved by id."""
+        self.instance.user_with_id('10')
+
+        self.session.get.assert_called_once_with(url_for('user/10'))
+
 
 class TestGitHubIterators(UnitIteratorHelper):
     described_class = GitHub

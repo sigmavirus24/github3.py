@@ -1521,6 +1521,19 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'teams')
         return self._iter(int(number), url, Team, etag=etag)
 
+    def user_with_id(self, number):
+        """Get the user's information with id ``number``.
+
+        :param int number: the user's id number
+        :returns: :class:`User <github3.users.User>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('user', str(number))
+            json = self._json(self._get(url), 200)
+        return User(json, self) if json else None
+
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg
 
