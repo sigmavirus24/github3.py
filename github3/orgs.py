@@ -35,8 +35,7 @@ class Team(GitHubCore):
 
     """
 
-    def __init__(self, team, session=None):
-        super(Team, self).__init__(team, session)
+    def _update_attributes(self, team):
         self._api = team.get('url', '')
         #: This team's name.
         self.name = team.get('name')
@@ -56,9 +55,6 @@ class Team(GitHubCore):
 
     def _repr(self):
         return '<Team [{0}]>'.format(self.name)
-
-    def _update_(self, team):
-        self.__init__(team, self.session)
 
     @requires_auth
     def add_member(self, username):
@@ -101,7 +97,7 @@ class Team(GitHubCore):
             data = {'name': name, 'permission': permission}
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
             if json:
-                self._update_(json)
+                self._update_attributes(json)
                 return True
         return False
 
@@ -351,7 +347,7 @@ class Organization(BaseAccount):
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
