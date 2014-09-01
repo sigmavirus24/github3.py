@@ -29,8 +29,7 @@ class Hook(GitHubCore):
 
     See also: http://developer.github.com/v3/repos/hooks/
     """
-    def __init__(self, hook, session=None):
-        super(Hook, self).__init__(hook, session)
+    def _update_attributes(self, hook, session=None):
         self._api = hook.get('url', '')
         #: datetime object representing when this hook was last updated.
         self.updated_at = self._strptime(hook.get('updated_at'))
@@ -49,9 +48,6 @@ class Hook(GitHubCore):
 
     def _repr(self):
         return '<Hook [{0}]>'.format(self.name)
-
-    def _update_(self, hook):
-        self.__init__(hook, self.session)
 
     @requires_auth
     def delete(self):
@@ -90,7 +86,7 @@ class Hook(GitHubCore):
         json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
 
         return False

@@ -18,8 +18,7 @@ class Status(GitHubObject):
 
     See also: http://developer.github.com/v3/repos/statuses/
     """
-    def __init__(self, status):
-        super(Status, self).__init__(status)
+    def _update_attributes(self, status):
         #: datetime object representing the creation of the status object
         self.created_at = self._strptime(status.get('created_at'))
         #: :class:`User <github3.users.User>` who created the object

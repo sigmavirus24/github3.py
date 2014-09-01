@@ -10,8 +10,7 @@ class Branch(GitHubCore):
     returns about a branch on a
     :class:`Repository <github3.repos.repo.Repository>`.
     """
-    def __init__(self, branch, session=None):
-        super(Branch, self).__init__(branch, session)
+    def _update_attributes(self, branch):
         #: Name of the branch.
         self.name = branch.get('name')
         #: Returns the branch's

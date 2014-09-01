@@ -29,8 +29,8 @@ class RepoCommit(BaseCommit):
         c1.sha != c2.sha
 
     """
-    def __init__(self, commit, session=None):
-        super(RepoCommit, self).__init__(commit, session)
+    def _update_attributes(self, commit):
+        super(RepoCommit, self)._update_attributes(commit)
         #: :class:`User <github3.users.User>` who authored the commit.
         self.author = commit.get('author')
         if self.author:

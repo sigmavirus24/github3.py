@@ -32,8 +32,7 @@ class Contents(GitHubCore):
 
     See also: http://developer.github.com/v3/repos/contents/
     """
-    def __init__(self, content, session=None):
-        super(Contents, self).__init__(content, session)
+    def _update_attributes(self, content):
         # links
         self._api = content.get('url')
         #: Dictionary of links
@@ -146,7 +145,7 @@ class Contents(GitHubCore):
             self._remove_none(data)
             json = self._json(self._put(self._api, data=dumps(data)), 200)
             if 'content' in json and 'commit' in json:
-                self.__init__(json['content'], self)
+                self._update_attributes(json['content'])
                 json = Commit(json['commit'], self)
         return json
 

@@ -4,8 +4,7 @@ from github3.models import GitHubObject
 
 
 class PagesInfo(GitHubObject):
-    def __init__(self, info):
-        super(PagesInfo, self).__init__(info)
+    def _update_attributes(self, info):
         self._api = info.get('url')
 
         #: Status of the pages site, e.g., built
@@ -26,8 +25,7 @@ class PagesInfo(GitHubObject):
 
 
 class PagesBuild(GitHubObject):
-    def __init__(self, build):
-        super(PagesBuild, self).__init__(build)
+    def _update_attributes(self, build):
         self._api = build.get('url')
 
         #: Status of the pages build, e.g., building

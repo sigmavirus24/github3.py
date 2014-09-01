@@ -20,8 +20,7 @@ class Release(GitHubCore):
 
     CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
 
-    def __init__(self, release, session=None):
-        super(Release, self).__init__(release, session)
+    def _update_attributes(self, release):
         self._api = release.get('url')
         #: List of :class:`Asset <Asset>` objects for this release
         self.original_assets = [
@@ -114,7 +113,7 @@ class Release(GitHubCore):
         successful = self._boolean(r, 200, 404)
         if successful:
             # If the edit was successful, let's update the object.
-            self.__init__(r.json(), self)
+            self._update_attributes(r.json())
 
         return successful
 
@@ -141,8 +140,7 @@ class Release(GitHubCore):
 
 
 class Asset(GitHubCore):
-    def __init__(self, asset, session=None):
-        super(Asset, self).__init__(asset, session)
+    def _update_attributes(self, asset):
         self._api = asset.get('url')
         #: Content-Type provided when the asset was created
         self.content_type = asset.get('content_type')
@@ -217,6 +215,6 @@ class Asset(GitHubCore):
         )
         successful = self._boolean(r, 200, 404)
         if successful:
-            self.__init__(r.json(), self)
+            self._update_attributes(r.json())
 
         return successful

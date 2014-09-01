@@ -58,8 +58,7 @@ class Repository(GitHubCore):
 
     """
 
-    def __init__(self, repo, session=None):
-        super(Repository, self).__init__(repo, session)
+    def _update_attributes(self, repo):
         #: URL used to clone via HTTPS.
         self.clone_url = repo.get('clone_url', '')
         #: ``datetime`` object representing when the Repository was created.
@@ -296,9 +295,6 @@ class Repository(GitHubCore):
 
     def __str__(self):
         return self.full_name
-
-    def _update_(self, repo):
-        self.__init__(repo, self.session)
 
     def _create_pull(self, data):
         self._remove_none(data)
@@ -1162,7 +1158,7 @@ class Repository(GitHubCore):
         json = None
         if edit:
             json = self._json(self._patch(self._api, data=dumps(edit)), 200)
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 

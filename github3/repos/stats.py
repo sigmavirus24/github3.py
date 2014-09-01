@@ -24,10 +24,9 @@ class ContributorStats(GitHubCore):
 
     """
 
-    def __init__(self, stats_object, session=None):
-        super(ContributorStats, self).__init__(stats_object, session)
+    def _update_attributes(self, stats_object):
         #: Contributor in particular that this relates to
-        self.author = User(stats_object.get('author', {}), session)
+        self.author = User(stats_object.get('author', {}), self)
         #: Total number of commits authored by ``author``.
         self.total = stats_object.get('total')
         #: List of weekly dictionaries.

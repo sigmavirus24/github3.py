@@ -28,8 +28,8 @@ class RepoComment(BaseComment):
         c1.id != c2.id
 
     """
-    def __init__(self, comment, session=None):
-        super(RepoComment, self).__init__(comment, session)
+    def _update_attributes(self, comment):
+        super(RepoComment, self)._update_attributes(comment)
         #: Commit id on which the comment was made.
         self.commit_id = comment.get('commit_id')
         #: URL of the comment on GitHub.
@@ -52,10 +52,6 @@ class RepoComment(BaseComment):
             self.commit_id[:7], self.user.login or ''
         )
 
-    def _update_(self, comment):
-        super(RepoComment, self)._update_(comment)
-        self.__init__(comment, self.session)
-
     @requires_auth
     def update(self, body):
         """Update this comment.
@@ -68,6 +64,6 @@ class RepoComment(BaseComment):
             json = self._json(self._post(self._api, data={'body': body}), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
