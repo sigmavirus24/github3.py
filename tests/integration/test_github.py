@@ -192,6 +192,15 @@ class TestGitHub(IntegrationHelper):
             for t in self.gh.user_teams():
                 assert isinstance(t, github3.orgs.Team)
 
+    def test_me(self):
+        """Test the ability to retrieve the authenticated user's info."""
+        self.basic_login()
+        cassette_name = self.cassette_name('me')
+        with self.recorder.use_cassette(cassette_name):
+            me = self.gh.me()
+
+        assert isinstance(me, github3.users.User)
+
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses."""
         cassette_name = self.cassette_name('meta')
