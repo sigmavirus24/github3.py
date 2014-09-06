@@ -54,6 +54,25 @@ class TestGitHub(UnitHelper):
             auth=('client-id', 'client-secret')
         )
 
+    def test_create_gist(self):
+        """Test the request to create a gist."""
+        self.instance.create_gist('description', {
+            'example.py': {'content': '# example contents'}
+        })
+
+        self.post_called_with(
+            url_for('gists'),
+            data={
+                'description': 'description',
+                'files': {
+                    'example.py': {
+                        'content': '# example contents'
+                    }
+                },
+                'public': True,
+            }
+        )
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
