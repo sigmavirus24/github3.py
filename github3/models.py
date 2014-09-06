@@ -142,7 +142,7 @@ class GitHubCore(GitHubObject):
 
     def _instance_or_null(self, instance_class, json):
         if json is None:
-            return NullObject(str(instance_class))
+            return NullObject(instance_class.__name__)
         try:
             return instance_class(json, self)
         except TypeError:  # instance_class is not a subclass of GitHubCore
