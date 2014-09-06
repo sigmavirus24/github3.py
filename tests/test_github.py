@@ -18,13 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_create_gist(self):
-        self.response('gist', 201)
-
-        g = self.g.create_gist('description', 'files')
-        assert isinstance(g, github3.gists.Gist)
-        assert self.request.called is True
-
     def test_create_issue(self):
         self.response('issue', 201)
 
