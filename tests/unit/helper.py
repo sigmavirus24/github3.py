@@ -155,7 +155,7 @@ class UnitIteratorHelper(UnitHelper):
         # Retrieve a mocked session object
         session = super(UnitIteratorHelper, self).create_mocked_session(*args)
         # Initialize a NullObject which has magical properties
-        null = github3.structs.NullObject()
+        null = github3.null.NullObject()
         # Set it as the return value for every method
         session.delete.return_value = null
         session.get.return_value = null

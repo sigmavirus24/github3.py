@@ -15,6 +15,7 @@ from logging import getLogger
 
 from github3.decorators import requires_auth
 from github3.exceptions import error_for
+from github3.null import NullObject
 from github3.session import GitHubSession
 from github3.utils import UTC
 
@@ -138,6 +139,14 @@ class GitHubCore(GitHubObject):
         for (k, v) in list(data.items()):
             if v is None:
                 del(data[k])
+
+    def _instance_or_null(self, instance_class, json):
+        if json is None:
+            return NullObject(str(instance_class))
+        try:
+            return instance_class(json, self)
+        except TypeError:  # instance_class is not a subclass of GitHubCore
+            return instance_class(json)
 
     def _json(self, response, status_code):
         ret = None
