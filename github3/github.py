@@ -124,7 +124,7 @@ class GitHub(GitHubCore):
         if int(id_num) > 0:
             url = self._build_url('authorizations', str(id_num))
             json = self._json(self._get(url), 200)
-        return Authorization(json, self) if json else None
+        return self._instance_or_null(Authorization, json)
 
     @requires_basic_auth
     def authorizations(self, number=-1, etag=None):
@@ -171,7 +171,7 @@ class GitHub(GitHubCore):
             with self.session.temporary_basic_auth(username, password):
                 json = self._json(self._post(url, data=data), 201)
 
-        return Authorization(json, self) if json else None
+        return self._instance_or_null(Authorization, json)
 
     def check_authorization(self, access_token):
         """Check an authorization created by a registered application.
