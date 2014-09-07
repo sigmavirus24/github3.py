@@ -218,7 +218,15 @@ class GitHub(GitHubCore):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
-        body, assignee, milestone, labels are all optional.
+        ``body``, ``assignee``, ``milestone``, ``labels`` are all optional.
+
+        .. warning::
+
+            This method retrieves the repository first and then uses it to
+            create an issue. If you're making several issues, you should use
+            :py:meth:`repository <github3.github.GitHub.repository>` and then
+            use :py:meth:`create_issue
+            <github3.repos.repo.Repository.create_issue>`
 
         :param str owner: (required), login of the owner
         :param str repository: (required), repository name
@@ -232,19 +240,24 @@ class GitHub(GitHubCore):
             <github3.issues.Milestone>` object, ``m.number`` is what you pass
             here.)
         :param list labels: (optional), List of label names.
-        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
-            None
+        :returns: :class:`Issue <github3.issues.Issue>` if successful
         """
         repo = None
         if owner and repository and title:
             repo = self.repository(owner, repository)
 
-        if repo:
+        # repo can be None or a NullObject.
+        # If repo is None, than one of owner, repository, or title were
+        # False-y. If repo is a NullObject then owner/repository 404's.
+
+        if repo is not None:
+            # If repo is a NullObject then that's most likely because the
+            # repository was not found (404). In that case, calling the
+            # create_issue method will still return <NullObject('Repository')>
+            # which will ideally help the user understand what went wrong.
             return repo.create_issue(title, body, assignee, milestone, labels)
 
-        # Regardless, something went wrong. We were unable to create the
-        # issue
-        return None
+        return self._instance_or_null(Issue, None)
 
     @requires_auth
     def create_key(self, title, key):
