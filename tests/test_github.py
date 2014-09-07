@@ -18,26 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_create_issue(self):
-        self.response('issue', 201)
-
-        self.login()
-        i = self.g.create_issue(None, None, None)
-        assert i is None
-        assert self.request.called is False
-
-        i = self.g.create_issue('user', 'repo', '')
-        assert i is None
-        assert self.request.called is False
-
-        with mock.patch.object(github3.GitHub, 'repository') as repo:
-            repo.return_value = github3.repos.Repository(
-                load('repo'), self.g)
-            i = self.g.create_issue('user', 'repo', 'Title')
-
-        assert isinstance(i, github3.issues.Issue)
-        assert self.request.called is True
-
     def test_create_key(self):
         self.response('key', 201)
 
