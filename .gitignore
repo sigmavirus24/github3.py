@@ -15,4 +15,4 @@ venv*/
 build/
 *.egg
 .env
-*.ropeproject/
+.ipynb_checkpoints
