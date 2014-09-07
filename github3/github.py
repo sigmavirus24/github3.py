@@ -210,7 +210,7 @@ class GitHub(GitHubCore):
                     'files': files}
         url = self._build_url('gists')
         json = self._json(self._post(url, data=new_gist), 201)
-        return Gist(json, self) if json else None
+        return self._instance_or_null(Gist, json)
 
     @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
