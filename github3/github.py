@@ -268,15 +268,13 @@ class GitHub(GitHubCore):
             or file-like object
         :returns: :class:`Key <github3.users.Key>`
         """
-        created = None
+        json = None
 
         if title and key:
             url = self._build_url('user', 'keys')
             req = self._post(url, data={'title': title, 'key': key})
             json = self._json(req, 201)
-            if json:
-                created = Key(json, self)
-        return created
+        return self._instance_or_null(Key, json)
 
     @requires_auth
     def create_repo(self, name, description='', homepage='', private=False,

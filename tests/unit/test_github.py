@@ -73,6 +73,30 @@ class TestGitHub(UnitHelper):
             }
         )
 
+    def test_create_key(self):
+        """Test the request to create a key."""
+        self.instance.create_key('key_name', 'key text')
+
+        self.post_called_with(
+            url_for('user/keys'),
+            data={
+                'title': 'key_name',
+                'key': 'key text'
+            }
+        )
+
+    def test_create_key_requires_a_key(self):
+        """Test that no request is made with an empty key."""
+        self.instance.create_key('title', '')
+
+        assert self.session.post.called is False
+
+    def test_create_key_requires_a_title(self):
+        """Test that no request is made with an empty title."""
+        self.instance.create_key('', 'key text')
+
+        assert self.session.post.called is False
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
@@ -709,6 +733,16 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that GitHub#me requires authentication."""
         with pytest.raises(AuthenticationFailed):
             self.instance.me()
+
+    def test_create_issue(self):
+        """Show that GitHub#create_issue requires auth."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.create_issue('owner', 'repo', 'title')
+
+    def test_create_key(self):
+        """Show that GitHub#create_key requires auth."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.create_key('title', 'key')
 
 
 class TestGitHubAuthorizations(UnitHelper):

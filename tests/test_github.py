@@ -18,20 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_create_key(self):
-        self.response('key', 201)
-
-        self.assertRaises(github3.GitHubError, self.g.create_key, None, None)
-#            k = self.g.create_key(None, None)
-#            assert k is None
-        assert self.request.called is False
-
-        self.login()
-        k = self.g.create_key('Name', 'Key')
-
-        assert isinstance(k, github3.users.Key)
-        assert self.request.called is True
-
     def test_create_repo(self):
         self.response('repo', 201)
         self.login()
