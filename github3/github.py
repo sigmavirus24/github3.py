@@ -277,9 +277,10 @@ class GitHub(GitHubCore):
         return self._instance_or_null(Key, json)
 
     @requires_auth
-    def create_repo(self, name, description='', homepage='', private=False,
-                    has_issues=True, has_wiki=True, has_downloads=True,
-                    auto_init=False, gitignore_template=''):
+    def create_repository(self, name, description='', homepage='',
+                          private=False, has_issues=True, has_wiki=True,
+                          has_downloads=True, auto_init=False,
+                          gitignore_template=''):
         """Create a repository for the authenticated user.
 
         :param str name: (required), name of the repository
@@ -307,7 +308,7 @@ class GitHub(GitHubCore):
                 'has_downloads': has_downloads, 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
         json = self._json(self._post(url, data=data), 201)
-        return Repository(json, self) if json else None
+        return self._instance_or_null(Repository, json)
 
     @requires_auth
     def delete_key(self, key_id):

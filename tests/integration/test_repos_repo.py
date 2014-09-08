@@ -139,6 +139,15 @@ class TestRepository(IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_delete(self):
+        """Test that a repository can be deleted."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'my-new-repo')
+            assert repository is not None
+            assert repository.delete() is True
+
     def test_deployments(self):
         """Test that a repository's deployments may be retrieved."""
         cassette_name = self.cassette_name('deployments')

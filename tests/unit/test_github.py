@@ -97,6 +97,25 @@ class TestGitHub(UnitHelper):
 
         assert self.session.post.called is False
 
+    def test_create_repository(self):
+        """Test the request to create a repository."""
+        self.instance.create_repository('repo-name')
+
+        self.post_called_with(
+            url_for('user/repos'),
+            data={
+                'name': 'repo-name',
+                'description': '',
+                'homepage': '',
+                'private': False,
+                'has_issues': True,
+                'has_wiki': True,
+                'has_downloads': True,
+                'auto_init': False,
+                'gitignore_template': ''
+            }
+        )
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()

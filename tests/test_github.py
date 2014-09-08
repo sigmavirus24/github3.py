@@ -18,13 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_create_repo(self):
-        self.response('repo', 201)
-        self.login()
-        r = self.g.create_repo('Repository')
-        assert isinstance(r, github3.repos.Repository)
-        assert self.request.called is True
-
     def test_delete_key(self):
         self.response(None, 204)
 

@@ -178,6 +178,8 @@ Old name                                      New name
 
   - ``GitHub#is_subscribed``
 
+- Rename ``GitHub#create_repo`` to ``GitHub#create_repository``
+
 - ``Repository#set_subscription`` was split into two simpler functions
 
   - ``Repository#subscribe`` subscribes the authenticated user to the 

@@ -74,6 +74,17 @@ class TestGitHub(IntegrationHelper):
         assert k.title == 'Key name'
         assert k.key == SSH_KEY
 
+    def test_create_repository(self):
+        """Show an authenticated user can create a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_repository')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.create_repository('my-new-repo',
+                                          description='Test repo creation')
+
+        assert isinstance(r, github3.repos.Repository)
+        assert str(r) == 'sigmavirus24/my-new-repo'
+
     def test_emojis(self):
         """Test the ability to retrieve from /emojis."""
         cassette_name = self.cassette_name('emojis')
