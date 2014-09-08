@@ -18,18 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_follow(self):
-        self.response(None, 204)
-        self.put('https://api.github.com/user/following/sigmavirus24')
-        self.conf = {'data': None}
-
-        self.assertRaises(github3.GitHubError, self.g.follow, 'sigmavirus24')
-
-        self.login()
-        assert self.g.follow(None) is False
-        assert self.g.follow('sigmavirus24') is True
-        self.mock_assertions()
-
     def test_gist(self):
         self.response('gist', 200)
         self.get('https://api.github.com/gists/10')

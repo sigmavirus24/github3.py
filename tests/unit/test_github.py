@@ -115,6 +115,20 @@ class TestGitHub(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('emojis'))
 
+    def test_follow(self):
+        """Test the request to follow a user."""
+        self.instance.follow('username')
+
+        self.session.put.assert_called_once_with(
+            url_for('user/following/username')
+        )
+
+    def test_follow_requires_a_username(self):
+        """Test that GitHub#follow requires a username."""
+        self.instance.follow(None)
+
+        assert self.session.put.called is False
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
@@ -706,6 +720,11 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that one needs to authenticate to use #emails."""
         with pytest.raises(AuthenticationFailed):
             self.instance.emails()
+
+    def test_follow(self):
+        """Show that one needs to authenticate to use #follow."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.follow('foo')
 
     def test_gists(self):
         """Show that one needs to authenticate to use #gists."""
