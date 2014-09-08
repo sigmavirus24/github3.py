@@ -170,7 +170,7 @@ Old name                                      New name
 
   - ``GitHub#me`` which retrieves the authenticated user's information
 
-- Remove legacy watching API:
+- The legacy watching API has been removed:
 
   - ``GitHub#subscribe``
 
@@ -178,7 +178,10 @@ Old name                                      New name
 
   - ``GitHub#is_subscribed``
 
-- Rename ``GitHub#create_repo`` to ``GitHub#create_repository``
+- ``GitHub#create_repo`` was renamed to ``GitHub#create_repository``
+
+- ``GitHub#delete_key`` was removed. To delete a key retrieve it with
+  ``GitHub#key`` and then call ``Key#delete``.
 
 - ``Repository#set_subscription`` was split into two simpler functions
 

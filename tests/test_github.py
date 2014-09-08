@@ -18,18 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_delete_key(self):
-        self.response(None, 204)
-
-        self.login()
-        with mock.patch.object(github3.github.GitHub, 'key') as key:
-            key.return_value = github3.users.Key(load('key'), self.g)
-            assert self.g.delete_key(10) is True
-            key.return_value = None
-            assert self.g.delete_key(10) is False
-
-        assert self.request.called is True
-
     def test_follow(self):
         self.response(None, 204)
         self.put('https://api.github.com/user/following/sigmavirus24')

@@ -311,18 +311,6 @@ class GitHub(GitHubCore):
         return self._instance_or_null(Repository, json)
 
     @requires_auth
-    def delete_key(self, key_id):
-        """Delete user key pointed to by ``key_id``.
-
-        :param int key_id: (required), unique id used by Github
-        :returns: bool
-        """
-        key = self.key(key_id)
-        if key:
-            return key.delete()
-        return False  # (No coverage)
-
-    @requires_auth
     def emails(self, number=-1, etag=None):
         """Iterate over email addresses for the authenticated user.
 
