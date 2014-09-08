@@ -109,6 +109,12 @@ class TestGitHub(UnitHelper):
             }
         )
 
+    def test_emojis(self):
+        """Test the request to retrieve GitHub's emojis."""
+        self.instance.emojis()
+
+        self.session.get.assert_called_once_with(url_for('emojis'))
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
