@@ -23,13 +23,6 @@ class TestGitHub(UnitHelper):
             url_for('authorizations/10'),
         )
 
-    def test_authorization_requires_auth(self):
-        """A user must be authenticated to retrieve an authorization."""
-        self.session.auth = None
-
-        with pytest.raises(GitHubError):
-            self.instance.authorization(1)
-
     def test_authorize(self):
         """Show an authorization can be created for a user."""
         self.instance.authorize('username', 'password', ['user', 'repo'])
@@ -273,12 +266,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_authorizations_requires_auth(self):
-        """Show that one needs to authenticate to use #authorizations."""
-        self.session.auth = None
-        with pytest.raises(GitHubError):
-            self.instance.authorizations()
-
     def test_emails(self):
         """Show that an authenticated user can iterate over their emails."""
         i = self.instance.emails()
@@ -370,12 +357,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_gists_requires_auth(self):
-        """Show that one needs to authenticate to use #gists."""
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.gists()
-
     def test_gists_by(self):
         """Show that an user's gists can be iterated over."""
         i = self.instance.gists_by('sigmavirus24')
@@ -415,12 +396,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_issues_requires_auth(self):
-        """Show that one needs to authenticate to use #issues."""
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.issues()
-
     def test_keys(self):
         """
         Show that an authenticated user can iterate over their public keys.
@@ -433,12 +408,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
-
-    def test_keys_requires_auth(self):
-        """Show that one needs to authenticate to use #keys."""
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.keys()
 
     def test_notifications(self):
         """
@@ -475,12 +444,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_notifications_requires_auth(self):
-        """Show that one needs to authenticate to use #gists."""
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.notifications()
-
     def test_organization_issues(self):
         """Show that one can iterate over an organization's issues."""
         i = self.instance.organization_issues('org')
@@ -509,13 +472,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_organization_issues_requires_auth(self):
-        """Show that one needs to authenticate to use #organization_issues."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.organization_issues('org')
-
     def test_organizations(self):
         """
         Show that one can iterate over all of the authenticated user's orgs.
@@ -528,13 +484,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
-
-    def test_organizations_requires_auth(self):
-        """Show that one needs to authenticate to use #organizations."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.organizations()
 
     def test_organizations_with(self):
         """Show that one can iterate over all of a user's orgs."""
@@ -585,13 +534,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_repositories_requires_auth(self):
-        """Show that one needs to authenticate to use #repositories."""
-        self.session.has_auth.return_value = False
-
-        with pytest.raises(GitHubError):
-            self.instance.repositories()
-
     def test_issues_on(self):
         """Show that a user can iterate over a repository's issues."""
         i = self.instance.issues_on('owner', 'repo')
@@ -630,12 +572,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
-
-    def test_starred_requires_auth(self):
-        """Show that one needs to authenticate to use #starred."""
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.starred()
 
     def test_starred_by(self):
         """Show that one can iterate over a user's stars."""
@@ -683,14 +619,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
-
-    def test_user_issues_requires_auth(self):
-        """
-        Test that one must authenticate to interate over a user's issues.
-        """
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.user_issues()
 
     def test_user_issues_with_parameters(self):
         """Test that one may pass parameters to GitHub#user_issues."""
@@ -746,12 +674,18 @@ class TestGitHubRequiresAuthentication(UnitHelper):
 
     def after_setup(self):
         """Disable authentication on the session."""
+        self.session.auth = None
         self.session.has_auth.return_value = False
 
-    def test_me(self):
-        """Show that GitHub#me requires authentication."""
+    def test_authorization(self):
+        """A user must be authenticated to retrieve an authorization."""
         with pytest.raises(AuthenticationFailed):
-            self.instance.me()
+            self.instance.authorization(1)
+
+    def test_authorizations(self):
+        """Show that one needs to authenticate to use #authorizations."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.authorizations()
 
     def test_create_issue(self):
         """Show that GitHub#create_issue requires auth."""
@@ -762,6 +696,61 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that GitHub#create_key requires auth."""
         with pytest.raises(AuthenticationFailed):
             self.instance.create_key('title', 'key')
+
+    def test_create_repository(self):
+        """Show that GitHub#create_repository requires auth."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.create_repository('repo')
+
+    def test_gists(self):
+        """Show that one needs to authenticate to use #gists."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.gists()
+
+    def test_issues(self):
+        """Show that one needs to authenticate to use #issues."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.issues()
+
+    def test_keys(self):
+        """Show that one needs to authenticate to use #keys."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.keys()
+
+    def test_me(self):
+        """Show that GitHub#me requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.me()
+
+    def test_notifications(self):
+        """Show that one needs to authenticate to use #gists."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.notifications()
+
+    def test_organization_issues(self):
+        """Show that one needs to authenticate to use #organization_issues."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.organization_issues('org')
+
+    def test_organizations(self):
+        """Show that one needs to authenticate to use #organizations."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.organizations()
+
+    def test_repositories(self):
+        """Show that one needs to authenticate to use #repositories."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.repositories()
+
+    def test_starred(self):
+        """Show that one needs to authenticate to use #starred."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.starred()
+
+    def test_user_issues(self):
+        """Show that GitHub#user_issues requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.user_issues()
 
 
 class TestGitHubAuthorizations(UnitHelper):
