@@ -277,12 +277,6 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
-    def test_emails_require_auth(self):
-        """Show that one needs to authenticate to use #emails."""
-        self.session.has_auth.return_value = False
-        with pytest.raises(GitHubError):
-            self.instance.emails()
-
     def test_followers(self):
         """
         Show that an authenticated user can iterate over their followers.
@@ -701,6 +695,11 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that GitHub#create_repository requires auth."""
         with pytest.raises(AuthenticationFailed):
             self.instance.create_repository('repo')
+
+    def test_emails(self):
+        """Show that one needs to authenticate to use #emails."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.emails()
 
     def test_gists(self):
         """Show that one needs to authenticate to use #gists."""
