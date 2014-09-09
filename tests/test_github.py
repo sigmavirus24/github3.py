@@ -18,13 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_gist(self):
-        self.response('gist', 200)
-        self.get('https://api.github.com/gists/10')
-
-        assert isinstance(self.g.gist(10), github3.gists.Gist)
-        self.mock_assertions()
-
     def test_gitignore_template(self):
         self.response('template')
         self.get('https://api.github.com/gitignore/templates/Python')

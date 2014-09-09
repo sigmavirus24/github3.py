@@ -442,14 +442,14 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, User, etag=etag)
 
     def gist(self, id_num):
-        """Gets the gist using the specified id number.
+        """Retrieve the gist using the specified id number.
 
         :param int id_num: (required), unique id of the gist
         :returns: :class:`Gist <github3.gists.Gist>`
         """
         url = self._build_url('gists', str(id_num))
         json = self._json(self._get(url), 200)
-        return Gist(json, self) if json else None
+        return self._instance_or_null(Gist, json)
 
     @requires_auth
     def gists(self, number=-1, etag=None):

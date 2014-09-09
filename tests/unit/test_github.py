@@ -128,6 +128,12 @@ class TestGitHub(UnitHelper):
 
         assert self.session.put.called is False
 
+    def test_gist(self):
+        """Test the request to retrieve a specific gist."""
+        self.instance.gist(10)
+
+        self.session.get.assert_called_once_with(url_for('gists/10'))
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
