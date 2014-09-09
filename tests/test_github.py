@@ -18,15 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_gitignore_template(self):
-        self.response('template')
-        self.get('https://api.github.com/gitignore/templates/Python')
-
-        template = self.g.gitignore_template('Python')
-
-        assert template.startswith('*.py[cod]')
-        self.mock_assertions()
-
     def test_gitignore_templates(self):
         self.response('templates')
         self.get('https://api.github.com/gitignore/templates')

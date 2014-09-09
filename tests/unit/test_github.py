@@ -134,6 +134,14 @@ class TestGitHub(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('gists/10'))
 
+    def test_gitignore_template(self):
+        """Test the request to retrieve a gitignore template."""
+        self.instance.gitignore_template('Python')
+
+        self.session.get.assert_called_once_with(
+            url_for('gitignore/templates/Python')
+        )
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()

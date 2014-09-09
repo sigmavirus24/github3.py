@@ -482,7 +482,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Gist, etag=etag)
 
     def gitignore_template(self, language):
-        """Returns the template for language.
+        """Return the template for language.
 
         :returns: str
         """
