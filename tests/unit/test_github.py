@@ -158,6 +158,26 @@ class TestGitHub(UnitHelper):
             url_for('user/following/username')
         )
 
+    def test_is_starred(self):
+        """Test the request to check if the user starred a repository."""
+        self.instance.is_starred('username', 'repository')
+
+        self.session.get.assert_called_once_with(
+            url_for('user/starred/username/repository')
+        )
+
+    def test_is_starred_requires_an_owner(self):
+        """Test that GitHub#is_starred requires an owner."""
+        self.instance.is_starred(None, 'repo')
+
+        assert self.session.get.called is False
+
+    def test_is_starred_requires_a_repo(self):
+        """Test that GitHub#is_starred requires an repo."""
+        self.instance.is_starred('username', None)
+
+        assert self.session.get.called is False
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
@@ -764,6 +784,11 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that GitHub#is_following requires authentication."""
         with pytest.raises(AuthenticationFailed):
             self.instance.is_following('foo')
+
+    def test_is_starred(self):
+        """Show that GitHub#is_starred requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.is_starred('foo', 'bar')
 
     def test_issues(self):
         """Show that one needs to authenticate to use #issues."""

@@ -18,21 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_is_starred(self):
-        self.response(None, 204)
-        self.get('https://api.github.com/user/starred/user/repo')
-
-        self.assertRaises(github3.GitHubError, self.g.is_starred,
-                          'user', 'repo')
-
-        self.login()
-
-        assert self.g.is_starred(None, None) is False
-        assert self.request.called is False
-
-        assert self.g.is_starred('user', 'repo') is True
-        self.mock_assertions()
-
     def test_issue(self):
         self.response('issue', 200)
         self.get('https://api.github.com/repos/sigmavirus24/github3.py/'

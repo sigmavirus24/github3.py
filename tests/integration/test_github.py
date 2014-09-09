@@ -154,6 +154,13 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             assert self.gh.is_following('lukasa') is True
 
+    def test_is_starred(self):
+        """Test the ability to check if a user starred a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('is_starred')
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.is_starred('lukasa', 'mkcert') is True
+
     def test_issue(self):
         """Test the ability to retrieve a single issue."""
         cassette_name = self.cassette_name('issue')
