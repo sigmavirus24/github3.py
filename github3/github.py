@@ -279,8 +279,7 @@ class GitHub(GitHubCore):
     @requires_auth
     def create_repository(self, name, description='', homepage='',
                           private=False, has_issues=True, has_wiki=True,
-                          has_downloads=True, auto_init=False,
-                          gitignore_template=''):
+                          auto_init=False, gitignore_template=''):
         """Create a repository for the authenticated user.
 
         :param str name: (required), name of the repository
@@ -292,8 +291,6 @@ class GitHub(GitHubCore):
             issues for this repository. API default: ``True``
         :param bool has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :param bool has_downloads: (optional), If ``True``, enable
-            downloads for this repository. API default: ``True``
         :param bool auto_init: (optional), auto initialize the repository
         :param str gitignore_template: (optional), name of the git template to
             use; ignored if auto_init = False.
@@ -305,7 +302,7 @@ class GitHub(GitHubCore):
         data = {'name': name, 'description': description,
                 'homepage': homepage, 'private': private,
                 'has_issues': has_issues, 'has_wiki': has_wiki,
-                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(Repository, json)

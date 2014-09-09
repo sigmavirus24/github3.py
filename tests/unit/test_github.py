@@ -103,7 +103,6 @@ class TestGitHub(UnitHelper):
                 'private': False,
                 'has_issues': True,
                 'has_wiki': True,
-                'has_downloads': True,
                 'auto_init': False,
                 'gitignore_template': ''
             }
