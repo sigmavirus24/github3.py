@@ -18,26 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_gitignore_templates(self):
-        self.response('templates')
-        self.get('https://api.github.com/gitignore/templates')
-
-        assert isinstance(self.g.gitignore_templates(), list)
-        self.mock_assertions()
-
-    def test_is_following(self):
-        self.response(None, 204)
-        self.get('https://api.github.com/user/following/login')
-
-        self.assertRaises(github3.GitHubError, self.g.is_following, 'login')
-
-        self.login()
-        assert self.g.is_following(None) is False
-        assert self.request.called is False
-
-        assert self.g.is_following('login')
-        self.mock_assertions()
-
     def test_is_starred(self):
         self.response(None, 204)
         self.get('https://api.github.com/user/starred/user/repo')

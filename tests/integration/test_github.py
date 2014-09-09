@@ -147,6 +147,13 @@ class TestGitHub(IntegrationHelper):
         assert l != []
         assert isinstance(l, list)
 
+    def test_is_following(self):
+        """Test the ability to check if a user is being followed."""
+        self.basic_login()
+        cassette_name = self.cassette_name('is_following')
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.is_following('lukasa') is True
+
     def test_issue(self):
         """Test the ability to retrieve a single issue."""
         cassette_name = self.cassette_name('issue')

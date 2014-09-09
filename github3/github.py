@@ -493,7 +493,7 @@ class GitHub(GitHubCore):
         return json.get('source', '')
 
     def gitignore_templates(self):
-        """Returns the list of available templates.
+        """Return the list of available templates.
 
         :returns: list of template names
         """

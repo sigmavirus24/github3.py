@@ -142,6 +142,22 @@ class TestGitHub(UnitHelper):
             url_for('gitignore/templates/Python')
         )
 
+    def test_gitignore_templates(self):
+        """Test the request to retrieve gitignore templates."""
+        self.instance.gitignore_templates()
+
+        self.session.get.assert_called_once_with(
+            url_for('gitignore/templates')
+        )
+
+    def test_is_following(self):
+        """Test the request to check if the user is following a user."""
+        self.instance.is_following('username')
+
+        self.session.get.assert_called_once_with(
+            url_for('user/following/username')
+        )
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
@@ -743,6 +759,11 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that one needs to authenticate to use #gists."""
         with pytest.raises(AuthenticationFailed):
             self.instance.gists()
+
+    def test_is_following(self):
+        """Show that GitHub#is_following requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.is_following('foo')
 
     def test_issues(self):
         """Show that one needs to authenticate to use #issues."""
