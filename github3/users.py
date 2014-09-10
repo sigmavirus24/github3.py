@@ -53,6 +53,11 @@ class Key(GitHubCore):
     def update(self, title, key):
         """Update this key.
 
+        .. warning::
+
+            As of 20 June 2014, the API considers keys to be immutable.
+            This will soon begin to return MethodNotAllowed errors.
+
         :param str title: (required), title of the key
         :param str key: (required), text of the key file
         :returns: bool
