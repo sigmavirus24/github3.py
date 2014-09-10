@@ -529,17 +529,19 @@ class GitHub(GitHubCore):
         return json
 
     def issue(self, username, repository, number):
-        """Fetch issue #:number: from https://github.com/:owner:/:repository:
+        """Fetch issue from owner/repository.
 
         :param str username: (required), owner of the repository
         :param str repository: (required), name of the repository
         :param int number: (required), issue number
         :return: :class:`Issue <github3.issues.Issue>`
         """
-        repo = self.repository(username, repository)
-        if repo:
-            return repo.issue(number)
-        return None
+        json = None
+        if username and repository and int(number) > 0:
+            url = self._build_url('repos', username, repository, 'issues',
+                                  str(number))
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(Issue, json)
 
     @requires_auth
     def issues(self, filter='', state='', labels='', sort='', direction='',

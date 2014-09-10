@@ -18,19 +18,6 @@ class TestGitHub(BaseCase):
         g = github3.GitHub(token='foo')
         assert repr(g).endswith('{0:x}>'.format(id(g)))
 
-    def test_issue(self):
-        self.response('issue', 200)
-        self.get('https://api.github.com/repos/sigmavirus24/github3.py/'
-                 'issues/1')
-
-        assert self.g.issue(None, None, 0) is None
-        with mock.patch.object(github3.github.GitHub, 'repository') as repo:
-            repo.return_value = github3.repos.Repository(load('repo'))
-            i = self.g.issue('user', 'repo', 1)
-
-        assert isinstance(i, github3.issues.Issue)
-        self.mock_assertions()
-
     def test_key(self):
         self.response('key')
         self.get('https://api.github.com/user/keys/10')

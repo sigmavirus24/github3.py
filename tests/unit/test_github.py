@@ -178,6 +178,32 @@ class TestGitHub(UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_issue(self):
+        """Test the request to retrieve a single issue."""
+        self.instance.issue('owner', 'repo', 1)
+
+        self.session.get.assert_called_once_with(
+            url_for('repos/owner/repo/issues/1')
+        )
+
+    def test_issue_requires_username(self):
+        """Test GitHub#issue requires a non-None username."""
+        self.instance.issue(None, 'foo', 1)
+
+        assert self.session.get.called is False
+
+    def test_issue_requires_repository(self):
+        """Test GitHub#issue requires a non-None repository."""
+        self.instance.issue('foo', None, 1)
+
+        assert self.session.get.called is False
+
+    def test_issue_requires_positive_issue_id(self):
+        """Test GitHub#issue requires positive issue id."""
+        self.instance.issue('foo', 'bar', -1)
+
+        assert self.session.get.called is False
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
