@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 
 from re import match
 from json import dumps
-from github3.decorators import requires_auth
-from github3.issues.comment import IssueComment
-from github3.issues.event import IssueEvent
-from github3.issues.label import Label
-from github3.issues.milestone import Milestone
-from github3.models import GitHubCore
-from github3.users import User
+from ..decorators import requires_auth
+from .comment import IssueComment
+from .event import IssueEvent
+from .label import Label
+from .milestone import Milestone
+from ..models import GitHubCore
+from ..users import User
 from uritemplate import URITemplate
 
 

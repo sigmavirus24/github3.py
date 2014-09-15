@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from github3.models import GitHubObject
+from ..models import GitHubObject
 
 
 class PagesInfo(GitHubObject):
@@ -34,7 +34,7 @@ class PagesBuild(GitHubObject):
         #: Error dictionary containing the error message
         self.error = build.get('error')
 
-        from github3.users import User
+        from ..users import User
         #: :class:`User <github3.users.User>` representing who pushed the
         #: commit
         self.pusher = User(build.get('pusher'))

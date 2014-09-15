@@ -8,20 +8,20 @@ This module contains the main GitHub session object.
 """
 from __future__ import unicode_literals
 
-from github3.auths import Authorization
-from github3.decorators import (requires_auth, requires_basic_auth,
+from .auths import Authorization
+from .decorators import (requires_auth, requires_basic_auth,
                                 requires_app_credentials)
-from github3.events import Event
-from github3.gists import Gist
-from github3.issues import Issue, issue_params
-from github3.models import GitHubCore
-from github3.orgs import Organization, Team
-from github3.repos.repo import Repository, repo_issue_params
-from github3.search import (CodeSearchResult, IssueSearchResult,
+from .events import Event
+from .gists import Gist
+from .issues import Issue, issue_params
+from .models import GitHubCore
+from .orgs import Organization, Team
+from .repos.repo import Repository, repo_issue_params
+from .search import (CodeSearchResult, IssueSearchResult,
                             RepositorySearchResult, UserSearchResult)
-from github3.structs import SearchIterator
-from github3.users import User, Key
-from github3.notifications import Thread
+from .structs import SearchIterator
+from .users import User, Key
+from .notifications import Thread
 from uritemplate import URITemplate
 
 

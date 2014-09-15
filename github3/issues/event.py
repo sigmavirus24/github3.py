@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from github3.models import GitHubCore
-from github3.users import User
+from ..models import GitHubCore
+from ..users import User
 
 
 class IssueEvent(GitHubCore):
@@ -35,7 +35,7 @@ class IssueEvent(GitHubCore):
         #: :class:`Issue <github3.issues.Issue>` where this comment was made.
         self.issue = event.get('issue')
         if self.issue:
-            from github3.issues import Issue
+            from .issue import Issue
             self.issue = Issue(self.issue, self)
 
         #: :class:`User <github3.users.User>` who caused this event.

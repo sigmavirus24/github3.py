@@ -9,11 +9,11 @@ This module contains all of the classes related to organizations.
 from __future__ import unicode_literals
 
 from json import dumps
-from github3.events import Event
-from github3.models import BaseAccount, GitHubCore
-from github3.repos import Repository
-from github3.users import User
-from github3.decorators import requires_auth
+from .events import Event
+from .models import BaseAccount, GitHubCore
+from .repos import Repository
+from .users import User
+from .decorators import requires_auth
 from uritemplate import URITemplate
 
 

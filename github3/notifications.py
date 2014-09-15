@@ -10,7 +10,7 @@ See also: http://developer.github.com/v3/activity/notifications/
 from __future__ import unicode_literals
 
 from json import dumps
-from github3.models import GitHubCore
+from .models import GitHubCore
 
 
 class Thread(GitHubCore):
@@ -38,7 +38,7 @@ class Thread(GitHubCore):
         #: Thread information
         self.thread = notif.get('thread', {})
 
-        from github3.repos import Repository
+        from .repos import Repository
         #: Repository the comment was made on
         self.repository = Repository(notif.get('repository', {}), self)
         #: When the thread was last updated

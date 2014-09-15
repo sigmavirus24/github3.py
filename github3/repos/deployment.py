@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from github3.models import GitHubCore
-from github3.users import User
+from ..models import GitHubCore
+from ..users import User
 
 
 class Deployment(GitHubCore):

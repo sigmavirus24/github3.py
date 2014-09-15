@@ -8,9 +8,9 @@ This module contains the RepoCommit class alone
 """
 from __future__ import unicode_literals
 
-from github3.git import Commit
-from github3.models import BaseCommit
-from github3.users import User
+from ..git import Commit
+from ..models import BaseCommit
+from ..users import User
 
 
 class RepoCommit(BaseCommit):
