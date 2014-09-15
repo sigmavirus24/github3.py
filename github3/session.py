@@ -2,7 +2,7 @@
 import requests
 
 from collections import Callable
-from github3 import __version__
+from . import __version__
 from logging import getLogger
 from contextlib import contextmanager
 

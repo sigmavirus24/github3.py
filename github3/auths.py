@@ -8,8 +8,8 @@ This module contains the Authorization object.
 """
 from __future__ import unicode_literals
 
-from github3.decorators import requires_basic_auth
-from github3.models import GitHubCore
+from .decorators import requires_basic_auth
+from .models import GitHubCore
 
 
 class Authorization(GitHubCore):

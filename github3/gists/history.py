@@ -8,8 +8,8 @@ Module containing the logic for the GistHistory object.
 """
 from __future__ import unicode_literals
 
-from github3.models import GitHubCore
-from github3.users import User
+from ..models import GitHubCore
+from ..users import User
 
 
 class GistHistory(GitHubCore):
@@ -63,6 +63,6 @@ class GistHistory(GitHubCore):
         :returns: :class:`Gist <github3.gists.gist.Gist>`
 
         """
-        from github3.gists.gist import Gist
+        from .gist import Gist
         json = self._json(self._get(self._api), 200)
         return Gist(json, self)
