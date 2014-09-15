@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 import json
 
-from github3.decorators import requires_auth
-from github3.models import GitHubCore, GitHubError
-from github3.utils import stream_response_to_file
+from ..decorators import requires_auth
+from ..models import GitHubCore, GitHubError
+from ..utils import stream_response_to_file
 from uritemplate import URITemplate
 
 

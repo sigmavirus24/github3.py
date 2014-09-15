@@ -8,8 +8,8 @@ This module contains the Status object for GitHub's commit status API
 """
 from __future__ import unicode_literals
 
-from github3.models import GitHubObject
-from github3.users import User
+from ..models import GitHubObject
+from ..users import User
 
 
 class Status(GitHubObject):

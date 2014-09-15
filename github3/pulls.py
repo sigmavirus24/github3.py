@@ -10,11 +10,11 @@ from __future__ import unicode_literals
 
 from re import match
 from json import dumps
-from github3.git import Commit
-from github3.models import GitHubObject, GitHubCore, BaseComment
-from github3.users import User
-from github3.decorators import requires_auth
-from github3.issues.comment import IssueComment
+from .git import Commit
+from .models import GitHubObject, GitHubCore, BaseComment
+from .users import User
+from .decorators import requires_auth
+from .issues.comment import IssueComment
 from uritemplate import URITemplate
 
 

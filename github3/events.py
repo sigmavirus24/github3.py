@@ -8,7 +8,7 @@ This module contains the class(es) related to Events
 """
 from __future__ import unicode_literals
 
-from github3.models import GitHubObject
+from .models import GitHubObject
 
 
 class Event(GitHubObject):
@@ -31,8 +31,8 @@ class Event(GitHubObject):
 
     def __init__(self, event):
         super(Event, self).__init__(event)
-        from github3.users import User
-        from github3.orgs import Organization
+        from .users import User
+        from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
         self.actor = User(event.get('actor')) if event.get('actor') else None
         #: datetime object representing when the event was created.
@@ -75,36 +75,36 @@ class Event(GitHubObject):
 
 
 def _commitcomment(payload):
-    from github3.repos.comment import RepoComment
+    from .repos.comment import RepoComment
     if payload.get('comment'):
         payload['comment'] = RepoComment(payload['comment'], None)
     return payload
 
 
 def _follow(payload):
-    from github3.users import User
+    from .users import User
     if payload.get('target'):
         payload['target'] = User(payload['target'], None)
     return payload
 
 
 def _forkev(payload):
-    from github3.repos import Repository
+    from .repos import Repository
     if payload.get('forkee'):
         payload['forkee'] = Repository(payload['forkee'], None)
     return payload
 
 
 def _gist(payload):
-    from github3.gists import Gist
+    from .gists import Gist
     if payload.get('gist'):
         payload['gist'] = Gist(payload['gist'], None)
     return payload
 
 
 def _issuecomm(payload):
-    from github3.issues import Issue
-    from github3.issues.comment import IssueComment
+    from .issues import Issue
+    from .issues.comment import IssueComment
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     if payload.get('comment'):
@@ -113,35 +113,35 @@ def _issuecomm(payload):
 
 
 def _issueevent(payload):
-    from github3.issues import Issue
+    from .issues import Issue
     if payload.get('issue'):
         payload['issue'] = Issue(payload['issue'], None)
     return payload
 
 
 def _member(payload):
-    from github3.users import User
+    from .users import User
     if payload.get('member'):
         payload['member'] = User(payload['member'], None)
     return payload
 
 
 def _pullreqev(payload):
-    from github3.pulls import PullRequest
+    from .pulls import PullRequest
     if payload.get('pull_request'):
         payload['pull_request'] = PullRequest(payload['pull_request'], None)
     return payload
 
 
 def _pullreqcomm(payload):
-    from github3.pulls import ReviewComment
+    from .pulls import ReviewComment
     if payload.get('comment'):
         payload['comment'] = ReviewComment(payload['comment'], None)
     return payload
 
 
 def _release(payload):
-    from github3.repos.release import Release
+    from .repos.release import Release
     release = payload.get('release')
     if release:
         payload['release'] = Release(release)
@@ -149,9 +149,9 @@ def _release(payload):
 
 
 def _team(payload):
-    from github3.orgs import Team
-    from github3.repos import Repository
-    from github3.users import User
+    from .orgs import Team
+    from .repos import Repository
+    from .users import User
     if payload.get('team'):
         payload['team'] = Team(payload['team'], None)
     if payload.get('repo'):
