@@ -11,9 +11,9 @@ from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64decode
-from github3.models import GitHubObject, GitHubCore, BaseCommit
-from github3.users import User
-from github3.decorators import requires_auth
+from .models import GitHubObject, GitHubCore, BaseCommit
+from .users import User
+from .decorators import requires_auth
 
 
 class Blob(GitHubObject):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import Iterator
-from github3.models import GitHubCore
+from .models import GitHubCore
 from requests.compat import urlparse, urlencode
 
 

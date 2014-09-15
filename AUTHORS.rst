@@ -66,3 +66,13 @@ Contributors
 - David Moss (@damoss007)
 
 - John Barbuto (@jbarbuto)
+
+- Nikolay Bryskin (@nikicat)
+
+- Tomi Äijö (@tomiaijo)
+
+- jnothman (@jnothman)
+
+- Cameron Davidson-Pilon (@CamDavidsonPilon)
+
+- Alex Couper (@alexcouper)

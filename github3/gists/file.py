@@ -7,7 +7,7 @@ Module containing the logic for the GistFile object.
 """
 from __future__ import unicode_literals
 
-from github3.models import GitHubObject
+from ..models import GitHubObject
 
 
 class GistFile(GitHubObject):

@@ -9,8 +9,8 @@ GitHub API.
 """
 from __future__ import unicode_literals
 
-from github3.models import GitHubCore
-from github3.repos.commit import RepoCommit
+from ..models import GitHubCore
+from .commit import RepoCommit
 
 
 class Comparison(GitHubCore):

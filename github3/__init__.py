@@ -17,7 +17,7 @@ __copyright__ = 'Copyright 2012-2014 Ian Cordasco'
 __version__ = '1.0.0b1'
 __version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
 
-from github3.api import (
+from .api import (
     authorize, login, enterprise_login, emojis, gist, gitignore_template,
     create_gist, issue, markdown, octocat, organization, pull_request,
     followers_of, followed_by, public_gists, gists_by, issues_on,
@@ -26,8 +26,8 @@ from github3.api import (
     rate_limit, repository, search_code, search_repositories, search_users,
     user, zen
 )
-from github3.github import GitHub, GitHubEnterprise, GitHubStatus
-from github3.exceptions import (
+from .github import GitHub, GitHubEnterprise, GitHubStatus
+from .exceptions import (
     BadRequest, AuthenticationFailed, ForbiddenError, GitHubError,
     MethodNotAllowed, NotFoundError, ServerError, NotAcceptable,
     UnprocessableEntity

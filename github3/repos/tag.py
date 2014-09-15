@@ -8,7 +8,7 @@ This module contains the RepoTag object for GitHub's tag API.
 """
 from __future__ import unicode_literals
 
-from github3.models import GitHubObject
+from ..models import GitHubObject
 
 
 class RepoTag(GitHubObject):

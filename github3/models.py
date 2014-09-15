@@ -13,11 +13,11 @@ from requests.compat import urlparse, is_py2
 from datetime import datetime
 from logging import getLogger
 
-from github3.decorators import requires_auth
-from github3.exceptions import error_for
-from github3.null import NullObject
-from github3.session import GitHubSession
-from github3.utils import UTC
+from .decorators import requires_auth
+from .exceptions import error_for
+from .null import NullObject
+from .session import GitHubSession
+from .utils import UTC
 
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
@@ -32,8 +32,8 @@ class GitHubObject(object):
         if json is not None:
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
+            self._uniq = json.get('url', None)
         self._json_data = json
-        self._uniq = json.get('url', None)
         self._update_attributes(json)
 
     def _update_attributes(self, json):
@@ -225,7 +225,7 @@ class GitHubCore(GitHubObject):
         :returns: A lazy iterator over the pagianted resource
         :rtype: :class:`GitHubIterator <github3.structs.GitHubIterator>`
         """
-        from github3.structs import GitHubIterator
+        from .structs import GitHubIterator
         return GitHubIterator(count, url, cls, self, params, etag)
 
     @property

@@ -11,30 +11,30 @@ from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64encode
-from github3.decorators import requires_auth
-from github3.events import Event
-from github3.git import Blob, Commit, Reference, Tag, Tree
-from github3.issues import issue_params, Issue
-from github3.issues.event import IssueEvent
-from github3.issues.label import Label
-from github3.issues.milestone import Milestone
-from github3.models import GitHubCore
-from github3.notifications import Subscription, Thread
-from github3.pulls import PullRequest
-from github3.repos.branch import Branch
-from github3.repos.comment import RepoComment
-from github3.repos.commit import RepoCommit
-from github3.repos.comparison import Comparison
-from github3.repos.contents import Contents, validate_commmitter
-from github3.repos.deployment import Deployment
-from github3.repos.hook import Hook
-from github3.repos.pages import PagesBuild, PagesInfo
-from github3.repos.status import Status
-from github3.repos.stats import ContributorStats
-from github3.repos.release import Release, Asset
-from github3.repos.tag import RepoTag
-from github3.users import User, Key
-from github3.utils import stream_response_to_file, timestamp_parameter
+from ..decorators import requires_auth
+from ..events import Event
+from ..git import Blob, Commit, Reference, Tag, Tree
+from ..issues import issue_params, Issue
+from ..issues.event import IssueEvent
+from ..issues.label import Label
+from ..issues.milestone import Milestone
+from ..models import GitHubCore
+from ..notifications import Subscription, Thread
+from ..pulls import PullRequest
+from .branch import Branch
+from .comment import RepoComment
+from .commit import RepoCommit
+from .comparison import Comparison
+from .contents import Contents, validate_commmitter
+from .deployment import Deployment
+from .hook import Hook
+from .pages import PagesBuild, PagesInfo
+from .status import Status
+from .stats import ContributorStats
+from .release import Release, Asset
+from .tag import RepoTag
+from ..users import User, Key
+from ..utils import stream_response_to_file, timestamp_parameter
 from uritemplate import URITemplate
 
 
@@ -1783,7 +1783,7 @@ class Repository(GitHubCore):
             endpoint
         :returns: generator of :class:`Team <github3.orgs.Team>`\ s
         """
-        from github3.orgs import Team
+        from ..orgs import Team
         url = self._build_url('teams', base_url=self._api)
         return self._iter(int(number), url, Team, etag=etag)
 

@@ -5,6 +5,11 @@ History/Changelog
 
 .. include:: ./LATEST_VERSION_NOTES.rst
 
+0.9.1: 2014-08-10
+~~~~~~~~~~~~~~~~~
+
+- Correct Repository attribute ``fork_count`` should be ``forks_count``
+
 0.9.0: 2014-05-04
 ~~~~~~~~~~~~~~~~~
 

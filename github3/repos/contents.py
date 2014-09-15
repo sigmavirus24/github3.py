@@ -11,9 +11,9 @@ from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64decode, b64encode
-from github3.git import Commit
-from github3.models import GitHubCore
-from github3.decorators import requires_auth
+from ..git import Commit
+from ..models import GitHubCore
+from ..decorators import requires_auth
 
 
 class Contents(GitHubCore):
