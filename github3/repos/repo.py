@@ -1038,7 +1038,9 @@ class Repository(GitHubCore):
         """
         json = None
         if tree and isinstance(tree, list):
-            data = {'tree': tree, 'base_tree': base_tree}
+            data = {'tree': tree}
+            if base_tree:
+                data['base_tree'] = base_tree
             url = self._build_url('git', 'trees', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return Tree(json) if json else None
