@@ -15,7 +15,7 @@ from .events import Event
 from .gists import Gist
 from .issues import Issue, issue_params
 from .models import GitHubCore
-from .orgs import Organization, Team
+from .orgs import Membership, Organization, Team
 from .repos.repo import Repository, repo_issue_params
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
@@ -824,6 +824,14 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'orgs')
         return self._iter(int(number), url, Organization, etag=etag)
 
+    @requires_auth
+    def membership_in(self, organization):
+        """Retrieve the user's membership in the specified organization."""
+        url = self._build_url('user', 'memberships', 'orgs',
+                              str(organization))
+        json = self._json(self._get(url), 200)
+        return Membership(json, self)
+
     def organizations_with(self, username, number=-1, etag=None):
         """Iterate over organizations with ``username`` as a public member.
 
@@ -857,6 +865,22 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('gists', 'public')
         return self._iter(int(number), url, Gist, etag=etag)
+
+    @requires_auth
+    def organization_memberships(self, state=None, number=-1, etag=None):
+        """List organizations of which the user is a current or pending member.
+
+        :param str state: (option), state of the membership, i.e., active,
+            pending
+        :returns: iterator of :class:`Membership <github3.orgs.Membership>`
+        """
+        params = None
+        url = self._build_url('user', 'memberships', 'orgs')
+        if state is not None and state.lower() in ('active', 'pending'):
+            params = {'state': state.lower()}
+        return self._iter(int(number), url, Membership,
+                          params=params,
+                          etag=etag)
 
     @requires_auth
     def pubsubhubbub(self, mode, topic, callback, secret=''):

@@ -153,8 +153,8 @@ def _team(payload):
         payload['team'] = Team(payload['team'], None)
     if payload.get('repo'):
         payload['repo'] = Repository(payload['repo'], None)
-    if payload.get('user'):
-        payload['user'] = User(payload['user'], None)
+    if payload.get('sender'):
+        payload['sender'] = User(payload['sender'], None)
     return payload
 
 

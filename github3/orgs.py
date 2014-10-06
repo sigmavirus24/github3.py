@@ -8,6 +8,8 @@ This module contains all of the classes related to organizations.
 """
 from __future__ import unicode_literals
 
+import warnings
+
 from json import dumps
 from .events import Event
 from .models import BaseAccount, GitHubCore
@@ -64,6 +66,11 @@ class Team(GitHubCore):
             the team.
         :returns: bool
         """
+        warnings.warn(
+            'This is no longer supported by the GitHub API, see '
+            'https://developer.github.com/changes/2014-09-23-one-more-week'
+            '-before-the-add-team-member-api-breaking-change/',
+            DeprecationWarning)
         url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
@@ -111,9 +118,22 @@ class Team(GitHubCore):
         url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    def invite(self, username):
+        """Invite the user to join this team.
+
+        This returns a dictionary like so::
+
+            {'state': 'pending', 'url': 'https://api.github.com/teams/...'}
+
+        :param str username: (required), user to invite to join this team.
+        :returns: dictionary
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._json(self._put(url), 200)
+
     @requires_auth
     def is_member(self, username):
-        """Check if ``username`` is a member of this team.
+        """Check if ``login`` is a member of this team.
 
         :param str username: (required), username name of the user
         :returns: bool
@@ -149,13 +169,39 @@ class Team(GitHubCore):
         return self._iter(int(number), url, Repository, etag=etag)
 
     @requires_auth
+    def membership_for(self, username):
+        """Retrieve the membership information for the user.
+
+        :param str username: (required), name of the user
+        :returns: dictionary
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return json or {}
+
+    @requires_auth
     def remove_member(self, username):
         """Remove ``username`` from this team.
 
         :param str username: (required), username of the member to remove
         :returns: bool
         """
+        warnings.warn(
+            'This is no longer supported by the GitHub API, see '
+            'https://developer.github.com/changes/2014-09-23-one-more-week'
+            '-before-the-add-team-member-api-breaking-change/',
+            DeprecationWarning)
         url = self._build_url('members', username, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def revoke_membership(self, username):
+        """Revoke this user's team membership.
+
+        :param str username: (required), name of the team member
+        :returns: bool
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
@@ -210,6 +256,11 @@ class Organization(BaseAccount):
     def add_member(self, username, team_id):
         """Add ``username`` to ``team`` and thereby to this organization.
 
+        .. warning::
+            This method is no longer valid. To add a member to a team, you
+            must now retrieve the team directly, and use the ``invite``
+            method.
+
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
 
@@ -223,6 +274,11 @@ class Organization(BaseAccount):
         :param int team_id: (required), team id
         :returns: bool
         """
+        warnings.warn(
+            'This is no longer supported by the GitHub API, see '
+            'https://developer.github.com/changes/2014-09-23-one-more-week'
+            '-before-the-add-team-member-api-breaking-change/',
+            DeprecationWarning)
         if int(team_id) < 0:
             return False
 
@@ -483,3 +539,38 @@ class Organization(BaseAccount):
             url = self._build_url('teams', str(team_id))
             json = self._json(self._get(url), 200)
         return Team(json, self) if json else None
+
+
+class Membership(GitHubCore):
+
+    """The wrapper for information about Team and Organization memberships."""
+
+    def __init__(self, membership, session=None):
+        super(Membership, self).__init__(membership, session)
+        self._update_attributes(membership)
+
+    def _repr(self):
+        return '<Membership [{0}]>'.format(self.organization)
+
+    def _update_attributes(self, membership):
+        self._api = membership.get('url')
+        self.organization = Organization(membership.get('organization', {}),
+                                         self)
+        self.state = membership.get('state', '')
+        self.organization_url = membership.get('organization_url')
+        self.active = self.state.lower() == 'active'
+        self.pending = self.state.lower() == 'pending'
+
+    @requires_auth
+    def edit(self, state):
+        """Edit the user's membership.
+
+        :param str state: (required), the state the membership should be in.
+            Only accepts ``"active"``.
+        :returns: itself
+        """
+        if state and state.lower() == 'active':
+            data = dumps({'state': state.lower()})
+            json = self._json(self._patch(self._api, data=data))
+            self._update_attributes(json)
+        return self
