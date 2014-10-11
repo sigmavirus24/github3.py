@@ -87,4 +87,3 @@ class TestPayloadHandlers(TestCase):
         github3.events._team(t)
         assert isinstance(t['team'], github3.orgs.Team)
         assert isinstance(t['repo'], github3.repos.Repository)
-        assert isinstance(t['user'], github3.users.User)

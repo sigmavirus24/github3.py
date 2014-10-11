@@ -26,7 +26,7 @@ class TestGitHub(BaseCase):
         assert self.request.called is False
 
         self.login()
-        assert self.g.key(-1) is None
+        assert self.g.key(-1).is_null()
         assert self.request.called is False
 
         assert isinstance(self.g.key(10), github3.users.Key)
