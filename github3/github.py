@@ -633,7 +633,7 @@ class GitHub(GitHubCore):
         if int(id_num) > 0:
             url = self._build_url('user', 'keys', str(id_num))
             json = self._json(self._get(url), 200)
-        return Key(json, self) if json else None
+        return self._instance_or_null(Key, json)
 
     @requires_auth
     def keys(self, number=-1, etag=None):
@@ -675,7 +675,7 @@ class GitHub(GitHubCore):
             this is the repository to use as the context for the rendering
         :param bool raw: (optional), renders a document like a README.md, no
             gfm, no context
-        :returns: str -- HTML formatted text
+        :returns: str (or unicode on Python 2) -- HTML formatted text
         """
         data = None
         json = False
@@ -698,11 +698,12 @@ class GitHub(GitHubCore):
                 data['context'] = context
             json = True
 
+        html = ''
         if data:
             req = self._post(url, data=data, json=json, headers=headers)
             if req.ok:
-                return req.content
-        return ''  # (No coverage)
+                html = req.text
+        return html
 
     @requires_auth
     def me(self):
@@ -717,7 +718,7 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user')
         json = self._json(self._get(url), 200)
-        return User(json, self) if json else None
+        return self._instance_or_null(User, json)
 
     def meta(self):
         """Returns a dictionary with arrays of addresses in CIDR format
@@ -727,7 +728,7 @@ class GitHub(GitHubCore):
         .. versionadded:: 0.5
         """
         url = self._build_url('meta')
-        return self._json(self._get(url), 200)
+        return self._json(self._get(url), 200) or {}
 
     @requires_auth
     def notifications(self, all=False, participating=False, number=-1,
@@ -757,11 +758,11 @@ class GitHub(GitHubCore):
 
         :params str say: (optional), pass in what you'd like Octocat to say
         :returns: ascii art of Octocat
+        :rtype: str (or unicode on Python 3)
         """
         url = self._build_url('octocat')
         req = self._get(url, params={'s': say})
-        return req.content if req.ok else ''
-        # TODO: Switch to req.text. Unicode is better.
+        return req.text if req.ok else ''
 
     def organization(self, username):
         """Returns a Organization object for the login name
@@ -771,7 +772,7 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('orgs', username)
         json = self._json(self._get(url), 200)
-        return Organization(json, self) if json else None
+        return self._instance_or_null(Organization, json)
 
     @requires_auth
     def organization_issues(self, name, filter='', state='', labels='',
@@ -830,7 +831,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'memberships', 'orgs',
                               str(organization))
         json = self._json(self._get(url), 200)
-        return Membership(json, self)
+        return self._instance_or_null(Membership, json)
 
     def organizations_with(self, username, number=-1, etag=None):
         """Iterate over organizations with ``username`` as a public member.
