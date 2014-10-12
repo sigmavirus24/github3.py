@@ -52,7 +52,7 @@ class TestGitHub(BaseCase):
 
         assert self.g.markdown(
             'Foo', 'gfm', 'sigmavirus24/cfg'
-        ).startswith(b'archive_data')
+        ).startswith('archive_data')
         self.mock_assertions()
 
         self.post('https://api.github.com/markdown/raw')
@@ -73,7 +73,7 @@ class TestGitHub(BaseCase):
     def test_octocat(self):
         self.response('archive')
         self.get('https://api.github.com/octocat')
-        assert self.g.octocat().startswith(b'archive_data')
+        assert self.g.octocat().startswith('archive_data')
         self.mock_assertions()
 
     def test_organization(self):

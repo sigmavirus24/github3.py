@@ -268,7 +268,7 @@ class TestGitHub(IntegrationHelper):
             assert o is not None
             assert o is not ''
             o = self.gh.octocat(say)
-            assert say in o.decode()
+            assert say in o
 
     def test_organization(self):
         """Test the ability to retrieve an Organization."""
