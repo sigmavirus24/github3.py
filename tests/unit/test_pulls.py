@@ -35,6 +35,20 @@ class TestPullRequest(UnitHelper):
             }
         )
 
+    def test_create_review_comment(self):
+        """Verify the request to create a review comment on a PR diff."""
+        self.instance.create_review_comment('body', 'sha', 'path', 6)
+
+        self.post_called_with(
+            url_for('comments'),
+            data={
+                'body': 'body',
+                'commit_id': 'sha',
+                'path': 'path',
+                'position': '6'
+            }
+        )
+
     def test_diff(self):
         """Show that a user can request the diff of a Pull Request."""
         self.instance.diff()
@@ -109,6 +123,11 @@ class TestPullRequestRequiresAuthentication(UnitHelper):
         """Show that you must be authenticated to close a Pull Request."""
         with pytest.raises(GitHubError):
             self.instance.close()
+
+    def test_create_review_comment(self):
+        """Show that you must be authenticated to close a Pull Request."""
+        with pytest.raises(GitHubError):
+            self.instance.create_review_comment('', '', '', 1)
 
     def test_merge(self):
         """Show that you must be authenticated to merge a Pull Request."""
