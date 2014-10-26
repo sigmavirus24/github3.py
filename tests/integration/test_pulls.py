@@ -33,6 +33,20 @@ class TestPullRequest(IntegrationHelper):
             for commit in p.commits():
                 assert isinstance(commit, github3.git.Commit)
 
+    def test_create_review_comment(self):
+        """Show that a user can create an in-line reveiw comment on a PR."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_review_comment')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=286)
+            comment = p.create_review_comment(
+                body='Testing review comments',
+                commit_id='4437428aefdb50913e2acabd0552bd13021dc38f',
+                path='github3/pulls.py',
+                position=6
+            )
+        assert isinstance(comment, github3.pulls.ReviewComment)
+
     def test_diff(self):
         """Show that one can retrieve a bytestring diff of a PR."""
         cassette_name = self.cassette_name('diff')
@@ -98,3 +112,18 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=241)
             assert p.update(p.title) is True
+
+
+class TestReviewComment(IntegrationHelper):
+
+    """Integration tests for the ReviewComment object."""
+
+    def test_reply(self):
+        """Show that a user can reply to an existing ReviewComment."""
+        self.basic_login()
+        cassette_name = self.cassette_name('reply')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.gh.pull_request('sigmavirus24', 'github3.py', 286)
+            c = next(p.review_comments())
+            comment = c.reply('Replying to comments is fun.')
+        assert isinstance(comment, github3.pulls.ReviewComment)
