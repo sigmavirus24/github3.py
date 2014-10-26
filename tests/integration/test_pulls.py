@@ -112,3 +112,18 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=241)
             assert p.update(p.title) is True
+
+
+class TestReviewComment(IntegrationHelper):
+
+    """Integration tests for the ReviewComment object."""
+
+    def test_reply(self):
+        """Show that a user can reply to an existing ReviewComment."""
+        self.basic_login()
+        cassette_name = self.cassette_name('reply')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.gh.pull_request('sigmavirus24', 'github3.py', 286)
+            c = next(p.review_comments())
+            comment = c.reply('Replying to comments is fun.')
+        assert isinstance(comment, github3.pulls.ReviewComment)
