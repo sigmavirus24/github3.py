@@ -1,6 +1,7 @@
 language: python
 before_script:
 - pip install tox
+- pip install -U requests"$REQUESTS_VERSION"
 
 # test script
 script:  tox -e ${TOX_ENV}
