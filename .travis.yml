@@ -29,6 +29,6 @@ env:
   - TOX_ENV=py34-flake8
 
 matrix:
-  allowed_failures:
+  allow_failures:
   - env: TOX_ENV=py27-flake8
   - env: TOX_ENV=py34-flake8
