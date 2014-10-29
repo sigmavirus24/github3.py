@@ -1026,7 +1026,7 @@ class Repository(GitHubCore):
         return Tag(json) if json else None
 
     @requires_auth
-    def create_tree(self, tree, base_tree=''):
+    def create_tree(self, tree, base_tree=None):
         """Create a tree on this repository.
 
         :param list tree: (required), specifies the tree structure.

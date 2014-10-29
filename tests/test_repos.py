@@ -409,24 +409,6 @@ class TestRepository(BaseCase):
                                  lightweight=True)
             cr.assert_called_once_with('refs/tags/tag', 'fakesha')
 
-    def test_create_tree(self):
-        self.response('tree', 201)
-        self.post(self.api + 'git/trees')
-        data = {'tree': [{'path': 'file1', 'mode': '100755',
-                          'type': 'tree',
-                          'sha': '75b347329e3fc87ac78895ca1be58daff78872a1'}],
-                'base_tree': ''}
-        self.conf = {'data': data}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_tree, **data)
-
-        self.login()
-        assert self.repo.create_tree(None) is None
-        assert self.repo.create_tree({'foo': 'bar'}) is None
-        self.not_called()
-        assert isinstance(self.repo.create_tree(**data), github3.git.Tree)
-        self.mock_assertions()
-
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api[:-1])

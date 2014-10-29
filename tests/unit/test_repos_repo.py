@@ -155,6 +155,36 @@ class TestRepository(UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_create_tree(self):
+        """Verify the request to create a tree."""
+        self.instance.create_tree([{'foo': 'bar'}])
+
+        self.post_called_with(
+            url_for('git/trees'),
+            data={
+                'tree': [{'foo': 'bar'}]
+            }
+        )
+
+    def test_create_tree_with_base_tree(self):
+        """Verify the request to create a tree with a base tree."""
+        self.instance.create_tree([{'foo': 'bar'}], base_tree='sha')
+
+        self.post_called_with(
+            url_for('git/trees'),
+            data={
+                'tree': [{'foo': 'bar'}],
+                'base_tree': 'sha'
+            }
+        )
+
+    def test_create_tree_rejects_invalid_trees(self):
+        """Verify no request is made if tree is not a list or is None."""
+        self.instance.create_tree({'foo': 'bar'})
+        self.instance.create_tree(None)
+
+        assert self.session.post.called is False
+
     def test_key(self):
         """Test the ability to fetch a deploy key."""
         self.instance.key(10)
