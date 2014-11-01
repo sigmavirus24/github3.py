@@ -76,3 +76,5 @@ Contributors
 - Cameron Davidson-Pilon (@CamDavidsonPilon)
 
 - Alex Couper (@alexcouper)
+
+- Marc Abramowitz (@msabramo)
