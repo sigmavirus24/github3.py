@@ -42,6 +42,6 @@ class TestReviewComment(IntegrationHelper):
         cassette_name = self.cassette_name('reply')
         with self.recorder.use_cassette(cassette_name):
             p = self.gh.pull_request('sigmavirus24', 'github3.py', 286)
-            c = next(p.review_comments())
+            c = next(p.iter_review_comments())
             comment = c.reply('Replying to comments is fun.')
         assert isinstance(comment, github3.pulls.ReviewComment)

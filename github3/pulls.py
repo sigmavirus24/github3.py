@@ -299,6 +299,17 @@ class PullRequest(GitHubCore):
         url = self._build_url(base_url=self.links['comments'])
         return self._iter(int(number), url, IssueComment, etag=etag)
 
+    def iter_review_comments(self, number=-1, etag=None):
+        r"""Iterate over the review comments on this pull request.
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all available comments.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`ReviewComment <ReviewComment>`\ s
+        """
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, ReviewComment, etag=etag)
+
     @requires_auth
     def merge(self, commit_message=''):
         """Merge this pull request.
