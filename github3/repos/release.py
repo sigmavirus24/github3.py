@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import json
 
+from ..session import GitHubSession
 from ..decorators import requires_auth
 from ..models import GitHubCore, GitHubError
 from ..utils import stream_response_to_file
@@ -188,7 +189,7 @@ class Asset(GitHubCore):
                 'Authorization': None,
                 'Content-Type': None,
                 })
-            resp = self._get(resp.headers['location'], stream=True,
+            resp = GitHubSession().get(resp.headers['location'], stream=True,
                              headers=headers)
 
         if self._boolean(resp, 200, 404):
