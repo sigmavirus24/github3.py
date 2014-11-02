@@ -179,7 +179,7 @@ class PullRequest(GitHubCore):
         #: Review comment URL Template. Expands with ``number``
         self.review_comment_url = URITemplate(comments) if comments else None
         #: Number of review comments on the pull request
-        self.review_comments = pull.get('review_comments')
+        self.review_comments_count = pull.get('review_comments')
         #: GitHub.com url for review comments (not a template)
         self.review_comments_url = pull.get('review_comments_url')
 
