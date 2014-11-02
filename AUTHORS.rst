@@ -78,3 +78,5 @@ Contributors
 - Alex Couper (@alexcouper)
 
 - Marc Abramowitz (@msabramo)
+
+- Adrian Moisey (@adrianmoisey)

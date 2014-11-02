@@ -1,6 +1,15 @@
 History/Changelog
 -----------------
 
+0.9.3: 2014-11-0x
+~~~~~~~~~~~~~~~~~
+
+- Backport of ``PullRequest#create_review_comment`` by Adrian Moisey
+
+- Backport of ``PullRequest#review_comments`` by Adrian Moisey
+
+- Documentation typo fix by Marc Abramowitz
+
 0.9.2: 2014-10-05
 ~~~~~~~~~~~~~~~~~
 
