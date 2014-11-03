@@ -1566,11 +1566,11 @@ class GitHub(GitHubCore):
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg
 
-        :returns: str
+        :returns: str (on Python 3, unicode on Python 2)
         """
         url = self._build_url('zen')
         resp = self._get(url)
-        return resp.content if resp.status_code == 200 else ''
+        return resp.text if resp.status_code == 200 else b''.decode('utf-8')
 
 
 class GitHubEnterprise(GitHub):
