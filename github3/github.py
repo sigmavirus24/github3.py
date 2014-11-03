@@ -16,6 +16,7 @@ from .gists import Gist
 from .issues import Issue, issue_params
 from .models import GitHubCore
 from .orgs import Membership, Organization, Team
+from .pulls import PullRequest
 from .repos.repo import Repository, repo_issue_params
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
@@ -918,10 +919,14 @@ class GitHub(GitHubCore):
         :param str owner: (required), owner of the repository
         :param str repository: (required), name of the repository
         :param int number: (required), issue number
-        :return: :class:`Issue <github3.issues.Issue>`
+        :return: :class:`~github.pulls.PullRequest`
         """
-        r = self.repository(owner, repository)
-        return r.pull_request(number) if r else None
+        json = None
+        if int(number) > 0:
+            url = self._build_url('repos', owner, repository, 'pulls',
+                                  str(number))
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(PullRequest, json)
 
     def rate_limit(self):
         """Returns a dictionary with information from /rate_limit.
@@ -1031,7 +1036,7 @@ class GitHub(GitHubCore):
         if owner and repository:
             url = self._build_url('repos', owner, repository)
             json = self._json(self._get(url), 200)
-        return Repository(json, self) if json else None
+        return self._instance_or_null(Repository, json)
 
     def repository_with_id(self, number):
         """Returns the Repository with id ``number``.
@@ -1044,7 +1049,7 @@ class GitHub(GitHubCore):
         if number > 0:
             url = self._build_url('repositories', str(number))
             json = self._json(self._get(url), 200)
-        return Repository(json, self) if json else None
+        return self._instance_or_null(Repository, json)
 
     @requires_app_credentials
     def revoke_authorization(self, access_token):
@@ -1487,7 +1492,7 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('users', username)
         json = self._json(self._get(url), 200)
-        return User(json, self) if json else None
+        return self._instance_or_null(User, json)
 
     @requires_auth
     def user_issues(self, filter='', state='', labels='', sort='',
@@ -1556,7 +1561,7 @@ class GitHub(GitHubCore):
         if number > 0:
             url = self._build_url('user', str(number))
             json = self._json(self._get(url), 200)
-        return User(json, self) if json else None
+        return self._instance_or_null(User, json)
 
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg
