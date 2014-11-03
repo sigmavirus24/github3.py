@@ -132,17 +132,6 @@ class TestGitHub(BaseCase):
 
         self.mock_assertions()
 
-    def test_repository(self):
-        self.response('repo')
-        repo = self.g.repository(None, None)
-        assert repo is None
-        self.not_called()
-
-        self.get('https://api.github.com/repos/sigmavirus24/github3.py')
-        repo = self.g.repository('sigmavirus24', 'github3.py')
-        assert isinstance(repo, github3.repos.Repository)
-        self.mock_assertions()
-
     def test_set_client_id(self):
         auth = ('idXXXXXXXXXXXX', 'secretXXXXXXXXXXXXXXXX')
         self.g.set_client_id(*auth)

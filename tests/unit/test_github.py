@@ -210,6 +210,30 @@ class TestGitHub(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('user'))
 
+    def test_repository(self):
+        """"Verify the GET request for a repository."""
+        self.instance.repository('user', 'repo')
+
+        self.session.get.assert_called_once_with(url_for('repos/user/repo'))
+
+    def test_repository_with_invalid_repo(self):
+        """Verify there is no call made for invalid repo combos."""
+        self.instance.repository('user', None)
+
+        assert self.session.get.called is False
+
+    def test_repository_with_invalid_user(self):
+        """Verify there is no call made for invalid username combos."""
+        self.instance.repository(None, 'repo')
+
+        assert self.session.get.called is False
+
+    def test_repository_with_invalid_user_and_repo(self):
+        """Verify there is no call made for invalid user/repo combos."""
+        self.instance.repository(None, None)
+
+        assert self.session.get.called is False
+
     def test_repository_with_id(self):
         """Test the ability to retrieve a repository by its id."""
         self.instance.repository_with_id(10)
