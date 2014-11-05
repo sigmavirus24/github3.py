@@ -185,11 +185,11 @@ class Asset(GitHubCore):
             # Amazon S3 will reject the redirected request unless we omit
             # certain request headers
             headers.update({
-                'Authorization': None,
                 'Content-Type': None,
                 })
-            resp = self._get(resp.headers['location'], stream=True,
-                             headers=headers)
+            with self._session.no_auth():
+                resp = self._get(resp.headers['location'], stream=True,
+                                 headers=headers)
 
         if self._boolean(resp, 200, 404):
             stream_response_to_file(resp, path)

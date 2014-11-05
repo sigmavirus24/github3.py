@@ -74,6 +74,25 @@ class TestAsset(IntegrationHelper):
 
         os.unlink(filename)
 
+    def test_download_when_authenticated(self):
+        """Test the ability to download an asset when authenticated."""
+        self.basic_login()
+        cassette_name = self.cassette_name('download_when_authenticated')
+        with self.recorder.use_cassette(cassette_name,
+                                        preserve_exact_body_bytes=True):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            release = repository.release(76677)
+            asset = next(release.iter_assets())
+            _, filename = tempfile.mkstemp()
+            assert asset._session.auth is not None
+            asset.download(filename)
+            assert asset._session.auth is not None
+
+        with open(filename, 'rb') as fd:
+            assert len(fd.read(1024)) > 0
+
+        os.unlink(filename)
+
     def test_edit(self):
         """Test the ability to edit an existing asset."""
         self.basic_login()

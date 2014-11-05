@@ -1,8 +1,9 @@
 from github3.repos.release import Release, Asset
 
-from .helper import UnitHelper
+from .helper import UnitHelper, mock
 
 import json
+import pytest
 
 
 def releases_url(path=''):
@@ -71,6 +72,20 @@ class TestAsset(UnitHelper):
         "created_at": "2013-02-27T19:35:32Z",
         "updated_at": "2013-02-27T19:35:32Z"
         }
+
+    @pytest.mark.xfail
+    def test_download(self):
+        """Verify the request to download an Asset file."""
+        with mock.patch('github3.utils.stream_response_to_file') as stream:
+            self.instance.download()
+
+        self.session.get.assert_called_once_with(
+            self.example_data['url'],
+            stream=True,
+            allow_redirects=False,
+            headers={'Accept': 'application/octect-stream'}
+        )
+        assert stream.called is False
 
     def test_edit_without_label(self):
         self.instance.edit('new name')
