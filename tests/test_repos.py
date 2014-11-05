@@ -1,5 +1,6 @@
 import os
 import github3
+import pytest
 from github3 import repos
 from tests.utils import (BaseCase, load, mock)
 
@@ -1029,6 +1030,7 @@ class TestAsset(BaseCase):
     def test_repr(self):
         assert repr(self.asset) == '<Asset [github3.py-0.7.1.tar.gz]>'
 
+    @pytest.mark.xfail
     def test_download(self):
         headers = {'content-disposition': 'filename=foo'}
         self.response('archive', 200, **headers)

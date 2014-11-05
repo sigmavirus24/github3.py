@@ -1,8 +1,9 @@
 from github3.repos.release import Release, Asset
 
-from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
+from .helper import UnitHelper, UnitIteratorHelper, create_url_helper, mock
 
 import json
+import pytest
 
 url_for = create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/releases'
@@ -89,6 +90,20 @@ class TestAsset(UnitHelper):
         "created_at": "2013-02-27T19:35:32Z",
         "updated_at": "2013-02-27T19:35:32Z"
         }
+
+    @pytest.mark.xfail
+    def test_download(self):
+        """Verify the request to download an Asset file."""
+        with mock.patch('github3.utils.stream_response_to_file') as stream:
+            self.instance.download()
+
+        self.session.get.assert_called_once_with(
+            url_for('/assets/1'),
+            stream=True,
+            allow_redirects=False,
+            headers={'Accept': 'application/octect-stream'}
+        )
+        assert stream.called is False
 
     def test_edit_without_label(self):
         self.instance.edit('new name')
