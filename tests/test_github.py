@@ -214,7 +214,7 @@ class TestGitHub(BaseCase):
         self.response('archive')
         self.get('https://api.github.com/zen')
 
-        assert self.g.zen().startswith(b'archive_data')
+        assert self.g.zen().startswith('archive_data')
         self.mock_assertions()
 
 
