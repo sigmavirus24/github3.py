@@ -27,8 +27,10 @@ env:
   - TOX_ENV=pypy REQUESTS_VERSION=""
   - TOX_ENV=py27-flake8
   - TOX_ENV=py34-flake8
+  - TOX_ENV=docstrings
 
 matrix:
   allow_failures:
   - env: TOX_ENV=py27-flake8
   - env: TOX_ENV=py34-flake8
+  - env: TOX_ENV=docstrings
