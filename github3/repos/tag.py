@@ -19,6 +19,8 @@ class RepoTag(GitHubObject):
     """
     def __init__(self, tag):
         super(RepoTag, self).__init__(tag)
+        if tag is None:
+            return
         #: Name of the tag.
         self.name = tag.get('name')
         #: URL for the GitHub generated zipball associated with the tag.
