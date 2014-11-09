@@ -23,7 +23,6 @@ class PullDestination(GitHubCore):
     """The :class:`PullDestination <PullDestination>` object.
 
     See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
-
     """
 
     def __init__(self, dest, direction):
@@ -52,12 +51,13 @@ class PullDestination(GitHubCore):
 
 
 class PullFile(GitHubObject):
+
     """The :class:`PullFile <PullFile>` object.
 
     See also: http://developer.github.com/v3/pulls/#list-pull-requests-files
     """
-    def __init__(self, pfile):
-        super(PullFile, self).__init__(pfile)
+
+    def _update_attributes(self, pfile):
         #: SHA of the commit
         self.sha = pfile.get('sha')
         #: Name of the file
@@ -65,11 +65,11 @@ class PullFile(GitHubObject):
         #: Status of the file, e.g., 'added'
         self.status = pfile.get('status')
         #: Number of additions on this file
-        self.additions = pfile.get('additions')
+        self.additions_count = pfile.get('additions')
         #: Number of deletions on this file
-        self.deletions = pfile.get('deletions')
+        self.deletions_count = pfile.get('deletions')
         #: Number of changes made to this file
-        self.changes = pfile.get('changes')
+        self.changes_count = pfile.get('changes')
         #: URL to view the blob for this file
         self.blob_url = pfile.get('blob_url')
         #: URL to view the raw diff of this file
@@ -82,6 +82,7 @@ class PullFile(GitHubObject):
 
 
 class PullRequest(GitHubCore):
+
     """The :class:`PullRequest <PullRequest>` object.
 
     Two pull request instances can be checked like so::
@@ -96,8 +97,8 @@ class PullRequest(GitHubCore):
 
     See also: http://developer.github.com/v3/pulls/
     """
-    def __init__(self, pull, session=None):
-        super(PullRequest, self).__init__(pull, session)
+
+    def _update_attributes(self, pull):
         self._api = pull.get('url', '')
         #: Base of the merge
         self.base = PullDestination(pull.get('base'), 'Base')
@@ -108,18 +109,18 @@ class PullRequest(GitHubCore):
         #: Body of the pull request as plain text
         self.body_text = pull.get('body_text', '')
         #: Number of additions on this pull request
-        self.additions = pull.get('additions')
+        self.additions_count = pull.get('additions')
         #: Number of deletions on this pull request
-        self.deletions = pull.get('deletions')
+        self.deletions_count = pull.get('deletions')
 
         #: datetime object representing when the pull was closed
         self.closed_at = self._strptime(pull.get('closed_at'))
         #: Number of comments
-        self.comments = pull.get('comments')
+        self.comments_count = pull.get('comments')
         #: Comments url (not a template)
         self.comments_url = pull.get('comments_url')
         #: Number of commits
-        self.commits = pull.get('commits')
+        self.commits_count = pull.get('commits')
         #: GitHub.com url of commits in this pull request
         self.commits_url = pull.get('commits_url')
         #: datetime object representing when the pull was created
@@ -137,36 +138,15 @@ class PullRequest(GitHubCore):
         #: Statuses URL
         self.statuses_url = pull.get('statuses_url')
 
-        # These are the links provided by the dictionary in the json called
-        # '_links'. It's structure is horrific, so to make this look a lot
-        # cleaner, I reconstructed what the links would be:
-        #  - ``self`` is just the api url, e.g.,
-        #    https://api.github.com/repos/:user/:repo/pulls/:number
-        #  - ``comments`` is just the api url for comments on the issue, e.g.,
-        #    https://api.github.com/repos/:user/:repo/issues/:number/comments
-        #  - ``issue`` is the api url for the issue, e.g.,
-        #    https://api.github.com/repos/:user/:repo/issues/:number
-        #  - ``html`` is just the html_url attribute
-        #  - ``review_comments`` is just the api url for the pull, e.g.,
-        #    https://api.github.com/repos/:user/:repo/pulls/:number/comments
-        #: Dictionary of _links
-        self.links = {
-            'self': self._api,
-            'comments': '/'.join([self._api.replace('pulls', 'issues'),
-                                  'comments']),
-            'issue': self._api.replace('pulls', 'issues'),
-            'html': self.html_url,
-            'review_comments': self._api + '/comments'
-        }
-
+        #: Dictionary of _links. Changed in 1.0
+        self.links = pull.get('_links')
         #: datetime object representing when the pull was merged
         self.merged_at = self._strptime(pull.get('merged_at'))
         #: Whether the pull is deemed mergeable by GitHub
         self.mergeable = pull.get('mergeable', False)
         #: Whether it would be a clean merge or not
         self.mergeable_state = pull.get('mergeable_state', '')
-        #: SHA of the merge commit. DEPRECATED
-        self.merge_commit_sha = pull.get('merge_commit_sha', '')
+
         user = pull.get('merged_by')
         #: :class:`User <github3.users.User>` who merged this pull
         self.merged_by = User(user, self) if user else None
@@ -207,12 +187,9 @@ class PullRequest(GitHubCore):
     def _repr(self):
         return '<Pull Request [#{0}]>'.format(self.number)
 
-    def _update_(self, pull):
-        self.__init__(pull, self._session)
-
     @requires_auth
     def close(self):
-        """Closes this Pull Request without merging.
+        """Close this Pull Request without merging.
 
         :returns: bool
         """
@@ -235,36 +212,27 @@ class PullRequest(GitHubCore):
         data = {'body': body, 'commit_id': commit_id, 'path': path,
                 'position': str(position)}
         json = self._json(self._post(url, data=data), 201)
-        return ReviewComment(json, self) if json else None
+        return self._instance_or_null(ReviewComment, json)
 
     def diff(self):
-        """Return the diff"""
+        """Return the diff.
+
+        :returns: bytestring representation of the diff.
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.diff'})
         return resp.content if self._boolean(resp, 200, 404) else None
 
     def is_merged(self):
-        """Checks to see if the pull request was merged.
+        """Check to see if the pull request was merged.
 
         :returns: bool
         """
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1, etag=None):
-        """Iterate over the comments on this pull request.
-
-        :param int number: (optional), number of comments to return. Default:
-            -1 returns all available comments.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`ReviewComment <ReviewComment>`\ s
-        """
-        url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, ReviewComment, etag=etag)
-
-    def iter_commits(self, number=-1, etag=None):
-        """Iterates over the commits on this pull request.
+    def commits(self, number=-1, etag=None):
+        r"""Iterate over the commits on this pull request.
 
         :param int number: (optional), number of commits to return. Default:
             -1 returns all available commits.
@@ -275,8 +243,8 @@ class PullRequest(GitHubCore):
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, Commit, etag=etag)
 
-    def iter_files(self, number=-1, etag=None):
-        """Iterate over the files associated with this pull request.
+    def files(self, number=-1, etag=None):
+        r"""Iterate over the files associated with this pull request.
 
         :param int number: (optional), number of files to return. Default:
             -1 returns all available files.
@@ -287,8 +255,8 @@ class PullRequest(GitHubCore):
         url = self._build_url('files', base_url=self._api)
         return self._iter(int(number), url, PullFile, etag=etag)
 
-    def iter_issue_comments(self, number=-1, etag=None):
-        """Iterate over the issue comments on this pull request.
+    def issue_comments(self, number=-1, etag=None):
+        r"""Iterate over the issue comments on this pull request.
 
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
@@ -296,7 +264,12 @@ class PullRequest(GitHubCore):
             endpoint
         :returns: generator of :class:`IssueComment <IssueComment>`\ s
         """
-        url = self._build_url(base_url=self.links['comments'])
+        comments = self.links.get('comments', {})
+        url = comments.get('href')
+        if not url:
+            url = self._build_url(
+                'comments', base_url=self._api.replace('pulls', 'issues')
+            )
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
@@ -312,11 +285,15 @@ class PullRequest(GitHubCore):
             data = dumps({'commit_message': commit_message})
         url = self._build_url('merge', base_url=self._api)
         json = self._json(self._put(url, data=data), 200)
-        self.merge_commit_sha = json['sha']
+        if not json:
+            return False
         return json['merged']
 
     def patch(self):
-        """Return the patch"""
+        """Return the patch.
+
+        :returns: bytestring representation of the patch
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.patch'})
         return resp.content if self._boolean(resp, 200, 404) else None
@@ -331,6 +308,7 @@ class PullRequest(GitHubCore):
 
     def review_comments(self, number=-1, etag=None):
         r"""Iterate over the review comments on this pull request.
+
         :param int number: (optional), number of comments to return. Default:
             -1 returns all available comments.
         :param str etag: (optional), ETag from a previous request to the same
@@ -357,14 +335,16 @@ class PullRequest(GitHubCore):
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
 
 class ReviewComment(BaseComment):
-    """The :class:`ReviewComment <ReviewComment>` object. This is used to
-    represent comments on pull requests.
+
+    """The :class:`ReviewComment <ReviewComment>` object.
+
+    This is used to represent comments on pull requests.
 
     Two comment instances can be checked like so::
 
@@ -378,9 +358,9 @@ class ReviewComment(BaseComment):
 
     See also: http://developer.github.com/v3/pulls/comments/
     """
-    def __init__(self, comment, session=None):
-        super(ReviewComment, self).__init__(comment, session)
 
+    def _update_attributes(self, comment):
+        super(ReviewComment, self)._update_attributes(comment)
         #: :class:`User <github3.users.User>` who made the comment
         self.user = None
         if comment.get('user'):
@@ -424,4 +404,4 @@ class ReviewComment(BaseComment):
         json = self._json(self._post(url, data={
             'body': body, 'in_reply_to': in_reply_to
         }), 201)
-        return ReviewComment(json, self) if json else None
+        return self._instance_or_null(ReviewComment, json)

@@ -17,7 +17,7 @@ class TestLabel(BaseCase):
 
     def setUp(self):
         super(TestLabel, self).setUp()
-        self.l = Label(self.l.to_json(), self.g)
+        self.l = Label(self.l.as_dict(), self.g)
 
     def test_equality(self):
         l = Label(load('label'))
@@ -69,7 +69,7 @@ class TestMilestone(BaseCase):
 
     def setUp(self):
         super(TestMilestone, self).setUp()
-        self.m = Milestone(self.m.to_json(), self.g)
+        self.m = Milestone(self.m.as_dict(), self.g)
 
     def test_repr(self):
         assert repr(self.m) == '<Milestone [v1.0.0]>'
@@ -89,19 +89,10 @@ class TestMilestone(BaseCase):
         self.mock_assertions()
 
     def test_due_on(self):
-        json = self.m.to_json().copy()
+        json = self.m.as_dict().copy()
         json['due_on'] = '2012-12-31T23:59:59Z'
         m = Milestone(json)
         assert isinstance(m.due_on, datetime.datetime)
-
-    def test_iter_labels(self):
-        self.response('label', _iter=True)
-        self.get(self.api + '/labels')
-
-        i = self.m.iter_labels()
-        assert isinstance(i, github3.structs.GitHubIterator)
-        assert isinstance((next(i)), Label)
-        self.mock_assertions()
 
     def test_update(self):
         self.response('milestone', 200)
@@ -137,7 +128,7 @@ class TestIssue(BaseCase):
 
     def setUp(self):
         super(TestIssue, self).setUp()
-        self.i = Issue(self.i.to_json(), self.g)
+        self.i = Issue(self.i.as_dict(), self.g)
 
     def test_equality(self):
         i = Issue(load('issue'))
@@ -173,7 +164,7 @@ class TestIssue(BaseCase):
             self.not_called()
             assert self.i.assign('sigmavirus24')
             n = self.i.milestone.number if self.i.milestone else None
-            labels = [str(l) for l in self.i.labels]
+            labels = [str(l) for l in self.i.original_labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, 'sigmavirus24', self.i.state, n,
                 labels
@@ -190,7 +181,7 @@ class TestIssue(BaseCase):
             assert self.i.close()
             u = self.i.assignee.login if self.i.assignee else ''
             n = self.i.milestone.number if self.i.milestone else None
-            l = [str(label) for label in self.i.labels]
+            l = [str(label) for label in self.i.original_labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, self.i.state, n, l
             )
@@ -241,22 +232,6 @@ class TestIssue(BaseCase):
         self.i.state = 'open'
         assert self.i.is_closed() is False
 
-    def test_iter_comments(self):
-        self.response('issue_comment', _iter=True)
-        self.get(self.api + '/comments')
-
-        assert isinstance((next(self.i.iter_comments())), IssueComment)
-        self.mock_assertions()
-
-    def test_iter_events(self):
-        self.response('issue_event', _iter=True)
-        self.get(self.api + '/events')
-
-        e = next(self.i.iter_events())
-        assert isinstance(e, IssueEvent)
-        assert repr(e).startswith('<Issue Event')
-        self.mock_assertions()
-
     def test_remove_label(self):
         self.response('', 204)
         self.delete(self.api + '/labels/name')
@@ -302,7 +277,7 @@ class TestIssue(BaseCase):
         with mock.patch.object(Issue, 'edit') as ed:
             ed.return_value = True
             assert self.i.reopen()
-            labels = [str(l) for l in self.i.labels]
+            labels = [str(l) for l in self.i.original_labels]
             ed.assert_called_once_with(
                 self.i.title, self.i.body, u, 'open', n, labels
             )

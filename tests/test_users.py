@@ -15,10 +15,10 @@ class TestKey(BaseCase):
 
     def setUp(self):
         super(TestKey, self).setUp()
-        self.key = github3.users.Key(self.key.to_json(), self.g)
+        self.key = github3.users.Key(self.key.as_dict(), self.g)
 
     def test_equality(self):
-        k = github3.users.Key(self.key.to_json())
+        k = github3.users.Key(self.key.as_dict())
         assert self.key == k
         k._uniq += "cruft"
         assert self.key != k
@@ -82,7 +82,7 @@ class TestUser(BaseCase):
 
     def setUp(self):
         super(TestUser, self).setUp()
-        self.user = github3.users.User(self.user.to_json(), self.g)
+        self.user = github3.users.User(self.user.as_dict(), self.g)
         if hasattr(self.user.name, 'decode'):
             self.user.name = self.user.name.decode('utf-8')
 
@@ -186,78 +186,6 @@ class TestUser(BaseCase):
         self.get(self.api + '/following/kennethreitz')
 
         assert self.user.is_following('kennethreitz')
-        self.mock_assertions()
-
-    def test_iter_events(self):
-        self.response('event', 200, _iter=True)
-        self.get(self.api + '/events')
-
-        assert isinstance(next(self.user.iter_events()), github3.events.Event)
-        self.mock_assertions()
-
-        self.get(self.api + '/events/public')
-        next(self.user.iter_events(public=True))
-        self.mock_assertions()
-
-    def test_iter_followers(self):
-        self.response('user', 200, _iter=True)
-        self.get(self.api + '/followers')
-
-        assert isinstance(next(self.user.iter_followers()), github3.users.User)
-        self.mock_assertions()
-
-    def test_iter_following(self):
-        self.response('user', 200, _iter=True)
-        self.get(self.api + '/following')
-
-        assert isinstance(next(self.user.iter_following()), github3.users.User)
-        self.mock_assertions()
-
-    def test_iter_org_events(self):
-        self.response('event', 200, _iter=True)
-        self.get(self.api + '/events/orgs/foo')
-
-        with self.assertRaises(StopIteration):
-            next(self.user.iter_org_events(None))
-
-        self.not_called()
-        assert isinstance(next(self.user.iter_org_events('foo')),
-                          github3.events.Event)
-        self.mock_assertions()
-
-    def test_iter_received_events(self):
-        self.response('event', 200, _iter=True)
-        self.get(self.api + '/received_events')
-
-        assert isinstance(next(self.user.iter_received_events()),
-                          github3.events.Event)
-        self.mock_assertions()
-
-        self.get(self.api + '/received_events/public')
-        next(self.user.iter_received_events(public=True))
-        self.mock_assertions()
-
-    def test_iter_starred(self):
-        self.response('repo', 200, _iter=True)
-        self.get(self.api + '/starred')
-
-        assert isinstance(next(self.user.iter_starred()),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
-    def test_iter_subscriptions(self):
-        self.response('repo', 200, _iter=True)
-        self.get(self.api + '/subscriptions')
-
-        assert isinstance(next(self.user.iter_subscriptions()),
-                          github3.repos.Repository)
-        self.mock_assertions()
-
-    def test_iter_keys(self):
-        self.response('key', 200, _iter=True)
-        self.get(self.api + '/keys')
-
-        assert isinstance(next(self.user.iter_keys()), github3.users.Key)
         self.mock_assertions()
 
     def test_update(self):

@@ -6,7 +6,7 @@ from tests.utils import BaseCase, TestCase, RequestsBytesIO, is_py3
 
 class TestGitHubObject(TestCase):
     def test_from_json(self):
-        o = github3.models.GitHubObject.from_json({})
+        o = github3.models.GitHubObject.from_json('{}')
         assert isinstance(o, github3.models.GitHubObject)
 
 
@@ -51,7 +51,7 @@ class TestGitHubError(TestCase):
         self.r.status_code = 400
         message = '{"message": "m", "errors": ["e"]}'
         self.r.raw = RequestsBytesIO(message.encode() if is_py3 else message)
-        self.error = github3.models.GitHubError(self.r)
+        self.error = github3.GitHubError(self.r)
 
     def test_repr(self):
         assert repr(self.error) == '<GitHubError [m]>'
@@ -66,5 +66,5 @@ class TestGitHubError(TestCase):
         r = requests.Response()
         r.status_code = 400
         r.raw = RequestsBytesIO()
-        e = github3.models.GitHubError(r)
+        e = github3.GitHubError(r)
         assert e.message == '[No message]'

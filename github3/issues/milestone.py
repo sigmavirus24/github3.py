@@ -14,8 +14,7 @@ class Milestone(GitHubCore):
 
     See also: http://developer.github.com/v3/issues/milestones/
     """
-    def __init__(self, mile, session=None):
-        super(Milestone, self).__init__(mile, session)
+    def _update_attributes(self, mile):
         self._api = mile.get('url', '')
         #: Identifying number associated with milestone.
         self.number = mile.get('number')
@@ -27,7 +26,7 @@ class Milestone(GitHubCore):
         self.description = mile.get('description')
         #: :class:`User <github3.users.User>` object representing the creator
         #: of the milestone.
-        self.creator = User(mile.get('creator'), self._session)
+        self.creator = User(mile.get('creator'), self)
         #: Number of issues associated with this milestone which are still
         #: open.
         self.open_issues = mile.get('open_issues')
@@ -46,9 +45,6 @@ class Milestone(GitHubCore):
     def __str__(self):
         return self.title
 
-    def _update_(self, mile):
-        self.__init__(mile, self._session)
-
     @requires_auth
     def delete(self):
         """Delete this milestone.
@@ -57,9 +53,8 @@ class Milestone(GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    def iter_labels(self, number=-1, etag=None):
-        """Iterate over the labels for every issue associated with this
-        milestone.
+    def labels(self, number=-1, etag=None):
+        r"""Iterate over the labels of every associated issue.
 
         .. versionchanged:: 0.9
 
@@ -95,6 +90,6 @@ class Milestone(GitHubCore):
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False

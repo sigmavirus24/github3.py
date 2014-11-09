@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""A collection of useful utilities."""
 from collections import Callable
 from datetime import datetime, timedelta, tzinfo
 from requests.compat import basestring
@@ -12,14 +13,27 @@ ISO_8601 = re.compile("^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0"
 
 
 def timestamp_parameter(timestamp, allow_none=True):
+    """Function to check the conformance of timestamps passed by users.
 
+    This will check that a string is a valid format and allow users to pass a
+    datetime object which we will then convert to a proper ISO8601 date-time
+    string.
+
+    :param timestamp: string to be validated or datetime object to be
+        converted.
+    :param bool allow_none: whether or not to allow timestamp to be None.
+        Default: ``True``
+    :returns: valid ISO8601 string
+    :rtype: str
+    :raises: ValueError
+    """
     if timestamp is None:
         if allow_none:
             return None
         raise ValueError("Timestamp value cannot be None")
 
     if isinstance(timestamp, datetime):
-        return timestamp.isoformat()
+        return timestamp.isoformat() + 'Z'
 
     if isinstance(timestamp, basestring):
         if not ISO_8601.match(timestamp):
@@ -31,6 +45,7 @@ def timestamp_parameter(timestamp, allow_none=True):
 
 
 class UTC(tzinfo):
+
     """Yet another UTC reimplementation, to avoid a dependency on pytz or
     dateutil."""
 
@@ -50,6 +65,15 @@ class UTC(tzinfo):
 
 
 def stream_response_to_file(response, path=None):
+    """Stream a response body to the specified file.
+
+    Either use the ``path`` provided or use the name provided in the
+    ``Content-Disposition`` header.
+
+    :param response: A Response object from requests
+    :type response: requests.models.Response
+    :param str path: The full path and file name used to save the response
+    """
     pre_opened = False
     fd = None
     if path:

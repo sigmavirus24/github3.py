@@ -10,8 +10,7 @@ class Deployment(GitHubCore):
         'Accept': 'application/vnd.github.cannonball-preview+json'
         }
 
-    def __init__(self, deployment, session=None):
-        super(Deployment, self).__init__(deployment, session)
+    def _update_attributes(self, deployment):
         self._api = deployment.get('url')
 
         #: GitHub's id of this deployment
@@ -73,7 +72,7 @@ class Deployment(GitHubCore):
 
         return DeploymentStatus(json, self) if json else None
 
-    def iter_statuses(self, number=-1, etag=None):
+    def statuses(self, number=-1, etag=None):
         """Iterate over the deployment statuses for this deployment.
 
         :param int number: (optional), the number of statuses to return.
@@ -89,8 +88,7 @@ class Deployment(GitHubCore):
 
 
 class DeploymentStatus(GitHubCore):
-    def __init__(self, status, session=None):
-        super(DeploymentStatus, self).__init__(status, session)
+    def _update_attributes(self, status):
         self._api = status.get('url')
 
         #: GitHub's id for this deployment status

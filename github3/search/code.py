@@ -6,8 +6,7 @@ from ..repos import Repository
 
 
 class CodeSearchResult(GitHubCore):
-    def __init__(self, data, session=None):
-        super(CodeSearchResult, self).__init__(data, session)
+    def _update_attributes(self, data):
         self._api = data.get('url')
         #: Filename the match occurs in
         self.name = data.get('name')

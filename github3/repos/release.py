@@ -3,7 +3,8 @@ from __future__ import unicode_literals
 import json
 
 from ..decorators import requires_auth
-from ..models import GitHubCore, GitHubError
+from ..exceptions import error_for
+from ..models import GitHubCore
 from ..utils import stream_response_to_file
 from uritemplate import URITemplate
 
@@ -19,11 +20,12 @@ class Release(GitHubCore):
 
     CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
 
-    def __init__(self, release, session=None):
-        super(Release, self).__init__(release, session)
+    def _update_attributes(self, release):
         self._api = release.get('url')
         #: List of :class:`Asset <Asset>` objects for this release
-        self.assets = [Asset(i, self) for i in release.get('assets', [])]
+        self.original_assets = [
+            Asset(i, self) for i in release.get('assets', [])
+        ]
         #: URL for uploaded assets
         self.assets_url = release.get('assets_url')
         #: Body of the release (the description)
@@ -38,7 +40,7 @@ class Release(GitHubCore):
         self.id = release.get('id')
         #: Name given to the release
         self.name = release.get('name')
-        #; Boolean whether release is a prerelease
+        #: Boolean whether release is a prerelease
         self.prerelease = release.get('prerelease')
         #: Date the release was published
         self.published_at = self._strptime(release.get('published_at'))
@@ -52,6 +54,16 @@ class Release(GitHubCore):
 
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
+
+    def assets(self, number=-1, etag=None):
+        """Iterate over the assets available for this release.
+
+        :param int number: (optional), Number of assets to return
+        :param str etag: (optional), last ETag header sent
+        :returns: generator of :class:`Asset <Asset>` objects
+        """
+        url = self._build_url('assets', base_url=self._api)
+        return self._iter(number, url, Asset, etag=etag)
 
     @requires_auth
     def delete(self):
@@ -94,26 +106,16 @@ class Release(GitHubCore):
         }
         self._remove_none(data)
 
-        r = self._session.patch(
+        r = self.session.patch(
             url, data=json.dumps(data), headers=Release.CUSTOM_HEADERS
         )
 
         successful = self._boolean(r, 200, 404)
         if successful:
             # If the edit was successful, let's update the object.
-            self.__init__(r.json(), self)
+            self._update_attributes(r.json())
 
         return successful
-
-    def iter_assets(self, number=-1, etag=None):
-        """Iterate over the assets available for this release.
-
-        :param int number: (optional), Number of assets to return
-        :param str etag: (optional), last ETag header sent
-        :returns: generator of :class:`Asset <Asset>` objects
-        """
-        url = self._build_url('assets', base_url=self._api)
-        return self._iter(number, url, Asset, etag=etag)
 
     @requires_auth
     def upload_asset(self, content_type, name, asset):
@@ -134,12 +136,11 @@ class Release(GitHubCore):
                        verify=False)
         if r.status_code in (201, 202):
             return Asset(r.json(), self)
-        raise GitHubError(r)
+        raise error_for(r)
 
 
 class Asset(GitHubCore):
-    def __init__(self, asset, session=None):
-        super(Asset, self).__init__(asset, session)
+    def _update_attributes(self, asset):
         self._api = asset.get('url')
         #: Content-Type provided when the asset was created
         self.content_type = asset.get('content_type')
@@ -187,7 +188,8 @@ class Asset(GitHubCore):
             headers.update({
                 'Content-Type': None,
                 })
-            with self._session.no_auth():
+
+            with self.session.no_auth():
                 resp = self._get(resp.headers['location'], stream=True,
                                  headers=headers)
 
@@ -214,6 +216,6 @@ class Asset(GitHubCore):
         )
         successful = self._boolean(r, 200, 404)
         if successful:
-            self.__init__(r.json(), self)
+            self._update_attributes(r.json())
 
         return successful

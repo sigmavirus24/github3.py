@@ -2,7 +2,6 @@ import os
 import github3
 import pytest
 from github3 import repos
-from datetime import datetime
 from tests.utils import (BaseCase, load, mock)
 
 
@@ -13,7 +12,7 @@ class TestRepository(BaseCase):
 
     def setUp(self):
         super(TestRepository, self).setUp()
-        self.repo = repos.Repository(self.repo.to_json(), self.g)
+        self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
     def test_add_collaborator(self):
@@ -411,24 +410,6 @@ class TestRepository(BaseCase):
                                  lightweight=True)
             cr.assert_called_once_with('refs/tags/tag', 'fakesha')
 
-    def test_create_tree(self):
-        self.response('tree', 201)
-        self.post(self.api + 'git/trees')
-        data = {'tree': [{'path': 'file1', 'mode': '100755',
-                          'type': 'tree',
-                          'sha': '75b347329e3fc87ac78895ca1be58daff78872a1'}],
-                'base_tree': ''}
-        self.conf = {'data': data}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_tree, **data)
-
-        self.login()
-        assert self.repo.create_tree(None) is None
-        assert self.repo.create_tree({'foo': 'bar'}) is None
-        self.not_called()
-        assert isinstance(self.repo.create_tree(**data), github3.git.Tree)
-        self.mock_assertions()
-
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api[:-1])
@@ -529,18 +510,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.issue(2), github3.issues.Issue)
         self.mock_assertions()
 
-    def test_key(self):
-        self.response('key')
-        self.get(self.api + 'keys/2')
-
-        self.assertRaises(github3.GitHubError, self.repo.key, 2)
-
-        self.login()
-        assert self.repo.key(-2) is None
-        self.not_called()
-        assert isinstance(self.repo.key(2), github3.users.Key)
-        self.mock_assertions()
-
     def test_label(self):
         self.response('label')
         self.get(self.api + 'labels/name')
@@ -548,316 +517,6 @@ class TestRepository(BaseCase):
         assert self.repo.label(None) is None
         self.not_called()
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
-        self.mock_assertions()
-
-    def test_iter_assignees(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'assignees')
-        self.conf = {'params': {'per_page': 100}}
-
-        u = next(self.repo.iter_assignees())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
-    def test_iter_branches(self):
-        self.response('branch', _iter=True)
-        self.get(self.api + 'branches')
-        self.conf = {'params': {'per_page': 100}}
-
-        b = next(self.repo.iter_branches())
-        assert isinstance(b, repos.branch.Branch)
-        self.mock_assertions()
-
-    def test_iter_collaborators(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'collaborators')
-        self.conf = {'params': {'per_page': 100}}
-
-        u = next(self.repo.iter_collaborators())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
-    def test_iter_comments(self):
-        self.response('repo_comment', _iter=True)
-        self.get(self.api + 'comments')
-        self.conf = {'params': {'per_page': 100}}
-
-        c = next(self.repo.iter_comments())
-        assert isinstance(c, repos.comment.RepoComment)
-        self.mock_assertions()
-
-    def test_iter_comments_on_commit(self):
-        self.response('repo_comment', _iter=True)
-        self.get(self.api + 'commits/fakesha/comments')
-        self.conf = {'params': {'per_page': 1}}
-
-        c = next(self.repo.iter_comments_on_commit('fakesha'))
-        assert isinstance(c, repos.comment.RepoComment)
-        self.mock_assertions()
-
-    def test_iter_commits(self):
-        self.response('commit', _iter=True)
-        self.get(self.api + 'commits')
-        self.conf = {'params': {'per_page': 100}}
-
-        c = next(self.repo.iter_commits())
-        assert isinstance(c, repos.commit.RepoCommit)
-        self.mock_assertions()
-
-        self.conf = {'params': {'sha': 'fakesha', 'path': '/',
-                                'per_page': 100}}
-        c = next(self.repo.iter_commits('fakesha', '/'))
-        self.mock_assertions()
-
-        since = datetime(2013, 6, 1, 0, 0, 0)
-        until = datetime(2013, 6, 2, 0, 0, 0)
-        self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00',
-                                'per_page': 100}}
-        c = next(self.repo.iter_commits(since=since, until=until))
-        self.mock_assertions()
-
-        since = '2013-06-01T00:00:00'
-        until = '2013-06-02T00:00:00'
-        self.conf = {'params': {'since': '2013-06-01T00:00:00',
-                                'until': '2013-06-02T00:00:00',
-                                'per_page': 100}}
-        c = next(self.repo.iter_commits(since=since, until=until))
-        self.mock_assertions()
-
-    def test_iter_contributors(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'contributors')
-        self.conf = {'params': {'per_page': 100}}
-
-        u = next(self.repo.iter_contributors())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
-        self.conf = {'params': {'anon': True, 'per_page': 100}}
-        next(self.repo.iter_contributors(True))
-        self.mock_assertions()
-
-        next(self.repo.iter_contributors('true value'))
-        self.mock_assertions()
-
-    def test_iter_events(self):
-        self.response('event', _iter=True)
-        self.get(self.api + 'events')
-        self.conf = {'params': {'per_page': 100}}
-
-        e = next(self.repo.iter_events())
-        assert isinstance(e, github3.events.Event)
-        self.mock_assertions()
-
-    def test_iter_forks(self):
-        self.response('repo', _iter=True)
-        self.get(self.api + 'forks')
-        self.conf = {'params': {'per_page': 100}}
-
-        r = next(self.repo.iter_forks())
-        assert isinstance(r, repos.Repository)
-        self.mock_assertions()
-
-        self.conf['params']['sort'] = 'newest'
-        forks_params = self.conf['params'].copy()
-        forks_params.pop('per_page')
-        next(self.repo.iter_forks(**forks_params))
-        self.mock_assertions()
-
-    def test_iter_hooks(self):
-        self.response('hook', _iter=True)
-        self.get(self.api + 'hooks')
-        self.conf = {'params': {'per_page': 100}}
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_hooks)
-
-        self.login()
-        h = next(self.repo.iter_hooks())
-        assert isinstance(h, repos.hook.Hook)
-        self.mock_assertions()
-
-    def test_iter_issues(self):
-        self.response('issue', _iter=True)
-        self.get(self.api + 'issues')
-        params = {'per_page': 100}
-        self.conf = {'params': params}
-
-        i = next(self.repo.iter_issues())
-        assert isinstance(i, github3.issues.Issue)
-        self.mock_assertions()
-
-        params['milestone'] = 'none'
-        next(self.repo.iter_issues('none'))
-        self.mock_assertions()
-
-        params['state'] = 'open'
-
-        request_params = params.copy()
-        request_params.pop('per_page')
-        next(self.repo.iter_issues(**request_params))
-        self.mock_assertions()
-
-    def test_iter_issue_events(self):
-        self.response('issue_event', _iter=True)
-        self.get(self.api + 'issues/events')
-        self.conf = {'params': {'per_page': 100}}
-
-        e = next(self.repo.iter_issue_events())
-        assert isinstance(e, github3.issues.event.IssueEvent)
-        self.mock_assertions()
-
-    def test_iter_keys(self):
-        self.response('key', _iter=True)
-        self.get(self.api + 'keys')
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_keys)
-
-        self.login()
-        k = next(self.repo.iter_keys())
-        assert isinstance(k, github3.users.Key)
-        self.mock_assertions()
-
-    def test_iter_labels(self):
-        self.response('label', _iter=True)
-        self.get(self.api + 'labels')
-
-        l = next(self.repo.iter_labels())
-        assert isinstance(l, github3.issues.label.Label)
-        self.mock_assertions()
-
-    def test_iter_languages(self):
-        #: repos/:login/:repo/languages is just a dictionary, so _iter=False
-        self.response('language')
-        self.get(self.api + 'languages')
-
-        l = next(self.repo.iter_languages())
-        assert isinstance(l, tuple)
-        self.assertNotIn('ETag', l)
-        self.assertNotIn('Last-Modified', l)
-        self.mock_assertions()
-
-    def test_iter_milestones(self):
-        self.response('milestone', _iter=True)
-        self.get(self.api + 'milestones')
-
-        m = next(self.repo.iter_milestones())
-        assert isinstance(m, github3.issues.milestone.Milestone)
-        self.mock_assertions()
-
-    def test_iter_network_events(self):
-        self.response('event', _iter=True)
-        self.get(self.api.replace('repos', 'networks', 1) + 'events')
-
-        e = next(self.repo.iter_network_events())
-        assert isinstance(e, github3.events.Event)
-        self.mock_assertions()
-
-    def test_iter_notifications(self):
-        self.response('notification', _iter=True)
-        self.get(self.api + 'notifications')
-        self.conf.update(params={'per_page': 100})
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_notifications)
-
-        self.login()
-        n = next(self.repo.iter_notifications())
-        assert isinstance(n, github3.notifications.Thread)
-        self.mock_assertions()
-
-    def test_iter_pulls(self):
-        self.response('pull', _iter=True)
-        self.get(self.api + 'pulls')
-        base_params = {'per_page': 100, 'sort': 'created', 'direction': 'desc'}
-        self.conf.update(params=base_params)
-
-        p = next(self.repo.iter_pulls())
-        assert isinstance(p, github3.pulls.PullRequest)
-        self.mock_assertions()
-
-        next(self.repo.iter_pulls('foo'))
-        self.mock_assertions()
-
-        params = {'state': 'open'}
-        params.update(base_params)
-        self.conf.update(params=params)
-        next(self.repo.iter_pulls('Open'))
-        self.mock_assertions()
-
-        params = {'head': 'user:branch'}
-        params.update(base_params)
-        self.conf.update(params=params)
-        next(self.repo.iter_pulls(head='user:branch'))
-        self.mock_assertions()
-
-        params = {'base': 'branch'}
-        params.update(base_params)
-        self.conf.update(params=params)
-        next(self.repo.iter_pulls(base='branch'))
-        self.mock_assertions()
-
-    def test_iter_refs(self):
-        self.response('ref', _iter=True)
-        self.get(self.api + 'git/refs')
-
-        r = next(self.repo.iter_refs())
-        assert isinstance(r, github3.git.Reference)
-        self.mock_assertions()
-
-        self.get(self.api + 'git/refs/subspace')
-        r = next(self.repo.iter_refs('subspace'))
-        assert isinstance(r, github3.git.Reference)
-        self.mock_assertions()
-
-    def test_iter_stargazers(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'stargazers')
-
-        u = next(self.repo.iter_stargazers())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
-    def test_iter_subscribers(self):
-        self.response('user', _iter=True)
-        self.get(self.api + 'subscribers')
-
-        u = next(self.repo.iter_subscribers())
-        assert isinstance(u, github3.users.User)
-        self.mock_assertions()
-
-    def test_iter_statuses(self):
-        self.response('status', _iter=True)
-        self.get(self.api + 'statuses/fakesha')
-
-        with self.assertRaises(StopIteration):
-            next(self.repo.iter_statuses(None))
-        self.not_called()
-
-        s = next(self.repo.iter_statuses('fakesha'))
-        assert isinstance(s, repos.status.Status)
-        self.mock_assertions()
-
-    def test_iter_tags(self):
-        self.response('tag', _iter=True)
-        self.get(self.api + 'tags')
-
-        t = next(self.repo.iter_tags())
-        assert isinstance(t, repos.tag.RepoTag)
-        self.mock_assertions()
-
-        assert repr(t).startswith('<Repository Tag')
-        assert str(t) > ''
-
-    def test_iter_teams(self):
-        self.response('team', _iter=True)
-        self.get(self.api + 'teams')
-
-        self.assertRaises(github3.GitHubError, self.repo.iter_teams)
-        self.not_called()
-
-        self.login()
-        t = next(self.repo.iter_teams())
-        assert isinstance(t, github3.orgs.Team)
         self.mock_assertions()
 
     def test_mark_notifications(self):
@@ -905,7 +564,7 @@ class TestRepository(BaseCase):
         self.mock_assertions()
 
     def test_parent(self):
-        json = self.repo.to_json().copy()
+        json = self.repo.as_dict().copy()
         json['parent'] = json.copy()
         r = repos.Repository(json)
         assert isinstance(r.parent, repos.Repository)
@@ -956,24 +615,10 @@ class TestRepository(BaseCase):
         assert repr(self.repo) == '<Repository [sigmavirus24/github3.py]>'
 
     def test_source(self):
-        json = self.repo.to_json().copy()
+        json = self.repo.as_dict().copy()
         json['source'] = json.copy()
         r = repos.Repository(json)
         assert isinstance(r.source, repos.Repository)
-
-    def test_set_subscription(self):
-        self.response('subscription')
-        self.put(self.api + 'subscription')
-        self.conf = {'data': {'subscribed': True, 'ignored': False}}
-
-        self.assertRaises(github3.GitHubError, self.repo.set_subscription,
-                          True, False)
-        self.not_called()
-
-        self.login()
-        s = self.repo.set_subscription(True, False)
-        assert isinstance(s, github3.notifications.Subscription)
-        self.mock_assertions()
 
     def test_subscription(self):
         self.response('subscription')
@@ -1109,33 +754,6 @@ class TestRepository(BaseCase):
         self.assertEqual(w, {})
         self.mock_assertions()
 
-    def test_iter_commit_activity(self):
-        self.response('commit_activity', _iter=True)
-        self.get(self.api + 'stats/commit_activity')
-
-        w = next(self.repo.iter_commit_activity())
-        assert isinstance(w, dict)
-
-        self.mock_assertions()
-
-    def test_iter_contributor_statistics(self):
-        self.response('contributor_statistics', _iter=True)
-        self.get(self.api + 'stats/contributors')
-
-        s = next(self.repo.iter_contributor_statistics())
-        assert isinstance(s, repos.stats.ContributorStats)
-
-        self.mock_assertions()
-
-    def test_iter_code_frequency(self):
-        self.response('code_frequency', _iter=True)
-        self.get(self.api + 'stats/code_frequency')
-
-        s = next(self.repo.iter_code_frequency())
-        assert isinstance(s, list)
-
-        self.mock_assertions()
-
 
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):
@@ -1145,7 +763,7 @@ class TestContents(BaseCase):
 
     def setUp(self):
         super(TestContents, self).setUp()
-        self.contents = repos.contents.Contents(self.contents.to_json(),
+        self.contents = repos.contents.Contents(self.contents.as_dict(),
                                                 self.g)
 
     def test_equality(self):
@@ -1213,7 +831,7 @@ class TestHook(BaseCase):
 
     def setUp(self):
         super(TestHook, self).setUp()
-        self.hook = repos.hook.Hook(self.hook.to_json(), self.g)
+        self.hook = repos.hook.Hook(self.hook.as_dict(), self.g)
 
     def test_equality(self):
         h = repos.hook.Hook(load('hook'))
@@ -1302,7 +920,7 @@ class TestRepoComment(BaseCase):
 
     def setUp(self):
         super(TestRepoComment, self).setUp()
-        self.comment = repos.comment.RepoComment(self.comment.to_json(),
+        self.comment = repos.comment.RepoComment(self.comment.as_dict(),
                                                  self.g)
 
     def test_delete(self):

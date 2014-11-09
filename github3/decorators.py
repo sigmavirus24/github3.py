@@ -30,19 +30,18 @@ def requires_auth(func):
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         auth = False
-        if hasattr(self, '_session'):
-            auth = (self._session.auth or
-                    self._session.headers.get('Authorization'))
+        if hasattr(self, 'session'):
+            auth = self.session.has_auth()
 
         if auth:
             return func(self, *args, **kwargs)
         else:
-            from .models import GitHubError
+            from .exceptions import error_for
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires authentication"}'
             )
-            raise GitHubError(r)
+            raise error_for(r)
     return auth_wrapper
 
 
@@ -55,15 +54,15 @@ def requires_basic_auth(func):
     """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        if hasattr(self, '_session') and self._session.auth:
+        if hasattr(self, 'session') and self.session.auth:
             return func(self, *args, **kwargs)
         else:
-            from .models import GitHubError
+            from .exceptions import error_for
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires username/password authentication"}'
             )
-            raise GitHubError(r)
+            raise error_for(r)
     return auth_wrapper
 
 
@@ -76,16 +75,16 @@ def requires_app_credentials(func):
     """
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        client_id, client_secret = self._session.retrieve_client_credentials()
+        client_id, client_secret = self.session.retrieve_client_credentials()
         if client_id and client_secret:
             return func(self, *args, **kwargs)
         else:
-            from .models import GitHubError
+            from .exceptions import error_for
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires username/password authentication"}'
             )
-            raise GitHubError(r)
+            raise error_for(r)
 
     return auth_wrapper
 

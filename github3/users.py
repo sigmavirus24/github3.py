@@ -29,8 +29,7 @@ class Key(GitHubCore):
         k1.id == k2.id
         k1.id != k2.id
     """
-    def __init__(self, key, session=None):
-        super(Key, self).__init__(key, session)
+    def _update_attributes(self, key, session=None):
         self._api = key.get('url', '')
         #: The text of the actual key
         self.key = key.get('key')
@@ -45,9 +44,6 @@ class Key(GitHubCore):
     def __str__(self):
         return self.key
 
-    def _update_(self, key):
-        self.__init__(key, self._session)
-
     @requires_auth
     def delete(self):
         """Delete this Key"""
@@ -56,6 +52,11 @@ class Key(GitHubCore):
     @requires_auth
     def update(self, title, key):
         """Update this key.
+
+        .. warning::
+
+            As of 20 June 2014, the API considers keys to be immutable.
+            This will soon begin to return MethodNotAllowed errors.
 
         :param str title: (required), title of the key
         :param str key: (required), text of the key file
@@ -66,7 +67,7 @@ class Key(GitHubCore):
             data = {'title': title, 'key': key}
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
@@ -77,8 +78,7 @@ class Plan(GitHubObject):
     <http://developer.github.com/v3/users/#get-the-authenticated-user>`_
     documentation for more specifics.
     """
-    def __init__(self, plan):
-        super(Plan, self).__init__(plan)
+    def _update_attributes(self, plan):
         #: Number of collaborators
         self.collaborators = plan.get('collaborators')
         #: Name of the plan
@@ -119,8 +119,8 @@ class User(BaseAccount):
 
     """
 
-    def __init__(self, user, session=None):
-        super(User, self).__init__(user, session)
+    def _update_attributes(self, user):
+        super(User, self)._update_attributes(user)
         if not self.type:
             self.type = 'User'
 
@@ -129,7 +129,7 @@ class User(BaseAccount):
         #: True -- for hire, False -- not for hire
         self.hireable = user.get('hireable', False)
 
-        ## The number of public_gists
+        # The number of public_gists
         #: Number of public gists
         self.public_gists = user.get('public_gists', 0)
 
@@ -178,13 +178,19 @@ class User(BaseAccount):
         #: Subscriptions URL (not a template)
         self.subscriptions_url = user.get('subscriptions_url', '')
 
+        #: Number of repo contributions. Only appears in ``repo.contributors``
+        contributions = user.get('contributions')
+        # The refresh method uses __init__ to replace the attributes on the
+        # instance with what it receives from the /users/:username endpoint.
+        # What that means is that contributions is no longer returned and as
+        # such is changed because it doesn't exist. This guards against that.
+        if contributions is not None:
+            self.contributions = contributions
+
         self._uniq = user.get('id', None)
 
     def __str__(self):
         return self.login
-
-    def _update_(self, user):
-        self.__init__(user, self._session)
 
     @requires_auth
     def add_email_address(self, address):
@@ -231,26 +237,29 @@ class User(BaseAccount):
         return self._boolean(self._delete(url, data=dumps(addresses)),
                              204, 404)
 
-    def is_assignee_on(self, login, repository):
-        """Checks if this user can be assigned to issues on login/repository.
+    def is_assignee_on(self, username, repository):
+        """Check if this user can be assigned to issues on username/repository.
 
-        :returns: :class:`bool`
+        :param str username: owner's username of the repository
+        :param str repository: name of the repository
+        :returns: True if the use can be assigned, False otherwise
+        :rtype: :class:`bool`
         """
-        url = self._build_url('repos', login, repository, 'assignees',
+        url = self._build_url('repos', username, repository, 'assignees',
                               self.login)
         return self._boolean(self._get(url), 204, 404)
 
-    def is_following(self, login):
-        """Checks if this user is following ``login``.
+    def is_following(self, username):
+        """Checks if this user is following ``username``.
 
-        :param str login: (required)
+        :param str username: (required)
         :returns: bool
 
         """
-        url = self.following_urlt.expand(other_user=login)
+        url = self.following_urlt.expand(other_user=username)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_events(self, public=False, number=-1, etag=None):
+    def events(self, public=False, number=-1, etag=None):
         """Iterate over events performed by this user.
 
         :param bool public: (optional), only list public events for the
@@ -267,7 +276,7 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_followers(self, number=-1, etag=None):
+    def followers(self, number=-1, etag=None):
         """Iterate over the followers of this user.
 
         :param int number: (optional), number of followers to return. Default:
@@ -279,7 +288,7 @@ class User(BaseAccount):
         url = self._build_url('followers', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_following(self, number=-1, etag=None):
+    def following(self, number=-1, etag=None):
         """Iterate over the users being followed by this user.
 
         :param int number: (optional), number of users to return. Default: -1
@@ -291,7 +300,7 @@ class User(BaseAccount):
         url = self._build_url('following', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_keys(self, number=-1, etag=None):
+    def keys(self, number=-1, etag=None):
         """Iterate over the public keys of this user.
 
         .. versionadded:: 0.5
@@ -305,7 +314,8 @@ class User(BaseAccount):
         url = self._build_url('keys', base_url=self._api)
         return self._iter(int(number), url, Key, etag=etag)
 
-    def iter_org_events(self, org, number=-1, etag=None):
+    @requires_auth
+    def organization_events(self, org, number=-1, etag=None):
         """Iterate over events as they appear on the user's organization
         dashboard. You must be authenticated to view this.
 
@@ -321,7 +331,7 @@ class User(BaseAccount):
             url = self._build_url('events', 'orgs', org, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_received_events(self, public=False, number=-1, etag=None):
+    def received_events(self, public=False, number=-1, etag=None):
         """Iterate over events that the user has received. If the user is the
         authenticated user, you will see private and public events, otherwise
         you will only see public events.
@@ -340,7 +350,7 @@ class User(BaseAccount):
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_orgs(self, number=-1, etag=None):
+    def organizations(self, number=-1, etag=None):
         """Iterate over organizations the user is member of
 
         :param int number: (optional), number of organizations to return.
@@ -354,7 +364,8 @@ class User(BaseAccount):
         url = self._build_url('orgs', base_url=self._api)
         return self._iter(int(number), url, Organization, etag=etag)
 
-    def iter_starred(self, sort=None, direction=None, number=-1, etag=None):
+    def starred_repositories(self, sort=None, direction=None, number=-1,
+                             etag=None):
         """Iterate over repositories starred by this user.
 
         .. versionchanged:: 0.5
@@ -378,7 +389,7 @@ class User(BaseAccount):
         url = self.starred_urlt.expand(owner=None, repo=None)
         return self._iter(int(number), url, Repository, params, etag)
 
-    def iter_subscriptions(self, number=-1, etag=None):
+    def subscriptions(self, number=-1, etag=None):
         """Iterate over repositories subscribed to by this user.
 
         :param int number: (optional), number of subscriptions to return.
@@ -413,6 +424,6 @@ class User(BaseAccount):
         url = self._build_url('user')
         json = self._json(self._patch(url, data=dumps(user)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False

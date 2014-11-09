@@ -24,8 +24,7 @@ class Blob(GitHubObject):
 
     """
 
-    def __init__(self, blob):
-        super(Blob, self).__init__(blob)
+    def _update_attributes(self, blob):
         self._api = blob.get('url', '')
 
         #: Raw content of the blob.
@@ -56,8 +55,7 @@ class GitData(GitHubCore):
 
     """
 
-    def __init__(self, data, session=None):
-        super(GitData, self).__init__(data, session)
+    def _update_attributes(self, data):
         #: SHA of the object
         self.sha = data.get('sha')
         self._api = data.get('url', '')
@@ -72,9 +70,8 @@ class Commit(BaseCommit):
 
     """
 
-    def __init__(self, commit, session=None):
-        super(Commit, self).__init__(commit, session)
-
+    def _update_attributes(self, commit):
+        super(Commit, self)._update_attributes(commit)
         #: dict containing at least the name, email and date the commit was
         #: created
         self.author = commit.get('author', {}) or {}
@@ -90,7 +87,7 @@ class Commit(BaseCommit):
         #: :class:`Tree <Tree>` the commit belongs to.
         self.tree = None
         if commit.get('tree'):
-            self.tree = Tree(commit.get('tree'), self._session)
+            self.tree = Tree(commit.get('tree'), self)
 
     def _repr(self):
         return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
@@ -101,7 +98,7 @@ class Commit(BaseCommit):
         validity of this object, i.e., having a login or created_at object.
 
         """
-        return User(self.author, self._session)
+        return User(self.author, self)
 
     def committer_as_User(self):
         """Attempt to return the committer attribute as a
@@ -109,7 +106,7 @@ class Commit(BaseCommit):
         about the validity of this object.
 
         """
-        return User(self.committer, self._session)
+        return User(self.committer, self)
 
 
 class Reference(GitHubCore):
@@ -121,8 +118,7 @@ class Reference(GitHubCore):
 
     """
 
-    def __init__(self, ref, session=None):
-        super(Reference, self).__init__(ref, session)
+    def _update_attributes(self, ref):
         self._api = ref.get('url', '')
         #: The reference path, e.g., refs/heads/sc/featureA
         self.ref = ref.get('ref')
@@ -131,9 +127,6 @@ class Reference(GitHubCore):
 
     def _repr(self):
         return '<Reference [{0}]>'.format(self.ref)
-
-    def _update_(self, ref):
-        self.__init__(ref, self._session)
 
     @requires_auth
     def delete(self):
@@ -156,7 +149,7 @@ class Reference(GitHubCore):
         data = {'sha': sha, 'force': force}
         json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
@@ -165,8 +158,8 @@ class GitObject(GitData):
 
     """The :class:`GitObject <GitObject>` object."""
 
-    def __init__(self, obj):
-        super(GitObject, self).__init__(obj, None)
+    def _update_attributes(self, obj):
+        super(GitObject, self)._update_attributes(obj)
         #: The type of object.
         self.type = obj.get('type')
 
@@ -182,8 +175,8 @@ class Tag(GitData):
 
     """
 
-    def __init__(self, tag):
-        super(Tag, self).__init__(tag, None)
+    def _update_attributes(self, tag):
+        super(Tag, self)._update_attributes(tag)
         #: String of the tag
         self.tag = tag.get('tag')
         #: Commit message for the tag
@@ -205,8 +198,8 @@ class Tree(GitData):
 
     """
 
-    def __init__(self, tree, session=None):
-        super(Tree, self).__init__(tree, session)
+    def _update_attributes(self, tree):
+        super(Tree, self)._update_attributes(tree)
         #: list of :class:`Hash <Hash>` objects
         self.tree = [Hash(t) for t in tree.get('tree', [])]
 
@@ -220,7 +213,7 @@ class Tree(GitData):
         """
         json = self._json(self._get(self._api, params={'recursive': '1'}),
                           200)
-        return Tree(json, self._session) if json else None
+        return Tree(json, self) if json else None
 
 
 class Hash(GitHubObject):
@@ -231,8 +224,7 @@ class Hash(GitHubObject):
 
     """
 
-    def __init__(self, info):
-        super(Hash, self).__init__(info)
+    def _update_attributes(self, info):
         #: Path to file
         self.path = info.get('path')
         #: File mode

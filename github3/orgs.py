@@ -37,8 +37,7 @@ class Team(GitHubCore):
 
     """
 
-    def __init__(self, team, session=None):
-        super(Team, self).__init__(team, session)
+    def _update_attributes(self, team):
         self._api = team.get('url', '')
         #: This team's name.
         self.name = team.get('name')
@@ -59,13 +58,12 @@ class Team(GitHubCore):
     def _repr(self):
         return '<Team [{0}]>'.format(self.name)
 
-    def _update_(self, team):
-        self.__init__(team, self._session)
-
     @requires_auth
-    def add_member(self, login):
-        """Add ``login`` to this team.
+    def add_member(self, username):
+        """Add ``username`` to this team.
 
+        :param str username: the username of the user you would like to add to
+            the team.
         :returns: bool
         """
         warnings.warn(
@@ -73,17 +71,17 @@ class Team(GitHubCore):
             'https://developer.github.com/changes/2014-09-23-one-more-week'
             '-before-the-add-team-member-api-breaking-change/',
             DeprecationWarning)
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_repo(self, repo):
-        """Add ``repo`` to this team.
+    def add_repository(self, repository):
+        """Add ``repository`` to this team.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :returns: bool
         """
-        url = self._build_url('repos', repo, base_url=self._api)
+        url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
@@ -106,17 +104,18 @@ class Team(GitHubCore):
             data = {'name': name, 'permission': permission}
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
             if json:
-                self._update_(json)
+                self._update_attributes(json)
                 return True
         return False
 
-    def has_repo(self, repo):
-        """Checks if this team has access to ``repo``
+    @requires_auth
+    def has_repository(self, repository):
+        """Check if this team has access to ``repository``.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :returns: bool
         """
-        url = self._build_url('repos', repo, base_url=self._api)
+        url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
@@ -133,17 +132,19 @@ class Team(GitHubCore):
         url = self._build_url('memberships', username, base_url=self._api)
         return self._json(self._put(url), 200)
 
-    def is_member(self, login):
+    @requires_auth
+    def is_member(self, username):
         """Check if ``login`` is a member of this team.
 
-        :param str login: (required), login name of the user
+        :param str username: (required), username name of the user
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_members(self, number=-1, etag=None):
-        """Iterate over the members of this team.
+    @requires_auth
+    def members(self, number=-1, etag=None):
+        r"""Iterate over the members of this team.
 
         :param int number: (optional), number of users to iterate over.
             Default: -1 iterates over all values
@@ -154,7 +155,8 @@ class Team(GitHubCore):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_repos(self, number=-1, etag=None):
+    @requires_auth
+    def repositories(self, number=-1, etag=None):
         """Iterate over the repositories this team has access to.
 
         :param int number: (optional), number of repos to iterate over.
@@ -179,10 +181,10 @@ class Team(GitHubCore):
         return json or {}
 
     @requires_auth
-    def remove_member(self, login):
-        """Remove ``login`` from this team.
+    def remove_member(self, username):
+        """Remove ``username`` from this team.
 
-        :param str login: (required), login of the member to remove
+        :param str username: (required), username of the member to remove
         :returns: bool
         """
         warnings.warn(
@@ -190,7 +192,7 @@ class Team(GitHubCore):
             'https://developer.github.com/changes/2014-09-23-one-more-week'
             '-before-the-add-team-member-api-breaking-change/',
             DeprecationWarning)
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
@@ -204,13 +206,13 @@ class Team(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def remove_repo(self, repo):
-        """Remove ``repo`` from this team.
+    def remove_repository(self, repository):
+        """Remove ``repository`` from this team.
 
-        :param str repo: (required), form: 'user/repo'
+        :param str repository: (required), form: 'user/repo'
         :returns: bool
         """
-        url = self._build_url('repos', repo, base_url=self._api)
+        url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
 
@@ -232,10 +234,9 @@ class Organization(BaseAccount):
 
     """
 
-    def __init__(self, org, session=None):
-        super(Organization, self).__init__(org, session)
-        if not self.type:
-            self.type = 'Organization'
+    def _update_attributes(self, org):
+        super(Organization, self)._update_attributes(org)
+        self.type = self.type or 'Organization'
 
         #: Events url (not a template)
         self.events_url = org.get('events_url')
@@ -253,8 +254,13 @@ class Organization(BaseAccount):
         self.repos_url = org.get('repos_url')
 
     @requires_auth
-    def add_member(self, login, team):
-        """Add ``login`` to ``team`` and thereby to this organization.
+    def add_member(self, username, team_id):
+        """Add ``username`` to ``team`` and thereby to this organization.
+
+        .. warning::
+            This method is no longer valid. To add a member to a team, you
+            must now retrieve the team directly, and use the ``invite``
+            method.
 
         .. warning::
             This method is no longer valid. To add a member to a team, you
@@ -264,15 +270,14 @@ class Organization(BaseAccount):
         Any user that is to be added to an organization, must be added
         to a team as per the GitHub api.
 
-        .. note::
-            This method is of complexity O(n). This iterates over all teams in
-            your organization and only adds the user when the team name
-            matches the team parameter above. If you want constant time, you
-            should retrieve the team and call ``add_member`` on that team
-            directly.
+        .. versionchanged:: 1.0
 
-        :param str login: (required), login name of the user to be added
-        :param str team: (required), team name
+            The second parameter used to be ``team`` but has been changed to
+            ``team_id``. This parameter is now required to be an integer to
+            improve performance of this method.
+
+        :param str username: (required), login name of the user to be added
+        :param int team_id: (required), team id
         :returns: bool
         """
         warnings.warn(
@@ -280,44 +285,42 @@ class Organization(BaseAccount):
             'https://developer.github.com/changes/2014-09-23-one-more-week'
             '-before-the-add-team-member-api-breaking-change/',
             DeprecationWarning)
-        for t in self.iter_teams():
-            if team == t.name:
-                return t.add_member(login)
-        return False
+
+        if int(team_id) < 0:
+            return False
+
+        url = self._build_url('teams', str(team_id), 'members', str(username))
+        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_repo(self, repo, team):
-        """Add ``repo`` to ``team``.
+    def add_repository(self, repository, team_id):
+        """Add ``repository`` to ``team``.
 
-        .. note::
-            This method is of complexity O(n). This iterates over all teams in
-            your organization and only adds the repo when the team name
-            matches the team parameter above. If you want constant time, you
-            should retrieve the team and call ``add_repo`` on that team
-            directly.
+        .. versionchanged:: 1.0
 
-        :param str repo: (required), form: 'user/repo'
-        :param str team: (required), team name
+            The second parameter used to be ``team`` but has been changed to
+            ``team_id``. This parameter is now required to be an integer to
+            improve performance of this method.
+
+        :param str repository: (required), form: 'user/repo'
+        :param int team_id: (required), team id
+        :returns: bool
         """
-        for t in self.iter_teams():
-            if team == t.name:
-                return t.add_repo(repo)
-        return False
+        if int(team_id) < 0:
+            return False
+
+        url = self._build_url('teams', str(team_id), 'repos', str(repository))
+        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def create_repo(self,
-                    name,
-                    description='',
-                    homepage='',
-                    private=False,
-                    has_issues=True,
-                    has_wiki=True,
-                    has_downloads=True,
-                    team_id=0,
-                    auto_init=False,
-                    gitignore_template=''):
-        """Create a repository for this organization if the authenticated user
-        is a member.
+    def create_repository(self, name, description='', homepage='',
+                          private=False, has_issues=True, has_wiki=True,
+                          team_id=0, auto_init=False, gitignore_template='',
+                          license_template=''):
+        """Create a repository for this organization.
+
+        If the client is authenticated and a member of the organization, this
+        will create a new repository in the organization.
 
         :param str name: (required), name of the repository
         :param str description: (optional)
@@ -328,12 +331,12 @@ class Organization(BaseAccount):
             this repository. API default: ``True``
         :param bool has_wiki: (optional), If ``True``, enable the wiki for
             this repository. API default: ``True``
-        :param bool has_downloads: (optional), If ``True``, enable downloads
-            for this repository. API default: ``True``
         :param int team_id: (optional), id of the team that will be granted
             access to this repository
         :param bool auto_init: (optional), auto initialize the repository.
         :param str gitignore_template: (optional), name of the template; this
+            is ignored if auto_int = False.
+        :param str license_template: (optional), name of the license; this
             is ignored if auto_int = False.
         :returns: :class:`Repository <github3.repos.Repository>`
 
@@ -343,26 +346,28 @@ class Organization(BaseAccount):
         data = {'name': name, 'description': description,
                 'homepage': homepage, 'private': private,
                 'has_issues': has_issues, 'has_wiki': has_wiki,
-                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'license_template': license_template, 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
-        if team_id > 0:
+        if int(team_id) > 0:
             data.update({'team_id': team_id})
         json = self._json(self._post(url, data), 201)
         return Repository(json, self) if json else None
 
     @requires_auth
-    def conceal_member(self, login):
-        """Conceal ``login``'s membership in this organization.
+    def conceal_member(self, username):
+        """Conceal ``username``'s membership in this organization.
 
+        :param str username: username of the organization member to conceal
         :returns: bool
         """
-        url = self._build_url('public_members', login, base_url=self._api)
+        url = self._build_url('public_members', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def create_team(self, name, repo_names=[], permission=''):
-        """Assuming the authenticated user owns this organization,
-        create and return a new team.
+        """Create a new team and return it.
+
+        This only works if the authenticated user owns this organization.
 
         :param str name: (required), name to be given to the team
         :param list repo_names: (optional) repositories, e.g.
@@ -382,14 +387,10 @@ class Organization(BaseAccount):
                 'permission': permission}
         url = self._build_url('teams', base_url=self._api)
         json = self._json(self._post(url, data), 201)
-        return Team(json, self._session) if json else None
+        return Team(json, self) if json else None
 
     @requires_auth
-    def edit(self,
-             billing_email=None,
-             company=None,
-             email=None,
-             location=None,
+    def edit(self, billing_email=None, company=None, email=None, location=None,
              name=None):
         """Edit this organization.
 
@@ -409,28 +410,30 @@ class Organization(BaseAccount):
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
-    def is_member(self, login):
-        """Check if the user with login ``login`` is a member.
+    def is_member(self, username):
+        """Check if the user named ``username`` is a member.
 
+        :param str username: name of the user you'd like to check
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def is_public_member(self, login):
-        """Check if the user with login ``login`` is a public member.
+    def is_public_member(self, username):
+        """Check if the user named ``username`` is a public member.
 
+        :param str username: name of the user you'd like to check
         :returns: bool
         """
-        url = self._build_url('public_members', login, base_url=self._api)
+        url = self._build_url('public_members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_events(self, number=-1, etag=None):
-        """Iterate over events for this org.
+    def events(self, number=-1, etag=None):
+        r"""Iterate over events for this org.
 
         :param int number: (optional), number of events to return. Default: -1
             iterates over all events available.
@@ -441,8 +444,8 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def iter_members(self, number=-1, etag=None):
-        """Iterate over members of this organization.
+    def members(self, number=-1, etag=None):
+        r"""Iterate over members of this organization.
 
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
@@ -453,8 +456,8 @@ class Organization(BaseAccount):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_public_members(self, number=-1, etag=None):
-        """Iterate over public members of this organization.
+    def public_members(self, number=-1, etag=None):
+        r"""Iterate over public members of this organization.
 
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
@@ -465,8 +468,8 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', base_url=self._api)
         return self._iter(int(number), url, User, etag=etag)
 
-    def iter_repos(self, type='', number=-1, etag=None):
-        """Iterate over repos for this organization.
+    def repositories(self, type='', number=-1, etag=None):
+        r"""Iterate over repos for this organization.
 
         :param str type: (optional), accepted values:
             ('all', 'public', 'member', 'private', 'forks', 'sources'), API
@@ -484,8 +487,8 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
-    def iter_teams(self, number=-1, etag=None):
-        """Iterate over teams that are part of this organization.
+    def teams(self, number=-1, etag=None):
+        r"""Iterate over teams that are part of this organization.
 
         :param int number: (optional), number of teams to return. Default: -1
             returns all available teams.
@@ -497,41 +500,43 @@ class Organization(BaseAccount):
         return self._iter(int(number), url, Team, etag=etag)
 
     @requires_auth
-    def publicize_member(self, login):
-        """Make ``login``'s membership in this organization public.
+    def publicize_member(self, username):
+        """Make ``username``'s membership in this organization public.
 
+        :param str username: the name of the user whose membership you wish to
+            publicize
         :returns: bool
         """
-        url = self._build_url('public_members', login, base_url=self._api)
+        url = self._build_url('public_members', username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def remove_member(self, login):
-        """Remove the user with login ``login`` from this
-        organization.
+    def remove_member(self, username):
+        """Remove the user named ``username`` from this organization.
 
+        :param str username: name of the user to remove from the org
         :returns: bool
         """
-        url = self._build_url('members', login, base_url=self._api)
+        url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def remove_repo(self, repo, team):
-        """Remove ``repo`` from ``team``.
+    def remove_repository(self, repository, team_id):
+        """Remove ``repository`` from the team with ``team_id``.
 
-        :param str repo: (required), form: 'user/repo'
-        :param str team: (required)
+        :param str repository: (required), form: 'user/repo'
+        :param int team_id: (required)
         :returns: bool
         """
-        for t in self.iter_teams():
-            if team == t.name:
-                return t.remove_repo(repo)
+        if int(team_id) > 0:
+            url = self._build_url('teams', str(team_id), 'repos',
+                                  str(repository))
+            return self._boolean(self._delete(url), 204, 404)
         return False
 
     @requires_auth
     def team(self, team_id):
-        """Returns Team object with information about team specified by
-        ``team_id``.
+        """Return the team specified by ``team_id``.
 
         :param int team_id: (required), unique id for the team
         :returns: :class:`Team <Team>`
@@ -540,7 +545,7 @@ class Organization(BaseAccount):
         if int(team_id) > 0:
             url = self._build_url('teams', str(team_id))
             json = self._json(self._get(url), 200)
-        return Team(json, self._session) if json else None
+        return Team(json, self) if json else None
 
 
 class Membership(GitHubCore):

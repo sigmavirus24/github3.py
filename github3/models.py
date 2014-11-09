@@ -8,13 +8,16 @@ This module provides the basic models used in github3.py
 """
 from __future__ import unicode_literals
 
-from json import dumps
+from json import dumps, loads
 from requests.compat import urlparse, is_py2
-from .decorators import requires_auth
-from .session import GitHubSession
-from .utils import UTC
 from datetime import datetime
 from logging import getLogger
+
+from .decorators import requires_auth
+from .exceptions import error_for
+from .null import NullObject
+from .session import GitHubSession
+from .utils import UTC
 
 __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
@@ -31,14 +34,45 @@ class GitHubObject(object):
             self.last_modified = json.pop('Last-Modified', None)
             self._uniq = json.get('url', None)
         self._json_data = json
+        self._update_attributes(json)
 
-    def to_json(self):
-        """Return the json representing this object."""
+    def _update_attributes(self, json):
+        pass
+
+    def as_dict(self):
+        """Return the attributes for this object as a dictionary.
+
+        This is equivalent to calling::
+
+            json.loads(obj.as_json())
+
+        :returns: this object's attributes serialized to a dictionary
+        :rtype: dict
+        """
         return self._json_data
 
+    def as_json(self):
+        """Return the json data for this object.
+
+        This is equivalent to calling::
+
+            json.dumps(obj.as_dict())
+
+        :returns: this object's attributes as a JSON string
+        :rtype: str
+        """
+        return dumps(self._json_data)
+
     def _strptime(self, time_str):
-        """Convert an ISO 8601 formatted string in UTC into a
-        timezone-aware datetime object."""
+        """Convert an ISO 8601 formatted string to a datetime object.
+
+        We assume that the ISO 8601 formatted string is in UTC and we create
+        the datetime object so that it is timezone-aware.
+
+        :param str time_str: ISO 8601 formatted string
+        :returns: timezone-aware datetime object
+        :rtype: datetime or None
+        """
         if time_str:
             # Parse UTC string into naive datetime, then add timezone
             dt = datetime.strptime(time_str, __timeformat__)
@@ -46,7 +80,7 @@ class GitHubObject(object):
         return None
 
     def _repr(self):
-        return ''
+        return '<github3-object at 0x{0:x}>'.format(id(self))
 
     def __repr__(self):
         repr_string = self._repr()
@@ -55,9 +89,14 @@ class GitHubObject(object):
         return repr_string
 
     @classmethod
+    def from_dict(cls, json_dict):
+        """Return an instance of this class formed from ``json_dict``."""
+        return cls(json_dict)
+
+    @classmethod
     def from_json(cls, json):
-        """Return an instance of ``cls`` formed from ``json``."""
-        return cls(json)
+        """Return an instance of this class formed from ``json``."""
+        return cls(loads(json))
 
     def __eq__(self, other):
         return self._uniq == other._uniq
@@ -70,30 +109,44 @@ class GitHubObject(object):
 
 
 class GitHubCore(GitHubObject):
-    """The :class:`GitHubCore <GitHubCore>` object. This class provides some
-    basic attributes to other classes that are very useful to have.
+
+    """The base object for all objects that require a session.
+
+    The :class:`GitHubCore <GitHubCore>` object provides some
+    basic attributes and methods to other sub-classes that are very useful to
+    have.
     """
+
     def __init__(self, json, session=None):
-        super(GitHubCore, self).__init__(json)
-        if hasattr(session, '_session'):
-            # i.e. session is actually a GitHub object
-            session = session._session
+        if hasattr(session, 'session'):
+            # i.e. session is actually a GitHubCore instance
+            session = session.session
         elif session is None:
             session = GitHubSession()
-        self._session = session
+        self.session = session
 
         # set a sane default
         self._github_url = 'https://api.github.com'
+        super(GitHubCore, self).__init__(json)
 
     def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
 
-    def _remove_none(self, data):
+    @staticmethod
+    def _remove_none(data):
         if not data:
             return
         for (k, v) in list(data.items()):
             if v is None:
                 del(data[k])
+
+    def _instance_or_null(self, instance_class, json):
+        if json is None:
+            return NullObject(instance_class.__name__)
+        try:
+            return instance_class(json, self)
+        except TypeError:  # instance_class is not a subclass of GitHubCore
+            return instance_class(json)
 
     def _json(self, response, status_code):
         ret = None
@@ -118,20 +171,20 @@ class GitHubCore(GitHubObject):
             if status_code == true_code:
                 return True
             if status_code != false_code and status_code >= 400:
-                raise GitHubError(response)
+                raise error_for(response)
         return False
 
     def _delete(self, url, **kwargs):
         __logs__.debug('DELETE %s with %s', url, kwargs)
-        return self._session.delete(url, **kwargs)
+        return self.session.delete(url, **kwargs)
 
     def _get(self, url, **kwargs):
         __logs__.debug('GET %s with %s', url, kwargs)
-        return self._session.get(url, **kwargs)
+        return self.session.get(url, **kwargs)
 
     def _patch(self, url, **kwargs):
         __logs__.debug('PATCH %s with %s', url, kwargs)
-        return self._session.patch(url, **kwargs)
+        return self.session.patch(url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
@@ -142,15 +195,15 @@ class GitHubCore(GitHubObject):
                 'Content-Type': None
                 }.update(kwargs['headers'])
         __logs__.debug('POST %s with %s, %s', url, data, kwargs)
-        return self._session.post(url, data, **kwargs)
+        return self.session.post(url, data, **kwargs)
 
     def _put(self, url, **kwargs):
         __logs__.debug('PUT %s with %s', url, kwargs)
-        return self._session.put(url, **kwargs)
+        return self.session.put(url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
-        return self._session.build_url(*args, **kwargs)
+        return self.session.build_url(*args, **kwargs)
 
     @property
     def _api(self):
@@ -159,6 +212,7 @@ class GitHubCore(GitHubObject):
     @_api.setter
     def _api(self, uri):
         self._uri = urlparse(uri)
+        self.url = uri
 
     def _iter(self, count, url, cls, params=None, etag=None):
         """Generic iterator for this project.
@@ -168,6 +222,8 @@ class GitHubCore(GitHubObject):
         :param class cls: cls to return an object of
         :param params dict: (optional) Parameters for the request
         :param str etag: (optional), ETag from the last call
+        :returns: A lazy iterator over the pagianted resource
+        :rtype: :class:`GitHubIterator <github3.structs.GitHubIterator>`
         """
         from .structs import GitHubIterator
         return GitHubIterator(count, url, cls, self, params, etag)
@@ -184,22 +240,16 @@ class GitHubCore(GitHubObject):
         return self._remaining
 
     def refresh(self, conditional=False):
-        """Re-retrieve the information for this object and returns the
-        refreshed instance.
-
-        :param bool conditional: If True, then we will search for a stored
-            header ('Last-Modified', or 'ETag') on the object and send that
-            as described in the `Conditional Requests`_ section of the docs
-        :returns: self
+        """Re-retrieve the information for this object.
 
         The reasoning for the return value is the following example: ::
 
-            repos = [r.refresh() for r in g.iter_repos('kennethreitz')]
+            repos = [r.refresh() for r in g.repositories_by('kennethreitz')]
 
         Without the return value, that would be an array of ``None``'s and you
         would otherwise have to do: ::
 
-            repos = [r for i in g.iter_repos('kennethreitz')]
+            repos = [r for i in g.repositories_by('kennethreitz')]
             [r.refresh() for r in repos]
 
         Which is really an anti-pattern.
@@ -208,6 +258,11 @@ class GitHubCore(GitHubObject):
 
         .. _Conditional Requests:
             http://developer.github.com/v3/#conditional-requests
+
+        :param bool conditional: If True, then we will search for a stored
+            header ('Last-Modified', or 'ETag') on the object and send that
+            as described in the `Conditional Requests`_ section of the docs
+        :returns: self
         """
         headers = {}
         if conditional:
@@ -219,15 +274,15 @@ class GitHubCore(GitHubObject):
         headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)
         if json is not None:
-            self.__init__(json, self._session)
+            self._update_attributes(json)
         return self
 
 
 class BaseComment(GitHubCore):
-    """The :class:`BaseComment <BaseComment>` object. A basic class for Gist,
-    Issue and Pull Request Comments."""
-    def __init__(self, comment, session):
-        super(BaseComment, self).__init__(comment, session)
+
+    """A basic class for Gist, Issue and Pull Request Comments."""
+
+    def _update_attributes(self, comment):
         #: Unique ID of the comment.
         self.id = comment.get('id')
         #: Body of the comment. (As written by the commenter)
@@ -252,9 +307,6 @@ class BaseComment(GitHubCore):
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
-    def _update_(self, comment):
-        self.__init__(comment, self._session)
-
     @requires_auth
     def delete(self):
         """Delete this comment.
@@ -275,17 +327,20 @@ class BaseComment(GitHubCore):
             json = self._json(self._patch(self._api,
                               data=dumps({'body': body})), 200)
             if json:
-                self._update_(json)
+                self._update_attributes(json)
                 return True
         return False
 
 
 class BaseCommit(GitHubCore):
-    """The :class:`BaseCommit <BaseCommit>` object. This serves as the base for
+
+    """This abstracts a lot of the common attributes for commit-like objects.
+
+    The :class:`BaseCommit <BaseCommit>` object serves as the base for
     the various types of commit objects returned by the API.
     """
-    def __init__(self, commit, session):
-        super(BaseCommit, self).__init__(commit, session)
+
+    def _update_attributes(self, commit):
         self._api = commit.get('url', '')
         #: SHA of this commit.
         self.sha = commit.get('sha')
@@ -303,12 +358,15 @@ class BaseCommit(GitHubCore):
 
 
 class BaseAccount(GitHubCore):
-    """The :class:`BaseAccount <BaseAccount>` object. This is used to do the
+
+    """This class holds the commonalities of Organizations and Users.
+
+    The :class:`BaseAccount <BaseAccount>` object is used to do the
     heavy lifting for :class:`Organization <github3.orgs.Organization>` and
     :class:`User <github3.users.User>` objects.
     """
-    def __init__(self, acct, session):
-        super(BaseAccount, self).__init__(acct, session)
+
+    def _update_attributes(self, acct):
         #: Tells you what type of account this is
         self.type = None
         if acct.get('type'):
@@ -328,31 +386,31 @@ class BaseAccount(GitHubCore):
         #: E-mail address of the user/org
         self.email = acct.get('email')
 
-        ## The number of people following this acct
+        # The number of people following this acct
         #: Number of followers
-        self.followers = acct.get('followers', 0)
+        self.followers_count = acct.get('followers', 0)
 
-        ## The number of people this acct follows
+        # The number of people this acct follows
         #: Number of people the user is following
-        self.following = acct.get('following', 0)
+        self.following_count = acct.get('following', 0)
 
         #: Unique ID of the account
         self.id = acct.get('id', 0)
         #: Location of the user/org
         self.location = acct.get('location', '')
-        #: login name of the user/org
+        #: User name of the user/organization
         self.login = acct.get('login', '')
 
-        ## e.g. first_name last_name
+        # e.g. first_name last_name
         #: Real name of the user/org
         self.name = acct.get('name') or ''
         self.name = self.name
 
-        ## The number of public_repos
+        # The number of public_repos
         #: Number of public repos owned by the user/org
-        self.public_repos = acct.get('public_repos', 0)
+        self.public_repos_count = acct.get('public_repos', 0)
 
-        ## e.g. https://github.com/self._login
+        # e.g. https://github.com/self._login
         #: URL of the user/org's profile
         self.html_url = acct.get('html_url', '')
 
@@ -361,34 +419,3 @@ class BaseAccount(GitHubCore):
 
     def _repr(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
-
-    def _update_(self, acct):
-        self.__init__(acct, self._session)
-
-
-class GitHubError(Exception):
-    def __init__(self, resp):
-        super(GitHubError, self).__init__(resp)
-        #: Response code that triggered the error
-        self.response = resp
-        self.code = resp.status_code
-        self.errors = []
-        try:
-            error = resp.json()
-            #: Message associated with the error
-            self.msg = error.get('message')
-            #: List of errors provided by GitHub
-            if error.get('errors'):
-                self.errors = error.get('errors')
-        except:  # Amazon S3 error
-            self.msg = resp.content or '[No message]'
-
-    def __repr__(self):
-        return '<GitHubError [{0}]>'.format(self.msg or self.code)
-
-    def __str__(self):
-        return '{0} {1}'.format(self.code, self.msg)
-
-    @property
-    def message(self):
-        return self.msg

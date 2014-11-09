@@ -18,6 +18,8 @@ def requires_2fa(response):
 
 
 class GitHubSession(requests.Session):
+    auth = None
+
     def __init__(self):
         super(GitHubSession, self).__init__()
         self.headers.update({
@@ -54,7 +56,7 @@ class GitHubSession(requests.Session):
         parts = [str(p) for p in parts]
         key = tuple(parts)
         __logs__.info('Building a url from %s', key)
-        if not key in __url_cache__:
+        if key not in __url_cache__:
             __logs__.info('Missed the cache building the url')
             __url_cache__[key] = '/'.join(parts)
         return __url_cache__[key]
@@ -66,6 +68,9 @@ class GitHubSession(requests.Session):
             })
         kwargs.update(headers=headers)
         return super(GitHubSession, self).request(*args, **kwargs)
+
+    def has_auth(self):
+        return (self.auth or self.headers.get('Authorization'))
 
     def oauth2_auth(self, client_id, client_secret):
         """Use OAuth2 for authentication.

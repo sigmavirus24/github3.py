@@ -1,5 +1,9 @@
+.. vim: set tw=100
+
 History/Changelog
 -----------------
+
+.. include:: ./LATEST_VERSION_NOTES.rst
 
 0.9.3: 2014-11-04
 ~~~~~~~~~~~~~~~~~

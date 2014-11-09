@@ -39,10 +39,9 @@ class Gist(GitHubCore):
 
     """
 
-    def __init__(self, data, session=None):
-        super(Gist, self).__init__(data, session)
+    def _update_attributes(self, data):
         #: Number of comments on this gist
-        self.comments = data.get('comments', 0)
+        self.comments_count = data.get('comments', 0)
 
         #: Unique id for this gist.
         self.id = '{0}'.format(data.get('id', ''))
@@ -59,8 +58,6 @@ class Gist(GitHubCore):
         self.public = data.get('public')
 
         self._forks = data.get('forks', [])
-        #: The number of forks of this gist.
-        self.forks = len(self._forks)
 
         #: Git URL to pull this gist, e.g., git://gist.github.com/1.git
         self.git_pull_url = data.get('git_pull_url', '')
@@ -80,14 +77,12 @@ class Gist(GitHubCore):
         self.owner = User(owner, self) if owner else None
 
         self._files = [GistFile(data['files'][f]) for f in data['files']]
-        #: Number of files in this gist.
-        self.files = len(self._files)
 
         #: History of this gist, list of
         #: :class:`GistHistory <github3.gists.history.GistHistory>`
         self.history = [GistHistory(h, self) for h in data.get('history', [])]
 
-        ## New urls
+        # New urls
 
         #: Comments URL (not a template)
         self.comments_url = data.get('comments_url', '')
@@ -106,9 +101,6 @@ class Gist(GitHubCore):
 
     def _repr(self):
         return '<Gist [{0}]>'.format(self.id)
-
-    def _update_(self, data):
-        self.__init__(data, self._session)
 
     @requires_auth
     def create_comment(self, body):
@@ -155,7 +147,7 @@ class Gist(GitHubCore):
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
@@ -170,14 +162,6 @@ class Gist(GitHubCore):
         json = self._json(self._post(url), 201)
         return Gist(json, self) if json else None
 
-    def is_public(self):
-        """Check to see if this gist is public or not.
-
-        :returns: bool -- True if public, False if private
-
-        """
-        return self.public
-
     @requires_auth
     def is_starred(self):
         """Check to see if this gist is starred by the authenticated user.
@@ -188,8 +172,8 @@ class Gist(GitHubCore):
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    def iter_comments(self, number=-1, etag=None):
-        """List comments on this gist.
+    def comments(self, number=-1, etag=None):
+        """Iterate over comments on this gist.
 
         :param int number: (optional), number of comments to iterate over.
             Default: -1 will iterate over all comments on the gist
@@ -202,8 +186,8 @@ class Gist(GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, GistComment, etag=etag)
 
-    def iter_commits(self, number=-1, etag=None):
-        """Iter over the commits on this gist.
+    def commits(self, number=-1, etag=None):
+        """Iterate over the commits on this gist.
 
         These commits will be requested from the API and should be the same as
         what is in ``Gist.history``.
@@ -226,7 +210,7 @@ class Gist(GitHubCore):
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, GistHistory)
 
-    def iter_files(self):
+    def files(self):
         """Iterator over the files stored in this gist.
 
         :returns: generator of :class`GistFile <github3.gists.file.GistFile>`
@@ -234,7 +218,7 @@ class Gist(GitHubCore):
         """
         return iter(self._files)
 
-    def iter_forks(self, number=-1, etag=None):
+    def forks(self, number=-1, etag=None):
         """Iterator of forks of this gist.
 
         .. versionchanged:: 0.9

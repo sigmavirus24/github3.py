@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from ..models import GitHubObject
 
 
 class PagesInfo(GitHubObject):
-    def __init__(self, info):
-        super(PagesInfo, self).__init__(info)
+    def _update_attributes(self, info):
         self._api = info.get('url')
 
         #: Status of the pages site, e.g., built
@@ -15,10 +16,16 @@ class PagesInfo(GitHubObject):
         #: Boolean indicating whether there is a custom 404 for the pages site
         self.custom_404 = info.get('custom_404')
 
+    def _repr(self):
+        info = self.cname or ''
+        if info:
+            info += '/'
+        info += self.status or ''
+        return '<Pages Info [{0}]>'.format(info)
+
 
 class PagesBuild(GitHubObject):
-    def __init__(self, build):
-        super(PagesBuild, self).__init__(build)
+    def _update_attributes(self, build):
         self._api = build.get('url')
 
         #: Status of the pages build, e.g., building
@@ -43,3 +50,6 @@ class PagesBuild(GitHubObject):
 
         #: Datetime the build was updated
         self.updated_at = self._strptime(build.get('updated_at'))
+
+    def _repr(self):
+        return '<Pages Build [{0}/{1}]>'.format(self.commit, self.status)

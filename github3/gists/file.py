@@ -19,9 +19,7 @@ class GistFile(GitHubObject):
 
     """
 
-    def __init__(self, attributes):
-        super(GistFile, self).__init__(attributes)
-
+    def _update_attributes(self, attributes):
         #: The raw URL for the file at GitHub.
         self.raw_url = attributes.get('raw_url')
         #: The name of the file.

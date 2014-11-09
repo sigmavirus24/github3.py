@@ -5,7 +5,7 @@ from .helper import IntegrationHelper
 
 class TestAPI(IntegrationHelper):
     def get_client(self):
-        return github3.gh
+        return github3.api.gh
 
     def test_emojis(self):
         """Test the ability to use the /emojis endpoint"""

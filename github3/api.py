@@ -3,7 +3,7 @@
 github3.api
 ===========
 
-:copyright: (c) 2012 by SigmaVirus24
+:copyright: (c) 2012-2014 by Ian Cordasco
 :license: Modified BSD, see LICENSE for more details
 
 """
@@ -13,11 +13,11 @@ from .github import GitHub, GitHubEnterprise
 gh = GitHub()
 
 
-def authorize(login, password, scopes, note='', note_url='', client_id='',
+def authorize(username, password, scopes, note='', note_url='', client_id='',
               client_secret='', two_factor_callback=None):
     """Obtain an authorization token for the GitHub API.
 
-    :param str login: (required)
+    :param str username: (required)
     :param str password: (required)
     :param list scopes: (required), areas you want this token to apply to,
         i.e., 'gist', 'user'
@@ -34,20 +34,23 @@ def authorize(login, password, scopes, note='', note_url='', client_id='',
     """
     gh = GitHub()
     gh.login(two_factor_callback=two_factor_callback)
-    return gh.authorize(login, password, scopes, note, note_url, client_id,
+    return gh.authorize(username, password, scopes, note, note_url, client_id,
                         client_secret)
 
 
-def login(username=None, password=None, token=None, url=None,
-          two_factor_callback=None):
+def login(username=None, password=None, token=None, two_factor_callback=None):
     """Construct and return an authenticated GitHub session.
 
-    This will return a GitHubEnterprise session if a url is provided.
+    .. note::
+
+        To allow you to specify either a username and password combination or
+        a token, none of the parameters are required. If you provide none of
+        them, you will receive a
+        :class:`NullObject <github3.null.NullObject>`
 
     :param str username: login name
     :param str password: password for the login
     :param str token: OAuth token
-    :param str url: (optional), URL of a GitHub Enterprise instance
     :param func two_factor_callback: (optional), function you implement to
         provide the Two Factor Authentication code to GitHub when necessary
     :returns: :class:`GitHub <github3.github.GitHub>`
@@ -56,7 +59,40 @@ def login(username=None, password=None, token=None, url=None,
     g = None
 
     if (username and password) or token:
-        g = GitHubEnterprise(url) if url is not None else GitHub()
+        g = GitHub()
+        g.login(username, password, token, two_factor_callback)
+
+    return g
+
+
+def enterprise_login(username=None, password=None, token=None, url=None,
+                     two_factor_callback=None):
+    """Construct and return an authenticated GitHubEnterprise session.
+
+    .. note::
+
+        To allow you to specify either a username and password combination or
+        a token, none of the parameters are required. If you provide none of
+        them, you will receive a
+        :class:`NullObject <github3.structs.NullObject>`
+
+    :param str username: login name
+    :param str password: password for the login
+    :param str token: OAuth token
+    :param str url: URL of a GitHub Enterprise instance
+    :param func two_factor_callback: (optional), function you implement to
+        provide the Two Factor Authentication code to GitHub when necessary
+    :returns: :class:`GitHubEnterprise <github3.github.GitHubEnterprise>`
+
+    """
+    if not url:
+        raise ValueError('GitHub Enterprise requires you provide the URL of'
+                         ' the instance')
+
+    g = None
+
+    if (username and password) or token:
+        g = GitHubEnterprise(url)
         g.login(username, password, token, two_factor_callback)
 
     return g
@@ -95,7 +131,7 @@ def gitignore_templates():
     return gh.gitignore_templates()
 
 
-def iter_all_repos(number=-1, etag=None):
+def all_repositories(number=-1, etag=None):
     """Iterate over every repository in the order they were created.
 
     :param int number: (optional), number of repositories to return.
@@ -105,10 +141,10 @@ def iter_all_repos(number=-1, etag=None):
     :returns: generator of :class:`Repository <github3.repos.Repository>`
 
     """
-    return gh.iter_all_repos(number, etag)
+    return gh.all_repositories(number, etag)
 
 
-def iter_all_users(number=-1, etag=None):
+def all_users(number=-1, etag=None):
     """Iterate over every user in the order they signed up for GitHub.
 
     :param int number: (optional), number of users to return. Default: -1,
@@ -118,10 +154,10 @@ def iter_all_users(number=-1, etag=None):
     :returns: generator of :class:`User <github3.users.User>`
 
     """
-    return gh.iter_all_users(number, etag)
+    return gh.all_users(number, etag)
 
 
-def iter_events(number=-1, etag=None):
+def all_events(number=-1, etag=None):
     """Iterate over public events.
 
     :param int number: (optional), number of events to return. Default: -1
@@ -131,10 +167,10 @@ def iter_events(number=-1, etag=None):
     :returns: generator of :class:`Event <github3.events.Event>`
 
     """
-    return gh.iter_events(number, etag)
+    return gh.all_events(number, etag)
 
 
-def iter_followers(username, number=-1, etag=None):
+def followers_of(username, number=-1, etag=None):
     """List the followers of ``username``.
 
     :param str username: (required), login of the person to list the followers
@@ -146,10 +182,10 @@ def iter_followers(username, number=-1, etag=None):
     :returns: generator of :class:`User <github3.users.User>`
 
     """
-    return gh.iter_followers(username, number, etag) if username else []
+    return gh.followers_of(username, number, etag) if username else []
 
 
-def iter_following(username, number=-1, etag=None):
+def followed_by(username, number=-1, etag=None):
     """List the people ``username`` follows.
 
     :param str username: (required), login of the user
@@ -160,13 +196,30 @@ def iter_following(username, number=-1, etag=None):
     :returns: generator of :class:`User <github3.users.User>`
 
     """
-    return gh.iter_following(username, number, etag) if username else []
+    return gh.followed_by(username, number, etag) if username else []
 
 
-def iter_gists(username=None, number=-1, etag=None):
-    """Iterate over public gists or gists for the provided username.
+def public_gists(number=-1, etag=None):
+    """Iterate over all public gists.
 
-    :param str username: (optional), if provided, get the gists for this user
+    .. versionadded:: 1.0
+
+        This was split from ``github3.iter_gists`` before 1.0.
+
+    :param int number: (optional), number of gists to return. Default: -1,
+        return all of them
+    :param str etag: (optional), ETag from a previous request to the same
+        endpoint
+    :returns: generator of :class:`Gist <github3.gists.Gist>`
+
+    """
+    return gh.public_gists(number, etag)
+
+
+def gists_by(username, number=-1, etag=None):
+    """Iterate over gists created by the provided username.
+
+    :param str username: (required), if provided, get the gists for this user
         instead of the authenticated user.
     :param int number: (optional), number of gists to return. Default: -1,
         return all of them
@@ -175,14 +228,15 @@ def iter_gists(username=None, number=-1, etag=None):
     :returns: generator of :class:`Gist <github3.gists.Gist>`
 
     """
-    return gh.iter_gists(username, number, etag)
+    if username:
+        return gh.gists_by(username, number, etag)
+    return iter([])
 
 
-def iter_repo_issues(owner, repository, milestone=None, state=None,
-                     assignee=None, mentioned=None, labels=None, sort=None,
-                     direction=None, since=None, number=-1, etag=None):
-    """List issues on owner/repository. Only owner and repository are
-    required.
+def issues_on(owner, repository, milestone=None, state=None, assignee=None,
+              mentioned=None, labels=None, sort=None, direction=None,
+              since=None, number=-1, etag=None):
+    """Iterate over issues on owner/repository.
 
     .. versionchanged:: 0.9.0
 
@@ -214,14 +268,14 @@ def iter_repo_issues(owner, repository, milestone=None, state=None,
 
     """
     if owner and repository:
-        return gh.iter_repo_issues(owner, repository, milestone, state,
-                                   assignee, mentioned, labels, sort,
-                                   direction, since, number, etag)
+        return gh.issues_on(owner, repository, milestone, state, assignee,
+                            mentioned, labels, sort, direction, since, number,
+                            etag)
     return iter([])
 
 
-def iter_orgs(username, number=-1, etag=None):
-    """List the organizations associated with ``username``.
+def organizations_with(username, number=-1, etag=None):
+    """List the organizations with ``username`` as a member.
 
     :param str username: (required), login of the user
     :param int number: (optional), number of orgs to return. Default: -1,
@@ -232,18 +286,18 @@ def iter_orgs(username, number=-1, etag=None):
         :class:`Organization <github3.orgs.Organization>`
 
     """
-    return gh.iter_orgs(username, number, etag) if username else []
+    return gh.organizations_with(username, number, etag)
 
 
-def iter_user_repos(login, type=None, sort=None, direction=None, number=-1,
+def repositories_by(username, type=None, sort=None, direction=None, number=-1,
                     etag=None):
-    """List public repositories for the specified ``login``.
+    """List public repositories for the specified ``username``.
 
     .. versionadded:: 0.6
 
     .. note:: This replaces github3.iter_repos
 
-    :param str login: (required)
+    :param str username: (required)
     :param str type: (optional), accepted values:
         ('all', 'owner', 'member')
         API default: 'all'
@@ -262,11 +316,12 @@ def iter_user_repos(login, type=None, sort=None, direction=None, number=-1,
 
     """
     if login:
-        return gh.iter_user_repos(login, type, sort, direction, number, etag)
+        return gh.repositories_by(username, type, sort, direction, number,
+                                  etag)
     return iter([])
 
 
-def iter_starred(username, number=-1, etag=None):
+def starred_by(username, number=-1, etag=None):
     """Iterate over repositories starred by ``username``.
 
     :param str username: (optional), name of user whose stars you want to see
@@ -277,14 +332,13 @@ def iter_starred(username, number=-1, etag=None):
     :returns: generator of :class:`Repository <github3.repos.Repository>`
 
     """
-    return gh.iter_starred(username, number, etag)
+    return gh.starred_by(username, number, etag)
 
 
-def iter_subscriptions(username, number=-1, etag=None):
+def subscriptions_for(username, number=-1, etag=None):
     """Iterate over repositories subscribed to by ``username``.
 
-    :param str username: (optional), name of user whose subscriptions you want
-        to see
+    :param str username: name of user whose subscriptions you want to see
     :param int number: (optional), number of repositories to return.
         Default: -1 returns all repositories
     :param str etag: (optional), ETag from a previous request to the same
@@ -292,7 +346,7 @@ def iter_subscriptions(username, number=-1, etag=None):
     :returns: generator of :class:`Repository <github3.repos.Repository>`
 
     """
-    return gh.iter_subscriptions(username, number, etag)
+    return gh.subscriptions_for(username, number, etag)
 
 
 def create_gist(description, files):
@@ -345,8 +399,8 @@ def octocat(say=None):
     return gh.octocat(say)
 
 
-def organization(login):
-    return gh.organization(login)
+def organization(name):
+    return gh.organization(name)
 organization.__doc__ = gh.organization.__doc__
 
 
@@ -370,15 +424,6 @@ rate_limit.__doc__ = gh.rate_limit.__doc__
 def repository(owner, repository):
     return gh.repository(owner, repository)
 repository.__doc__ = gh.repository.__doc__
-
-
-def ratelimit_remaining():
-    """Get the remaining number of requests allowed.
-
-    :returns: int
-
-    """
-    return gh.ratelimit_remaining
 
 
 def search_code(query, sort=None, order=None, per_page=None,
@@ -589,8 +634,8 @@ def search_users(query, sort=None, order=None, per_page=None,
                            etag)
 
 
-def user(login):
-    return gh.user(login)
+def user(username):
+    return gh.user(username)
 user.__doc__ = gh.user.__doc__
 
 

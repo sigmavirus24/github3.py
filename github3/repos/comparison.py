@@ -31,8 +31,7 @@ class Comparison(GitHubCore):
     See also:
     http://developer.github.com/v3/repos/commits/#compare-two-commits
     """
-    def __init__(self, compare):
-        super(Comparison, self).__init__(compare)
+    def _update_attributes(self, compare):
         self._api = compare.get('url', '')
         #: URL to view the comparison at GitHub
         self.html_url = compare.get('html_url')

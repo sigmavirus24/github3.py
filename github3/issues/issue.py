@@ -31,14 +31,13 @@ class Issue(GitHubCore):
 
     """
 
-    def __init__(self, issue, session=None):
-        super(Issue, self).__init__(issue, session)
+    def _update_attributes(self, issue):
         self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
         #: was assigned to.
         self.assignee = issue.get('assignee')
         if self.assignee:
-            self.assignee = User(issue.get('assignee'), self._session)
+            self.assignee = User(issue.get('assignee'), self)
         #: Body (description) of the issue.
         self.body = issue.get('body', '')
         #: HTML formatted body of the issue.
@@ -51,7 +50,7 @@ class Issue(GitHubCore):
         self.closed_at = self._strptime(issue.get('closed_at'))
 
         #: Number of comments on this issue.
-        self.comments = issue.get('comments')
+        self.comments_count = issue.get('comments')
         #: Comments url (not a template)
         self.comments_url = issue.get('comments_url')
         #: datetime object representing when the issue was created.
@@ -64,7 +63,9 @@ class Issue(GitHubCore):
         self.id = issue.get('id')
         #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
         #: on this issue.
-        self.labels = [Label(l, self._session) for l in issue.get('labels')]
+        self.original_labels = [
+            Label(l, self) for l in issue.get('labels')
+        ]
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels_url) if labels_url else None
@@ -72,7 +73,7 @@ class Issue(GitHubCore):
         #: issue was assigned to.
         self.milestone = None
         if issue.get('milestone'):
-            self.milestone = Milestone(issue.get('milestone'), self._session)
+            self.milestone = Milestone(issue.get('milestone'), self)
         #: Issue number (e.g. #15)
         self.number = issue.get('number')
         #: Dictionary URLs for the pull request (if they exist)
@@ -98,9 +99,6 @@ class Issue(GitHubCore):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
                                                      n=self.number)
 
-    def _update_(self, issue):
-        self.__init__(issue, self._session)
-
     @requires_auth
     def add_labels(self, *args):
         """Add labels to this issue.
@@ -113,18 +111,18 @@ class Issue(GitHubCore):
         return [Label(l, self) for l in json] if json else []
 
     @requires_auth
-    def assign(self, login):
-        """Assigns user ``login`` to this issue. This is a short cut for
+    def assign(self, username):
+        """Assigns user ``username`` to this issue. This is a short cut for
         ``issue.edit``.
 
-        :param str login: username of the person to assign this issue to
+        :param str username: username of the person to assign this issue to
         :returns: bool
         """
-        if not login:
+        if not username:
             return False
         number = self.milestone.number if self.milestone else None
-        labels = [str(l) for l in self.labels]
-        return self.edit(self.title, self.body, login, self.state, number,
+        labels = [str(l) for l in self.original_labels]
+        return self.edit(self.title, self.body, username, self.state, number,
                          labels)
 
     @requires_auth
@@ -135,7 +133,7 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
-        labels = [str(l) for l in self.labels]
+        labels = [str(l) for l in self.original_labels]
         return self.edit(self.title, self.body, assignee, 'closed',
                          number, labels)
 
@@ -156,6 +154,16 @@ class Issue(GitHubCore):
                                   str(id_num))
             json = self._json(self._get(url), 200)
         return IssueComment(json) if json else None
+
+    def comments(self, number=-1):
+        r"""Iterate over the comments on this issue.
+
+        :param int number: (optional), number of comments to iterate over
+        :returns: iterator of
+            :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
+        """
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, IssueComment)
 
     @requires_auth
     def create_comment(self, body):
@@ -198,30 +206,11 @@ class Issue(GitHubCore):
                 data['milestone'] = None
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
-            self._update_(json)
+            self._update_attributes(json)
             return True
         return False
 
-    def is_closed(self):
-        """Checks if the issue is closed.
-
-        :returns: bool
-        """
-        if self.closed_at or (self.state == 'closed'):
-            return True
-        return False
-
-    def iter_comments(self, number=-1):
-        """Iterate over the comments on this issue.
-
-        :param int number: (optional), number of comments to iterate over
-        :returns: iterator of
-            :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
-        """
-        url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, IssueComment)
-
-    def iter_events(self, number=-1):
+    def events(self, number=-1):
         """Iterate over events associated with this issue only.
 
         :param int number: (optional), number of events to return. Default: -1
@@ -232,7 +221,16 @@ class Issue(GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, IssueEvent)
 
-    def iter_labels(self, number=-1, etag=None):
+    def is_closed(self):
+        """Checks if the issue is closed.
+
+        :returns: bool
+        """
+        if self.closed_at or (self.state == 'closed'):
+            return True
+        return False
+
+    def labels(self, number=-1, etag=None):
         """Iterate over the labels associated with this issue.
 
         :param int number: (optional), number of labels to return. Default: -1
@@ -285,6 +283,6 @@ class Issue(GitHubCore):
         """
         assignee = self.assignee.login if self.assignee else ''
         number = self.milestone.number if self.milestone else None
-        labels = [str(l) for l in self.labels]
+        labels = [str(l) for l in self.original_labels]
         return self.edit(self.title, self.body, assignee, 'open',
                          number, labels)

@@ -16,7 +16,8 @@ from .gists import Gist
 from .issues import Issue, issue_params
 from .models import GitHubCore
 from .orgs import Membership, Organization, Team
-from .repos import Repository
+from .pulls import PullRequest
+from .repos.repo import Repository, repo_issue_params
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
 from .structs import SearchIterator
@@ -26,6 +27,7 @@ from uritemplate import URITemplate
 
 
 class GitHub(GitHubCore):
+
     """Stores all the session information.
 
     There are two ways to log into the GitHub API
@@ -49,28 +51,68 @@ class GitHub(GitHubCore):
     This is simple backward compatibility since originally there was no way to
     call the GitHub object with authentication parameters.
     """
-    def __init__(self, login='', password='', token=''):
+
+    def __init__(self, username='', password='', token=''):
         super(GitHub, self).__init__({})
         if token:
-            self.login(login, token=token)
-        elif login and password:
-            self.login(login, password)
+            self.login(username, token=token)
+        elif username and password:
+            self.login(username, password)
 
     def _repr(self):
-        if self._session.auth:
-            return '<GitHub [{0[0]}]>'.format(self._session.auth)
+        if self.session.auth:
+            return '<GitHub [{0[0]}]>'.format(self.session.auth)
         return '<GitHub at 0x{0:x}>'.format(id(self))
 
-    def __enter__(self):
-        return self
+    def all_events(self, number=-1, etag=None):
+        """Iterate over public events.
 
-    def __exit__(self, *args):
-        pass
+        :param int number: (optional), number of events to return. Default: -1
+            returns all available events
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        url = self._build_url('events')
+        return self._iter(int(number), url, Event, etag=etag)
 
-    @requires_auth
-    def _iter_follow(self, which, number, etag):
-        url = self._build_url('user', which)
-        return self._iter(number, url, User, etag=etag)
+    def all_repositories(self, number=-1, since=None, etag=None,
+                         per_page=None):
+        """Iterate over every repository in the order they were created.
+
+        :param int number: (optional), number of repositories to return.
+            Default: -1, returns all of them
+        :param int since: (optional), last repository id seen (allows
+            restarting this iteration)
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :param int per_page: (optional), number of repositories to list per
+            request
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        url = self._build_url('repositories')
+        return self._iter(int(number), url, Repository,
+                          params={'since': since, 'per_page': per_page},
+                          etag=etag)
+
+    def all_users(self, number=-1, etag=None, per_page=None, since=None):
+        """Iterate over every user in the order they signed up for GitHub.
+
+        .. versionchanged:: 1.0.0
+
+            Inserted the ``since`` parameter after the ``number`` parameter.
+
+        :param int number: (optional), number of users to return. Default: -1,
+            returns all of them
+        :param int since: (optional), ID of the last user that you've seen.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :param int per_page: (optional), number of users to list per request
+        :returns: generator of :class:`User <github3.users.User>`
+        """
+        url = self._build_url('users')
+        return self._iter(int(number), url, User, etag=etag,
+                          params={'per_page': per_page, 'since': since})
 
     @requires_basic_auth
     def authorization(self, id_num):
@@ -83,14 +125,30 @@ class GitHub(GitHubCore):
         if int(id_num) > 0:
             url = self._build_url('authorizations', str(id_num))
             json = self._json(self._get(url), 200)
-        return Authorization(json, self) if json else None
+        return self._instance_or_null(Authorization, json)
 
-    def authorize(self, login, password, scopes=None, note='', note_url='',
+    @requires_basic_auth
+    def authorizations(self, number=-1, etag=None):
+        """Iterate over authorizations for the authenticated user. This will
+        return a 404 if you are using a token for authentication.
+
+        :param int number: (optional), number of authorizations to return.
+            Default: -1 returns all available authorizations
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Authorization <Authorization>`\ s
+        """
+        url = self._build_url('authorizations')
+        return self._iter(int(number), url, Authorization, etag=etag)
+
+    def authorize(self, username, password, scopes=None, note='', note_url='',
                   client_id='', client_secret=''):
-        """Obtain an authorization token from the GitHub API for the GitHub
-        API.
+        """Obtain an authorization token.
 
-        :param str login: (required)
+        The retrieved token will allow future consumers to use the API without
+        a username and password.
+
+        :param str username: (required)
         :param str password: (required)
         :param list scopes: (optional), areas you want this token to apply to,
             i.e., 'gist', 'user'
@@ -103,34 +161,30 @@ class GitHub(GitHubCore):
         :returns: :class:`Authorization <Authorization>`
         """
         json = None
-        # TODO: Break this behaviour in 1.0 (Don't rely on self._session.auth)
-        auth = None
-        if self._session.auth:
-            auth = self._session.auth
-        elif login and password:
-            auth = (login, password)
 
-        if auth:
+        if username and password:
             url = self._build_url('authorizations')
             data = {'note': note, 'note_url': note_url,
                     'client_id': client_id, 'client_secret': client_secret}
             if scopes:
                 data['scopes'] = scopes
 
-            with self._session.temporary_basic_auth(*auth):
+            with self.session.temporary_basic_auth(username, password):
                 json = self._json(self._post(url, data=data), 201)
 
-        return Authorization(json, self) if json else None
+        return self._instance_or_null(Authorization, json)
 
     def check_authorization(self, access_token):
-        """OAuth applications can use this method to check token validity
+        """Check an authorization created by a registered application.
+
+        OAuth applications can use this method to check token validity
         without hitting normal rate limits because of failed login attempts.
         If the token is valid, it will return True, otherwise it will return
         False.
 
         :returns: bool
         """
-        p = self._session.params
+        p = self.session.params
         auth = (p.get('client_id'), p.get('client_secret'))
         if access_token and auth:
             url = self._build_url('applications', str(auth[0]), 'tokens',
@@ -157,21 +211,23 @@ class GitHub(GitHubCore):
                     'files': files}
         url = self._build_url('gists')
         json = self._json(self._post(url, data=new_gist), 201)
-        return Gist(json, self) if json else None
+        return self._instance_or_null(Gist, json)
 
     @requires_auth
-    def create_issue(self,
-                     owner,
-                     repository,
-                     title,
-                     body=None,
-                     assignee=None,
-                     milestone=None,
-                     labels=[]):
+    def create_issue(self, owner, repository, title, body=None, assignee=None,
+                     milestone=None, labels=[]):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
-        body, assignee, milestone, labels are all optional.
+        ``body``, ``assignee``, ``milestone``, ``labels`` are all optional.
+
+        .. warning::
+
+            This method retrieves the repository first and then uses it to
+            create an issue. If you're making several issues, you should use
+            :py:meth:`repository <github3.github.GitHub.repository>` and then
+            use :py:meth:`create_issue
+            <github3.repos.repo.Repository.create_issue>`
 
         :param str owner: (required), login of the owner
         :param str repository: (required), repository name
@@ -185,19 +241,24 @@ class GitHub(GitHubCore):
             <github3.issues.Milestone>` object, ``m.number`` is what you pass
             here.)
         :param list labels: (optional), List of label names.
-        :returns: :class:`Issue <github3.issues.Issue>` if successful, else
-            None
+        :returns: :class:`Issue <github3.issues.Issue>` if successful
         """
         repo = None
         if owner and repository and title:
             repo = self.repository(owner, repository)
 
-        if repo:
+        # repo can be None or a NullObject.
+        # If repo is None, than one of owner, repository, or title were
+        # False-y. If repo is a NullObject then owner/repository 404's.
+
+        if repo is not None:
+            # If repo is a NullObject then that's most likely because the
+            # repository was not found (404). In that case, calling the
+            # create_issue method will still return <NullObject('Repository')>
+            # which will ideally help the user understand what went wrong.
             return repo.create_issue(title, body, assignee, milestone, labels)
 
-        # Regardless, something went wrong. We were unable to create the
-        # issue
-        return None
+        return self._instance_or_null(Issue, None)
 
     @requires_auth
     def create_key(self, title, key):
@@ -208,27 +269,18 @@ class GitHub(GitHubCore):
             or file-like object
         :returns: :class:`Key <github3.users.Key>`
         """
-        created = None
+        json = None
 
         if title and key:
             url = self._build_url('user', 'keys')
             req = self._post(url, data={'title': title, 'key': key})
             json = self._json(req, 201)
-            if json:
-                created = Key(json, self)
-        return created
+        return self._instance_or_null(Key, json)
 
     @requires_auth
-    def create_repo(self,
-                    name,
-                    description='',
-                    homepage='',
-                    private=False,
-                    has_issues=True,
-                    has_wiki=True,
-                    has_downloads=True,
-                    auto_init=False,
-                    gitignore_template=''):
+    def create_repository(self, name, description='', homepage='',
+                          private=False, has_issues=True, has_wiki=True,
+                          auto_init=False, gitignore_template=''):
         """Create a repository for the authenticated user.
 
         :param str name: (required), name of the repository
@@ -240,8 +292,6 @@ class GitHub(GitHubCore):
             issues for this repository. API default: ``True``
         :param bool has_wiki: (optional), If ``True``, enable the
             wiki for this repository. API default: ``True``
-        :param bool has_downloads: (optional), If ``True``, enable
-            downloads for this repository. API default: ``True``
         :param bool auto_init: (optional), auto initialize the repository
         :param str gitignore_template: (optional), name of the git template to
             use; ignored if auto_init = False.
@@ -253,22 +303,23 @@ class GitHub(GitHubCore):
         data = {'name': name, 'description': description,
                 'homepage': homepage, 'private': private,
                 'has_issues': has_issues, 'has_wiki': has_wiki,
-                'has_downloads': has_downloads, 'auto_init': auto_init,
+                'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
         json = self._json(self._post(url, data=data), 201)
-        return Repository(json, self) if json else None
+        return self._instance_or_null(Repository, json)
 
     @requires_auth
-    def delete_key(self, key_id):
-        """Delete user key pointed to by ``key_id``.
+    def emails(self, number=-1, etag=None):
+        """Iterate over email addresses for the authenticated user.
 
-        :param int key_id: (required), unique id used by Github
-        :returns: bool
+        :param int number: (optional), number of email addresses to return.
+            Default: -1 returns all available email addresses
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of dicts
         """
-        key = self.key(key_id)
-        if key:
-            return key.delete()
-        return False  # (No coverage)
+        url = self._build_url('user', 'emails')
+        return self._iter(int(number), url, dict, etag=etag)
 
     def emojis(self):
         """Retrieves a dictionary of all of the emojis that GitHub supports.
@@ -311,30 +362,128 @@ class GitHub(GitHubCore):
         return json
 
     @requires_auth
-    def follow(self, login):
-        """Make the authenticated user follow login.
+    def follow(self, username):
+        """Make the authenticated user follow the provided username.
 
-        :param str login: (required), user to follow
+        :param str username: (required), user to follow
         :returns: bool
         """
         resp = False
-        if login:
-            url = self._build_url('user', 'following', login)
+        if username:
+            url = self._build_url('user', 'following', username)
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
+    def followed_by(self, username, number=-1, etag=None):
+        """Iterate over users being followed by ``username``.
+
+        .. versionadded:: 1.0.0
+
+            This replaces iter_following('sigmavirus24').
+
+        :param str username: (required), login of the user to check
+        :param int number: (optional), number of people to return. Default: -1
+            returns all people you follow
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('users', username, 'following')
+        return self._iter(int(number), url, User, etag=etag)
+
+    @requires_auth
+    def followers(self, number=-1, etag=None):
+        """Iterate over followers of the authenticated user.
+
+        .. versionadded:: 1.0.0
+
+            This replaces iter_followers().
+
+        :param int number: (optional), number of followers to return. Default:
+            -1 returns all followers
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('user', 'followers')
+        return self._iter(int(number), url, User, etag=etag)
+
+    def followers_of(self, username, number=-1, etag=None):
+        """Iterate over followers of ``username``.
+
+        .. versionadded:: 1.0.0
+
+            This replaces iter_followers('sigmavirus24').
+
+        :param str username: (required), login of the user to check
+        :param int number: (optional), number of followers to return. Default:
+            -1 returns all followers
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('users', username, 'followers')
+        return self._iter(int(number), url, User, etag=etag)
+
+    @requires_auth
+    def following(self, number=-1, etag=None):
+        """Iterate over users the authenticated user is following.
+
+        .. versionadded:: 1.0.0
+
+            This replaces iter_following().
+
+        :param int number: (optional), number of people to return. Default: -1
+            returns all people you follow
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`User <github3.users.User>`\ s
+        """
+        url = self._build_url('user', 'following')
+        return self._iter(int(number), url, User, etag=etag)
+
     def gist(self, id_num):
-        """Gets the gist using the specified id number.
+        """Retrieve the gist using the specified id number.
 
         :param int id_num: (required), unique id of the gist
         :returns: :class:`Gist <github3.gists.Gist>`
         """
         url = self._build_url('gists', str(id_num))
         json = self._json(self._get(url), 200)
-        return Gist(json, self) if json else None
+        return self._instance_or_null(Gist, json)
+
+    @requires_auth
+    def gists(self, number=-1, etag=None):
+        """Retrieve the authenticated user's gists.
+
+        .. versionadded:: 1.0
+
+        :param int number: (optional), number of gists to return. Default: -1,
+            returns all available gists
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        """
+        url = self._build_url('gists')
+        return self._iter(int(number), url, Gist, etag=etag)
+
+    def gists_by(self, username, number=-1, etag=None):
+        """Iterate over the gists owned by a user.
+
+        .. versionadded:: 1.0
+
+        :param str username: login of the user who owns the gists
+        :param int number: (optional), number of gists to return. Default: -1
+            returns all available gists
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        """
+        url = self._build_url('users', username, 'gists')
+        return self._iter(int(number), url, Gist, etag=etag)
 
     def gitignore_template(self, language):
-        """Returns the template for language.
+        """Return the template for language.
 
         :returns: str
         """
@@ -345,7 +494,7 @@ class GitHub(GitHubCore):
         return json.get('source', '')
 
     def gitignore_templates(self):
-        """Returns the list of available templates.
+        """Return the list of available templates.
 
         :returns: list of template names
         """
@@ -353,239 +502,51 @@ class GitHub(GitHubCore):
         return self._json(self._get(url), 200) or []
 
     @requires_auth
-    def is_following(self, login):
+    def is_following(self, username):
         """Check if the authenticated user is following login.
 
-        :param str login: (required), login of the user to check if the
+        :param str username: (required), login of the user to check if the
             authenticated user is checking
         :returns: bool
         """
         json = False
-        if login:
-            url = self._build_url('user', 'following', login)
+        if username:
+            url = self._build_url('user', 'following', username)
             json = self._boolean(self._get(url), 204, 404)
         return json
 
     @requires_auth
-    def is_starred(self, login, repo):
-        """Check if the authenticated user starred login/repo.
+    def is_starred(self, username, repo):
+        """Check if the authenticated user starred username/repo.
 
-        :param str login: (required), owner of repository
+        :param str username: (required), owner of repository
         :param str repo: (required), name of repository
         :returns: bool
         """
         json = False
-        if login and repo:
-            url = self._build_url('user', 'starred', login, repo)
+        if username and repo:
+            url = self._build_url('user', 'starred', username, repo)
             json = self._boolean(self._get(url), 204, 404)
         return json
 
-    @requires_auth
-    def is_subscribed(self, login, repo):
-        """Check if the authenticated user is subscribed to login/repo.
+    def issue(self, username, repository, number):
+        """Fetch issue from owner/repository.
 
-        :param str login: (required), owner of repository
-        :param str repo: (required), name of repository
-        :returns: bool
-        """
-        json = False
-        if login and repo:
-            url = self._build_url('user', 'subscriptions', login, repo)
-            json = self._boolean(self._get(url), 204, 404)
-        return json
-
-    def issue(self, owner, repository, number):
-        """Fetch issue #:number: from https://github.com/:owner:/:repository:
-
-        :param str owner: (required), owner of the repository
+        :param str username: (required), owner of the repository
         :param str repository: (required), name of the repository
         :param int number: (required), issue number
         :return: :class:`Issue <github3.issues.Issue>`
         """
-        repo = self.repository(owner, repository)
-        if repo:
-            return repo.issue(number)
-        return None
-
-    def iter_all_repos(self, number=-1, since=None, etag=None, per_page=None):
-        """Iterate over every repository in the order they were created.
-
-        :param int number: (optional), number of repositories to return.
-            Default: -1, returns all of them
-        :param int since: (optional), last repository id seen (allows
-            restarting this iteration)
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :param int per_page: (optional), number of repositories to list per
-            request
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
-        """
-        url = self._build_url('repositories')
-        return self._iter(int(number), url, Repository,
-                          params={'since': since, 'per_page': per_page},
-                          etag=etag)
-
-    def iter_all_users(self, number=-1, etag=None, per_page=None):
-        """Iterate over every user in the order they signed up for GitHub.
-
-        :param int number: (optional), number of users to return. Default: -1,
-            returns all of them
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :param int per_page: (optional), number of users to list per request
-        :returns: generator of :class:`User <github3.users.User>`
-        """
-        url = self._build_url('users')
-        return self._iter(int(number), url, User,
-                          params={'per_page': per_page}, etag=etag)
-
-    @requires_basic_auth
-    def iter_authorizations(self, number=-1, etag=None):
-        """Iterate over authorizations for the authenticated user. This will
-        return a 404 if you are using a token for authentication.
-
-        :param int number: (optional), number of authorizations to return.
-            Default: -1 returns all available authorizations
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Authorization <Authorization>`\ s
-        """
-        url = self._build_url('authorizations')
-        return self._iter(int(number), url, Authorization, etag=etag)
+        json = None
+        if username and repository and int(number) > 0:
+            url = self._build_url('repos', username, repository, 'issues',
+                                  str(number))
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(Issue, json)
 
     @requires_auth
-    def iter_emails(self, number=-1, etag=None):
-        """Iterate over email addresses for the authenticated user.
-
-        :param int number: (optional), number of email addresses to return.
-            Default: -1 returns all available email addresses
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of dicts
-        """
-        url = self._build_url('user', 'emails')
-        return self._iter(int(number), url, dict, etag=etag)
-
-    def iter_events(self, number=-1, etag=None):
-        """Iterate over public events.
-
-        :param int number: (optional), number of events to return. Default: -1
-            returns all available events
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Event <github3.events.Event>`\ s
-        """
-        url = self._build_url('events')
-        return self._iter(int(number), url, Event, etag=etag)
-
-    def iter_followers(self, login=None, number=-1, etag=None):
-        """If login is provided, iterate over a generator of followers of that
-        login name; otherwise return a generator of followers of the
-        authenticated user.
-
-        :param str login: (optional), login of the user to check
-        :param int number: (optional), number of followers to return. Default:
-            -1 returns all followers
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
-        """
-        if login:
-            return self.user(login).iter_followers()
-        return self._iter_follow('followers', int(number), etag=etag)
-
-    def iter_following(self, login=None, number=-1, etag=None):
-        """If login is provided, iterate over a generator of users being
-        followed by login; otherwise return a generator of people followed by
-        the authenticated user.
-
-        :param str login: (optional), login of the user to check
-        :param int number: (optional), number of people to return. Default: -1
-            returns all people you follow
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
-        """
-        if login:
-            return self.user(login).iter_following()
-        return self._iter_follow('following', int(number), etag=etag)
-
-    def iter_gists(self, username=None, number=-1, etag=None):
-        """If no username is specified, GET /gists, otherwise GET
-        /users/:username/gists
-
-        :param str login: (optional), login of the user to check
-        :param int number: (optional), number of gists to return. Default: -1
-            returns all available gists
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
-        """
-        if username:
-            url = self._build_url('users', username, 'gists')
-        else:
-            url = self._build_url('gists')
-        return self._iter(int(number), url, Gist, etag=etag)
-
-    @requires_auth
-    def iter_notifications(self, all=False, participating=False, number=-1,
-                           etag=None):
-        """Iterate over the user's notification.
-
-        :param bool all: (optional), iterate over all notifications
-        :param bool participating: (optional), only iterate over notifications
-            in which the user is participating
-        :param int number: (optional), how many notifications to return
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`Thread <github3.notifications.Thread>`
-        """
-        params = None
-        if all:
-            params = {'all': all}
-        elif participating:
-            params = {'participating': participating}
-
-        url = self._build_url('notifications')
-        return self._iter(int(number), url, Thread, params, etag=etag)
-
-    @requires_auth
-    def iter_org_issues(self, name, filter='', state='', labels='', sort='',
-                        direction='', since=None, number=-1, etag=None):
-        """Iterate over the organnization's issues if the authenticated user
-        belongs to it.
-
-        :param str name: (required), name of the organization
-        :param str filter: accepted values:
-            ('assigned', 'created', 'mentioned', 'subscribed')
-            api-default: 'assigned'
-        :param str state: accepted values: ('open', 'closed')
-            api-default: 'open'
-        :param str labels: comma-separated list of label names, e.g.,
-            'bug,ui,@high'
-        :param str sort: accepted values: ('created', 'updated', 'comments')
-            api-default: created
-        :param str direction: accepted values: ('asc', 'desc')
-            api-default: desc
-        :param since: (optional), Only issues after this date will
-            be returned. This can be a `datetime` or an ISO8601 formatted
-            date string, e.g., 2012-05-20T23:10:27Z
-        :type since: datetime or string
-        :param int number: (optional), number of issues to return. Default:
-            -1, returns all available issues
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
-        """
-        url = self._build_url('orgs', name, 'issues')
-        # issue_params will handle the since parameter
-        params = issue_params(filter, state, labels, sort, direction, since)
-        return self._iter(int(number), url, Issue, params, etag)
-
-    @requires_auth
-    def iter_issues(self, filter='', state='', labels='', sort='',
-                    direction='', since=None, number=-1, etag=None):
+    def issues(self, filter='', state='', labels='', sort='', direction='',
+               since=None, number=-1, etag=None):
         """List all of the authenticated user's (and organization's) issues.
 
         .. versionchanged:: 0.9.0
@@ -619,47 +580,9 @@ class GitHub(GitHubCore):
         params = issue_params(filter, state, labels, sort, direction, since)
         return self._iter(int(number), url, Issue, params, etag)
 
-    @requires_auth
-    def iter_user_issues(self, filter='', state='', labels='', sort='',
-                         direction='', since=None, number=-1, etag=None):
-        """List only the authenticated user's issues. Will not list
-        organization's issues
-
-        .. versionchanged:: 0.9.0
-
-            - The ``state`` parameter now accepts 'all' in addition to 'open'
-              and 'closed'.
-
-        :param str filter: accepted values:
-            ('assigned', 'created', 'mentioned', 'subscribed')
-            api-default: 'assigned'
-        :param str state: accepted values: ('all', 'open', 'closed')
-            api-default: 'open'
-        :param str labels: comma-separated list of label names, e.g.,
-            'bug,ui,@high'
-        :param str sort: accepted values: ('created', 'updated', 'comments')
-            api-default: created
-        :param str direction: accepted values: ('asc', 'desc')
-            api-default: desc
-        :param since: (optional), Only issues after this date will
-            be returned. This can be a `datetime` or an ISO8601 formatted
-            date string, e.g., 2012-05-20T23:10:27Z
-        :type since: datetime or string
-        :param int number: (optional), number of issues to return.
-            Default: -1 returns all issues
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
-        """
-        url = self._build_url('user', 'issues')
-        # issue_params will handle the since parameter
-        params = issue_params(filter, state, labels, sort, direction, since)
-        return self._iter(int(number), url, Issue, params, etag)
-
-    def iter_repo_issues(self, owner, repository, milestone=None,
-                         state=None, assignee=None, mentioned=None,
-                         labels=None, sort=None, direction=None, since=None,
-                         number=-1, etag=None):
+    def issues_on(self, username, repository, milestone=None, state=None,
+                  assignee=None, mentioned=None, labels=None, sort=None,
+                  direction=None, since=None, number=-1, etag=None):
         """List issues on owner/repository. Only owner and repository are
         required.
 
@@ -668,7 +591,7 @@ class GitHub(GitHubCore):
             - The ``state`` parameter now accepts 'all' in addition to 'open'
               and 'closed'.
 
-        :param str owner: login of the owner of the repository
+        :param str username: login of the owner of the repository
         :param str repository: name of the repository
         :param int milestone: None, '*', or ID of milestone
         :param str state: accepted values: ('all', 'open', 'closed')
@@ -691,176 +614,14 @@ class GitHub(GitHubCore):
             endpoint
         :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
         """
-        if owner and repository:
-            repo = self.repository(owner, repository)
-            return repo.iter_issues(milestone, state, assignee, mentioned,
-                                    labels, sort, direction, since, number,
-                                    etag)
+        if username and repository:
+            url = self._build_url('repos', username, repository, 'issues')
+
+            params = repo_issue_params(milestone, state, assignee, mentioned,
+                                       labels, sort, direction, since)
+            return self._iter(int(number), url, Issue, params=params,
+                              etag=etag)
         return iter([])
-
-    @requires_auth
-    def iter_keys(self, number=-1, etag=None):
-        """Iterate over public keys for the authenticated user.
-
-        :param int number: (optional), number of keys to return. Default: -1
-            returns all your keys
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Key <github3.users.Key>`\ s
-        """
-        url = self._build_url('user', 'keys')
-        return self._iter(int(number), url, Key, etag=etag)
-
-    def iter_orgs(self, login=None, number=-1, etag=None):
-        """Iterate over public organizations for login if provided; otherwise
-        iterate over public and private organizations for the authenticated
-        user.
-
-        :param str login: (optional), user whose orgs you wish to list
-        :param int number: (optional), number of organizations to return.
-            Default: -1 returns all available organizations
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`Organization <github3.orgs.Organization>`\ s
-        """
-        if login:
-            url = self._build_url('users', login, 'orgs')
-        else:
-            url = self._build_url('user', 'orgs')
-
-        return self._iter(int(number), url, Organization, etag=etag)
-
-    @requires_auth
-    def iter_repos(self, type=None, sort=None, direction=None, number=-1,
-                   etag=None):
-        """List public repositories for the authenticated user.
-
-        .. versionchanged:: 0.6
-           Removed the login parameter for correctness. Use iter_user_repos
-           instead
-
-        :param str type: (optional), accepted values:
-            ('all', 'owner', 'public', 'private', 'member')
-            API default: 'all'
-        :param str sort: (optional), accepted values:
-            ('created', 'updated', 'pushed', 'full_name')
-            API default: 'created'
-        :param str direction: (optional), accepted values:
-            ('asc', 'desc'), API default: 'asc' when using 'full_name',
-            'desc' otherwise
-        :param int number: (optional), number of repositories to return.
-            Default: -1 returns all repositories
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
-            objects
-        """
-        url = self._build_url('user', 'repos')
-
-        params = {}
-        if type in ('all', 'owner', 'public', 'private', 'member'):
-            params.update(type=type)
-        if sort in ('created', 'updated', 'pushed', 'full_name'):
-            params.update(sort=sort)
-        if direction in ('asc', 'desc'):
-            params.update(direction=direction)
-
-        return self._iter(int(number), url, Repository, params, etag)
-
-    def iter_starred(self, login=None, sort=None, direction=None, number=-1,
-                     etag=None):
-        """Iterate over repositories starred by ``login`` or the authenticated
-        user.
-
-        .. versionchanged:: 0.5
-           Added sort and direction parameters (optional) as per the change in
-           GitHub's API.
-
-        :param str login: (optional), name of user whose stars you want to see
-        :param str sort: (optional), either 'created' (when the star was
-            created) or 'updated' (when the repository was last pushed to)
-        :param str direction: (optional), either 'asc' or 'desc'. Default:
-            'desc'
-        :param int number: (optional), number of repositories to return.
-            Default: -1 returns all repositories
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
-        """
-        if login:
-            return self.user(login).iter_starred(sort, direction)
-
-        params = {'sort': sort, 'direction': direction}
-        self._remove_none(params)
-        url = self._build_url('user', 'starred')
-        return self._iter(int(number), url, Repository, params, etag)
-
-    def iter_subscriptions(self, login=None, number=-1, etag=None):
-        """Iterate over repositories subscribed to by ``login`` or the
-        authenticated user.
-
-        :param str login: (optional), name of user whose subscriptions you want
-            to see
-        :param int number: (optional), number of repositories to return.
-            Default: -1 returns all repositories
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
-        """
-        if login:
-            return self.user(login).iter_subscriptions()
-
-        url = self._build_url('user', 'subscriptions')
-        return self._iter(int(number), url, Repository, etag=etag)
-
-    def iter_user_repos(self, login, type=None, sort=None, direction=None,
-                        number=-1, etag=None):
-        """List public repositories for the specified ``login``.
-
-        .. versionadded:: 0.6
-
-        :param str login: (required), username
-        :param str type: (optional), accepted values:
-            ('all', 'owner', 'member')
-            API default: 'all'
-        :param str sort: (optional), accepted values:
-            ('created', 'updated', 'pushed', 'full_name')
-            API default: 'created'
-        :param str direction: (optional), accepted values:
-            ('asc', 'desc'), API default: 'asc' when using 'full_name',
-            'desc' otherwise
-        :param int number: (optional), number of repositories to return.
-            Default: -1 returns all repositories
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
-            objects
-        """
-        url = self._build_url('users', login, 'repos')
-
-        params = {}
-        if type in ('all', 'owner', 'member'):
-            params.update(type=type)
-        if sort in ('created', 'updated', 'pushed', 'full_name'):
-            params.update(sort=sort)
-        if direction in ('asc', 'desc'):
-            params.update(direction=direction)
-
-        return self._iter(int(number), url, Repository, params, etag)
-
-    @requires_auth
-    def iter_user_teams(self, number=-1, etag=None):
-        """Gets the authenticated user's teams across all of organizations.
-
-        List all of the teams across all of the organizations to which the
-        authenticated user belongs. This method requires user or repo scope
-        when authenticating via OAuth.
-
-        :returns: generator of :class:`Team <github3.orgs.Team>` objects
-        """
-        url = self._build_url('user', 'teams')
-        return self._iter(int(number), url, Team, etag=etag)
 
     @requires_auth
     def key(self, id_num):
@@ -873,7 +634,20 @@ class GitHub(GitHubCore):
         if int(id_num) > 0:
             url = self._build_url('user', 'keys', str(id_num))
             json = self._json(self._get(url), 200)
-        return Key(json, self) if json else None
+        return self._instance_or_null(Key, json)
+
+    @requires_auth
+    def keys(self, number=-1, etag=None):
+        """Iterate over public keys for the authenticated user.
+
+        :param int number: (optional), number of keys to return. Default: -1
+            returns all your keys
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Key <github3.users.Key>`\ s
+        """
+        url = self._build_url('user', 'keys')
+        return self._iter(int(number), url, Key, etag=etag)
 
     def login(self, username=None, password=None, token=None,
               two_factor_callback=None):
@@ -886,12 +660,12 @@ class GitHub(GitHubCore):
             provide the Two Factor Authentication code to GitHub when necessary
         """
         if username and password:
-            self._session.basic_auth(username, password)
+            self.session.basic_auth(username, password)
         elif token:
-            self._session.token_auth(token)
+            self.session.token_auth(token)
 
         # The Session method handles None for free.
-        self._session.two_factor_auth_callback(two_factor_callback)
+        self.session.two_factor_auth_callback(two_factor_callback)
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.
@@ -902,7 +676,7 @@ class GitHub(GitHubCore):
             this is the repository to use as the context for the rendering
         :param bool raw: (optional), renders a document like a README.md, no
             gfm, no context
-        :returns: str -- HTML formatted text
+        :returns: str (or unicode on Python 2) -- HTML formatted text
         """
         data = None
         json = False
@@ -925,11 +699,27 @@ class GitHub(GitHubCore):
                 data['context'] = context
             json = True
 
+        html = ''
         if data:
             req = self._post(url, data=data, json=json, headers=headers)
             if req.ok:
-                return req.content
-        return ''  # (No coverage)
+                html = req.text
+        return html
+
+    @requires_auth
+    def me(self):
+        """Retrieves the info for the authenticated user.
+
+        .. versionadded:: 1.0
+
+            This was separated from the ``user`` method.
+
+        :returns: The representation of the authenticated user.
+        :rtype: :class:`User <github3.users.User>`
+        """
+        url = self._build_url('user')
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(User, json)
 
     @requires_auth
     def membership_in(self, organization):
@@ -937,7 +727,7 @@ class GitHub(GitHubCore):
         url = self._build_url('user', 'memberships', 'orgs',
                               str(organization))
         json = self._json(self._get(url), 200)
-        return Membership(json, self)
+        return self._instance_or_null(Membership, json)
 
     def meta(self):
         """Returns a dictionary with arrays of addresses in CIDR format
@@ -947,28 +737,136 @@ class GitHub(GitHubCore):
         .. versionadded:: 0.5
         """
         url = self._build_url('meta')
-        return self._json(self._get(url), 200)
+        return self._json(self._get(url), 200) or {}
+
+    @requires_auth
+    def notifications(self, all=False, participating=False, number=-1,
+                      etag=None):
+        """Iterate over the user's notification.
+
+        :param bool all: (optional), iterate over all notifications
+        :param bool participating: (optional), only iterate over notifications
+            in which the user is participating
+        :param int number: (optional), how many notifications to return
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`Thread <github3.notifications.Thread>`
+        """
+        params = None
+        if all is True:
+            params = {'all': 'true'}
+        elif participating is True:
+            params = {'participating': 'true'}
+
+        url = self._build_url('notifications')
+        return self._iter(int(number), url, Thread, params, etag=etag)
 
     def octocat(self, say=None):
         """Returns an easter egg of the API.
 
         :params str say: (optional), pass in what you'd like Octocat to say
         :returns: ascii art of Octocat
+        :rtype: str (or unicode on Python 3)
         """
         url = self._build_url('octocat')
         req = self._get(url, params={'s': say})
-        return req.content if req.ok else ''
-        # TODO: Switch to req.text. Unicode is better.
+        return req.text if req.ok else ''
 
-    def organization(self, login):
+    def organization(self, username):
         """Returns a Organization object for the login name
 
-        :param str login: (required), login name of the org
+        :param str username: (required), login name of the org
         :returns: :class:`Organization <github3.orgs.Organization>`
         """
-        url = self._build_url('orgs', login)
+        url = self._build_url('orgs', username)
         json = self._json(self._get(url), 200)
-        return Organization(json, self) if json else None
+        return self._instance_or_null(Organization, json)
+
+    @requires_auth
+    def organization_issues(self, name, filter='', state='', labels='',
+                            sort='', direction='', since=None, number=-1,
+                            etag=None):
+        """Iterate over the organization's issues if the authenticated user
+        belongs to it.
+
+        :param str name: (required), name of the organization
+        :param str filter: accepted values:
+            ('assigned', 'created', 'mentioned', 'subscribed')
+            api-default: 'assigned'
+        :param str state: accepted values: ('open', 'closed')
+            api-default: 'open'
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
+        :param int number: (optional), number of issues to return. Default:
+            -1, returns all available issues
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        """
+        url = self._build_url('orgs', name, 'issues')
+        # issue_params will handle the since parameter
+        params = issue_params(filter, state, labels, sort, direction, since)
+        return self._iter(int(number), url, Issue, params, etag)
+
+    @requires_auth
+    def organizations(self, number=-1, etag=None):
+        """Iterate over all organizations the authenticated user belongs to.
+
+        This will display both the private memberships and the publicized
+        memberships.
+
+        :param int number: (optional), number of organizations to return.
+            Default: -1 returns all available organizations
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`Organization <github3.orgs.Organization>`\ s
+        """
+        url = self._build_url('user', 'orgs')
+        return self._iter(int(number), url, Organization, etag=etag)
+
+    def organizations_with(self, username, number=-1, etag=None):
+        """Iterate over organizations with ``username`` as a public member.
+
+        .. versionadded:: 1.0.0
+
+            Replaces ``iter_orgs('sigmavirus24')``.
+
+        :param str username: (optional), user whose orgs you wish to list
+        :param int number: (optional), number of organizations to return.
+            Default: -1 returns all available organizations
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`Organization <github3.orgs.Organization>`\ s
+        """
+        if username:
+            url = self._build_url('users', username, 'orgs')
+            return self._iter(int(number), url, Organization, etag=etag)
+        return iter([])
+
+    def public_gists(self, number=-1, etag=None):
+        """Retrieve all public gists and iterate over them.
+
+        .. versionadded:: 1.0
+
+        :param int number: (optional), number of gists to return. Default: -1
+            returns all available gists
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        """
+        url = self._build_url('gists', 'public')
+        return self._iter(int(number), url, Gist, etag=etag)
 
     @requires_auth
     def organization_memberships(self, state=None, number=-1, etag=None):
@@ -1021,10 +919,14 @@ class GitHub(GitHubCore):
         :param str owner: (required), owner of the repository
         :param str repository: (required), name of the repository
         :param int number: (required), issue number
-        :return: :class:`Issue <github3.issues.Issue>`
+        :return: :class:`~github.pulls.PullRequest`
         """
-        r = self.repository(owner, repository)
-        return r.pull_request(number) if r else None
+        json = None
+        if int(number) > 0:
+            url = self._build_url('repos', owner, repository, 'pulls',
+                                  str(number))
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(PullRequest, json)
 
     def rate_limit(self):
         """Returns a dictionary with information from /rate_limit.
@@ -1049,6 +951,79 @@ class GitHub(GitHubCore):
         url = self._build_url('rate_limit')
         return self._json(self._get(url), 200)
 
+    @requires_auth
+    def repositories(self, type=None, sort=None, direction=None, number=-1,
+                     etag=None):
+        """List public repositories for the authenticated user.
+
+        .. versionchanged:: 0.6
+
+           Removed the login parameter for correctness. Use repositories_by
+           instead
+
+        :param str type: (optional), accepted values:
+            ('all', 'owner', 'public', 'private', 'member')
+            API default: 'all'
+        :param str sort: (optional), accepted values:
+            ('created', 'updated', 'pushed', 'full_name')
+            API default: 'created'
+        :param str direction: (optional), accepted values:
+            ('asc', 'desc'), API default: 'asc' when using 'full_name',
+            'desc' otherwise
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+            objects
+        """
+        url = self._build_url('user', 'repos')
+
+        params = {}
+        if type in ('all', 'owner', 'public', 'private', 'member'):
+            params.update(type=type)
+        if sort in ('created', 'updated', 'pushed', 'full_name'):
+            params.update(sort=sort)
+        if direction in ('asc', 'desc'):
+            params.update(direction=direction)
+
+        return self._iter(int(number), url, Repository, params, etag)
+
+    def repositories_by(self, username, type=None, sort=None, direction=None,
+                        number=-1, etag=None):
+        """List public repositories for the specified ``username``.
+
+        .. versionadded:: 0.6
+
+        :param str username: (required), username
+        :param str type: (optional), accepted values:
+            ('all', 'owner', 'member')
+            API default: 'all'
+        :param str sort: (optional), accepted values:
+            ('created', 'updated', 'pushed', 'full_name')
+            API default: 'created'
+        :param str direction: (optional), accepted values:
+            ('asc', 'desc'), API default: 'asc' when using 'full_name',
+            'desc' otherwise
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+            objects
+        """
+        url = self._build_url('users', username, 'repos')
+
+        params = {}
+        if type in ('all', 'owner', 'member'):
+            params.update(type=type)
+        if sort in ('created', 'updated', 'pushed', 'full_name'):
+            params.update(sort=sort)
+        if direction in ('asc', 'desc'):
+            params.update(direction=direction)
+
+        return self._iter(int(number), url, Repository, params, etag)
+
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
         owner and repository
@@ -1061,7 +1036,20 @@ class GitHub(GitHubCore):
         if owner and repository:
             url = self._build_url('repos', owner, repository)
             json = self._json(self._get(url), 200)
-        return Repository(json, self) if json else None
+        return self._instance_or_null(Repository, json)
+
+    def repository_with_id(self, number):
+        """Returns the Repository with id ``number``.
+
+        :param int number: id of the repository
+        :returns: :class:`Repository <github3.repos.Repository>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('repositories', str(number))
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(Repository, json)
 
     @requires_app_credentials
     def revoke_authorization(self, access_token):
@@ -1073,10 +1061,10 @@ class GitHub(GitHubCore):
         :param str access_token: (required), the access_token to revoke
         :returns: bool -- True if successful, False otherwise
         """
-        client_id, client_secret = self._session.retrieve_client_credentials()
+        client_id, client_secret = self.session.retrieve_client_credentials()
         url = self._build_url('applications', str(client_id), 'tokens',
                               access_token)
-        with self._session.temporary_basic_auth(client_id, client_secret):
+        with self.session.temporary_basic_auth(client_id, client_secret):
             response = self._delete(url, params={'client_id': None,
                                                  'client_secret': None})
 
@@ -1092,9 +1080,9 @@ class GitHub(GitHubCore):
         :param str client_id: (required), the client_id of your application
         :returns: bool -- True if successful, False otherwise
         """
-        client_id, client_secret = self._session.retrieve_client_credentials()
+        client_id, client_secret = self.session.retrieve_client_credentials()
         url = self._build_url('applications', str(client_id), 'tokens')
-        with self._session.temporary_basic_auth(client_id, client_secret):
+        with self.session.temporary_basic_auth(client_id, client_secret):
             response = self._delete(url, params={'client_id': None,
                                                  'client_secret': None})
 
@@ -1347,7 +1335,7 @@ class GitHub(GitHubCore):
         :param str secret: 40-character hexidecimal client_secret provided by
             GitHub
         """
-        self._session.params = {'client_id': id, 'client_secret': secret}
+        self.session.params = {'client_id': id, 'client_secret': secret}
 
     def set_user_agent(self, user_agent):
         """Allows the user to set their own user agent string to identify with
@@ -1358,74 +1346,121 @@ class GitHub(GitHubCore):
         """
         if not user_agent:
             return
-        self._session.headers.update({'User-Agent': user_agent})
+        self.session.headers.update({'User-Agent': user_agent})
 
     @requires_auth
-    def star(self, login, repo):
-        """Star to login/repo
+    def star(self, username, repo):
+        """Star to username/repo
 
-        :param str login: (required), owner of the repo
+        :param str username: (required), owner of the repo
         :param str repo: (required), name of the repo
         :return: bool
         """
         resp = False
-        if login and repo:
-            url = self._build_url('user', 'starred', login, repo)
+        if username and repo:
+            url = self._build_url('user', 'starred', username, repo)
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
     @requires_auth
-    def subscribe(self, login, repo):
-        """Subscribe to login/repo
+    def starred(self, sort=None, direction=None, number=-1, etag=None):
+        """Iterate over repositories starred by the authenticated user.
 
-        :param str login: (required), owner of the repo
-        :param str repo: (required), name of the repo
-        :return: bool
+        .. versionchanged:: 1.0
+
+           This was split from ``iter_starred`` and requires authentication.
+
+        :param str sort: (optional), either 'created' (when the star was
+            created) or 'updated' (when the repository was last pushed to)
+        :param str direction: (optional), either 'asc' or 'desc'. Default:
+            'desc'
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
-        resp = False
-        if login and repo:
-            url = self._build_url('user', 'subscriptions', login, repo)
-            resp = self._boolean(self._put(url), 204, 404)
-        return resp
+        params = {'sort': sort, 'direction': direction}
+        self._remove_none(params)
+        url = self._build_url('user', 'starred')
+        return self._iter(int(number), url, Repository, params, etag)
+
+    def starred_by(self, username, sort=None, direction=None, number=-1,
+                   etag=None):
+        """Iterate over repositories starred by ``username``.
+
+        .. versionadded:: 1.0
+
+           This was split from ``iter_starred`` and requires the login
+           parameter.
+
+        :param str username: name of user whose stars you want to see
+        :param str sort: (optional), either 'created' (when the star was
+            created) or 'updated' (when the repository was last pushed to)
+        :param str direction: (optional), either 'asc' or 'desc'. Default:
+            'desc'
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        params = {'sort': sort, 'direction': direction}
+        self._remove_none(params)
+        url = self._build_url('users', str(username), 'starred')
+        return self._iter(int(number), url, Repository, params, etag)
 
     @requires_auth
-    def unfollow(self, login):
-        """Make the authenticated user stop following login
+    def subscriptions(self, number=-1, etag=None):
+        """Iterate over repositories subscribed to by the authenticated user.
 
-        :param str login: (required)
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        url = self._build_url('user', 'subscriptions')
+        return self._iter(int(number), url, Repository, etag=etag)
+
+    def subscriptions_for(self, username, number=-1, etag=None):
+        """Iterate over repositories subscribed to by ``username``.
+
+        :param str username: , name of user whose subscriptions you want
+            to see
+        :param int number: (optional), number of repositories to return.
+            Default: -1 returns all repositories
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        """
+        url = self._build_url('users', str(username), 'subscriptions')
+        return self._iter(int(number), url, Repository, etag=etag)
+
+    @requires_auth
+    def unfollow(self, username):
+        """Make the authenticated user stop following username
+
+        :param str username: (required)
         :returns: bool
         """
         resp = False
-        if login:
-            url = self._build_url('user', 'following', login)
+        if username:
+            url = self._build_url('user', 'following', username)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
     @requires_auth
-    def unstar(self, login, repo):
-        """Unstar to login/repo
+    def unstar(self, username, repo):
+        """Unstar to username/repo
 
-        :param str login: (required), owner of the repo
+        :param str username: (required), owner of the repo
         :param str repo: (required), name of the repo
         :return: bool
         """
         resp = False
-        if login and repo:
-            url = self._build_url('user', 'starred', login, repo)
-            resp = self._boolean(self._delete(url), 204, 404)
-        return resp
-
-    @requires_auth
-    def unsubscribe(self, login, repo):
-        """Unsubscribe to login/repo
-
-        :param str login: (required), owner of the repo
-        :param str repo: (required), name of the repo
-        :return: bool
-        """
-        resp = False
-        if login and repo:
-            url = self._build_url('user', 'subscriptions', login, repo)
+        if username and repo:
+            url = self._build_url('user', 'starred', username, repo)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
@@ -1449,30 +1484,93 @@ class GitHub(GitHubCore):
         return user.update(name, email, blog, company, location, hireable,
                            bio)
 
-    def user(self, login=None):
-        """Returns a User object for the specified login name if
-        provided. If no login name is provided, this will return a User
-        object for the authenticated user.
+    def user(self, username):
+        """Returns a User object for the specified user name.
 
-        :param str login: (optional)
+        :param str username: name of the user
         :returns: :class:`User <github3.users.User>`
         """
-        if login:
-            url = self._build_url('users', login)
-        else:
-            url = self._build_url('user')
-
+        url = self._build_url('users', username)
         json = self._json(self._get(url), 200)
-        return User(json, self._session) if json else None
+        return self._instance_or_null(User, json)
+
+    @requires_auth
+    def user_issues(self, filter='', state='', labels='', sort='',
+                    direction='', since=None, per_page=None, number=-1,
+                    etag=None):
+        """List only the authenticated user's issues. Will not list
+        organization's issues
+
+        .. versionchanged:: 1.0
+
+            ``per_page`` parameter added before ``number``
+
+        .. versionchanged:: 0.9.0
+
+            - The ``state`` parameter now accepts 'all' in addition to 'open'
+              and 'closed'.
+
+        :param str filter: accepted values:
+            ('assigned', 'created', 'mentioned', 'subscribed')
+            api-default: 'assigned'
+        :param str state: accepted values: ('all', 'open', 'closed')
+            api-default: 'open'
+        :param str labels: comma-separated list of label names, e.g.,
+            'bug,ui,@high'
+        :param str sort: accepted values: ('created', 'updated', 'comments')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            api-default: desc
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
+        :param int number: (optional), number of issues to return.
+            Default: -1 returns all issues
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        """
+        url = self._build_url('user', 'issues')
+        # issue_params will handle the since parameter
+        params = issue_params(filter, state, labels, sort, direction, since)
+        params.update(per_page=per_page)
+        return self._iter(int(number), url, Issue, params, etag)
+
+    @requires_auth
+    def user_teams(self, number=-1, etag=None):
+        """Gets the authenticated user's teams across all of organizations.
+
+        List all of the teams across all of the organizations to which the
+        authenticated user belongs. This method requires user or repo scope
+        when authenticating via OAuth.
+
+        :returns: generator of :class:`Team <github3.orgs.Team>` objects
+        """
+        url = self._build_url('user', 'teams')
+        return self._iter(int(number), url, Team, etag=etag)
+
+    def user_with_id(self, number):
+        """Get the user's information with id ``number``.
+
+        :param int number: the user's id number
+        :returns: :class:`User <github3.users.User>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('user', str(number))
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(User, json)
 
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg
 
-        :returns: str
+        :returns: str (on Python 3, unicode on Python 2)
         """
         url = self._build_url('zen')
         resp = self._get(url)
-        return resp.content if resp.status_code == 200 else ''
+        return resp.text if resp.status_code == 200 else b''.decode('utf-8')
 
 
 class GitHubEnterprise(GitHub):
@@ -1487,10 +1585,10 @@ class GitHubEnterprise(GitHub):
     If you have a self signed SSL for your local github enterprise you can
     override the validation by passing `verify=False`.
     """
-    def __init__(self, url, login='', password='', token='', verify=True):
-        super(GitHubEnterprise, self).__init__(login, password, token)
-        self._session.base_url = url.rstrip('/') + '/api/v3'
-        self._session.verify = verify
+    def __init__(self, url, username='', password='', token='', verify=True):
+        super(GitHubEnterprise, self).__init__(username, password, token)
+        self.session.base_url = url.rstrip('/') + '/api/v3'
+        self.session.verify = verify
 
     def _repr(self):
         return '<GitHub Enterprise [0.url]>'.format(self)
@@ -1519,7 +1617,7 @@ class GitHubStatus(GitHubCore):
     """
     def __init__(self):
         super(GitHubStatus, self).__init__({})
-        self._session.base_url = 'https://status.github.com'
+        self.session.base_url = 'https://status.github.com'
 
     def _repr(self):
         return '<GitHub Status>'

@@ -17,8 +17,7 @@ class RepoTag(GitHubObject):
 
     See also: http://developer.github.com/v3/repos/#list-tags
     """
-    def __init__(self, tag):
-        super(RepoTag, self).__init__(tag)
+    def _update_attributes(self, tag):
         #: Name of the tag.
         self.name = tag.get('name')
         #: URL for the GitHub generated zipball associated with the tag.
