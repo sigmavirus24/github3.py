@@ -29,8 +29,8 @@ class Event(GitHubCore):
 
     """
 
-    def __init__(self, event):
-        super(Event, self).__init__(event)
+    def __init__(self, event, session=None):
+        super(Event, self).__init__(event, session)
         from .users import User
         from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
