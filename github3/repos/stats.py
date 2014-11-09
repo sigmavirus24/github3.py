@@ -33,7 +33,8 @@ class ContributorStats(GitHubCore):
         self.weeks = stats_object.get('weeks', [])
         #: Alternative collection of weekly dictionaries
         #: This provides a datetime object and easy to remember keys for each
-        #: element in the list. 'w' -> 'start of week', 'a' -> 'Number of additions',
+        #: element in the list.
+        #: 'w' -> 'start of week', 'a' -> 'Number of additions',
         #: 'd' -> 'Number of deletions', 'c' -> 'Number of commits'
         self.alt_weeks = [alternate_week(w) for w in self.weeks]
 
