@@ -1491,9 +1491,10 @@ class GitHubEnterprise(GitHub):
         super(GitHubEnterprise, self).__init__(login, password, token)
         self._session.base_url = url.rstrip('/') + '/api/v3'
         self._session.verify = verify
+        self.url = url
 
     def _repr(self):
-        return '<GitHub Enterprise [0.url]>'.format(self)
+        return '<GitHub Enterprise [{0.url}]>'.format(self)
 
     @requires_auth
     def admin_stats(self, option):
