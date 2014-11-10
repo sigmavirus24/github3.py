@@ -23,10 +23,10 @@ Let's get information about a user::
     # Ian Cordasco
     print(sigmavirus24.login)
     # sigmavirus24
-    print(sigmavirus24.followers)
+    print(sigmavirus24.followers_count)
     # 4
 
-    for f in gh.iter_followers():
+    for f in gh.followers():
         print(str(f))
 
     kennethreitz = gh.user('kennethreitz')
@@ -34,9 +34,9 @@ Let's get information about a user::
 
     print(kennethreitz.name)
     print(kennethreitz.login)
-    print(kennethreitz.followers)
+    print(kennethreitz.followers_count)
 
-    followers = [str(f) for f in gh.iter_followers('kennethreitz')]
+    followers = [str(f) for f in gh.followers('kennethreitz')]
 
 More Examples
 ~~~~~~~~~~~~~
@@ -148,16 +148,33 @@ Examples
 Running the Unittests
 ~~~~~~~~~~~~~~~~~~~~~
 
-::
+The tests are generally run using tox. Tox can be installed lke so::
 
-    mkdir -p /path/to/virtualenv/github3.py
-    cd /path/to/virtualenv/github3.py
-    virtualenv .
-    cd /path/to/github3.py_repo/
-    pip install -r dev-requirements.txt
-    # Or you could run make test-deps
-    make tests
+    pip install tox
 
+We test against PyPy and the following versions of Python:
+
+- 2.6
+- 2.7
+- 3.2
+- 3.3
+- 3.4
+
+If you simply run ``tox`` it will run tests against all of these versions of 
+python and run ``flake8`` against the codebase as well. If you want to run 
+against one specific version, you can do::
+
+    tox -e py34
+
+And if you want to run tests against a specific file, you can do::
+
+    tox -e py34 -- tests/uni/test_github.py
+
+To run the tests, ``tox`` uses ``py.test`` so you can pass any options or 
+parameters to ``py.test`` after specifying ``--``. For example, you can get 
+more verbose output by doing::
+
+    tox -e py34 -- -vv
 
 .. toctree::
 
