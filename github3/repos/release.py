@@ -55,6 +55,20 @@ class Release(GitHubCore):
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
 
+    def asset(self, asset_id):
+        """Retrieve the asset from this release with ``asset_id``.
+
+        :param int asset_id: ID of the Asset to retrieve
+        :returns: :class:`~github3.repos.release.Asset`
+        """
+        json = None
+        if int(asset_id) > 0:
+            i = self._api.rfind('/')
+            url = self._build_url('assets', str(asset_id),
+                                  base_url=self._api[:i])
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(Asset, json)
+
     def assets(self, number=-1, etag=None):
         """Iterate over the assets available for this release.
 

@@ -6,6 +6,27 @@ from .helper import IntegrationHelper
 
 
 class TestRelease(IntegrationHelper):
+    def test_asset(self):
+        """Test the ability to retrieve a single asset from a release."""
+        cassette_name = self.cassette_name('asset')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            release = repository.release(76677)
+            asset = release.asset(37944)
+
+        assert asset is not None
+        assert isinstance(asset, github3.repos.release.Asset)
+
+    def test_assets(self):
+        """Test the ability to iterate over the assets of a release."""
+        cassette_name = self.cassette_name('assets')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            release = repository.release(76677)
+            for asset in release.assets():
+                assert isinstance(asset, github3.repos.release.Asset)
+            assert asset is not None
+
     def test_delete(self):
         """Test the ability to delete a release."""
         self.token_login()
@@ -28,16 +49,6 @@ class TestRelease(IntegrationHelper):
             release = repository.release(85783)
             assert release.edit(body='Test editing a release') is True
             assert release.body == 'Test editing a release'
-
-    def test_assets(self):
-        """Test the ability to iterate over the assets of a release."""
-        cassette_name = self.cassette_name('assets')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            release = repository.release(76677)
-            for asset in release.assets():
-                assert isinstance(asset, github3.repos.release.Asset)
-            assert asset is not None
 
     def test_upload_asset(self):
         """Test the ability to upload an asset to a release."""
