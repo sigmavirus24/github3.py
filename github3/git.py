@@ -213,7 +213,7 @@ class Tree(GitData):
         """
         json = self._json(self._get(self._api, params={'recursive': '1'}),
                           200)
-        return Tree(json, self) if json else None
+        return self._instance_or_null(Tree, json)
 
 
 class Hash(GitHubObject):
