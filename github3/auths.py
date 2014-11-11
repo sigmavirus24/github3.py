@@ -82,8 +82,7 @@ class Authorization(GitHubCore):
         :returns: True if successful, False otherwise
         :rtype: bool
         """
-        data = {'add_scopes': scopes}
-        return self._update(data, note, note_url)
+        return self._update({'add_scopes': scopes}, note, note_url)
 
     @requires_basic_auth
     def delete(self):
@@ -104,8 +103,7 @@ class Authorization(GitHubCore):
         :returns: True if successful, False otherwise
         :rtype: bool
         """
-        data = {'rm_scopes': scopes}
-        return self._update(data, note, note_url)
+        return self._update({'rm_scopes': scopes}, note, note_url)
 
     @requires_basic_auth
     def replace_scopes(self, scopes, note=None, note_url=None):
@@ -120,5 +118,4 @@ class Authorization(GitHubCore):
         :returns: True if successful, False otherwise
         :rtype: bool
         """
-        data = {'scopes': scopes}
-        return self._update(data, note, note_url)
+        return self._update({'scopes': scopes}, note, note_url)
