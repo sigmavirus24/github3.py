@@ -23,7 +23,8 @@ class GitHubError(Exception):
             self.msg = resp.content or '[No message]'
 
     def __repr__(self):
-        return '<GitHubError [{0}]>'.format(self.msg or self.code)
+        return '<{0} [{1}]>'.format(self.__class__.__name__,
+                                    self.msg or self.code)
 
     def __str__(self):
         return '{0} {1}'.format(self.code, self.msg)
