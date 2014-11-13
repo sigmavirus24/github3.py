@@ -99,7 +99,7 @@ class Thread(GitHubCore):
         """
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Subscription, json) self)
+        return self._instance_or_null(Subscription, json)
 
 
 class Subscription(GitHubCore):
