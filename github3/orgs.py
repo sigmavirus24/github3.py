@@ -358,7 +358,7 @@ class Organization(BaseAccount):
         if int(team_id) > 0:
             data.update({'team_id': team_id})
         json = self._json(self._post(url, data), 201)
-        return Repository(json, self) if json else None
+        return self._instance_or_null(Repository, json)
 
     @requires_auth
     def conceal_member(self, username):
@@ -394,7 +394,7 @@ class Organization(BaseAccount):
                 'permission': permission}
         url = self._build_url('teams', base_url=self._api)
         json = self._json(self._post(url, data), 201)
-        return Team(json, self) if json else None
+        return self._instance_or_null(Team, json)
 
     @requires_auth
     def edit(self, billing_email=None, company=None, email=None, location=None,
@@ -552,7 +552,7 @@ class Organization(BaseAccount):
         if int(team_id) > 0:
             url = self._build_url('teams', str(team_id))
             json = self._json(self._get(url), 200)
-        return Team(json, self) if json else None
+        return self._instance_or_null(Team, json)
 
 
 class Membership(GitHubCore):

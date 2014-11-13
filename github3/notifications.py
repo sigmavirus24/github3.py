@@ -90,7 +90,7 @@ class Thread(GitHubCore):
         url = self._build_url('subscription', base_url=self._api)
         sub = {'subscribed': subscribed, 'ignored': ignored}
         json = self._json(self._put(url, data=dumps(sub)), 200)
-        return Subscription(json, self) if json else None
+        return self._instance_or_null(Subscription, json)
 
     def subscription(self):
         """Checks the status of the user's subscription to this thread.
@@ -99,7 +99,7 @@ class Thread(GitHubCore):
         """
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return Subscription(json, self) if json else None
+        return self._instance_or_null(Subscription, json) self)
 
 
 class Subscription(GitHubCore):
