@@ -80,3 +80,5 @@ Contributors
 - Marc Abramowitz (@msabramo)
 
 - Adrian Moisey (@adrianmoisey)
+
+- Bryce Boe (@bboe)
