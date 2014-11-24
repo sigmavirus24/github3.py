@@ -65,13 +65,21 @@ class RepoCommit(BaseCommit):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])
 
     def diff(self):
-        """Return the diff"""
+        """Retrieve the diff for this commit.
+
+        :returns: the diff as a bytes object
+        :rtype: bytes
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.diff'})
-        return resp.content if self._boolean(resp, 200, 404) else None
+        return resp.content if self._boolean(resp, 200, 404) else b''
 
     def patch(self):
-        """Return the patch"""
+        """Retrieve the patch formatted diff for this commit.
+
+        :returns: the patch as a bytes object
+        :rtype: bytes
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.patch'})
-        return resp.content if self._boolean(resp, 200, 404) else None
+        return resp.content if self._boolean(resp, 200, 404) else b''
