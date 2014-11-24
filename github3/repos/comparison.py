@@ -64,13 +64,21 @@ class Comparison(GitHubCore):
         return '<Comparison of {0} commits>'.format(self.total_commits)
 
     def diff(self):
-        """Return the diff"""
+        """Retrieve the diff for this comparison.
+
+        :returns: the diff as a bytes object
+        :rtype: bytes
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.diff'})
-        return resp.content if self._boolean(resp, 200, 404) else None
+        return resp.content if self._boolean(resp, 200, 404) else b''
 
     def patch(self):
-        """Return the patch"""
+        """Retrieve the patch formatted diff for this commit.
+
+        :returns: the patch as a bytes object
+        :rtype: bytes
+        """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.patch'})
-        return resp.content if self._boolean(resp, 200, 404) else None
+        return resp.content if self._boolean(resp, 200, 404) else b''
