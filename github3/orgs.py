@@ -559,10 +559,6 @@ class Membership(GitHubCore):
 
     """The wrapper for information about Team and Organization memberships."""
 
-    def __init__(self, membership, session=None):
-        super(Membership, self).__init__(membership, session)
-        self._update_attributes(membership)
-
     def _repr(self):
         return '<Membership [{0}]>'.format(self.organization)
 
@@ -581,10 +577,12 @@ class Membership(GitHubCore):
 
         :param str state: (required), the state the membership should be in.
             Only accepts ``"active"``.
-        :returns: itself
+        :returns: whether the edit was successful or not
+        :rtype: bool
         """
         if state and state.lower() == 'active':
             data = dumps({'state': state.lower()})
             json = self._json(self._patch(self._api, data=data))
             self._update_attributes(json)
-        return self
+            return True
+        return False
