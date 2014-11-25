@@ -724,20 +724,6 @@ class TestRepository(BaseCase):
         assert isinstance(ret['content'], repos.contents.Contents)
         self.mock_assertions()
 
-    def test_delete_file(self):
-        self.response('create_content', 200)
-        self.delete(self.api + 'contents/setup.py')
-        self.conf = {'data': {'message': 'foo', 'sha': 'ae02db'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.delete_file,
-                          'setup.py', None, None)
-
-        self.not_called()
-        self.login()
-        ret = self.repo.delete_file('setup.py', 'foo', 'ae02db')
-        assert isinstance(ret, github3.git.Commit)
-        self.mock_assertions()
-
     def test_weekly_commit_count(self):
         self.response('weekly_commit_count', ETag='"foobarbogus"')
         self.request.return_value.headers['Last-Modified'] = 'foo'
@@ -781,6 +767,7 @@ class TestContents(BaseCase):
     def test_repr(self):
         assert repr(self.contents) == '<Content [{0}]>'.format('README.rst')
 
+    @pytest.mark.xfail
     def test_delete(self):
         self.response('create_content', 200)
         self.delete(self.api)

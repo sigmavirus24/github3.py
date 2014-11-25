@@ -321,6 +321,13 @@ Old name                            New attribute name
 - ``Event#is_public`` has been removed. Simply check the event's ``public``
   attribute instead.
 
+- ``Repository#delete_file`` has been removed. Simply delete a file using the
+  Contents API.
+
+- ``Content#delete`` now returns a dictionary that matches the JSON returned
+  by the API. It contains the Contents and the Commit associated with the
+  deletion.
+
 New Features
 ````````````
 

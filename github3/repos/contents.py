@@ -103,10 +103,11 @@ class Contents(GitHubCore):
         :param dict author: (optional), if omitted this will be filled in with
             committer information. If passed, you must specify both a name and
             email.
-        :returns: :class:`Commit <github3.git.Commit>`
-
+        :returns: dictionary of new content and associated commit
+        :rtype: :class:`~github3.repos.contents.Content` and
+            :class:`~github3.git.Commit`
         """
-        json = None
+        json = {}
         if message:
             data = {'message': message, 'sha': self.sha,
                     'committer': validate_commmitter(committer),
@@ -114,7 +115,7 @@ class Contents(GitHubCore):
             self._remove_none(data)
             json = self._json(self._delete(self._api, data=dumps(data)), 200)
             if 'commit' in json:
-                json = Commit(json['commit'], self)
+                json['commit'] = Commit(json['commit'], self)
         return json
 
     @requires_auth
