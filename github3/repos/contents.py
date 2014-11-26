@@ -104,7 +104,7 @@ class Contents(GitHubCore):
             committer information. If passed, you must specify both a name and
             email.
         :returns: dictionary of new content and associated commit
-        :rtype: :class:`~github3.repos.contents.Content` and
+        :rtype: :class:`~github3.repos.contents.Contents` and
             :class:`~github3.git.Commit`
         """
         json = {}
@@ -116,6 +116,9 @@ class Contents(GitHubCore):
             json = self._json(self._delete(self._api, data=dumps(data)), 200)
             if 'commit' in json:
                 json['commit'] = Commit(json['commit'], self)
+            if 'content' in json:
+                json['content'] = self._instance_or_null(Contents,
+                                                         json['content'])
         return json
 
     @requires_auth
@@ -130,8 +133,10 @@ class Contents(GitHubCore):
         :param dict author: (optional), if omitted this will be filled in with
             committer information. If passed, you must specify both a name and
             email.
-        :returns: :class:`Commit <github3.git.Commit>`
-
+        :returns: dictionary containing the updated contents object and the
+            commit in which it was changed.
+        :rtype: dictionary of :class:`~github3.repos.contents.Contents` and
+            :class:`~github3.git.Commit`
         """
         if content and not isinstance(content, bytes):
             raise ValueError(  # (No coverage)
@@ -145,9 +150,11 @@ class Contents(GitHubCore):
                     'author': validate_commmitter(author)}
             self._remove_none(data)
             json = self._json(self._put(self._api, data=dumps(data)), 200)
-            if 'content' in json and 'commit' in json:
+            if 'content' in json:
                 self._update_attributes(json['content'])
-                json = Commit(json['commit'], self)
+                json['content'] = self
+            if 'commit' in json:
+                json['commit'] = Commit(json['commit'], self)
         return json
 
 

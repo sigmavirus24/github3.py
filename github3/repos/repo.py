@@ -1767,47 +1767,6 @@ class Repository(GitHubCore):
         return Tree(json, self) if json else None
 
     @requires_auth
-    def update_file(self, path, message, content, sha, branch=None,
-                    author=None, committer=None):
-        """Update the file ``path`` with ``content``.
-
-        This is part of the Contents CrUD (Create Update Delete) API. See
-        http://developer.github.com/v3/repos/contents/#update-a-file for more
-        information.
-
-        :param str path: (required), path to the file being updated
-        :param str message: (required), commit message
-        :param str content: (required), updated contents of the file
-        :param str sha: (required), blob sha of the file being updated
-        :param str branch: (optional), uses the default branch on the
-            repository if not provided.
-        :param dict author: (optional), if omitted this will be filled in with
-            committer information. If passed, you must specify both a name and
-            email.
-        :returns: {'commit': :class:`Commit <github3.git.Commit>`,
-            'content': :class:`Contents <github3.repos.contents.Contents>`}
-
-        """
-        if content and not isinstance(content, bytes):
-            raise ValueError(  # (No coverage)
-                'content must be a bytes object')  # (No coverage)
-
-        json = None
-        if path and message and content and sha:
-            url = self._build_url('contents', path, base_url=self._api)
-            content = b64encode(content).decode('utf-8')
-            data = {'message': message, 'content': content, 'sha': sha,
-                    'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author),
-                    'branch': branch}
-            self._remove_none(data)
-            json = self._json(self._put(url, data=dumps(data)), 200)
-            if 'content' in json and 'commit' in json:
-                json['content'] = Contents(json['content'], self)
-                json['commit'] = Commit(json['commit'], self)
-        return json
-
-    @requires_auth
     def update_label(self, name, color, new_name=''):
         """Update the label ``name``.
 
