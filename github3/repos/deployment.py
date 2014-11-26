@@ -70,7 +70,7 @@ class Deployment(GitHubCore):
                                   headers=Deployment.CUSTOM_HEADERS)
             json = self._json(response, 201)
 
-        return DeploymentStatus(json, self) if json else None
+        return self._instance_or_null(DeploymentStatus, json)
 
     def statuses(self, number=-1, etag=None):
         """Iterate over the deployment statuses for this deployment.
