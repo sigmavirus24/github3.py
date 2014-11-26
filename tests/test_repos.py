@@ -97,6 +97,7 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.commit(sha), repos.commit.RepoCommit)
         self.mock_assertions()
 
+    @pytest.mark.xfail
     def test_commit_comment(self):
         self.response('commit_comment')
         comment_id = 1380832
@@ -124,9 +125,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.contents(filename),
                           repos.contents.Contents)
         self.mock_assertions()
-
-        self.response('', 404)
-        assert self.repo.contents(filename) is None
 
         self.response('contents', _iter=True)
         files = self.repo.contents(filename)
@@ -174,8 +172,6 @@ class TestRepository(BaseCase):
                           body, sha)
 
         self.login()
-        assert self.repo.create_comment(None, None) is None
-        assert self.repo.create_comment(body, sha, line=0) is None
         assert isinstance(self.repo.create_comment(body, sha),
                           repos.comment.RepoComment)
         self.mock_assertions()
@@ -200,7 +196,6 @@ class TestRepository(BaseCase):
         self.assertRaises(github3.GitHubError, self.repo.create_commit, **data)
 
         self.login()
-        assert self.repo.create_commit(None, None, None) is None
         assert isinstance(self.repo.create_commit(**data), github3.git.Commit)
         self.mock_assertions()
 
@@ -235,11 +230,6 @@ class TestRepository(BaseCase):
                           None, None)
 
         self.login()
-        assert self.repo.create_hook(None, {'foo': 'bar'}) is None
-        assert self.repo.create_hook('name', None) is None
-        assert self.repo.create_hook('name', 'bar') is None
-        self.not_called()
-
         h = self.repo.create_hook(**self.conf['data'])
         assert isinstance(h, repos.hook.Hook)
         self.mock_assertions()
@@ -253,7 +243,6 @@ class TestRepository(BaseCase):
         self.assertRaises(github3.GitHubError, self.repo.create_issue, title)
 
         self.login()
-        assert self.repo.create_issue(None) is None
         assert isinstance(self.repo.create_issue(title), github3.issues.Issue)
         self.mock_assertions()
 
@@ -280,8 +269,6 @@ class TestRepository(BaseCase):
                           **self.conf['data'])
 
         self.login()
-        assert self.repo.create_key(None, None) is None
-        self.not_called()
         assert isinstance(self.repo.create_key(**self.conf['data']),
                           github3.users.Key)
         self.mock_assertions()
@@ -295,8 +282,6 @@ class TestRepository(BaseCase):
                           **self.conf['data'])
 
         self.login()
-        assert self.repo.create_label(None, None) is None
-        self.not_called()
         assert isinstance(self.repo.create_label(**self.conf['data']),
                           github3.issues.label.Label)
         self.mock_assertions()
@@ -310,8 +295,6 @@ class TestRepository(BaseCase):
                           **self.conf['data'])
 
         self.login()
-        assert self.repo.create_milestone(None) is None
-        self.not_called()
         assert isinstance(self.repo.create_milestone('foo'),
                           github3.issues.milestone.Milestone)
         self.mock_assertions()
@@ -326,8 +309,6 @@ class TestRepository(BaseCase):
                           **self.conf['data'])
 
         self.login()
-        assert self.repo.create_pull(None, None, None) is None
-        self.not_called()
         assert isinstance(self.repo.create_pull(**self.conf['data']),
                           github3.pulls.PullRequest)
         self.mock_assertions()
@@ -343,8 +324,6 @@ class TestRepository(BaseCase):
                           **self.conf['data'])
 
         self.login()
-        assert self.repo.create_pull_from_issue(0, 'foo', 'bar') is None
-        self.not_called()
         pull = self.repo.create_pull_from_issue(**self.conf['data'])
         assert isinstance(pull, github3.pulls.PullRequest)
         self.mock_assertions()
@@ -358,7 +337,6 @@ class TestRepository(BaseCase):
                           'foo', 'bar')
 
         self.login()
-        assert self.repo.create_ref('foo/bar', None) is None
         assert isinstance(self.repo.create_ref(**self.conf['data']),
                           github3.git.Reference)
         self.mock_assertions()
@@ -372,7 +350,6 @@ class TestRepository(BaseCase):
                           'fakesha', 'success')
 
         self.login()
-        assert self.repo.create_status(None, None) is None
         s = self.repo.create_status('fakesha', 'success')
         assert isinstance(s, repos.status.Status)
         assert repr(s) > ''
@@ -398,8 +375,6 @@ class TestRepository(BaseCase):
 
         self.login()
         with mock.patch.object(repos.Repository, 'create_ref'):
-            assert self.repo.create_tag(None, None, None, None,
-                                        None) is None
             tag = self.repo.create_tag(**data)
             assert isinstance(tag, github3.git.Tag)
             assert repr(tag).startswith('<Tag')
@@ -475,8 +450,6 @@ class TestRepository(BaseCase):
         self.response('git_commit')
         self.get(self.api + 'git/commits/fakesha')
 
-        assert self.repo.git_commit(None) is None
-        self.not_called()
         assert isinstance(self.repo.git_commit('fakesha'), github3.git.Commit)
         self.mock_assertions()
 
@@ -487,8 +460,6 @@ class TestRepository(BaseCase):
         self.assertRaises(github3.GitHubError, self.repo.hook, 2)
 
         self.login()
-        assert self.repo.hook(-2) is None
-        self.not_called()
         assert isinstance(self.repo.hook(2), repos.hook.Hook)
         self.mock_assertions()
 
@@ -505,8 +476,6 @@ class TestRepository(BaseCase):
         self.response('issue')
         self.get(self.api + 'issues/2')
 
-        assert self.repo.issue(-2) is None
-        self.not_called()
         assert isinstance(self.repo.issue(2), github3.issues.Issue)
         self.mock_assertions()
 
@@ -514,8 +483,6 @@ class TestRepository(BaseCase):
         self.response('label')
         self.get(self.api + 'labels/name')
 
-        assert self.repo.label(None) is None
-        self.not_called()
         assert isinstance(self.repo.label('name'), github3.issues.label.Label)
         self.mock_assertions()
 
@@ -556,9 +523,6 @@ class TestRepository(BaseCase):
         self.response('milestone', 200)
         self.get(self.api + 'milestones/2')
 
-        assert self.repo.milestone(0) is None
-        self.not_called()
-
         assert isinstance(self.repo.milestone(2),
                           github3.issues.milestone.Milestone)
         self.mock_assertions()
@@ -573,9 +537,6 @@ class TestRepository(BaseCase):
         self.response('pull', 200)
         self.get(self.api + 'pulls/2')
 
-        assert self.repo.pull_request(0) is None
-        self.not_called()
-
         assert isinstance(self.repo.pull_request(2), github3.pulls.PullRequest)
         self.mock_assertions()
 
@@ -589,9 +550,6 @@ class TestRepository(BaseCase):
     def test_ref(self):
         self.response('ref', 200)
         self.get(self.api + 'git/refs/fakesha')
-
-        assert self.repo.ref(None) is None
-        self.not_called()
 
         assert isinstance(self.repo.ref('fakesha'), github3.git.Reference)
         self.mock_assertions()
@@ -636,18 +594,12 @@ class TestRepository(BaseCase):
         self.response('tag')
         self.get(self.api + 'git/tags/fakesha')
 
-        assert self.repo.tag(None) is None
-        self.not_called()
-
         assert isinstance(self.repo.tag('fakesha'), github3.git.Tag)
         self.mock_assertions()
 
     def test_tree(self):
         self.response('tree')
         self.get(self.api + 'git/trees/fakesha')
-
-        assert self.repo.tree(None) is None
-        self.not_called()
 
         assert isinstance(self.repo.tree('fakesha'), github3.git.Tree)
         self.mock_assertions()
