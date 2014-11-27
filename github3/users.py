@@ -268,7 +268,7 @@ class User(BaseAccount):
             returns all available events.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Event <github3.events.Event>`\ s
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         path = ['events']
         if public:
@@ -324,7 +324,7 @@ class User(BaseAccount):
             returns all available events
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Event <github3.events.Event>`\ s
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
         url = ''
         if org:
@@ -357,7 +357,7 @@ class User(BaseAccount):
             Default: -1 returns all available organization
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: list of :class:`Event <github3.orgs.Organization>`\ s
+        :returns: generator of :class:`Event <github3.orgs.Organization>`\ s
         """
         # Import here, because a toplevel import causes an import loop
         from .orgs import Organization
