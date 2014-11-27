@@ -64,4 +64,4 @@ class GistHistory(GitHubCore):
         """
         from .gist import Gist
         json = self._json(self._get(self._api), 200)
-        return Gist(json, self)
+        return self._instance_or_null(Gist, json)
