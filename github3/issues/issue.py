@@ -77,7 +77,7 @@ class Issue(GitHubCore):
         #: Issue number (e.g. #15)
         self.number = issue.get('number')
         #: Dictionary URLs for the pull request (if they exist)
-        self.pull_request = issue.get('pull_request')
+        self.pull_request_urls = issue.get('pull_request', {})
         m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)/\d+',
                   self.html_url)
         #: Returns ('owner', 'repository') this issue was filed on.
@@ -241,6 +241,18 @@ class Issue(GitHubCore):
         """
         url = self._build_url('labels', base_url=self._api)
         return self._iter(int(number), url, Label, etag=etag)
+
+    def pull_request(self):
+        """Retrieve the pull request associated with this issue.
+
+        :returns: :class:`~github3.pulls.PullRequest`
+        """
+        from .. import pulls
+        json = None
+        pull_request_url = self.pull_request_urls.get('url')
+        if pull_request_url:
+            json = self._json(self._get(pull_request_url), 200)
+        return self._instance_or_null(pulls.PullRequest, json)
 
     @requires_auth
     def remove_label(self, name):
