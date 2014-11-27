@@ -203,9 +203,6 @@ class TestIssue(BaseCase):
         self.assertRaises(github3.GitHubError, self.i.create_comment, '')
 
         self.login()
-        assert self.i.create_comment(None) is None
-        self.not_called()
-
         assert isinstance(self.i.create_comment('comment body'), IssueComment)
         self.mock_assertions()
 

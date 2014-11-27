@@ -153,7 +153,7 @@ class Issue(GitHubCore):
             url = self._build_url('repos', owner, repo, 'issues', 'comments',
                                   str(id_num))
             json = self._json(self._get(url), 200)
-        return IssueComment(json) if json else None
+        return self._instance_or_null(IssueComment, json)
 
     def comments(self, number=-1):
         r"""Iterate over the comments on this issue.
@@ -177,7 +177,7 @@ class Issue(GitHubCore):
             url = self._build_url('comments', base_url=self._api)
             json = self._json(self._post(url, data={'body': body}),
                               201)
-        return IssueComment(json, self) if json else None
+        return self._instance_or_null(IssueComment, json)
 
     @requires_auth
     def edit(self, title=None, body=None, assignee=None, state=None,
