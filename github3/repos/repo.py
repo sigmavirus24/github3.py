@@ -514,7 +514,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('comments', str(comment_id), base_url=self._api)
         json = self._json(self._get(url), 200)
-        self._instance_or_null(RepoComment, json)
+        return self._instance_or_null(RepoComment, json)
 
     def commits(self, sha=None, path=None, author=None, number=-1, etag=None,
                 since=None, until=None):

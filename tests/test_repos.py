@@ -97,7 +97,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.commit(sha), repos.commit.RepoCommit)
         self.mock_assertions()
 
-    @pytest.mark.xfail
     def test_commit_comment(self):
         self.response('commit_comment')
         comment_id = 1380832
