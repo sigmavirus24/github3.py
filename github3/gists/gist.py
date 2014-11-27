@@ -114,7 +114,7 @@ class Gist(GitHubCore):
         if body:
             url = self._build_url('comments', base_url=self._api)
             json = self._json(self._post(url, data={'body': body}), 201)
-        return GistComment(json, self) if json else None
+        return self._instance_or_null(GistComment, json)
 
     @requires_auth
     def delete(self):
@@ -160,7 +160,7 @@ class Gist(GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         json = self._json(self._post(url), 201)
-        return Gist(json, self) if json else None
+        return self._instance_or_null(Gist, json)
 
     @requires_auth
     def is_starred(self):
