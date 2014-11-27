@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/env python
 
 import sys
 import os
@@ -29,7 +28,8 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py bdist_wheel sdist upload")
     sys.exit()
 
-requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0"])
+requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0",
+                 "pyOpenSSL", "ndg-httpsclient", "pyasn1"])
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
@@ -51,7 +51,7 @@ class PyTest(TestCommand):
         self.test_suite = True
 
     def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
+        # import here, cause outside the eggs aren't loaded
         import pytest
         errno = pytest.main(self.test_args)
         sys.exit(errno)
