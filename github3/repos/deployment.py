@@ -49,8 +49,7 @@ class Deployment(GitHubCore):
     def _repr(self):
         return '<Deployment [{0} @ {1}]>'.format(self.id, self.sha)
 
-    def create_status(self, state, target_url=None, description=None,
-                      context=None):
+    def create_status(self, state, target_url=None, description=None):
         """Create a new deployment status for this deployment.
 
         :param str state: (required), The state of the status. Can be one of
@@ -66,7 +65,7 @@ class Deployment(GitHubCore):
 
         if state in ('pending', 'success', 'error', 'failure'):
             data = {'state': state, 'target_url': target_url,
-                    'description': description, 'context': context}
+                    'description': description}
             self._remove_none(data)
             response = self._post(self.statuses_url, data=data,
                                   headers=Deployment.CUSTOM_HEADERS)
