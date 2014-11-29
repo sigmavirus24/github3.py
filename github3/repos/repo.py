@@ -1661,6 +1661,11 @@ class Repository(GitHubCore):
     def statuses(self, sha, number=-1, etag=None):
         r"""Iterate over the statuses for a specific SHA.
 
+        .. warning::
+
+            Deprecated in v1.0. Also deprecated upstream
+            https://developer.github.com/v3/repos/statuses/
+
         :param str sha: SHA of the commit to list the statuses of
         :param int number: (optional), return up to number statuses. Default:
             -1 returns all available statuses.

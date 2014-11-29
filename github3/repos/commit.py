@@ -8,12 +8,13 @@ This module contains the RepoCommit class alone
 """
 from __future__ import unicode_literals
 
-from ..git import Commit
-from ..models import BaseCommit
-from ..users import User
+from . import status
+from .. import git
+from .. import models
+from .. import users
 
 
-class RepoCommit(BaseCommit):
+class RepoCommit(models.BaseCommit):
     """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
     viewed by a :class:`Repository`. This is different from a Commit object
     returned from the git data section.
@@ -34,15 +35,15 @@ class RepoCommit(BaseCommit):
         #: :class:`User <github3.users.User>` who authored the commit.
         self.author = commit.get('author')
         if self.author:
-            self.author = User(self.author, self)
+            self.author = users.User(self.author, self)
         #: :class:`User <github3.users.User>` who committed the commit.
         self.committer = commit.get('committer')
         if self.committer:
-            self.committer = User(self.committer, self)
+            self.committer = users.User(self.committer, self)
         #: :class:`Commit <github3.git.Commit>`.
         self.commit = commit.get('commit')
         if self.commit:
-            self.commit = Commit(self.commit, self)
+            self.commit = git.Commit(self.commit, self)
 
         self.sha = commit.get('sha')
         #: The number of additions made in the commit.
@@ -83,3 +84,12 @@ class RepoCommit(BaseCommit):
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.patch'})
         return resp.content if self._boolean(resp, 200, 404) else b''
+
+    def statuses(self):
+        """Retrieve the statuses for this commit.
+
+        :returns: the statuses for this commit
+        :rtype: :class:`~github3.repos.status.Status`
+        """
+        url = self._build_url('statuses', base_url=self._api)
+        return self._iter(-1, url, status.Status)
