@@ -40,3 +40,13 @@ class TestIssue(IntegrationHelper):
             assert issue is not None
             for label in issue.labels():
                 assert isinstance(label, github3.issues.label.Label)
+
+    def test_pull_request(self):
+        """Test the ability to retrieve the PR associated with an issue."""
+        cassette_name = self.cassette_name('pull_request')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue('sigmavirus24', 'github3.py', 301)
+            assert issue is not None
+            pull_request = issue.pull_request()
+
+        assert isinstance(pull_request, github3.pulls.PullRequest)
