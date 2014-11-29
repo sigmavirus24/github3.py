@@ -21,6 +21,7 @@ kwargs['tests_require'] = ['betamax >=0.2.0', 'pytest',
                            'betamax-matchers>=0.1.0']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2 ==0.5.1')
+    requires.extend(["pyOpenSSL", "ndg-httpsclient", "pyasn1"])
 if sys.version_info < (3, 3):
     kwargs['tests_require'].append('mock ==1.0.1')
 
@@ -28,8 +29,7 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py bdist_wheel sdist upload")
     sys.exit()
 
-requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0",
-                 "pyOpenSSL", "ndg-httpsclient", "pyasn1"])
+requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0"])
 
 __version__ = ''
 with open('github3/__init__.py', 'r') as fd:
