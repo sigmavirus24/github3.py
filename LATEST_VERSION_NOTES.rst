@@ -332,6 +332,8 @@ Old name                            New attribute name
   by the API. It contains the Contents and the Commit associated with the
   deletion.
 
+- ``Issue.pull_request`` has been renamed to ``Issue.pull_request_urls``
+
 New Features
 ````````````
 
@@ -344,3 +346,11 @@ New Features
 
 - You can now retrieve a repository by its id with
   ``GitHub#repository_with_id``.
+
+- You can call the ``pull_request`` method on an ``Issue`` now to retrieve the
+  associated pull request::
+
+      import github3
+
+      i = github3.issue('sigmavirus24', 'github3.py', 301)
+      pr = i.pull_request()
