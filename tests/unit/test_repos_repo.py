@@ -185,6 +185,24 @@ class TestRepository(UnitHelper):
 
         assert self.session.post.called is False
 
+    def test_directory_contents(self):
+        """Verify the request made to retrieve a directory's contents."""
+        self.instance.directory_contents('path/to/directory')
+
+        self.session.get.assert_called_once_with(
+            url_for('contents/path/to/directory'),
+            params={'ref': None}
+        )
+
+    def test_directory_contents_with_ref(self):
+        """Verify the request made to retrieve a directory's contents."""
+        self.instance.directory_contents('path/to/directory', ref='some-sha')
+
+        self.session.get.assert_called_once_with(
+            url_for('contents/path/to/directory'),
+            params={'ref': 'some-sha'}
+        )
+
     def test_key(self):
         """Test the ability to fetch a deploy key."""
         self.instance.key(10)

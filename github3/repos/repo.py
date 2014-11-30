@@ -1094,6 +1094,39 @@ class Repository(GitHubCore):
         i.headers.update(Deployment.CUSTOM_HEADERS)
         return i
 
+    def directory_contents(self, directory_path, ref=None, return_as=list):
+        """Get the contents of each file in ``directory_path``.
+
+        If the path provided is actually a directory, you will receive a
+        list back of the form::
+
+            [('filename.md', Contents(...)),
+             ('github.py', Contents(...)),
+             # ...
+             ('fiz.py', Contents(...))]
+
+        You can either then transform it into a dictionary::
+
+            contents = dict(repo.directory_contents('path/to/dir/'))
+
+        Or you can use the ``return_as`` parameter to have it return a
+        dictionary for you::
+
+            contents = repo.directory_contents('path/to/dir/', return_as=dict)
+
+        :param str path: (required), path to file, e.g.
+            github3/repos/repo.py
+        :param str ref: (optional), the string name of a commit/branch/tag.
+            Default: master
+        :param return_as: (optional), how to return the directory's contents.
+            Default: :class:`list`
+        :returns: list of tuples of the filename and the Contents returned
+        :rtype: list((str, :class:`~github3.repos.contents.Contents`))
+        """
+        url = self._build_url('contents', directory_path, base_url=self._api)
+        json = self._json(self._get(url, params={'ref': ref}), 200) or []
+        return return_as((j.get('name'), Contents(j, self)) for j in json)
+
     @requires_auth
     def edit(self, name, description=None, homepage=None, private=None,
              has_issues=None, has_wiki=None, has_downloads=None,
