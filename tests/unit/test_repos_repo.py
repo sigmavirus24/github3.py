@@ -384,9 +384,7 @@ class TestRepositoryIterator(UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('deployments'),
             params={'per_page': 100},
-            headers={
-                'Accept': 'application/vnd.github.cannonball-preview+json'
-            }
+            headers={}
         )
 
     def test_events(self):

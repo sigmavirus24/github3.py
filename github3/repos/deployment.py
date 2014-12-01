@@ -6,10 +6,6 @@ from ..users import User
 
 
 class Deployment(GitHubCore):
-    CUSTOM_HEADERS = {
-        'Accept': 'application/vnd.github.cannonball-preview+json'
-        }
-
     def _update_attributes(self, deployment):
         self._api = deployment.get('url')
 
@@ -67,8 +63,7 @@ class Deployment(GitHubCore):
             data = {'state': state, 'target_url': target_url,
                     'description': description}
             self._remove_none(data)
-            response = self._post(self.statuses_url, data=data,
-                                  headers=Deployment.CUSTOM_HEADERS)
+            response = self._post(self.statuses_url, data=data)
             json = self._json(response, 201)
 
         return self._instance_or_null(DeploymentStatus, json)
@@ -84,7 +79,6 @@ class Deployment(GitHubCore):
         """
         i = self._iter(int(number), self.statuses_url, DeploymentStatus,
                        etag=etag)
-        i.headers = Deployment.CUSTOM_HEADERS
         return i
 
 

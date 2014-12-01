@@ -64,7 +64,5 @@ class TestDeploymentIterators(UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('statuses'),
             params={'per_page': 100},
-            headers={
-                'Accept': 'application/vnd.github.cannonball-preview+json'
-            }
+            headers={}
         )
