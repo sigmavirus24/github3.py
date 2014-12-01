@@ -180,6 +180,15 @@ class TestRepository(IntegrationHelper):
         for event in events:
             assert isinstance(event, github3.events.Event)
 
+    def test_file_contents(self):
+        """Test that a file's contents can be retrieved."""
+        cassette_name = self.cassette_name('file_contents')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            contents = repository.file_contents('github3/repos/repo.py')
+
+        assert isinstance(contents, github3.repos.contents.Contents)
+
     def test_forks(self):
         """Test that a user can iterate over the forks of a repository."""
         cassette_name = self.cassette_name('forks')

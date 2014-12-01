@@ -203,6 +203,15 @@ class TestRepository(UnitHelper):
             params={'ref': 'some-sha'}
         )
 
+    def test_file_contents(self):
+        """Verify the request made to retrieve a dictionary's contents."""
+        self.instance.file_contents('path/to/file.txt', ref='some-sha')
+
+        self.session.get.assert_called_once_with(
+            url_for('contents/path/to/file.txt'),
+            params={'ref': 'some-sha'}
+        )
+
     def test_key(self):
         """Test the ability to fetch a deploy key."""
         self.instance.key(10)
