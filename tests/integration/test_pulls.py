@@ -31,7 +31,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for commit in p.commits():
-                assert isinstance(commit, github3.git.Commit)
+                assert isinstance(commit, github3.repos.commit.RepoCommit)
 
     def test_create_review_comment(self):
         """Show that a user can create an in-line reveiw comment on a PR."""
