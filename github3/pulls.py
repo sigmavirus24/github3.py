@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 
 from re import match
 from json import dumps
-from .git import Commit
+from .repos.commit import RepoCommit
 from .models import GitHubObject, GitHubCore, BaseComment
 from .users import User
 from .decorators import requires_auth
@@ -238,10 +238,11 @@ class PullRequest(GitHubCore):
             -1 returns all available commits.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Commit <github3.git.Commit>`\ s
+        :returns: generator of
+            :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
         """
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, Commit, etag=etag)
+        return self._iter(int(number), url, RepoCommit, etag=etag)
 
     def files(self, number=-1, etag=None):
         r"""Iterate over the files associated with this pull request.
