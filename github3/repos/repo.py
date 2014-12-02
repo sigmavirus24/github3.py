@@ -724,8 +724,7 @@ class Repository(GitHubCore):
                     'auto_merge': auto_merge, 'description': description,
                     'environment': environment}
             self._remove_none(data)
-            headers = Deployment.CUSTOM_HEADERS
-            json = self._json(self._post(url, data=data, headers=headers),
+            json = self._json(self._post(url, data=data),
                               201)
         return self._instance_or_null(Deployment, json)
 
@@ -1091,7 +1090,6 @@ class Repository(GitHubCore):
         """
         url = self._build_url('deployments', base_url=self._api)
         i = self._iter(int(number), url, Deployment, etag=etag)
-        i.headers.update(Deployment.CUSTOM_HEADERS)
         return i
 
     @requires_auth

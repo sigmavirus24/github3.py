@@ -82,3 +82,5 @@ Contributors
 - Adrian Moisey (@adrianmoisey)
 
 - Bryce Boe (@bboe)
+
+- Ryan Weald (@rweald)
