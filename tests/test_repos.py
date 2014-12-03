@@ -116,31 +116,6 @@ class TestRepository(BaseCase):
                           repos.comparison.Comparison)
         self.mock_assertions()
 
-    def test_contents(self):
-        self.response('contents')
-        filename = 'setup.py'
-        self.get(self.api + 'contents/' + filename)
-
-        assert isinstance(self.repo.contents(filename),
-                          repos.contents.Contents)
-        self.mock_assertions()
-
-        self.response('contents', _iter=True)
-        files = self.repo.contents(filename)
-        assert isinstance(files, dict)
-
-        self.mock_assertions()
-
-    def test_contents_ref(self):
-        self.response('contents')
-        filename = 'setup.py'
-        self.get(self.api + 'contents/' + filename)
-        self.conf = {'params': {'ref': 'foo'}}
-
-        assert isinstance(self.repo.contents(filename, ref='foo'),
-                          repos.contents.Contents)
-        self.mock_assertions()
-
     def test_create_blob(self):
         self.response('blob', 201)
         content = 'VGVzdCBibG9i\n'

@@ -157,6 +157,17 @@ class TestRepository(IntegrationHelper):
             for d in repository.deployments():
                 assert isinstance(d, github3.repos.deployment.Deployment)
 
+    def test_directory_contents(self):
+        """Test that a directory's contents can be retrieved."""
+        cassette_name = self.cassette_name('directory_contents')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            contents = repository.directory_contents('github3/search/')
+
+        for (filename, content) in contents:
+            assert content.name == filename
+            assert isinstance(content, github3.repos.contents.Contents)
+
     def test_events(self):
         """Test that a user can iterate over the events from a repository."""
         cassette_name = self.cassette_name('events')
@@ -168,6 +179,15 @@ class TestRepository(IntegrationHelper):
         assert len(events) > 0
         for event in events:
             assert isinstance(event, github3.events.Event)
+
+    def test_file_contents(self):
+        """Test that a file's contents can be retrieved."""
+        cassette_name = self.cassette_name('file_contents')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            contents = repository.file_contents('github3/repos/repo.py')
+
+        assert isinstance(contents, github3.repos.contents.Contents)
 
     def test_forks(self):
         """Test that a user can iterate over the forks of a repository."""

@@ -191,6 +191,13 @@ Old name                                      New name
   - ``Repository#ignore`` ignores notifications from the repository for the 
     authenticated user
 
+- ``Repository#contents`` was split into two simpler functions
+
+  - ``Repository#file_contents`` returns the contents of a file object
+
+  - ``Repository#directory_contents`` returns the contents of files in a
+    directory.
+
 - ``Organization#add_repo`` and ``Team#add_repo`` have been renamed to
   ``Organization#add_repository`` and ``Team#add_repository`` respectively.
 
