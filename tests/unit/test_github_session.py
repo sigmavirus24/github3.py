@@ -1,3 +1,4 @@
+import cPickle as pickle
 import pytest
 
 import requests
@@ -231,3 +232,14 @@ class TestGitHubSession:
         """
         s = self.build_session()
         assert s.retrieve_client_credentials() == (None, None)
+
+    def test_pickling(self):
+        s = self.build_session('https://api.github.com')
+        dumped = pickle.dumps(s, pickle.HIGHEST_PROTOCOL)
+        loaded = pickle.loads(dumped)
+
+        assert hasattr(loaded, 'base_url')
+        assert hasattr(loaded, 'two_factor_auth_cb')
+
+        assert loaded.base_url == s.base_url
+        assert loaded.two_factor_auth_cb == s.two_factor_auth_cb
