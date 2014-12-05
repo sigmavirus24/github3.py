@@ -34,6 +34,7 @@ class GitHubSession(requests.Session):
             })
         self.base_url = 'https://api.github.com'
         self.two_factor_auth_cb = None
+        self.__attrs__.extend(['base_url', 'two_factor_auth_cb'])
 
     def basic_auth(self, username, password):
         """Set the Basic Auth credentials on this Session.
