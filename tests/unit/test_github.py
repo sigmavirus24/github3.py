@@ -262,6 +262,19 @@ class TestGitHub(UnitHelper):
         self.instance.login('username', 'password')
         self.instance.login(token='token')
 
+    def test_update_me(self):
+        """Verify the request to update the authenticated user's profile."""
+        self.instance.update_me(name='New name', email='email@example.com',
+                                blog='http://blog.example.com', company='Corp',
+                                location='here')
+
+        self.patch_called_with(
+            url_for('user'),
+            data={'name': 'New name', 'email': 'email@example.com',
+                  'blog': 'http://blog.example.com', 'company': 'Corp',
+                  'location': 'here', 'hireable': False}
+            )
+
     def test_user(self):
         """Test that a user can retrieve information about any user."""
         self.instance.user('username')

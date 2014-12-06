@@ -188,28 +188,6 @@ class TestUser(BaseCase):
         assert self.user.is_following('kennethreitz')
         self.mock_assertions()
 
-    def test_update(self):
-        self.response('user', 200)
-        self.patch('https://api.github.com/user')
-        self.conf = {
-            'data': {
-                'name': 'Ian Cordasco',
-                'email': 'ian@cor.da.sc.o',
-                'blog': 'http://example.com/blog',
-                'hireable': True,
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.user.update)
-
-        self.not_called()
-        self.login()
-        assert self.user.update(**self.conf['data'])
-        self.mock_assertions()
-
-        self.response('', 404)
-        assert self.user.update(**self.conf['data']) is False
-
     def test_equality(self):
         u = github3.users.User(load('user'))
         assert self.user == u

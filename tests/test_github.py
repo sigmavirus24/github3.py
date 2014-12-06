@@ -184,20 +184,6 @@ class TestGitHub(BaseCase):
         assert self.g.unstar('sigmavirus24', 'github3.py')
         self.mock_assertions()
 
-    def test_update_user(self):
-        self.login()
-        args = ('Ian Cordasco', 'example@mail.com', 'www.blog.com', 'company',
-                'loc', True, 'bio')
-
-        with mock.patch.object(github3.github.GitHub, 'user') as user:
-            with mock.patch.object(github3.users.User, 'update') as upd:
-                user.return_value = github3.users.User(load('user'), self.g)
-                upd.return_value = True
-                assert self.g.update_user(*args)
-                assert user.called
-                assert upd.called
-                upd.assert_called_with(*args)
-
     def test_utf8_user(self):
         self.response('utf8_user')
         self.get('https://api.github.com/users/alejandrogomez')

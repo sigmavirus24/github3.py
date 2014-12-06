@@ -8,6 +8,8 @@ This module contains the main GitHub session object.
 """
 from __future__ import unicode_literals
 
+import json
+
 from .auths import Authorization
 from .decorators import (requires_auth, requires_basic_auth,
                          requires_app_credentials)
@@ -1452,7 +1454,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def unstar(self, username, repo):
-        """Unstar to username/repo
+        """Unstar username/repo.
 
         :param str username: (required), owner of the repo
         :param str repo: (required), name of the repo
@@ -1465,24 +1467,30 @@ class GitHub(GitHubCore):
         return resp
 
     @requires_auth
-    def update_user(self, name=None, email=None, blog=None,
-                    company=None, location=None, hireable=False, bio=None):
-        """If authenticated as this user, update the information with
-        the information provided in the parameters. All parameters are
-        optional.
+    def update_me(self, name=None, email=None, blog=None, company=None,
+                  location=None, hireable=False, bio=None):
+        """Update the profile of the authenticated user.
 
         :param str name: e.g., 'John Smith', not login name
         :param str email: e.g., 'john.smith@example.com'
         :param str blog: e.g., 'http://www.example.com/jsmith/blog'
-        :param str company: company name
-        :param str location: where you are located
+        :param str company:
+        :param str location:
         :param bool hireable: defaults to False
         :param str bio: GitHub flavored markdown
-        :returns: bool
+        :returns: whether the operation was successful or not
+        :rtype: bool
         """
-        user = self.user()
-        return user.update(name, email, blog, company, location, hireable,
-                           bio)
+        user = {'name': name, 'email': email, 'blog': blog,
+                'company': company, 'location': location,
+                'hireable': hireable, 'bio': bio}
+        self._remove_none(user)
+        url = self._build_url('user')
+        _json = self._json(self._patch(url, data=json.dumps(user)), 200)
+        if _json:
+            self._update_attributes(_json)
+            return True
+        return False
 
     def user(self, username):
         """Returns a User object for the specified user name.
