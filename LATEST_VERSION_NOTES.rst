@@ -255,37 +255,37 @@ Old name                            New attribute name
 - Most instances of ``login`` as a parameter have been changed to ``username``
   for clarity and consistency. This affects the following methods:
 
-    - ``github3.authorize``
-    - ``github3.repositories_by``
-    - ``github3.user``
-    - ``GitHub``
-    - ``GitHub#authorize``
-    - ``GitHub#follow``
-    - ``GitHub#is_following``
-    - ``GitHub#is_starred``
-    - ``GitHub#issue``
-    - ``GitHub#followers_of``
-    - ``GitHub#followed_by``
-    - ``GitHub#gists_by``
-    - ``GitHub#issues_on``
-    - ``GitHub#organizations_with``
-    - ``GitHub#starred_by``
-    - ``GitHub#subscriptions_for``
-    - ``GitHub#user``
-    - ``GitHubEnterprise``
-    - ``Issue#assign``
-    - ``Organization#add_member``
-    - ``Organization#is_member``
-    - ``Organization#is_public_member``
-    - ``Organization#remove_member``
-    - ``Repository#add_collaborator``
-    - ``Repository#is_assignee``
-    - ``Repository#is_collaborator``
-    - ``Repository#remove_collaborator``
-    - ``Team#add_member``
-    - ``Team#is_member``
-    - ``User#is_assignee_on``
-    - ``User#is_following``
+  - ``github3.authorize``
+  - ``github3.repositories_by``
+  - ``github3.user``
+  - ``GitHub``
+  - ``GitHub#authorize``
+  - ``GitHub#follow``
+  - ``GitHub#is_following``
+  - ``GitHub#is_starred``
+  - ``GitHub#issue``
+  - ``GitHub#followers_of``
+  - ``GitHub#followed_by``
+  - ``GitHub#gists_by``
+  - ``GitHub#issues_on``
+  - ``GitHub#organizations_with``
+  - ``GitHub#starred_by``
+  - ``GitHub#subscriptions_for``
+  - ``GitHub#user``
+  - ``GitHubEnterprise``
+  - ``Issue#assign``
+  - ``Organization#add_member``
+  - ``Organization#is_member``
+  - ``Organization#is_public_member``
+  - ``Organization#remove_member``
+  - ``Repository#add_collaborator``
+  - ``Repository#is_assignee``
+  - ``Repository#is_collaborator``
+  - ``Repository#remove_collaborator``
+  - ``Team#add_member``
+  - ``Team#is_member``
+  - ``User#is_assignee_on``
+  - ``User#is_following``
 
 - ``Repository.stargazers`` is now ``Repository.stargazers_count`` (conforming
   with the attribute name returned by the API).
