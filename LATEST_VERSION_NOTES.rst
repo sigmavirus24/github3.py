@@ -170,6 +170,10 @@ Old name                                      New name
 
   - ``GitHub#me`` which retrieves the authenticated user's information
 
+- ``GitHub#update_user`` has been renamed to ``GitHub#update_me`` and only
+  uses 1 API call now. It was renamed to reflect the addition of
+  ``GitHub#me``.
+
 - The legacy watching API has been removed:
 
   - ``GitHub#subscribe``

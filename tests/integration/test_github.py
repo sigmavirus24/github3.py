@@ -411,6 +411,14 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(repos, github3.structs.SearchIterator)
         assert len(repo_result.text_matches) > 0
 
+    def test_update_me(self):
+        """Test the ability to update the current authenticated User."""
+        cassette_name = self.cassette_name('update_me')
+        self.basic_login()
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.update_me(name='Ian "RFC" Cordasco') is True
+            assert self.gh.update_me(name='Ian Cordasco') is True
+
     def test_user(self):
         """Test the ability to retrieve a User."""
         cassette_name = self.cassette_name('user')
