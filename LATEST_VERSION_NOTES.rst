@@ -1,7 +1,7 @@
 .. vim: set tw=100
 
-1.0.0: 2014-xx-xx
-~~~~~~~~~~~~~~~~~
+1.0.0a1: 2014-12-07
+~~~~~~~~~~~~~~~~~~~
 
 1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
 It is suggested you read the following release notes *very* carefully.

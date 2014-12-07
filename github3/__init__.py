@@ -14,7 +14,7 @@ __title__ = 'github3'
 __author__ = 'Ian Cordasco'
 __license__ = 'Modified BSD'
 __copyright__ = 'Copyright 2012-2014 Ian Cordasco'
-__version__ = '1.0.0b1'
+__version__ = '1.0.0a1'
 __version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
 
 from .api import (
