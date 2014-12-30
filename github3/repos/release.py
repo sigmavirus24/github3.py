@@ -153,6 +153,9 @@ class Release(GitHubCore):
 
 
 class Asset(GitHubCore):
+
+    CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
+
     def _update_attributes(self, asset):
         self._api = asset.get('url')
         #: Content-Type provided when the asset was created
@@ -210,6 +213,19 @@ class Asset(GitHubCore):
             stream_response_to_file(resp, path)
             return True
         return False
+
+    @requires_auth
+    def delete(self):
+        """Users with push access to the repository can delete an asset.
+
+        :returns: True if successful; False if not successful
+        """
+        url = self._api
+        return self._boolean(
+            self._delete(url, headers=Asset.CUSTOM_HEADERS),
+            204,
+            404
+        )
 
     def edit(self, name, label=None):
         """Edit this asset.
