@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 import json
 
-from github3.decorators import requires_auth
-from github3.models import GitHubCore, GitHubError
-from github3.utils import stream_response_to_file
+from ..decorators import requires_auth
+from ..models import GitHubCore, GitHubError
+from ..utils import stream_response_to_file
 from uritemplate import URITemplate
 
 
@@ -185,11 +185,11 @@ class Asset(GitHubCore):
             # Amazon S3 will reject the redirected request unless we omit
             # certain request headers
             headers.update({
-                'Authorization': None,
                 'Content-Type': None,
                 })
-            resp = self._get(resp.headers['location'], stream=True,
-                             headers=headers)
+            with self._session.no_auth():
+                resp = self._get(resp.headers['location'], stream=True,
+                                 headers=headers)
 
         if self._boolean(resp, 200, 404):
             stream_response_to_file(resp, path)

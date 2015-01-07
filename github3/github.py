@@ -8,20 +8,20 @@ This module contains the main GitHub session object.
 """
 from __future__ import unicode_literals
 
-from github3.auths import Authorization
-from github3.decorators import (requires_auth, requires_basic_auth,
-                                requires_app_credentials)
-from github3.events import Event
-from github3.gists import Gist
-from github3.issues import Issue, issue_params
-from github3.models import GitHubCore
-from github3.orgs import Organization, Team
-from github3.repos import Repository
-from github3.search import (CodeSearchResult, IssueSearchResult,
-                            RepositorySearchResult, UserSearchResult)
-from github3.structs import SearchIterator
-from github3.users import User, Key
-from github3.notifications import Thread
+from .auths import Authorization
+from .decorators import (requires_auth, requires_basic_auth,
+                         requires_app_credentials)
+from .events import Event
+from .gists import Gist
+from .issues import Issue, issue_params
+from .models import GitHubCore
+from .orgs import Membership, Organization, Team
+from .repos import Repository
+from .search import (CodeSearchResult, IssueSearchResult,
+                     RepositorySearchResult, UserSearchResult)
+from .structs import SearchIterator
+from .users import User, Key
+from .notifications import Thread
 from uritemplate import URITemplate
 
 
@@ -931,6 +931,14 @@ class GitHub(GitHubCore):
                 return req.content
         return ''  # (No coverage)
 
+    @requires_auth
+    def membership_in(self, organization):
+        """Retrieve the user's membership in the specified organization."""
+        url = self._build_url('user', 'memberships', 'orgs',
+                              str(organization))
+        json = self._json(self._get(url), 200)
+        return Membership(json, self)
+
     def meta(self):
         """Returns a dictionary with arrays of addresses in CIDR format
         specifying theaddresses that the incoming service hooks will originate
@@ -963,6 +971,22 @@ class GitHub(GitHubCore):
         return Organization(json, self) if json else None
 
     @requires_auth
+    def organization_memberships(self, state=None, number=-1, etag=None):
+        """List organizations of which the user is a current or pending member.
+
+        :param str state: (option), state of the membership, i.e., active,
+            pending
+        :returns: iterator of :class:`Membership <github3.orgs.Membership>`
+        """
+        params = None
+        url = self._build_url('user', 'memberships', 'orgs')
+        if state is not None and state.lower() in ('active', 'pending'):
+            params = {'state': state.lower()}
+        return self._iter(int(number), url, Membership,
+                          params=params,
+                          etag=etag)
+
+    @requires_auth
     def pubsubhubbub(self, mode, topic, callback, secret=''):
         """Create/update a pubsubhubbub hook.
 
@@ -976,7 +1000,7 @@ class GitHub(GitHubCore):
         :returns: bool
         """
         from re import match
-        m = match('https://[\w\d\-\.\:]+/\w+/[\w\._-]+/events/\w+', topic)
+        m = match('https?://[\w\d\-\.\:]+/\w+/[\w\._-]+/events/\w+', topic)
         status = False
         if mode and topic and callback and m:
             data = [('hub.mode', mode), ('hub.topic', topic),
@@ -1454,13 +1478,13 @@ class GitHub(GitHubCore):
 class GitHubEnterprise(GitHub):
     """For GitHub Enterprise users, this object will act as the public API to
     your instance. You must provide the URL to your instance upon
-    initializaiton and can provide the rest of the login details just like in
+    initialization and can provide the rest of the login details just like in
     the :class:`GitHub <GitHub>` object.
 
     There is no need to provide the end of the url (e.g., /api/v3/), that will
     be taken care of by us.
-    
-    If you have a self signed SSL for your local github enterprise you can 
+
+    If you have a self signed SSL for your local github enterprise you can
     override the validation by passing `verify=False`.
     """
     def __init__(self, url, login='', password='', token='', verify=True):

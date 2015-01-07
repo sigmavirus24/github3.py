@@ -10,11 +10,11 @@ from __future__ import unicode_literals
 
 from re import match
 from json import dumps
-from github3.git import Commit
-from github3.models import GitHubObject, GitHubCore, BaseComment
-from github3.users import User
-from github3.decorators import requires_auth
-from github3.issues.comment import IssueComment
+from .git import Commit
+from .models import GitHubObject, GitHubCore, BaseComment
+from .users import User
+from .decorators import requires_auth
+from .issues.comment import IssueComment
 from uritemplate import URITemplate
 
 
@@ -179,11 +179,11 @@ class PullRequest(GitHubCore):
         #: Review comment URL Template. Expands with ``number``
         self.review_comment_url = URITemplate(comments) if comments else None
         #: Number of review comments on the pull request
-        self.review_comments = pull.get('review_comments')
+        self.review_comments_count = pull.get('review_comments')
         #: GitHub.com url for review comments (not a template)
         self.review_comments_url = pull.get('review_comments_url')
 
-        m = match('https://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)?/\d+',
+        m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)?/\d+',
                   self.issue_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
@@ -217,6 +217,25 @@ class PullRequest(GitHubCore):
         :returns: bool
         """
         return self.update(self.title, self.body, 'closed')
+
+    @requires_auth
+    def create_review_comment(self, body, commit_id, path, position):
+        """Create a review comment on this pull request.
+
+        All parameters are required by the GitHub API.
+
+        :param str body: The comment text itself
+        :param str commit_id: The SHA of the commit to comment on
+        :param str path: The relative path of the file to comment on
+        :param int position: The line index in the diff to comment on.
+        :returns: The created review comment.
+        :rtype: :class:`~github3.pulls.ReviewComment`
+        """
+        url = self._build_url('comments', base_url=self._api)
+        data = {'body': body, 'commit_id': commit_id, 'path': path,
+                'position': str(position)}
+        json = self._json(self._post(url, data=data), 201)
+        return ReviewComment(json, self) if json else None
 
     def diff(self):
         """Return the diff"""
@@ -310,6 +329,17 @@ class PullRequest(GitHubCore):
         """
         return self.update(self.title, self.body, 'open')
 
+    def review_comments(self, number=-1, etag=None):
+        r"""Iterate over the review comments on this pull request.
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all available comments.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`ReviewComment <ReviewComment>`\ s
+        """
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, ReviewComment, etag=etag)
+
     @requires_auth
     def update(self, title=None, body=None, state=None):
         """Update this pull request.
@@ -374,5 +404,24 @@ class ReviewComment(BaseComment):
         #: Original commit SHA
         self.original_commit_id = comment.get('original_commit_id')
 
+        #: API URL for the Pull Request
+        self.pull_request_url = comment.get('pull_request_url')
+
     def _repr(self):
         return '<Review Comment [{0}]>'.format(self.user.login)
+
+    @requires_auth
+    def reply(self, body):
+        """Reply to this review comment with a new review comment.
+
+        :param str body: The text of the comment.
+        :returns: The created review comment.
+        :rtype: :class:`~github3.pulls.ReviewComment`
+        """
+        url = self._build_url('comments', base_url=self.pull_request_url)
+        index = self._api.rfind('/') + 1
+        in_reply_to = self._api[index:]
+        json = self._json(self._post(url, data={
+            'body': body, 'in_reply_to': in_reply_to
+        }), 201)
+        return ReviewComment(json, self) if json else None

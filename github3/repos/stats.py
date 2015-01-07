@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from github3.models import GitHubCore
-from github3.users import User
+from ..models import GitHubCore
+from ..users import User
 
 
 def alternate_week(week):

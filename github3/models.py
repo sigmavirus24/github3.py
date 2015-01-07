@@ -10,9 +10,9 @@ from __future__ import unicode_literals
 
 from json import dumps
 from requests.compat import urlparse, is_py2
-from github3.decorators import requires_auth
-from github3.session import GitHubSession
-from github3.utils import UTC
+from .decorators import requires_auth
+from .session import GitHubSession
+from .utils import UTC
 from datetime import datetime
 from logging import getLogger
 
@@ -29,8 +29,8 @@ class GitHubObject(object):
         if json is not None:
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
+            self._uniq = json.get('url', None)
         self._json_data = json
-        self._uniq = json.get('url', None)
 
     def to_json(self):
         """Return the json representing this object."""
@@ -169,7 +169,7 @@ class GitHubCore(GitHubObject):
         :param params dict: (optional) Parameters for the request
         :param str etag: (optional), ETag from the last call
         """
-        from github3.structs import GitHubIterator
+        from .structs import GitHubIterator
         return GitHubIterator(count, url, cls, self, params, etag)
 
     @property

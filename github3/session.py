@@ -2,7 +2,7 @@
 import requests
 
 from collections import Callable
-from github3 import __version__
+from . import __version__
 from logging import getLogger
 from contextlib import contextmanager
 
@@ -126,6 +126,18 @@ class GitHubSession(requests.Session):
         old_token_auth = self.headers.get('Authorization')
 
         self.basic_auth(*auth)
+        yield
+
+        self.auth = old_basic_auth
+        if old_token_auth:
+            self.headers['Authorization'] = old_token_auth
+
+    @contextmanager
+    def no_auth(self):
+        """Unset authentication temporarily as a context manager."""
+        old_basic_auth, self.auth = self.auth, None
+        old_token_auth = self.headers.pop('Authorization', None)
+
         yield
 
         self.auth = old_basic_auth

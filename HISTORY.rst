@@ -1,6 +1,34 @@
 History/Changelog
 -----------------
 
+0.9.3: 2014-11-04
+~~~~~~~~~~~~~~~~~
+
+- Backport of ``PullRequest#create_review_comment`` by Adrian Moisey
+
+- Backport of ``PullRequest#review_comments`` by Adrian Moisey
+
+- Backport of a fix that allows authenticated users to download Release
+  Assets. Original bug reported by Eugene Fidelin in issue #288.
+
+- Documentation typo fix by Marc Abramowitz
+
+0.9.2: 2014-10-05
+~~~~~~~~~~~~~~~~~
+
+- Updates for `new team management`_ API changes
+
+  - Add ``Team#invite``, ``Team#membership_for``, and
+    ``Team#revoke_membership``
+
+  - Deprecate ``Team#add_member``, ``Team#remove_member``, and
+    ``Organization#add_member``.
+
+  - Update payload handler for ``TeamAddEvent``.
+
+.. _new team management:
+    https://developer.github.com/changes/2014-09-23-one-more-week-before-the-add-team-member-api-breaking-change/
+
 0.9.1: 2014-08-10
 ~~~~~~~~~~~~~~~~~
 

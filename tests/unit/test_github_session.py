@@ -201,6 +201,19 @@ class TestGitHubSession:
         with s.temporary_basic_auth('temp', 'pass'):
             assert s.auth == ('temp', 'pass')
 
+    def test_no_auth(self):
+        """Verify that no_auth removes existing authentication."""
+        s = self.build_session()
+        s.basic_auth('user', 'password')
+        s.headers['Authorization'] = 'token foobarbogus'
+
+        with s.no_auth():
+            assert 'Authentication' not in s.headers
+            assert s.auth is None
+
+        assert s.headers['Authorization'] == 'token foobarbogus'
+        assert s.auth == ('user', 'password')
+
     def test_retrieve_client_credentials_when_set(self):
         """Test that retrieve_client_credentials will return the credentials.
 
