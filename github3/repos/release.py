@@ -216,9 +216,10 @@ class Asset(GitHubCore):
 
     @requires_auth
     def delete(self):
-        """Users with push access to the repository can delete an asset.
+        """Delete this asset if the user has push access.
 
         :returns: True if successful; False if not successful
+        :rtype: boolean
         """
         url = self._api
         return self._boolean(
