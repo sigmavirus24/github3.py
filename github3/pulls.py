@@ -50,7 +50,7 @@ class PullDestination(GitHubCore):
         return '<{0} [{1}]>'.format(self.direction, self.label)
 
 
-class PullFile(GitHubObject):
+class PullFile(GitHubCore):
 
     """The :class:`PullFile <PullFile>` object.
 
@@ -79,6 +79,14 @@ class PullFile(GitHubObject):
 
     def _repr(self):
         return '<Pull Request File [{0}]>'.format(self.filename)
+
+    def contents(self, stream=False):
+        """Return the contents of the raw file.
+
+        :param stream: When true, the resulting object can be iterated over via
+            ``iter_contents``.
+        """
+        return self.session.get(self.raw_url, stream=stream)
 
 
 class PullRequest(GitHubCore):
