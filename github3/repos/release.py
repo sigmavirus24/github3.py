@@ -154,8 +154,6 @@ class Release(GitHubCore):
 
 class Asset(GitHubCore):
 
-    CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
-
     def _update_attributes(self, asset):
         self._api = asset.get('url')
         #: Content-Type provided when the asset was created
@@ -223,7 +221,7 @@ class Asset(GitHubCore):
         """
         url = self._api
         return self._boolean(
-            self._delete(url, headers=Asset.CUSTOM_HEADERS),
+            self._delete(url, headers=Release.CUSTOM_HEADERS),
             204,
             404
         )
