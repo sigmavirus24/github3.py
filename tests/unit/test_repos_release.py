@@ -91,6 +91,15 @@ class TestAsset(UnitHelper):
         "updated_at": "2013-02-27T19:35:32Z"
         }
 
+    def test_delete(self):
+        """Verify the request to delete an Asset."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(
+            url_for('/assets/1'),
+            headers=Release.CUSTOM_HEADERS
+        )
+
     @pytest.mark.xfail
     def test_download(self):
         """Verify the request to download an Asset file."""

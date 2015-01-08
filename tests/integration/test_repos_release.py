@@ -69,6 +69,16 @@ class TestRelease(IntegrationHelper):
 
 
 class TestAsset(IntegrationHelper):
+    def test_delete(self):
+        """Test the ability to delete an asset."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'github3.py')
+            release = repository.release(833407)
+            asset = release.asset(370020)
+            assert asset.delete() is True
+
     def test_download(self):
         """Test the ability to download an asset."""
         cassette_name = self.cassette_name('download')
