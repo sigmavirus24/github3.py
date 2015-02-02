@@ -10,15 +10,17 @@ from __future__ import unicode_literals
 
 from re import match
 from json import dumps
+
+from . import models
+from . import utils
 from .repos.commit import RepoCommit
-from .models import GitHubObject, GitHubCore, BaseComment
 from .users import User
 from .decorators import requires_auth
 from .issues.comment import IssueComment
 from uritemplate import URITemplate
 
 
-class PullDestination(GitHubCore):
+class PullDestination(models.GitHubCore):
 
     """The :class:`PullDestination <PullDestination>` object.
 
@@ -50,7 +52,7 @@ class PullDestination(GitHubCore):
         return '<{0} [{1}]>'.format(self.direction, self.label)
 
 
-class PullFile(GitHubCore):
+class PullFile(models.GitHubCore):
 
     """The :class:`PullFile <PullFile>` object.
 
@@ -80,16 +82,36 @@ class PullFile(GitHubCore):
     def _repr(self):
         return '<Pull Request File [{0}]>'.format(self.filename)
 
-    def contents(self, stream=False):
-        """Return the contents of the raw file.
+    def download(self, path=None):
+        """Download the contents for this file to disk.
+
+        :param path: (optional), path where the file should be saved
+            to, default is the filename provided in the headers and will be
+            written in the current directory.
+            it can take a file-like object as well
+        :type path: str, file-like object
+        :returns: bool -- True if successful, False otherwise
+        """
+        headers = {'Accept': 'application/octet-stream'}
+        resp = self._get(self.raw_url, stream=True, headers=headers)
+        if self._boolean(resp, 200, 404):
+            return utils.stream_response_to_file(resp, path)
+        return None
+
+    def contents(self):
+        """Return the contents of the file as bytes.
 
         :param stream: When true, the resulting object can be iterated over via
             ``iter_contents``.
         """
-        return self.session.get(self.raw_url, stream=stream)
+        headers = {'Accept': 'application/octect-stream'}
+        resp = self._get(self.raw_url, headers=headers)
+        if self._boolean(resp, 200, 404):
+            return resp.content
+        return b''
 
 
-class PullRequest(GitHubCore):
+class PullRequest(models.GitHubCore):
 
     """The :class:`PullRequest <PullRequest>` object.
 
@@ -349,7 +371,7 @@ class PullRequest(GitHubCore):
         return False
 
 
-class ReviewComment(BaseComment):
+class ReviewComment(models.BaseComment):
 
     """The :class:`ReviewComment <ReviewComment>` object.
 
