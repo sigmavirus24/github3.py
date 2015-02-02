@@ -1052,6 +1052,17 @@ class Repository(GitHubCore):
         url = self._build_url('subscription', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
+    def deployment(self, id):
+        """Retrieve the deployment identified by ``id``.
+
+        :param int id: (required), id for deployments.
+        :returns: :class:`~github3.repos.deployment.Deployment`
+        """
+        if int(id) > 0:
+            url = self._build_url('deployments', str(id), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(Deployment, json)
+
     def deployments(self, number=-1, etag=None):
         r"""Iterate over deployments for this repository.
 
