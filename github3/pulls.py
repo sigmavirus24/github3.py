@@ -94,6 +94,8 @@ class PullFile(models.GitHubCore):
         """
         headers = {'Accept': 'application/octet-stream'}
         resp = self._get(self.raw_url, stream=True, headers=headers)
+        if path is None:
+            path = self.filename
         if self._boolean(resp, 200, 404):
             return utils.stream_response_to_file(resp, path)
         return None

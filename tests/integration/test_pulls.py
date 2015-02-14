@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on PullRequest."""
+import os
+import os.path
 
 import github3
 
@@ -127,3 +129,24 @@ class TestReviewComment(IntegrationHelper):
             c = next(p.review_comments())
             comment = c.reply('Replying to comments is fun.')
         assert isinstance(comment, github3.pulls.ReviewComment)
+
+
+class TestPullFile(IntegrationHelper):
+    """Integration tests for the PullFile object."""
+
+    def test_download(self):
+        """Show that a user can download a file in a pull request."""
+        cassette_name = self.cassette_name('download')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.gh.pull_request('sigmavirus24', 'github3.py', 286)
+
+            for pull_file in p.files():
+                if pull_file.filename == 'github3/pulls.py':
+                    break
+            else:
+                assert False, "Could not find 'github3/pulls.py'"
+
+            filename = pull_file.download()
+
+        assert os.path.exists(filename)
+        os.unlink(filename)
