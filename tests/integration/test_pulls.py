@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on PullRequest."""
-import os
-import os.path
+import tempfile
 
 import github3
 
@@ -146,7 +145,6 @@ class TestPullFile(IntegrationHelper):
             else:
                 assert False, "Could not find 'github3/pulls.py'"
 
-            filename = pull_file.download()
-
-        assert os.path.exists(filename)
-        os.unlink(filename)
+            with tempfile.NamedTemporaryFile() as fd:
+                filename = pull_file.download(fd)
+                assert filename is not None
