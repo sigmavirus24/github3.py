@@ -106,7 +106,7 @@ class PullFile(models.GitHubCore):
         :param stream: When true, the resulting object can be iterated over via
             ``iter_contents``.
         """
-        headers = {'Accept': 'application/octect-stream'}
+        headers = {'Accept': 'application/octet-stream'}
         resp = self._get(self.raw_url, headers=headers)
         if self._boolean(resp, 200, 404):
             return resp.content

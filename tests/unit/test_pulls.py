@@ -2,10 +2,10 @@
 import pytest
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                     create_example_data_helper)
+                     create_example_data_helper, mock)
 
 from github3 import GitHubError
-from github3.pulls import PullRequest, ReviewComment
+from github3 import pulls
 
 get_pr_example_data = create_example_data_helper('pull_request_example')
 
@@ -16,10 +16,9 @@ url_for = create_url_helper(
 
 
 class TestPullRequest(UnitHelper):
-
     """PullRequest unit tests."""
 
-    described_class = PullRequest
+    described_class = pulls.PullRequest
     example_data = get_pr_example_data()
 
     def test_close(self):
@@ -109,10 +108,9 @@ class TestPullRequest(UnitHelper):
 
 
 class TestPullRequestRequiresAuthentication(UnitHelper):
-
     """PullRequest unit tests that demonstrate which methods require auth."""
 
-    described_class = PullRequest
+    described_class = pulls.PullRequest
     example_data = get_pr_example_data()
 
     def after_setup(self):
@@ -146,10 +144,9 @@ class TestPullRequestRequiresAuthentication(UnitHelper):
 
 
 class TestPullRequestIterator(UnitIteratorHelper):
-
     """Test PullRequest methods that return Iterators."""
 
-    described_class = PullRequest
+    described_class = pulls.PullRequest
     example_data = get_pr_example_data()
 
     def test_commits(self):
@@ -198,10 +195,9 @@ class TestPullRequestIterator(UnitIteratorHelper):
 
 
 class TestReviewComment(UnitHelper):
-
     """Unit tests for the ReviewComment class."""
 
-    described_class = ReviewComment
+    described_class = pulls.ReviewComment
     example_data = {
         "url": ("https://api.github.com/repos/octocat/Hello-World/pulls/"
                 "comments/1"),
@@ -276,3 +272,54 @@ class TestReviewComment(UnitHelper):
 
         with pytest.raises(GitHubError):
             self.instance.reply('')
+
+
+class TestPullFile(UnitHelper):
+    """Unit tests for the PullFile class."""
+
+    described_class = pulls.PullFile
+    example_data = {
+        "sha": "bbcd538c8e72b8c175046e27cc8f907076331401",
+        "filename": "file1.txt",
+        "status": "added",
+        "additions": 103,
+        "deletions": 21,
+        "changes": 124,
+        "blob_url": ("https://github.com/octocat/Hello-World/blob/"
+                     "6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt"),
+        "raw_url": ("https://github.com/octocat/Hello-World/raw/"
+                    "6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt"),
+        "contents_url": ("https://api.github.com/repos/octocat/Hello-World/"
+                         "contents/file1.txt?ref=6dcb09b5b57875f334f61aebed"
+                         "695e2e4193db5e"),
+        "patch": ("@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@"
+                  " module Test")
+    }
+
+    @mock.patch('github3.utils.stream_response_to_file')
+    def test_download(self, stream_response_to_file):
+        """Verify the proper request is made to download file contents."""
+        response_mock = mock.Mock()
+        response_mock.status_code = 200
+        self.session.get.return_value = response_mock
+
+        self.instance.download()
+
+        self.session.get.assert_called_once_with(
+            self.example_data['raw_url'], stream=True,
+            headers={'Accept': 'application/octet-stream'}
+        )
+        stream_response_to_file.assert_called_once_with(mock.ANY, 'file1.txt')
+
+    @mock.patch('github3.utils.stream_response_to_file')
+    def test_download_does_not_stream(self, stream_response_to_file):
+        """Verify the proper request is made to download file contents."""
+        # Since the default return value for self.session.get is None we do
+        # not need to mock out the response object in this test.
+        self.instance.download()
+
+        self.session.get.assert_called_once_with(
+            self.example_data['raw_url'], stream=True,
+            headers={'Accept': 'application/octet-stream'}
+        )
+        assert stream_response_to_file.called is False
