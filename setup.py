@@ -32,7 +32,7 @@ if sys.argv[-1] in ("submit", "publish"):
 requires.extend(["requests >= 2.0", "uritemplate.py >= 0.2.0"])
 
 __version__ = ''
-with open('github3/__init__.py', 'r') as fd:
+with open('github3/__about__.py', 'r') as fd:
     reg = re.compile(r'__version__ = [\'"]([^\'"]*)[\'"]')
     for line in fd:
         m = reg.match(line)

@@ -10,13 +10,11 @@ See http://github3py.rtfd.org/ for documentation.
 
 """
 
-__title__ = 'github3'
-__author__ = 'Ian Cordasco'
-__license__ = 'Modified BSD'
-__copyright__ = 'Copyright 2012-2014 Ian Cordasco'
-__version__ = '1.0.0a1'
-__version_info__ = tuple(int(i) for i in __version__.split('.') if i.isdigit())
-
+from .__about__ import (
+    __package_name__, __title__, __author__, __author_email__,
+    __license__, __copyright__, __version__, __version_info__,
+    __url__,
+)
 from .api import (
     authorize, login, enterprise_login, emojis, gist, gitignore_template,
     create_gist, issue, markdown, octocat, organization, pull_request,
@@ -45,4 +43,8 @@ __all__ = (
     'repositories_by', 'starred_by', 'subscriptions_for', 'rate_limit',
     'repository', 'search_code', 'search_repositories', 'search_users',
     'user', 'zen',
+    # Metadata attributes
+    '__package_name__', '__title__', '__author__', '__author_email__',
+    '__license__', '__copyright__', '__version__', '__version_info__',
+    '__url__',
 )
