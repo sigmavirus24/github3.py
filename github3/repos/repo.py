@@ -527,9 +527,7 @@ class _Repository(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        if isinstance(sha, Commit):
-            sha = sha.sha
-        elif not isinstance(sha, basestring):
+        if sha is None:
             sha = self.commit("HEAD").sha
 
         ref = "refs/heads/%s" % name
@@ -933,6 +931,9 @@ class _Repository(models.GitHubCore):
         :rtype:
             :class:`~github3.git.Reference`
         """
+        if isinstance(sha, Commit):
+            sha = sha.sha
+        
         json = None
         if ref and ref.startswith('refs') and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
@@ -1103,8 +1104,7 @@ class _Repository(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('git/refs/heads', name, base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
+        return self.delete_ref("heads/%s" % name)
 
     @requires_auth
     def delete_key(self, key_id):
@@ -1118,6 +1118,18 @@ class _Repository(models.GitHubCore):
         if int(key_id) <= 0:
             return False
         url = self._build_url('keys', str(key_id), base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def delete_ref(self, ref):
+        """Delete a reference. Returns False if ref doesn't exist
+        or not authorized for the action.
+
+        :param str ref: (required), the reference to delete.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('git/refs', ref, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
