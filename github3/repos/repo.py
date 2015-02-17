@@ -516,6 +516,26 @@ class _Repository(models.GitHubCore):
         return sha
 
     @requires_auth
+    def create_branch(self, name, sha=None):
+        """Create a branch. Returns False if branch doesn't exist
+        or not authorized.
+
+        :param str branch: (required), the branch to create.
+        :param str|commit sha: (optional), the commit to base
+                the branch from, otherwise the HEAD commit on
+                master will be fetched from the API.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        if isinstance(sha, Commit):
+            sha = sha.sha
+        elif not isinstance(sha, basestring):
+            sha = self.commit("HEAD").sha
+
+        ref = "refs/heads/%s" % name
+        return self.create_ref(ref, sha)
+
+    @requires_auth
     def create_comment(self, body, sha, path=None, position=None, line=1):
         """Create a comment on a commit.
 
@@ -1073,6 +1093,18 @@ class _Repository(models.GitHubCore):
             bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
+
+    @requires_auth
+    def delete_branch(self, name):
+        """Delete a branch. Returns False if branch doesn't exist
+        or not authorized.
+
+        :param str branch: (required), the branch to delete.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('git/refs/heads', name, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def delete_key(self, key_id):
