@@ -1,5 +1,22 @@
 .. vim: set tw=100
 
+1.0.0a2: 2015-02-01
+~~~~~~~~~~~~~~~~~~~
+
+Breaking Changes (since 1.0.0a1)
+````````````````````````````````
+
+- When you download a release asset, instead of returning ``True`` or
+  ``False``, it will return the name of the file in which it saved the asset.
+
+Features Added (since 1.0.0a1)
+``````````````````````````````
+
+- You can now download a file in a pull request to a file on disk.
+
+- You can retrieve the contents of the file in a pull request as bytes.
+
+
 1.0.0a1: 2014-12-07
 ~~~~~~~~~~~~~~~~~~~
 

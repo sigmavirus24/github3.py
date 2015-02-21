@@ -5,7 +5,7 @@ import json
 from ..decorators import requires_auth
 from ..exceptions import error_for
 from ..models import GitHubCore
-from ..utils import stream_response_to_file
+from .. import utils
 from uritemplate import URITemplate
 
 
@@ -189,7 +189,8 @@ class Asset(GitHubCore):
             written in the current directory.
             it can take a file-like object as well
         :type path: str, file
-        :returns: bool -- True if successful, False otherwise
+        :returns: name of the file, if successful otherwise ``None``
+        :rtype: str
         """
         headers = {
             'Accept': 'application/octet-stream'
@@ -208,9 +209,8 @@ class Asset(GitHubCore):
                                  headers=headers)
 
         if self._boolean(resp, 200, 404):
-            stream_response_to_file(resp, path)
-            return True
-        return False
+            return utils.stream_response_to_file(resp, path)
+        return None
 
     @requires_auth
     def delete(self):

@@ -11,8 +11,8 @@ __logs__ = getLogger(__package__)
 
 
 def requires_2fa(response):
-    if (response.status_code == 401 and 'X-GitHub-OTP' in response.headers
-            and 'required' in response.headers['X-GitHub-OTP']):
+    if (response.status_code == 401 and 'X-GitHub-OTP' in response.headers and
+            'required' in response.headers['X-GitHub-OTP']):
         return True
     return False
 

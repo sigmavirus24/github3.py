@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """A collection of useful utilities."""
-from collections import Callable
-from datetime import datetime, timedelta, tzinfo
-from requests.compat import basestring
+import collections
+import datetime
 import re
+
+from requests import compat
 
 # with thanks to https://code.google.com/p/jquery-localtime/issues/detail?id=4
 ISO_8601 = re.compile("^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[0-1]|0"
@@ -32,10 +33,10 @@ def timestamp_parameter(timestamp, allow_none=True):
             return None
         raise ValueError("Timestamp value cannot be None")
 
-    if isinstance(timestamp, datetime):
+    if isinstance(timestamp, datetime.datetime):
         return timestamp.isoformat() + 'Z'
 
-    if isinstance(timestamp, basestring):
+    if isinstance(timestamp, compat.basestring):
         if not ISO_8601.match(timestamp):
             raise ValueError(("Invalid timestamp: %s is not a valid ISO-8601"
                               " formatted date") % timestamp)
@@ -44,12 +45,12 @@ def timestamp_parameter(timestamp, allow_none=True):
     raise ValueError("Cannot accept type %s for timestamp" % type(timestamp))
 
 
-class UTC(tzinfo):
+class UTC(datetime.tzinfo):
 
     """Yet another UTC reimplementation, to avoid a dependency on pytz or
     dateutil."""
 
-    ZERO = timedelta(0)
+    ZERO = datetime.timedelta(0)
 
     def __repr__(self):
         return 'UTC()'
@@ -73,22 +74,30 @@ def stream_response_to_file(response, path=None):
     :param response: A Response object from requests
     :type response: requests.models.Response
     :param str path: The full path and file name used to save the response
+    :return: path to the file
+    :rtype: str
     """
     pre_opened = False
     fd = None
+    filename = None
     if path:
-        if isinstance(getattr(path, 'write', None), Callable):
+        if isinstance(getattr(path, 'write', None), collections.Callable):
             pre_opened = True
             fd = path
+            filename = getattr(fd, 'name', None)
         else:
             fd = open(path, 'wb')
+            filename = path
     else:
         header = response.headers['content-disposition']
         i = header.find('filename=') + len('filename=')
-        fd = open(header[i:], 'wb')
+        filename = header[i:]
+        fd = open(filename, 'wb')
 
     for chunk in response.iter_content(chunk_size=512):
         fd.write(chunk)
 
     if not pre_opened:
         fd.close()
+
+    return filename
