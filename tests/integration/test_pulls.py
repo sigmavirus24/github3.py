@@ -132,18 +132,36 @@ class TestReviewComment(IntegrationHelper):
 
 class TestPullFile(IntegrationHelper):
     """Integration tests for the PullFile object."""
+    def get_pull_request_file(self, owner, repo, pull_number, filename):
+        p = self.gh.pull_request(owner, repo, pull_number)
+
+        for pull_file in p.files():
+            if pull_file.filename == filename:
+                break
+        else:
+            assert False, "Could not find '{0}'".format(filename)
+
+        return pull_file
+
+    def test_contents(self):
+        """Show that a user can retrieve the contents of a PR file."""
+        cassette_name = self.cassette_name('contents')
+        with self.recorder.use_cassette(cassette_name):
+            pull_file = self.get_pull_request_file(
+                owner='sigmavirus24', repo='github3.py', pull_number=286,
+                filename='github3/pulls.py'
+            )
+
+            assert isinstance(pull_file.contents(), bytes)
 
     def test_download(self):
         """Show that a user can download a file in a pull request."""
         cassette_name = self.cassette_name('download')
         with self.recorder.use_cassette(cassette_name):
-            p = self.gh.pull_request('sigmavirus24', 'github3.py', 286)
-
-            for pull_file in p.files():
-                if pull_file.filename == 'github3/pulls.py':
-                    break
-            else:
-                assert False, "Could not find 'github3/pulls.py'"
+            pull_file = self.get_pull_request_file(
+                owner='sigmavirus24', repo='github3.py', pull_number=286,
+                filename='github3/pulls.py'
+            )
 
             with tempfile.NamedTemporaryFile() as fd:
                 filename = pull_file.download(fd)

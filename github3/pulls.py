@@ -82,6 +82,18 @@ class PullFile(models.GitHubCore):
     def _repr(self):
         return '<Pull Request File [{0}]>'.format(self.filename)
 
+    def contents(self):
+        """Return the contents of the file as bytes.
+
+        :param stream: When true, the resulting object can be iterated over via
+            ``iter_contents``.
+        """
+        headers = {'Accept': 'application/octet-stream'}
+        resp = self._get(self.raw_url, headers=headers)
+        if self._boolean(resp, 200, 404):
+            return resp.content
+        return b''
+
     def download(self, path=None):
         """Download the contents for this file to disk.
 
@@ -99,18 +111,6 @@ class PullFile(models.GitHubCore):
         if self._boolean(resp, 200, 404):
             return utils.stream_response_to_file(resp, path)
         return None
-
-    def contents(self):
-        """Return the contents of the file as bytes.
-
-        :param stream: When true, the resulting object can be iterated over via
-            ``iter_contents``.
-        """
-        headers = {'Accept': 'application/octet-stream'}
-        resp = self._get(self.raw_url, headers=headers)
-        if self._boolean(resp, 200, 404):
-            return resp.content
-        return b''
 
 
 class PullRequest(models.GitHubCore):
