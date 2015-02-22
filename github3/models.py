@@ -13,8 +13,8 @@ from requests.compat import urlparse, is_py2
 from datetime import datetime
 from logging import getLogger
 
+from . import exceptions
 from .decorators import requires_auth
-from .exceptions import error_for
 from .null import NullObject
 from .session import GitHubSession
 from .utils import UTC
@@ -143,6 +143,10 @@ class GitHubCore(GitHubObject):
     def _instance_or_null(self, instance_class, json):
         if json is None:
             return NullObject(instance_class.__name__)
+        if not isinstance(json, dict):
+            return exceptions.UnprocessableResponseBody(
+                "GitHub's API returned a body that could not be handled", json
+            )
         try:
             return instance_class(json, self)
         except TypeError:  # instance_class is not a subclass of GitHubCore
@@ -171,7 +175,7 @@ class GitHubCore(GitHubObject):
             if status_code == true_code:
                 return True
             if status_code != false_code and status_code >= 400:
-                raise error_for(response)
+                raise exceptions.error_for(response)
         return False
 
     def _delete(self, url, **kwargs):

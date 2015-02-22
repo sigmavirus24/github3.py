@@ -3,7 +3,6 @@
 
 
 class GitHubError(Exception):
-
     """The base exception class."""
 
     def __init__(self, resp):
@@ -35,15 +34,26 @@ class GitHubError(Exception):
         return self.msg
 
 
+class UnprocessableResponseBody(GitHubError):
+    """Exception class for response objects that cannot be handled."""
+    def __init__(self, message, body):
+        Exception.__init__(self, message)
+        self.body = body
+        self.msg = message
+
+    def __repr__(self):
+        return '<{0} [{1}]>'.format('UnprocessableResponseBody', self.body)
+
+    def __str__(self):
+        return self.message
+
+
 class BadRequest(GitHubError):
-
     """Exception class for 400 responses."""
-
     pass
 
 
 class AuthenticationFailed(GitHubError):
-
     """Exception class for 401 responses.
 
     Possible reasons:
@@ -51,12 +61,10 @@ class AuthenticationFailed(GitHubError):
     - Need one time password (for two-factor authentication)
     - You are not authorized to access the resource
     """
-
     pass
 
 
 class ForbiddenError(GitHubError):
-
     """Exception class for 403 responses.
 
     Possible reasons:
@@ -64,47 +72,36 @@ class ForbiddenError(GitHubError):
     - Too many requests (you've exceeded the ratelimit)
     - Too many login failures
     """
-
     pass
 
 
 class NotFoundError(GitHubError):
-
     """Exception class for 404 responses."""
-
     pass
 
 
 class MethodNotAllowed(GitHubError):
-
     """Exception class for 405 responses."""
-
     pass
 
 
 class NotAcceptable(GitHubError):
-
     """Exception class for 406 responses."""
-
     pass
 
 
 class UnprocessableEntity(GitHubError):
-
     """Exception class for 422 responses."""
-
     pass
 
 
 class ClientError(GitHubError):
-
     """Catch-all for 400 responses that aren't specific errors."""
+    pass
 
 
 class ServerError(GitHubError):
-
     """Exception class for 5xx responses."""
-
     pass
 
 

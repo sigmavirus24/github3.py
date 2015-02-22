@@ -1,10 +1,13 @@
 """Integration tests for Repositories."""
 import github3
+import github3.exceptions as exc
 
-from .helper import IntegrationHelper
+import pytest
+
+from . import helper
 
 
-class TestRepository(IntegrationHelper):
+class TestRepository(helper.IntegrationHelper):
 
     """Integration tests for the Repository object."""
 
@@ -420,6 +423,15 @@ class TestRepository(IntegrationHelper):
         assert len(references) > 0
         for ref in references:
             assert isinstance(ref, github3.git.Reference)
+
+    def test_refs_raises_unprocessable_exception(self):
+        """Verify github3.exceptions.UnprocessableResponseBody is raised."""
+        cassette_name = self.cassette_name('invalid_refs')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            with pytest.raises(exc.UnprocessableResponseBody):
+                list(repository.refs('heads/develop'))
 
     def test_stargazers(self):
         """Test the ability to retrieve the stargazers on a repository."""
