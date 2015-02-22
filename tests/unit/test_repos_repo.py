@@ -203,6 +203,18 @@ class TestRepository(UnitHelper):
             params={'ref': 'some-sha'}
         )
 
+    def test_deployment(self):
+        """Verify the request made to retrieve a deployment."""
+        self.instance.deployment(10)
+
+        self.session.get.assert_called_once_with(url_for('deployments/10'))
+
+    def test_deployment_requires_positive_int(self):
+        """Verify that a positive deployment id is required."""
+        self.instance.deployment(-10)
+
+        assert self.session.get.called is False
+
     def test_file_contents(self):
         """Verify the request made to retrieve a dictionary's contents."""
         self.instance.file_contents('path/to/file.txt', ref='some-sha')

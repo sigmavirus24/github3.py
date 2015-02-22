@@ -148,6 +148,16 @@ class TestRepository(IntegrationHelper):
             assert repository is not None
             assert repository.delete() is True
 
+    def test_deployment(self):
+        """Test that a deployment can be retrieved by its id."""
+        cassette_name = self.cassette_name('deployment')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            deployment = repository.deployment(797)
+
+        assert isinstance(deployment, github3.repos.deployment.Deployment)
+
     def test_deployments(self):
         """Test that a repository's deployments may be retrieved."""
         cassette_name = self.cassette_name('deployments')
