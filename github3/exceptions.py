@@ -39,6 +39,10 @@ class UnprocessableResponseBody(GitHubError):
     def __init__(self, message, body):
         Exception.__init__(self, message)
         self.body = body
+        self.msg = message
+
+    def __repr__(self):
+        return '<{0} [{1}]>'.format('UnprocessableResponseBody', self.body)
 
     def __str__(self):
         return self.message
