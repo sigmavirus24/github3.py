@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
-from collections import Iterator
-from .models import GitHubCore
+import collections
+import functools
+
 from requests.compat import urlparse, urlencode
 
+from . import exceptions
+from . import models
 
-class GitHubIterator(GitHubCore, Iterator):
+
+class GitHubIterator(models.GitHubCore, collections.Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
     def __init__(self, count, url, cls, session, params=None, etag=None,
                  headers=None):
-        GitHubCore.__init__(self, {}, session)
+        models.GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
         self.original = count
         #: Number of items left in the iterator
@@ -45,7 +49,7 @@ class GitHubIterator(GitHubCore, Iterator):
         return '<GitHubIterator [{0}, {1}]>'.format(self.count, self.path)
 
     def __iter__(self):
-        self.last_url, params, cls = self.url, self.params, self.cls
+        self.last_url, params = self.url, self.params
         headers = self.headers
 
         if 0 < self.count <= 100 and self.count != -1:
@@ -53,6 +57,10 @@ class GitHubIterator(GitHubCore, Iterator):
 
         if 'per_page' not in params and self.count == -1:
             params['per_page'] = 100
+
+        cls = self.cls
+        if issubclass(self.cls, models.GitHubCore):
+            cls = functools.partial(self.cls, session=self)
 
         while (self.count == -1 or self.count > 0) and self.last_url:
             response = self._get(self.last_url, params=params,
@@ -72,6 +80,11 @@ class GitHubIterator(GitHubCore, Iterator):
 
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):
+                if issubclass(self.cls, models.GitHubObject):
+                    raise exceptions.UnprocessableResponseBody(
+                        "GitHub's API returned a body that could not be"
+                        " handled", json
+                    )
                 if json.get('ETag'):
                     del json['ETag']
                 if json.get('Last-Modified'):
@@ -79,7 +92,7 @@ class GitHubIterator(GitHubCore, Iterator):
                 json = json.items()
 
             for i in json:
-                yield cls(i, self) if issubclass(cls, GitHubCore) else cls(i)
+                yield cls(i)
                 self.count -= 1 if self.count > 0 else 0
                 if self.count == 0:
                     break

@@ -5,10 +5,9 @@ from github3.structs import GitHubIterator
 class TestGitHubIterator(UnitHelper):
     described_class = GitHubIterator
 
-    def setUp(self):
-        super(TestGitHubIterator, self).setUp()
-        self.count = -1
-        self.cls = object
+    def after_setup(self):
+        self.count = self.instance.count = -1
+        self.cls = self.instance.cls = object
 
     def create_instance_of_described_class(self):
         self.url = 'https://api.github.com/users'
