@@ -1058,6 +1058,7 @@ class Repository(GitHubCore):
         :param int id: (required), id for deployments.
         :returns: :class:`~github3.repos.deployment.Deployment`
         """
+        json = None
         if int(id) > 0:
             url = self._build_url('deployments', str(id), base_url=self._api)
             json = self._json(self._get(url), 200)
