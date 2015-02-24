@@ -80,3 +80,6 @@ Contributors
 - Marc Abramowitz (@msabramo)
 
 - Adrian Moisey (@adrianmoisey)
+
+- Lars Holm Nielsen (@larshankat)
+
