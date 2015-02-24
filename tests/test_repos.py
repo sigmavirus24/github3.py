@@ -507,6 +507,12 @@ class TestRepository(BaseCase):
         r = repos.Repository(json)
         assert isinstance(r.parent, repos.Repository)
 
+    def test_permissions(self):
+        json = load('repo')
+        permissions = {"admin": True, "push": True, "pull": True}
+        assert json['permissions'] == permissions
+        assert self.repo.permissions == permissions
+
     def test_pull_request(self):
         self.response('pull', 200)
         self.get(self.api + 'pulls/2')
