@@ -127,6 +127,10 @@ class Repository(GitHubCore):
 
         #: Is this repository private?
         self.private = repo.get('private')
+
+        #: Permissions for this repository
+        self.permissions = repo.get('permissions')
+
         #: ``datetime`` object representing the last time commits were pushed
         #: to the repository.
         self.pushed_at = self._strptime(repo.get('pushed_at'))

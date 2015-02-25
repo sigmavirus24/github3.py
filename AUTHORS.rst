@@ -84,3 +84,5 @@ Contributors
 - Bryce Boe (@bboe)
 
 - Ryan Weald (@rweald)
+
+- Lars Holm Nielsen (@larshankat)
