@@ -16,7 +16,7 @@ Let's get information about a user::
 
     gh = login('sigmavirus24', password='<password>')
 
-    sigmavirus24 = gh.user()
+    sigmavirus24 = gh.me()
     # <User [sigmavirus24:Ian Cordasco]>
 
     print(sigmavirus24.name)
