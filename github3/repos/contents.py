@@ -93,10 +93,12 @@ class Contents(GitHubCore):
         return self.sha != other
 
     @requires_auth
-    def delete(self, message, committer=None, author=None):
+    def delete(self, message, branch=None, committer=None, author=None):
         """Delete this file.
 
         :param str message: (required), commit message to describe the removal
+        :param str branch: (optional), branch where the file exists.
+            Defaults to the default branch of the repository.
         :param dict committer: (optional), if no information is given the
             authenticated user's information will be used. You must specify
             both a name and email.
@@ -109,7 +111,7 @@ class Contents(GitHubCore):
         """
         json = {}
         if message:
-            data = {'message': message, 'sha': self.sha,
+            data = {'message': message, 'sha': self.sha, 'branch': branch,
                     'committer': validate_commmitter(committer),
                     'author': validate_commmitter(author)}
             self._remove_none(data)
@@ -122,11 +124,14 @@ class Contents(GitHubCore):
         return json
 
     @requires_auth
-    def update(self, message, content, committer=None, author=None):
+    def update(self, message, content, branch=None, committer=None,
+               author=None):
         """Update this file.
 
         :param str message: (required), commit message to describe the update
         :param str content: (required), content to update the file with
+        :param str branch: (optional), branch where the file exists.
+            Defaults to the default branch of the repository.
         :param dict committer: (optional), if no information is given the
             authenticated user's information will be used. You must specify
             both a name and email.
@@ -145,7 +150,8 @@ class Contents(GitHubCore):
         json = None
         if message and content:
             content = b64encode(content).decode('utf-8')
-            data = {'message': message, 'content': content, 'sha': self.sha,
+            data = {'message': message, 'content': content, 'branch': branch,
+                    'sha': self.sha,
                     'committer': validate_commmitter(committer),
                     'author': validate_commmitter(author)}
             self._remove_none(data)
