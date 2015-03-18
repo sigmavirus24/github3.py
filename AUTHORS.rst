@@ -86,3 +86,5 @@ Contributors
 - Ryan Weald (@rweald)
 
 - Lars Holm Nielsen (@larshankat)
+
+- Ryan Pitts (@ryanpitts)
