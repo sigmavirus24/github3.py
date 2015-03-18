@@ -29,11 +29,7 @@ def requires_auth(func):
     """Decorator to note which object methods require authorization."""
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        auth = False
-        if hasattr(self, 'session'):
-            auth = self.session.has_auth()
-
-        if auth:
+        if hasattr(self, 'session') and self.session.has_auth():
             return func(self, *args, **kwargs)
         else:
             from .exceptions import error_for
