@@ -35,6 +35,7 @@ class GitHubSession(requests.Session):
             })
         self.base_url = 'https://api.github.com'
         self.two_factor_auth_cb = None
+        self.request_counter = 0
 
     def basic_auth(self, username, password):
         """Set the Basic Auth credentials on this Session.
@@ -85,6 +86,7 @@ class GitHubSession(requests.Session):
 
     def request(self, *args, **kwargs):
         response = super(GitHubSession, self).request(*args, **kwargs)
+        self.request_counter += 1
         if requires_2fa(response) and self.two_factor_auth_cb:
             # No need to flatten and re-collect the args in
             # handle_two_factor_auth
