@@ -6,6 +6,8 @@ COVERAGE_INCLUDE := github3/*.py
 TEST_RUNNER := python setup.py test
 
 .DEFAULT_GOAL := tests
+.PHONY: clean travis tests test-deps htmlcov docs
+
 
 clean:
 	git clean -Xdf

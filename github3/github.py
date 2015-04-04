@@ -52,6 +52,9 @@ class GitHub(GitHubCore):
 
     This is simple backward compatibility since originally there was no way to
     call the GitHub object with authentication parameters.
+
+    Note that a *Personal access token* needs to be passed as ``password``,
+    not as a ``token``.
     """
 
     def __init__(self, username='', password='', token=''):
