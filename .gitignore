@@ -12,7 +12,9 @@ htmlcov/
 .tox/
 venv/
 venv*/
+.venv/
 build/
 *.egg
+.eggs/
 .env
 .ipynb_checkpoints
