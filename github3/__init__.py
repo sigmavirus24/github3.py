@@ -33,7 +33,7 @@ from .exceptions import (
 
 __all__ = (
     'AuthenticationFailed',  'BadRequest', 'ForbiddenError', 'GitHub',
-    'GitHubEnterprise', 'GitHubError', 'GitHubStatus', 'InvalidRequestError',
+    'GitHubEnterprise', 'GitHubError', 'GitHubStatus',
     'MethodNotAllowed', 'NotAcceptable', 'NotFoundError', 'ServerError',
     'UnprocessableEntity', 'authorize', 'login', 'enterprise_login', 'emojis',
     'gist', 'gitignore_template', 'create_gist', 'issue', 'markdown',
