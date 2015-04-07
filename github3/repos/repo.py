@@ -971,7 +971,7 @@ class Repository(GitHubCore):
         json = {}
         if sha and state:
             data = {'state': state, 'target_url': target_url,
-                    'description': description, 'context': None}
+                    'description': description, 'context': context}
             url = self._build_url('statuses', sha, base_url=self._api)
             self._remove_none(data)
             json = self._json(self._post(url, data=data), 201)
