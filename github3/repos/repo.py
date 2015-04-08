@@ -786,7 +786,7 @@ class Repository(GitHubCore):
         return Release(json, self)
 
     @requires_auth
-    def create_status(self, sha, state, target_url='', description=''):
+    def create_status(self, sha, state, target_url='', description='', context=''):
         """Create a status object on a commit.
 
         :param str sha: (required), SHA of the commit to create the status on
@@ -798,7 +798,7 @@ class Repository(GitHubCore):
         json = {}
         if sha and state:
             data = {'state': state, 'target_url': target_url,
-                    'description': description}
+                    'description': description, 'context': context}
             url = self._build_url('statuses', sha, base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return Status(json) if json else None
