@@ -3,6 +3,7 @@ import datetime
 import pytest
 
 from github3 import GitHubError
+from github3.null import NullObject
 from github3.repos.repo import Repository
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper)
@@ -135,6 +136,21 @@ class TestRepository(UnitHelper):
 
     described_class = Repository
     example_data = repo_example_data
+
+    def test_add_collaborator(self):
+        """Verify the request to add a collaborator to a repository."""
+        self.instance.add_collaborator('sigmavirus24')
+
+        self.session.put.assert_called_once_with(
+            url_for('collaborators/sigmavirus24')
+        )
+
+    def test_add_null_collaborator(self):
+        """Verify no request is made when adding `None` as a collaborator."""
+        self.instance.add_collaborator(None)
+        self.instance.add_collaborator(NullObject())
+
+        assert self.session.put.called is False
 
     def test_asset(self):
         """Test retrieving an asset uses the right headers.
@@ -686,6 +702,11 @@ class TestRepositoryRequiresAuth(UnitHelper):
     def after_setup(self):
         """Set-up the session to not be authenticated."""
         self.session.has_auth.return_value = False
+
+    def test_add_collaborator(self):
+        """Verify that adding a collaborator requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.add_collaborator('foo')
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""
