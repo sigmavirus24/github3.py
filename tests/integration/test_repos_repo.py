@@ -11,15 +11,14 @@ class TestRepository(helper.IntegrationHelper):
 
     """Integration tests for the Repository object."""
 
-    @pytest.skip('Need internet to record the cassette')
     def test_add_collaborator(self):
         """Test the ability to add a collaborator to a repository."""
         self.basic_login()
         cassette_name = self.cassette_name('add_collaborator')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'fork_this')
+            repository = self.gh.repository('testgh3', 'collaborators')
             assert repository
-            assert repository.add_collaborator('esacteksab')
+            assert repository.add_collaborator('sigmavirus24')
 
     def test_assignees(self):
         """Test the ability to retrieve assignees of issues on a repo."""
