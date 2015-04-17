@@ -242,7 +242,7 @@ class PullRequest(models.GitHubCore):
         """
         url = self._build_url('comments', base_url=self._api)
         data = {'body': body, 'commit_id': commit_id, 'path': path,
-                'position': str(position)}
+                'position': int(position)}
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(ReviewComment, json)
 
