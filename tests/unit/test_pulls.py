@@ -44,7 +44,7 @@ class TestPullRequest(UnitHelper):
                 'body': 'body',
                 'commit_id': 'sha',
                 'path': 'path',
-                'position': '6'
+                'position': 6
             }
         )
 
