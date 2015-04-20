@@ -59,7 +59,9 @@ class Authorization(models.GitHubCore):
         #: base64-encoded of the SHA-256 digest of the token
         self.hashed_token = auth.get('hashed_token')
         #: SHA-256 digest of the token (derived from ``hashed_token``)
-        self.sha256_hashed_token = base64.b64decode(self.hashed_token)
+        self.sha256_hashed_token = None
+        if self.hashed_token:
+            self.sha256_hashed_token = base64.b64decode(self.hashed_token)
         #: A string that distinguishes the new authorization from others for
         #: the same client ID and user
         self.fingerprint = auth.get('fingerprint')

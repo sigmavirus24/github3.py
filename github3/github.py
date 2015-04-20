@@ -144,7 +144,7 @@ class GitHub(GitHubCore):
         return self._iter(int(number), url, Authorization, etag=etag)
 
     def authorize(self, username, password, scopes=None, note='', note_url='',
-                  client_id='', client_secret=''):
+                  client_id='', client_secret='', fingerprint=''):
         """Obtain an authorization token.
 
         The retrieved token will allow future consumers to use the API without
@@ -170,11 +170,15 @@ class GitHub(GitHubCore):
                     'client_id': client_id, 'client_secret': client_secret}
             if scopes:
                 data['scopes'] = scopes
+            if fingerprint:
+                data['fingerprint'] = fingerprint
 
             with self.session.temporary_basic_auth(username, password):
                 json = self._json(self._post(url, data=data), 201)
 
         return self._instance_or_null(Authorization, json)
+
+    create_authorization = authorize
 
     def check_authorization(self, access_token):
         """Check an authorization created by a registered application.
