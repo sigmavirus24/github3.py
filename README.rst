@@ -11,7 +11,7 @@ Installation
 
 ::
 
-    $ pip install github3.py
+    $ pip install --pre github3.py
 
 Dependencies
 ------------
