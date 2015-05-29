@@ -90,3 +90,5 @@ Contributors
 - Ryan Pitts (@ryanpitts)
 
 - Jürgen Hermann (@jhermann)
+
+- Antoine Giraudmaillet (@antoine-g)

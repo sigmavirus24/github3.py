@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from ..utils import timestamp_parameter
 from ..models import BaseComment
 from ..users import User
 
@@ -36,3 +37,19 @@ class IssueComment(BaseComment):
 
     def _repr(self):
         return '<Issue Comment [{0}]>'.format(self.user.login)
+
+
+def issue_comment_params(sort, direction, since):
+    params = {}
+
+    if sort in ('created', 'updated'):
+        params['sort'] = sort
+
+    if direction in ('asc', 'desc'):
+        params['direction'] = direction
+
+    since = timestamp_parameter(since)
+    if since:
+        params['since'] = since
+
+    return params

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from re import match
 from json import dumps
 from ..decorators import requires_auth
-from .comment import IssueComment
+from .comment import IssueComment, issue_comment_params
 from .event import IssueEvent
 from .label import Label
 from .milestone import Milestone
@@ -155,15 +155,25 @@ class Issue(GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(IssueComment, json)
 
-    def comments(self, number=-1):
-        r"""Iterate over the comments on this issue.
+    def comments(self, number=-1, sort='', direction='', since=None):
+        """Iterate over the comments on this issue.
 
         :param int number: (optional), number of comments to iterate over
+            Default: -1 returns all comments
+        :param str sort: accepted valuees: ('created', 'updated')
+            api-default: created
+        :param str direction: accepted values: ('asc', 'desc')
+            Ignored without the sort parameter
+        :param since: (optional), Only issues after this date will
+            be returned. This can be a `datetime` or an ISO8601 formatted
+            date string, e.g., 2012-05-20T23:10:27Z
+        :type since: datetime or string
         :returns: iterator of
             :class:`IssueComment <github3.issues.comment.IssueComment>`\ s
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, IssueComment)
+        params = issue_comment_params(sort, direction, since)
+        return self._iter(int(number), url, IssueComment, params)
 
     @requires_auth
     def create_comment(self, body):
