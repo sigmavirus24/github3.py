@@ -57,6 +57,23 @@ class IssueEvent(GitHubCore):
         #: Dictionary of links for the pull request
         self.pull_request = event.get('pull_request', {})
 
+        #: Dictionary containing label details
+        self.label = event.get('label', {})
+
+        #: The integer ID of the event
+        self.id = event.get('id')
+
+        #: :class:`User <github3.users.User>` that is assigned
+        self.assignee = event.get('assignee')
+        if self.assignee:
+            self.assignee = User(self.assignee, self._session)
+
+        #: Dictionary containing milestone details
+        self.milestone = event.get('milestone', {})
+
+        #: Dictionary containing to and from attributes
+        self.rename = event.get('rename', {})
+
         self._uniq = self.commit_id
 
     def _repr(self):
