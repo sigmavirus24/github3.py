@@ -57,6 +57,9 @@ class IssueEvent(GitHubCore):
         #: Dictionary of links for the pull request
         self.pull_request = event.get('pull_request', {})
 
+        #: Dictionary containing label details
+        self.label = event.get('label', {})
+
         self._uniq = self.commit_id
 
     def _repr(self):
