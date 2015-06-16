@@ -67,7 +67,9 @@ class TestPullRequest(UnitHelper):
         """Show that a user can merge a Pull Request."""
         self.instance.merge()
 
-        self.session.put.assert_called_once_with(url_for('merge'), data=None)
+        self.session.put.assert_called_once_with(
+	    url_for('merge'),
+	    data='{"commit_message": ""}')
 
     def test_patch(self):
         """Show that a user can fetch the patch from a Pull Request."""
