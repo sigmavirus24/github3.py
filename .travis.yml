@@ -28,6 +28,7 @@ env:
   - TOX_ENV=py27-flake8
   - TOX_ENV=py34-flake8
   - TOX_ENV=docstrings
+  - TOX_ENV=notebooks
 
 matrix:
   fast_finish: true
