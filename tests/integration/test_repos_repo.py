@@ -66,17 +66,6 @@ class TestRepository(helper.IntegrationHelper):
             for comment in repository.comments():
                 assert isinstance(comment, github3.repos.comment.RepoComment)
 
-    def test_comments_on_commit(self):
-        """Test the ability to retrieve the comments on a commit."""
-        sha = '65c0c7d58b3ef09a0b3d5f9779228f9d1a5ad552'
-        cassette_name = self.cassette_name('comments_on_commit')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('glynnis',
-                                            'Madison-Women-in-Tech')
-            assert repository is not None
-            for comment in repository.comments_on_commit(sha):
-                assert isinstance(comment, github3.repos.comment.RepoComment)
-
     def test_commit_activity(self):
         """Test the ability to retrieve commit activity on a repo."""
         cassette_name = self.cassette_name('commit_activity')

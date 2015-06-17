@@ -341,17 +341,6 @@ class TestRepositoryIterator(UnitIteratorHelper):
             headers={}
         )
 
-    def test_comments_on_commit(self):
-        """Test the ability to iterate over comments on a specific commit."""
-        i = self.instance.comments_on_commit('some-sha')
-        self.get_next(i)
-
-        self.session.get.assert_called_once_with(
-            url_for('commits/some-sha/comments'),
-            params={'per_page': 100},
-            headers={}
-        )
-
     def test_commit_activity(self):
         """Test the ability to iterate over commit activity on a repo."""
         i = self.instance.commit_activity()

@@ -9,6 +9,7 @@ This module contains the RepoCommit class alone
 from __future__ import unicode_literals
 
 from . import status
+from .comment import RepoComment
 from .. import git
 from .. import models
 from .. import users
@@ -93,3 +94,16 @@ class RepoCommit(models.BaseCommit):
         """
         url = self._build_url('statuses', base_url=self._api)
         return self._iter(-1, url, status.Status)
+
+    def comments(self, number=-1, etag=None):
+        """Iterate over comments for this commit.
+
+        :param int number: (optional), number of comments to return. Default:
+            -1 returns all comments
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
+        """
+        url = self._build_url('comments', base_url=self._api)
+        return self._iter(int(number), url, RepoComment, etag=etag)

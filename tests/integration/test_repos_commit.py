@@ -20,3 +20,16 @@ class TestRepoCommit(helper.IntegrationHelper):
 
         for status in statuses:
             assert isinstance(status, github3.repos.status.Status)
+
+    def test_comments(self):
+        """Test the ability to retrieve comments on a commit."""
+        cassette_name = self.cassette_name('comments')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('octocat', 'Hello-World')
+            commit = repository.commit(
+                '553c2077f0edc3d5dc5d17262f6aa498e69d6f8e'
+            )
+            comments = list(commit.comments())
+
+        for comment in comments:
+            assert isinstance(comment, github3.repos.comment.RepoComment)
