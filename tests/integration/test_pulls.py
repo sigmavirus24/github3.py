@@ -3,6 +3,7 @@
 import tempfile
 
 import github3
+from github3 import repos
 
 from .helper import IntegrationHelper
 
@@ -151,18 +152,6 @@ class TestPullFile(IntegrationHelper):
                 owner='sigmavirus24', repo='github3.py', pull_number=286,
                 filename='github3/pulls.py'
             )
-
-            assert isinstance(pull_file.contents(), bytes)
-
-    def test_download(self):
-        """Show that a user can download a file in a pull request."""
-        cassette_name = self.cassette_name('download')
-        with self.recorder.use_cassette(cassette_name):
-            pull_file = self.get_pull_request_file(
-                owner='sigmavirus24', repo='github3.py', pull_number=286,
-                filename='github3/pulls.py'
-            )
-
-            with tempfile.NamedTemporaryFile() as fd:
-                filename = pull_file.download(fd)
-                assert filename is not None
+            contents = pull_file.contents()
+            assert isinstance(contents, repos.contents.Contents)
+            assert contents.decoded != b''

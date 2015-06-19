@@ -298,40 +298,10 @@ class TestPullFile(UnitHelper):
                   " module Test")
     }
 
-    @mock.patch('github3.utils.stream_response_to_file')
-    def test_download(self, stream_response_to_file):
-        """Verify the proper request is made to download file contents."""
-        response_mock = mock.Mock()
-        response_mock.status_code = 200
-        self.session.get.return_value = response_mock
-
-        self.instance.download()
-
-        self.session.get.assert_called_once_with(
-            self.example_data['raw_url'], stream=True,
-            headers={'Accept': 'application/octet-stream'}
-        )
-        stream_response_to_file.assert_called_once_with(response_mock,
-                                                        'file1.txt')
-
-    @mock.patch('github3.utils.stream_response_to_file')
-    def test_download_does_not_stream(self, stream_response_to_file):
-        """Verify the proper request is made to download file contents."""
-        # Since the default return value for self.session.get is None we do
-        # not need to mock out the response object in this test.
-        self.instance.download()
-
-        self.session.get.assert_called_once_with(
-            self.example_data['raw_url'], stream=True,
-            headers={'Accept': 'application/octet-stream'}
-        )
-        assert stream_response_to_file.called is False
-
     def test_contents(self):
         """Verify the request made to fetch a pull request file contents."""
         self.instance.contents()
 
         self.session.get.assert_called_once_with(
-            self.example_data['raw_url'],
-            headers={'Accept': 'application/octet-stream'}
+            self.example_data['contents_url']
         )
