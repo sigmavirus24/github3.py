@@ -165,7 +165,7 @@ enterprise installation, e.g.
 
 ::
 
-    from github import GitHubEnterprise
+    from github3 import GitHubEnterprise
 
     g = GitHubEnterprise('https://github.examplesintl.com')
     stats = g.admin_stats('all')
