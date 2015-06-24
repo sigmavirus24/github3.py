@@ -9,12 +9,24 @@ Breaking Changes (since 1.0.0a1)
 - When you download a release asset, instead of returning ``True`` or
   ``False``, it will return the name of the file in which it saved the asset.
 
+- The ``download`` method on ``github3.pulls.PullFile`` instances has been
+  removed.
+
+- The ``contents`` method on ``github3.pulls.PullFile`` instances now return
+  instances of ``github3.repos.contents.Contents``.
+
 Features Added (since 1.0.0a1)
 ``````````````````````````````
 
 - You can now download a file in a pull request to a file on disk.
 
 - You can retrieve the contents of the file in a pull request as bytes.
+
+Bugs Fixed (since 1.0.0a1)
+``````````````````````````
+
+- Pull request files can now be downloaded even when the repository is
+  private.
 
 
 1.0.0a1: 2014-12-07

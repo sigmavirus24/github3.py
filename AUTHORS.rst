@@ -92,3 +92,5 @@ Contributors
 - Jürgen Hermann (@jhermann)
 
 - Antoine Giraudmaillet (@antoine-g)
+
+- Paulus Schoutsen (@balloob)
