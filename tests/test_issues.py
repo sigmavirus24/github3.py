@@ -77,6 +77,9 @@ class TestMilestone(BaseCase):
     def test_str(self):
         assert str(self.m) == 'v1.0.0'
 
+    def test_id(self):
+        assert self.m.id== '219754'
+
     def test_delete(self):
         self.response('', 204)
         self.delete(self.api)
