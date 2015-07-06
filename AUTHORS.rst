@@ -94,3 +94,5 @@ Contributors
 - Antoine Giraudmaillet (@antoine-g)
 
 - Paulus Schoutsen (@balloob)
+
+- Nolan Bruabker (@nrb)
