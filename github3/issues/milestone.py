@@ -39,7 +39,7 @@ class Milestone(GitHubCore):
         #: datetime object representing when the milestone was updated.
         self.updated_at = self._strptime(mile.get('updated_at'))
         #: string representing the milestone's ID.
-        self.id = str(mile.get('id'))
+        self.id = mile.get('id')
 
     def _repr(self):
         return '<Milestone [{0}]>'.format(self)
