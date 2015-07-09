@@ -122,3 +122,14 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+    def test_comments(self):
+        """Verify the request to iterate over comments of a commit."""
+        i = self.instance.comments()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('comments'),
+            params={'per_page': 100},
+            headers={}
+        )
