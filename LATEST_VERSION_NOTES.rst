@@ -1,6 +1,6 @@
 .. vim: set tw=100
 
-1.0.0a2: 2015-02-01
+1.0.0a2: 2015-07-14
 ~~~~~~~~~~~~~~~~~~~
 
 Breaking Changes (since 1.0.0a1)
@@ -15,6 +15,8 @@ Breaking Changes (since 1.0.0a1)
 - The ``contents`` method on ``github3.pulls.PullFile`` instances now return
   instances of ``github3.repos.contents.Contents``.
 
+- Replace ``Repository#comments_on_commit`` with ``RepoCommit#comments``.
+
 Features Added (since 1.0.0a1)
 ``````````````````````````````
 
@@ -22,11 +24,32 @@ Features Added (since 1.0.0a1)
 
 - You can retrieve the contents of the file in a pull request as bytes.
 
+- Add ``id`` attribute to ``github3.repos.milestone.Milestone``.
+
+- Add support for sort, direction, and since parameters to the ``comments``
+  method on ``github3.issues.Issue``.
+
+- Add branch argument to update and delete methods on
+  ``github3.repos.contents.Contents``.
+
+- Add ``permissions`` attribute to ``github3.repos.repo.Repository`` object to
+  retrieve the permissions for a specific repository.
+
+- Allow a deployment to be retrieved by its id.
+
+- Add the ``delete`` method to the ``github3.repos.release.Asset`` class.
+
 Bugs Fixed (since 1.0.0a1)
 ``````````````````````````
 
 - Pull request files can now be downloaded even when the repository is
   private.
+
+- Fix exception when merging a pull request with an empty commit message.
+
+- Add missing Issue events.
+
+- Coerce review comment positions to integers.
 
 
 1.0.0a1: 2014-12-07
@@ -101,7 +124,7 @@ Old name                                      New name
 ``Repository#iter_code_frequency``            ``Repository#code_frequency``
 ``Repository#iter_collaborators``             ``Repository#collaborators``
 ``Repository#iter_comments``                  ``Repository#comments``
-``Repository#iter_comments_on_commit``        ``Repository#comments_on_commit``
+``Repository#iter_comments_on_commit``        ``RepoCommit#comments``
 ``Repository#iter_commit_activity``           ``Repository#commit_activity``
 ``Repository#iter_commits``                   ``Repository#commits``
 ``Repository#iter_contributor_statistics``    ``Repository#contributor_statistics``
