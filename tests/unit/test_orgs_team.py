@@ -168,6 +168,17 @@ class TestTeamIterator(UnitIteratorHelper):
             headers={'Accept': 'application/vnd.github.ironman-preview+json'}
         )
 
+    def test_members_excludes_fake_roles(self):
+        """Show that one cannot pass a bogus role to the API."""
+        i = self.instance.members(role='bogus-role')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('members'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_members_requires_auth(self):
         """Show that one needs to authenticate to get team members."""
         self.session.has_auth.return_value = False
