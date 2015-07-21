@@ -37,22 +37,25 @@ class Team(GitHubCore):
 
     """
 
+    # Roles available to members on a team.
+    members_roles = frozenset(['member', 'maintainer', 'all'])
+
     def _update_attributes(self, team):
         self._api = team.get('url', '')
         #: This team's name.
         self.name = team.get('name')
         #: Unique ID of the team.
         self.id = team.get('id')
-        #: Permission leve of the group
+        #: Permission level of the group.
         self.permission = team.get('permission')
         #: Number of members in this team.
         self.members_count = team.get('members_count')
         members = team.get('members_url')
-        #: Members URL Template. Expands with ``member``
+        #: Members URL Template. Expands with ``member``.
         self.members_urlt = URITemplate(members) if members else None
         #: Number of repos owned by this team.
         self.repos_count = team.get('repos_count')
-        #: Repositories url (not a template)
+        #: Repositories url (not a template).
         self.repositories_url = team.get('repositories_url')
 
     def _repr(self):
@@ -157,7 +160,7 @@ class Team(GitHubCore):
         """
         headers = {}
         params = {}
-        if role in set(["member", "maintainer", "all"]):
+        if role in self.members_roles:
             params['role'] = role
             headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
@@ -241,6 +244,13 @@ class Organization(BaseAccount):
     See also: http://developer.github.com/v3/orgs/
 
     """
+
+    # Filters available when listing members. Note: ``"2fa_disabled"``
+    # is only available for organization owners.
+    members_filters = frozenset(['2fa_disabled', 'all'])
+
+    # Roles available to members in an organization.
+    members_roles = frozenset(['all', 'admin', 'member'])
 
     def _update_attributes(self, org):
         super(Organization, self)._update_attributes(org)
@@ -470,9 +480,9 @@ class Organization(BaseAccount):
         """
         headers = {}
         params = {}
-        if filter in set(["2fa_disabled", "all"]):
+        if filter in self.members_filters:
             params['filter'] = filter
-        if role in set(["all", "admin", "member"]):
+        if role in self.members_roles:
             params['role'] = role
             headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
