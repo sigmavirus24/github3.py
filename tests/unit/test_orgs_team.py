@@ -157,6 +157,17 @@ class TestTeamIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_members_roles(self):
+        """Show that one can iterate of all maintainers of a Team."""
+        i = self.instance.members(role='maintainer')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('members'),
+            params={'per_page': 100, 'role': 'maintainer'},
+            headers={u'Accept': u'application/vnd.github.ironman-preview+json'}
+        )
+
     def test_members_requires_auth(self):
         """Show that one needs to authenticate to get team members."""
         self.session.has_auth.return_value = False

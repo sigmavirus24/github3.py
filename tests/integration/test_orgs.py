@@ -128,6 +128,31 @@ class TestOrganization(IntegrationHelper):
             for member in o.members():
                 assert isinstance(member, github3.users.User)
 
+    @pytest.mark.xfail(reason="sigmavirus24 needs to actually write a test for this.")
+    def test_can_filter_organization_members(self):
+        """
+        Test the ability to filter an organization's members by
+        their ``"2fa_disabled"`` status. This filter is only
+        available to organization owners.
+        """
+        self.basic_login()
+        cassette_name = self.cassette_name('members_filters')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+
+            for member in o.members(filter='2fa_disabled'):
+                assert isinstance(member, github3.users.User)
+
+    def test_can_filter_members_by_role(self):
+        """Test the ability to filter an organization's members by role."""
+        self.basic_login()
+        cassette_name = self.cassette_name('members_roles')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+
+            for member in o.members(role='all'):
+                assert isinstance(member, github3.users.User)
+
     def test_public_members(self):
         """Test the ability to retrieve an organization's public members."""
         self.basic_login()
