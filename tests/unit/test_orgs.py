@@ -292,7 +292,7 @@ class TestOrganizationIterator(UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('members'),
             params={'per_page': 100, 'role': 'admin'},
-            headers={u'Accept': u'application/vnd.github.ironman-preview+json'}
+            headers={'Accept': 'application/vnd.github.ironman-preview+json'}
         )
 
     def test_public_members(self):
