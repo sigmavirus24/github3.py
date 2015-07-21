@@ -96,3 +96,5 @@ Contributors
 - Paulus Schoutsen (@balloob)
 
 - Nolan Bruabker (@nrb)
+
+- Marcin Wielgoszewski (@mwielgoszewski)

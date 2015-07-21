@@ -143,24 +143,17 @@ class Team(GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
-    def members(self, filter=None, number=-1, etag=None):
+    def members(self, number=-1, etag=None):
         r"""Iterate over the members of this team.
 
-        :param str filter: (optional), filter members returned by this method.
-            Can be one of: ``"2fa_disabled"``, ``"all",``. Default: ``"all"``.
-            Filtering by ``"2fa_disabled"`` is only available for organization
-            owners with private repositories.
         :param int number: (optional), number of users to iterate over.
             Default: -1 iterates over all values
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
-        params = {}
-        if filter in set(["2fa_disabled", "all"]):
-            params['filter'] = filter
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, params=params, etag=etag)
+        return self._iter(int(number), url, User, etag=etag)
 
     @requires_auth
     def repositories(self, number=-1, etag=None):
@@ -451,17 +444,24 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def members(self, number=-1, etag=None):
+    def members(self, filter=None, number=-1, etag=None):
         r"""Iterate over members of this organization.
 
+        :param str filter: (optional), filter members returned by this method.
+            Can be one of: ``"2fa_disabled"``, ``"all",``. Default: ``"all"``.
+            Filtering by ``"2fa_disabled"`` is only available for organization
+            owners with private repositories.
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
+        params = {}
+        if filter in set(["2fa_disabled", "all"]):
+            params['filter'] = filter
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, User, params=params, etag=etag)
 
     def public_members(self, number=-1, etag=None):
         r"""Iterate over public members of this organization.
