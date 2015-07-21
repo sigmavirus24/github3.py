@@ -143,17 +143,25 @@ class Team(GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
-    def members(self, number=-1, etag=None):
+    def members(self, role=None, number=-1, etag=None):
         r"""Iterate over the members of this team.
 
+        :param str role: (optional), filter members returned by their role
+            in the team. Can be one of: ``"member"``, ``"maintainer"``,
+            ``"all"``. Default: ``"all"``.
         :param int number: (optional), number of users to iterate over.
             Default: -1 iterates over all values
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
+        headers = {}
+        params = {}
+        if role in set(["member", "maintainer", "all"]):
+            params['role'] = role
+            headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, User, etag=etag, headers=headers)
 
     @requires_auth
     def repositories(self, number=-1, etag=None):
@@ -444,24 +452,32 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
-    def members(self, filter=None, number=-1, etag=None):
+    def members(self, filter=None, role=None, number=-1, etag=None):
         r"""Iterate over members of this organization.
 
         :param str filter: (optional), filter members returned by this method.
             Can be one of: ``"2fa_disabled"``, ``"all",``. Default: ``"all"``.
             Filtering by ``"2fa_disabled"`` is only available for organization
             owners with private repositories.
+        :param str role: (optional), filter members returned by their role.
+            Can be one of: ``"all"``, ``"admin"``, ``"member"``. Default:
+            ``"all"``.
         :param int number: (optional), number of members to return. Default:
             -1 will return all available.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
+        headers = {}
         params = {}
         if filter in set(["2fa_disabled", "all"]):
             params['filter'] = filter
+        if role in set(["all", "admin", "member"]):
+            params['role'] = role
+            headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, params=params, etag=etag)
+        return self._iter(int(number), url, User, params=params, etag=etag,
+                          headers=headers)
 
     def public_members(self, number=-1, etag=None):
         r"""Iterate over public members of this organization.
