@@ -164,7 +164,8 @@ class Team(GitHubCore):
             params['role'] = role
             headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag, headers=headers)
+        return self._iter(int(number), url, User, params=params, etag=etag,
+                          headers=headers)
 
     @requires_auth
     def repositories(self, number=-1, etag=None):
