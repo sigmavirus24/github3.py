@@ -273,6 +273,50 @@ class TestOrganizationIterator(UnitIteratorHelper):
             headers={}
         )
 
+    def test_members_filters(self):
+        """Show that one can iterate over all members with 2fa_disabled."""
+        i = self.instance.members(filter='2fa_disabled')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('members'),
+            params={'per_page': 100, 'filter': '2fa_disabled'},
+            headers={}
+        )
+
+    def test_members_excludes_fake_filters(self):
+        """Show that one cannot pass a bogus filter to the API."""
+        i = self.instance.members(filter='bogus-filter')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('members'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_members_roles(self):
+        """Show that one can iterate over all admins."""
+        i = self.instance.members(role='admin')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('members'),
+            params={'per_page': 100, 'role': 'admin'},
+            headers={'Accept': 'application/vnd.github.ironman-preview+json'}
+        )
+
+    def test_members_excludes_fake_roles(self):
+        """Show that one cannot pass a bogus role to the API."""
+        i = self.instance.members(role='bogus-role')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('members'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_public_members(self):
         """Show that one can iterate over all public members."""
         i = self.instance.public_members()
