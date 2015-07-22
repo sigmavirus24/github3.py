@@ -1644,13 +1644,15 @@ class Repository(GitHubCore):
         :param str head: (required), where you're merging from
         :param str message: (optional), message to be used for the commit
         :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>`
+		OR Status code
         """
         url = self._build_url('merges', base_url=self._api)
         data = {'base': base, 'head': head}
         if message:
             data['commit_message'] = message
-        json = self._json(self._post(url, data=data), 201)
-        return RepoCommit(json, self) if json else None
+        response = self._post(url, data=data)
+        json = self._json(response, 201)
+        return RepoCommit(json, self) if json else response.status_code
 
     def milestone(self, number):
         """Get the milestone indicated by ``number``.
