@@ -359,7 +359,9 @@ class GitHub(GitHubCore):
 
         links = json.get('_links', {})
         for d in links.values():
-            d['href'] = URITemplate(d['href'])
+            # call only if d has some values
+            if d:
+                d['href'] = URITemplate(d['href'])
 
         return json
 
