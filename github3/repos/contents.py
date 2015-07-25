@@ -62,7 +62,7 @@ class Contents(GitHubCore):
         #: with the character set you wish to use, e.g.,
         #: ``content.decoded.decode('utf-8')``.
         #: .. versionchanged:: 0.5.2
-        self.decoded = b''
+        self.decoded = self.content
         if self.encoding == 'base64' and self.content:
             self.decoded = b64decode(self.content.encode())
 
