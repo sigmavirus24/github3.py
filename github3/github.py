@@ -78,6 +78,26 @@ class GitHub(GitHubCore):
         url = self._build_url('events')
         return self._iter(int(number), url, Event, etag=etag)
 
+    def all_organizations(self, number=-1, since=None, etag=None,
+                          per_page=None):
+        """Iterate over every organization in the order they were created.
+
+        :param int number: (optional), number of organizations to return.
+            Default: -1, returns all of them
+        :param int since: (optional), last organization id seen (allows
+            restarting this iteration)
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :param int per_page: (optional), number of organizations to list per
+            request
+        :returns: generator of :class:`Organization
+            <github3.orgs.Organization>`
+        """
+        url = self._build_url('organizations')
+        return self._iter(int(number), url, Organization,
+                          params={'since': since, 'per_page': per_page},
+                          etag=etag)
+
     def all_repositories(self, number=-1, since=None, etag=None,
                          per_page=None):
         """Iterate over every repository in the order they were created.

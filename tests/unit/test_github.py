@@ -317,6 +317,40 @@ class TestGitHubIterators(UnitIteratorHelper):
             headers={}
         )
 
+    def test_all_organizations(self):
+        """Show that one can iterate over all organizations."""
+        i = self.instance.all_organizations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('organizations'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_all_organizations_per_page(self):
+        """Show that one can iterate over all organizations with per_page."""
+        i = self.instance.all_organizations(per_page=25)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('organizations'),
+            params={'per_page': 25},
+            headers={}
+        )
+
+    def test_all_organizations_since(self):
+        """Show that one can limit the organizations returned."""
+        since = 100000
+        i = self.instance.all_organizations(since=since)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('organizations'),
+            params={'per_page': 100, 'since': since},
+            headers={}
+        )
+
     def test_all_repositories(self):
         """Show that one can iterate over all repositories."""
         i = self.instance.all_repositories()
