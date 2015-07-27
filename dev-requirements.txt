@@ -3,5 +3,5 @@
 mock==1.0.1
 pytest>=2.3.5
 wheel==0.21.0
-git+git://github.com/sigmavirus24/betamax
-git+git://github.com/sigmavirus24/betamax_matchers
+betamax>=0.5.0
+betamax_matchers>=0.2.0
