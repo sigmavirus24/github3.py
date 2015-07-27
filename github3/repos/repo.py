@@ -940,7 +940,7 @@ class Repository(GitHubCore):
 
     @requires_auth
     def create_status(self, sha, state, target_url=None, description=None,
-                      context=None):
+                      context='default'):
         """Create a status object on a commit.
 
         :param str sha: (required), SHA of the commit to create the status on
