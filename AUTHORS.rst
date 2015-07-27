@@ -98,3 +98,5 @@ Contributors
 - Nolan Bruabker (@nrb)
 
 - Marcin Wielgoszewski (@mwielgoszewski)
+
+- Omri Harel (@omriharel)
