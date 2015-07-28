@@ -215,9 +215,7 @@ class PullRequest(models.GitHubCore):
         :param str body: (required), comment body
         :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
-        response = self._get(self.issue_url)
-        json = self._json(response, 200)
-        issue = self._instance_or_null(Issue, json)
+        issue = self.issue()
         return issue.create_comment(body)
 
     @requires_auth
@@ -255,6 +253,14 @@ class PullRequest(models.GitHubCore):
         """
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
+
+    def issue(self):
+        """Retrieve the issue associated with this pull request.
+
+        :returns: :class:`~github3.issues.Issue`
+        """
+        json = self._json(self._get(self.issue_url), 200)
+        return self._instance_or_null(Issue, json)
 
     def commits(self, number=-1, etag=None):
         r"""Iterate over the commits on this pull request.
