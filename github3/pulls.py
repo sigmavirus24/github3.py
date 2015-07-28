@@ -16,6 +16,7 @@ from .repos.contents import Contents
 from .repos.commit import RepoCommit
 from .users import User
 from .decorators import requires_auth
+from .issues import Issue
 from .issues.comment import IssueComment
 from uritemplate import URITemplate
 
@@ -206,6 +207,18 @@ class PullRequest(models.GitHubCore):
         :returns: bool
         """
         return self.update(self.title, self.body, 'closed')
+
+    @requires_auth
+    def create_comment(self, body):
+        """Create a comment on this pull request's issue.
+
+        :param str body: (required), comment body
+        :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
+        """
+        response = self._get(self.issue_url)
+        json = self._json(response, 200)
+        issue = self._instance_or_null(Issue, json)
+        return issue.create_comment(body)
 
     @requires_auth
     def create_review_comment(self, body, commit_id, path, position):
