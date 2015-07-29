@@ -27,6 +27,15 @@ class TestPullRequest(IntegrationHelper):
             p = self.get_pull_request(num=241)
             assert p.close() is True
 
+    def test_create_comment(self):
+        """Show that a user can create a comment on a PR."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_comment')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=423)
+            comment = p.create_comment('Testing pull request comment')
+        assert isinstance(comment, github3.issues.comment.IssueComment)
+
     def test_commits(self):
         """Show that one can iterate over a PR's commits."""
         cassette_name = self.cassette_name('commits')
