@@ -34,6 +34,15 @@ class TestPullRequest(UnitHelper):
             }
         )
 
+    def test_create_comment(self):
+        """Show that a user can comment on a PR."""
+        self.instance.create_comment('body')
+
+        self.instance.issue().session.post.assert_called_once_with(
+            url_for('comments').replace('pulls', 'issues'),
+            data={'body': 'body'}
+        )
+
     def test_create_review_comment(self):
         """Verify the request to create a review comment on a PR diff."""
         self.instance.create_review_comment('body', 'sha', 'path', 6)
