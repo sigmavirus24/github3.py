@@ -73,6 +73,14 @@ class TestPullRequest(IntegrationHelper):
             p = self.get_pull_request()
             assert p.is_merged() is True
 
+    def test_issue(self):
+        """Show that one can retrieve the associated issue of a PR."""
+        cassette_name = self.cassette_name('issue')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            issue = p.issue()
+            assert isinstance(issue, github3.issues.Issue)
+
     def test_issue_comments(self):
         """Show that one can iterate over a PR's issue comments."""
         cassette_name = self.cassette_name('issue_comments')
