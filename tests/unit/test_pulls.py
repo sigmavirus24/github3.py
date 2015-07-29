@@ -63,6 +63,14 @@ class TestPullRequest(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('merge'))
 
+    def test_issue(self):
+        """Show that a user can retrieve the associated issue of a PR."""
+        self.instance.issue()
+
+        self.session.get.assert_called_once_with(
+            url_for().replace('pulls', 'issues')
+        )
+
     def test_merge(self):
         """Show that a user can merge a Pull Request."""
         self.instance.merge()
