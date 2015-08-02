@@ -38,7 +38,7 @@ class TestPullRequest(UnitHelper):
         """Show that a user can comment on a PR."""
         self.instance.create_comment('body')
 
-        self.instance.issue().session.post.assert_called_once_with(
+        self.post_called_with(
             url_for('comments').replace('pulls', 'issues'),
             data={'body': 'body'}
         )
