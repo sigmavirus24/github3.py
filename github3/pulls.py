@@ -215,8 +215,11 @@ class PullRequest(models.GitHubCore):
         :param str body: (required), comment body
         :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
-        issue = self.issue()
-        return issue.create_comment(body)
+        url = self.comments_url
+        json = None
+        if body:
+            json = self._json(self._post(url, data={'body': body}), 201)
+        return self._instance_or_null(IssueComment, json)
 
     @requires_auth
     def create_review_comment(self, body, commit_id, path, position):
