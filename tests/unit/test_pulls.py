@@ -34,6 +34,15 @@ class TestPullRequest(UnitHelper):
             }
         )
 
+    def test_create_comment(self):
+        """Show that a user can comment on a PR."""
+        self.instance.create_comment('body')
+
+        self.post_called_with(
+            url_for('comments').replace('pulls', 'issues'),
+            data={'body': 'body'}
+        )
+
     def test_create_review_comment(self):
         """Verify the request to create a review comment on a PR diff."""
         self.instance.create_review_comment('body', 'sha', 'path', 6)
@@ -62,6 +71,14 @@ class TestPullRequest(UnitHelper):
         self.instance.is_merged()
 
         self.session.get.assert_called_once_with(url_for('merge'))
+
+    def test_issue(self):
+        """Show that a user can retrieve the associated issue of a PR."""
+        self.instance.issue()
+
+        self.session.get.assert_called_once_with(
+            url_for().replace('pulls', 'issues')
+        )
 
     def test_merge(self):
         """Show that a user can merge a Pull Request."""

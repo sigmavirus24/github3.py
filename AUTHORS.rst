@@ -100,3 +100,5 @@ Contributors
 - Marcin Wielgoszewski (@mwielgoszewski)
 
 - Omri Harel (@omriharel)
+
+- Noel Lee (@noellee)

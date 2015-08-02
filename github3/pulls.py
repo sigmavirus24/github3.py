@@ -16,6 +16,7 @@ from .repos.contents import Contents
 from .repos.commit import RepoCommit
 from .users import User
 from .decorators import requires_auth
+from .issues import Issue
 from .issues.comment import IssueComment
 from uritemplate import URITemplate
 
@@ -208,6 +209,19 @@ class PullRequest(models.GitHubCore):
         return self.update(self.title, self.body, 'closed')
 
     @requires_auth
+    def create_comment(self, body):
+        """Create a comment on this pull request's issue.
+
+        :param str body: (required), comment body
+        :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
+        """
+        url = self.comments_url
+        json = None
+        if body:
+            json = self._json(self._post(url, data={'body': body}), 201)
+        return self._instance_or_null(IssueComment, json)
+
+    @requires_auth
     def create_review_comment(self, body, commit_id, path, position):
         """Create a review comment on this pull request.
 
@@ -242,6 +256,14 @@ class PullRequest(models.GitHubCore):
         """
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
+
+    def issue(self):
+        """Retrieve the issue associated with this pull request.
+
+        :returns: :class:`~github3.issues.Issue`
+        """
+        json = self._json(self._get(self.issue_url), 200)
+        return self._instance_or_null(Issue, json)
 
     def commits(self, number=-1, etag=None):
         r"""Iterate over the commits on this pull request.
