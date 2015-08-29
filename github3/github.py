@@ -192,7 +192,10 @@ class GitHub(GitHubCore):
                 data['scopes'] = scopes
 
             with self.session.temporary_basic_auth(username, password):
-                json = self._json(self._post(url, data=data), 201)
+                try:
+                    json = self._json(self._post(url, data=data), 201)
+                except Exception as e:
+                    raise KeyError('Failed to create a token: {}'.format(e))
 
         return self._instance_or_null(Authorization, json)
 
