@@ -27,14 +27,23 @@ class GitHubObject(object):
     """The :class:`GitHubObject <GitHubObject>` object. A basic class to be
     subclassed by GitHubCore and other classes that would otherwise subclass
     object."""
-    def __init__(self, json):
+    def __init__(self, data, status_code=200):
         super(GitHubObject, self).__init__()
-        if json is not None:
-            self.etag = json.pop('ETag', None)
-            self.last_modified = json.pop('Last-Modified', None)
-            self._uniq = json.get('url', None)
-        self._json_data = json
-        self._update_attributes(json)
+        if isinstance(data, requests.Response):
+            self.response = data
+            self.last_modified = data.headers.get('Last-Modified', '')
+            self.etag = data.headers.get('ETag', '')
+            self._json_data = self._json(response, status_code)
+        else:
+            self.response = self.last_modified = self.etag = None
+            self._json_data = data
+        if self._json_data is not None:
+            if not isinstance(self._json_data, dict):
+                return exceptions.UnprocessableResponseBody(
+                    "GitHub's API returned a body that could not be handled", json
+                )
+            self._uniq = self._json_data.get('url', None)
+            self._update_attributes(self._json_data)
 
     def _update_attributes(self, json):
         pass
@@ -117,7 +126,7 @@ class GitHubCore(GitHubObject):
     have.
     """
 
-    def __init__(self, json, session=None):
+    def __init__(self, data, status_code=200, session=None):
         if hasattr(session, 'session'):
             # i.e. session is actually a GitHubCore instance
             session = session.session
@@ -127,7 +136,7 @@ class GitHubCore(GitHubObject):
 
         # set a sane default
         self._github_url = 'https://api.github.com'
-        super(GitHubCore, self).__init__(json)
+        super(GitHubCore, self).__init__(data, status_code)
 
     def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
@@ -140,17 +149,13 @@ class GitHubCore(GitHubObject):
             if v is None:
                 del(data[k])
 
-    def _instance_or_null(self, instance_class, json):
-        if json is None:
+    def _instance_or_null(self, instance_class, data, status_code):
+        if data is None:
             return NullObject(instance_class.__name__)
-        if not isinstance(json, dict):
-            return exceptions.UnprocessableResponseBody(
-                "GitHub's API returned a body that could not be handled", json
-            )
         try:
-            return instance_class(json, self)
+            return instance_class(data, status_code, session=self)
         except TypeError:  # instance_class is not a subclass of GitHubCore
-            return instance_class(json)
+            return instance_class(data, status_code)
 
     def _json(self, response, status_code):
         ret = None
@@ -159,13 +164,6 @@ class GitHubCore(GitHubObject):
                           'with status code %d expecting %d',
                           response.status_code, status_code)
             ret = response.json()
-            headers = response.headers
-            if ((headers.get('Last-Modified') or headers.get('ETag')) and
-                    isinstance(ret, dict)):
-                ret['Last-Modified'] = response.headers.get(
-                    'Last-Modified', ''
-                )
-                ret['ETag'] = response.headers.get('ETag', '')
         __logs__.info('JSON was %sreturned', 'not ' if ret is None else '')
         return ret
 

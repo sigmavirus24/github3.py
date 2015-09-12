@@ -1835,10 +1835,6 @@ class Repository(GitHubCore):
         if resp.status_code == 202:
             return {}
         json = self._json(resp, 200)
-        if json.get('ETag'):
-            del json['ETag']
-        if json.get('Last-Modified'):
-            del json['Last-Modified']
         return json
 
 
