@@ -110,11 +110,11 @@ class Gist(GitHubCore):
         :returns: :class:`GistComment <github3.gists.comment.GistComment>`
 
         """
-        json = None
+        data = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, data={'body': body}), 201)
-        return self._instance_or_null(GistComment, json)
+            data = self._post(url, data={'body': body})
+        return self._instance_or_null(GistComment, data, 201)
 
     @requires_auth
     def delete(self):
@@ -159,8 +159,7 @@ class Gist(GitHubCore):
 
         """
         url = self._build_url('forks', base_url=self._api)
-        json = self._json(self._post(url), 201)
-        return self._instance_or_null(Gist, json)
+        return self._instance_or_null(Gist, self._post(url), 201)
 
     @requires_auth
     def is_starred(self):

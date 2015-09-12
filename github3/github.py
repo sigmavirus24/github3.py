@@ -365,8 +365,6 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('feeds')
         json = self._json(self._get(url), 200)
-        del json['ETag']
-        del json['Last-Modified']
 
         urls = [
             'timeline_url', 'user_url', 'current_user_public_url',
