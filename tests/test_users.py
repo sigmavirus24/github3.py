@@ -193,3 +193,10 @@ class TestUser(BaseCase):
         assert self.user == u
         u._uniq += 1
         assert self.user != u
+
+    def test_repositories(self):
+        self.response('user_repos', 200)
+        self.get(self.api + '/repos')
+
+        assert len([i for i in self.user.repositories()]) == 1
+        self.mock_assertions()
