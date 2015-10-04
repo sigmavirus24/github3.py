@@ -34,5 +34,6 @@ matrix:
   fast_finish: true
   allow_failures:
   - env: TOX_ENV=docstrings
+  - env: TOX_ENV=notebooks
 
 sudo: false
