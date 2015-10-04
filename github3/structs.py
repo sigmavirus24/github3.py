@@ -88,7 +88,10 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
                 json = json.items()
 
             for i in json:
-                yield cls(i)
+                inst = cls(i)
+                if isinstance(inst, models.GitHubObject):
+                    inst.response = response
+                yield inst
                 self.count -= 1 if self.count > 0 else 0
                 if self.count == 0:
                     break
