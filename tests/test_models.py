@@ -21,14 +21,10 @@ class TestGitHubCore(BaseCase):
 
     def test_json(self):
         r = requests.Response()
-        r.headers['Last-Modified'] = 'foo'
-        r.headers['ETag'] = 'bar'
         r.raw = RequestsBytesIO('{}'.encode() if is_py3 else '{}')
         r.status_code = 200
 
         json = self.g._json(r, 200)
-        assert json['Last-Modified'] == 'foo'
-        assert json['ETag'] == 'bar'
 
     def test_boolean(self):
         r = requests.Response()

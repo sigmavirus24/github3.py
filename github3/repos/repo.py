@@ -302,11 +302,11 @@ class Repository(GitHubCore):
 
     def _create_pull(self, data):
         self._remove_none(data)
-        json = None
+        response = None
         if data:
             url = self._build_url('pulls', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(PullRequest, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(PullRequest, response, 201)
 
     @requires_auth
     def add_collaborator(self, username):
@@ -354,13 +354,12 @@ class Repository(GitHubCore):
         :param int id: (required), id of the asset
         :returns: :class:`Asset <github3.repos.release.Asset>`
         """
-        data = None
+        response = None
         if int(id) > 0:
             url = self._build_url('releases', 'assets', str(id),
                                   base_url=self._api)
-            data = self._json(self._get(url, headers=Release.CUSTOM_HEADERS),
-                              200)
-        return self._instance_or_null(Asset, data)
+            response = self._get(url, headers=Release.CUSTOM_HEADERS)
+        return self._instance_or_null(Asset, response, 200)
 
     def assignees(self, number=-1, etag=None):
         r"""Iterate over all assignees to which an issue may be assigned.
@@ -382,8 +381,7 @@ class Repository(GitHubCore):
             None
         """
         url = self._build_url('git', 'blobs', sha, base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Blob, json)
+        return self._instance_or_null(Blob, self._get(url), 200)
 
     def branch(self, name):
         """Get the branch ``name`` of this repository.
@@ -392,11 +390,11 @@ class Repository(GitHubCore):
         :type name: str
         :returns: :class:`Branch <github3.repos.branch.Branch>`
         """
-        json = None
+        response = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Branch, json)
+            response = self._get(url)
+        return self._instance_or_null(Branch, response, 200)
 
     def branches(self, number=-1, etag=None):
         r"""Iterate over the branches in this repository.
@@ -470,8 +468,7 @@ class Repository(GitHubCore):
             successful, otherwise None
         """
         url = self._build_url('commits', sha, base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(RepoCommit, json)
+        return self._instance_or_null(RepoCommit, self._get(url), 200)
 
     def commit_activity(self, number=-1, etag=None):
         """Iterate over last year of commit activity by week.
@@ -502,8 +499,7 @@ class Repository(GitHubCore):
             successful, otherwise None
         """
         url = self._build_url('comments', str(comment_id), base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(RepoComment, json)
+        return self._instance_or_null(RepoComment, self._get(url), 200)
 
     def commits(self, sha=None, path=None, author=None, number=-1, etag=None,
                 since=None, until=None):
@@ -549,8 +545,7 @@ class Repository(GitHubCore):
         """
         url = self._build_url('compare', base + '...' + head,
                               base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Comparison, json)
+        return self._instance_or_null(Comparison, self._get(url), 200)
 
     def contributor_statistics(self, number=-1, etag=None):
         """Iterate over the contributors list.
@@ -623,15 +618,15 @@ class Repository(GitHubCore):
             successful, otherwise None
 
         """
-        json = None
+        response = None
         if body and sha and (line and int(line) > 0):
             data = {'body': body, 'line': line, 'path': path,
                     'position': position}
             self._remove_none(data)
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(RepoComment, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(RepoComment, response, 201)
 
     @requires_auth
     def create_commit(self, message, tree, parents, author={}, committer={}):
@@ -654,13 +649,13 @@ class Repository(GitHubCore):
         :returns: :class:`Commit <github3.git.Commit>` if successful, else
             None
         """
-        json = None
+        response = None
         if message and tree and isinstance(parents, list):
             url = self._build_url('git', 'commits', base_url=self._api)
             data = {'message': message, 'tree': tree, 'parents': parents,
                     'author': author, 'committer': committer}
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Commit, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Commit, response, 201)
 
     @requires_auth
     def create_deployment(self, ref, force=False, payload='',
@@ -680,16 +675,15 @@ class Repository(GitHubCore):
             environment (e.g., production, staging, qa). Default: "production"
         :returns: :class:`Deployment <github3.repos.deployment.Deployment>`
         """
-        json = None
+        response = None
         if ref:
             url = self._build_url('deployments', base_url=self._api)
             data = {'ref': ref, 'force': force, 'payload': payload,
                     'auto_merge': auto_merge, 'description': description,
                     'environment': environment}
             self._remove_none(data)
-            json = self._json(self._post(url, data=data),
-                              201)
-        return self._instance_or_null(Deployment, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Deployment, response, 201)
 
     @requires_auth
     def create_file(self, path, message, content, branch=None,
@@ -746,8 +740,7 @@ class Repository(GitHubCore):
         else:
             resp = self._post(url)
 
-        json = self._json(resp, 202)
-        return self._instance_or_null(Repository, json)
+        return self._instance_or_null(Repository, resp, 202)
 
     @requires_auth
     def create_hook(self, name, config, events=['push'], active=True):
@@ -796,13 +789,13 @@ class Repository(GitHubCore):
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels}
         self._remove_none(issue)
-        json = None
+        response = None
 
         if issue:
             url = self._build_url('issues', base_url=self._api)
-            json = self._json(self._post(url, data=issue), 201)
+            response = self._post(url, data=issue)
 
-        return self._instance_or_null(Issue, json)
+        return self._instance_or_null(Issue, response, 201)
 
     @requires_auth
     def create_key(self, title, key):
@@ -812,12 +805,12 @@ class Repository(GitHubCore):
         :param str key: (required), key text
         :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
-        json = None
+        response = None
         if title and key:
             data = {'title': title, 'key': key}
             url = self._build_url('keys', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Key, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Key, response, 201)
 
     @requires_auth
     def create_label(self, name, color):
@@ -829,12 +822,12 @@ class Repository(GitHubCore):
         :returns: :class:`Label <github3.issues.label.Label>` if successful,
             else None
         """
-        json = None
+        response = None
         if name and color:
             data = {'name': name, 'color': color.strip('#')}
             url = self._build_url('labels', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Label, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Label, response, 201)
 
     @requires_auth
     def create_milestone(self, title, state=None, description=None,
@@ -855,10 +848,10 @@ class Repository(GitHubCore):
         data = {'title': title, 'state': state,
                 'description': description, 'due_on': due_on}
         self._remove_none(data)
-        json = None
+        response = None
         if data:
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Milestone, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Milestone, response, 201)
 
     @requires_auth
     def create_pull(self, title, base, head, body=None):
@@ -901,12 +894,12 @@ class Repository(GitHubCore):
         :returns: :class:`Reference <github3.git.Reference>` if successful
             else None
         """
-        json = None
+        response = None
         if ref and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
             url = self._build_url('git', 'refs', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Reference, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Reference, response, 201)
 
     @requires_auth
     def create_release(self, tag_name, target_commitish=None, name=None,
@@ -933,10 +926,8 @@ class Repository(GitHubCore):
         self._remove_none(data)
 
         url = self._build_url('releases', base_url=self._api)
-        json = self._json(self._post(
-            url, data=data, headers=Release.CUSTOM_HEADERS
-            ), 201)
-        return self._instance_or_null(Release, json)
+        response = self._post(url, data=data, headers=Release.CUSTOM_HEADERS)
+        return self._instance_or_null(Release, response, 201)
 
     @requires_auth
     def create_status(self, sha, state, target_url=None, description=None,
@@ -953,14 +944,14 @@ class Repository(GitHubCore):
         :returns: the status created if successful
         :rtype: :class:`~github3.repos.status.Status`
         """
-        json = {}
+        response = None
         if sha and state:
             data = {'state': state, 'target_url': target_url,
                     'description': description, 'context': context}
             url = self._build_url('statuses', sha, base_url=self._api)
             self._remove_none(data)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Status, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Status, response, 201)
 
     @requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
@@ -983,15 +974,15 @@ class Repository(GitHubCore):
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
 
-        json = None
+        response = None
         if tag and message and sha and obj_type and len(tagger) == 3:
             data = {'tag': tag, 'message': message, 'object': sha,
                     'type': obj_type, 'tagger': tagger}
             url = self._build_url('git', 'tags', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-            if json:
+            response = self._post(url, data=data)
+            if response.status_code == 201:
                 self.create_ref('refs/tags/' + tag, sha)
-        return self._instance_or_null(Tag, json)
+        return self._instance_or_null(Tag, response, 201)
 
     @requires_auth
     def create_tree(self, tree, base_tree=None):
@@ -1004,14 +995,14 @@ class Repository(GitHubCore):
             to update with new data
         :returns: :class:`Tree <github3.git.Tree>` if successful, else None
         """
-        json = None
+        response = None
         if tree and isinstance(tree, list):
             data = {'tree': tree}
             if base_tree:
                 data['base_tree'] = base_tree
             url = self._build_url('git', 'trees', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Tree, json)
+            response = self._post(url, data=data)
+        return self._instance_or_null(Tree, response, 201)
 
     @requires_auth
     def delete(self):
@@ -1047,11 +1038,11 @@ class Repository(GitHubCore):
         :param int id: (required), id for deployments.
         :returns: :class:`~github3.repos.deployment.Deployment`
         """
-        json = None
+        response = None
         if int(id) > 0:
             url = self._build_url('deployments', str(id), base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Deployment, json)
+            response = self._get(url)
+        return self._instance_or_null(Deployment, response, 200)
 
     def deployments(self, number=-1, etag=None):
         r"""Iterate over deployments for this repository.
@@ -1164,8 +1155,8 @@ class Repository(GitHubCore):
         :rtype: :class:`~github3.repos.contents.Contents`
         """
         url = self._build_url('contents', path, base_url=self._api)
-        json = self._json(self._get(url, params={'ref': ref}), 200)
-        return self._instance_or_null(Contents, json)
+        response = self._get(url, params={'ref': ref})
+        return self._instance_or_null(Contents, response, 200)
 
     def forks(self, sort='', number=-1, etag=None):
         """Iterate over forks of this repository.
@@ -1191,11 +1182,11 @@ class Repository(GitHubCore):
         :returns: :class:`Commit <github3.git.Commit>` if successful,
             otherwise None
         """
-        json = {}
+        response = None
         if sha:
             url = self._build_url('git', 'commits', sha, base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Commit, json)
+            response = self._get(url)
+        return self._instance_or_null(Commit, response, 200)
 
     @requires_auth
     def hook(self, hook_id):
@@ -1205,11 +1196,11 @@ class Repository(GitHubCore):
         :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
             otherwise None
         """
-        json = None
+        response = None
         if int(hook_id) > 0:
             url = self._build_url('hooks', str(hook_id), base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Hook, json)
+            response = self._get(url)
+        return self._instance_or_null(Hook, response, 200)
 
     @requires_auth
     def hooks(self, number=-1, etag=None):
@@ -1235,8 +1226,8 @@ class Repository(GitHubCore):
         :returns: :class:`Subscription <github3.notifications.Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=dumps({'ignored': True})), 200)
-        return self._instance_or_null(Subscription, json)
+        response = self._put(url, data=dumps({'ignored': True}))
+        return self._instance_or_null(Subscription, response, 200)
 
     def is_assignee(self, username):
         """Check if the user can be assigned an issue on this repository.
@@ -1270,11 +1261,11 @@ class Repository(GitHubCore):
         :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
             otherwise None
         """
-        json = None
+        response = None
         if int(number) > 0:
             url = self._build_url('issues', str(number), base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Issue, json)
+            response = self._get(url)
+        return self._instance_or_null(Issue, response, 200)
 
     def issue_events(self, number=-1, etag=None):
         r"""Iterate over issue events on this repository.
@@ -1359,11 +1350,11 @@ class Repository(GitHubCore):
         :returns: :class:`Label <github3.issues.label.Label>` if successful,
             else None
         """
-        json = None
+        response = None
         if name:
             url = self._build_url('labels', name, base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Label, json)
+            response = self._get(url)
+        return self._instance_or_null(Label, response, 200)
 
     def labels(self, number=-1, etag=None):
         r"""Iterate over labels on this repository.
@@ -1396,8 +1387,7 @@ class Repository(GitHubCore):
         :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
         """
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(PagesBuild, json)
+        return self._instance_or_null(PagesBuild, self._get(url), 200)
 
     @requires_auth
     def mark_notifications(self, last_read=''):
@@ -1429,8 +1419,8 @@ class Repository(GitHubCore):
         data = {'base': base, 'head': head}
         if message:
             data['commit_message'] = message
-        json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(RepoCommit, json)
+        response = self._post(url, data=data)
+        return self._instance_or_null(RepoCommit, response, 201)
 
     def milestone(self, number):
         """Get the milestone indicated by ``number``.
@@ -1438,12 +1428,12 @@ class Repository(GitHubCore):
         :param int number: (required), unique id number of the milestone
         :returns: :class:`Milestone <github3.issues.milestone.Milestone>`
         """
-        json = None
+        response = None
         if int(number) > 0:
             url = self._build_url('milestones', str(number),
                                   base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Milestone, json)
+            response = self._get(url)
+        return self._instance_or_null(Milestone, response, 200)
 
     def milestones(self, state=None, sort=None, direction=None, number=-1,
                    etag=None):
@@ -1520,8 +1510,7 @@ class Repository(GitHubCore):
         :returns: :class:`PagesInfo <github3.repos.pages.PagesInfo>`
         """
         url = self._build_url('pages', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(PagesInfo, json)
+        return self._instance_or_null(PagesInfo, self._get(url), 200)
 
     @requires_auth
     def pages_builds(self, number=-1, etag=None):
@@ -1539,11 +1528,11 @@ class Repository(GitHubCore):
         :param int number: (required), number of the pull request.
         :returns: :class:`PullRequest <github3.pulls.PullRequest>`
         """
-        json = None
+        response = None
         if int(number) > 0:
             url = self._build_url('pulls', str(number), base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(PullRequest, json)
+            response = self._get(url)
+        return self._instance_or_null(PullRequest, response, 200)
 
     def pull_requests(self, state=None, head=None, base=None, sort='created',
                       direction='desc', number=-1, etag=None):
@@ -1593,8 +1582,7 @@ class Repository(GitHubCore):
         :returns: :class:`Contents <github3.repos.contents.Contents>`
         """
         url = self._build_url('readme', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Contents, json)
+        return self._instance_or_null(Contents, self._get(url), 200)
 
     def ref(self, ref):
         """Get a reference pointed to by ``ref``.
@@ -1607,11 +1595,11 @@ class Repository(GitHubCore):
         :param str ref: (required)
         :returns: :class:`Reference <github3.git.Reference>`
         """
-        json = None
+        response = None
         if ref:
             url = self._build_url('git', 'refs', ref, base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Reference, json)
+            response = self._get(url)
+        return self._instance_or_null(Reference, response, 200)
 
     def refs(self, subspace='', number=-1, etag=None):
         r"""Iterate over references for this repository.
@@ -1636,11 +1624,11 @@ class Repository(GitHubCore):
         :param int id: (required), id of release
         :returns: :class:`Release <github3.repos.release.Release>`
         """
-        json = None
+        response = None
         if int(id) > 0:
             url = self._build_url('releases', str(id), base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Release, json)
+            response = self._get(url)
+        return self._instance_or_null(Release, response, 200)
 
     def releases(self, number=-1, etag=None):
         r"""Iterate over releases for this repository.
@@ -1719,9 +1707,8 @@ class Repository(GitHubCore):
         :returns: :class:`Subscription <github3.notifications.Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=dumps({'subcribed': True})),
-                          200)
-        return self._instance_or_null(Subscription, json)
+        response = self._put(url, data=dumps({'subcribed': True}))
+        return self._instance_or_null(Subscription, response, 200)
 
     def subscribers(self, number=-1, etag=None):
         r"""Iterate over users subscribed to this repository.
@@ -1742,8 +1729,7 @@ class Repository(GitHubCore):
         :returns: :class:`Subscription <github3.notifications.Subscription>`
         """
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Subscription, json)
+        return self._instance_or_null(Subscription, self._get(url), 200)
 
     def tag(self, sha):
         """Get an annotated tag.
@@ -1753,11 +1739,11 @@ class Repository(GitHubCore):
         :param str sha: (required), sha of the object for this tag
         :returns: :class:`Tag <github3.git.Tag>`
         """
-        json = None
+        response = None
         if sha:
             url = self._build_url('git', 'tags', sha, base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Tag, json)
+            response = self._get(url)
+        return self._instance_or_null(Tag, response, 200)
 
     def tags(self, number=-1, etag=None):
         r"""Iterate over tags on this repository.
@@ -1791,11 +1777,11 @@ class Repository(GitHubCore):
         :param str sha: (required), sha of the object for this tree
         :returns: :class:`Tree <github3.git.Tree>`
         """
-        json = None
+        response = None
         if sha:
             url = self._build_url('git', 'trees', sha, base_url=self._api)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Tree, json)
+            response = self._get(url)
+        return self._instance_or_null(Tree, response, 200)
 
     @requires_auth
     def update_label(self, name, color, new_name=''):
@@ -1835,10 +1821,6 @@ class Repository(GitHubCore):
         if resp.status_code == 202:
             return {}
         json = self._json(resp, 200)
-        if json.get('ETag'):
-            del json['ETag']
-        if json.get('Last-Modified'):
-            del json['Last-Modified']
         return json
 
 

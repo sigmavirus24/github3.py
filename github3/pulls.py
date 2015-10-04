@@ -90,8 +90,8 @@ class PullFile(models.GitHubCore):
 
         :returns: :class:`Contents <github3.repos.contents.Contents>`
         """
-        json = self._json(self._get(self.contents_url), 200)
-        return self._instance_or_null(Contents, json)
+        response = self._get(self.contents_url)
+        return self._instance_or_null(Contents, response, 200)
 
 
 class PullRequest(models.GitHubCore):
@@ -216,10 +216,10 @@ class PullRequest(models.GitHubCore):
         :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
         url = self.comments_url
-        json = None
+        response = None
         if body:
-            json = self._json(self._post(url, data={'body': body}), 201)
-        return self._instance_or_null(IssueComment, json)
+            response = self._post(url, data={'body': body})
+        return self._instance_or_null(IssueComment, response, 201)
 
     @requires_auth
     def create_review_comment(self, body, commit_id, path, position):
@@ -237,8 +237,8 @@ class PullRequest(models.GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         data = {'body': body, 'commit_id': commit_id, 'path': path,
                 'position': int(position)}
-        json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(ReviewComment, json)
+        response = self._post(url, data=data)
+        return self._instance_or_null(ReviewComment, response, 201)
 
     def diff(self):
         """Return the diff.
@@ -262,8 +262,7 @@ class PullRequest(models.GitHubCore):
 
         :returns: :class:`~github3.issues.Issue`
         """
-        json = self._json(self._get(self.issue_url), 200)
-        return self._instance_or_null(Issue, json)
+        return self._instance_or_null(Issue, self._get(self.issue_url), 200)
 
     def commits(self, number=-1, etag=None):
         r"""Iterate over the commits on this pull request.
@@ -436,7 +435,8 @@ class ReviewComment(models.BaseComment):
         url = self._build_url('comments', base_url=self.pull_request_url)
         index = self._api.rfind('/') + 1
         in_reply_to = self._api[index:]
-        json = self._json(self._post(url, data={
-            'body': body, 'in_reply_to': in_reply_to
-        }), 201)
-        return self._instance_or_null(ReviewComment, json)
+        response = self._post(url, data={
+            'body': body,
+            'in_reply_to': in_reply_to
+        })
+        return self._instance_or_null(ReviewComment, response, 201)
