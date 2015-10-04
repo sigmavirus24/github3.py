@@ -44,6 +44,10 @@ class CustomHeadersMatcher(betamax.BaseMatcher):
         recorded_request = copy.deepcopy(recorded_request)
         request.headers.pop('User-Agent', None)
         recorded_request['headers'].pop('User-Agent', None)
+        request.headers.pop('Accept-Encoding', None)
+        recorded_request['headers'].pop('Accept-Encoding', None)
+        request.headers.pop('Connection', None)
+        recorded_request['headers'].pop('Connection', None)
         return self.headers_matcher.match(request, recorded_request)
 
 

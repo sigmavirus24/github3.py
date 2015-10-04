@@ -9,12 +9,12 @@ This module contains the Gist class alone for simplicity.
 from __future__ import unicode_literals
 
 from json import dumps
-from github3.models import GitHubCore
-from github3.decorators import requires_auth
-from github3.gists.comment import GistComment
-from github3.gists.file import GistFile
-from github3.gists.history import GistHistory
-from github3.users import User
+from ..models import GitHubCore
+from ..decorators import requires_auth
+from .comment import GistComment
+from .file import GistFile
+from .history import GistHistory
+from ..users import User
 
 
 class Gist(GitHubCore):
@@ -97,6 +97,9 @@ class Gist(GitHubCore):
 
         #: Forks URL (not a template)
         self.forks_url = data.get('forks_url', '')
+
+        #: Whether the content of this Gist has been truncated or not
+        self.truncated = data.get('truncated')
 
     def __str__(self):
         return self.id

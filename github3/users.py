@@ -10,9 +10,9 @@ from __future__ import unicode_literals
 
 from json import dumps
 from uritemplate import URITemplate
-from github3.events import Event
-from github3.models import GitHubObject, GitHubCore, BaseAccount
-from github3.decorators import requires_auth
+from .events import Event
+from .models import GitHubObject, GitHubCore, BaseAccount
+from .decorators import requires_auth
 
 
 class Key(GitHubCore):
@@ -350,7 +350,7 @@ class User(BaseAccount):
         :returns: list of :class:`Event <github3.orgs.Organization>`\ s
         """
         # Import here, because a toplevel import causes an import loop
-        from github3.orgs import Organization
+        from .orgs import Organization
         url = self._build_url('orgs', base_url=self._api)
         return self._iter(int(number), url, Organization, etag=etag)
 
@@ -371,7 +371,7 @@ class User(BaseAccount):
             endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
-        from github3.repos import Repository
+        from .repos import Repository
 
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
@@ -387,7 +387,7 @@ class User(BaseAccount):
             endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
-        from github3.repos import Repository
+        from .repos import Repository
         url = self._build_url('subscriptions', base_url=self._api)
         return self._iter(int(number), url, Repository, etag=etag)
 

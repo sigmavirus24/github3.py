@@ -1,25 +1,34 @@
 language: python
-python:
-- 2.6
-- 2.7
-- 3.2
-- 3.3
-- 3.4
-- pypy
-# command to run tests, e.g. python setup.py test
 before_script:
-- pip install -r dev-requirements.txt
+- pip install tox
 - pip install -U requests"$REQUESTS_VERSION"
 
 # test script
-script:  make travis
+script:  tox -e ${TOX_ENV}
 notifications:
-   on_success: change
-   on_failure: always
+  on_success: change
+  on_failure: always
 
 env:
   global:
   - TRAVIS_GH3="True"
   matrix:
-  - REQUESTS_VERSION="==2.0.1"
-  - REQUESTS_VERSION=""  # Latest
+  - TOX_ENV=py26 REQUESTS_VERSION="==2.0.1"
+  - TOX_ENV=py27 REQUESTS_VERSION="==2.0.1"
+  - TOX_ENV=py32 REQUESTS_VERSION="==2.0.1"
+  - TOX_ENV=py33 REQUESTS_VERSION="==2.0.1"
+  - TOX_ENV=py34 REQUESTS_VERSION="==2.0.1"
+  - TOX_ENV=pypy REQUESTS_VERSION="==2.0.1"
+  - TOX_ENV=py26 REQUESTS_VERSION=""
+  - TOX_ENV=py27 REQUESTS_VERSION=""
+  - TOX_ENV=py32 REQUESTS_VERSION=""
+  - TOX_ENV=py33 REQUESTS_VERSION=""
+  - TOX_ENV=py34 REQUESTS_VERSION=""
+  - TOX_ENV=pypy REQUESTS_VERSION=""
+  - TOX_ENV=py27-flake8
+  - TOX_ENV=py34-flake8
+
+matrix:
+  allow_failures:
+  - env: TOX_ENV=py27-flake8
+  - env: TOX_ENV=py34-flake8
