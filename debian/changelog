@@ -1,3 +1,9 @@
+github3.py (0.9.3-1) wily; urgency=medium
+
+  * New upstream version
+
+ -- Dennis Kaarsemaker <dennis@kaarsemaker.net>  Sun, 04 Oct 2015 15:04:38 +0200
+
 github3.py (0.9.0-1) trusty; urgency=medium
 
   * New upstream version
