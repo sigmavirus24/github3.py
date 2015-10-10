@@ -26,6 +26,23 @@ class TestThread(UnitHelper):
             self.instance.subject.get('title'))
 
     def test_delete_description(self):
+        """Show that a user can delete a subscription"""
         self.instance.delete_subscription()
 
         self.session.delete.assert_called_once_with(url_for('subscription'))
+
+    def test_mark(self):
+        """Show that a user can mark the subscription"""
+        self.instance.mark()
+
+        assert self.session.patch.called
+
+    def test_set_subscription(self):
+        """Show that a user can subscribe to nofication"""
+
+        self.instance.set_subscription(True, False)
+
+        self.session.put.assert_called_once_with(
+            url_for('subscription'),
+            data='{"ignored": false, "subscribed": true}'
+        )
