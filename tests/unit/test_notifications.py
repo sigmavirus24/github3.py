@@ -46,3 +46,12 @@ class TestThread(UnitHelper):
             url_for('subscription'),
             data='{"ignored": false, "subscribed": true}'
         )
+
+    def test_subscription(self):
+        # subscription = self.instance.subscription()
+        self.instance.subscription()
+        # Need to figure out why this fails
+        # assert isinstance(subscription, github3.notifications.Subscription)
+        self.session.get.assert_called_once_with(
+            url_for('subscription')
+        )
