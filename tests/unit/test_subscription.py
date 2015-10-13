@@ -13,6 +13,7 @@ class TestSubscription(UnitHelper):
     example_data = get_subscription_example_data()
 
     def test_repr(self):
+        """Show that instance is formatted as a string when printed"""
         assert isinstance(repr(self.instance), str)
 
     def test_delete(self):
