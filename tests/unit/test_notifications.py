@@ -15,6 +15,15 @@ class TestThread(UnitHelper):
     described_class = github3.notifications.Thread
     example_data = get_notification_example_data()
 
+    def test_equality(self):
+        thread = github3.notifications.Thread(get_notification_example_data())
+        assert self.instance == thread
+        thread._uniq = 1
+        assert self.instance != thread
+
+    def test_is_unread(self):
+        assert self.instance.is_unread() == self.instance.unread
+
     def test_last_read_at(self):
         json = self.instance.as_dict().copy()
         json['last_read_at'] = '2013-12-31T23:59:59Z'
@@ -48,10 +57,7 @@ class TestThread(UnitHelper):
         )
 
     def test_subscription(self):
+        pass
         # subscription = self.instance.subscription()
-        self.instance.subscription()
         # Need to figure out why this fails
         # assert isinstance(subscription, github3.notifications.Subscription)
-        self.session.get.assert_called_once_with(
-            url_for('subscription')
-        )
