@@ -16,21 +16,25 @@ class TestThread(UnitHelper):
     example_data = get_notification_example_data()
 
     def test_equality(self):
+        """Test equality/inequality between two instances"""
         thread = github3.notifications.Thread(get_notification_example_data())
         assert self.instance == thread
         thread._uniq = 1
         assert self.instance != thread
 
     def test_is_unread(self):
+        """Show that is_unread() equals unread property"""
         assert self.instance.is_unread() == self.instance.unread
 
     def test_last_read_at(self):
+        """Show that last_read_at attribute is a datetime type"""
         json = self.instance.as_dict().copy()
         json['last_read_at'] = '2013-12-31T23:59:59Z'
         thread = github3.notifications.Thread(json)
         assert isinstance(thread.last_read_at, datetime.datetime)
 
     def test_repr(self):
+        """Show instance string is formatted correctly"""
         assert repr(self.instance) == '<Thread [{0}]>'.format(
             self.instance.subject.get('title'))
 
