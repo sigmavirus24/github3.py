@@ -102,3 +102,5 @@ Contributors
 - Omri Harel (@omriharel)
 
 - Noel Lee (@noellee)
+
+- Matt Chung (@itsmemattchung)
