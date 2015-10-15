@@ -265,3 +265,91 @@ does hurt to double check though.
 
 .. _Betamax: https://github.com/sigmavirus24/betamax
 .. _cassettes: https://betamax.readthedocs.org/en/latest/cassettes.html
+
+Asserting using the assert statement
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``py.test`` allows you to use the standard python ``assert`` for verifying expectations and values in Python tests. For example, you can write the following:
+
+.. code::
+
+    # content of test_assert1.py
+    def f():
+        return 3
+
+    def test_function():
+        assert f() == 4
+        
+to assert that the  function returns a certain value. If the assertion fails you will see the return value of the function call:
+
+.. code::
+
+     $ py.test test_assert1.py
+    ======= test session starts ========
+    platform linux -- Python 3.4.3, pytest-2.8.2, py-1.4.30, pluggy-0.3.1
+    rootdir: $REGENDOC_TMPDIR, inifile:
+    collected 1 items
+
+    test_assert1.py F
+
+    ======= FAILURES ========
+    _______ test_function ________
+
+        def test_function():
+    >       assert f() == 4
+    E       assert 3 == 4
+    E        +  where 3 = f()
+
+    test_assert1.py:5: AssertionError
+    ======= 1 failed in 0.12 seconds ========
+    
+
+Making use of context-sensitive comparisons
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``py.test`` has support for providing context-sensitive information when encountering comparisons.
+For Example:
+
+.. code::
+
+    # content of test_assert2.py
+
+    def test_set_comparison():
+        set1 = set("1308")
+        set2 = set("8035")
+        assert set1 == set2
+        
+On Running the module:
+
+.. code::
+
+     $ py.test test_assert2.py
+    ======= test session starts ========
+    platform linux -- Python 3.4.3, pytest-2.8.2, py-1.4.30, pluggy-0.3.1
+    rootdir: $REGENDOC_TMPDIR, inifile:
+    collected 1 items
+
+    test_assert2.py F
+
+    ======= FAILURES ========
+    _______ test_set_comparison ________
+
+        def test_set_comparison():
+            set1 = set("2308")
+            set2 = set("8036")
+    >           assert set1 == set2
+    E           assert set(['0', '1', '3', '8']) == set(['0', '3', '5', '8'])
+    E         Extra items in the left set:
+    E         '2'
+    E         Extra items in the right set:
+    E         '6'
+    E         Use -v to get the full diff
+
+    test_assert2.py:5: AssertionError
+    ======= 1 failed in 0.12 seconds ========
+
+Context-sensitive comparisons can be used for a number of cases:
+
+- comparing long strings: a context diff is shown
+- comparing long sequences: first failing indices
+- comparing dicts: different entries in the dict
