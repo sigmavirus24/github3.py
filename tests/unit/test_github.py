@@ -211,7 +211,7 @@ class TestGitHub(UnitHelper):
         self.session.get.assert_called_once_with(url_for('user'))
 
     def test_repository(self):
-        """"Verify the GET request for a repository."""
+        """Verify the GET request for a repository."""
         self.instance.repository('user', 'repo')
 
         self.session.get.assert_called_once_with(url_for('repos/user/repo'))
