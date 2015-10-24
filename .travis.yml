@@ -4,7 +4,7 @@ before_script:
 - pip install -U requests"$REQUESTS_VERSION"
 
 # test script
-script:  tox -e ${TOX_ENV}
+script:  tox
 notifications:
   on_success: change
   on_failure: always
@@ -13,27 +13,27 @@ env:
   global:
   - TRAVIS_GH3="True"
   matrix:
-  - TOX_ENV=py26 REQUESTS_VERSION="==2.0.1"
-  - TOX_ENV=py27 REQUESTS_VERSION="==2.0.1"
-  - TOX_ENV=py32 REQUESTS_VERSION="==2.0.1"
-  - TOX_ENV=py33 REQUESTS_VERSION="==2.0.1"
-  - TOX_ENV=py34 REQUESTS_VERSION="==2.0.1"
-  - TOX_ENV=pypy REQUESTS_VERSION="==2.0.1"
-  - TOX_ENV=py26 REQUESTS_VERSION=""
-  - TOX_ENV=py27 REQUESTS_VERSION=""
-  - TOX_ENV=py32 REQUESTS_VERSION=""
-  - TOX_ENV=py33 REQUESTS_VERSION=""
-  - TOX_ENV=py34 REQUESTS_VERSION=""
-  - TOX_ENV=pypy REQUESTS_VERSION=""
-  - TOX_ENV=py27-flake8
-  - TOX_ENV=py34-flake8
-  - TOX_ENV=docstrings
-  - TOX_ENV=notebooks
+  - TOXENV=py26 REQUESTS_VERSION="===2.0.1"
+  - TOXENV=py27 REQUESTS_VERSION="===2.0.1"
+  - TOXENV=py32 REQUESTS_VERSION="===2.0.1"
+  - TOXENV=py33 REQUESTS_VERSION="===2.0.1"
+  - TOXENV=py34 REQUESTS_VERSION="===2.0.1"
+  - TOXENV=pypy REQUESTS_VERSION="===2.0.1"
+  - TOXENV=py26 REQUESTS_VERSION=""
+  - TOXENV=py27 REQUESTS_VERSION=""
+  - TOXENV=py32 REQUESTS_VERSION=""
+  - TOXENV=py33 REQUESTS_VERSION=""
+  - TOXENV=py34 REQUESTS_VERSION=""
+  - TOXENV=pypy REQUESTS_VERSION=""
+  - TOXENV=py27-flake8
+  - TOXENV=py34-flake8
+  - TOXENV=docstrings
+  - TOXENV=notebooks
 
 matrix:
   fast_finish: true
   allow_failures:
-  - env: TOX_ENV=docstrings
-  - env: TOX_ENV=notebooks
+  - env: TOXENV=docstrings
+  - env: TOXENV=notebooks
 
 sudo: false
