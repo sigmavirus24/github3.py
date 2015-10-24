@@ -87,10 +87,11 @@ class UnitHelper(unittest.TestCase):
 
         return instance
 
-    def patch_called_with(self, *args, **kwargs):
-        """Use to assert patch was called with JSON."""
-        assert self.session.patch.called is True
-        call_args, call_kwargs = self.session.patch.call_args
+    def method_called_with(self, method_name, args, kwargs):
+        """Assert that a method was called on a session with JSON."""
+        mock_method = getattr(self.session, method_name)
+        assert mock_method.called is True
+        call_args, call_kwargs = mock_method.call_args
 
         # Data passed to assertion
         data = kwargs.pop('data', None)
@@ -107,6 +108,10 @@ class UnitHelper(unittest.TestCase):
         assert args == call_args
         assert data == call_data
         assert kwargs == call_kwargs
+
+    def patch_called_with(self, *args, **kwargs):
+        """Use to assert patch was called with JSON."""
+        self.method_called_with('patch', args, kwargs)
 
     def post_called_with(self, *args, **kwargs):
         """Use to assert post was called with JSON."""
@@ -125,6 +130,10 @@ class UnitHelper(unittest.TestCase):
         assert args == call_args
         assert data == call_data
         assert kwargs == call_kwargs
+
+    def put_called_with(self, *args, **kwargs):
+        """Use to assert put was called with JSON."""
+        self.method_called_with('put', args, kwargs)
 
     def setUp(self):
         """Use to set up attributes on self before each test."""
