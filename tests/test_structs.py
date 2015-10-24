@@ -72,8 +72,8 @@ class TestGitHubIterator(BaseCase):
     def test_refresh(self):
         with mock.patch.object(GitHubIterator, '__iter__') as i:
             self.i.refresh()
-            i.__iter__.assert_called()
+            assert i.called is True
 
             i.reset_mock()
             self.i.refresh(True)
-            i.__iter__.assert_called()
+            assert i.called is True
