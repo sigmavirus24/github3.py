@@ -211,9 +211,8 @@ class Tree(GitData):
 
         :returns: :class:`Tree <Tree>`
         """
-        json = self._json(self._get(self._api, params={'recursive': '1'}),
-                          200)
-        return self._instance_or_null(Tree, json)
+        response = self._get(self._api, params={'recursive': '1'})
+        return self._instance_or_null(Tree, response, 200)
 
 
 class Hash(GitHubObject):

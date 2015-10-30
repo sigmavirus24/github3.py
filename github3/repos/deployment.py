@@ -57,16 +57,15 @@ class Deployment(GitHubCore):
         :param str description: A short description of the status. Default: ''.
         :return: partial :class:`DeploymentStatus <DeploymentStatus>`
         """
-        json = None
+        response = None
 
         if state in ('pending', 'success', 'error', 'failure'):
             data = {'state': state, 'target_url': target_url,
                     'description': description}
             self._remove_none(data)
             response = self._post(self.statuses_url, data=data)
-            json = self._json(response, 201)
 
-        return self._instance_or_null(DeploymentStatus, json)
+        return self._instance_or_null(DeploymentStatus, response, 201)
 
     def statuses(self, number=-1, etag=None):
         """Iterate over the deployment statuses for this deployment.

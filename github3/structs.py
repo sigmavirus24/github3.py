@@ -85,14 +85,13 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
                         "GitHub's API returned a body that could not be"
                         " handled", json
                     )
-                if json.get('ETag'):
-                    del json['ETag']
-                if json.get('Last-Modified'):
-                    del json['Last-Modified']
                 json = json.items()
 
             for i in json:
-                yield cls(i)
+                inst = cls(i)
+                if isinstance(inst, models.GitHubObject):
+                    inst.response = response
+                yield inst
                 self.count -= 1 if self.count > 0 else 0
                 if self.count == 0:
                     break

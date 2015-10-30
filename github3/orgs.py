@@ -371,8 +371,7 @@ class Organization(BaseAccount):
                 'gitignore_template': gitignore_template}
         if int(team_id) > 0:
             data.update({'team_id': team_id})
-        json = self._json(self._post(url, data), 201)
-        return self._instance_or_null(Repository, json)
+        return self._instance_or_null(Repository, self._post(url, data), 201)
 
     @requires_auth
     def conceal_member(self, username):
@@ -407,8 +406,7 @@ class Organization(BaseAccount):
         data = {'name': name, 'repo_names': repo_names,
                 'permission': permission}
         url = self._build_url('teams', base_url=self._api)
-        json = self._json(self._post(url, data), 201)
-        return self._instance_or_null(Team, json)
+        return self._instance_or_null(Team, self._post(url, data), 201)
 
     @requires_auth
     def edit(self, billing_email=None, company=None, email=None, location=None,
@@ -577,11 +575,11 @@ class Organization(BaseAccount):
         :param int team_id: (required), unique id for the team
         :returns: :class:`Team <Team>`
         """
-        json = None
+        response = None
         if int(team_id) > 0:
             url = self._build_url('teams', str(team_id))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Team, json)
+            response = self._get(url)
+        return self._instance_or_null(Team, response, 200)
 
 
 class Membership(GitHubCore):

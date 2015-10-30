@@ -143,11 +143,11 @@ class GitHub(GitHubCore):
         :param int id_num: (required), unique id of the authorization
         :returns: :class:`Authorization <Authorization>`
         """
-        json = None
+        response = None
         if int(id_num) > 0:
             url = self._build_url('authorizations', str(id_num))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Authorization, json)
+            response = self._get(url)
+        return self._instance_or_null(Authorization, response, 200)
 
     @requires_basic_auth
     def authorizations(self, number=-1, etag=None):
@@ -182,7 +182,7 @@ class GitHub(GitHubCore):
             for which to create the token
         :returns: :class:`Authorization <Authorization>`
         """
-        json = None
+        response = None
 
         if username and password:
             url = self._build_url('authorizations')
@@ -192,9 +192,9 @@ class GitHub(GitHubCore):
                 data['scopes'] = scopes
 
             with self.session.temporary_basic_auth(username, password):
-                json = self._json(self._post(url, data=data), 201)
+                response = self._post(url, data=data)
 
-        return self._instance_or_null(Authorization, json)
+        return self._instance_or_null(Authorization, response, 201)
 
     def check_authorization(self, access_token):
         """Check an authorization created by a registered application.
@@ -232,8 +232,8 @@ class GitHub(GitHubCore):
         new_gist = {'description': description, 'public': public,
                     'files': files}
         url = self._build_url('gists')
-        json = self._json(self._post(url, data=new_gist), 201)
-        return self._instance_or_null(Gist, json)
+        response = self._post(url, data=new_gist)
+        return self._instance_or_null(Gist, response, 201)
 
     @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
@@ -291,13 +291,12 @@ class GitHub(GitHubCore):
             or file-like object
         :returns: :class:`Key <github3.users.Key>`
         """
-        json = None
+        response = None
 
         if title and key:
             url = self._build_url('user', 'keys')
-            req = self._post(url, data={'title': title, 'key': key})
-            json = self._json(req, 201)
-        return self._instance_or_null(Key, json)
+            response = self._post(url, data={'title': title, 'key': key})
+        return self._instance_or_null(Key, response, 201)
 
     @requires_auth
     def create_repository(self, name, description='', homepage='',
@@ -327,8 +326,8 @@ class GitHub(GitHubCore):
                 'has_issues': has_issues, 'has_wiki': has_wiki,
                 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
-        json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Repository, json)
+        response = self._post(url, data=data)
+        return self._instance_or_null(Repository, response, 201)
 
     @requires_auth
     def emails(self, number=-1, etag=None):
@@ -365,8 +364,6 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('feeds')
         json = self._json(self._get(url), 200)
-        del json['ETag']
-        del json['Last-Modified']
 
         urls = [
             'timeline_url', 'user_url', 'current_user_public_url',
@@ -471,8 +468,7 @@ class GitHub(GitHubCore):
         :returns: :class:`Gist <github3.gists.Gist>`
         """
         url = self._build_url('gists', str(id_num))
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Gist, json)
+        return self._instance_or_null(Gist, self._get(url), 200)
 
     @requires_auth
     def gists(self, number=-1, etag=None):
@@ -559,12 +555,12 @@ class GitHub(GitHubCore):
         :param int number: (required), issue number
         :return: :class:`Issue <github3.issues.Issue>`
         """
-        json = None
+        response = None
         if username and repository and int(number) > 0:
             url = self._build_url('repos', username, repository, 'issues',
                                   str(number))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Issue, json)
+            response = self._get(url)
+        return self._instance_or_null(Issue, response, 200)
 
     @requires_auth
     def issues(self, filter='', state='', labels='', sort='', direction='',
@@ -652,11 +648,11 @@ class GitHub(GitHubCore):
         :param int id_num: (required), unique id of the key
         :returns: :class:`Key <github3.users.Key>`
         """
-        json = None
+        response = None
         if int(id_num) > 0:
             url = self._build_url('user', 'keys', str(id_num))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Key, json)
+            response = self._get(url)
+        return self._instance_or_null(Key, response, 200)
 
     @requires_auth
     def keys(self, number=-1, etag=None):
@@ -740,16 +736,14 @@ class GitHub(GitHubCore):
         :rtype: :class:`User <github3.users.User>`
         """
         url = self._build_url('user')
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(User, json)
+        return self._instance_or_null(User, self._get(url), 200)
 
     @requires_auth
     def membership_in(self, organization):
         """Retrieve the user's membership in the specified organization."""
         url = self._build_url('user', 'memberships', 'orgs',
                               str(organization))
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Membership, json)
+        return self._instance_or_null(Membership, self._get(url), 200)
 
     def meta(self):
         """Returns a dictionary with arrays of addresses in CIDR format
@@ -802,8 +796,7 @@ class GitHub(GitHubCore):
         :returns: :class:`Organization <github3.orgs.Organization>`
         """
         url = self._build_url('orgs', username)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(Organization, json)
+        return self._instance_or_null(Organization, self._get(url), 200)
 
     @requires_auth
     def organization_issues(self, name, filter='', state='', labels='',
@@ -943,12 +936,12 @@ class GitHub(GitHubCore):
         :param int number: (required), issue number
         :return: :class:`~github.pulls.PullRequest`
         """
-        json = None
+        response = None
         if int(number) > 0:
             url = self._build_url('repos', owner, repository, 'pulls',
                                   str(number))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(PullRequest, json)
+            response = self._get(url)
+        return self._instance_or_null(PullRequest, response, 200)
 
     def rate_limit(self):
         """Returns a dictionary with information from /rate_limit.
@@ -1054,11 +1047,11 @@ class GitHub(GitHubCore):
         :param str repository: (required)
         :returns: :class:`Repository <github3.repos.Repository>`
         """
-        json = None
+        response = None
         if owner and repository:
             url = self._build_url('repos', owner, repository)
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Repository, json)
+            response = self._get(url)
+        return self._instance_or_null(Repository, response, 200)
 
     def repository_with_id(self, number):
         """Returns the Repository with id ``number``.
@@ -1067,11 +1060,11 @@ class GitHub(GitHubCore):
         :returns: :class:`Repository <github3.repos.Repository>`
         """
         number = int(number)
-        json = None
+        response = None
         if number > 0:
             url = self._build_url('repositories', str(number))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(Repository, json)
+            response = self._get(url)
+        return self._instance_or_null(Repository, response, 200)
 
     @requires_app_credentials
     def revoke_authorization(self, access_token):
@@ -1519,8 +1512,7 @@ class GitHub(GitHubCore):
         :returns: :class:`User <github3.users.User>`
         """
         url = self._build_url('users', username)
-        json = self._json(self._get(url), 200)
-        return self._instance_or_null(User, json)
+        return self._instance_or_null(User, self._get(url), 200)
 
     @requires_auth
     def user_issues(self, filter='', state='', labels='', sort='',
@@ -1585,11 +1577,11 @@ class GitHub(GitHubCore):
         :returns: :class:`User <github3.users.User>`
         """
         number = int(number)
-        json = None
+        response = None
         if number > 0:
             url = self._build_url('user', str(number))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(User, json)
+            response = self._get(url)
+        return self._instance_or_null(User, response, 200)
 
     def zen(self):
         """Returns a quote from the Zen of GitHub. Yet another API Easter Egg

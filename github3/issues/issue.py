@@ -147,13 +147,13 @@ class Issue(GitHubCore):
         :param int id_num: (required), comment id, see example above
         :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
-        json = None
+        response = None
         if int(id_num) > 0:  # Might as well check that it's positive
             owner, repo = self.repository
             url = self._build_url('repos', owner, repo, 'issues', 'comments',
                                   str(id_num))
-            json = self._json(self._get(url), 200)
-        return self._instance_or_null(IssueComment, json)
+            response = self._get(url)
+        return self._instance_or_null(IssueComment, response, 200)
 
     def comments(self, number=-1, sort='', direction='', since=None):
         """Iterate over the comments on this issue.
@@ -182,12 +182,11 @@ class Issue(GitHubCore):
         :param str body: (required), comment body
         :returns: :class:`IssueComment <github3.issues.comment.IssueComment>`
         """
-        json = None
+        response = None
         if body:
             url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, data={'body': body}),
-                              201)
-        return self._instance_or_null(IssueComment, json)
+            response = self._post(url, data={'body': body})
+        return self._instance_or_null(IssueComment, response, 201)
 
     @requires_auth
     def edit(self, title=None, body=None, assignee=None, state=None,
@@ -258,11 +257,11 @@ class Issue(GitHubCore):
         :returns: :class:`~github3.pulls.PullRequest`
         """
         from .. import pulls
-        json = None
+        response = None
         pull_request_url = self.pull_request_urls.get('url')
         if pull_request_url:
-            json = self._json(self._get(pull_request_url), 200)
-        return self._instance_or_null(pulls.PullRequest, json)
+            response = self._get(pull_request_url)
+        return self._instance_or_null(pulls.PullRequest, response, 200)
 
     @requires_auth
     def remove_label(self, name):

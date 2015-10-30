@@ -634,7 +634,6 @@ class TestRepository(BaseCase):
 
     def test_weekly_commit_count(self):
         self.response('weekly_commit_count', ETag='"foobarbogus"')
-        self.request.return_value.headers['Last-Modified'] = 'foo'
         self.get(self.api + 'stats/participation')
 
         w = self.repo.weekly_commit_count()
