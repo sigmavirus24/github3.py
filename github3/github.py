@@ -976,7 +976,7 @@ class GitHub(GitHubCore):
     @requires_auth
     def repositories(self, type=None, sort=None, direction=None, number=-1,
                      etag=None):
-        """List public repositories for the authenticated user.
+        """List repositories for the authenticated user, filterable by ``type``.
 
         .. versionchanged:: 0.6
 
