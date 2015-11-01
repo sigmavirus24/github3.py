@@ -967,6 +967,17 @@ class Repository(GitHubCore):
                    lightweight=False):
         """Create a tag in this repository.
 
+        By default, this method creates an annotated tag. If you wish to
+        create a lightweight tag instead, pass ``lightweight=True``.
+
+        If you are creating an annotated tag, this method makes **2 calls** to
+        the API:
+
+        1. Creates the tag object
+        2. Creates the reference for the tag
+
+        This behaviour is required by the GitHub API.
+
         :param str tag: (required), name of the tag
         :param str message: (required), tag message
         :param str sha: (required), SHA of the git object this is tagging
