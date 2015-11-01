@@ -990,7 +990,7 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'tags', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
             if json:
-                self.create_ref('refs/tags/' + tag, sha)
+                self.create_ref('refs/tags/' + tag, json['sha'])
         return self._instance_or_null(Tag, json)
 
     @requires_auth
