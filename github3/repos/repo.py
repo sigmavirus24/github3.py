@@ -902,7 +902,7 @@ class Repository(GitHubCore):
             else None
         """
         json = None
-        if ref and ref.count('/') >= 2 and sha:
+        if ref and ref.startswith('refs') and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
             url = self._build_url('git', 'refs', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
