@@ -140,6 +140,27 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_create_tag(self):
+        """Test the ability to create an annotated tag on a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_tag')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'fork_this')
+            assert repository is not None
+            tag = repository.create_tag(
+                tag='tag-name',
+                message='Test annotated tag creation',
+                sha='5145c9682d46d714c31ae0b5fbe30a83039a96e5',
+                obj_type='commit',
+                tagger={
+                    'name': 'Ian Cordasco',
+                    'email': 'graffatcolmingov@gmail.com',
+                    'date': '2015-11-01T14:09:00Z'
+                }
+            )
+
+        assert isinstance(tag, github3.git.Tag)
+
     def test_delete(self):
         """Test that a repository can be deleted."""
         self.basic_login()

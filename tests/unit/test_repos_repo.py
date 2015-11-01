@@ -171,6 +171,69 @@ class TestRepository(UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_create_ref(self):
+        """Verify the request to create a reference."""
+        self.instance.create_ref('refs/heads/foo', 'my-fake-sha')
+
+        self.post_called_with(
+            url_for('git/refs'),
+            data={
+                'ref': 'refs/heads/foo',
+                'sha': 'my-fake-sha',
+            },
+        )
+
+    def test_create_ref_requires_a_reference_with_two_slashes(self):
+        """Test that we check the validity of a reference."""
+        self.instance.create_ref('refs/heads', 'my-fake-sha')
+
+        assert self.session.post.called is False
+
+    def test_create_ref_requires_a_reference_start_with_refs(self):
+        """Test that we check the validity of a reference."""
+        self.instance.create_ref('my-silly-ref/foo/bar', 'my-fake-sha')
+
+        assert self.session.post.called is False
+
+    def test_create_ref_requires_a_non_None_sha(self):
+        """Test that we don't send an empty SHA."""
+        self.instance.create_ref('refs/heads/valid', None)
+
+        assert self.session.post.called is False
+
+    def test_create_ref_requires_a_truthy_sha(self):
+        """Test that we don't send an empty SHA."""
+        self.instance.create_ref('refs/heads/valid', '')
+
+        assert self.session.post.called is False
+
+    def test_create_tag_that_is_not_lightweight(self):
+        """Verify we can create an annotated tag."""
+        self.instance.create_tag(
+            tag='tag-name',
+            message='message',
+            sha='my-sha',
+            obj_type='commit',
+            tagger={'name': 'Ian Cordasco',
+                    'email': 'example@example.com',
+                    'date': '2015-11-01T12:16:00Z'},
+        )
+
+        self.post_called_with(
+            url_for('git/tags'),
+            data={
+                'tag': 'tag-name',
+                'message': 'message',
+                'object': 'my-sha',
+                'type': 'commit',
+                'tagger': {
+                    'name': 'Ian Cordasco',
+                    'email': 'example@example.com',
+                    'date': '2015-11-01T12:16:00Z',
+                },
+            },
+        )
+
     def test_create_tree(self):
         """Verify the request to create a tree."""
         self.instance.create_tree([{'foo': 'bar'}])
@@ -696,6 +759,11 @@ class TestRepositoryRequiresAuth(UnitHelper):
         """Verify that adding a collaborator requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.add_collaborator('foo')
+
+    def test_create_ref(self):
+        """Verify that creating a tag requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_ref('some ref', 'some sha')
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""

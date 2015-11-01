@@ -902,7 +902,7 @@ class Repository(GitHubCore):
             else None
         """
         json = None
-        if ref and ref.count('/') >= 2 and sha:
+        if ref and ref.startswith('refs') and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
             url = self._build_url('git', 'refs', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
@@ -953,7 +953,7 @@ class Repository(GitHubCore):
         :returns: the status created if successful
         :rtype: :class:`~github3.repos.status.Status`
         """
-        json = {}
+        json = None
         if sha and state:
             data = {'state': state, 'target_url': target_url,
                     'description': description, 'context': context}
@@ -966,6 +966,17 @@ class Repository(GitHubCore):
     def create_tag(self, tag, message, sha, obj_type, tagger,
                    lightweight=False):
         """Create a tag in this repository.
+
+        By default, this method creates an annotated tag. If you wish to
+        create a lightweight tag instead, pass ``lightweight=True``.
+
+        If you are creating an annotated tag, this method makes **2 calls** to
+        the API:
+
+        1. Creates the tag object
+        2. Creates the reference for the tag
+
+        This behaviour is required by the GitHub API.
 
         :param str tag: (required), name of the tag
         :param str message: (required), tag message
@@ -990,7 +1001,7 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'tags', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
             if json:
-                self.create_ref('refs/tags/' + tag, sha)
+                self.create_ref('refs/tags/' + tag, json.get('sha'))
         return self._instance_or_null(Tag, json)
 
     @requires_auth
