@@ -953,7 +953,7 @@ class Repository(GitHubCore):
         :returns: the status created if successful
         :rtype: :class:`~github3.repos.status.Status`
         """
-        json = {}
+        json = None
         if sha and state:
             data = {'state': state, 'target_url': target_url,
                     'description': description, 'context': context}
