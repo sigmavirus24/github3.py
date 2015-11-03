@@ -160,7 +160,7 @@ class Release(GitHubCore):
         return successful
 
     @requires_auth
-    def upload_asset(self, content_type, name, asset):
+    def upload_asset(self, content_type, name, asset, label=None):
         """Upload an asset to this release.
 
         All parameters are required.
@@ -169,11 +169,14 @@ class Release(GitHubCore):
             a list of common media types
         :param str name: The name of the file
         :param asset: The file or bytes object to upload.
+        :param label: (optional), An alternate short description of the asset.
         :returns: :class:`Asset <Asset>`
         """
         headers = Release.CUSTOM_HEADERS.copy()
         headers.update({'Content-Type': content_type})
-        url = self.upload_urlt.expand({'name': name})
+        params = {'name': name, 'label': label}
+        self._remove_none(params)
+        url = self.upload_urlt.expand(params)
         r = self._post(url, data=asset, json=False, headers=headers)
         if r.status_code in (201, 202):
             return Asset(r.json(), self)
