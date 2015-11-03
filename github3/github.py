@@ -364,24 +364,29 @@ class GitHub(GitHubCore):
         :returns: dictionary parsed to include URITemplates
         """
         url = self._build_url('feeds')
-        json = self._json(self._get(url), 200)
-        del json['ETag']
-        del json['Last-Modified']
+        data = self._json(self._get(url), 200)
 
-        urls = [
-            'timeline_url', 'user_url', 'current_user_public_url',
-            'current_user_url', 'current_user_actor_url',
-            'current_user_organization_url',
-            ]
+        def template_href(wrapper):
+            if wrapper and 'href' in wrapper:
+                wrapper['href'] = URITemplate(wrapper['href'])
 
-        for url in urls:
-            json[url] = URITemplate(json[url])
-
-        links = json.get('_links', {})
+        links = data.get('_links', {})
         for d in links.values():
-            d['href'] = URITemplate(d['href'])
+            if type(d) == list:
+                map(template_href, d)
+            else:
+                template_href(d)
 
-        return json
+        for key, value in data.items():
+            if key == '_links':
+                continue
+
+            if type(value) == list:
+                data[key] = list(map(URITemplate, value))
+            else:
+                data[key] = URITemplate(value)
+
+        return data
 
     @requires_auth
     def follow(self, username):
