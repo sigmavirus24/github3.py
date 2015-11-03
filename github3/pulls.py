@@ -153,6 +153,8 @@ class PullRequest(models.GitHubCore):
 
         #: Dictionary of _links. Changed in 1.0
         self.links = pull.get('_links')
+        #: Boolean representing whether the pull request has been merged
+        self.merged = pull.get('merged')
         #: datetime object representing when the pull was merged
         self.merged_at = self._strptime(pull.get('merged_at'))
         #: Whether the pull is deemed mergeable by GitHub
@@ -254,6 +256,9 @@ class PullRequest(models.GitHubCore):
 
         :returns: bool
         """
+        if self.merged:
+            return self.merged
+
         url = self._build_url('merge', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
