@@ -53,7 +53,7 @@ class Contents(GitHubCore):
 
         # content, base64 encoded and decoded
         #: Base64-encoded content of the file.
-        self.content = content.get('content', '')
+        self.content = content.get('content')
 
         #: Decoded content of the file as a bytes object. If we try to decode
         #: to character set for you, we might encounter an exception which
@@ -62,7 +62,7 @@ class Contents(GitHubCore):
         #: with the character set you wish to use, e.g.,
         #: ``content.decoded.decode('utf-8')``.
         #: .. versionchanged:: 0.5.2
-        self.decoded = b''
+        self.decoded = self.content
         if self.encoding == 'base64' and self.content:
             self.decoded = b64decode(self.content.encode())
 
