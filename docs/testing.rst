@@ -257,7 +257,7 @@ environment variables when running `py.test`, e.g.,
 .. code::
 
     GH_AUTH="abc123" py.test
-    GH_USER="sigmavirus24" GH_PASS="super-secure-password-plz-kthxbai" py.test
+    GH_USER="sigmavirus24" GH_PASSWORD="super-secure-password-plz-kthxbai" py.test
 
 If you are concerned that your credentials will be saved, you need not worry.
 Betamax sanitizes information like that before saving the cassette. It never
