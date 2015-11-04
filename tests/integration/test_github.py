@@ -95,6 +95,15 @@ class TestGitHub(IntegrationHelper):
         # Asserts that it's a string and looks ilke the URLs we expect to see
         assert emojis['+1'].startswith('https://github')
 
+    def test_emojis_etag(self):
+        """Test the ability to retrieve from /emojis."""
+        cassette_name = self.cassette_name('emojis')
+        with self.recorder.use_cassette(cassette_name):
+            emojis = self.gh.emojis()
+
+        assert 'ETag' not in emojis
+        assert 'Last-Modified' not in emojis
+
     def test_feeds(self):
         """Test the ability to retrieve a user's timelime URLs."""
         self.basic_login()
