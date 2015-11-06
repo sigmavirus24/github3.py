@@ -106,3 +106,5 @@ Contributors
 - Sourav Singh(@souravsingh)
 
 - Matt Chung (@itsmemattchung)
+
+- Bastien Gandouet (@b4stien)
