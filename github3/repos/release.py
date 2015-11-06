@@ -46,14 +46,45 @@ class Release(GitHubCore):
         self.published_at = self._strptime(release.get('published_at'))
         #: Name of the tag
         self.tag_name = release.get('tag_name')
+        #: URL to download a tarball of the release
+        self.tarball_url = release.get('tarball_url')
         #: "Commit" that this release targets
         self.target_commitish = release.get('target_commitish')
         upload_url = release.get('upload_url')
         #: URITemplate to upload an asset with
         self.upload_urlt = URITemplate(upload_url) if upload_url else None
+        #: URL to download a zipball of the release
+        self.zipball_url = release.get('zipball_url')
 
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
+
+    def archive(self, format, path=''):
+        """Get the tarball or zipball archive for this release.
+
+        :param str format: (required), accepted values: ('tarball',
+            'zipball')
+        :param path: (optional), path where the file should be saved
+            to, default is the filename provided in the headers and will be
+            written in the current directory.
+            it can take a file-like object as well
+        :type path: str, file
+        :returns: bool -- True if successful, False otherwise
+
+        """
+        resp = None
+        if format == 'tarball':
+            resp = self._get(self.tarball_url, allow_redirects=True,
+                             stream=True)
+
+        elif format == 'zipball':
+            resp = self._get(self.zipball_url, allow_redirects=True,
+                             stream=True)
+
+        if resp and self._boolean(resp, 200, 404):
+            utils.stream_response_to_file(resp, path)
+            return True
+        return False
 
     def asset(self, asset_id):
         """Retrieve the asset from this release with ``asset_id``.
