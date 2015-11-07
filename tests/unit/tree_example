@@ -1,0 +1,141 @@
+{
+    "sha": "75b347329e3fc87ac78895ca1be58daff78872a1",
+    "tree": [
+        {
+            "mode": "100644",
+            "path": "__init__.py",
+            "sha": "4b80ea07585ce06c2ce9457dc672cc56ee595627",
+            "size": 471,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/4b80ea07585ce06c2ce9457dc672cc56ee595627"
+        },
+        {
+            "mode": "100644",
+            "path": "api.py",
+            "sha": "48878ac761879373c1c9c9ebaf6d3a4fc59a1aaf",
+            "size": 11539,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/48878ac761879373c1c9c9ebaf6d3a4fc59a1aaf"
+        },
+        {
+            "mode": "100644",
+            "path": "auths.py",
+            "sha": "21bf5675371228c22b9e957240542ff5866ef3c8",
+            "size": 3179,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/21bf5675371228c22b9e957240542ff5866ef3c8"
+        },
+        {
+            "mode": "100644",
+            "path": "decorators.py",
+            "sha": "95cc275caf320b3ee7ae57a14ef574d410a57559",
+            "size": 2050,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/95cc275caf320b3ee7ae57a14ef574d410a57559"
+        },
+        {
+            "mode": "100644",
+            "path": "events.py",
+            "sha": "134b391ddc4ea3a1c569c6944e4813c34fcface4",
+            "size": 4852,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/134b391ddc4ea3a1c569c6944e4813c34fcface4"
+        },
+        {
+            "mode": "100644",
+            "path": "gists.py",
+            "sha": "4e7ba7a5c61ff4ff0cc6b19c4f0d31da49d3cfc5",
+            "size": 9173,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/4e7ba7a5c61ff4ff0cc6b19c4f0d31da49d3cfc5"
+        },
+        {
+            "mode": "100644",
+            "path": "git.py",
+            "sha": "1e85dda0861c8264b591d53613a415e389c56dee",
+            "size": 6388,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/1e85dda0861c8264b591d53613a415e389c56dee"
+        },
+        {
+            "mode": "100644",
+            "path": "github.py",
+            "sha": "ddbe2d0f105b5bf138e6b9d224517b503b73d916",
+            "size": 38859,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/ddbe2d0f105b5bf138e6b9d224517b503b73d916"
+        },
+        {
+            "mode": "100644",
+            "path": "issues.py",
+            "sha": "1602a5f936d531392f64e40c26e152dacc0b477f",
+            "size": 17049,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/1602a5f936d531392f64e40c26e152dacc0b477f"
+        },
+        {
+            "mode": "100644",
+            "path": "legacy.py",
+            "sha": "05d4d9333c56d43b8f26de053b17c1d0c8844a76",
+            "size": 7584,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/05d4d9333c56d43b8f26de053b17c1d0c8844a76"
+        },
+        {
+            "mode": "100644",
+            "path": "models.py",
+            "sha": "2734a5f4f974ad9f4db5c27ae1e9a8ffc371922d",
+            "size": 11154,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/2734a5f4f974ad9f4db5c27ae1e9a8ffc371922d"
+        },
+        {
+            "mode": "100644",
+            "path": "notifications.py",
+            "sha": "d30142d0432beeea999637c7d7b29562f7466c0b",
+            "size": 4686,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/d30142d0432beeea999637c7d7b29562f7466c0b"
+        },
+        {
+            "mode": "100644",
+            "path": "orgs.py",
+            "sha": "0b4417e9616ddd1abf2078994db06586a2b81888",
+            "size": 14477,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/0b4417e9616ddd1abf2078994db06586a2b81888"
+        },
+        {
+            "mode": "040000",
+            "path": "packages",
+            "sha": "6168db7e150f4c83346ce9e48c33aa571d745db4",
+            "type": "tree",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/trees/6168db7e150f4c83346ce9e48c33aa571d745db4"
+        },
+        {
+            "mode": "100644",
+            "path": "pulls.py",
+            "sha": "b3ab41d99c8ece6adeb65858a007b3c956c8401d",
+            "size": 12267,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/b3ab41d99c8ece6adeb65858a007b3c956c8401d"
+        },
+        {
+            "mode": "100644",
+            "path": "repos.py",
+            "sha": "c5b7fc8919b2c4d569c09deb02f469af53670462",
+            "size": 69890,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/c5b7fc8919b2c4d569c09deb02f469af53670462"
+        },
+        {
+            "mode": "100644",
+            "path": "users.py",
+            "sha": "84e86918c0665596c0036b50bf8e48de96fbbf8b",
+            "size": 11335,
+            "type": "blob",
+            "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/blobs/84e86918c0665596c0036b50bf8e48de96fbbf8b"
+        }
+    ],
+    "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/trees/75b347329e3fc87ac78895ca1be58daff78872a1"
+}
