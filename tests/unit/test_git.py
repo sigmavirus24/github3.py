@@ -23,5 +23,5 @@ class TestTree(UnitHelper):
         self.instance.recurse()
         self.session.get.assert_called_once_with(
             url_for(),
-            params={u'recursive': u'1'}
+            params={'recursive': '1'}
         )
