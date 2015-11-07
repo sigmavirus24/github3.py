@@ -73,13 +73,10 @@ class Release(GitHubCore):
 
         """
         resp = None
-        if format == 'tarball':
-            resp = self._get(self.tarball_url, allow_redirects=True,
-                             stream=True)
-
-        elif format == 'zipball':
-            resp = self._get(self.zipball_url, allow_redirects=True,
-                             stream=True)
+        if format in ('tarball', 'zipball'):
+            repo_url = self._api[:self._api.rfind('/releases')]
+            url = self._build_url(format, self.tag_name, base_url=repo_url)
+            resp = self._get(url, allow_redirects=True, stream=True)
 
         if resp and self._boolean(resp, 200, 404):
             utils.stream_response_to_file(resp, path)
