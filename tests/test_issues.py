@@ -121,7 +121,7 @@ class TestMilestone(BaseCase):
                              '2013-12-31T23:59:59Z')
         self.mock_assertions()
 
-    def test_issue_464(self):
+    def test_issue_465(self):
         json = self.m.as_dict().copy()
         json['creator'] = None
         m = Milestone(json)
