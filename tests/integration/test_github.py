@@ -95,6 +95,15 @@ class TestGitHub(IntegrationHelper):
         # Asserts that it's a string and looks ilke the URLs we expect to see
         assert emojis['+1'].startswith('https://github')
 
+    def test_emojis_etag(self):
+        """Test the ability to retrieve from /emojis."""
+        cassette_name = self.cassette_name('emojis')
+        with self.recorder.use_cassette(cassette_name):
+            emojis = self.gh.emojis()
+
+        assert 'ETag' not in emojis
+        assert 'Last-Modified' not in emojis
+
     def test_feeds(self):
         """Test the ability to retrieve a user's timelime URLs."""
         self.basic_login()
@@ -102,15 +111,21 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             feeds = self.gh.feeds()
 
-        for v in feeds['_links'].values():
-            assert isinstance(v['href'], uritemplate.URITemplate)
+        _links = feeds.pop('_links')
 
-        # The processing on _links has been tested. Get rid of it.
-        del feeds['_links']
+        for urls in feeds.values():
+            if not isinstance(urls, list):
+                urls = [urls]
+            for url in urls:
+                assert isinstance(url, uritemplate.URITemplate)
 
-        # Test the rest of the response
-        for v in feeds.values():
-            assert isinstance(v, uritemplate.URITemplate)
+        for links in _links.values():
+            if not isinstance(links, list):
+                links = [links]
+            for link in links:
+                href = link.get('href')
+                assert (href is None or
+                        isinstance(href, uritemplate.URITemplate))
 
     def test_gist(self):
         """Test the ability to retrieve a single gist."""

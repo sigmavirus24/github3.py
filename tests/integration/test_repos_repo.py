@@ -199,6 +199,8 @@ class TestRepository(helper.IntegrationHelper):
         for (filename, content) in contents:
             assert content.name == filename
             assert isinstance(content, github3.repos.contents.Contents)
+            assert content.content is None
+            assert content.decoded is None
 
     def test_events(self):
         """Test that a user can iterate over the events from a repository."""
@@ -220,6 +222,8 @@ class TestRepository(helper.IntegrationHelper):
             contents = repository.file_contents('github3/repos/repo.py')
 
         assert isinstance(contents, github3.repos.contents.Contents)
+        assert contents.content is not None
+        assert contents.decoded is not None
 
     def test_forks(self):
         """Test that a user can iterate over the forks of a repository."""
