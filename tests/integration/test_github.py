@@ -102,15 +102,21 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             feeds = self.gh.feeds()
 
-        for v in feeds['_links'].values():
-            assert isinstance(v['href'], uritemplate.URITemplate)
+        _links = feeds.pop('_links')
 
-        # The processing on _links has been tested. Get rid of it.
-        del feeds['_links']
+        for urls in feeds.values():
+            if not isinstance(urls, list):
+                urls = [urls]
+            for url in urls:
+                assert isinstance(url, uritemplate.URITemplate)
 
-        # Test the rest of the response
-        for v in feeds.values():
-            assert isinstance(v, uritemplate.URITemplate)
+        for links in _links.values():
+            if not isinstance(links, list):
+                links = [links]
+            for link in links:
+                href = link.get('href')
+                assert (href is None or
+                        isinstance(href, uritemplate.URITemplate))
 
     def test_gist(self):
         """Test the ability to retrieve a single gist."""

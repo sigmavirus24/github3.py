@@ -363,25 +363,53 @@ class GitHub(GitHubCore):
 
         :returns: dictionary parsed to include URITemplates
         """
+        def replace_href(feed_dict):
+            if not feed_dict:
+                return feed_dict
+            ret_dict = {}
+            # Let's pluck out what we're most interested in, the href value
+            href = feed_dict.pop('href', None)
+            # Then we update the return dictionary with the rest of the values
+            ret_dict.update(feed_dict)
+            if href is not None:
+                # So long as there is something to template, let's template it
+                ret_dict['href'] = URITemplate(href)
+            return ret_dict
+
         url = self._build_url('feeds')
-        json = self._json(self._get(url), 200)
-        del json['ETag']
-        del json['Last-Modified']
+        json = self._json(self._get(url), 200, include_cache_info=False)
+        if json is None:  # If something went wrong, get out early
+            return None
 
-        urls = [
-            'timeline_url', 'user_url', 'current_user_public_url',
-            'current_user_url', 'current_user_actor_url',
-            'current_user_organization_url',
-            ]
+        # We have a response body to parse
+        feeds = {}
 
-        for url in urls:
-            json[url] = URITemplate(json[url])
+        # Let's pop out the old links so we don't have to skip them below
+        old_links = json.pop('_links', {})
+        _links = {}
+        # If _links is in the response JSON, iterate over that and recreate it
+        # so that any templates contained inside can be turned into
+        # URITemplates
+        for key, value in old_links.items():
+            if isinstance(value, list):
+                # If it's an array/list of links, let's replace that with a
+                # new list of links
+                _links[key] = [replace_href(d) for d in value]
+            else:
+                # Otherwise, just use the new value
+                _links[key] = replace_href(value)
 
-        links = json.get('_links', {})
-        for d in links.values():
-            d['href'] = URITemplate(d['href'])
+        # Start building up our return dictionary
+        feeds['_links'] = _links
 
-        return json
+        for key, value in json.items():
+            # This should roughly be the same logic as above.
+            if isinstance(value, list):
+                feeds[key] = [URITemplate(v) for v in value]
+            else:
+                feeds[key] = URITemplate(value)
+
+        return feeds
 
     @requires_auth
     def follow(self, username):
