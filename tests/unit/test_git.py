@@ -3,8 +3,8 @@ import github3
 from .helper import (UnitHelper, create_example_data_helper, create_url_helper)
 
 get_example_data = create_example_data_helper('tree_example')
-url_for = create_url_helper('https://api.github.com/repos/sigmavirus24/github3.py/'
-                            'git/trees/75b347329e3fc87ac78895ca1be58daff78872a1')
+url_for = create_url_helper('https://api.github.com/repos/octocat/Hello-World/'
+                            'trees/9fb037999f264ba9a7fc6274d15fa3ae2ab98312')
 
 
 class TestTree(UnitHelper):
