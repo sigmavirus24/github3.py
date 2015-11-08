@@ -152,7 +152,7 @@ class GitHubCore(GitHubObject):
         except TypeError:  # instance_class is not a subclass of GitHubCore
             return instance_class(json)
 
-    def _json(self, response, status_code):
+    def _json(self, response, status_code, include_cache_info=True):
         ret = None
         if self._boolean(response, status_code, 404) and response.content:
             __logs__.info('Attempting to get JSON information from a Response '
@@ -160,7 +160,8 @@ class GitHubCore(GitHubObject):
                           response.status_code, status_code)
             ret = response.json()
             headers = response.headers
-            if ((headers.get('Last-Modified') or headers.get('ETag')) and
+            if (include_cache_info and
+                    (headers.get('Last-Modified') or headers.get('ETag')) and
                     isinstance(ret, dict)):
                 ret['Last-Modified'] = response.headers.get(
                     'Last-Modified', ''

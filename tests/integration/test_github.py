@@ -95,41 +95,28 @@ class TestGitHub(IntegrationHelper):
         # Asserts that it's a string and looks ilke the URLs we expect to see
         assert emojis['+1'].startswith('https://github')
 
-    def test_feeds_values(self):
+    def test_feeds(self):
         """Test the ability to retrieve a user's timelime URLs."""
         self.basic_login()
         cassette_name = self.cassette_name('feeds')
         with self.recorder.use_cassette(cassette_name):
             feeds = self.gh.feeds()
 
-        # _links is tested in its own test:
-        del feeds['_links']
+        _links = feeds.pop('_links')
 
-        def check(wrapper):
-            assert isinstance(wrapper, uritemplate.URITemplate)
+        for urls in feeds.values():
+            if not isinstance(urls, list):
+                urls = [urls]
+            for url in urls:
+                assert isinstance(url, uritemplate.URITemplate)
 
-        for v in feeds.values():
-            if type(v) is list:
-                map(check, v)
-            else:
-                check(v)
-
-    def test_feeds__links(self):
-        """Test the ability to retrieve a user's timelime URLs."""
-        self.basic_login()
-        cassette_name = self.cassette_name('feeds')
-        with self.recorder.use_cassette(cassette_name):
-            feeds = self.gh.feeds()
-
-        def check(wrapper):
-            if v:
-                assert isinstance(wrapper['href'], uritemplate.URITemplate)
-
-        for v in feeds['_links'].values():
-            if type(v) is list:
-                map(check, v)
-            else:
-                check(v)
+        for links in _links.values():
+            if not isinstance(links, list):
+                links = [links]
+            for link in links:
+                href = link.get('href')
+                assert (href is None or
+                        isinstance(href, uritemplate.URITemplate))
 
     def test_gist(self):
         """Test the ability to retrieve a single gist."""
