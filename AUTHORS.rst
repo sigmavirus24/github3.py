@@ -108,3 +108,5 @@ Contributors
 - Matt Chung (@itsmemattchung)
 
 - Martin Ek (@ekmartin)
+
+- Chris Thompson (@notyetsecure)
