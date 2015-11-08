@@ -199,15 +199,6 @@ class TestRepository(helper.IntegrationHelper):
         for (filename, content) in contents:
             assert content.name == filename
             assert isinstance(content, github3.repos.contents.Contents)
-
-    def test_directory_contents_content(self):
-        """Tests the content/decoded attributes of a directory's file content"""
-        cassette_name = self.cassette_name('directory_contents')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            contents = repository.directory_contents('github3/search/')
-
-        for (filename, content) in contents:
             assert content.content is None
             assert content.decoded is None
 
@@ -231,14 +222,6 @@ class TestRepository(helper.IntegrationHelper):
             contents = repository.file_contents('github3/repos/repo.py')
 
         assert isinstance(contents, github3.repos.contents.Contents)
-
-    def test_file_contents_content(self):
-        """Tests that the content and decoded attributes of a file is set"""
-        cassette_name = self.cassette_name('file_contents')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            contents = repository.file_contents('github3/repos/repo.py')
-
         assert contents.content is not None
         assert contents.decoded is not None
 
