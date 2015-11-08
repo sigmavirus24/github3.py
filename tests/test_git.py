@@ -65,28 +65,3 @@ class TestReference(BaseCase):
         self.response('', 404)
         assert self.ref.update('fakesha', True) is False
         self.mock_assertions()
-
-
-class TestTree(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestTree, self).__init__(methodName)
-        self.tree = github3.git.Tree(load('tree'))
-        self.api = ('https://api.github.com/repos/sigmavirus24/github3.py/git/'
-                    'trees/75b347329e3fc87ac78895ca1be58daff78872a1')
-
-    def setUp(self):
-        super(TestTree, self).setUp()
-        self.tree = github3.git.Tree(self.tree.as_dict(), self.g)
-
-    def test_recurse(self):
-        self.response('tree', 200)
-        self.get(self.api)
-        self.conf = {'params': {'recursive': '1'}}
-
-        t = self.tree.recurse()
-        assert isinstance(t, github3.git.Tree)
-        assert repr(t).startswith('<Tree')
-        self.mock_assertions()
-
-        assert isinstance(t.tree[0], github3.git.Hash)
-        assert repr(t.tree[0]).startswith('<Hash')
