@@ -355,10 +355,7 @@ class GitHub(GitHubCore):
                 }
         """
         url = self._build_url('emojis')
-        data = self._json(self._get(url), 200)
-        del data['ETag']
-        del data['Last-Modified']
-        return data
+        return self._json(self._get(url), 200, include_cache_info=False)
 
     @requires_basic_auth
     def feeds(self):
