@@ -110,3 +110,5 @@ Contributors
 - Martin Ek (@ekmartin)
 
 - Chris Thompson (@notyetsecure)
+
+- Bastien Gandouet (@b4stien)

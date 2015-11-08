@@ -49,6 +49,32 @@ class TestRelease(UnitHelper):
         assert self.instance.upload_urlt is not None
 
     # Method tests
+    def test_tarball_archive(self):
+        """Verify that we generate the correct URL for a tarball archive."""
+        self.instance.archive(format='tarball')
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/repos/octocat/Hello-World/tarball/v1.0.0',
+            allow_redirects=True,
+            stream=True
+        )
+
+    def test_zipball_archive(self):
+        """Verify that we generate the correct URL for a zipball archive."""
+        self.instance.archive(format='zipball')
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/repos/octocat/Hello-World/zipball/v1.0.0',
+            allow_redirects=True,
+            stream=True
+        )
+
+    def test_unsupported_archive(self):
+        """Do not make a request if the archive format is unsupported."""
+        self.instance.archive(format='clearly fake')
+
+        assert self.session.get.called is False
+
     def test_delete(self):
         self.instance.delete()
         self.session.delete.assert_called_once_with(
