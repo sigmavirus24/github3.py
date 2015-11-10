@@ -611,7 +611,7 @@ class TestRepositoryIterator(UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('notifications'),
-            params={'per_page': 100, 'participating': False, 'all': False},
+            params={'per_page': 100, 'participating': 'false', 'all': 'false'},
             headers={}
         )
 

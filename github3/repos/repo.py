@@ -1517,8 +1517,8 @@ class Repository(GitHubCore):
         """
         url = self._build_url('notifications', base_url=self._api)
         params = {
-            'all': all,
-            'participating': participating,
+            'all': str(all).lower(),
+            'participating': str(participating).lower(),
             'since': timestamp_parameter(since)
         }
         self._remove_none(params)
