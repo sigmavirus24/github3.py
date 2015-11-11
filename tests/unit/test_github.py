@@ -23,6 +23,18 @@ class TestGitHub(UnitHelper):
             url_for('authorizations/10'),
         )
 
+    def test_authorize_without_scope(self):
+        """Show an authorization can be created for a user without scope."""
+        self.instance.authorize('username', 'password')
+        self.session.temporary_basic_auth.assert_called_once_with(
+            'username', 'password'
+        )
+        self.post_called_with(
+            url_for('authorizations'),
+            data={'note': '', 'note_url': '', 'client_id': '',
+                  'client_secret': ''}
+        )
+
     def test_authorize(self):
         """Show an authorization can be created for a user."""
         self.instance.authorize('username', 'password', ['user', 'repo'])
