@@ -341,6 +341,14 @@ class TestRepository(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('pages'))
 
+    def test_release_by_tag_name(self):
+        """Test the request for retrieving release by tag name"""
+        self.instance.release_by_tag_name('v1.0.0')
+
+        self.session.get.assert_called_once_with(
+            url_for('releases/tags/v1.0.0')
+        )
+
 
 class TestRepositoryIterator(UnitIteratorHelper):
 

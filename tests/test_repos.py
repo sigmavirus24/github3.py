@@ -491,14 +491,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.ref('fakesha'), github3.git.Reference)
         self.mock_assertions()
 
-    def test_release_by_tag_name(self):
-        self.response('release', 200)
-        self.get(self.api + 'releases/tags/v0.7.1')
-
-        assert isinstance(self.repo.release_by_tag_name('v0.7.1'),
-                          github3.repos.release.Release)
-        self.mock_assertions()
-
     def test_remove_collaborator(self):
         self.response('', 204)
         self.delete(self.api + 'collaborators/login')
