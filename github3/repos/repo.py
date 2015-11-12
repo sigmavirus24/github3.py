@@ -1653,8 +1653,11 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Release, json)
 
-    def release_by_tag_name(self, tag_name):
-        """Get a relase by tag name
+    def release_from_tag(self, tag_name):
+        """Get a release by tag name.
+
+        release_from_tag() returns a release with specified tag
+        while release() returns a release with specified release id
 
         :param str tag_name: (required) name of tag
         :returns: :class:`Release <github3.repos.release.Release>`
