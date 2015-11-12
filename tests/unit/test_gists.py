@@ -6,6 +6,8 @@ from .helper import (create_example_data_helper, create_url_helper,
                      UnitHelper, UnitIteratorHelper)
 
 gist_example_data = create_example_data_helper('gist_example_data')
+gist_history_example_data = create_example_data_helper('gist_history_example_data')
+gist_comment_example_data = create_example_data_helper('gist_comment_example_data')
 
 url_for = create_url_helper(
     'https://api.github.com/gists/b4c7ac7be6e591d0d155'
@@ -57,6 +59,12 @@ class TestGist(UnitHelper):
         self.instance.fork()
 
         self.session.post.assert_called_once_with(url_for('forks'), None)
+
+    def test_history(self):
+        """Show that a user can get a gist's history."""
+        history = self.instance.history[0]
+        assert isinstance(history, github3.gists.history.GistHistory)
+        assert repr(history).startswith('<Gist History')
 
     def test_is_starred(self):
         """Show that a user can check if they starred a gist."""
@@ -174,3 +182,37 @@ class TestGistIterators(UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+
+class TestGistHistory(UnitHelper):
+
+    """ Test Gist History. """
+
+    described_class = github3.gists.history.GistHistory
+    example_data = gist_history_example_data()
+
+    def test_equality(self):
+        """Show that two instances of a GistHistory are equal."""
+        history = github3.gists.history.GistHistory(gist_history_example_data())
+        assert self.instance == history
+        history._uniq = 'foo'
+        assert self.instance != history
+
+
+class TestGistComment(UnitHelper):
+
+    """Test Gist Comments."""
+
+    described_class = github3.gists.comment.GistComment
+    example_data = gist_comment_example_data()
+
+    def test_equality(self):
+        """Show that two instances of a GistComment are equal."""
+        comment = github3.gists.comment.GistComment(gist_comment_example_data())
+        assert self.instance == comment
+        comment._uniq = '1'
+        assert self.instance != comment
+
+    def test_repr(self):
+        """Show that the string representation of GistComment starts with Gist Comment."""
+        assert repr(self.instance).startswith('<Gist Comment')
