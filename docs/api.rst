@@ -61,47 +61,51 @@ Or you can simply use the following functions
 
 ------
 
-.. autofunction:: github3.iter_all_repos
+.. autofunction:: github3.issues_on
 
 ------
 
-.. autofunction:: github3.iter_all_users
+.. autofunction:: github3.all_repositories
 
 ------
 
-.. autofunction:: github3.iter_events
+.. autofunction:: github3.all_users
 
 ------
 
-.. autofunction:: github3.iter_followers
+.. autofunction:: github3.all_events
 
 ------
 
-.. autofunction:: github3.iter_following
+.. autofunction:: github3.followers_of
 
 ------
 
-.. autofunction:: github3.iter_gists
+.. autofunction:: github3.followed_by
 
 ------
 
-.. autofunction:: github3.iter_orgs
+.. autofunction:: github3.public_gists
 
 ------
 
-.. autofunction:: github3.iter_user_repos
+.. autofunction:: github3.gists_by
 
 ------
 
-.. autofunction:: github3.iter_repo_issues
+.. autofunction:: github3.organizations_with
 
 ------
 
-.. autofunction:: github3.iter_starred
+.. autofunction:: github3.repositories_by
 
 ------
 
-.. autofunction:: github3.iter_subscriptions
+.. autofunction:: github3.starred_by
+
+------
+
+.. autofunction:: github3.subscriptions_for
 
 ------
 
@@ -121,7 +125,7 @@ Or you can simply use the following functions
 
 ------
 
-.. autofunction:: github3.ratelimit_remaining
+.. autofunction:: github3.rate_limit
 
 ------
 
@@ -142,7 +146,6 @@ Or you can simply use the following functions
 ------
 
 .. autofunction:: github3.search_users
-
 
 ------
 
