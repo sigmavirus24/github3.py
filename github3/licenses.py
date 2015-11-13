@@ -19,37 +19,16 @@ class License(GitHubCore):
     }
 
     def _update_attributes(self, license):
-        # name of license
         self.name = license.get('name')
-
-        # permission of license
         self.permitted = license.get('permitted')
-
-        # category of license
         self.category = license.get('category')
-
-        # forbidden
         self.forbidden = license.get('forbidden')
-
-        # featured
         self.featured = license.get('featured')
-
-        # html url
         self.html_url = license.get('html_url')
-
-        # body
         self.body = license.get('body')
-
-        # key
         self.key = license.get('key')
-
-        # description
         self.description = license.get('description')
-
-        # implementation
         self.implementation = license.get('implementation')
-
-        # required
         self.required = license.get('required')
 
     def _repr(self):
