@@ -28,6 +28,7 @@ from .comparison import Comparison
 from .contents import Contents, validate_commmitter
 from .deployment import Deployment
 from .hook import Hook
+from ..licenses import License
 from .pages import PagesBuild, PagesInfo
 from .status import Status
 from .stats import ContributorStats
@@ -107,6 +108,7 @@ class Repository(GitHubCore):
         self.id = repo.get('id', 0)
         #: Language property.
         self.language = repo.get('language', '')
+
         #: Mirror property.
         self.mirror_url = repo.get('mirror_url', '')
 
@@ -1409,6 +1411,15 @@ class Repository(GitHubCore):
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(PagesBuild, json)
+
+    def license(self):
+        """Get the contents of a license for the repo
+
+        :returns: :class:`License <github3.licenses.License>`
+        """
+        url = self._build_url('license', base_url=self._api)
+        json = self._json(self._get(url, headers=License.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(License, json)
 
     @requires_auth
     def mark_notifications(self, last_read=''):
