@@ -344,6 +344,14 @@ class TestRepository(helper.IntegrationHelper):
                 assert 'Last-Modified' not in l
                 assert isinstance(l, tuple)
 
+    def test_license(self):
+        """Test that a repository's license can be retrieved."""
+        cassette_name = self.cassette_name('license')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            license = repository.license()
+            assert isinstance(license, github3.licenses.License)
+
     def test_milestone(self):
         """Test the ability to retrieve a milestone on a repository."""
         cassette_name = self.cassette_name('milestone')

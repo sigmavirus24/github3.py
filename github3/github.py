@@ -25,6 +25,7 @@ from .search import (CodeSearchResult, IssueSearchResult,
 from .structs import SearchIterator
 from .users import User, Key
 from .notifications import Thread
+from .licenses import License
 from uritemplate import URITemplate
 
 
@@ -698,6 +699,26 @@ class GitHub(GitHubCore):
         """
         url = self._build_url('user', 'keys')
         return self._iter(int(number), url, Key, etag=etag)
+
+    def license(self, name):
+        """Retrieve the license specified by the name.
+
+        :param string name: (required), name of license
+        :returns: :class:`License <github3.licenses.License>`
+        """
+
+        url = self._build_url('licenses', name)
+        json = self._json(self._get(url, headers=License.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(License, json)
+
+    def licenses(self, number=-1, etag=None):
+        """Iterate over open source licenses.
+
+        :returns: generator of :class:`License <github3.licenses.License>`
+        """
+        url = self._build_url('licenses')
+        return self._iter(int(number), url, License, etag=etag,
+                          headers=License.CUSTOM_HEADERS)
 
     def login(self, username=None, password=None, token=None,
               two_factor_callback=None):
