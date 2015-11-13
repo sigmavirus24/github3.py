@@ -14,6 +14,24 @@ class TestLicenses(UnitHelper):
     described_class = github3.licenses.License
     example_data = get_example_data()
 
+    def test_get_attr(self):
+        """Show that attributes exist in class."""
+        attributes = [
+            'description',
+            'body',
+            'implementation',
+            'html_url',
+            'key',
+            'required',
+            'name',
+            'permitted',
+            'category',
+            'forbidden',
+            'featured',
+        ]
+        for attr in attributes:
+            assert(getattr(self.instance, attr))
+
     def test_repr(self):
         """Show that instance string is formatted properly."""
         assert(repr(self.instance).startswith('<License'))

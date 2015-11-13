@@ -34,5 +34,23 @@ class License(GitHubCore):
         # featured
         self.featured = license.get('featured')
 
+        # html url
+        self.html_url = license.get('html_url')
+
+        # body
+        self.body = license.get('body')
+
+        # key
+        self.key = license.get('key')
+
+        # description
+        self.description = license.get('description')
+
+        # implementation
+        self.implementation = license.get('implementation')
+
+        # required
+        self.required = license.get('required')
+
     def _repr(self):
         return '<License [{0}]>'.format(self.name)

@@ -108,7 +108,6 @@ class Repository(GitHubCore):
         self.id = repo.get('id', 0)
         #: Language property.
         self.language = repo.get('language', '')
-
         #: Mirror property.
         self.mirror_url = repo.get('mirror_url', '')
 
