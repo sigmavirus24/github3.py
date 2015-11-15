@@ -20,6 +20,8 @@ class Branch(GitHubCore):
             self.commit = RepoCommit(self.commit, self)
         #: Returns '_links' attribute.
         self.links = branch.get('_links', {})
+        #: Provides the branch's protection status.
+        self.protection = branch.get('protection')
 
     def _repr(self):
         return '<Repository Branch [{0}]>'.format(self.name)
