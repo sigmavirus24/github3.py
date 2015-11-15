@@ -396,21 +396,26 @@ class Repository(GitHubCore):
         json = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            json = self._json(self._get(url), 200)
+            json = self._json(self._get(url, headers=Branch.PREVIEW_HEADERS),
+                              200)
         return self._instance_or_null(Branch, json)
 
-    def branches(self, number=-1, etag=None):
+    def branches(self, number=-1, protected=False, etag=None):
         r"""Iterate over the branches in this repository.
 
         :param int number: (optional), number of branches to return. Default:
             -1 returns all branches
+        :param bool protected: (optional), True lists only protected branches.
+            Default: False
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
             :class:`Branch <github3.repos.branch.Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
-        return self._iter(int(number), url, Branch, etag=etag)
+        params = {'protected': '1'} if protected else None
+        return self._iter(int(number), url, Branch, params, etag=etag,
+                          headers=Branch.PREVIEW_HEADERS)
 
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.

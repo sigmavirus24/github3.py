@@ -29,14 +29,33 @@ class TestRepository(helper.IntegrationHelper):
             for assignee in repository.assignees():
                 assert isinstance(assignee, github3.users.User)
 
+    def test_branch(self):
+        """Test the ability to retrieve a single branch in a repository."""
+        cassette_name = self.cassette_name('branch')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            branch = repository.branch('develop')
+            assert isinstance(branch, github3.repos.branch.Branch)
+            assert 'enabled' in branch.protection
+
     def test_branches(self):
-        """Test the ability to retrieve the brances in a repository."""
+        """Test the ability to retrieve the branches in a repository."""
         cassette_name = self.cassette_name('branches')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for branch in repository.branches():
                 assert isinstance(branch, github3.repos.branch.Branch)
+
+    def test_protected_branches(self):
+        """Test the ability to retrieve protected branches in a repository."""
+        cassette_name = self.cassette_name('branches_protected')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            assert all(b.protection['enabled'] is True
+                       for b in repository.branches(protected=True))
 
     def test_code_frequency(self):
         """Test the ability to retrieve the code frequency in a repo."""
