@@ -85,6 +85,7 @@ class TestRepository(BaseCase):
 
         b = self.repo.branch('master')
         assert isinstance(b, repos.branch.Branch)
+        assert b.protection
         self.mock_assertions()
 
         assert repr(b) == '<Repository Branch [master]>'

@@ -396,7 +396,8 @@ class Repository(GitHubCore):
         json = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            json = self._json(self._get(url), 200)
+            headers = {'Accept': 'application/vnd.github.loki-preview+json'}
+            json = self._json(self._get(url, headers=headers), 200)
         return self._instance_or_null(Branch, json)
 
     def branches(self, number=-1, protected=False, etag=None):
