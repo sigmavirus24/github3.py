@@ -5,4 +5,5 @@ pytest>=2.3.5
 wheel==0.21.0
 betamax>=0.5.0
 betamax_matchers>=0.2.0
+betamax_serializers>=0.1.1
 tox>=2.2.0
