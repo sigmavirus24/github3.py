@@ -1,1 +1,47 @@
-{"http_interactions": [{"request": {"body": "", "headers": {"Accept-Charset": "utf-8", "Content-Type": "application/json", "Accept-Encoding": "gzip, deflate, compress", "Accept": "application/vnd.github.v3.full.text-match+json", "User-Agent": "github3.py/0.8.1"}, "method": "GET", "uri": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100"}, "response": {"body": {"base64_string": "H4sIAAAAAAAAA5WT32vbMBDH/5Vh6J6yyPGPJA6Udi973sPGHkYJsny2VSzJSOe0mcn/vpO9tkkoKwKDzOm+X310pxsjNMi7vTCDxmi3WkQSQblo93uMOtNIHe0iZR6NKk1Ee9WUwg8cud0PtqPdFrF3O8YaO4eXwig2/7IkFxux2iZJWpdZwjOx5rAS26pc13lcF+VddTvJb9KvN8k3+mQFGqUw2i0bie1QejeKi0zwLEm3PC4LWpK4EiKPC76uN/k2K8plr5vP9vaZGF849h42+oiABJfX4L08O5oNDqxjbxVoUXXXF38FPcurTdeZJ9JeJf/Pnr2KiGr+l7oJNyDRyAy2QC0i/JMvinQYhDIJRuYXKqS3cNRyC1UIzj8JwTxp4hiZhd5MXkPphJU9Sup0kOO5kIyMbbiWf3iwEQkd6T1QEMAkICEc6KEGKWfFyHorD1wcfRksCJAHqmm425WUzPDYAz34n9RxX2Ea4z2vlB9gtANQRBhLCas4X8bFOt2QAp5xrziKFuaBN+UjCAzoh+/ArLk8vbemB4tH4gHFZUd5teWNoppRCI26f5tu2jtn8FBzDm1IXUkxwcWL9OH0cFqMLwcGTe1HkJoruGT8YdSn7xYcGv3lF1h6vu9zUt57nJ71L4UGbX5bBQAA", "encoding": "utf-8"}, "headers": {"status": "200 OK", "x-ratelimit-remaining": "8", "x-github-media-type": "github.v3; param=full.text-match; format=json", "x-content-type-options": "nosniff", "access-control-expose-headers": "ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval", "transfer-encoding": "chunked", "x-github-request-id": "48A0C4D9:5BD7:50C9047:52F8D7DD", "content-encoding": "gzip", "vary": "Accept-Encoding", "server": "GitHub.com", "cache-control": "no-cache", "x-ratelimit-limit": "10", "access-control-allow-credentials": "true", "date": "Mon, 10 Feb 2014 13:45:02 GMT", "access-control-allow-origin": "*", "content-type": "application/json; charset=utf-8", "x-ratelimit-reset": "1392039961"}, "url": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100", "status_code": 200}, "recorded_at": "2014-02-10T13:45:02"}], "recorded_with": "betamax"}
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2014-02-10T13:45:02",
+      "request": {
+        "body": "",
+        "headers": {
+          "Accept": "application/vnd.github.v3.full.text-match+json",
+          "Accept-Charset": "utf-8",
+          "Accept-Encoding": "gzip, deflate, compress",
+          "Content-Type": "application/json",
+          "User-Agent": "github3.py/0.8.1"
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA5WT32vbMBDH/5Vh6J6yyPGPJA6Udi973sPGHkYJsny2VSzJSOe0mcn/vpO9tkkoKwKDzOm+X310pxsjNMi7vTCDxmi3WkQSQblo93uMOtNIHe0iZR6NKk1Ee9WUwg8cud0PtqPdFrF3O8YaO4eXwig2/7IkFxux2iZJWpdZwjOx5rAS26pc13lcF+VddTvJb9KvN8k3+mQFGqUw2i0bie1QejeKi0zwLEm3PC4LWpK4EiKPC76uN/k2K8plr5vP9vaZGF849h42+oiABJfX4L08O5oNDqxjbxVoUXXXF38FPcurTdeZJ9JeJf/Pnr2KiGr+l7oJNyDRyAy2QC0i/JMvinQYhDIJRuYXKqS3cNRyC1UIzj8JwTxp4hiZhd5MXkPphJU9Sup0kOO5kIyMbbiWf3iwEQkd6T1QEMAkICEc6KEGKWfFyHorD1wcfRksCJAHqmm425WUzPDYAz34n9RxX2Ea4z2vlB9gtANQRBhLCas4X8bFOt2QAp5xrziKFuaBN+UjCAzoh+/ArLk8vbemB4tH4gHFZUd5teWNoppRCI26f5tu2jtn8FBzDm1IXUkxwcWL9OH0cFqMLwcGTe1HkJoruGT8YdSn7xYcGv3lF1h6vu9zUt57nJ71L4UGbX5bBQAA",
+          "encoding": "utf-8"
+        },
+        "headers": {
+          "access-control-allow-credentials": "true",
+          "access-control-allow-origin": "*",
+          "access-control-expose-headers": "ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "cache-control": "no-cache",
+          "content-encoding": "gzip",
+          "content-type": "application/json; charset=utf-8",
+          "date": "Mon, 10 Feb 2014 13:45:02 GMT",
+          "server": "GitHub.com",
+          "status": "200 OK",
+          "transfer-encoding": "chunked",
+          "vary": "Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-github-media-type": "github.v3; param=full.text-match; format=json",
+          "x-github-request-id": "48A0C4D9:5BD7:50C9047:52F8D7DD",
+          "x-ratelimit-limit": "10",
+          "x-ratelimit-remaining": "8",
+          "x-ratelimit-reset": "1392039961"
+        },
+        "status_code": 200,
+        "url": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100"
+      }
+    }
+  ],
+  "recorded_with": "betamax"
+}
