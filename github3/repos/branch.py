@@ -10,6 +10,11 @@ class Branch(GitHubCore):
     returns about a branch on a
     :class:`Repository <github3.repos.repo.Repository>`.
     """
+
+    # The Accept header will likely be removable once the feature is out of
+    # preview mode. See: http://git.io/v4O1e
+    PREVIEW_HEADERS = {'Accept': 'application/vnd.github.loki-preview+json'}
+
     def _update_attributes(self, branch):
         #: Name of the branch.
         self.name = branch.get('name')

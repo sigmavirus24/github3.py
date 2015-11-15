@@ -396,8 +396,8 @@ class Repository(GitHubCore):
         json = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            headers = {'Accept': 'application/vnd.github.loki-preview+json'}
-            json = self._json(self._get(url, headers=headers), 200)
+            json = self._json(self._get(url, headers=Branch.PREVIEW_HEADERS),
+                              200)
         return self._instance_or_null(Branch, json)
 
     def branches(self, number=-1, protected=False, etag=None):
@@ -413,14 +413,9 @@ class Repository(GitHubCore):
             :class:`Branch <github3.repos.branch.Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
-
-        # The Accept header will likely be removable once the feature is out of
-        # preview mode. See: http://git.io/v4O1e
-        headers = {'Accept': 'application/vnd.github.loki-preview+json'}
-
         params = {'protected': '1'} if protected else None
         return self._iter(int(number), url, Branch, params, etag=etag,
-                          headers=headers)
+                          headers=Branch.PREVIEW_HEADERS)
 
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.
