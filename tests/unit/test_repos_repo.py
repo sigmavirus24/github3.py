@@ -368,7 +368,18 @@ class TestRepositoryIterator(UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('branches'),
             params={'per_page': 100},
-            headers={}
+            headers={'Accept': 'application/vnd.github.loki-preview+json'}
+        )
+
+    def test_branches_protected(self):
+        """Test ability to iterate over protected branches in a Repository."""
+        i = self.instance.branches(protected=True)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('branches'),
+            params={'per_page': 100, 'protected': '1'},
+            headers={'Accept': 'application/vnd.github.loki-preview+json'}
         )
 
     def test_code_frequency(self):
