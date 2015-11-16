@@ -29,6 +29,12 @@ class Branch(GitHubCore):
         #: Provides the branch's protection status.
         self.protection = branch.get('protection')
 
+        if 'self' in self.links:
+            self._api = self.links['self']
+        else:  # Branches obtained via `repo.branches` don't have links.
+            base = self.commit.url.split('/commit', 1)[0]
+            self._api = self._build_url('branches', self.name, base_url=base)
+
     def _repr(self):
         return '<Repository Branch [{0}]>'.format(self.name)
 
@@ -52,7 +58,7 @@ class Branch(GitHubCore):
 
         edit = {'protection': {'enabled': True, 'required_status_checks': {
             'enforcement_level': enforcement, 'contexts': status_checks}}}
-        json = self._json(self._patch(self.links['self'], data=dumps(edit),
+        json = self._json(self._patch(self._api, data=dumps(edit),
                                       headers=self.PREVIEW_HEADERS), 200)
 
         # When attempting to clear `contexts`, the reply from github doesn't
@@ -67,7 +73,7 @@ class Branch(GitHubCore):
     def unprotect(self):
         """Disable force push protection on this branch."""
         edit = {'protection': {'enabled': False}}
-        json = self._json(self._patch(self.links['self'], data=dumps(edit),
+        json = self._json(self._patch(self._api, data=dumps(edit),
                                       headers=self.PREVIEW_HEADERS), 200)
         self._update_attributes(json)
         return True

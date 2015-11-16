@@ -9,11 +9,6 @@ class TestBranch(IntegrationHelper):
 
     betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
 
-    def get_branch(self):
-        """Return the branch needed for the tests."""
-        repository = self.gh.repository('bboe', 'github3.py')
-        return repository.branch('develop')
-
     def test_protect(self):
         expected = {
             'enabled': True,
@@ -24,8 +19,10 @@ class TestBranch(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('protect')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            repository = self.gh.repository('bboe', 'github3.py')
+            branch = repository.branch('develop')
+
             # Initial change
-            branch = self.get_branch()
             branch.protect('off', [])
             assert branch.protection == expected
 
@@ -53,6 +50,7 @@ class TestBranch(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('unprotect')
         with self.recorder.use_cassette(cassette_name):
-            branch = self.get_branch()
+            repository = self.gh.repository('bboe', 'github3.py')
+            branch = next(repository.branches(protected=True))
             branch.unprotect()
             assert branch.protection == expected
