@@ -341,6 +341,14 @@ class TestRepository(UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('pages'))
 
+    def test_release_latest(self):
+        """Test the request for retrieving the latest release"""
+        self.instance.release_latest()
+
+        self.session.get.assert_called_once_with(
+            url_for('releases/latest')
+        )
+
     def test_release_from_tag(self):
         """Test the request for retrieving release by tag name"""
         self.instance.release_from_tag('v1.0.0')

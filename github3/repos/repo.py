@@ -1668,6 +1668,17 @@ class Repository(GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Release, json)
 
+    def release_latest(self):
+        """Get the latest release.
+
+        Draft releases and prereleases are not returned by this endpoint.
+
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        url = self._build_url('releases', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(Release, json)
+
     def release_from_tag(self, tag_name):
         """Get a release by tag name.
 
