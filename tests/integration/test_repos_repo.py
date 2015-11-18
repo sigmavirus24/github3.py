@@ -453,6 +453,16 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_release_latest(self):
+        """Test the ability to retrieve the latest release."""
+        cassette_name = self.cassette_name('release_latest')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            release = repository.release_latest()
+
+        assert isinstance(release, github3.repos.release.Release)
+
     def test_release_from_tag(self):
         """Test the ability to retrieve a release by tag name"""
         cassette_name = self.cassette_name('release_from_tag')
