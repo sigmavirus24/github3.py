@@ -144,6 +144,25 @@ class TestGitHub(IntegrationHelper):
         assert t is not None
         assert t != ''
 
+    def test_license(self):
+        """Test the ability to retrieve a single license."""
+        cassette_name = self.cassette_name('license')
+        with self.recorder.use_cassette(cassette_name):
+            license = self.gh.license('mit')
+
+        assert isinstance(license, github3.licenses.License)
+
+    def test_licenses(self):
+        """Test the ability to retrieve open source licenses."""
+
+        cassette_name = self.cassette_name('licenses')
+        with self.recorder.use_cassette(cassette_name):
+            licenses = list(self.gh.licenses())
+            assert len(licenses) > 0
+
+            license = licenses[0]
+            assert isinstance(license, github3.licenses.License)
+
     def test_non_existent_gitignore_template(self):
         """Test the ability to retrieve a single gitignore template."""
         cassette_name = self.cassette_name('non_existent_gitignore_template')

@@ -28,6 +28,7 @@ from .comparison import Comparison
 from .contents import Contents, validate_commmitter
 from .deployment import Deployment
 from .hook import Hook
+from ..licenses import License
 from .pages import PagesBuild, PagesInfo
 from .status import Status
 from .stats import ContributorStats
@@ -395,21 +396,26 @@ class Repository(GitHubCore):
         json = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            json = self._json(self._get(url), 200)
+            json = self._json(self._get(url, headers=Branch.PREVIEW_HEADERS),
+                              200)
         return self._instance_or_null(Branch, json)
 
-    def branches(self, number=-1, etag=None):
+    def branches(self, number=-1, protected=False, etag=None):
         r"""Iterate over the branches in this repository.
 
         :param int number: (optional), number of branches to return. Default:
             -1 returns all branches
+        :param bool protected: (optional), True lists only protected branches.
+            Default: False
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
             :class:`Branch <github3.repos.branch.Branch>`\ es
         """
         url = self._build_url('branches', base_url=self._api)
-        return self._iter(int(number), url, Branch, etag=etag)
+        params = {'protected': '1'} if protected else None
+        return self._iter(int(number), url, Branch, params, etag=etag,
+                          headers=Branch.PREVIEW_HEADERS)
 
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.
@@ -1410,6 +1416,15 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(PagesBuild, json)
 
+    def license(self):
+        """Get the contents of a license for the repo
+
+        :returns: :class:`License <github3.licenses.License>`
+        """
+        url = self._build_url('license', base_url=self._api)
+        json = self._json(self._get(url, headers=License.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(License, json)
+
     @requires_auth
     def mark_notifications(self, last_read=''):
         """Mark all notifications in this repository as read.
@@ -1651,6 +1666,31 @@ class Repository(GitHubCore):
         if int(id) > 0:
             url = self._build_url('releases', str(id), base_url=self._api)
             json = self._json(self._get(url), 200)
+        return self._instance_or_null(Release, json)
+
+    def release_latest(self):
+        """Get the latest release.
+
+        Draft releases and prereleases are not returned by this endpoint.
+
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        url = self._build_url('releases', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(Release, json)
+
+    def release_from_tag(self, tag_name):
+        """Get a release by tag name.
+
+        release_from_tag() returns a release with specified tag
+        while release() returns a release with specified release id
+
+        :param str tag_name: (required) name of tag
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        url = self._build_url('releases', 'tags', tag_name,
+                              base_url=self._api)
+        json = self._json(self._get(url), 200)
         return self._instance_or_null(Release, json)
 
     def releases(self, number=-1, etag=None):

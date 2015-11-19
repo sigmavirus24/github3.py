@@ -28,7 +28,7 @@ class TestRelease(UnitHelper):
             "updated_at": "2013-02-27T19:35:32Z"
             }],
         "assets_url": url_for("/1/assets"),
-        "upload_url": url_for("/1/assets{?name}"),
+        "upload_url": url_for("/1/assets{?name}{&label}"),
         "id": 1,
         "tag_name": "v1.0.0",
         "target_commitish": "master",
@@ -81,6 +81,35 @@ class TestRelease(UnitHelper):
             self.example_data['url'],
             headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
+
+    def test_upload_asset(self):
+        self.session.post.return_value = mock.Mock(
+            status_code=201, json=lambda: self.example_data["assets"][0])
+        with open(__file__) as fd:
+            content = fd.read()
+            self.instance.upload_asset(
+                'text/plain', 'test_repos_release.py', content,
+            )
+            self.post_called_with(
+                url_for('/1/assets?name=%s' % 'test_repos_release.py'),
+                data=content,
+                headers=None
+            )
+
+    def test_upload_asset_with_a_label(self):
+        self.session.post.return_value = mock.Mock(
+            status_code=201, json=lambda: self.example_data["assets"][0])
+        with open(__file__) as fd:
+            content = fd.read()
+            self.instance.upload_asset(
+                'text/plain', 'test_repos_release.py', content, 'test-label'
+            )
+            self.post_called_with(
+                url_for('/1/assets?name=%s&label=%s' % (
+                    'test_repos_release.py', 'test-label')),
+                data=content,
+                headers=None
+            )
 
 
 class TestReleaseIterators(UnitIteratorHelper):

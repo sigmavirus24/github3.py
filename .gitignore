@@ -16,3 +16,4 @@ build/
 *.egg
 .env
 .ipynb_checkpoints
+.cache/

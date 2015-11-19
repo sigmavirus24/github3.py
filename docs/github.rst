@@ -14,7 +14,7 @@ you're looking for anonymous functions, you're most likely looking for the
 Examples
 --------
 
-Examples utilizing this object can be found here_.
+Examples utilizing this object can be found :ref:`here <github_examples>`.
 
 GitHub Object
 -------------
@@ -22,8 +22,6 @@ GitHub Object
 .. autoclass:: GitHub
     :inherited-members:
 
-.. links
-.. _here: examples/githubex.html
 
 GitHubEnterprise Object
 -----------------------
