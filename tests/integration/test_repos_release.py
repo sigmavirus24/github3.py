@@ -89,7 +89,7 @@ class TestRelease(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'github3.py')
             release = repository.create_release(
-                '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
+                '0.8.0.pre', 'develop', '0.8.0.pre fake release with upload',
                 'To be deleted'
                 )
             with open(__file__) as fd:
@@ -97,8 +97,9 @@ class TestRelease(IntegrationHelper):
                     'text/plain', 'test_repos_release.py', fd.read(),
                     'test-label',
                 )
-            assert isinstance(asset, github3.repos.release.Asset)
             release.delete()
+        assert isinstance(asset, github3.repos.release.Asset)
+
 
 class TestAsset(IntegrationHelper):
     def test_delete(self):

@@ -172,8 +172,7 @@ class Release(GitHubCore):
         :param label: (optional), An alternate short description of the asset.
         :returns: :class:`Asset <Asset>`
         """
-        headers = Release.CUSTOM_HEADERS.copy()
-        headers.update({'Content-Type': content_type})
+        headers = {'Content-Type': content_type}
         params = {'name': name, 'label': label}
         self._remove_none(params)
         url = self.upload_urlt.expand(params)
