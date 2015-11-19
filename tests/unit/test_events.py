@@ -19,13 +19,6 @@ class TestEvent(UnitHelper):
     described_class = github3.events.Event
     example_data = get_example_data()
 
-    def test_equality(self):
-        """Test equality/inequality between two instances."""
-        event = github3.events.Event(get_example_data())
-        assert self.instance == event
-        event._uniq = 1
-        assert self.instance != event
-
     def test_repr(self):
         """Show that instance string is formatted properly."""
         assert repr(self.instance).startswith('<Event')
