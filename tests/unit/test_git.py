@@ -75,7 +75,13 @@ class TestReference(UnitHelper):
         """Show that a user can update the reference."""
 
         self.instance.update('fakesha', True)
-        self.session.patch.assert_called_once_with(
-            delete_url_for(),
-            data='{"sha": "fakesha", "force": true}'
-        )
+        try:
+            self.session.patch.assert_called_once_with(
+                delete_url_for(),
+                data='{"force": true, "sha": "fakesha"}'
+            )
+        except AssertionError:
+            self.session.patch.assert_called_once_with(
+                delete_url_for(),
+                data='{"sha": "fakesha", "force": true}'
+            )
