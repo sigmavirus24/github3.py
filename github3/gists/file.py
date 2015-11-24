@@ -7,12 +7,10 @@ Module containing the logic for the GistFile object.
 """
 from __future__ import unicode_literals
 
-import requests
-
-from ..models import GitHubObject
+from ..models import GitHubCore
 
 
-class GistFile(GitHubObject):
+class GistFile(GitHubCore):
 
     """This represents the file object returned by interacting with gists.
 
@@ -33,8 +31,16 @@ class GistFile(GitHubObject):
         #: The size of the file.
         self.size = attributes.get('size')
         #: The content of the file.
-        r = requests.get(self.raw_url)
-        self.content = r.text
+        self.content = self.get_content(attributes)
 
     def _repr(self):
         return '<Gist File [{0}]>'.format(self.name)
+
+    def get_content(self, attributes):
+        """Retrieve contents of file."""
+        content = attributes.get('content')
+        if not content:
+            response = self._get(self.raw_url)
+            if self._boolean(response, 200, 404):
+                content = response.content
+        return content
