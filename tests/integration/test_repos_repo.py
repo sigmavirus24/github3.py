@@ -29,6 +29,14 @@ class TestRepository(helper.IntegrationHelper):
             for assignee in repository.assignees():
                 assert isinstance(assignee, github3.users.User)
 
+    def test_blob(self):
+        """Test the ability to retrieve blob on a repository."""
+        cassette_name = self.cassette_name('blob')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            blob = repository.blob('e1bacfb242c7dee1d24aef52df23d7a3f7442ea3')
+            assert isinstance(blob, github3.git.Blob)
+
     def test_branch(self):
         """Test the ability to retrieve a single branch in a repository."""
         cassette_name = self.cassette_name('branch')
@@ -94,6 +102,14 @@ class TestRepository(helper.IntegrationHelper):
             for activity in repository.commit_activity():
                 assert isinstance(activity, dict)
 
+    def test_commit_comment(self):
+        """Test the ability to retrieve single commit comment."""
+        cassette_name = self.cassette_name('commit_comment')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comment = repository.commit_comment(1380832)
+            assert isinstance(comment, github3.repos.comment.RepoComment)
+
     def test_commits(self):
         """Test the ability to retrieve commits on a repository."""
         cassette_name = self.cassette_name('commits')
@@ -102,6 +118,16 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             for commit in repository.commits(number=25):
                 assert isinstance(commit, github3.repos.commit.RepoCommit)
+
+    def test_compare_commits(self):
+        """Test the ability to compare two commits."""
+        cassette_name = self.cassette_name('compare_commits')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            base = 'a811e1a270f65eecb65755eca38d888cbefcb0a7'
+            head = '76dcc6cb4b9860034be81b7e58adc286a115aa97'
+            comparison = repository.compare_commits(base, head)
+            assert isinstance(comparison, github3.repos.comparison.Comparison)
 
     def test_contributor_statistics(self):
         """Test the ability to retrieve contributor statistics for a repo."""
@@ -121,6 +147,71 @@ class TestRepository(helper.IntegrationHelper):
             for contributor in repository.contributors():
                 assert isinstance(contributor, github3.users.User)
                 assert isinstance(contributor.contributions, int)
+
+    def test_create_blob(self):
+        """Test the ability to create a blob on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_blob')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            content = 'VGVzdCBibG9i\n'
+            encoding = 'base64'
+            sha = '30f2c645388832f70d37ab2b47eb9ea527e5ae7c'
+            assert repository.create_blob(content, encoding) == sha
+
+    def test_create_comment(self):
+        """Test the ability to create a comment on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_comment')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            body = ('Early morning commits are a good idea. '
+                    'It is just me. Me migrating unit/integration tests.')
+            sha = '1ad1d8309317a4240d5f17b23a2e7dab25e4cb10'
+            assert isinstance(repository.create_comment(body, sha),
+                              github3.repos.comment.RepoComment)
+
+    def test_create_commit(self):
+        """Test the ability to create a commit."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_commit')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            data = {'message': 'My commit message',
+                    'author': {
+                        'name': 'Matt Chung',
+                        'email': 'foo@example.com',
+                        'date': '2015-12-03T16:13:30+12:00',
+                    },
+                    'parents': [
+                        '679358c79005523246ec3f460410ceda6b94e006'
+                    ],
+                    'tree': '6857122c4eff3ea461516c066f6bb1eba206d694',
+                    }
+            commit = repository.create_commit(**data)
+            assert isinstance(commit, github3.git.Commit)
+
+    def test_create_commit_with_empty_committer(self):
+        """Show that UnProcessableEntity is raised with empty comitter."""
+        self.token_login()
+        cassette_name = self.cassette_name(('create_commit_with_'
+                                            'empty_committer'))
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            data = {'message': 'My commit message',
+                    'author': {
+                        'name': 'Matt Chung',
+                        'email': 'foo@example.com',
+                        'date': '2015-12-03T16:13:30+12:00',
+                    },
+                    'committer': {},
+                    'parents': [
+                        '679358c79005523246ec3f460410ceda6b94e006'
+                    ],
+                    'tree': '6857122c4eff3ea461516c066f6bb1eba206d694',
+                    }
+            with pytest.raises(exc.UnprocessableEntity):
+                repository.create_commit(**data)
 
     def test_create_empty_blob(self):
         """Test the ability to create an empty blob on a repository."""

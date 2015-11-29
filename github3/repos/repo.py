@@ -647,7 +647,8 @@ class Repository(GitHubCore):
         return self._instance_or_null(RepoComment, json)
 
     @requires_auth
-    def create_commit(self, message, tree, parents, author={}, committer={}):
+    def create_commit(self, message, tree, parents, author=None,
+                      committer=None):
         """Create a commit on this repository.
 
         :param str message: (required), commit message
@@ -672,6 +673,7 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'commits', base_url=self._api)
             data = {'message': message, 'tree': tree, 'parents': parents,
                     'author': author, 'committer': committer}
+            self._remove_none(data)
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(Commit, json)
 
