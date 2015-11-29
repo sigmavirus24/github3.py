@@ -59,6 +59,10 @@ class Repository(GitHubCore):
 
     """
 
+    STAR_HEADERS = {
+        'Accept': 'application/vnd.github.v3.star+json'
+    }
+
     def _update_attributes(self, repo):
         #: URL used to clone via HTTPS.
         self.clone_url = repo.get('clone_url', '')
@@ -141,6 +145,9 @@ class Repository(GitHubCore):
         # The number of stargazers
         #: Number of users who starred the repository
         self.stargazers_count = repo.get('stargazers_count', 0)
+
+        #: ``datetime`` object representing when the repository was starred
+        self.starred_at = self._strptime(repo.get('starred_at'))
 
         # SSH url e.g. git@github.com/sigmavirus24/github3.py
         #: URL to clone the repository via SSH.
