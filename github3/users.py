@@ -387,7 +387,8 @@ class User(BaseAccount):
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
         url = self.starred_urlt.expand(owner=None, repo=None)
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, Repository, params, etag,
+                          headers=Repository.STAR_HEADERS)
 
     def subscriptions(self, number=-1, etag=None):
         """Iterate over repositories subscribed to by this user.

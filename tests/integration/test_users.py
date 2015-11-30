@@ -1,5 +1,6 @@
 """Integration tests for the User class."""
 import github3
+import datetime
 
 from .helper import IntegrationHelper
 
@@ -93,6 +94,7 @@ class TestUser(IntegrationHelper):
         assert len(repos) > 0
         for starred in repos:
             assert isinstance(starred, github3.repos.Repository)
+            assert isinstance(starred.starred_at, datetime.datetime)
 
     def test_subscriptions(self):
         """Show that a user can retrieve the repos subscribed to by a user."""

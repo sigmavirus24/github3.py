@@ -155,7 +155,9 @@ class TestUserIterators(UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('starred'),
             params={'per_page': 100},
-            headers={}
+            headers={
+                'Accept': 'application/vnd.github.v3.star+json'
+            }
         )
 
     def test_subscriptions(self):
