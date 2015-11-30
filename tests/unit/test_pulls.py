@@ -66,11 +66,19 @@ class TestPullRequest(UnitHelper):
             headers={'Accept': 'application/vnd.github.diff'}
         )
 
-    def test_is_merged(self):
+    def test_is_merged_request(self):
         """Show that a user can request the merge status of a PR."""
+        self.instance.merged = False
         self.instance.is_merged()
 
         self.session.get.assert_called_once_with(url_for('merge'))
+
+    def test_is_merged_no_requset(self):
+        """Show that no request is needed if .merged is True"""
+        self.instance.merged = True
+
+        assert self.instance.is_merged()
+        assert self.session.get.called is False
 
     def test_issue(self):
         """Show that a user can retrieve the associated issue of a PR."""
@@ -85,8 +93,9 @@ class TestPullRequest(UnitHelper):
         self.instance.merge()
 
         self.session.put.assert_called_once_with(
-	    url_for('merge'),
-	    data='{"commit_message": ""}')
+            url_for('merge'),
+            data='{"commit_message": ""}'
+        )
 
     def test_patch(self):
         """Show that a user can fetch the patch from a Pull Request."""

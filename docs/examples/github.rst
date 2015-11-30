@@ -1,4 +1,4 @@
-.. _github:
+.. _github_examples:
 
 GitHub Examples
 ===============

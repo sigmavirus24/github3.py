@@ -104,3 +104,13 @@ Contributors
 - Noel Lee (@noellee)
 
 - Sourav Singh(@souravsingh)
+
+- Matt Chung (@itsmemattchung)
+
+- Martin Ek (@ekmartin)
+
+- Chris Thompson (@notyetsecure)
+
+- Bastien Gandouet (@b4stien)
+
+- Usman Ehtesham Gul (@ueg1990)

@@ -302,19 +302,6 @@ class TestRepository(BaseCase):
         assert isinstance(pull, github3.pulls.PullRequest)
         self.mock_assertions()
 
-    def test_create_ref(self):
-        self.response('ref', 201)
-        self.post(self.api + 'git/refs')
-        self.conf = {'data': {'ref': 'refs/heads/master', 'sha': 'fakesha'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_ref,
-                          'foo', 'bar')
-
-        self.login()
-        assert isinstance(self.repo.create_ref(**self.conf['data']),
-                          github3.git.Reference)
-        self.mock_assertions()
-
     def test_create_status(self):
         self.response('status', 201)
         self.post(self.api + 'statuses/fakesha')
@@ -328,36 +315,6 @@ class TestRepository(BaseCase):
         assert isinstance(s, repos.status.Status)
         assert repr(s) > ''
         self.mock_assertions()
-
-    def test_create_tag(self):
-        self.response('tag', 201)
-        self.post(self.api + 'git/tags')
-        data = {
-            'tag': '0.3', 'message': 'Fake message', 'object': 'fakesha',
-            'type': 'commit', 'tagger': {
-                'name': 'Ian Cordasco', 'date': 'Not a UTC date',
-                'email': 'graffatcolmingov@gmail.com'
-            }
-        }
-        self.conf = {'data': data.copy()}
-        data['obj_type'] = data['type']
-        data['sha'] = data['object']
-        del(data['type'], data['object'])
-
-        self.assertRaises(github3.GitHubError, self.repo.create_tag,
-                          None, None, None, None, None)
-
-        self.login()
-        with mock.patch.object(repos.Repository, 'create_ref'):
-            tag = self.repo.create_tag(**data)
-            assert isinstance(tag, github3.git.Tag)
-            assert repr(tag).startswith('<Tag')
-        self.mock_assertions()
-
-        with mock.patch.object(repos.Repository, 'create_ref') as cr:
-            self.repo.create_tag('tag', '', 'fakesha', '', '',
-                                 lightweight=True)
-            cr.assert_called_once_with('refs/tags/tag', 'fakesha')
 
     def test_delete(self):
         self.response('', 204)

@@ -1,9 +1,9 @@
 # Makefile for github3.py
 #
-# Copyright 2012, Ian Cordasco
+# Copyright 2015, Ian Cordasco
 
 COVERAGE_INCLUDE := github3/*.py
-TEST_RUNNER := python setup.py test
+TEST_RUNNER := tox
 
 .DEFAULT_GOAL := tests
 
@@ -23,4 +23,4 @@ htmlcov: .coverage
 	coverage html --omit=github3/packages/*
 
 docs: docs/*.rst
-	make -C docs/ html
+	tox -e docs

@@ -29,14 +29,33 @@ class TestRepository(helper.IntegrationHelper):
             for assignee in repository.assignees():
                 assert isinstance(assignee, github3.users.User)
 
+    def test_branch(self):
+        """Test the ability to retrieve a single branch in a repository."""
+        cassette_name = self.cassette_name('branch')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            branch = repository.branch('develop')
+            assert isinstance(branch, github3.repos.branch.Branch)
+            assert 'enabled' in branch.protection
+
     def test_branches(self):
-        """Test the ability to retrieve the brances in a repository."""
+        """Test the ability to retrieve the branches in a repository."""
         cassette_name = self.cassette_name('branches')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for branch in repository.branches():
                 assert isinstance(branch, github3.repos.branch.Branch)
+
+    def test_protected_branches(self):
+        """Test the ability to retrieve protected branches in a repository."""
+        cassette_name = self.cassette_name('branches_protected')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            assert all(b.protection['enabled'] is True
+                       for b in repository.branches(protected=True))
 
     def test_code_frequency(self):
         """Test the ability to retrieve the code frequency in a repo."""
@@ -140,6 +159,27 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_create_tag(self):
+        """Test the ability to create an annotated tag on a repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('create_tag')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'fork_this')
+            assert repository is not None
+            tag = repository.create_tag(
+                tag='tag-name',
+                message='Test annotated tag creation',
+                sha='5145c9682d46d714c31ae0b5fbe30a83039a96e5',
+                obj_type='commit',
+                tagger={
+                    'name': 'Ian Cordasco',
+                    'email': 'graffatcolmingov@gmail.com',
+                    'date': '2015-11-01T14:09:00Z'
+                }
+            )
+
+        assert isinstance(tag, github3.git.Tag)
+
     def test_delete(self):
         """Test that a repository can be deleted."""
         self.basic_login()
@@ -178,6 +218,8 @@ class TestRepository(helper.IntegrationHelper):
         for (filename, content) in contents:
             assert content.name == filename
             assert isinstance(content, github3.repos.contents.Contents)
+            assert content.content is None
+            assert content.decoded is None
 
     def test_events(self):
         """Test that a user can iterate over the events from a repository."""
@@ -199,6 +241,8 @@ class TestRepository(helper.IntegrationHelper):
             contents = repository.file_contents('github3/repos/repo.py')
 
         assert isinstance(contents, github3.repos.contents.Contents)
+        assert contents.content is not None
+        assert contents.decoded is not None
 
     def test_forks(self):
         """Test that a user can iterate over the forks of a repository."""
@@ -319,6 +363,14 @@ class TestRepository(helper.IntegrationHelper):
                 assert 'Last-Modified' not in l
                 assert isinstance(l, tuple)
 
+    def test_license(self):
+        """Test that a repository's license can be retrieved."""
+        cassette_name = self.cassette_name('license')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            license = repository.license()
+            assert isinstance(license, github3.licenses.License)
+
     def test_milestone(self):
         """Test the ability to retrieve a milestone on a repository."""
         cassette_name = self.cassette_name('milestone')
@@ -398,6 +450,26 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             release = repository.release(76677)
+
+        assert isinstance(release, github3.repos.release.Release)
+
+    def test_release_latest(self):
+        """Test the ability to retrieve the latest release."""
+        cassette_name = self.cassette_name('release_latest')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            release = repository.release_latest()
+
+        assert isinstance(release, github3.repos.release.Release)
+
+    def test_release_from_tag(self):
+        """Test the ability to retrieve a release by tag name"""
+        cassette_name = self.cassette_name('release_from_tag')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            release = repository.release_from_tag('v0.7.1')
 
         assert isinstance(release, github3.repos.release.Release)
 

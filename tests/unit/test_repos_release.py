@@ -28,7 +28,7 @@ class TestRelease(UnitHelper):
             "updated_at": "2013-02-27T19:35:32Z"
             }],
         "assets_url": url_for("/1/assets"),
-        "upload_url": url_for("/1/assets{?name}"),
+        "upload_url": url_for("/1/assets{?name}{&label}"),
         "id": 1,
         "tag_name": "v1.0.0",
         "target_commitish": "master",
@@ -49,12 +49,67 @@ class TestRelease(UnitHelper):
         assert self.instance.upload_urlt is not None
 
     # Method tests
+    def test_tarball_archive(self):
+        """Verify that we generate the correct URL for a tarball archive."""
+        self.instance.archive(format='tarball')
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/repos/octocat/Hello-World/tarball/v1.0.0',
+            allow_redirects=True,
+            stream=True
+        )
+
+    def test_zipball_archive(self):
+        """Verify that we generate the correct URL for a zipball archive."""
+        self.instance.archive(format='zipball')
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/repos/octocat/Hello-World/zipball/v1.0.0',
+            allow_redirects=True,
+            stream=True
+        )
+
+    def test_unsupported_archive(self):
+        """Do not make a request if the archive format is unsupported."""
+        self.instance.archive(format='clearly fake')
+
+        assert self.session.get.called is False
+
     def test_delete(self):
         self.instance.delete()
         self.session.delete.assert_called_once_with(
             self.example_data['url'],
             headers={'Accept': 'application/vnd.github.manifold-preview'}
         )
+
+    def test_upload_asset(self):
+        self.session.post.return_value = mock.Mock(
+            status_code=201, json=lambda: self.example_data["assets"][0])
+        with open(__file__) as fd:
+            content = fd.read()
+            self.instance.upload_asset(
+                'text/plain', 'test_repos_release.py', content,
+            )
+            self.post_called_with(
+                url_for('/1/assets?name=%s' % 'test_repos_release.py'),
+                data=content,
+                headers=None
+            )
+
+    def test_upload_asset_with_a_label(self):
+        self.session.post.return_value = mock.Mock(
+            status_code=201, json=lambda: self.example_data["assets"][0])
+        with open(__file__) as fd:
+            content = fd.read()
+            self.instance.upload_asset(
+                'text/plain', 'test_repos_release.py', content, 'test-label'
+            )
+            self.post_called_with(
+                url_for('/1/assets?name=%s&label=%s' % (
+                    'test_repos_release.py', 'test-label')),
+                data=content,
+                headers=None
+            )
 
 
 class TestReleaseIterators(UnitIteratorHelper):

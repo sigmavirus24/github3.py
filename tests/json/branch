@@ -1,1 +1,91 @@
-{"commit": {"committer": {"following_url": "https://api.github.com/users/sigmavirus24/following", "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}", "organizations_url": "https://api.github.com/users/sigmavirus24/orgs", "url": "https://api.github.com/users/sigmavirus24", "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}", "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions", "avatar_url": "https://secure.gravatar.com/avatar/c148356d89f925e692178bee1d93acf7?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png", "repos_url": "https://api.github.com/users/sigmavirus24/repos", "received_events_url": "https://api.github.com/users/sigmavirus24/received_events", "gravatar_id": "c148356d89f925e692178bee1d93acf7", "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}", "login": "sigmavirus24", "type": "User", "id": 240830, "followers_url": "https://api.github.com/users/sigmavirus24/followers"}, "author": {"following_url": "https://api.github.com/users/sigmavirus24/following", "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}", "organizations_url": "https://api.github.com/users/sigmavirus24/orgs", "url": "https://api.github.com/users/sigmavirus24", "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}", "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions", "avatar_url": "https://secure.gravatar.com/avatar/c148356d89f925e692178bee1d93acf7?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png", "repos_url": "https://api.github.com/users/sigmavirus24/repos", "received_events_url": "https://api.github.com/users/sigmavirus24/received_events", "gravatar_id": "c148356d89f925e692178bee1d93acf7", "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}", "login": "sigmavirus24", "type": "User", "id": 240830, "followers_url": "https://api.github.com/users/sigmavirus24/followers"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/a21ded00eb40383b7496c00b598555665b751e95", "comments_url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/a21ded00eb40383b7496c00b598555665b751e95/comments", "sha": "a21ded00eb40383b7496c00b598555665b751e95", "parents": [{"url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/5d8ef57b55797bb79b045e0107919e5ebbe5ee98", "sha": "5d8ef57b55797bb79b045e0107919e5ebbe5ee98"}], "commit": {"committer": {"date": "2012-11-22T03:38:47Z", "email": "graffatcolmingov@gmail.com", "name": "Ian Cordasco"}, "author": {"date": "2012-11-22T03:38:47Z", "email": "graffatcolmingov@gmail.com", "name": "Ian Cordasco"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/commits/a21ded00eb40383b7496c00b598555665b751e95", "tree": {"url": "https://api.github.com/repos/sigmavirus24/github3.py/git/trees/d49c1850effb6d95d2168d042395730116f642d4", "sha": "d49c1850effb6d95d2168d042395730116f642d4"}, "comment_count": 0, "message": "Upgrade development to 0.2"}}, "_links": {"self": "https://api.github.com/repos/sigmavirus24/github3.py/branches/master", "html": "https://github.com/sigmavirus24/github3.py/tree/master"}, "name": "master"}
+{
+  "name": "master",
+  "commit": {
+    "sha": "749656b8b3b282d11a4221bb84e48291ca23ecc6",
+    "commit": {
+      "author": {
+        "name": "Ian Cordasco",
+        "email": "sigmavirus24@users.noreply.github.com",
+        "date": "2015-06-19T22:37:18Z"
+      },
+      "committer": {
+        "name": "Ian Cordasco",
+        "email": "sigmavirus24@users.noreply.github.com",
+        "date": "2015-06-19T22:37:18Z"
+      },
+      "message": "Merge pull request #388 from jonathanwcrane/patch-1\n\nCall out proper name of module in import statent",
+      "tree": {
+        "sha": "49d7464ad951e0e0e13bf073b06d8eed217c6e74",
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/trees/49d7464ad951e0e0e13bf073b06d8eed217c6e74"
+      },
+      "url": "https://api.github.com/repos/sigmavirus24/github3.py/git/commits/749656b8b3b282d11a4221bb84e48291ca23ecc6",
+      "comment_count": 0
+    },
+    "url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/749656b8b3b282d11a4221bb84e48291ca23ecc6",
+    "html_url": "https://github.com/sigmavirus24/github3.py/commit/749656b8b3b282d11a4221bb84e48291ca23ecc6",
+    "comments_url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/749656b8b3b282d11a4221bb84e48291ca23ecc6/comments",
+    "author": {
+      "login": "sigmavirus24",
+      "id": 240830,
+      "avatar_url": "https://avatars.githubusercontent.com/u/240830?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sigmavirus24",
+      "html_url": "https://github.com/sigmavirus24",
+      "followers_url": "https://api.github.com/users/sigmavirus24/followers",
+      "following_url": "https://api.github.com/users/sigmavirus24/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions",
+      "organizations_url": "https://api.github.com/users/sigmavirus24/orgs",
+      "repos_url": "https://api.github.com/users/sigmavirus24/repos",
+      "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sigmavirus24/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "sigmavirus24",
+      "id": 240830,
+      "avatar_url": "https://avatars.githubusercontent.com/u/240830?v=3",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/sigmavirus24",
+      "html_url": "https://github.com/sigmavirus24",
+      "followers_url": "https://api.github.com/users/sigmavirus24/followers",
+      "following_url": "https://api.github.com/users/sigmavirus24/following{/other_user}",
+      "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions",
+      "organizations_url": "https://api.github.com/users/sigmavirus24/orgs",
+      "repos_url": "https://api.github.com/users/sigmavirus24/repos",
+      "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/sigmavirus24/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b26841b7f083f9b7b3e3658fbc2fcc2e2f94db56",
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/b26841b7f083f9b7b3e3658fbc2fcc2e2f94db56",
+        "html_url": "https://github.com/sigmavirus24/github3.py/commit/b26841b7f083f9b7b3e3658fbc2fcc2e2f94db56"
+      },
+      {
+        "sha": "06277499140f8e61651a041985db928a8408e79e",
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/commits/06277499140f8e61651a041985db928a8408e79e",
+        "html_url": "https://github.com/sigmavirus24/github3.py/commit/06277499140f8e61651a041985db928a8408e79e"
+      }
+    ]
+  },
+  "_links": {
+    "self": "https://api.github.com/repos/sigmavirus24/github3.py/branches/master",
+    "html": "https://github.com/sigmavirus24/github3.py/tree/master"
+  },
+  "protection": {
+    "enabled": false,
+    "required_status_checks": {
+      "enforcement_level": "off",
+      "contexts": [
+
+      ]
+    }
+  }
+}

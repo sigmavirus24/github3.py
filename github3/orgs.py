@@ -178,8 +178,10 @@ class Team(GitHubCore):
         :returns: generator of :class:`Repository <github3.repos.Repository>`
             objects
         """
+        headers = {'Accept': 'application/vnd.github.ironman-preview+json'}
         url = self._build_url('repos', base_url=self._api)
-        return self._iter(int(number), url, Repository, etag=etag)
+        return self._iter(int(number), url, Repository, etag=etag,
+                          headers=headers)
 
     @requires_auth
     def membership_for(self, username):

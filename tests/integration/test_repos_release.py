@@ -6,6 +6,21 @@ from .helper import IntegrationHelper
 
 
 class TestRelease(IntegrationHelper):
+    def test_archive(self):
+        """Test the ability to download a release archive."""
+        cassette_name = self.cassette_name('archive')
+        with self.recorder.use_cassette(cassette_name,
+                                        preserve_exact_body_bytes=True):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            release = repository.release(76677)
+            _, filename = tempfile.mkstemp()
+            release.archive('tarball', path=filename)
+
+        with open(filename, 'rb') as fd:
+            assert len(fd.read(1024)) > 0
+
+        os.unlink(filename)
+
     def test_asset(self):
         """Test the ability to retrieve a single asset from a release."""
         cassette_name = self.cassette_name('asset')
@@ -62,10 +77,28 @@ class TestRelease(IntegrationHelper):
                 )
             with open(__file__) as fd:
                 asset = release.upload_asset(
-                    'text/plain', 'test_repos_release.py', fd.read()
-                    )
+                    'text/plain', 'test_repos_release.py', fd.read(),
+                )
             assert isinstance(asset, github3.repos.release.Asset)
             release.delete()
+
+    def test_upload_asset_with_a_label(self):
+        """Test the ability to upload an asset to a release with a label."""
+        self.token_login()
+        cassette_name = self.cassette_name('upload_asset_with_a_label')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'github3.py')
+            release = repository.create_release(
+                '0.8.0.pre', 'develop', '0.8.0.pre fake release with upload',
+                'To be deleted'
+                )
+            with open(__file__) as fd:
+                asset = release.upload_asset(
+                    'text/plain', 'test_repos_release.py', fd.read(),
+                    'test-label',
+                )
+            release.delete()
+        assert isinstance(asset, github3.repos.release.Asset)
 
 
 class TestAsset(IntegrationHelper):

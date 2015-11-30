@@ -39,7 +39,7 @@ class TestAuthorization(UnitHelper):
         })
 
     def test_delete(self):
-        """"Test the request to delete an authorization."""
+        """Test the request to delete an authorization."""
         self.instance.delete()
 
         self.session.delete.assert_called_once_with(url_for(''))
