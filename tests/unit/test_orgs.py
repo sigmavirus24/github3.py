@@ -3,31 +3,16 @@ import pytest
 from github3 import GitHubError
 from github3.orgs import Organization
 
-from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
+from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
+                    create_example_data_helper)
 
-url_for = create_url_helper('https://api.github.com/orgs/hapy')
+url_for = create_url_helper('https://api.github.com/orgs/github')
 
+get_org_example_data = create_example_data_helper('org_example')
 
 class TestOrganization(UnitHelper):
     described_class = Organization
-    example_data = {
-        'login': 'hapy',
-        'id': 1,
-        'url': 'https://api.github.com/orgs/hapy',
-        'avatar_url': 'https://github.com/images/error/octocat_happy.gif',
-        'name': 'github',
-        'company': 'GitHub',
-        'blog': 'https://github.com/blog',
-        'location': 'San Francisco',
-        'email': 'octocat@github.com',
-        'public_repos': 2,
-        'public_gists': 1,
-        'followers': 20,
-        'following': 0,
-        'html_url': 'https://github.com/hapy',
-        'created_at': '2008-01-14T04:33:35Z',
-        'type': 'Organization'
-    }
+    example_data = get_org_example_data()
 
     def test_add_member(self):
         """Show that an authenticated user can add a member to an org."""
@@ -170,24 +155,7 @@ class TestOrganization(UnitHelper):
 
 class TestOrganizationRequiresAuth(UnitHelper):
     described_class = Organization
-    example_data = {
-        'login': 'hapy',
-        'id': 1,
-        'url': 'https://api.github.com/orgs/hapy',
-        'avatar_url': 'https://github.com/images/error/octocat_happy.gif',
-        'name': 'github',
-        'company': 'GitHub',
-        'blog': 'https://github.com/blog',
-        'location': 'San Francisco',
-        'email': 'octocat@github.com',
-        'public_repos': 2,
-        'public_gists': 1,
-        'followers': 20,
-        'following': 0,
-        'html_url': 'https://github.com/hapy',
-        'created_at': '2008-01-14T04:33:35Z',
-        'type': 'Organization'
-    }
+    example_data = get_org_example_data()
 
     def after_setup(self):
         """Set MockedSession#has_auth.return_value to False."""

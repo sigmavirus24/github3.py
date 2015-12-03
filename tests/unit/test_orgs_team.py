@@ -3,27 +3,16 @@ import pytest
 from github3 import GitHubError
 from github3.orgs import Team
 
-from .helper import UnitHelper, UnitIteratorHelper, create_url_helper
+from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
+                    create_example_data_helper)
 
 url_for = create_url_helper('https://api.github.com/teams/10')
 
+get_team_example_data = create_example_data_helper('orgs_team_example')
 
 class TestTeam(UnitHelper):
     described_class = Team
-    example_data = {
-        'url': 'https://api.github.com/teams/10',
-        'name': 'Owners',
-        'id': 10,
-        'permission': 'admin',
-        'members_count': 3,
-        'repos_count': 10,
-        'organization': {
-            'login': 'github',
-            'id': 1,
-            'url': 'https://api.github.com/orgs/github',
-            'avatar_url': 'https://github.com/images/error/octocat_happy.gif'
-        }
-    }
+    example_data = get_team_example_data()
 
     def test_add_member(self):
         """Show that one can add a member to an organization team."""
@@ -79,20 +68,7 @@ class TestTeam(UnitHelper):
 
 class TestTeamRequiresAuth(UnitHelper):
     described_class = Team
-    example_data = {
-        'url': 'https://api.github.com/teams/10',
-        'name': 'Owners',
-        'id': 10,
-        'permission': 'admin',
-        'members_count': 3,
-        'repos_count': 10,
-        'organization': {
-            'login': 'github',
-            'id': 1,
-            'url': 'https://api.github.com/orgs/github',
-            'avatar_url': 'https://github.com/images/error/octocat_happy.gif'
-        }
-    }
+    example_data = get_team_example_data()
 
     def after_setup(self):
         """Set up for test cases in TestTeamRequiresAuth."""

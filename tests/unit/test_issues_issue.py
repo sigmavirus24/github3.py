@@ -8,7 +8,7 @@ url_for = helper.create_url_helper(
 )
 
 get_issue_example_data = helper.create_example_data_helper(
-    'issue_example_data'
+    'issue_example'
 )
 
 
