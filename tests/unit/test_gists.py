@@ -8,6 +8,7 @@ from .helper import (create_example_data_helper, create_url_helper,
 gist_example_data = create_example_data_helper('gist_example')
 gist_history_example_data = create_example_data_helper('gist_history_example')
 gist_comment_example_data = create_example_data_helper('gist_comment_example')
+gist_example_list_data = create_example_data_helper('gist_example_list_data')
 
 url_for = create_url_helper(
     'https://api.github.com/gists/b4c7ac7be6e591d0d155'
@@ -65,6 +66,11 @@ class TestGist(UnitHelper):
         history = self.instance.history[0]
         assert isinstance(history, github3.gists.history.GistHistory)
         assert repr(history).startswith('<Gist History')
+
+    def test_file(self):
+        """Show that each file object is an instance of GistFile."""
+        _file = self.instance._files[0]
+        assert isinstance(_file, github3.gists.file.GistFile)
 
     def test_is_starred(self):
         """Show that a user can check if they starred a gist."""
@@ -186,7 +192,7 @@ class TestGistIterators(UnitIteratorHelper):
 
 class TestGistHistory(UnitHelper):
 
-    """ Test Gist History. """
+    """Test Gist History."""
 
     described_class = github3.gists.history.GistHistory
     example_data = gist_history_example_data()
@@ -220,3 +226,23 @@ class TestGistComment(UnitHelper):
     def test_repr(self):
         """Excercise the GistComment repr."""
         assert repr(self.instance).startswith('<Gist Comment')
+
+class TestGistFile(UnitHelper):
+
+    """Test Gist File."""
+
+    described_class = github3.gists.file.GistFile
+    example_data = gist_example_list_data()[0]
+
+    def test_no_original_content(self):
+        """Show that attribute original content is None"""
+        assert self.instance.original_content is None
+
+    def test_get_file_content_from_raw_url(self):
+        """Show that Get request is made to Gist raw_url when method content
+        is called.
+        """
+        self.instance.content()
+
+        self.session.get.assert_called_once_with(self.instance.raw_url)
+
