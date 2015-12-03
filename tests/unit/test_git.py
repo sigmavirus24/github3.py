@@ -6,8 +6,9 @@ get_example_data = create_example_data_helper('tree_example')
 url_for = create_url_helper('https://api.github.com/repos/octocat/Hello-World/'
                             'trees/9fb037999f264ba9a7fc6274d15fa3ae2ab98312')
 
-delete_url_for = create_url_helper('https://api.github.com/repos/octocat/Hello-World/'
-                                   'git/refs/heads/featureA')
+reference_url_for = create_url_helper('https://api.github.com/repos/'
+                                      'octocat/Hello-World/'
+                                      'git/refs/heads/featureA')
 
 get_commit_example_data = create_example_data_helper('commit_example')
 get_reference_example_data = create_example_data_helper('reference_example')
@@ -64,7 +65,7 @@ class TestReference(UnitHelper):
     def test_delete(self):
         self.instance.delete()
         self.session.delete.assert_called_once_with(
-            delete_url_for()
+            reference_url_for()
         )
 
     def test_repr(self):
@@ -77,11 +78,11 @@ class TestReference(UnitHelper):
         self.instance.update('fakesha', True)
         try:
             self.session.patch.assert_called_once_with(
-                delete_url_for(),
+                reference_url_for(),
                 data='{"force": true, "sha": "fakesha"}'
             )
         except AssertionError:
             self.session.patch.assert_called_once_with(
-                delete_url_for(),
+                reference_url_for(),
                 data='{"sha": "fakesha", "force": true}'
             )
