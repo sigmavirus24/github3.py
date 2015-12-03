@@ -7,10 +7,10 @@ get_example_data = create_example_data_helper('event_example')
 get_org_example_data = create_example_data_helper('org_example')
 get_comment_example_data = create_example_data_helper('comment_example')
 get_pull_request_example_data = create_example_data_helper('pull_request_example')
-get_issue_example_data = create_example_data_helper('issue_example_data')
+get_issue_example_data = create_example_data_helper('issue_example')
 get_user_example_data = create_example_data_helper('user_example')
 get_repo_example_data = create_example_data_helper('repo_example')
-get_gist_example_data = create_example_data_helper('gist_example_data')
+get_gist_example_data = create_example_data_helper('gist_example')
 get_team_example_data = create_example_data_helper('team_example')
 
 

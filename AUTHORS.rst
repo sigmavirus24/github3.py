@@ -116,3 +116,5 @@ Contributors
 - Usman Ehtesham Gul (@ueg1990)
 
 - Christophe Lecointe (@christophelec)
+
+- Derek Gustafson (@degustaf)

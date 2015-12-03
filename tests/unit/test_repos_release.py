@@ -1,6 +1,7 @@
 from github3.repos.release import Release, Asset
 
-from .helper import UnitHelper, UnitIteratorHelper, create_url_helper, mock
+from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper, mock,
+                    create_example_data_helper)
 
 import json
 import pytest
@@ -12,33 +13,8 @@ url_for = create_url_helper(
 
 class TestRelease(UnitHelper):
     described_class = Release
-    example_data = {
-        "url": url_for("/1"),
-        "html_url": "https://github.com/octocat/Hello-World/releases/v1.0.0",
-        "assets": [{
-            "url": url_for("/assets/1"),
-            "id": 1,
-            "name": "example.zip",
-            "label": "short description",
-            "state": "uploaded",
-            "content_type": "application/zip",
-            "size": 1024,
-            "download_count": 42,
-            "created_at": "2013-02-27T19:35:32Z",
-            "updated_at": "2013-02-27T19:35:32Z"
-            }],
-        "assets_url": url_for("/1/assets"),
-        "upload_url": url_for("/1/assets{?name}{&label}"),
-        "id": 1,
-        "tag_name": "v1.0.0",
-        "target_commitish": "master",
-        "name": "v1.0.0",
-        "body": "Description of the release",
-        "draft": False,
-        "prerelease": False,
-        "created_at": "2013-02-27T19:35:32Z",
-        "published_at": "2013-02-27T19:35:32Z"
-        }
+    get_release_example_data = create_example_data_helper('repos_release_example')
+    example_data = get_release_example_data()
 
     # Attribute tests
     def test_original_assets(self):
@@ -133,18 +109,8 @@ class TestReleaseIterators(UnitIteratorHelper):
 
 class TestAsset(UnitHelper):
     described_class = Asset
-    example_data = {
-        "url": url_for("/assets/1"),
-        "id": 1,
-        "name": "example.zip",
-        "label": "short description",
-        "state": "uploaded",
-        "content_type": "application/zip",
-        "size": 1024,
-        "download_count": 42,
-        "created_at": "2013-02-27T19:35:32Z",
-        "updated_at": "2013-02-27T19:35:32Z"
-        }
+    get_asset_example_data = create_example_data_helper('repos_asset_example')
+    example_data = get_asset_example_data()
 
     def test_delete(self):
         """Verify the request to delete an Asset."""

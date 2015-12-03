@@ -226,64 +226,8 @@ class TestReviewComment(UnitHelper):
     """Unit tests for the ReviewComment class."""
 
     described_class = pulls.ReviewComment
-    example_data = {
-        "url": ("https://api.github.com/repos/octocat/Hello-World/pulls/"
-                "comments/1"),
-        "id": 1,
-        "diff_hunk": ("@@ -16,33 +16,40 @@ public class Connection :"
-                      " IConnection..."),
-        "path": "file1.txt",
-        "position": 1,
-        "original_position": 4,
-        "commit_id": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
-        "original_commit_id": "9c48853fa3dc5c1c3d6f1f1cd1f2743e72652840",
-        "user": {
-            "login": "octocat",
-            "id": 1,
-            "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-            "gravatar_id": "",
-            "url": "https://api.github.com/users/octocat",
-            "html_url": "https://github.com/octocat",
-            "followers_url": "https://api.github.com/users/octocat/followers",
-            "following_url": ("https://api.github.com/users/octocat/following"
-                              "{/other_user}"),
-            "gists_url": ("https://api.github.com/users/octocat/gists"
-                          "{/gist_id}"),
-            "starred_url": ("https://api.github.com/users/octocat/starred"
-                            "{/owner}{/repo}"),
-            "subscriptions_url": ("https://api.github.com/users/octocat"
-                                  "/subscriptions"),
-            "organizations_url": "https://api.github.com/users/octocat/orgs",
-            "repos_url": "https://api.github.com/users/octocat/repos",
-            "events_url": ("https://api.github.com/users/octocat/events"
-                           "{/privacy}"),
-            "received_events_url": ("https://api.github.com/users/octocat"
-                                    "/received_events"),
-            "type": "User",
-            "site_admin": False
-        },
-        "body": "Great stuff",
-        "created_at": "2011-04-14T16:00:49Z",
-        "updated_at": "2011-04-14T16:00:49Z",
-        "html_url": ("https://github.com/octocat/Hello-World/pull/1"
-                     "#discussion-diff-1"),
-        "pull_request_url": ("https://api.github.com/repos/octocat/"
-                             "Hello-World/pulls/1"),
-        "_links": {
-            "self": {
-                "href": ("https://api.github.com/repos/octocat/Hello-World/"
-                         "pulls/comments/1")
-            },
-            "html": {
-                "href": ("https://github.com/octocat/Hello-World/pull/1"
-                         "#discussion-diff-1")
-            },
-            "pull_request": {
-                "href": ("https://api.github.com/repos/octocat/"
-                         "Hello-World/pulls/1")
-            }
-        }
-    }
+    get_comment_example_data = create_example_data_helper('review_comment_example')
+    example_data = get_comment_example_data()
 
     def test_reply(self):
         """Verify the request to reply to a review comment."""
@@ -306,23 +250,8 @@ class TestPullFile(UnitHelper):
     """Unit tests for the PullFile class."""
 
     described_class = pulls.PullFile
-    example_data = {
-        "sha": "bbcd538c8e72b8c175046e27cc8f907076331401",
-        "filename": "file1.txt",
-        "status": "added",
-        "additions": 103,
-        "deletions": 21,
-        "changes": 124,
-        "blob_url": ("https://github.com/octocat/Hello-World/blob/"
-                     "6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt"),
-        "raw_url": ("https://github.com/octocat/Hello-World/raw/"
-                    "6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt"),
-        "contents_url": ("https://api.github.com/repos/octocat/Hello-World/"
-                         "contents/file1.txt?ref=6dcb09b5b57875f334f61aebed"
-                         "695e2e4193db5e"),
-        "patch": ("@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@"
-                  " module Test")
-    }
+    get_pull_file_example_data = create_example_data_helper('pull_file_example')
+    example_data = get_pull_file_example_data()
 
     def test_contents(self):
         """Verify the request made to fetch a pull request file contents."""
