@@ -402,3 +402,17 @@ class User(BaseAccount):
         from .repos import Repository
         url = self._build_url('subscriptions', base_url=self._api)
         return self._iter(int(number), url, Repository, etag=etag)
+
+    @requires_auth
+    def rename(self, login):
+        """Rename the user. This is only available for administrators of
+        a GitHub Enterprise instance.
+
+        :param str login: (required), new name of the user
+        :returns: bool
+        """
+        url = self._build_url('admin', 'users', self.id)
+        payload = {'login': login}
+        resp = self._boolean(self._patch(url, data=payload), 202, 403)
+        return resp
+
