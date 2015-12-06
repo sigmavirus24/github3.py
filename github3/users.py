@@ -419,7 +419,7 @@ class User(BaseAccount):
         return resp
 
     @requires_auth
-    def authorize(self, scopes=None):
+    def impersonate(self, scopes=None):
         """Obtain an impersonation token for the user.
 
         The retrieved token will allow impersonation of the user.
@@ -438,3 +438,75 @@ class User(BaseAccount):
         json = self._json(self._post(url, data=data), 201)
 
         return self._instance_or_null(Authorization, json)
+
+    @requires_auth
+    def revoke_impersonation(self):
+        """Revoke all impersonation tokens for the current user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('admin', 'users', self.id, 'authorizations')
+        response = self._delete(url)
+
+        return self._boolean(response, 204, 403)
+
+    @requires_auth
+    def promote(self):
+        """Promote a user to site administrator.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('site_admin', base_url=self._api)
+        response = self._put(url)
+
+        return self._boolean(response, 204, 403)
+
+    @requires_auth
+    def demote(self):
+        """Demote a site administrator to simple user.
+
+        You can demote any user account except your own.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('site_admin', base_url=self._api)
+        response = self._delete(url)
+
+        return self._boolean(response, 204, 403)
+
+    @requires_auth
+    def suspend(self):
+        """Suspend the user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        This API is disabled if you use LDAP, check the GitHub API dos for more information.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('suspended', base_url=self._api)
+        response = self._put(url)
+
+        return self._boolean(response, 204, 403)
+
+    @requires_auth
+    def unsuspend(self):
+        """Unsuspend the user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        This API is disabled if you use LDAP, check the GitHub API dos for more information.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('suspended', base_url=self._api)
+        response = self._delete(url)
+
+        return self._boolean(response, 204, 403)
+
