@@ -9,6 +9,7 @@ This module contains everything relating to Users.
 from __future__ import unicode_literals
 
 from json import dumps
+from github3.auths import Authorization
 from uritemplate import URITemplate
 from .events import Event
 from .models import GitHubObject, GitHubCore, BaseAccount
@@ -29,6 +30,7 @@ class Key(GitHubCore):
         k1.id == k2.id
         k1.id != k2.id
     """
+
     def _update_attributes(self, key, session=None):
         self._api = key.get('url', '')
         #: The text of the actual key
@@ -78,6 +80,7 @@ class Plan(GitHubObject):
     <http://developer.github.com/v3/users/#get-the-authenticated-user>`_
     documentation for more specifics.
     """
+
     def _update_attributes(self, plan):
         #: Number of collaborators
         self.collaborators = plan.get('collaborators')
@@ -103,7 +106,6 @@ class Plan(GitHubObject):
 
 
 class User(BaseAccount):
-
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
 
@@ -416,3 +418,23 @@ class User(BaseAccount):
         resp = self._boolean(self._patch(url, data=payload), 202, 403)
         return resp
 
+    @requires_auth
+    def authorize(self, scopes=None):
+        """Obtain an impersonation token for the user.
+
+        The retrieved token will allow impersonation of the user.
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :param list scopes: (optional), areas you want this token to apply to,
+            i.e., 'gist', 'user'
+        :returns: :class:`Authorization <Authorization>`
+        """
+        url = self._build_url('admin', 'users', self.id, 'authorizations')
+        data = {}
+
+        if scopes:
+            data['scopes'] = scopes
+
+        json = self._json(self._post(url, data=data), 201)
+
+        return self._instance_or_null(Authorization, json)
