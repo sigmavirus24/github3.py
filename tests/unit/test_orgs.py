@@ -4,11 +4,12 @@ from github3 import GitHubError
 from github3.orgs import Organization
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                    create_example_data_helper)
+                     create_example_data_helper)
 
 url_for = create_url_helper('https://api.github.com/orgs/github')
 
 get_org_example_data = create_example_data_helper('org_example')
+
 
 class TestOrganization(UnitHelper):
     described_class = Organization

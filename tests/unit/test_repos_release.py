@@ -1,7 +1,7 @@
 from github3.repos.release import Release, Asset
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper, mock,
-                    create_example_data_helper)
+                     create_example_data_helper)
 
 import json
 import pytest
@@ -10,10 +10,11 @@ url_for = create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/releases'
 )
 
+get_release_example_data = create_example_data_helper('repos_release_example')
+
 
 class TestRelease(UnitHelper):
     described_class = Release
-    get_release_example_data = create_example_data_helper('repos_release_example')
     example_data = get_release_example_data()
 
     # Attribute tests

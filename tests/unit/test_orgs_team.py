@@ -4,11 +4,12 @@ from github3 import GitHubError
 from github3.orgs import Team
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                    create_example_data_helper)
+                     create_example_data_helper)
 
 url_for = create_url_helper('https://api.github.com/teams/10')
 
 get_team_example_data = create_example_data_helper('orgs_team_example')
+
 
 class TestTeam(UnitHelper):
     described_class = Team
