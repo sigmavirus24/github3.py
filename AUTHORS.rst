@@ -114,3 +114,5 @@ Contributors
 - Bastien Gandouet (@b4stien)
 
 - Usman Ehtesham Gul (@ueg1990)
+
+- Derek Gustafson (@degustaf)

@@ -2,47 +2,15 @@ import pytest
 
 import github3
 
-from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,)
+from .helper import UnitHelper, UnitIteratorHelper, create_url_helper, create_example_data_helper
 
 url_for = create_url_helper(
     'https://api.github.com/users/octocat'
 )
 
-example_data = {
-    "login": "octocat",
-    "id": 1,
-    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-    "gravatar_id": "somehexcode",
-    "url": "https://api.github.com/users/octocat",
-    "html_url": "https://github.com/octocat",
-    "followers_url": "https://api.github.com/users/octocat/followers",
-    "following_url": ("https://api.github.com/users/octocat/following"
-                      "{/other_user}"),
-    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
-    "starred_url": ("https://api.github.com/users/octocat/starred"
-                    "{/owner}{/repo}"),
-    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
-    "organizations_url": "https://api.github.com/users/octocat/orgs",
-    "repos_url": "https://api.github.com/users/octocat/repos",
-    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
-    "received_events_url": ("https://api.github.com/users/octocat/"
-                            "received_events"),
-    "type": "User",
-    "site_admin": False,
-    "name": "monalisa octocat",
-    "company": "GitHub",
-    "blog": "https://github.com/blog",
-    "location": "San Francisco",
-    "email": "octocat@github.com",
-    "hireable": False,
-    "bio": "There once was...",
-    "public_repos": 2,
-    "public_gists": 1,
-    "followers": 20,
-    "following": 0,
-    "created_at": "2008-01-14T04:33:35Z",
-    "updated_at": "2008-01-14T04:33:35Z"
-}
+get_users_example_data = create_example_data_helper('users_example')
+
+example_data = get_users_example_data()
 
 
 class TestUserIterators(UnitIteratorHelper):
