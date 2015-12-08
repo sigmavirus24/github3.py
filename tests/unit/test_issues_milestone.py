@@ -1,7 +1,8 @@
 """Unit tests for the Milestone class."""
 import github3
 
-from .helper import UnitIteratorHelper, create_url_helper,create_example_data_helper
+from .helper import (UnitIteratorHelper, create_url_helper,
+                     create_example_data_helper)
 
 get_milestone_example_data = create_example_data_helper('milestone_example')
 example_data = get_milestone_example_data()
