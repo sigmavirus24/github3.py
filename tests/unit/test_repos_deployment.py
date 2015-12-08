@@ -1,7 +1,8 @@
 """Unit tests for Deployment methods."""
 import github3
 
-from .helper import UnitIteratorHelper, create_url_helper, create_example_data_helper
+from .helper import (UnitIteratorHelper, create_url_helper,
+                     create_example_data_helper)
 
 url_for = create_url_helper(
     'https://api.github.com/repos/octocat/example/deployments/1'

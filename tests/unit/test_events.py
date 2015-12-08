@@ -6,7 +6,9 @@ from .helper import create_example_data_helper
 get_example_data = create_example_data_helper('event_example')
 get_org_example_data = create_example_data_helper('org_example')
 get_comment_example_data = create_example_data_helper('comment_example')
-get_pull_request_example_data = create_example_data_helper('pull_request_example')
+get_pull_request_example_data = create_example_data_helper(
+    'pull_request_example'
+)
 get_issue_example_data = create_example_data_helper('issue_example')
 get_user_example_data = create_example_data_helper('user_example')
 get_repo_example_data = create_example_data_helper('repo_example')
@@ -74,7 +76,8 @@ class TestPayLoadHandlers(TestCase):
         }
         github3.events._issuecomm(comment, None)
         assert isinstance(comment['issue'], github3.issues.Issue)
-        assert isinstance(comment['comment'], github3.issues.comment.IssueComment)
+        assert isinstance(comment['comment'],
+                          github3.issues.comment.IssueComment)
 
     def test_issueevent(self):
         """Show that the event type is a IssueEvent."""
@@ -92,7 +95,8 @@ class TestPayLoadHandlers(TestCase):
         """Show that the event type is a PullRequestEvent."""
         pull_request = {'pull_request': get_pull_request_example_data()}
         github3.events._pullreqev(pull_request, None)
-        assert isinstance(pull_request['pull_request'], github3.pulls.PullRequest)
+        assert isinstance(pull_request['pull_request'],
+                          github3.pulls.PullRequest)
 
     def test_pullreqcomment(self):
         """Show that the event type is a PullRequestReviewCommentEvent."""

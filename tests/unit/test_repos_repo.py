@@ -7,7 +7,7 @@ from github3.null import NullObject
 from github3.repos.repo import Repository
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                    create_example_data_helper)
+                     create_example_data_helper)
 
 url_for = create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'

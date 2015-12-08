@@ -128,7 +128,9 @@ class TestOrganization(IntegrationHelper):
             for member in o.members():
                 assert isinstance(member, github3.users.User)
 
-    @pytest.mark.xfail(reason="sigmavirus24 needs to actually write a test for this.")
+    @pytest.mark.xfail(
+        reason="sigmavirus24 needs to actually write a test for this."
+    )
     def test_can_filter_organization_members(self):
         """
         Test the ability to filter an organization's members by

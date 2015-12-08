@@ -1,6 +1,4 @@
 """Integration tests for methods implemented on Branch."""
-import github3
-
 from .helper import IntegrationHelper
 
 
