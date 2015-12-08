@@ -47,6 +47,7 @@ matrix:
     - env: TOXENV=py34-flake8
     - env: TOXENV=docstrings
     - env: TOXENV=notebooks
+    - env: TOXENV=readme
     - env: TOXENV=docs
   fast_finish: true
   allow_failures:
