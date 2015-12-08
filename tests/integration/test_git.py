@@ -12,7 +12,9 @@ class TestTree(IntegrationHelper):
         cassette_name = self.cassette_name('recurse')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
-            t = repository.tree('75b347329e3fc87ac78895ca1be58daff78872a1').recurse()
+            t = repository.tree(
+                '75b347329e3fc87ac78895ca1be58daff78872a1'
+            ).recurse()
             assert isinstance(t.tree[0], github3.git.Hash)
             assert repr(t.tree[0]).startswith('<Hash')
 
@@ -27,5 +29,9 @@ class TestReference(IntegrationHelper):
         cassette_name = self.cassette_name('update')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('itsmemattchung', 'github3.py')
-            reference = repository.ref('heads/migrate-tests/git-integration-test')
-            assert reference.update('b8bcee4db99325949c4171590b8fbcc8354d54d8') is True
+            reference = repository.ref(
+                'heads/migrate-tests/git-integration-test'
+            )
+            assert reference.update(
+                'b8bcee4db99325949c4171590b8fbcc8354d54d8'
+            ) is True

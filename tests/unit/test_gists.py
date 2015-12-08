@@ -193,7 +193,9 @@ class TestGistHistory(UnitHelper):
 
     def test_equality(self):
         """Show that two instances of a GistHistory are equal."""
-        history = github3.gists.history.GistHistory(gist_history_example_data())
+        history = github3.gists.history.GistHistory(
+            gist_history_example_data()
+        )
         assert self.instance == history
         history._uniq = 'foo'
         assert self.instance != history
@@ -208,11 +210,13 @@ class TestGistComment(UnitHelper):
 
     def test_equality(self):
         """Show that two instances of a GistComment are equal."""
-        comment = github3.gists.comment.GistComment(gist_comment_example_data())
+        comment = github3.gists.comment.GistComment(
+            gist_comment_example_data()
+        )
         assert self.instance == comment
         comment._uniq = '1'
         assert self.instance != comment
 
     def test_repr(self):
-        """Show that the string representation of GistComment starts with Gist Comment."""
+        """Excercise the GistComment repr."""
         assert repr(self.instance).startswith('<Gist Comment')

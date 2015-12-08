@@ -17,7 +17,8 @@ class TestThread(IntegrationHelper):
             assert len(threads) > 0
             thread = threads[0]
             assert isinstance(thread, github3.notifications.Thread)
-            assert isinstance(thread.subscription(), github3.notifications.Subscription)
+            assert isinstance(thread.subscription(),
+                              github3.notifications.Subscription)
 
 
 class TestSubscription(IntegrationHelper):

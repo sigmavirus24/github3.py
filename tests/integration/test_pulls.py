@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on PullRequest."""
-import tempfile
-
 import github3
 from github3 import repos
 
