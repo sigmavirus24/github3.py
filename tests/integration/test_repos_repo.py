@@ -236,6 +236,22 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(deployment, github3.repos.deployment.Deployment)
 
+    def test_create_hook(self):
+        """Test the ability to create a hook for a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_hook')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            data = {
+                'name': 'web',
+                'config': {
+                    'url': 'http://example.com/webhook',
+                    'content_type': 'json'
+                }
+            }
+            hook = repository.create_hook(**data)
+            assert isinstance(hook, github3.repos.hook.Hook)
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()

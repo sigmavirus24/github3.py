@@ -30,26 +30,6 @@ class TestRepository(BaseCase):
         assert isinstance(self.repo.create_fork('github3py'), repos.Repository)
         self.mock_assertions()
 
-    def test_create_hook(self):
-        self.response('hook', 201)
-        self.post(self.api + 'hooks')
-        self.conf = {
-            'data': {
-                'name': 'Hookname',
-                'config': {
-                    'foo': 'bar'
-                }
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.repo.create_hook,
-                          None, None)
-
-        self.login()
-        h = self.repo.create_hook(**self.conf['data'])
-        assert isinstance(h, repos.hook.Hook)
-        self.mock_assertions()
-
     def test_create_issue(self):
         self.response('issue', 201)
         title = 'Construct _api attribute on our own'

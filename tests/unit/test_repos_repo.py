@@ -58,6 +58,30 @@ class TestRepository(UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_create_hook(self):
+        """Verify the request to create a hook."""
+        data = {
+            'name': 'web',
+            'config': {
+                'url': 'http://example.com/webhook',
+                'content_type': 'json'
+            }
+        }
+
+        self.instance.create_hook(**data)
+        self.post_called_with(
+            url_for('hooks'),
+            data={
+                'name': 'web',
+                'config': {
+                    'url': 'http://example.com/webhook',
+                    'content_type': 'json'
+                },
+                'events': ['push'],
+                'active': True
+            }
+        )
+
     def test_create_ref(self):
         """Verify the request to create a reference."""
         self.instance.create_ref('refs/heads/foo', 'my-fake-sha')
