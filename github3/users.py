@@ -105,6 +105,27 @@ class Plan(GitHubObject):
         return self.name == 'free'  # (No coverage)
 
 
+class UserEmail(GitHubCore):
+
+    """The :class:`UserEmail` object. Please see GitHub's `Emails documentation
+    <https://developer.github.com/v3/users/emails/>` for more information.
+    """
+
+    def _update_attributes(self, email):
+        #: Email address
+        self.email = email.get('email')
+        #: Whether the address has been verified
+        self.verified = email.get('verified')
+        #: Whether the address is the primary address
+        self.primary = email.get('primary')
+
+    def _repr(self):
+        return '<UserEmail [{0}]>'.format(self.email)
+
+    def __str__(self):
+        return self.email
+
+
 class User(BaseAccount):
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
@@ -238,6 +259,18 @@ class User(BaseAccount):
         url = self._build_url('user', 'emails')
         return self._boolean(self._delete(url, data=dumps(addresses)),
                              204, 404)
+
+    @requires_auth
+    def email_addresses(self, number=-1):
+        """Iterate over each email address in the authenticated
+        user's account.
+
+        :param int number: (optional), number of email addresses to return.
+            Default: -1, returns all of them
+        :returns: generator of :class:`UserEmail <github3.users.UserEmail>`
+        """
+        url = self._build_url('user', 'emails')
+        return self._iter(int(number), url, UserEmail)
 
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.

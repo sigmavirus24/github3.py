@@ -40,6 +40,17 @@ class TestUser(IntegrationHelper):
 
     """Integration tests for methods on the User class."""
 
+    def test_email_addresses(self):
+        """Test the ability to retrieve the email addresses of the
+        authenticated user."""
+        self.token_login()
+        cassette_name = self.cassette_name('email_addresses')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.me()
+            assert user is not None
+            for address in user.email_addresses():
+                assert isinstance(address, github3.users.UserEmail)
+
     def test_events(self):
         """Show that a user can retrieve a events performed by a user."""
         cassette_name = self.cassette_name('events')
