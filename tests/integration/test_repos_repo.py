@@ -279,6 +279,27 @@ class TestRepository(helper.IntegrationHelper):
             issue = repository.create_issue(**data)
             assert isinstance(issue, github3.issues.issue.Issue)
 
+    def test_create_key(self):
+        """Test the ability to deploy a key."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_key')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            key = ('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZn4/RGE9YQrfjq7wSr'
+                   'YkdtKH3r1rEIkx/4Nv1AG/PqE4AWKSVzKkqhurnqKtctVCLtU9pNFIjl/'
+                   'XvNluTW3zrfqKjgaDdiBtWwecWzSbQqugfzmwFqCE4smJkP8e7+e9Fd1k'
+                   'GOGyqVJLBLfIUdEbHN3Ws40Z9OXgrJ/tiNdg1HHgAOjpknCMrQI8NDP9o'
+                   '9CLuE/AfNVzRNOzpf/rrdZ4YW4kcDhbcQ8X7DGCnbvY9wUp3lDmSvVy6z'
+                   'olYwLziYqsGjw0kLHvIzHdbGCjp+50iZSBrm29AlWa9eRsGskiUTIk6SA'
+                   'Q8Fm5qKNkCtPYQ6YmjRiKyDtsMoqfjzDkyEPLv mattchung@Matts-Ma'
+                   'cBook-Air.local')
+            data = {
+                'title': 'Deploy Key',
+                'key': key
+            }
+            key = repository.create_key(**data)
+            assert isinstance(key, github3.users.Key)
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()

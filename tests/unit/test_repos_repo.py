@@ -104,6 +104,18 @@ class TestRepository(UnitHelper):
             data=data
         )
 
+    def test_create_key(self):
+        """Verify the request to create a key."""
+        data = {
+            'title': 'octocat@octomac',
+            'key': 'ssh-rsa AAA'
+        }
+        self.instance.create_key(**data)
+        self.post_called_with(
+            url_for('keys'),
+            data=data
+        )
+
     def test_create_ref(self):
         """Verify the request to create a reference."""
         self.instance.create_ref('refs/heads/foo', 'my-fake-sha')
