@@ -6,9 +6,9 @@ from .helper import (create_example_data_helper, create_url_helper,
                      UnitHelper, UnitIteratorHelper)
 
 gist_example_data = create_example_data_helper('gist_example')
+gist_example_list_data = create_example_data_helper('gist_example_list')
 gist_history_example_data = create_example_data_helper('gist_history_example')
 gist_comment_example_data = create_example_data_helper('gist_comment_example')
-gist_example_list_data = create_example_data_helper('gist_example_list_data')
 
 url_for = create_url_helper(
     'https://api.github.com/gists/b4c7ac7be6e591d0d155'
