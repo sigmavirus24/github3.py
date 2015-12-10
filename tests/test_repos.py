@@ -15,46 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_create_fork(self):
-        self.response('repo', 202)
-        self.conf = {'data': None}
-        self.post(self.api + 'forks')
-
-        self.assertRaises(github3.GitHubError, self.repo.create_fork)
-
-        self.login()
-        assert isinstance(self.repo.create_fork(), repos.Repository)
-        self.mock_assertions()
-
-        self.conf['data'] = {'organization': 'github3py'}
-        assert isinstance(self.repo.create_fork('github3py'), repos.Repository)
-        self.mock_assertions()
-
-    def test_create_issue(self):
-        self.response('issue', 201)
-        title = 'Construct _api attribute on our own'
-        self.post(self.api + 'issues')
-        self.conf = {'data': {'title': title}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_issue, title)
-
-        self.login()
-        assert isinstance(self.repo.create_issue(title), github3.issues.Issue)
-        self.mock_assertions()
-
-        body = 'Fake body'
-        #self.conf['data'].update(body=body)
-        assert isinstance(self.repo.create_issue(title, body),
-                          github3.issues.Issue)
-        self.mock_assertions()
-
-        assignee, mile, labels = 'sigmavirus24', 1, ['bug', 'enhancement']
-        #self.conf['data'].update({'assignee': assignee, 'milestone': mile,
-        #                          'labels': labels})
-        issue = self.repo.create_issue(title, body, assignee, mile, labels)
-        assert isinstance(issue, github3.issues.Issue)
-        self.mock_assertions()
-
     def test_create_key(self):
         self.response('key', 201)
         self.post(self.api + 'keys')

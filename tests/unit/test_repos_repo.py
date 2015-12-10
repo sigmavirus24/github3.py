@@ -58,6 +58,13 @@ class TestRepository(UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_create_fork(self):
+        """Verify the request to fork a repository."""
+        self.instance.create_fork()
+        self.post_called_with(
+            url_for('forks')
+        )
+
     def test_create_hook(self):
         """Verify the request to create a hook."""
         data = {
@@ -80,6 +87,21 @@ class TestRepository(UnitHelper):
                 'events': ['push'],
                 'active': True
             }
+        )
+
+    def test_create_issue(self):
+        """Verify the request to create an issue."""
+        data = {
+            'title': 'Unit Issue',
+            'body': 'Fake body',
+            'assignee': 'sigmavirus24',
+            'milestone': 1,
+            'labels': ['bug', 'enhancement']
+        }
+        self.instance.create_issue(**data)
+        self.post_called_with(
+            url_for('issues'),
+            data=data
         )
 
     def test_create_ref(self):

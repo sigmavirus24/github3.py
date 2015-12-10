@@ -236,6 +236,19 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(deployment, github3.repos.deployment.Deployment)
 
+    def test_create_fork(self):
+        """Test the ability to fork a repository."""
+        self.token_login()
+        betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
+        cassette_name = self.cassette_name('create_fork')
+        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            forked_repo = repository.create_fork()
+            assert isinstance(forked_repo, github3.repos.Repository)
+
+            org_forked_repo = repository.create_fork('mattchung')
+            assert isinstance(org_forked_repo, github3.repos.Repository)
+
     def test_create_hook(self):
         """Test the ability to create a hook for a repository."""
         self.token_login()
@@ -251,6 +264,20 @@ class TestRepository(helper.IntegrationHelper):
             }
             hook = repository.create_hook(**data)
             assert isinstance(hook, github3.repos.hook.Hook)
+
+    def test_create_issue(self):
+        """Test the ability to create an issue for a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_issue')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            data = {
+                'title': 'Create Issue Integration Test',
+                'body': 'Delete me after',
+                'assignee': 'itsmemattchung'
+            }
+            issue = repository.create_issue(**data)
+            assert isinstance(issue, github3.issues.issue.Issue)
 
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
