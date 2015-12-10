@@ -227,6 +227,7 @@ class TestGistComment(UnitHelper):
         """Excercise the GistComment repr."""
         assert repr(self.instance).startswith('<Gist Comment')
 
+
 class TestGistFile(UnitHelper):
 
     """Test Gist File."""
@@ -245,4 +246,3 @@ class TestGistFile(UnitHelper):
         self.instance.content()
 
         self.session.get.assert_called_once_with(self.instance.raw_url)
-
