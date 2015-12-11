@@ -1,8 +1,39 @@
 """Integration tests for the User class."""
 import github3
 import datetime
+import pytest
 
 from .helper import IntegrationHelper
+from github3.exceptions import MethodNotAllowed
+
+
+class TestKey(IntegrationHelper):
+    """Integration tests for methods on Key class."""
+
+    def test_delete(self):
+        """Test the ability to delete a key."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            key = self.gh.key(14947878)
+            assert key.delete()
+
+    def test_update(self):
+        """Test the ability to update a key."""
+        self.token_login()
+        cassette_name = self.cassette_name('update')
+        with self.recorder.use_cassette(cassette_name):
+            key = self.gh.key(14948033)
+            key_text = ('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD5T3fBQaqmCsJ'
+                        'gHvDmlxpF89/nmb9V7sx30pTNPR9h1o/WEwJCdKIoqYcBRnoMUG'
+                        'vGRBh/irJF+jOs4iLm5rd3nC44EIFfUyaHIzMaCbt8VuauEEQLV'
+                        '/Rvgd8e0bYd4oaOrUhPhcSZPU9lMDopa8Gmf+6bt+HFIyDnUDPP'
+                        'KT6jb0YohZgGs57db7Z+exlfrtuQ9Wk+n5Xa9OSQSOSlBzRlS6+'
+                        'h/LLpTWUdFskxXjdFFZh5viGW2oUzLQ6eoNpx/sl2k/rpJGaqXe'
+                        '4aoskG0v7pmymdipnQOep3eNeOUJSqiue17qzsvULU9Zk4ZUYZC'
+                        '/8f7o4GtuLCKvIB+EdkVKbl mattchung@Matts-Air')
+            with pytest.raises(MethodNotAllowed):
+                key.update(title='Integration Test', key=key_text)
 
 
 class TestUser(IntegrationHelper):

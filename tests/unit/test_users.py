@@ -9,9 +9,45 @@ url_for = create_url_helper(
     'https://api.github.com/users/octocat'
 )
 
+key_url_for = create_url_helper(
+    'https://api.github.com/user/keys'
+)
+
 get_users_example_data = create_example_data_helper('users_example')
+get_user_key_example_data = create_example_data_helper('user_key_example')
 
 example_data = get_users_example_data()
+
+
+class TestUserKey(UnitHelper):
+    described_class = github3.users.Key
+    example_data = get_user_key_example_data()
+
+    def test_equality(self):
+        """Show that two instances of Key are equal."""
+        key = github3.users.Key(get_user_key_example_data())
+        assert self.instance == key
+
+        key._uniq += "cruft"
+        assert self.instance != key
+
+    def test_repr(self):
+        """Show instance string is formatted properly."""
+        assert str(self.instance) == self.instance.key
+        assert repr(self.instance).startswith('<User Key')
+
+    def test_delete(self):
+        """Test the request for deleting key."""
+        self.instance.delete()
+        assert self.session.delete.called
+
+    def test_update(self):
+        """Test the request for updating a key."""
+        self.instance.update(title='New Title', key='Fake key')
+        self.session.patch.assert_called_once_with(
+            key_url_for('1'),
+            data='{"key": "Fake key", "title": "New Title"}'
+        )
 
 
 class TestUserIterators(UnitIteratorHelper):
