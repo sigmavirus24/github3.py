@@ -19,12 +19,6 @@ class TestGitHubEnterprise(UnitHelper):
     described_class = GitHubEnterprise
     example_data = base_url
 
-    def create_instance_of_described_class(self):
-        instance = self.described_class(self.example_data)
-        instance.session = self.session
-
-        return instance
-
     def after_setup(self):
         self.described_class._build_url = _build_url
 
