@@ -483,7 +483,8 @@ class User(BaseAccount):
 
         This is only available for admins of a GitHub Enterprise instance.
 
-        This API is disabled if you use LDAP, check the GitHub API dos for more information.
+        This API is disabled if you use LDAP, check the GitHub API dos for more
+        information.
 
         :returns: bool -- True if successful, False otherwise
         """
@@ -497,7 +498,8 @@ class User(BaseAccount):
 
         This is only available for admins of a GitHub Enterprise instance.
 
-        This API is disabled if you use LDAP, check the GitHub API dos for more information.
+        This API is disabled if you use LDAP, check the GitHub API dos for more
+        information.
 
         :returns: bool -- True if successful, False otherwise
         """
@@ -507,7 +509,8 @@ class User(BaseAccount):
 
     @requires_auth
     def delete(self):
-        """Delete the user. Per GitHub API documentation, it is often preferable to suspend the user.
+        """Delete the user. Per GitHub API documentation, it is often preferable
+        to suspend the user.
 
         This is only available for admins of a GitHub Enterprise instance.
 
