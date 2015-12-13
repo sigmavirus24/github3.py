@@ -9,6 +9,7 @@ This module contains everything relating to Users.
 from __future__ import unicode_literals
 
 from json import dumps
+from github3.auths import Authorization
 from uritemplate import URITemplate
 from .events import Event
 from .models import GitHubObject, GitHubCore, BaseAccount
@@ -29,6 +30,7 @@ class Key(GitHubCore):
         k1.id == k2.id
         k1.id != k2.id
     """
+
     def _update_attributes(self, key, session=None):
         self._api = key.get('url', '')
         #: The text of the actual key
@@ -78,6 +80,7 @@ class Plan(GitHubObject):
     <http://developer.github.com/v3/users/#get-the-authenticated-user>`_
     documentation for more specifics.
     """
+
     def _update_attributes(self, plan):
         #: Number of collaborators
         self.collaborators = plan.get('collaborators')
@@ -103,7 +106,6 @@ class Plan(GitHubObject):
 
 
 class User(BaseAccount):
-
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
 
@@ -402,3 +404,117 @@ class User(BaseAccount):
         from .repos import Repository
         url = self._build_url('subscriptions', base_url=self._api)
         return self._iter(int(number), url, Repository, etag=etag)
+
+    @requires_auth
+    def rename(self, login):
+        """Rename the user. This is only available for administrators of
+        a GitHub Enterprise instance.
+
+        :param str login: (required), new name of the user
+        :returns: bool
+        """
+        url = self._build_url('admin', 'users', self.id)
+        payload = {'login': login}
+        resp = self._boolean(self._patch(url, data=payload), 202, 403)
+        return resp
+
+    @requires_auth
+    def impersonate(self, scopes=None):
+        """Obtain an impersonation token for the user.
+
+        The retrieved token will allow impersonation of the user.
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :param list scopes: (optional), areas you want this token to apply to,
+            i.e., 'gist', 'user'
+        :returns: :class:`Authorization <Authorization>`
+        """
+        url = self._build_url('admin', 'users', self.id, 'authorizations')
+        data = {}
+
+        if scopes:
+            data['scopes'] = scopes
+
+        json = self._json(self._post(url, data=data), 201)
+
+        return self._instance_or_null(Authorization, json)
+
+    @requires_auth
+    def revoke_impersonation(self):
+        """Revoke all impersonation tokens for the current user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('admin', 'users', self.id, 'authorizations')
+
+        return self._boolean(self._delete(url), 204, 403)
+
+    @requires_auth
+    def promote(self):
+        """Promote a user to site administrator.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('site_admin', base_url=self._api)
+
+        return self._boolean(self._put(url), 204, 403)
+
+    @requires_auth
+    def demote(self):
+        """Demote a site administrator to simple user.
+
+        You can demote any user account except your own.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('site_admin', base_url=self._api)
+
+        return self._boolean(self._delete(url), 204, 403)
+
+    @requires_auth
+    def suspend(self):
+        """Suspend the user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        This API is disabled if you use LDAP, check the GitHub API dos for more
+        information.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('suspended', base_url=self._api)
+
+        return self._boolean(self._put(url), 204, 403)
+
+    @requires_auth
+    def unsuspend(self):
+        """Unsuspend the user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        This API is disabled if you use LDAP, check the GitHub API dos for more
+        information.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('suspended', base_url=self._api)
+
+        return self._boolean(self._delete(url), 204, 403)
+
+    @requires_auth
+    def delete(self):
+        """Delete the user. Per GitHub API documentation, it is often preferable
+        to suspend the user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('admin', 'users', self.id)
+        return self._boolean(self._delete(url), 204, 403)
