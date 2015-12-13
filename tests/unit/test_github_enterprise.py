@@ -1,5 +1,3 @@
-import pytest
-
 from github3.github import GitHubEnterprise
 import github3
 
@@ -41,10 +39,16 @@ example_data = {
     "updated_at": "2008-01-14T04:33:35Z"
 }
 
+base_url = 'https://ghe.example.com/'
+
+
+def _build_url(_, *args, **kwargs):
+    return github3.session.GitHubSession().build_url(
+        base_url=base_url + 'api/v3', *args, **kwargs)
+
 
 class TestGitHubEnterprise(UnitHelper):
     described_class = GitHubEnterprise
-    base_url = 'https://ghe.example.com/'
     example_data = base_url
 
     def create_instance_of_described_class(self):
@@ -54,12 +58,11 @@ class TestGitHubEnterprise(UnitHelper):
         return instance
 
     def after_setup(self):
-        self.described_class._build_url = lambda _, *args, **kwargs: github3.session.GitHubSession().build_url(
-            base_url=self.base_url + 'api/v3', *args, **kwargs)
+        self.described_class._build_url = _build_url
 
     def url_for(self, path=''):
-        """Simple function to generate URLs with the base GitHubEnterprise URL."""
-        return self.base_url + 'api/v3/' + path.strip('/')
+        """Generate URLs with the base GitHubEnterprise URL."""
+        return base_url + 'api/v3/' + path.strip('/')
 
     def test_create_user(self):
         """Show that an admin can ask for user creation."""
@@ -91,34 +94,41 @@ class TestUserAdministration(UnitHelper):
     def test_rename_user(self):
         """Show that an admin can ask for user renaming."""
         self.instance.rename('new_login')
-        self.session.patch.assert_called_once_with(self.url_for_admin(), data={'login': 'new_login'})
+        self.session.patch.assert_called_once_with(self.url_for_admin(),
+                                                   data={'login': 'new_login'})
 
     def test_impersonate(self):
-        """Show that an admin can ask for an impersonation token for a specific user."""
+        """Show that an admin can ask for an impersonation token for a user."""
         self.instance.impersonate(scopes=['repo', 'user'])
-        self.post_called_with(self.url_for_admin('/authorizations'), data={'scopes': ['repo', 'user']})
+        self.post_called_with(self.url_for_admin('/authorizations'),
+                              data={'scopes': ['repo', 'user']})
 
     def test_revoke_impersonation(self):
-        """Show that an admin can revoke impersonation tokens for a specific user."""
+        """Show that an admin can revoke impersonation tokens for a user."""
         self.instance.revoke_impersonation()
-        self.session.delete.assert_called_once_with(self.url_for_admin('/authorizations'))
+        self.session.delete.assert_called_once_with(
+            self.url_for_admin('/authorizations'))
 
     def test_promote(self):
         """Show that an admin can promote a specific user."""
         self.instance.promote()
-        self.session.put.assert_called_once_with(self.url_for_user('/site_admin'))
+        self.session.put.assert_called_once_with(
+            self.url_for_user('/site_admin'))
 
     def test_demote(self):
         """Show that an admin can demote another admin."""
         self.instance.demote()
-        self.session.delete.assert_called_once_with(self.url_for_user('/site_admin'))
+        self.session.delete.assert_called_once_with(
+            self.url_for_user('/site_admin'))
 
     def test_suspend(self):
         """Show that an admin can suspend a user."""
         self.instance.suspend()
-        self.session.put.assert_called_once_with(self.url_for_user('/suspended'))
+        self.session.put.assert_called_once_with(
+            self.url_for_user('/suspended'))
 
     def test_unsuspend(self):
         """Show that an admin can unsuspend a user."""
         self.instance.unsuspend()
-        self.session.delete.assert_called_once_with(self.url_for_user('/suspended'))
+        self.session.delete.assert_called_once_with(
+            self.url_for_user('/suspended'))
