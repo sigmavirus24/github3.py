@@ -118,5 +118,3 @@ Contributors
 - Derek Gustafson (@degustaf)
 
 - Christophe Lecointe (@christophelec)
-
-
