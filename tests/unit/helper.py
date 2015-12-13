@@ -114,11 +114,6 @@ class UnitHelper(unittest.TestCase):
         """Use to assert patch was called with JSON."""
         self.method_called_with('patch', args, kwargs)
 
-    def delete_called_with(self, *args, **kwargs):
-        """Use to assert delete was called."""
-        self.method_called_with('delete', args, kwargs)
-
-
     def post_called_with(self, *args, **kwargs):
         """Use to assert post was called with JSON."""
         assert self.session.post.called is True
