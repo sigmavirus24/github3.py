@@ -79,12 +79,8 @@ class UnitHelper(unittest.TestCase):
         If cls.example_data is None, just create a simple instance of the
         class.
         """
-        if self.example_data:
-            instance = self.described_class(self.example_data,
-                                            self.session)
-        else:
-            instance = self.described_class()
-            instance.session = self.session
+        instance = self.described_class(self.example_data)
+        instance.session = self.session
 
         return instance
 
