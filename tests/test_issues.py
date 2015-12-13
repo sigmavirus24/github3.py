@@ -8,58 +8,6 @@ import datetime
 from tests.utils import BaseCase, load, mock
 
 
-class TestLabel(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestLabel, self).__init__(methodName)
-        self.l = Label(load('label'))
-        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "labels/Bug")
-
-    def setUp(self):
-        super(TestLabel, self).setUp()
-        self.l = Label(self.l.as_dict(), self.g)
-
-    def test_equality(self):
-        l = Label(load('label'))
-        assert self.l == l
-        l._uniq = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                   "labels/wontfix")
-        assert self.l != l
-
-    def test_repr(self):
-        assert repr(self.l) == '<Label [{0}]>'.format(self.l.name)
-
-    def test_str(self):
-        assert str(self.l) == self.l.name
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.l.delete)
-
-        self.not_called()
-        self.login()
-        assert self.l.delete()
-
-    def test_update(self):
-        self.response('label', 200)
-        self.patch(self.api)
-        self.conf = {'data': {'name': 'newname', 'color': 'afafaf'}}
-
-        self.assertRaises(github3.GitHubError, self.l.update, None, None)
-
-        self.login()
-        assert self.l.update(None, None) is False
-        self.not_called()
-
-        assert self.l.update('newname', 'afafaf')
-        self.mock_assertions()
-
-        assert self.l.update('newname', '#afafaf')
-        self.mock_assertions()
-
-
 class TestMilestone(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestMilestone, self).__init__(methodName)
