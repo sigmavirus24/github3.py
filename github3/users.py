@@ -448,9 +448,8 @@ class User(BaseAccount):
         :returns: bool -- True if successful, False otherwise
         """
         url = self._build_url('admin', 'users', self.id, 'authorizations')
-        response = self._delete(url)
 
-        return self._boolean(response, 204, 403)
+        return self._boolean(self._delete(url), 204, 403)
 
     @requires_auth
     def promote(self):
@@ -461,9 +460,8 @@ class User(BaseAccount):
         :returns: bool -- True if successful, False otherwise
         """
         url = self._build_url('site_admin', base_url=self._api)
-        response = self._put(url)
 
-        return self._boolean(response, 204, 403)
+        return self._boolean(self._put(url), 204, 403)
 
     @requires_auth
     def demote(self):
@@ -476,9 +474,8 @@ class User(BaseAccount):
         :returns: bool -- True if successful, False otherwise
         """
         url = self._build_url('site_admin', base_url=self._api)
-        response = self._delete(url)
 
-        return self._boolean(response, 204, 403)
+        return self._boolean(self._delete(url), 204, 403)
 
     @requires_auth
     def suspend(self):
@@ -491,9 +488,8 @@ class User(BaseAccount):
         :returns: bool -- True if successful, False otherwise
         """
         url = self._build_url('suspended', base_url=self._api)
-        response = self._put(url)
 
-        return self._boolean(response, 204, 403)
+        return self._boolean(self._put(url), 204, 403)
 
     @requires_auth
     def unsuspend(self):
@@ -506,7 +502,16 @@ class User(BaseAccount):
         :returns: bool -- True if successful, False otherwise
         """
         url = self._build_url('suspended', base_url=self._api)
-        response = self._delete(url)
 
-        return self._boolean(response, 204, 403)
+        return self._boolean(self._delete(url), 204, 403)
 
+    @requires_auth
+    def delete(self):
+        """Delete the user. Per GitHub API documentation, it is often preferable to suspend the user.
+
+        This is only available for admins of a GitHub Enterprise instance.
+
+        :returns: bool -- True if successful, False otherwise
+        """
+        url = self._build_url('admin', 'users', self.id)
+        return self._boolean(self._delete(url), 204, 403)
