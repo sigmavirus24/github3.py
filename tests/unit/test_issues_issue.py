@@ -1,5 +1,6 @@
 """Unit tests for the Issue class."""
 import github3
+import pytest
 
 from github3.issues.label import Label
 from .helper import create_example_data_helper
@@ -86,6 +87,33 @@ class TestIssueIterators(helper.UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+
+class TestLabelRequiresAuth(UnitHelper):
+
+    """Test that ensure certain methods on Label class requires auth."""
+
+    described_class = github3.issues.label.Label
+    example_data = get_issue_label_example_data()
+
+    def after_setup(self):
+        """Disable authention on sessions."""
+        self.session.has_auth.return_value = False
+
+    def test_delete(self):
+        """Test that deleting a label requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.delete()
+
+    def test_update(self):
+        """Test that updating label requires authentication."""
+        data = {
+            'name': 'newname',
+            'color': 'afafaf'
+        }
+
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.update(**data)
 
 
 class TestLabel(UnitHelper):
