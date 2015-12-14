@@ -19,7 +19,32 @@ get_user_key_example_data = create_example_data_helper('user_key_example')
 example_data = get_users_example_data()
 
 
+class TestUserKeyRequiresAuth(UnitHelper):
+
+    """Test that ensure certain methods on Key class requires auth."""
+
+    described_class = github3.users.Key
+    example_data = get_user_key_example_data()
+
+    """Test Key methods that require authentication."""
+    def after_setup(self):
+        self.session.has_auth.return_value = False
+
+    def test_update(self):
+        """Test that updating a key requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.update(title='New Title', key='Fake key')
+
+    def test_delete(self):
+        """Test that deleting a key requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.delete()
+
+
 class TestUserKey(UnitHelper):
+
+    """Test methods on Key class."""
+
     described_class = github3.users.Key
     example_data = get_user_key_example_data()
 
@@ -39,7 +64,7 @@ class TestUserKey(UnitHelper):
     def test_delete(self):
         """Test the request for deleting key."""
         self.instance.delete()
-        assert self.session.delete.called
+        assert self.session.delete.called is True
 
     def test_update(self):
         """Test the request for updating a key."""
