@@ -68,17 +68,15 @@ class TestUserKey(UnitHelper):
 
     def test_update(self):
         """Test the request for updating a key."""
-        self.instance.update(title='New Title', key='Fake key')
-        try:
-            self.session.patch.assert_called_once_with(
-                key_url_for('1'),
-                data='{"key": "Fake key", "title": "New Title"}'
-            )
-        except AssertionError:
-            self.session.patch.assert_called_once_with(
-                key_url_for('1'),
-                data='{"title": "New Title", "key": "Fake key"}'
-            )
+        data = {
+            'title': 'New Title',
+            'key': 'Fake key'
+        }
+        self.instance.update(**data)
+        self.patch_called_with(
+            key_url_for('1'),
+            data=data
+        )
 
 
 class TestUserIterators(UnitIteratorHelper):
