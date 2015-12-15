@@ -1,61 +1,10 @@
 import github3
 try:
-   from unittest.mock import patch
+    from unittest.mock import patch
 except ImportError:
-   from mock import patch
+    from mock import patch
 from tests.utils import (BaseCase, load)
 from datetime import datetime
-
-
-class TestKey(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestKey, self).__init__(methodName)
-        self.key = github3.users.Key(load('key'))
-        self.api = "https://api.github.com/user/keys/10"
-
-    def setUp(self):
-        super(TestKey, self).setUp()
-        self.key = github3.users.Key(self.key.as_dict(), self.g)
-
-    def test_equality(self):
-        k = github3.users.Key(self.key.as_dict())
-        assert self.key == k
-        k._uniq += "cruft"
-        assert self.key != k
-
-    def test_str(self):
-        assert str(self.key) == self.key.key
-        assert repr(self.key).startswith('<User Key')
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.key.delete)
-
-        self.not_called()
-        self.login()
-        assert self.key.delete()
-        self.mock_assertions()
-
-    def test_update(self):
-        self.response('key', 200)
-        self.patch(self.api)
-        self.conf = {
-            'data': {
-                'key': 'fakekey',
-                'title': 'New title',
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.key.update, None, None)
-
-        self.login()
-
-        assert self.key.update(None, None) is False
-        self.not_called()
-        assert self.key.update(**self.conf['data'])
-        self.mock_assertions()
 
 
 class TestPlan(BaseCase):

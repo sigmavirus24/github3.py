@@ -9,9 +9,74 @@ url_for = create_url_helper(
     'https://api.github.com/users/octocat'
 )
 
+key_url_for = create_url_helper(
+    'https://api.github.com/user/keys'
+)
+
 get_users_example_data = create_example_data_helper('users_example')
+get_user_key_example_data = create_example_data_helper('user_key_example')
 
 example_data = get_users_example_data()
+
+
+class TestUserKeyRequiresAuth(UnitHelper):
+
+    """Test that ensure certain methods on Key class requires auth."""
+
+    described_class = github3.users.Key
+    example_data = get_user_key_example_data()
+
+    """Test Key methods that require authentication."""
+    def after_setup(self):
+        self.session.has_auth.return_value = False
+
+    def test_update(self):
+        """Test that updating a key requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.update(title='New Title', key='Fake key')
+
+    def test_delete(self):
+        """Test that deleting a key requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.delete()
+
+
+class TestUserKey(UnitHelper):
+
+    """Test methods on Key class."""
+
+    described_class = github3.users.Key
+    example_data = get_user_key_example_data()
+
+    def test_equality(self):
+        """Show that two instances of Key are equal."""
+        key = github3.users.Key(get_user_key_example_data())
+        assert self.instance == key
+
+        key._uniq += "cruft"
+        assert self.instance != key
+
+    def test_repr(self):
+        """Show instance string is formatted properly."""
+        assert str(self.instance) == self.instance.key
+        assert repr(self.instance).startswith('<User Key')
+
+    def test_delete(self):
+        """Test the request for deleting key."""
+        self.instance.delete()
+        assert self.session.delete.called is True
+
+    def test_update(self):
+        """Test the request for updating a key."""
+        data = {
+            'title': 'New Title',
+            'key': 'Fake key'
+        }
+        self.instance.update(**data)
+        self.patch_called_with(
+            key_url_for('1'),
+            data=data
+        )
 
 
 class TestUserIterators(UnitIteratorHelper):
