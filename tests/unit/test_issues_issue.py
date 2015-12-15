@@ -154,13 +154,7 @@ class TestLabel(UnitHelper):
         }
 
         self.instance.update(**data)
-        try:
-            self.session.patch.assert_called_once_with(
-                label_url_for(),
-                data='{"name": "newname", "color": "afafaf"}'
-            )
-        except AssertionError:
-            self.session.patch.assert_called_once_with(
-                label_url_for(),
-                data='{"color": "afafaf", "name": "newname"}'
-            )
+        self.patch_called_with(
+            label_url_for(),
+            data=data
+        )
