@@ -1,14 +1,24 @@
 """Unit tests for the Issue class."""
 import github3
+import pytest
 
+from github3.issues.label import Label
 from . import helper
 
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/issues/1347'
 )
 
+label_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/labels/bug'
+)
+
 get_issue_example_data = helper.create_example_data_helper(
     'issue_example'
+)
+
+get_issue_label_example_data = helper.create_example_data_helper(
+    'issue_label_example'
 )
 
 
@@ -73,4 +83,75 @@ class TestIssueIterators(helper.UnitIteratorHelper):
             url_for('labels'),
             params={'per_page': 100},
             headers={}
+        )
+
+
+class TestLabelRequiresAuth(helper.UnitHelper):
+
+    """Test that ensure certain methods on Label class requires auth."""
+
+    described_class = github3.issues.label.Label
+    example_data = get_issue_label_example_data()
+
+    def after_setup(self):
+        """Disable authentication on sessions."""
+        self.session.has_auth.return_value = False
+
+    def test_delete(self):
+        """Test that deleting a label requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.delete()
+
+    def test_update(self):
+        """Test that updating label requires authentication."""
+        data = {
+            'name': 'newname',
+            'color': 'afafaf'
+        }
+
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.update(**data)
+
+
+class TestLabel(helper.UnitHelper):
+    """Unit Test for Label."""
+
+    described_class = github3.issues.label.Label
+    example_data = get_issue_label_example_data()
+
+    def test_equality(self):
+        """Show that two instances of Label are equal."""
+        label = Label(get_issue_label_example_data())
+        assert self.instance == label
+
+        label._uniq = ('https://https//api.github.com/repos/sigmavirus24/'
+                       'github3.py/labels/wontfix')
+
+        assert self.instance != label
+
+    def test_repr(self):
+        """Show that instance string is formatted correctly."""
+        assert repr(self.instance) == '<Label [{0}]>'.format(
+            self.instance.name)
+
+    def test_str(self):
+        """Show that instance is formated as a string correctly."""
+        assert str(self.instance) == self.instance.name
+
+    def test_delete(self):
+        """Test the request for deleting a label."""
+        self.instance.delete()
+        assert self.session.delete.called
+
+    def test_update(self):
+        """Test the request for updating a label."""
+        data = {
+            'name': 'newname',
+            'color': 'afafaf'
+        }
+
+        self.instance.update(**data)
+        self.patch_called_with(
+            label_url_for(),
+            data=data
         )

@@ -50,3 +50,25 @@ class TestIssue(IntegrationHelper):
             pull_request = issue.pull_request()
 
         assert isinstance(pull_request, github3.pulls.PullRequest)
+
+
+class TestLabel(IntegrationHelper):
+    """Integration test for methods on Label class."""
+
+    def test_delete(self):
+        """Test the ability to delete a label."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            label = repository.label('deleteme')
+            assert label.delete()
+
+    def test_update(self):
+        """Test the ability to update a label."""
+        self.token_login()
+        cassette_name = self.cassette_name('update')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            label = repository.label('integration')
+            assert label.update('integration', '5319e7')
