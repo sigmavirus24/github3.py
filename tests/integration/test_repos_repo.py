@@ -236,6 +236,70 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(deployment, github3.repos.deployment.Deployment)
 
+    def test_create_fork(self):
+        """Test the ability to fork a repository."""
+        self.token_login()
+        betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
+        cassette_name = self.cassette_name('create_fork')
+        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            forked_repo = repository.create_fork()
+            assert isinstance(forked_repo, github3.repos.Repository)
+
+            org_forked_repo = repository.create_fork('mattchung')
+            assert isinstance(org_forked_repo, github3.repos.Repository)
+
+    def test_create_hook(self):
+        """Test the ability to create a hook for a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_hook')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            data = {
+                'name': 'web',
+                'config': {
+                    'url': 'http://example.com/webhook',
+                    'content_type': 'json'
+                }
+            }
+            hook = repository.create_hook(**data)
+            assert isinstance(hook, github3.repos.hook.Hook)
+
+    def test_create_issue(self):
+        """Test the ability to create an issue for a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_issue')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            data = {
+                'title': 'Create Issue Integration Test',
+                'body': 'Delete me after',
+                'assignee': 'itsmemattchung'
+            }
+            issue = repository.create_issue(**data)
+            assert isinstance(issue, github3.issues.issue.Issue)
+
+    def test_create_key(self):
+        """Test the ability to deploy a key."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_key')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            key = ('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZn4/RGE9YQrfjq7wSr'
+                   'YkdtKH3r1rEIkx/4Nv1AG/PqE4AWKSVzKkqhurnqKtctVCLtU9pNFIjl/'
+                   'XvNluTW3zrfqKjgaDdiBtWwecWzSbQqugfzmwFqCE4smJkP8e7+e9Fd1k'
+                   'GOGyqVJLBLfIUdEbHN3Ws40Z9OXgrJ/tiNdg1HHgAOjpknCMrQI8NDP9o'
+                   '9CLuE/AfNVzRNOzpf/rrdZ4YW4kcDhbcQ8X7DGCnbvY9wUp3lDmSvVy6z'
+                   'olYwLziYqsGjw0kLHvIzHdbGCjp+50iZSBrm29AlWa9eRsGskiUTIk6SA'
+                   'Q8Fm5qKNkCtPYQ6YmjRiKyDtsMoqfjzDkyEPLv mattchung@Matts-Ma'
+                   'cBook-Air.local')
+            data = {
+                'title': 'Deploy Key',
+                'key': key
+            }
+            key = repository.create_key(**data)
+            assert isinstance(key, github3.users.Key)
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()
