@@ -65,6 +65,17 @@ class TestRepository(UnitHelper):
             url_for('forks')
         )
 
+    def test_create_fork_to_organization(self):
+        """Verify the request to fork a repository to an organization."""
+        self.instance.create_fork('mattchung')
+
+        self.post_called_with(
+            url_for('forks'),
+            data={
+                'organization': 'mattchung'
+            }
+        )
+
     def test_create_hook(self):
         """Verify the request to create a hook."""
         data = {
@@ -89,6 +100,24 @@ class TestRepository(UnitHelper):
             }
         )
 
+    def test_create_hook_requires_valid_name(self):
+        """Test that we check the validity of a hook."""
+        self.instance.create_hook(name='', config='config')
+
+        assert self.session.post.called is False
+
+    def test_create_hook_requires_valid_config(self):
+        """Test that we check the validity of a hook."""
+        self.instance.create_hook(name='name', config={})
+
+        assert self.session.post.called is False
+
+    def test_create_hook_requires_valid_name_and_config(self):
+        """Test that we check the validity of a hook."""
+        self.instance.create_hook(name='name', config='')
+
+        assert self.session.post.called is False
+
     def test_create_issue(self):
         """Verify the request to create an issue."""
         data = {
@@ -104,6 +133,12 @@ class TestRepository(UnitHelper):
             data=data
         )
 
+    def test_create_issue_require_valid_issue(self):
+        """Test that we check the validity of an issue."""
+        self.instance.create_issue(title=None)
+
+        assert self.session.post.called is False
+
     def test_create_key(self):
         """Verify the request to create a key."""
         data = {
@@ -115,6 +150,24 @@ class TestRepository(UnitHelper):
             url_for('keys'),
             data=data
         )
+
+    def test_create_key_requires_a_valid_title(self):
+        """Test that we check the validity of a key."""
+        self.instance.create_key(title=None, key='ssh-rsa ...')
+
+        assert self.session.post.called is False
+
+    def test_create_key_requires_a_valid_key(self):
+        """Test that we check the validity of a key."""
+        self.instance.create_key(title='foo', key='')
+
+        assert self.session.post.called is False
+
+    def test_create_key_requires_a_valid_title_and_key(self):
+        """Test that we check the validity of a key."""
+        self.instance.create_key(title='foo', key='')
+
+        assert self.session.post.called is False
 
     def test_create_ref(self):
         """Verify the request to create a reference."""
@@ -736,6 +789,26 @@ class TestRepositoryRequiresAuth(UnitHelper):
         """Verify that creating a tag requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.create_ref('some ref', 'some sha')
+
+    def test_create_fork(self):
+        """Verify that creating a fork requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_fork()
+
+    def test_create_hook(self):
+        """Verify that creating a hook requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_hook('foo', 'config')
+
+    def test_create_issue(self):
+        """Verify that creating an issue requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_issue('some title', 'some body', 'foo')
+
+    def test_create_key(self):
+        """Verify that deploying a key requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_key('key name', 'ssh-rsa ...')
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""
