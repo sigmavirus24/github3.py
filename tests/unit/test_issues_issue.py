@@ -3,24 +3,21 @@ import github3
 import pytest
 
 from github3.issues.label import Label
-from .helper import create_example_data_helper
-from .helper import UnitHelper
-from .helper import create_url_helper
 from . import helper
 
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/issues/1347'
 )
 
-label_url_for = create_url_helper(
+label_url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/labels/bug'
 )
 
-get_issue_example_data = create_example_data_helper(
+get_issue_example_data = helper.create_example_data_helper(
     'issue_example'
 )
 
-get_issue_label_example_data = create_example_data_helper(
+get_issue_label_example_data = helper.create_example_data_helper(
     'issue_label_example'
 )
 
@@ -89,7 +86,7 @@ class TestIssueIterators(helper.UnitIteratorHelper):
         )
 
 
-class TestLabelRequiresAuth(UnitHelper):
+class TestLabelRequiresAuth(helper.UnitHelper):
 
     """Test that ensure certain methods on Label class requires auth."""
 
@@ -97,7 +94,7 @@ class TestLabelRequiresAuth(UnitHelper):
     example_data = get_issue_label_example_data()
 
     def after_setup(self):
-        """Disable authention on sessions."""
+        """Disable authentication on sessions."""
         self.session.has_auth.return_value = False
 
     def test_delete(self):
@@ -116,7 +113,7 @@ class TestLabelRequiresAuth(UnitHelper):
             self.instance.update(**data)
 
 
-class TestLabel(UnitHelper):
+class TestLabel(helper.UnitHelper):
     """Unit Test for Label."""
 
     described_class = github3.issues.label.Label
