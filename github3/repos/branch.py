@@ -60,13 +60,6 @@ class Branch(GitHubCore):
             'enforcement_level': enforcement, 'contexts': status_checks}}}
         json = self._json(self._patch(self._api, data=dumps(edit),
                                       headers=self.PREVIEW_HEADERS), 200)
-
-        # When attempting to clear `contexts`, the reply from github doesn't
-        # currently reflect the actual value. Let's fix that for now.
-        cur_contexts = self.protection['required_status_checks']['contexts']
-        if status_checks == [] != cur_contexts:
-            json['protection']['required_status_checks']['contexts'] = []
-
         self._update_attributes(json)
         return True
 
