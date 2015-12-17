@@ -39,6 +39,14 @@ class GitHubObject(object):
     def _update_attributes(self, json):
         pass
 
+    def __getattr__(self, attribute):
+        """Proxy access to stored JSON."""
+        if attribute not in self._json_data:
+            raise AttributeError(attribute)
+        value = self._json_data.get(attribute, None)
+        setattr(self, attribute, value)
+        return value
+
     def as_dict(self):
         """Return the attributes for this object as a dictionary.
 
