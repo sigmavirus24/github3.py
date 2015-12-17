@@ -21,7 +21,6 @@ class TestGitHubObject(UnitHelper):
     example_data = {
         'fake_attr': 'foo',
         'another_fake_attr': 'bar'
-
     }
 
     def test_exposes_attributes(self):
