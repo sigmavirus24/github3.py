@@ -2,78 +2,8 @@ import github3
 from github3.issues.comment import IssueComment
 from github3.issues.event import IssueEvent
 from github3.issues.label import Label
-from github3.issues.milestone import Milestone
 from github3.issues import Issue
-import datetime
 from tests.utils import BaseCase, load, mock
-
-
-class TestMilestone(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestMilestone, self).__init__(methodName)
-        self.m = Milestone(load('milestone'))
-        self.api = ("https://api.github.com/repos/kennethreitz/requests/"
-                    "milestones/18")
-
-    def setUp(self):
-        super(TestMilestone, self).setUp()
-        self.m = Milestone(self.m.as_dict(), self.g)
-
-    def test_repr(self):
-        assert repr(self.m) == '<Milestone [v1.0.0]>'
-
-    def test_str(self):
-        assert str(self.m) == 'v1.0.0'
-
-    def test_id(self):
-        assert self.m.id == 219754
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.m.delete)
-
-        self.not_called()
-        self.login()
-        assert self.m.delete()
-        self.mock_assertions()
-
-    def test_due_on(self):
-        json = self.m.as_dict().copy()
-        json['due_on'] = '2012-12-31T23:59:59Z'
-        m = Milestone(json)
-        assert isinstance(m.due_on, datetime.datetime)
-
-    def test_update(self):
-        self.response('milestone', 200)
-        self.patch(self.api)
-        self.conf = {
-            'data': {
-                'title': 'foo',
-                'state': 'closed',
-                'description': ':sparkles:',
-                'due_on': '2013-12-31T23:59:59Z'
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.m.update, None)
-
-        self.login()
-        assert self.m.update(None) is False
-        self.not_called()
-
-        assert self.m.update(state='closed')
-
-        assert self.m.update('foo', 'closed', ':sparkles:',
-                             '2013-12-31T23:59:59Z')
-        self.mock_assertions()
-
-    def test_issue_465(self):
-        json = self.m.as_dict().copy()
-        json['creator'] = None
-        m = Milestone(json)
-        assert m.creator is None
 
 
 class TestIssue(BaseCase):
