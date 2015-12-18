@@ -6,7 +6,7 @@ from .helper import (create_example_data_helper, create_url_helper,
                      UnitHelper, UnitIteratorHelper)
 
 gist_example_data = create_example_data_helper('gist_example')
-gist_example_list_data = create_example_data_helper('gist_example_list')
+gist_example_short_data = create_example_data_helper('gist_example_short')
 gist_history_example_data = create_example_data_helper('gist_history_example')
 gist_comment_example_data = create_example_data_helper('gist_comment_example')
 
@@ -233,7 +233,7 @@ class TestGistFile(UnitHelper):
     """Test Gist File."""
 
     described_class = github3.gists.file.GistFile
-    example_data = gist_example_list_data()[0]
+    example_data = gist_example_short_data()
 
     def test_no_original_content(self):
         """Show that attribute original content is None"""
