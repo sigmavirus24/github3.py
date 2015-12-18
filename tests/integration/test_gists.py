@@ -73,6 +73,17 @@ class TestGist(IntegrationHelper):
                 },
             }) is True
 
+    def test_files(self):
+        """Show that a user can iterate over a list of gist files."""
+        cassette_name = self.cassette_name('files')
+        with self.recorder.use_cassette(cassette_name):
+            gists = self.gh.gists_by('sigmavirus24')
+            assert gists is not None
+            for gist in gists:
+                files = gist.files()
+                for _file in files:
+                    assert isinstance(_file, github3.gists.file.GistFile)
+
     def test_fork(self):
         """Show that a user can fork another user's gist."""
         self.basic_login()
