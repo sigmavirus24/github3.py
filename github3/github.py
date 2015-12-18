@@ -1672,6 +1672,21 @@ class GitHubEnterprise(GitHub):
         return '<GitHub Enterprise [{0.url}]>'.format(self)
 
     @requires_auth
+    def create_user(self, login, email):
+        """Create a new user.
+        This is only available for administrators of the instance.
+
+        :param str login: (required), The user's username.
+        :param str email: (required), The user's email address.
+
+        :returns: :class:`User <github3.users.User>`, if successful
+        """
+        url = self._build_url('admin', 'users')
+        payload = {'login': login, 'email': email}
+        json_data = self._json(self._post(url, data=payload), 201)
+        return self._instance_or_null(User, json_data)
+
+    @requires_auth
     def admin_stats(self, option):
         """This is a simple way to get statistics about your system.
 
