@@ -105,9 +105,11 @@ class Plan(GitHubObject):
         return self.name == 'free'  # (No coverage)
 
 
-class UserEmail(GitHubCore):
+class Email(GitHubCore):
 
-    """The :class:`UserEmail` object. Please see GitHub's `Emails documentation
+    """The :class:`Email` object.
+
+    Please see GitHub's `Emails documentation
     <https://developer.github.com/v3/users/emails/>` for more information.
     """
 
@@ -267,10 +269,10 @@ class User(BaseAccount):
 
         :param int number: (optional), number of email addresses to return.
             Default: -1, returns all of them
-        :returns: generator of :class:`UserEmail <github3.users.UserEmail>`
+        :returns: generator of :class:`Email <github3.users.Email>`
         """
         url = self._build_url('user', 'emails')
-        return self._iter(int(number), url, UserEmail)
+        return self._iter(int(number), url, Email)
 
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.

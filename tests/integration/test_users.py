@@ -49,7 +49,7 @@ class TestUser(IntegrationHelper):
             user = self.gh.me()
             assert user is not None
             for address in user.email_addresses():
-                assert isinstance(address, github3.users.UserEmail)
+                assert isinstance(address, github3.users.Email)
 
     def test_events(self):
         """Show that a user can retrieve a events performed by a user."""
