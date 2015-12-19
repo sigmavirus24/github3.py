@@ -23,20 +23,6 @@ class TestPlan(BaseCase):
         assert self.plan.is_free()
 
 
-class TestUserEmail(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestUserEmail, self).__init__(methodName)
-        self.useremail = github3.users.UserEmail({
-            'email': 'test@email.com',
-            'verified': True,
-            'primary': True,
-        })
-
-    def test_str(self):
-        assert str(self.useremail) == self.useremail.email
-        assert repr(self.useremail) == '<UserEmail [test@email.com]>'
-
-
 class TestUser(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestUser, self).__init__(methodName)

@@ -122,7 +122,7 @@ class Email(GitHubCore):
         self.primary = email.get('primary')
 
     def _repr(self):
-        return '<UserEmail [{0}]>'.format(self.email)
+        return '<Email [{0}]>'.format(self.email)
 
     def __str__(self):
         return self.email
@@ -264,8 +264,7 @@ class User(BaseAccount):
 
     @requires_auth
     def email_addresses(self, number=-1):
-        """Iterate over each email address in the authenticated
-        user's account.
+        """Iterate over each email address in the authenticated user's account.
 
         :param int number: (optional), number of email addresses to return.
             Default: -1, returns all of them

@@ -86,6 +86,17 @@ class TestUserIterators(UnitIteratorHelper):
     described_class = github3.users.User
     example_data = example_data.copy()
 
+    def test_email_addresses(self):
+        """Verify the request to retrive a user's email addresses."""
+        i = self.instance.email_addresses()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/emails'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_events(self):
         """Test the request to retrieve a user's events."""
         i = self.instance.events()
