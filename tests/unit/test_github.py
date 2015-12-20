@@ -15,6 +15,16 @@ class TestGitHub(UnitHelper):
     described_class = GitHub
     example_data = None
 
+    def test_add_email_addresses(self):
+        """Verify request to add email addresses for a user."""
+        self.instance.add_email_addresses(['example1@example.com',
+                                           'example2@example.com'])
+
+        self.post_called_with(
+            url_for('user/emails'),
+            data=['example1@example.com', 'example2@example.com'],
+        )
+
     def test_authorization(self):
         """Show that a user can retrieve a specific authorization by id."""
         self.instance.authorization(10)
@@ -118,6 +128,16 @@ class TestGitHub(UnitHelper):
                 'auto_init': False,
                 'gitignore_template': ''
             }
+        )
+
+    def test_delete_email_addresses(self):
+        """Verify the request to delete a user's email addresses."""
+        self.instance.delete_email_addresses(['example1@example.com',
+                                              'example2@example.com'])
+
+        self.delete_called_with(
+            url_for('user/emails'),
+            data=['example1@example.com', 'example2@example.com'],
         )
 
     def test_emojis(self):
@@ -854,6 +874,11 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         self.session.auth = None
         self.session.has_auth.return_value = False
 
+    def test_add_email_addresses(self):
+        """Verify a user must be authenticated to add email addresses."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.add_email_addresses([])
+
     def test_authorization(self):
         """A user must be authenticated to retrieve an authorization."""
         with pytest.raises(AuthenticationFailed):
@@ -878,6 +903,11 @@ class TestGitHubRequiresAuthentication(UnitHelper):
         """Show that GitHub#create_repository requires auth."""
         with pytest.raises(AuthenticationFailed):
             self.instance.create_repository('repo')
+
+    def test_delete_email_addresses(self):
+        """Verify a user must be authenticated to delete email addresses."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.delete_email_addresses([])
 
     def test_emails(self):
         """Show that one needs to authenticate to use #emails."""

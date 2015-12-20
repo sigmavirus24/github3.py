@@ -88,6 +88,10 @@ class UnitHelper(unittest.TestCase):
 
         return instance
 
+    def delete_called_with(self, *args, **kwargs):
+        """Use to assert delete was called with JSON."""
+        self.method_called_with('delete', args, kwargs)
+
     def method_called_with(self, method_name, args, kwargs):
         """Assert that a method was called on a session with JSON."""
         mock_method = getattr(self.session, method_name)

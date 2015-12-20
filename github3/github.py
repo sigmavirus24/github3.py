@@ -79,7 +79,7 @@ class GitHub(GitHubCore):
         if addresses:
             url = self._build_url('user', 'emails')
             json = self._json(self._post(url, data=addresses), 201)
-        return [users.Email(email) for email in json]
+        return [users.Email(email) for email in json] if json else []
 
     def all_events(self, number=-1, etag=None):
         """Iterate over public events.
