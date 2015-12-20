@@ -36,6 +36,18 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(auth, github3.auths.Authorization)
 
+    def test_add_email_addresses(self):
+        """Add email addresses to the authorized user's account."""
+        self.basic_login()
+        cassette_name = self.cassette_name('add_email_addresses')
+        with self.recorder.use_cassette(cassette_name):
+            emails = self.gh.add_email_addresses(
+                ['example1@example.com', 'example2@example.com']
+            )
+
+        for email in emails:
+            assert isinstance(email, github3.users.Email)
+
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist."""
         self.token_login()

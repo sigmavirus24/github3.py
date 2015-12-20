@@ -217,62 +217,6 @@ class User(BaseAccount):
     def __str__(self):
         return self.login
 
-    @requires_auth
-    def add_email_address(self, address):
-        """Add the single email address to the authenticated user's
-        account.
-
-        :param str address: (required), email address to add
-        :returns: list of email addresses
-        """
-        return self.add_email_addresses([address])
-
-    @requires_auth
-    def add_email_addresses(self, addresses=[]):
-        """Add the email addresses in ``addresses`` to the authenticated
-        user's account.
-
-        :param list addresses: (optional), email addresses to be added
-        :returns: list of email addresses
-        """
-        json = []
-        if addresses:
-            url = self._build_url('user', 'emails')
-            json = self._json(self._post(url, data=addresses), 201)
-        return json
-
-    @requires_auth
-    def delete_email_address(self, address):
-        """Delete the email address from the user's account.
-
-        :param str address: (required), email address to delete
-        :returns: bool
-        """
-        return self.delete_email_addresses([address])
-
-    @requires_auth
-    def delete_email_addresses(self, addresses=[]):
-        """Delete the email addresses in ``addresses`` from the
-        authenticated user's account.
-
-        :param list addresses: (optional), email addresses to be removed
-        :returns: bool
-        """
-        url = self._build_url('user', 'emails')
-        return self._boolean(self._delete(url, data=dumps(addresses)),
-                             204, 404)
-
-    @requires_auth
-    def email_addresses(self, number=-1):
-        """Iterate over each email address in the authenticated user's account.
-
-        :param int number: (optional), number of email addresses to return.
-            Default: -1, returns all of them
-        :returns: generator of :class:`Email <github3.users.Email>`
-        """
-        url = self._build_url('user', 'emails')
-        return self._iter(int(number), url, Email)
-
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.
 
