@@ -97,6 +97,16 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(r, github3.repos.Repository)
         assert str(r) == 'sigmavirus24/my-new-repo'
 
+    def test_delete_email_addresses(self):
+        """Delete email addresses from authenticated user's account."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete_email_addresses')
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.delete_email_addresses(
+                ['graffatcolmingov+example1@gmail.com',
+                 'graffatcolmingov+example2@gmail.com']
+            ) is True
+
     def test_emojis(self):
         """Test the ability to retrieve from /emojis."""
         cassette_name = self.cassette_name('emojis')
