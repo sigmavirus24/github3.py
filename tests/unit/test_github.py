@@ -25,6 +25,12 @@ class TestGitHub(UnitHelper):
             data=['example1@example.com', 'example2@example.com'],
         )
 
+    def test_add_email_addresses_with_empty_list(self):
+        """Verify no request is sent for an empty list of addresses."""
+        self.instance.add_email_addresses([])
+
+        assert self.session.post.called is False
+
     def test_authorization(self):
         """Show that a user can retrieve a specific authorization by id."""
         self.instance.authorization(10)
