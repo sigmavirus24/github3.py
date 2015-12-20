@@ -202,3 +202,13 @@ class UnitIteratorHelper(UnitHelper):
         """Stop mocking _get_json."""
         super(UnitIteratorHelper, self).tearDown()
         self.get_json_mock.stop()
+
+
+class UnitRequiresAuthenticationHelper(UnitHelper):
+
+    """Helper for unit tests that demonstrate authentication is required."""
+
+    def after_setup(self):
+        """Disable authentication on the session."""
+        self.session.auth = None
+        self.session.has_auth.return_value = False

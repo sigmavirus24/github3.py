@@ -1,21 +1,22 @@
 """Unit tests for the github3.pulls module."""
 import pytest
 
-from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                     create_example_data_helper)
+from . import helper
 
 from github3 import GitHubError
 from github3 import pulls
 
-get_pr_example_data = create_example_data_helper('pull_request_example')
+get_pr_example_data = helper.create_example_data_helper(
+    'pull_request_example'
+)
 
 
-url_for = create_url_helper(
+url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/pulls/1'
 )
 
 
-class TestPullRequest(UnitHelper):
+class TestPullRequest(helper.UnitHelper):
     """PullRequest unit tests."""
 
     described_class = pulls.PullRequest
@@ -135,15 +136,12 @@ class TestPullRequest(UnitHelper):
         )
 
 
-class TestPullRequestRequiresAuthentication(UnitHelper):
+class TestPullRequestRequiresAuthentication(
+        helper.UnitRequiresAuthenticationHelper):
     """PullRequest unit tests that demonstrate which methods require auth."""
 
     described_class = pulls.PullRequest
     example_data = get_pr_example_data()
-
-    def after_setup(self):
-        """Make it appear as if the user has not authenticated."""
-        self.session.has_auth.return_value = False
 
     def test_close(self):
         """Show that you must be authenticated to close a Pull Request."""
@@ -171,7 +169,7 @@ class TestPullRequestRequiresAuthentication(UnitHelper):
             self.instance.update('foo', 'bar', 'bogus')
 
 
-class TestPullRequestIterator(UnitIteratorHelper):
+class TestPullRequestIterator(helper.UnitIteratorHelper):
     """Test PullRequest methods that return Iterators."""
 
     described_class = pulls.PullRequest
@@ -222,11 +220,11 @@ class TestPullRequestIterator(UnitIteratorHelper):
         )
 
 
-class TestReviewComment(UnitHelper):
+class TestReviewComment(helper.UnitHelper):
     """Unit tests for the ReviewComment class."""
 
     described_class = pulls.ReviewComment
-    get_comment_example_data = create_example_data_helper(
+    get_comment_example_data = helper.create_example_data_helper(
         'review_comment_example'
     )
     example_data = get_comment_example_data()
@@ -248,11 +246,11 @@ class TestReviewComment(UnitHelper):
             self.instance.reply('')
 
 
-class TestPullFile(UnitHelper):
+class TestPullFile(helper.UnitHelper):
     """Unit tests for the PullFile class."""
 
     described_class = pulls.PullFile
-    get_pull_file_example_data = create_example_data_helper(
+    get_pull_file_example_data = helper.create_example_data_helper(
         'pull_file_example'
     )
     example_data = get_pull_file_example_data()
