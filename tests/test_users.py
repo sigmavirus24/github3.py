@@ -1,8 +1,4 @@
 import github3
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 from tests.utils import (BaseCase, load)
 from datetime import datetime
 
@@ -70,58 +66,6 @@ class TestUser(BaseCase):
     def test_str(self):
         assert str(self.user) == 'sigmavirus24'
         assert repr(self.user) == '<User [sigmavirus24:Ian Cordasco]>'
-
-    def test_add_email_address(self):
-        self.assertRaises(github3.GitHubError, self.user.add_email_address,
-                          'foo')
-
-        self.not_called()
-        self.login()
-        with patch.object(github3.users.User, 'add_email_addresses') as p:
-            self.user.add_email_address('foo')
-            p.assert_called_once_with(['foo'])
-
-    def test_add_email_addresses(self):
-        self.response('emails', 201, _iter=True)
-        self.post(self.github_url + 'user/emails')
-        self.conf = {
-            'data': '["foo@bar.com"]',
-        }
-
-        self.assertRaises(github3.GitHubError, self.user.add_email_addresses,
-                          [])
-
-        self.not_called()
-        self.login()
-
-        self.user.add_email_addresses(['foo@bar.com'])
-        self.mock_assertions()
-
-    def test_delete_email_address(self):
-        self.assertRaises(github3.GitHubError, self.user.delete_email_address,
-                          'foo')
-
-        self.not_called()
-        self.login()
-        with patch.object(github3.users.User, 'delete_email_addresses') as p:
-            self.user.delete_email_address('foo')
-            p.assert_called_once_with(['foo'])
-
-    def test_delete_email_addresses(self):
-        self.response('', 204)
-        self.delete(self.github_url + 'user/emails')
-        self.conf = {
-            'data': '["foo@bar.com"]'
-        }
-
-        self.assertRaises(github3.GitHubError,
-                          self.user.delete_email_addresses,
-                          [])
-
-        self.not_called()
-        self.login()
-        assert self.user.delete_email_addresses(['foo@bar.com'])
-        self.mock_assertions()
 
     def test_is_assignee_on(self):
         self.response('', 404)
