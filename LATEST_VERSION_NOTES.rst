@@ -1,5 +1,77 @@
 .. vim: set tw=100
 
+1.0.0a3: 201z-xx-yy
+~~~~~~~~~~~~~~~~~~~
+
+Breaking Changes (since 1.0.0a2)
+````````````````````````````````
+
+- Move ``Users#add_email_addresses`` to ``GitHub#add_email_addresses``.
+
+- Move ``Users#delete_email_addresses`` to ``GitHub#delete_email_addresses``.
+
+- Remove ``Users#add_email_address`` and ``Users#delete_eail_address``.
+
+Features Added (since 1.0.0a2)
+``````````````````````````````
+
+- Support filtering organization members by whether they have 2FA enabled.
+
+- Support filtering organization and team members by role.
+
+- Add ``GitHub#all_organizations``.
+
+- Add ``PullRequest#create_comment``.
+
+- Add ``Repository#release_by_tag_name`` to retrieve a Release from a
+  Repository by its associated tag name.
+
+- Add ``GitHub#license`` to retrieve a ``github3.license.License`` by the
+  license name.
+
+- Add ``GitHub#licenses`` to iterate over all the licenses returned by
+  GitHub's Licenses API.
+
+- Add protection information to ``github3.repos.branch.Branch``.
+
+- Add ``Branch#protect`` and ``Branch#unprotect`` to support updating a
+  Branch's protection status.
+
+- Vastly improved GitHub Enterprise support:
+
+  - Add ``User#rename`` to rename a user in a GitHub Enterprise installation.
+
+  - Add ``GitHub#create_user`` to create a user.
+
+  - Add ``User#impersonate`` to create an impersonation token by an admin for
+    a particular user.
+
+  - Add ``User#revoke_impersonation`` to revoke all impersonation tokens for a
+    user.
+
+  - Add ``User#promote`` to promote a particular user to a site administrator.
+
+  - Add ``User#demote`` to demote a site administrator to a simple user.
+
+  - Add ``User#suspend`` to suspend a user's account.
+
+  - Add ``User#unsuspend`` to reinstate a user's account.
+
+- Add ``original_content`` attribute to a ``GistFile``
+
+- Add ``GistFile#content`` to retrieve the contents of a file in a gist from
+  the API.
+
+Bugs Fixed (since 1.0.0a2)
+``````````````````````````
+
+- The ``context`` parameter to ``Repository#create_status`` now properly
+  defaults to ``"default"``.
+
+- Fix AttributeError when ``IssueEvent`` has assignee.
+
+- Correctly set the ``message`` attribute on ``RepoCommit`` instances
+
 1.0.0a2: 2015-07-14
 ~~~~~~~~~~~~~~~~~~~
 
