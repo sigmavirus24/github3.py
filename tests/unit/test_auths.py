@@ -2,17 +2,19 @@
 import github3
 import pytest
 
-from .helper import UnitHelper, create_url_helper, create_example_data_helper
+from . import helper
 
-url_for = create_url_helper('https://api.github.com/authorizations/1')
+url_for = helper.create_url_helper('https://api.github.com/authorizations/1')
 
 
-class TestAuthorization(UnitHelper):
+class TestAuthorization(helper.UnitHelper):
 
     """Authorization unit tests."""
 
     described_class = github3.auths.Authorization
-    get_auth_example_data = create_example_data_helper('authorization_example')
+    get_auth_example_data = helper.create_example_data_helper(
+        'authorization_example'
+    )
     example_data = get_auth_example_data()
 
     def test_add_scopes(self):
@@ -46,7 +48,7 @@ class TestAuthorization(UnitHelper):
         })
 
 
-class TestAuthorizationRequiresAuth(UnitHelper):
+class TestAuthorizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test methods that require authentication on Authorization."""
 
