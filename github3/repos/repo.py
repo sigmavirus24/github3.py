@@ -1425,6 +1425,17 @@ class Repository(GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(PagesBuild, json)
 
+    def latest_release(self):
+        """Get the latest release.
+
+        Draft releases and prereleases are not returned by this endpoint.
+
+        :returns: :class:`Release <github3.repos.release.Release>`
+        """
+        url = self._build_url('releases', 'latest', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(Release, json)
+
     def license(self):
         """Get the contents of a license for the repo
 
@@ -1675,17 +1686,6 @@ class Repository(GitHubCore):
         if int(id) > 0:
             url = self._build_url('releases', str(id), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Release, json)
-
-    def release_latest(self):
-        """Get the latest release.
-
-        Draft releases and prereleases are not returned by this endpoint.
-
-        :returns: :class:`Release <github3.repos.release.Release>`
-        """
-        url = self._build_url('releases', 'latest', base_url=self._api)
-        json = self._json(self._get(url), 200)
         return self._instance_or_null(Release, json)
 
     def release_from_tag(self, tag_name):

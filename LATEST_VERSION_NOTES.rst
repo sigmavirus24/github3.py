@@ -26,6 +26,9 @@ Features Added (since 1.0.0a2)
 - Add ``Repository#release_by_tag_name`` to retrieve a Release from a
   Repository by its associated tag name.
 
+- Add ``Repository#latest_release`` to retrieve the latest Release for a
+  Repository.
+
 - Add ``GitHub#license`` to retrieve a ``github3.license.License`` by the
   license name.
 
