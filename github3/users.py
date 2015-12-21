@@ -105,6 +105,29 @@ class Plan(GitHubObject):
         return self.name == 'free'  # (No coverage)
 
 
+class Email(GitHubCore):
+
+    """The :class:`Email` object.
+
+    Please see GitHub's `Emails documentation
+    <https://developer.github.com/v3/users/emails/>` for more information.
+    """
+
+    def _update_attributes(self, email):
+        #: Email address
+        self.email = email.get('email')
+        #: Whether the address has been verified
+        self.verified = email.get('verified')
+        #: Whether the address is the primary address
+        self.primary = email.get('primary')
+
+    def _repr(self):
+        return '<Email [{0}]>'.format(self.email)
+
+    def __str__(self):
+        return self.email
+
+
 class User(BaseAccount):
     """The :class:`User <User>` object. This handles and structures information
     in the `User section <http://developer.github.com/v3/users/>`_.
@@ -193,51 +216,6 @@ class User(BaseAccount):
 
     def __str__(self):
         return self.login
-
-    @requires_auth
-    def add_email_address(self, address):
-        """Add the single email address to the authenticated user's
-        account.
-
-        :param str address: (required), email address to add
-        :returns: list of email addresses
-        """
-        return self.add_email_addresses([address])
-
-    @requires_auth
-    def add_email_addresses(self, addresses=[]):
-        """Add the email addresses in ``addresses`` to the authenticated
-        user's account.
-
-        :param list addresses: (optional), email addresses to be added
-        :returns: list of email addresses
-        """
-        json = []
-        if addresses:
-            url = self._build_url('user', 'emails')
-            json = self._json(self._post(url, data=addresses), 201)
-        return json
-
-    @requires_auth
-    def delete_email_address(self, address):
-        """Delete the email address from the user's account.
-
-        :param str address: (required), email address to delete
-        :returns: bool
-        """
-        return self.delete_email_addresses([address])
-
-    @requires_auth
-    def delete_email_addresses(self, addresses=[]):
-        """Delete the email addresses in ``addresses`` from the
-        authenticated user's account.
-
-        :param list addresses: (optional), email addresses to be removed
-        :returns: bool
-        """
-        url = self._build_url('user', 'emails')
-        return self._boolean(self._delete(url, data=dumps(addresses)),
-                             204, 404)
 
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.

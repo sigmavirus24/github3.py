@@ -36,6 +36,18 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(auth, github3.auths.Authorization)
 
+    def test_add_email_addresses(self):
+        """Add email addresses to the authorized user's account."""
+        self.basic_login()
+        cassette_name = self.cassette_name('add_email_addresses')
+        with self.recorder.use_cassette(cassette_name):
+            emails = self.gh.add_email_addresses(
+                ['example1@example.com', 'example2@example.com']
+            )
+
+        for email in emails:
+            assert isinstance(email, github3.users.Email)
+
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist."""
         self.token_login()
@@ -84,6 +96,16 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(r, github3.repos.Repository)
         assert str(r) == 'sigmavirus24/my-new-repo'
+
+    def test_delete_email_addresses(self):
+        """Delete email addresses from authenticated user's account."""
+        self.basic_login()
+        cassette_name = self.cassette_name('delete_email_addresses')
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.delete_email_addresses(
+                ['graffatcolmingov+example1@gmail.com',
+                 'graffatcolmingov+example2@gmail.com']
+            ) is True
 
     def test_emojis(self):
         """Test the ability to retrieve from /emojis."""
