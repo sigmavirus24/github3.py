@@ -3,15 +3,14 @@ import pytest
 from github3 import GitHubError
 from github3.orgs import Team
 
-from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                     create_example_data_helper)
+from . import helper
 
-url_for = create_url_helper('https://api.github.com/teams/10')
+url_for = helper.create_url_helper('https://api.github.com/teams/10')
 
-get_team_example_data = create_example_data_helper('orgs_team_example')
+get_team_example_data = helper.create_example_data_helper('orgs_team_example')
 
 
-class TestTeam(UnitHelper):
+class TestTeam(helper.UnitHelper):
     described_class = Team
     example_data = get_team_example_data()
 
@@ -67,13 +66,9 @@ class TestTeam(UnitHelper):
         self.session.delete.assert_called_once_with(url_for('/repos/repo'))
 
 
-class TestTeamRequiresAuth(UnitHelper):
+class TestTeamRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     described_class = Team
     example_data = get_team_example_data()
-
-    def after_setup(self):
-        """Set up for test cases in TestTeamRequiresAuth."""
-        self.session.has_auth.return_value = False
 
     def test_add_member_requires_auth(self):
         """Show that adding a repo to a team requires authentication."""
@@ -116,7 +111,7 @@ class TestTeamRequiresAuth(UnitHelper):
             self.instance.remove_repository('repo')
 
 
-class TestTeamIterator(UnitIteratorHelper):
+class TestTeamIterator(helper.UnitIteratorHelper):
     described_class = Team
 
     example_data = {

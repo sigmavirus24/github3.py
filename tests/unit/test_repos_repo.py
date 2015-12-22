@@ -6,18 +6,19 @@ from github3 import GitHubError
 from github3.null import NullObject
 from github3.repos.repo import Repository
 
-from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                     create_example_data_helper)
+from . import helper
 
-url_for = create_url_helper(
+url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
 )
 
-get_repo_example_data = create_example_data_helper('repos_repo_example')
+get_repo_example_data = helper.create_example_data_helper(
+    'repos_repo_example'
+)
 repo_example_data = get_repo_example_data()
 
 
-class TestRepository(UnitHelper):
+class TestRepository(helper.UnitHelper):
 
     """Unit test for regular Repository methods."""
 
@@ -356,7 +357,7 @@ class TestRepository(UnitHelper):
         )
 
 
-class TestRepositoryIterator(UnitIteratorHelper):
+class TestRepositoryIterator(helper.UnitIteratorHelper):
 
     """Unit tests for Repository methods that return iterators."""
 
@@ -769,16 +770,12 @@ class TestRepositoryIterator(UnitIteratorHelper):
         )
 
 
-class TestRepositoryRequiresAuth(UnitHelper):
+class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Unit test for regular Repository methods."""
 
     described_class = Repository
     example_data = repo_example_data
-
-    def after_setup(self):
-        """Set-up the session to not be authenticated."""
-        self.session.has_auth.return_value = False
 
     def test_add_collaborator(self):
         """Verify that adding a collaborator requires authentication."""

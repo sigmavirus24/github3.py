@@ -3,15 +3,14 @@ import pytest
 from github3 import GitHubError
 from github3.orgs import Organization
 
-from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                     create_example_data_helper)
+from . import helper
 
-url_for = create_url_helper('https://api.github.com/orgs/github')
+url_for = helper.create_url_helper('https://api.github.com/orgs/github')
 
-get_org_example_data = create_example_data_helper('org_example')
+get_org_example_data = helper.create_example_data_helper('org_example')
 
 
-class TestOrganization(UnitHelper):
+class TestOrganization(helper.UnitHelper):
     described_class = Organization
     example_data = get_org_example_data()
 
@@ -154,13 +153,9 @@ class TestOrganization(UnitHelper):
         assert self.session.get.called is False
 
 
-class TestOrganizationRequiresAuth(UnitHelper):
+class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     described_class = Organization
     example_data = get_org_example_data()
-
-    def after_setup(self):
-        """Set MockedSession#has_auth.return_value to False."""
-        self.session.has_auth.return_value = False
 
     def test_add_member(self):
         """Show that one must be authenticated to add a member to an org."""
@@ -213,7 +208,7 @@ class TestOrganizationRequiresAuth(UnitHelper):
             self.instance.team(10)
 
 
-class TestOrganizationIterator(UnitIteratorHelper):
+class TestOrganizationIterator(helper.UnitIteratorHelper):
     described_class = Organization
 
     example_data = {

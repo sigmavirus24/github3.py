@@ -2,33 +2,30 @@ import pytest
 
 import github3
 
-from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper,
-                     create_example_data_helper)
+from . import helper
 
-url_for = create_url_helper(
+url_for = helper.create_url_helper(
     'https://api.github.com/users/octocat'
 )
 
-key_url_for = create_url_helper(
+key_url_for = helper.create_url_helper(
     'https://api.github.com/user/keys'
 )
 
-get_users_example_data = create_example_data_helper('users_example')
-get_user_key_example_data = create_example_data_helper('user_key_example')
+get_users_example_data = helper.create_example_data_helper('users_example')
+get_user_key_example_data = helper.create_example_data_helper(
+    'user_key_example'
+)
 
 example_data = get_users_example_data()
 
 
-class TestUserKeyRequiresAuth(UnitHelper):
+class TestUserKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test that ensure certain methods on Key class requires auth."""
 
     described_class = github3.users.Key
     example_data = get_user_key_example_data()
-
-    """Test Key methods that require authentication."""
-    def after_setup(self):
-        self.session.has_auth.return_value = False
 
     def test_update(self):
         """Test that updating a key requires authentication."""
@@ -41,7 +38,7 @@ class TestUserKeyRequiresAuth(UnitHelper):
             self.instance.delete()
 
 
-class TestUserKey(UnitHelper):
+class TestUserKey(helper.UnitHelper):
 
     """Test methods on Key class."""
 
@@ -79,7 +76,7 @@ class TestUserKey(UnitHelper):
         )
 
 
-class TestUserIterators(UnitIteratorHelper):
+class TestUserIterators(helper.UnitIteratorHelper):
 
     """Test User methods that return iterators."""
 
@@ -206,16 +203,12 @@ class TestUserIterators(UnitIteratorHelper):
         )
 
 
-class TestUsersRequiresAuth(UnitHelper):
+class TestUsersRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test that ensure certain methods on the User class requires auth."""
 
     described_class = github3.users.User
     example_data = example_data.copy()
-
-    def after_setup(self):
-        """Disable authentication on sessions."""
-        self.session.has_auth.return_value = False
 
     def test_organization_events(self):
         """Test that #organization_events requires authentication."""
