@@ -79,9 +79,12 @@ class UnitHelper(unittest.TestCase):
         If cls.example_data is None, just create a simple instance of the
         class.
         """
-        if self.example_data:
+        if self.example_data and self.session:
             instance = self.described_class(self.example_data,
                                             self.session)
+        elif self.example_data and not self.session:
+            instance = self.described_class(self.example_data)
+
         else:
             instance = self.described_class()
             instance.session = self.session
@@ -212,3 +215,18 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
         """Disable authentication on the session."""
         self.session.auth = None
         self.session.has_auth.return_value = False
+
+
+class UnitGitHubObjectHelper(UnitHelper):
+
+    """Base class for GitHubObject unit tests."""
+
+    def setUp(self):
+        self.session = None
+        self.instance = self.create_instance_of_described_class()
+        # Proxy the build_url method to the class so it can build the URL and
+        # we can assert things about the call that will be attempted to the
+        # internet
+        self.described_class._build_url = build_url
+        self.after_setup()
+        pass

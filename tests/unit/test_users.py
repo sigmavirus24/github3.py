@@ -7,17 +7,59 @@ from . import helper
 url_for = helper.create_url_helper(
     'https://api.github.com/users/octocat'
 )
+github_url_for = helper.create_url_helper(
+    'https://api.github.com'
+)
+
 
 key_url_for = helper.create_url_helper(
     'https://api.github.com/user/keys'
 )
 
+get_authenticated_user_example_data = helper.create_example_data_helper(
+    'authenticated_user_example'
+)
 get_users_example_data = helper.create_example_data_helper('users_example')
 get_user_key_example_data = helper.create_example_data_helper(
     'user_key_example'
 )
 
 example_data = get_users_example_data()
+
+
+class TestUser(helper.UnitHelper):
+
+    """Test methods on User class."""
+
+    described_class = github3.users.User
+    example_data = get_users_example_data()
+
+    def test_equality(self):
+        """Show that two instances are equal."""
+        user = github3.users.User(get_users_example_data())
+        self.instance == user
+
+        user._uniq += 1
+        assert self.instance != user
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance) == 'octocat'
+        assert repr(self.instance) == '<User [octocat:monalisa octocat]>'
+
+    def test_is_assignee_on(self):
+        """Verify the request for checking if user can be assignee."""
+        self.instance.is_assignee_on('octocat', 'hello-world')
+        self.session.get.assert_called_once_with(
+            github_url_for('repos/octocat/hello-world/assignees/octocat')
+        )
+
+    def test_is_following(self):
+        """Verify request for checking if a user is following a user."""
+        self.instance.is_following('sigmavirus24')
+        self.session.get.assert_called_once_with(
+            url_for('/following/sigmavirus24')
+        )
 
 
 class TestUserKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
@@ -214,3 +256,20 @@ class TestUsersRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Test that #organization_events requires authentication."""
         with pytest.raises(github3.GitHubError):
             self.instance.organization_events('foo')
+
+
+class TestPlan(helper.UnitGitHubObjectHelper):
+
+    """Test for methods on Plan class."""
+
+    described_class = github3.users.Plan
+    example_data = get_authenticated_user_example_data()['plan']
+
+    def test_str(self):
+        """Show that the instance string is formatted correctly."""
+        assert str(self.instance) == self.instance.name
+        assert repr(self.instance) == '<Plan [{0}]>'.format(self.instance.name)
+
+    def test_is_free(self):
+        """Show that user can check if the plan is free."""
+        assert self.instance.is_free() is False

@@ -84,6 +84,22 @@ class TestUser(IntegrationHelper):
         for key in keys:
             assert isinstance(key, github3.users.Key)
 
+    def test_is_assignee_on(self):
+        """Show that a user can check if a user can be assigned issues."""
+        cassette_name = self.cassette_name('is_assignee_on')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('itsmemattchung')
+            is_assignee_on = user.is_assignee_on('sigmavirus24', 'github3.py')
+        assert is_assignee_on is True
+
+    def test_is_following(self):
+        """Show that user can check if a user is following another user."""
+        cassette_name = self.cassette_name('is_following')
+        with self.recorder.use_cassette(cassette_name):
+            user = self.gh.user('itsmemattchung')
+            is_following = user.is_following('sigmavirus24')
+        assert is_following is True
+
     def test_organization_events(self):
         """Show that a user can retrieve their events on an organization."""
         self.basic_login()
