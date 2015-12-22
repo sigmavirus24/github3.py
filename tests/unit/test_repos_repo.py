@@ -322,6 +322,14 @@ class TestRepository(helper.UnitHelper):
             url_for('pages/builds/latest')
         )
 
+    def test_latest_release(self):
+        """Test the request for retrieving the latest release"""
+        self.instance.latest_release()
+
+        self.session.get.assert_called_once_with(
+            url_for('releases/latest')
+        )
+
     def test_milestone(self):
         """Test retrieving a specific milestone."""
         self.instance.milestone(20)
@@ -339,14 +347,6 @@ class TestRepository(helper.UnitHelper):
         self.instance.pages()
 
         self.session.get.assert_called_once_with(url_for('pages'))
-
-    def test_release_latest(self):
-        """Test the request for retrieving the latest release"""
-        self.instance.release_latest()
-
-        self.session.get.assert_called_once_with(
-            url_for('releases/latest')
-        )
 
     def test_release_from_tag(self):
         """Test the request for retrieving release by tag name"""
