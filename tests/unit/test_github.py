@@ -3,7 +3,7 @@ import pytest
 from github3 import AuthenticationFailed, GitHubError
 from github3.github import GitHub
 
-from .helper import UnitHelper, UnitIteratorHelper
+from . import helper
 
 
 def url_for(path=''):
@@ -11,7 +11,7 @@ def url_for(path=''):
     return 'https://api.github.com/' + path.strip('/')
 
 
-class TestGitHub(UnitHelper):
+class TestGitHub(helper.UnitHelper):
     described_class = GitHub
     example_data = None
 
@@ -345,7 +345,7 @@ class TestGitHub(UnitHelper):
         self.session.get.assert_called_once_with(url_for('user/10'))
 
 
-class TestGitHubIterators(UnitIteratorHelper):
+class TestGitHubIterators(helper.UnitIteratorHelper):
     described_class = GitHub
     example_data = None
 
@@ -868,17 +868,13 @@ class TestGitHubIterators(UnitIteratorHelper):
         )
 
 
-class TestGitHubRequiresAuthentication(UnitHelper):
+class TestGitHubRequiresAuthentication(
+        helper.UnitRequiresAuthenticationHelper):
 
     """Test methods that require authentication."""
 
     described_class = GitHub
     example_data = None
-
-    def after_setup(self):
-        """Disable authentication on the session."""
-        self.session.auth = None
-        self.session.has_auth.return_value = False
 
     def test_add_email_addresses(self):
         """Verify a user must be authenticated to add email addresses."""
@@ -991,7 +987,7 @@ class TestGitHubRequiresAuthentication(UnitHelper):
             self.instance.user_issues()
 
 
-class TestGitHubAuthorizations(UnitHelper):
+class TestGitHubAuthorizations(helper.UnitHelper):
     described_class = GitHub
     example_data = None
 

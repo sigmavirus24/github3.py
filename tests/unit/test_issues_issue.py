@@ -332,16 +332,12 @@ class TestIssueIterators(helper.UnitIteratorHelper):
         )
 
 
-class TestLabelRequiresAuth(helper.UnitHelper):
+class TestLabelRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test that ensure certain methods on Label class requires auth."""
 
     described_class = github3.issues.label.Label
     example_data = get_issue_label_example_data()
-
-    def after_setup(self):
-        """Disable authentication on sessions."""
-        self.session.has_auth.return_value = False
 
     def test_delete(self):
         """Test that deleting a label requires authentication."""

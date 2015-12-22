@@ -3,24 +3,22 @@ import datetime
 import github3
 import pytest
 
-from .helper import (UnitIteratorHelper, UnitHelper, create_url_helper,
-                     create_example_data_helper)
+from . import helper
 
-get_milestone_example_data = create_example_data_helper('milestone_example')
+get_milestone_example_data = helper.create_example_data_helper(
+    'milestone_example'
+)
 example_data = get_milestone_example_data()
 
-url_for = create_url_helper("https://api.github.com/repos/octocat/Hello-World/"
-                            "milestones/1")
+url_for = helper.create_url_helper("https://api.github.com/repos/octocat/"
+                                   "Hello-World/milestones/1")
 
 
-class TestMilestoneRequiresAuth(UnitHelper):
+class TestMilestoneRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Test Milestone methods that require authentication."""
 
     described_class = github3.issues.milestone.Milestone
     example_data = example_data
-
-    def after_setup(self):
-        self.session.has_auth.return_value = False
 
     def test_delete(self):
         """Test that deleting milestone requires authentication."""
@@ -39,7 +37,7 @@ class TestMilestoneRequiresAuth(UnitHelper):
             self.instance.update(**data)
 
 
-class TestMilestone(UnitHelper):
+class TestMilestone(helper.UnitHelper):
     """Test Milestone methods."""
 
     described_class = github3.issues.milestone.Milestone
@@ -98,7 +96,7 @@ class TestMilestone(UnitHelper):
         assert self.session.post.called is False
 
 
-class TestMilestoneIterator(UnitIteratorHelper):
+class TestMilestoneIterator(helper.UnitIteratorHelper):
 
     """Test Milestone methods that return iterators."""
 
