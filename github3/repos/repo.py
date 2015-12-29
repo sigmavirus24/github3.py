@@ -820,7 +820,7 @@ class Repository(GitHubCore):
         return self._instance_or_null(Issue, json)
 
     @requires_auth
-    def create_key(self, title, key):
+    def create_key(self, title, key, read_only=False):
         """Create a deploy key.
 
         :param str title: (required), title of key
@@ -829,7 +829,7 @@ class Repository(GitHubCore):
         """
         json = None
         if title and key:
-            data = {'title': title, 'key': key}
+            data = {'title': title, 'key': key, 'read_only': read_only}
             url = self._build_url('keys', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(Key, json)
