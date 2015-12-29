@@ -298,7 +298,7 @@ class GitHub(GitHubCore):
         return self._instance_or_null(Issue, None)
 
     @requires_auth
-    def create_key(self, title, key):
+    def create_key(self, title, key, read_only=False):
         """Create a new key for the authenticated user.
 
         :param str title: (required), key title
@@ -309,8 +309,9 @@ class GitHub(GitHubCore):
         json = None
 
         if title and key:
+            data = {'title': title, 'key': key, 'read_only': read_only}
             url = self._build_url('user', 'keys')
-            req = self._post(url, data={'title': title, 'key': key})
+            req = self._post(url, data=data)
             json = self._json(req, 201)
         return self._instance_or_null(users.Key, json)
 

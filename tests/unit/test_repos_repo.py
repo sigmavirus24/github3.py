@@ -144,7 +144,21 @@ class TestRepository(helper.UnitHelper):
         """Verify the request to create a key."""
         data = {
             'title': 'octocat@octomac',
-            'key': 'ssh-rsa AAA'
+            'key': 'ssh-rsa AAA',
+            'read_only': False
+        }
+        self.instance.create_key(**data)
+        self.post_called_with(
+            url_for('keys'),
+            data=data
+        )
+
+    def test_create_key_readonly(self):
+        """Verify the request to create a key with readonly true"""
+        data = {
+            'title': 'octocat@octomac',
+            'key': 'ssh-rsa AAA',
+            'read_only': True
         }
         self.instance.create_key(**data)
         self.post_called_with(
