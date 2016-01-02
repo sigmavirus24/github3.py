@@ -1,4 +1,5 @@
 import pytest
+import mock
 
 from github3 import AuthenticationFailed, GitHubError
 from github3.github import GitHub
@@ -247,11 +248,229 @@ class TestGitHub(helper.UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_key(self):
+        """Verify request for retrieving a user's key."""
+        self.instance.key(1)
+        self.session.get.assert_called_once_with(
+            url_for('user/keys/1')
+        )
+
+    def test_key_negative_id(self):
+        """Verify request for retrieving a user's key."""
+        self.instance.key(-1)
+        self.session.get.called is False
+
+    def test_login(self):
+        """Verify the request for user logging in."""
+        self.instance.login('user', 'password')
+        self.session.basic_auth.assert_called_once_with(
+            'user',
+            'password'
+        )
+
+        self.session.two_factor_auth_callback.assert_called_once_with(None)
+
+    def test_login_with_token(self):
+        """Verify the request for user logging in."""
+        token = 'OauthToken'
+        callback = lambda x: x
+        self.instance.login(token=token, two_factor_callback=callback)
+        self.session.token_auth.assert_called_once_with(token)
+        self.session.two_factor_auth_callback.assert_called_once_with(
+            callback
+        )
+
+    def test_markdown(self):
+        """Verify the request for rendering a markdown document."""
+        self.session.post.return_value = mock.Mock(
+            ok=True
+        )
+        text = '##Hello'
+        mode = 'markdown'
+        self.instance.markdown(text=text, mode=mode)
+        self.post_called_with(
+            url_for('markdown'),
+            data={
+                'text': text,
+                'mode': mode
+            },
+            headers={},
+        )
+
+    def test_markdown_raw(self):
+        """Verify the request for rendering a markdown document."""
+        self.session.post.return_value = mock.Mock(
+            ok=True
+        )
+        text = 'Hello'
+        raw = True
+        self.instance.markdown(text=text, raw=raw)
+        self.session.post.assert_called_once_with(
+            url_for('markdown/raw'),
+            'Hello',
+            headers={
+                'content-type': 'text/plain'
+            }
+        )
+
+    def test_markdown_gfm(self):
+        """Verify the request for rendering a markdown document."""
+        self.session.post.return_value = mock.Mock(
+            ok=True
+        )
+        text = '##Hello'
+        mode = 'gfm'
+        context = 'sigmavirus24/github3.py'
+        self.instance.markdown(text=text, mode=mode, context=context)
+        self.post_called_with(
+            url_for('markdown'),
+            data={
+                'text': text,
+                'mode': mode,
+                'context': context
+            },
+            headers={},
+        )
+
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
         self.instance.me()
 
         self.session.get.assert_called_once_with(url_for('user'))
+
+    def test_meta(self):
+        """Verify the request for returning  incoming service hooks data."""
+        self.instance.meta()
+        self.session.get.assert_called_once_with(
+            url_for('meta')
+        )
+
+    def test_octocat(self):
+        """Verify the request for retrieving an easter egg."""
+        self.session.get.return_value = mock.Mock(
+            ok=True, text='egg'
+        )
+        egg = self.instance.octocat(say='hello')
+        self.session.get.assert_called_once_with(
+            url_for('octocat'),
+            params={
+                's': 'hello'
+            }
+        )
+
+        assert egg == 'egg'
+
+    def test_octocat_response_not_ok(self):
+        """Verify the request for retrieving an easter egg."""
+        self.session.get.return_value = mock.Mock(
+            ok=False, text='egg'
+        )
+
+        egg = self.instance.octocat(say='hello')
+
+        assert egg == ''
+
+    def test_organization(self):
+        """Verify the request for retrieving an organization."""
+        self.instance.organization(username='github3py')
+        self.session.get.assert_called_once_with(
+            url_for('orgs/github3py')
+        )
+
+    def test_pubsubhubbub(self):
+        """Verify the request for creating a pubsubhubbub hook."""
+        topic = (
+            'hub.topic',
+            'https://github.com/octocat/hello-world/events/push'
+        )
+        body = [('hub.mode', 'subscribe'),
+                topic,
+                ('hub.callback', 'https://localhost/post')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        self.session.post.assert_called_once_with(
+            url_for('hub'),
+            body
+        )
+
+    def test_pubsubhubbub_secret(self):
+        """Verify the request for creating a pubsubhubbub hook."""
+        topic = (
+            'hub.topic',
+            'https://github.com/octocat/hello-world/events/push'
+        )
+        body = [('hub.mode', 'subscribe'),
+                topic,
+                ('hub.callback', 'https://localhost/post'),
+                ('hub.secret', 'secret')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        self.session.post.assert_called_once_with(
+            url_for('hub'),
+            body
+        )
+
+    def test_pubsubhubbub_required_callback(self):
+        """Verify the request for creating a pubsubhubbub hook."""
+        topic = (
+            'hub.topic',
+            'https://github.com/octocat/hello-world/events/push'
+        )
+        body = [('hub.mode', 'subscribe'),
+                topic,
+                ('hub.callback', '')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        assert self.session.post.called is False
+
+    def test_pubsubhubbub_required_mode(self):
+        """Verify the request for creating a pubsubhubbub hook."""
+        topic = (
+            'hub.topic',
+            'https://github.com/octocat/hello-world/events/push'
+        )
+        body = [('hub.mode', ''),
+                topic,
+                ('hub.callback', 'https://localhost/post')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        assert self.session.post.called is False
+
+    def test_pubsubhubbub_required_topic(self):
+        """Verify the request for creating a pubsubhubbub hook."""
+        body = [('hub.mode', ''),
+                ('hub.topic', ''),
+                ('hub.callback', 'https://localhost/post')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        assert self.session.post.called is False
+
+    def test_pubsubhubbub_topic_no_match(self):
+        """Verify the request for creating a pubsubhubbub hook."""
+        body = [('hub.mode', 'subscribe'),
+                ('hub.topic', ''),
+                ('hub.callback', 'https://localhost/post')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        assert self.session.post.called is False
+
+    def test_pull_request(self):
+        """Verify the request for retrieving a pull request."""
+        self.instance.pull_request(owner='octocat',
+                                   repository='hello-world',
+                                   number=1)
+
+        self.session.get.assert_called_once_with(
+            url_for('repos/octocat/hello-world/pulls/1')
+        )
+
+    def test_pull_request_negative_id(self):
+        """Verify the request for retrieving a pull request."""
+        self.instance.pull_request(owner='octocat',
+                                   repository='hello-world',
+                                   number=-1)
+
+        self.session.get.called is False
 
     def test_repository(self):
         """Verify the GET request for a repository."""
@@ -295,6 +514,13 @@ class TestGitHub(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('repositories/10'))
 
+    def test_set_client_id(self):
+        """Test the ability to set client id/secret."""
+        auth = ('id000000000000000000', 'secret99999999999999')
+        self.instance.set_client_id(*auth)
+        assert self.session.params['client_id'] == auth[0]
+        assert self.session.params['client_secret'] == auth[1]
+
     def test_two_factor_login(self):
         """Test the ability to pass two_factor_callback."""
         self.instance.login('username', 'password',
@@ -304,6 +530,40 @@ class TestGitHub(helper.UnitHelper):
         """Test that two_factor_callback is not required."""
         self.instance.login('username', 'password')
         self.instance.login(token='token')
+
+    def test_unfollow(self):
+        """Verify the request for unfollowing a user."""
+        self.instance.unfollow('sigmavirus24')
+        self.session.delete.assert_called_once_with(
+            url_for('user/following/sigmavirus24')
+        )
+
+    def test_unfollow_required_username(self):
+        """Verify the request for unfollowing a user."""
+        self.instance.unfollow('')
+        self.session.delete.called is False
+
+    def test_unstar(self):
+        """Verify the request for unstarring a repository."""
+        self.instance.unstar('sigmavirus24', 'github3.py')
+        self.session.delete.assert_called_once_with(
+            url_for('user/starred/sigmavirus24/github3.py')
+        )
+
+    def test_unstar_requires_username(self):
+        """Verify the request for unstarring a repository."""
+        self.instance.unstar('', 'github3.py')
+        self.session.delete.called is False
+
+    def test_unstar_requires_repository(self):
+        """Verify the request for unstarring a repository."""
+        self.instance.unstar('sigmavirus24', '')
+        self.session.delete.called is False
+
+    def test_unstar_requires_username_and_repository(self):
+        """Verify the request for unstarring a repository."""
+        self.instance.unstar('', '')
+        self.session.delete.called is False
 
     def test_update_me(self):
         """Verify the request to update the authenticated user's profile."""
@@ -343,6 +603,44 @@ class TestGitHub(helper.UnitHelper):
         self.instance.user_with_id('10')
 
         self.session.get.assert_called_once_with(url_for('user/10'))
+
+    def test_set_user_agent_required_user_agent(self):
+        self.instance.set_user_agent('')
+
+        self.session.headers.update.called is False
+
+    def test_set_user_agent(self):
+        self.instance.set_user_agent('github3py')
+        self.session.headers.update.assert_called_once_with({
+            'User-Agent': 'github3py'
+        })
+
+    def test_star_required_username_and_repo(self):
+        assert self.instance.star(username='', repo='') is False
+
+    def test_star_required_repo(self):
+        assert self.instance.star(username='sigmavirus24', repo='') is False
+
+    def test_star_required_username(self):
+        assert self.instance.star(username='', repo='github3.py') is False
+
+    def test_star(self):
+        """Verify the request for starring a repository."""
+        self.instance.star('sigmavirus24', 'github3.py')
+
+        self.session.put.assert_called_once_with(
+            url_for('user/starred/sigmavirus24/github3.py')
+        )
+
+    def test_zen(self):
+        """Verify the request for returning a quote from Zen of Github."""
+        self.session.get.return_value = mock.Mock(
+            status_code=200, text='hello'
+        )
+        self.instance.zen()
+        self.session.get.assert_called_once_with(
+            url_for('zen')
+        )
 
 
 class TestGitHubIterators(helper.UnitIteratorHelper):
@@ -946,6 +1244,11 @@ class TestGitHubRequiresAuthentication(
         with pytest.raises(AuthenticationFailed):
             self.instance.issues()
 
+    def test_key(self):
+        """Show that retrieving user key requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.key(1)
+
     def test_keys(self):
         """Show that one needs to authenticate to use #keys."""
         with pytest.raises(AuthenticationFailed):
@@ -971,15 +1274,35 @@ class TestGitHubRequiresAuthentication(
         with pytest.raises(AuthenticationFailed):
             self.instance.organizations()
 
+    def test_pubsubhubbub(self):
+        """Show that one needs to authenticate to use pull request."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.pubsubhubbub(mode='', topic='', callback='')
+
     def test_repositories(self):
         """Show that one needs to authenticate to use #repositories."""
         with pytest.raises(AuthenticationFailed):
             self.instance.repositories()
 
+    def test_star(self):
+        """Show that starring a repository requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.star(username='', repo='')
+
     def test_starred(self):
         """Show that one needs to authenticate to use #starred."""
         with pytest.raises(AuthenticationFailed):
             self.instance.starred()
+
+    def test_unfollow(self):
+        """Show that unfollowing a user requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.unfollow('foo')
+
+    def test_unstar(self):
+        """Show that unstarring requires authentication."""
+        with pytest.raises(AuthenticationFailed):
+            self.instance.unstar(username='', repo='')
 
     def test_user_issues(self):
         """Show that GitHub#user_issues requires authentication."""

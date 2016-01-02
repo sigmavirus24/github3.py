@@ -166,6 +166,14 @@ class TestGitHub(IntegrationHelper):
         assert t is not None
         assert t != ''
 
+    def test_key(self):
+        """Test the ability to retrieve a user's key."""
+        self.token_login()
+        cassette_name = self.cassette_name('key')
+        with self.recorder.use_cassette(cassette_name):
+            key = self.gh.key(14948033)
+        assert isinstance(key, github3.users.Key)
+
     def test_license(self):
         """Test the ability to retrieve a single license."""
         cassette_name = self.cassette_name('license')
@@ -184,6 +192,16 @@ class TestGitHub(IntegrationHelper):
 
             license = licenses[0]
             assert isinstance(license, github3.licenses.License)
+
+    def test_markdown(self):
+        """Test the ability to render a markdown document."""
+        cassette_name = self.cassette_name('markdown')
+        with self.recorder.use_cassette(cassette_name):
+            text = "github3.py **is** a python wrapper"
+            mode = 'markdown'
+            markdown = self.gh.markdown(text=text, mode=mode)
+        html = '<p>github3.py <strong>is</strong> a python wrapper</p>\n'
+        assert markdown == html
 
     def test_non_existent_gitignore_template(self):
         """Test the ability to retrieve a single gitignore template."""
@@ -341,6 +359,19 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(o, github3.orgs.Organization)
 
+    def test_pubsubhubbub(self):
+        """Test the ability to createa a pubsubhubbub hook."""
+        self.token_login()
+        cassette_name = self.cassette_name('pubsubhubbub')
+        with self.recorder.use_cassette(cassette_name):
+            topic = 'https://github.com/itsmemattchung/github3.py/events/push'
+            status = self.gh.pubsubhubbub(
+                mode='subscribe',
+                topic=topic,
+                callback='http://requestb.in/13w3nwt1'
+            )
+        assert status
+
     def test_pull_request(self):
         """Test the ability to retrieve a Pull Request."""
         cassette_name = self.cassette_name('pull_request')
@@ -474,6 +505,14 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(repos, github3.structs.SearchIterator)
         assert len(repo_result.text_matches) > 0
 
+    def test_star(self):
+        """Test the ability to star a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('star')
+        with self.recorder.use_cassette(cassette_name):
+            starred = self.gh.star('sigmavirus24', 'github3.py')
+        assert starred is True
+
     def test_update_me(self):
         """Test the ability to update the current authenticated User."""
         cassette_name = self.cassette_name('update_me')
@@ -489,6 +528,29 @@ class TestGitHub(IntegrationHelper):
             sigmavirus24 = self.gh.user('sigmavirus24')
 
         assert isinstance(sigmavirus24, github3.users.User)
+        try:
+            assert repr(sigmavirus24)
+        except UnicodeEncodeError:
+            self.fail('Regression caught. See PR #52. Names must be utf-8'
+                      ' encoded')
+
+    def test_unfollow(self):
+        """Test the ability to unfollow a user."""
+        self.token_login()
+        cassette_name = self.cassette_name('unfollow')
+        with self.recorder.use_cassette(cassette_name):
+            unfollowed = self.gh.unfollow('sigmavirus24')
+
+        assert unfollowed is True
+
+    def test_unstar(self):
+        """Test the ability to unstar a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('unstar')
+        with self.recorder.use_cassette(cassette_name):
+            unstarred = self.gh.unstar('sigmavirus24', 'github3.py')
+
+        assert unstarred is True
 
     def test_user_with_id(self):
         """Test the ability to retrieve a user by their id."""

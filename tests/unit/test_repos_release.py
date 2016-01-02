@@ -70,7 +70,9 @@ class TestRelease(UnitHelper):
             self.post_called_with(
                 url_for('/1/assets?name=%s' % 'test_repos_release.py'),
                 data=content,
-                headers=None
+                headers={
+                    'Content-Type': 'text/plain'
+                }
             )
 
     def test_upload_asset_with_a_label(self):
@@ -85,7 +87,9 @@ class TestRelease(UnitHelper):
                 url_for('/1/assets?name=%s&label=%s' % (
                     'test_repos_release.py', 'test-label')),
                 data=content,
-                headers=None
+                headers={
+                    'Content-Type': 'text/plain'
+                }
             )
 
 
