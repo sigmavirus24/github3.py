@@ -49,7 +49,7 @@ class TestGitHubError(TestCase):
         super(TestGitHubError, self).__init__(methodName)
         self.r = requests.Response()
         self.r.status_code = 400
-        message = '{"message": "m", "errors": ["e"]}'
+        message = '{"message": "m"}'
         self.r.raw = RequestsBytesIO(message.encode() if is_py3 else message)
         self.error = github3.GitHubError(self.r)
 
@@ -58,6 +58,15 @@ class TestGitHubError(TestCase):
 
     def test_str(self):
         assert str(self.error) == '400 m'
+
+    def test_str_detailed(self):
+        r = requests.Response()
+        r.status_code = 400
+        message = ('{"message": "m", "errors": [{"field": "description", '
+                   '"code": "already_exists", "resource": "OauthAccess"}]}')
+        r.raw = RequestsBytesIO(message.encode() if is_py3 else message)
+        error = github3.GitHubError(r)
+        assert str(error) == '400 m: OauthAccess description already_exists'
 
     def test_message(self):
         assert self.error.message == self.error.msg

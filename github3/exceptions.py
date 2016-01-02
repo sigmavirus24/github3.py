@@ -26,6 +26,10 @@ class GitHubError(Exception):
                                     self.msg or self.code)
 
     def __str__(self):
+        if self.errors:
+            error = self.errors[0]
+            return ('{0} {1}: {resource} {field} {code}'
+                    .format(self.code, self.msg, **error))
         return '{0} {1}'.format(self.code, self.msg)
 
     @property
