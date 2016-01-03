@@ -1,5 +1,4 @@
 import pytest
-import mock
 
 from github3 import AuthenticationFailed, GitHubError
 from github3.github import GitHub
@@ -282,7 +281,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = mock.Mock(
+        self.session.post.return_value = helper.mock.Mock(
             ok=True
         )
         text = '##Hello'
@@ -299,7 +298,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown_raw(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = mock.Mock(
+        self.session.post.return_value = helper.mock.Mock(
             ok=True
         )
         text = 'Hello'
@@ -315,7 +314,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown_gfm(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = mock.Mock(
+        self.session.post.return_value = helper.mock.Mock(
             ok=True
         )
         text = '##Hello'
@@ -347,7 +346,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = mock.Mock(
+        self.session.get.return_value = helper.mock.Mock(
             ok=True, text='egg'
         )
         egg = self.instance.octocat(say='hello')
@@ -362,7 +361,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat_response_not_ok(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = mock.Mock(
+        self.session.get.return_value = helper.mock.Mock(
             ok=False, text='egg'
         )
 
@@ -634,7 +633,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_zen(self):
         """Verify the request for returning a quote from Zen of Github."""
-        self.session.get.return_value = mock.Mock(
+        self.session.get.return_value = helper.mock.Mock(
             status_code=200, text='hello'
         )
         self.instance.zen()
