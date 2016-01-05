@@ -50,10 +50,6 @@ class TestGitHubError(TestCase):
         """Verify instance message is correct."""
         assert self.instance.msg == self.instance.message
 
-    def test_repr(self):
-        """Verify instance string is formatted correctly."""
-        assert repr(self.instance) == '<GitHubError [m]>'
-
     def test_str(self):
         """Verify instance string is formatted correctly."""
         assert str(self.instance) == '400 m'
@@ -190,11 +186,6 @@ class TestGitHubCore(helper.UnitHelper):
             self.url,
             headers=expected_headers,
         )
-
-    def test_repr(self):
-        """Verify that instance string is formatted correctly."""
-        instance_repr = '<github3-core at 0x{0:x}>'.format(id(self.instance))
-        assert repr(self.instance) == instance_repr
 
     def test_strptime(self):
         """Verify that method converts ISO 8601 formatted string."""
