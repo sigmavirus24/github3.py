@@ -21,6 +21,10 @@ with betamax.Betamax.configure() as config:
         os.environ.get('GH_AUTH', 'x' * 20)
         )
 
+    config.default_cassette_options['match_requests_on'].extend([
+        'json-body'
+    ])
+
     config.define_cassette_placeholder(
         '<BASIC_AUTH>',
         base64.b64encode(b':'.join(credentials)).decode()

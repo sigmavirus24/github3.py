@@ -362,8 +362,11 @@ class TestGitHub(IntegrationHelper):
     def test_pubsubhubbub(self):
         """Test the ability to createa a pubsubhubbub hook."""
         self.token_login()
+        betamax_kwargs = {
+            'match_requests_on': ['uri', 'method', 'body']
+        }
         cassette_name = self.cassette_name('pubsubhubbub')
-        with self.recorder.use_cassette(cassette_name):
+        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
             topic = 'https://github.com/itsmemattchung/github3.py/events/push'
             status = self.gh.pubsubhubbub(
                 mode='subscribe',
@@ -518,8 +521,8 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('update_me')
         self.basic_login()
         with self.recorder.use_cassette(cassette_name):
-            assert self.gh.update_me(name='Ian "RFC" Cordasco') is True
-            assert self.gh.update_me(name='Ian Cordasco') is True
+            assert self.gh.update_me(name='Matt "RFC" Chung') is True
+            assert self.gh.update_me(name='Matt Chung') is True
 
     def test_user(self):
         """Test the ability to retrieve a User."""
