@@ -360,13 +360,11 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(o, github3.orgs.Organization)
 
     def test_pubsubhubbub(self):
-        """Test the ability to createa a pubsubhubbub hook."""
+        """Test the ability to create a pubsubhubbub hook."""
         self.token_login()
-        betamax_kwargs = {
-            'match_requests_on': ['uri', 'method', 'body']
-        }
         cassette_name = self.cassette_name('pubsubhubbub')
-        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
+        with self.recorder.use_cassette(cassette_name,
+                                        **self.betamax_simple_body):
             topic = 'https://github.com/itsmemattchung/github3.py/events/push'
             status = self.gh.pubsubhubbub(
                 mode='subscribe',

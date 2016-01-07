@@ -2,9 +2,11 @@ import copy
 import betamax
 import github3
 import os
+import pytest
 import unittest
 
 
+@pytest.mark.usefixtures('betamax_simple_body')
 class IntegrationHelper(unittest.TestCase):
     def setUp(self):
         self.user = os.environ.get('GH_USER', 'foo')
