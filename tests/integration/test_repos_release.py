@@ -158,8 +158,7 @@ class TestAsset(IntegrationHelper):
         """Test the ability to edit an existing asset."""
         self.basic_login()
         cassette_name = self.cassette_name('edit')
-        with self.recorder.use_cassette(cassette_name,
-                                        preserve_exact_body_bytes=True):
+        with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
