@@ -68,35 +68,43 @@ class TestRelease(IntegrationHelper):
     def test_upload_asset(self):
         """Test the ability to upload an asset to a release."""
         self.token_login()
-        cassette_name = self.cassette_name('upload_asset')
+        cassette_name = self.cassette_name('create_release_upload_asset')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'github3.py')
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
                 )
-            with open(__file__) as fd:
-                asset = release.upload_asset(
-                    'text/plain', 'test_repos_release.py', fd.read(),
-                )
+
+        cassette_name = self.cassette_name('upload_asset')
+        with self.recorder.use_cassette(cassette_name,
+                                        **self.betamax_simple_body):
+            file_contents = 'Hello World'
+            asset = release.upload_asset(
+                'text/plain', 'test_repos_release.py', file_contents,
+            )
             assert isinstance(asset, github3.repos.release.Asset)
             release.delete()
 
     def test_upload_asset_with_a_label(self):
         """Test the ability to upload an asset to a release with a label."""
         self.token_login()
-        cassette_name = self.cassette_name('upload_asset_with_a_label')
+        cassette_name = self.cassette_name('create_release')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'github3.py')
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
-                '0.8.0.pre', 'develop', '0.8.0.pre fake release with upload',
+                '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
                 )
-            with open(__file__) as fd:
-                asset = release.upload_asset(
-                    'text/plain', 'test_repos_release.py', fd.read(),
-                    'test-label',
-                )
+
+        cassette_name = self.cassette_name('upload_asset_with_a_label')
+        with self.recorder.use_cassette(cassette_name,
+                                        **self.betamax_simple_body):
+            file_contents = 'Hello World'
+            asset = release.upload_asset(
+                'text/plain', 'test_repos_release.py', file_contents,
+                'test-label',
+            )
             release.delete()
         assert isinstance(asset, github3.repos.release.Asset)
 
@@ -116,7 +124,8 @@ class TestAsset(IntegrationHelper):
         """Test the ability to download an asset."""
         cassette_name = self.cassette_name('download')
         with self.recorder.use_cassette(cassette_name,
-                                        preserve_exact_body_bytes=True):
+                                        preserve_exact_body_bytes=True,
+                                        **self.betamax_simple_body):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
             asset = next(release.assets())
@@ -133,7 +142,8 @@ class TestAsset(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('download_when_authenticated')
         with self.recorder.use_cassette(cassette_name,
-                                        preserve_exact_body_bytes=True):
+                                        preserve_exact_body_bytes=True,
+                                        **self.betamax_simple_body):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
             asset = next(release.assets())
@@ -150,18 +160,21 @@ class TestAsset(IntegrationHelper):
     def test_edit(self):
         """Test the ability to edit an existing asset."""
         self.basic_login()
-        cassette_name = self.cassette_name('edit')
-        with self.recorder.use_cassette(cassette_name,
-                                        preserve_exact_body_bytes=True):
-            repository = self.gh.repository('github3py', 'github3.py')
+        cassette_name = self.cassette_name('create_release_edit')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
                 )
-            with open(__file__) as fd:
-                asset = release.upload_asset(
-                    'text/plain', 'test_repos_release.py', fd.read()
-                    )
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name,
+                                        preserve_exact_body_bytes=True,
+                                        **self.betamax_simple_body):
+            file_contents = 'Hello World'
+            asset = release.upload_asset(
+                'text/plain', 'test_repos_release.py', file_contents
+                )
             assert isinstance(asset, github3.repos.release.Asset)
             assert asset.edit('A new name for this asset') is True
             release.delete()
