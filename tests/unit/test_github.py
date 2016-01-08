@@ -96,13 +96,27 @@ class TestGitHub(helper.UnitHelper):
 
     def test_create_key(self):
         """Test the request to create a key."""
-        self.instance.create_key('key_name', 'key text')
+        self.instance.create_key('key_name', 'key text', read_only=False)
 
         self.post_called_with(
             url_for('user/keys'),
             data={
                 'title': 'key_name',
-                'key': 'key text'
+                'key': 'key text',
+                'read_only': False
+            }
+        )
+
+    def test_create_key_with_readonly(self):
+        """ Test the request to create a key with read only"""
+        self.instance.create_key('key_name', 'key text', read_only=True)
+
+        self.post_called_with(
+            url_for('user/keys'),
+            data={
+                'title': 'key_name',
+                'key': 'key text',
+                'read_only': True
             }
         )
 
