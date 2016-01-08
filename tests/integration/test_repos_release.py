@@ -69,15 +69,15 @@ class TestRelease(IntegrationHelper):
         """Test the ability to upload an asset to a release."""
         self.token_login()
         cassette_name = self.cassette_name('upload_asset')
-        betamax_kwargs = {
-            'match_requests_on': ['uri', 'method', 'body']
-        }
-        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
+        with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
                 )
+
+        with self.recorder.use_cassette(cassette_name,
+                                        **self.betamax_simple_body):
             file_contents = b'Hello World'
             asset = release.upload_asset(
                 'text/plain', 'test_repos_release.py', file_contents,
@@ -89,15 +89,14 @@ class TestRelease(IntegrationHelper):
         """Test the ability to upload an asset to a release with a label."""
         self.token_login()
         cassette_name = self.cassette_name('upload_asset_with_a_label')
-        betamax_kwargs = {
-            'match_requests_on': ['uri', 'method', 'body']
-        }
-        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
+        with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0.pre fake release with upload',
                 'To be deleted'
                 )
+        with self.recorder.use_cassette(cassette_name,
+                                        **self.betamax_simple_body):
             file_contents = b'Hello World'
             asset = release.upload_asset(
                 'text/plain', 'test_repos_release.py', file_contents,
@@ -121,12 +120,9 @@ class TestAsset(IntegrationHelper):
     def test_download(self):
         """Test the ability to download an asset."""
         cassette_name = self.cassette_name('download')
-        betamax_kwargs = {
-            'match_requests_on': ['uri', 'method', 'body']
-        }
         with self.recorder.use_cassette(cassette_name,
                                         preserve_exact_body_bytes=True,
-                                        **betamax_kwargs):
+                                        **self.betamax_simple_body):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
             asset = next(release.assets())
@@ -142,12 +138,9 @@ class TestAsset(IntegrationHelper):
         """Test the ability to download an asset when authenticated."""
         self.basic_login()
         cassette_name = self.cassette_name('download_when_authenticated')
-        betamax_kwargs = {
-            'match_requests_on': ['uri', 'method', 'body']
-        }
         with self.recorder.use_cassette(cassette_name,
                                         preserve_exact_body_bytes=True,
-                                        **betamax_kwargs):
+                                        **self.betamax_simple_body):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
             asset = next(release.assets())
@@ -165,17 +158,16 @@ class TestAsset(IntegrationHelper):
         """Test the ability to edit an existing asset."""
         self.basic_login()
         cassette_name = self.cassette_name('edit')
-        betamax_kwargs = {
-            'match_requests_on': ['uri', 'method', 'body']
-        }
         with self.recorder.use_cassette(cassette_name,
-                                        preserve_exact_body_bytes=True,
-                                        **betamax_kwargs):
+                                        preserve_exact_body_bytes=True):
             repository = self.gh.repository('itsmemattchung', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
                 )
+        with self.recorder.use_cassette(cassette_name,
+                                        preserve_exact_body_bytes=True,
+                                        **self.betamax_simple_body):
             file_contents = b'Hello World'
             asset = release.upload_asset(
                 'text/plain', 'test_repos_release.py', file_contents
