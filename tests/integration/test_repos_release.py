@@ -78,7 +78,7 @@ class TestRelease(IntegrationHelper):
 
         with self.recorder.use_cassette(cassette_name,
                                         **self.betamax_simple_body):
-            file_contents = b'Hello World'
+            file_contents = 'Hello World'
             asset = release.upload_asset(
                 'text/plain', 'test_repos_release.py', file_contents,
             )
@@ -97,7 +97,7 @@ class TestRelease(IntegrationHelper):
                 )
         with self.recorder.use_cassette(cassette_name,
                                         **self.betamax_simple_body):
-            file_contents = b'Hello World'
+            file_contents = 'Hello World'
             asset = release.upload_asset(
                 'text/plain', 'test_repos_release.py', file_contents,
                 'test-label',
@@ -168,7 +168,7 @@ class TestAsset(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name,
                                         preserve_exact_body_bytes=True,
                                         **self.betamax_simple_body):
-            file_contents = b'Hello World'
+            file_contents = 'Hello World'
             asset = release.upload_asset(
                 'text/plain', 'test_repos_release.py', file_contents
                 )
