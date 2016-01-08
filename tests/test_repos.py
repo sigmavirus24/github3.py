@@ -15,46 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_create_key(self):
-        self.response('key', 201)
-        self.post(self.api + 'keys')
-        self.conf = {'data': {'key': 'ssh-rsa foobarbogus',
-                              'title': 'Fake key'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_key,
-                          **self.conf['data'])
-
-        self.login()
-        assert isinstance(self.repo.create_key(**self.conf['data']),
-                          github3.users.Key)
-        self.mock_assertions()
-
-    def test_create_label(self):
-        self.response('label', 201)
-        self.post(self.api + 'labels')
-        self.conf = {'data': {'name': 'foo', 'color': 'f00f00'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_label,
-                          **self.conf['data'])
-
-        self.login()
-        assert isinstance(self.repo.create_label(**self.conf['data']),
-                          github3.issues.label.Label)
-        self.mock_assertions()
-
-    def test_create_milestone(self):
-        self.response('milestone', 201)
-        self.post(self.api + 'milestones')
-        self.conf = {'data': {'title': 'foo'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_milestone,
-                          **self.conf['data'])
-
-        self.login()
-        assert isinstance(self.repo.create_milestone('foo'),
-                          github3.issues.milestone.Milestone)
-        self.mock_assertions()
-
     def test_create_pull(self):
         self.response('pull', 201)
         self.post(self.api + 'pulls')

@@ -170,6 +170,70 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.post.called is False
 
+    def test_create_label(self):
+        """Verify the request for creating a label."""
+        data = {
+            'name': 'foo',
+            'color': 'fafafa'
+        }
+        self.instance.create_label(**data)
+        self.post_called_with(
+            url_for('labels'),
+            data=data
+        )
+
+    def test_create_label_required_name(self):
+        """Verify the request for creating a label."""
+        data = {
+            'name': '',
+            'color': 'fafafa'
+        }
+        self.instance.create_label(**data)
+        assert self.session.post.called is False
+
+    def test_create_label_required_color(self):
+        """Verify the request for creating a label."""
+        data = {
+            'name': 'foo',
+            'color': ''
+        }
+        self.instance.create_label(**data)
+        assert self.session.post.called is False
+
+    def test_create_label_required_name_and_color(self):
+        """Verify the request for creating a label."""
+        data = {
+            'name': '',
+            'color': ''
+        }
+        self.instance.create_label(**data)
+        assert self.session.post.called is False
+
+    def test_create_milestone(self):
+        """Verify the request for creating a milestone."""
+        data = {
+            'title': 'foo'
+        }
+        self.instance.create_milestone(**data)
+        self.post_called_with(
+            url_for('milestones'),
+            data=data
+        )
+
+    def test_create_milestone_accepted_state(self):
+        """Verify the request for creating a milestone."""
+        data = {
+            'title': 'foo',
+            'state': 'in_progress'
+        }
+        self.instance.create_milestone(**data)
+        self.post_called_with(
+            url_for('milestones'),
+            data={
+                'title': 'foo'
+            }
+        )
+
     def test_create_ref(self):
         """Verify the request to create a reference."""
         self.instance.create_ref('refs/heads/foo', 'my-fake-sha')

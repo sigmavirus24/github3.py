@@ -300,6 +300,26 @@ class TestRepository(helper.IntegrationHelper):
             key = repository.create_key(**data)
             assert isinstance(key, github3.users.Key)
 
+    def test_create_label(self):
+        """Test the ability to create a label on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_label')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            label = repository.create_label('fakelabel', 'fad8c7')
+
+        assert isinstance(label, github3.issues.label.Label)
+
+    def test_create_milestone(self):
+        """Test the ability to create a milestone on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_milestone')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            milestone = repository.create_milestone('foo')
+
+        assert isinstance(milestone, github3.issues.milestone.Milestone)
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()
