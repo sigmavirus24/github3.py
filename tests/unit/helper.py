@@ -6,6 +6,7 @@ except ImportError:
 import github3
 import json
 import os.path
+import pytest
 import unittest
 
 
@@ -230,3 +231,27 @@ class UnitGitHubObjectHelper(UnitHelper):
         self.described_class._build_url = build_url
         self.after_setup()
         pass
+
+
+@pytest.mark.usefixtures('enterprise_url')
+class UnitGitHubEnterpriseHelper(UnitHelper):
+
+    def build_url(self, *args, **kwargs):
+        """A function to proxy to the actual GitHubSession#build_url method."""
+        # We want to assert what is happening with the actual calls to the
+        # Internet. We can proxy this.
+        return github3.session.GitHubSession().build_url(
+            *args,
+            base_url=self.enterprise_url,
+            **kwargs
+        )
+
+    def setUp(self):
+        self.session = self.create_session_mock()
+        self.instance = github3.GitHubEnterprise(self.enterprise_url)
+        self.instance.session = self.session
+        # Proxy the build_url method to the class so it can build the URL and
+        # we can assert things about the call that will be attempted to the
+        # internet
+        self.instance._build_url = self.build_url
+        self.after_setup()

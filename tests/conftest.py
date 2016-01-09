@@ -36,3 +36,9 @@ def betamax_simple_body(request):
     request.cls.betamax_simple_body = {
         'match_requests_on': ['uri', 'method', 'body']
     }
+
+
+@pytest.fixture
+def enterprise_url(request):
+    """Configure class with enterprise url."""
+    request.cls.enterprise_url = 'https://enterprise.github3.com'

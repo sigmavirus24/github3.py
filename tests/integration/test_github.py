@@ -3,7 +3,7 @@
 import github3
 import uritemplate
 
-from .helper import IntegrationHelper
+from .helper import GitHubEnterpriseHelper, IntegrationHelper
 
 
 SSH_KEY = (
@@ -569,3 +569,14 @@ class TestGitHub(IntegrationHelper):
 
         assert z is not None
         assert z != ''
+
+
+class TestGitHubEnterprise(GitHubEnterpriseHelper):
+
+    def test_admin_stats(self):
+        cassette_name = self.cassette_name('admin_stats')
+        self.token_login()
+        with self.recorder.use_cassette(cassette_name):
+            stats = self.gh.admin_stats('all')
+
+        assert isinstance(stats, dict)

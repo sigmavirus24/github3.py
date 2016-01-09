@@ -1,6 +1,6 @@
 import pytest
 
-from github3 import AuthenticationFailed, GitHubError
+from github3 import AuthenticationFailed, GitHubEnterprise, GitHubError
 from github3.github import GitHub
 
 from . import helper
@@ -9,6 +9,8 @@ from . import helper
 def url_for(path=''):
     """Simple function to generate URLs with the base GitHub URL."""
     return 'https://api.github.com/' + path.strip('/')
+
+enterprise_url_for = helper.create_url_helper('https://enterprise.github3.com')
 
 
 class TestGitHub(helper.UnitHelper):
@@ -1359,4 +1361,22 @@ class TestGitHubAuthorizations(helper.UnitHelper):
         )
         self.session.temporary_basic_auth.assert_called_once_with(
             'id', 'secret'
+        )
+
+
+class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
+
+    described_class = GitHubEnterprise
+
+    def test_admin_stats(self):
+        """Verify the request for checking admin stats."""
+        self.instance.admin_stats(option='all')
+        self.session.get.assert_called_once_with(
+            enterprise_url_for('enterprise/stats/all')
+        )
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance) == '<GitHub Enterprise [{0}]>'.format(
+            enterprise_url_for()
         )

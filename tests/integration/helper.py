@@ -54,3 +54,10 @@ class CustomHeadersMatcher(betamax.BaseMatcher):
 
 
 betamax.Betamax.register_request_matcher(CustomHeadersMatcher)
+
+
+@pytest.mark.usefixtures('enterprise_url')
+class GitHubEnterpriseHelper(IntegrationHelper):
+
+    def get_client(self):
+        return github3.GitHubEnterprise(self.enterprise_url)
