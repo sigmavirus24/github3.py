@@ -15,21 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_create_pull_from_issue(self):
-        self.response('pull', 201)
-        self.post(self.api + 'pulls')
-        self.conf = {'data': {'issue': 1, 'base': 'master',
-                              'head': 'feature_branch'}}
-
-        self.assertRaises(github3.GitHubError,
-                          self.repo.create_pull_from_issue,
-                          **self.conf['data'])
-
-        self.login()
-        pull = self.repo.create_pull_from_issue(**self.conf['data'])
-        assert isinstance(pull, github3.pulls.PullRequest)
-        self.mock_assertions()
-
     def test_create_status(self):
         self.response('status', 201)
         self.post(self.api + 'statuses/fakesha')

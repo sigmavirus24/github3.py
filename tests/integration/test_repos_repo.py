@@ -335,6 +335,23 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(pull_request, github3.pulls.PullRequest)
 
+    def test_create_pull_from_issue(self):
+        """
+        Test the ability to create a pull request from an issue on a
+        repository.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name('create_pull_from_issue')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            pull_request = repository.create_pull_from_issue(
+                issue=536,
+                base='develop',
+                head='itsmemattchung:tests/migrate-repos',
+            )
+
+        assert isinstance(pull_request, github3.pulls.PullRequest)
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()
