@@ -5,6 +5,7 @@ import pytest
 from github3 import GitHubError
 from github3.null import NullObject
 from github3.repos.repo import Repository
+from github3.models import GitHubCore
 
 from . import helper
 
@@ -248,18 +249,64 @@ class TestRepository(helper.UnitHelper):
             }
         )
 
-    def test_create_pull(self):
+    def test_create_pull_private_required_data(self):
+        """Verify the request for creating a pull request."""
+        with helper.mock.patch.object(GitHubCore, '_remove_none') as rm_none:
+            data = {}
+            self.instance._create_pull(data)
+            rm_none.assert_called_once_with({})
+            assert self.session.post.called is False
+
+    def test_create_pull_private(self):
         """Verify the request for creating a pull request."""
         data = {
             'title': 'foo',
             'base': 'master',
             'head': 'feature_branch'
         }
-        self.instance.create_pull(**data)
+        self.instance._create_pull(data)
         self.post_called_with(
             url_for('pulls'),
             data=data
         )
+
+    def test_create_pull(self):
+        """Verify the request for creating a pull request."""
+        data = {
+            'title': 'foo',
+            'base': 'master',
+            'head': 'feature_branch',
+            'body': 'body'
+        }
+        with helper.mock.patch.object(Repository, '_create_pull') as pull:
+            self.instance.create_pull(**data)
+            pull.assert_called_once_with(
+                data
+            )
+
+    def test_create_pull_from_issue(self):
+        """Verify the request for creating a pull request from an issue."""
+        with helper.mock.patch.object(Repository, '_create_pull') as pull:
+            data = {
+                'issue': 1,
+                'base': 'master',
+                'head': 'feature_branch'
+            }
+            self.instance.create_pull_from_issue(
+                **data
+            )
+            pull.assert_called_once_with(data)
+
+    def test_create_pull_from_issue_required_issue_number(self):
+        """Verify the request for creating a pull request from an issue."""
+        with helper.mock.patch.object(Repository, '_create_pull') as pull:
+            pull_request = self.instance.create_pull_from_issue(
+                issue=-1,
+                base='master',
+                head='feature_branch'
+            )
+            assert pull.called is False
+            assert pull_request is None
 
     def test_create_ref(self):
         """Verify the request to create a reference."""
@@ -902,6 +949,17 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that creating a pull request requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.create_pull(title='foo', base='master')
+
+    def test_create_pull_from_issue(self):
+        """
+        Verify that creating a pull request from issue requires authentication.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.create_pull_from_issue(
+                issue=1,
+                title='foo',
+                base='master'
+            )
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""
