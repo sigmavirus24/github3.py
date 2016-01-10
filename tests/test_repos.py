@@ -15,31 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_create_status(self):
-        self.response('status', 201)
-        self.post(self.api + 'statuses/fakesha')
-        self.conf = {'data': {'state': 'success'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_status,
-                          'fakesha', 'success')
-
-        self.login()
-        s = self.repo.create_status('fakesha', 'success')
-        assert isinstance(s, repos.status.Status)
-        assert repr(s) > ''
-        self.mock_assertions()
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api[:-1])
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.repo.delete)
-
-        self.login()
-        assert self.repo.delete()
-        self.mock_assertions()
-
     def test_delete_key(self):
         self.response('', 204)
         self.delete(self.api + 'keys/2')

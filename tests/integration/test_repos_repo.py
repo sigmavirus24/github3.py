@@ -366,6 +366,19 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(release, github3.repos.release.Release)
 
+    def test_create_status(self):
+        """Test the ability to create a status object on a commit."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_status')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            status = repository.create_status(
+                sha='24893ec07db2a12073703258f0089f105906d2e4',
+                state='failure'
+            )
+
+        assert isinstance(status, github3.repos.status.Status)
+
     def test_create_tag(self):
         """Test the ability to create an annotated tag on a repository."""
         self.basic_login()

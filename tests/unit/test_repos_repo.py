@@ -344,6 +344,37 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.post.called is False
 
+    def test_create_status(self):
+        """Verify the request for creating a status on a commit."""
+        data = {
+            'state': 'success',
+            'target_url': 'foo',
+            'description': 'bar',
+            'context': 'default'
+        }
+        with helper.mock.patch.object(GitHubCore, '_remove_none') as rm_none:
+            self.instance.create_status(sha='fake-sha', **data)
+            rm_none.assert_called_once_with(data)
+            self.post_called_with(
+                url_for('statuses/fake-sha'),
+                data=data
+            )
+
+    def test_create_status_required_sha(self):
+        """Verify the request for creating a status on a commit."""
+        self.instance.create_status(sha='', state='success')
+        assert self.session.post.called is False
+
+    def test_create_status_required_state(self):
+        """Verify the request for creating a status on a commit."""
+        self.instance.create_status(sha='fake-sha', state='')
+        assert self.session.post.called is False
+
+    def test_create_status_required_sha_and_state(self):
+        """Verify the request for creating a status on a commit."""
+        self.instance.create_status(sha='', state='')
+        assert self.session.post.called is False
+
     def test_create_tag_that_is_not_lightweight(self):
         """Verify we can create an annotated tag."""
         self.instance.create_tag(
@@ -400,6 +431,12 @@ class TestRepository(helper.UnitHelper):
         self.instance.create_tree(None)
 
         assert self.session.post.called is False
+
+    def test_delete(self):
+        """Verify the request for deleting a repository."""
+        self.instance.delete()
+
+        assert self.session.delete.called is True
 
     def test_directory_contents(self):
         """Verify the request made to retrieve a directory's contents."""
@@ -959,6 +996,13 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
                 issue=1,
                 title='foo',
                 base='master'
+            )
+
+    def test_create_status(self):
+        """Verify the request for creating a status object on a commit."""
+        with pytest.raises(GitHubError):
+            self.instance.create_status(
+                sha='fake-sha'
             )
 
     def test_hooks(self):
