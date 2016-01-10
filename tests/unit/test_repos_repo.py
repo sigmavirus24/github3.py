@@ -248,6 +248,19 @@ class TestRepository(helper.UnitHelper):
             }
         )
 
+    def test_create_pull(self):
+        """Verify the request for creating a pull request."""
+        data = {
+            'title': 'foo',
+            'base': 'master',
+            'head': 'feature_branch'
+        }
+        self.instance.create_pull(**data)
+        self.post_called_with(
+            url_for('pulls'),
+            data=data
+        )
+
     def test_create_ref(self):
         """Verify the request to create a reference."""
         self.instance.create_ref('refs/heads/foo', 'my-fake-sha')
@@ -884,6 +897,11 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that deploying a key requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.create_key('key name', 'ssh-rsa ...')
+
+    def test_create_pull(self):
+        """Verify that creating a pull request requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_pull(title='foo', base='master')
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""
