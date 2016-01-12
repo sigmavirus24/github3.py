@@ -526,6 +526,36 @@ class TestRepository(helper.UnitHelper):
             params={'ref': 'some-sha'}
         )
 
+    def test_git_commit_required_sha(self):
+        """Verify the request for retrieving a git commit from a repository."""
+        self.instance.git_commit('')
+        assert self.session.get.called is False
+
+    def test_git_commit(self):
+        """Verify the request for retrieving a git commit from a repository."""
+        self.instance.git_commit('fake-sha')
+        self.session.get.assert_called_once_with(
+            url_for('git/commits/fake-sha')
+        )
+
+    def test_is_collaborator_required_username(self):
+        """
+        Verify the request for checking if a user is a collaborator on a
+        repository.
+        """
+        assert self.instance.is_collaborator('') is False
+        assert self.session.get.called is False
+
+    def test_is_collaborator(self):
+        """
+        Verify the request for checking if a user is a collaborator on a
+        repository.
+        """
+        self.instance.is_collaborator('octocat')
+        self.session.get.assert_called_once_with(
+            url_for('collaborators/octocat')
+        )
+
     def test_key(self):
         """Test the ability to fetch a deploy key."""
         self.instance.key(10)
@@ -1074,6 +1104,14 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that editing a repository requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.edit(name='Hello')
+
+    def test_is_collaborator(self):
+        """
+        Show that checking if a user is collaborator on a repository requires
+        authentication.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.is_collaborator('octocat')
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""

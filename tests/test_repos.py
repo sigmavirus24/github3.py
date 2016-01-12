@@ -15,22 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_is_collaborator(self):
-        self.response('', 204)
-        self.get(self.api + 'collaborators/user')
-
-        assert self.repo.is_collaborator(None) is False
-        self.not_called()
-        assert self.repo.is_collaborator('user')
-        self.mock_assertions()
-
-    def test_git_commit(self):
-        self.response('git_commit')
-        self.get(self.api + 'git/commits/fakesha')
-
-        assert isinstance(self.repo.git_commit('fakesha'), github3.git.Commit)
-        self.mock_assertions()
-
     def test_hook(self):
         self.response('hook')
         self.get(self.api + 'hooks/2')

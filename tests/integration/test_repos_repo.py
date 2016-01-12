@@ -500,6 +500,16 @@ class TestRepository(helper.IntegrationHelper):
         for fork in forks:
             assert isinstance(fork, github3.repos.Repository)
 
+    def test_git_commit(self):
+        """Test the ability to retrieve a commit from a repository."""
+        cassette_name = self.cassette_name('git_commit')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.git_commit(
+                '9ea7482560c9e70c66019f7981aa1727caf888e0'
+            )
+        assert isinstance(commit, github3.git.Commit)
+
     def test_hooks(self):
         """Test that a user can iterate over the hooks of a repository."""
         self.basic_login()
@@ -523,6 +533,17 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             subscription = repository.ignore()
             assert subscription.ignored is True
+
+    def test_is_collaborator(self):
+        """
+        Test the ability to check if a user is a collaborator on a
+        repository.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name('is_collaborator')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository.is_collaborator('itsmemattchung') is True
 
     def test_issue_events(self):
         """Test that a user can iterate over issue events in a repo."""
