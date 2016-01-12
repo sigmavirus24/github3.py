@@ -1,5 +1,6 @@
 """Unit tests for Repositories."""
 import datetime
+import mock
 import pytest
 
 from github3 import GitHubError
@@ -438,6 +439,28 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.delete.called is True
 
+    def test_delete_key(self):
+        """Verify the request for deleting a key on the repository."""
+        self.instance.delete_key(1)
+
+        self.session.delete.assert_called_once_with(
+            url_for('keys/1')
+        )
+
+    def test_delete_key_required_id(self):
+        """Verify the request for deleting a key on the repository."""
+        assert self.instance.delete_key(-1) is False
+
+        self.session.delete.called is False
+
+    def test_delete_subscription(self):
+        """Verify the request for deleting a subscription."""
+        self.instance.delete_subscription()
+
+        self.session.delete.assert_called_once_with(
+            url_for('subscription')
+        )
+
     def test_directory_contents(self):
         """Verify the request made to retrieve a directory's contents."""
         self.instance.directory_contents('path/to/directory')
@@ -467,6 +490,32 @@ class TestRepository(helper.UnitHelper):
         self.instance.deployment(-10)
 
         assert self.session.get.called is False
+
+    def test_edit(self):
+        """Verify the request for editing a repository."""
+        data = {
+            'name': 'hello-world',
+            'description': 'repo description',
+            'homepage': 'homepage_url',
+            'private': True,
+            'has_issues': True,
+            'has_wiki': True,
+            'has_downloads': True,
+            'default_branch': 'develop'
+        }
+
+        with mock.patch.object(Repository, '_update_attributes') as up_attr:
+            assert self.instance.edit(**data) is True
+            assert up_attr.called is True
+            self.patch_called_with(
+                url_for(),
+                data=data
+            )
+
+    def test_edit_required_name(self):
+        """Verify the request for editing a repository."""
+        assert self.instance.edit(None) is False
+        assert self.session.patch.called is False
 
     def test_file_contents(self):
         """Verify the request made to retrieve a dictionary's contents."""
@@ -999,11 +1048,32 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
             )
 
     def test_create_status(self):
-        """Verify the request for creating a status object on a commit."""
+        """
+        Show that a user must be authenticated to create a status object on a
+        commit.
+        """
         with pytest.raises(GitHubError):
             self.instance.create_status(
                 sha='fake-sha'
             )
+
+    def test_delete_key(self):
+        """
+        Show that a user must be authenticated to delete a key on a
+        repository.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.delete_key(1)
+
+    def test_delete_subscription(self):
+        """Show that deleting a subscription requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.delete_subscription()
+
+    def test_edit(self):
+        """Show that editing a repository requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.edit(name='Hello')
 
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""

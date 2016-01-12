@@ -15,47 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_delete_key(self):
-        self.response('', 204)
-        self.delete(self.api + 'keys/2')
-        self.conf = {}
-
-        self.assertRaises(github3.GitHubError, self.repo.delete_key, 2)
-
-        self.login()
-        assert self.repo.delete_key(-2) is False
-        self.not_called()
-        assert self.repo.delete_key(2)
-        self.mock_assertions()
-
-    def test_delete_subscription(self):
-        self.response('', 204)
-        self.delete(self.api + 'subscription')
-
-        self.assertRaises(github3.GitHubError, self.repo.delete_subscription)
-        self.not_called()
-
-        self.login()
-        assert self.repo.delete_subscription()
-        self.mock_assertions()
-
-    def test_edit(self):
-        self.response('repo')
-        self.patch(self.api[:-1])
-        self.conf = {'data': {'name': 'foo'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.edit, 'Foo')
-
-        self.login()
-        assert self.repo.edit(None) is False
-        self.not_called()
-        assert self.repo.edit('foo')
-        self.mock_assertions()
-
-        self.conf['data']['description'] = 'bar'
-        assert self.repo.edit(**self.conf['data'])
-        self.mock_assertions()
-
     def test_is_collaborator(self):
         self.response('', 204)
         self.get(self.api + 'collaborators/user')

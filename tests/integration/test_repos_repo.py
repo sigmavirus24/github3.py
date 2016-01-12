@@ -409,6 +409,22 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             assert repository.delete() is True
 
+    def test_delete_key(self):
+        """Test the ability to delete a key from a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete_key')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            assert repository.delete_key(15312662) is True
+
+    def test_delete_subscription(self):
+        """Test the ability to delete a subscription from a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete_subscription')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository.delete_subscription() is True
+
     def test_deployment(self):
         """Test that a deployment can be retrieved by its id."""
         cassette_name = self.cassette_name('deployment')
@@ -440,6 +456,14 @@ class TestRepository(helper.IntegrationHelper):
             assert isinstance(content, github3.repos.contents.Contents)
             assert content.content is None
             assert content.decoded is None
+
+    def test_edit(self):
+        """Test the ability to edit a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            assert repository.edit('github3py') is True
 
     def test_events(self):
         """Test that a user can iterate over the events from a repository."""
