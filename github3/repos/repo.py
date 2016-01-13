@@ -1276,6 +1276,7 @@ class Repository(GitHubCore):
         url = self._build_url('assignees', str(username), base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    @requires_auth
     def is_collaborator(self, username):
         """Check to see if ``username`` is a collaborator on this repository.
 
