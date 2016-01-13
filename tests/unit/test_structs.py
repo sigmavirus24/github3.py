@@ -11,7 +11,11 @@ class TestGitHubIterator(UnitHelper):
 
     def create_instance_of_described_class(self):
         self.url = 'https://api.github.com/users'
-        klass = lambda *args: args
+
+        def _klass(*args):
+            return args
+
+        klass = _klass
         instance = self.described_class(count=-1, url=self.url, cls=klass,
                                         session=self.session)
         return instance
