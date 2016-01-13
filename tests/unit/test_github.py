@@ -288,7 +288,11 @@ class TestGitHub(helper.UnitHelper):
     def test_login_with_token(self):
         """Verify the request for user logging in."""
         token = 'OauthToken'
-        callback = lambda x: x
+
+        def _callback(x):
+            return x
+
+        callback = _callback
         self.instance.login(token=token, two_factor_callback=callback)
         self.session.token_auth.assert_called_once_with(token)
         self.session.two_factor_auth_callback.assert_called_once_with(
