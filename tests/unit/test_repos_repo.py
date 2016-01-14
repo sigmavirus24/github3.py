@@ -156,7 +156,7 @@ class TestRepository(helper.UnitHelper):
         )
 
     def test_create_key_readonly(self):
-        """Verify the request to create a key with readonly true"""
+        """Verify the request to create a key with readonly true."""
         data = {
             'title': 'octocat@octomac',
             'key': 'ssh-rsa AAA',
@@ -567,6 +567,46 @@ class TestRepository(helper.UnitHelper):
         """
         assert self.instance.is_assignee('') is False
         assert self.session.get.called is False
+
+    def test_import_issue(self):
+        """Verify the request for importing an issue into a repository."""
+        data = {
+            'issue': {
+                'title': 'Foo',
+                'body': 'Foobar body',
+                'created_at': '2014-03-16T17:15:42Z',
+                'assignee': 'octocat',
+                'milestone': 1,
+                'closed': True,
+                'labels': ['easy', 'bug'],
+                'comments': {
+                    'created_at': '2014-03-18T17:15:42Z',
+                    'body': 'comment body'
+                }
+
+            }
+        }
+        with mock.patch.object(GitHubCore, '_remove_none') as rm_none:
+            self.instance.import_issue(**data['issue'])
+            assert rm_none.called is True
+
+        self.post_called_with(
+            url_for('import/issues'),
+            data=data,
+            headers={
+                'Accept': 'application/vnd.github.golden-comet-preview+json'
+            }
+        )
+
+    def test_imported_issue(self):
+        """Verify the request for retrieving an imported issue."""
+        self.instance.imported_issue(1)
+        self.session.get.assert_called_once_with(
+            url_for('import/issues/1'),
+            headers={
+                'Accept': 'application/vnd.github.golden-comet-preview+json'
+            }
+        )
 
     def test_is_collaborator_required_username(self):
         """
@@ -1232,6 +1272,20 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that a user must be authenticated to list hooks."""
         with pytest.raises(GitHubError):
             self.instance.hooks()
+
+    def test_import_issue(self):
+        """Show that a user must be authenticated to import an issue."""
+        with pytest.raises(GitHubError):
+            self.instance.import_issue(title='foo',
+                                       body='Foobar body',
+                                       created_at='2014-03-16T17:15:42Z')
+
+    def test_imported_issue(self):
+        """
+        Show that a user must be authenticated to retrieve an imported issue.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.import_issue(1)
 
     def test_key(self):
         """Show that a user must be authenticated to fetch a key."""

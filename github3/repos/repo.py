@@ -28,6 +28,7 @@ from .comparison import Comparison
 from .contents import Contents, validate_commmitter
 from .deployment import Deployment
 from .hook import Hook
+from .issue_import import ImportedIssue
 from ..licenses import License
 from .pages import PagesBuild, PagesInfo
 from .status import Status
@@ -1263,6 +1264,60 @@ class Repository(GitHubCore):
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._put(url, data=dumps({'ignored': True})), 200)
         return self._instance_or_null(Subscription, json)
+
+    @requires_auth
+    def imported_issue(self, imported_issue_id):
+        """Retrieve imported issue specified by imported issue id.
+
+        :param int imported_issue_id: (required) id of imported issue
+        :returns: :class:`Imported Issue <github3.repos.
+            issue_import.ImportedIssue>`
+        """
+        url = self._build_url('import/issues', imported_issue_id,
+                              base_url=self._api)
+        data = self._get(url, headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+        json = self._json(data, 200)
+        return self._instance_or_null(ImportedIssue, json)
+
+    @requires_auth
+    def import_issue(self, title, body, created_at, assignee=None,
+                     milestone=None, closed=None, labels=None, comments=None):
+        """Import issue into this repository.
+
+        :param string title: (required) Title of issue
+        :param string body: (required) Body of issue
+        :param timestamp created_at: (required) Creation timestamp
+        :param string assignee: (optional) Username to assign issue to
+        :param int milestone: (optional) Milestone ID
+        :param boolean closed: (optional) Status of issue is Closed if True
+        :param list labels: (optional) List of labels containing string names
+        :param list comments: (optional) List of dictionaries which contain
+            created_at and body attributes
+        :returns: :class:`ImportedIssue <github3.repos.
+            issue_import.ImportedIssue>`
+        """
+
+        issue = {
+            'issue': {
+                'title': title,
+                'body': body,
+                'created_at': created_at,
+                'assignee': assignee,
+                'milestone': milestone,
+                'closed': closed,
+                'labels': labels,
+                'comments': comments
+            }
+        }
+
+        self._remove_none(issue['issue'])
+        url = self._build_url('import/issues', base_url=self._api)
+
+        data = self._post(url, data=issue,
+                          headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+
+        json = self._json(data, 200)
+        return self._instance_or_null(ImportedIssue, json)
 
     def is_assignee(self, username):
         """Check if the user can be assigned an issue on this repository.

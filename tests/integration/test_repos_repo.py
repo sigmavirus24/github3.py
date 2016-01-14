@@ -573,6 +573,32 @@ class TestRepository(helper.IntegrationHelper):
             issue = repository.issue(525)
         assert isinstance(issue, github3.issues.issue.Issue)
 
+    def test_imported_issue(self):
+        """Test the ability to retrieve an imported issue by id."""
+        self.token_login()
+        cassette_name = self.cassette_name('imported_issue')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'test_rename1')
+            imported_issue = repository.imported_issue(399790)
+
+        assert isinstance(imported_issue,
+                          github3.repos.issue_import.ImportedIssue)
+
+    def test_import_issue(self):
+        """Test the ability to import an issue."""
+        self.token_login()
+        cassette_name = self.cassette_name('import_issue')
+        with self.recorder.use_cassette(cassette_name):
+            issue = {
+                'title': 'foo',
+                'body': 'bar',
+                'created_at': '2014-03-16T17:15:42Z'
+            }
+            repository = self.gh.repository('github3py', 'test_rename1')
+            imported_issue = repository.import_issue(**issue)
+
+        isinstance(imported_issue, github3.repos.issue_import.ImportedIssue)
+
     def test_issue_events(self):
         """Test that a user can iterate over issue events in a repo."""
         cassette_name = self.cassette_name('issue_events')
@@ -786,7 +812,7 @@ class TestRepository(helper.IntegrationHelper):
         assert isinstance(release, github3.repos.release.Release)
 
     def test_release_from_tag(self):
-        """Test the ability to retrieve a release by tag name"""
+        """Test the ability to retrieve a release by tag name."""
         cassette_name = self.cassette_name('release_from_tag')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
