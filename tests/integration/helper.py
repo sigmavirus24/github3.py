@@ -61,3 +61,9 @@ class GitHubEnterpriseHelper(IntegrationHelper):
 
     def get_client(self):
         return github3.GitHubEnterprise(self.enterprise_url)
+
+
+class GitHubStatusHelper(IntegrationHelper):
+
+    def get_client(self):
+        return github3.GitHubStatus()
