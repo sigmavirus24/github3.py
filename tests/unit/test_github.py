@@ -416,6 +416,32 @@ class TestGitHub(helper.UnitHelper):
             }
         )
 
+    def test_pubsubhubbub_invalid_username(self):
+        """Verify a valid call with invalid username does not call post."""
+        topic = (
+            'hub.topic',
+            'https://github.com/-octocat/hello-world/events/push'
+        )
+        body = [('hub.mode', 'subscribe'),
+                topic,
+                ('hub.callback', 'https://localhost/post')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        assert self.session.post.called is False
+
+    def test_pubsubhubbub_valid_username(self):
+        """Verify a valid call with valid username calls post."""
+        topic = (
+            'hub.topic',
+            'https://github.com/o-cto-ca-t/hello-world/events/push'
+        )
+        body = [('hub.mode', 'subscribe'),
+                topic,
+                ('hub.callback', 'https://localhost/post')]
+        data = dict([(k[4:], v) for k, v in body])
+        self.instance.pubsubhubbub(**data)
+        assert self.session.post.called is True
+
     def test_pubsubhubbub_secret(self):
         """Verify the request for creating a pubsubhubbub hook."""
         topic = (
