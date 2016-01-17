@@ -5,7 +5,9 @@ from .helper import IntegrationHelper
 
 class TestGitHubSession(IntegrationHelper):
     def test_two_factor_authentication_works(self):
-        two_factor_auth = lambda: '862478'
+        def _two_factor_auth():
+            return '862478'
+        two_factor_auth = _two_factor_auth
         self.basic_login()
         self.gh.login(two_factor_callback=two_factor_auth)
 

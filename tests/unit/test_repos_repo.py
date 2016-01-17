@@ -538,6 +538,36 @@ class TestRepository(helper.UnitHelper):
             url_for('git/commits/fake-sha')
         )
 
+    def test_hook(self):
+        """Verify the request for retrieving a hook on a repository."""
+        self.instance.hook(1)
+        self.session.get.assert_called_once_with(
+            url_for('hooks/1')
+        )
+
+    def test_hook_required_hook(self):
+        """Verify the request for retrieving a hook on a repository."""
+        self.instance.hook(-1)
+        assert self.session.get.called is False
+
+    def test_is_assignee(self):
+        """
+        Verify the request for checking if a user can be assigned issues
+        on a repository.
+        """
+        self.instance.is_assignee('octocat')
+        self.session.get.assert_called_once_with(
+            url_for('assignees/octocat')
+        )
+
+    def test_is_assignee_required_username(self):
+        """
+        Verify the request for checking if a user can be assigned issues
+        on a repository.
+        """
+        assert self.instance.is_assignee('') is False
+        assert self.session.get.called is False
+
     def test_is_collaborator_required_username(self):
         """
         Verify the request for checking if a user is a collaborator on a
@@ -556,6 +586,18 @@ class TestRepository(helper.UnitHelper):
             url_for('collaborators/octocat')
         )
 
+    def test_issue(self):
+        """Verify the request for retrieving an issue on a repository."""
+        self.instance.issue(1)
+        self.session.get.assert_called_once_with(
+            url_for('issues/1')
+        )
+
+    def test_issue_required_number(self):
+        """Verify the request for retrieving an issue on a repository."""
+        self.instance.issue(-1)
+        assert self.session.get.called is False
+
     def test_key(self):
         """Test the ability to fetch a deploy key."""
         self.instance.key(10)
@@ -566,6 +608,18 @@ class TestRepository(helper.UnitHelper):
         """Test that a positive key id is required."""
         self.instance.key(-10)
 
+        assert self.session.get.called is False
+
+    def test_label(self):
+        """Verify the request for retrieving a label on a repository."""
+        self.instance.label('bug')
+        self.session.get.assert_called_once_with(
+            url_for('labels/bug')
+        )
+
+    def test_label_required_name(self):
+        """Verify the request for retrieving a label on a repository."""
+        self.instance.label('')
         assert self.session.get.called is False
 
     def test_latest_pages_build(self):
@@ -589,6 +643,62 @@ class TestRepository(helper.UnitHelper):
         self.instance.milestone(20)
 
         self.session.get.assert_called_once_with(url_for('milestones/20'))
+
+    def test_mark_notifications(self):
+        """
+        Verify the request for marking all notifications on a repository
+        as read.
+        """
+        self.instance.mark_notifications('2012-10-09T23:39:01Z')
+        self.put_called_with(
+            url_for('notifications'),
+            data={
+                'read': True,
+                'last_read_at': '2012-10-09T23:39:01Z'
+            }
+        )
+
+    def test_mark_notifications_required_last_read(self):
+        """
+        Verify the request for marking all notifications on a repository
+        as read.
+        """
+
+        self.instance.mark_notifications('')
+        self.put_called_with(
+            url_for('notifications'),
+            data={
+                'read': True
+            }
+        )
+
+    def test_merge(self):
+        """Verify the request for performing a merge on a repository."""
+        self.instance.merge(base='develop',
+                            head='feature',
+                            message='merging now')
+
+        self.post_called_with(
+            url_for('merges'),
+            data={
+                'base': 'develop',
+                'head': 'feature',
+                'commit_message': 'merging now'
+            }
+        )
+
+    def test_merge_no_message(self):
+        """Verify the request for performing a merge on a repository."""
+        data = {
+            'base': 'develop',
+            'head': 'feature'
+        }
+
+        self.instance.merge(**data)
+        self.post_called_with(
+            url_for('merges'),
+            data=data
+        )
 
     def test_milestone_requires_positive_id(self):
         """Test that a positive milestone id is required."""
@@ -1113,6 +1223,11 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         with pytest.raises(GitHubError):
             self.instance.is_collaborator('octocat')
 
+    def test_hook(self):
+        """Show that a user must be authenticated to retrieve a hook."""
+        with pytest.raises(GitHubError):
+            self.instance.hook(1)
+
     def test_hooks(self):
         """Show that a user must be authenticated to list hooks."""
         with pytest.raises(GitHubError):
@@ -1127,6 +1242,22 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that a user must be authenticated to list keys."""
         with pytest.raises(GitHubError):
             self.instance.keys()
+
+    def test_mark_notifications(self):
+        """
+        Show that a user must be authenticated to mark notifications
+        as read.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.mark_notifications('2012-10-09T23:39:01Z')
+
+    def test_merge(self):
+        """
+        Show that a user must be authenticated to perform a merge on a
+        repository.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.merge('master', 'octocat/feature')
 
     def test_notifications(self):
         """Show that a user must be authenticated to list notifications."""

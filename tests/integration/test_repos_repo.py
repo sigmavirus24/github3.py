@@ -510,6 +510,15 @@ class TestRepository(helper.IntegrationHelper):
             )
         assert isinstance(commit, github3.git.Commit)
 
+    def test_hook(self):
+        """Test the ability to retrieve a hook from a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('hook')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            hook = repository.hook(6818702)
+        assert isinstance(hook, github3.repos.hook.Hook)
+
     def test_hooks(self):
         """Test that a user can iterate over the hooks of a repository."""
         self.basic_login()
@@ -534,6 +543,17 @@ class TestRepository(helper.IntegrationHelper):
             subscription = repository.ignore()
             assert subscription.ignored is True
 
+    def test_is_assignee(self):
+        """
+        Test the ability to check if a user can be assigned issues on a
+        repository.
+        """
+        cassette_name = self.cassette_name('is_assignee')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            is_assignee = repository.is_assignee('itsmemattchung')
+        assert is_assignee is True
+
     def test_is_collaborator(self):
         """
         Test the ability to check if a user is a collaborator on a
@@ -544,6 +564,14 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository.is_collaborator('itsmemattchung') is True
+
+    def test_issue(self):
+        """Test the ability to retrieve an issue from a repository."""
+        cassette_name = self.cassette_name('issue')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            issue = repository.issue(525)
+        assert isinstance(issue, github3.issues.issue.Issue)
 
     def test_issue_events(self):
         """Test that a user can iterate over issue events in a repo."""
@@ -605,6 +633,14 @@ class TestRepository(helper.IntegrationHelper):
         for key in keys:
             assert isinstance(key, github3.users.Key)
 
+    def test_label(self):
+        """Test that a user can retrieve a repository's label."""
+        cassette_name = self.cassette_name('label')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            label = repository.label('bug')
+        assert isinstance(label, github3.issues.label.Label)
+
     def test_labels(self):
         """Test that a user can retrieve a repository's labels."""
         cassette_name = self.cassette_name('labels')
@@ -635,6 +671,27 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             license = repository.license()
             assert isinstance(license, github3.licenses.License)
+
+    def test_mark_notifications(self):
+        """
+        Test the ability to mark all notifications on a repository
+        as read.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name('mark_notifications')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            marked = repository.mark_notifications('2016-01-12T00:00:00Z')
+        assert marked is True
+
+    def test_merge(self):
+        """Test the ability to perform a merge on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('merge')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            commit = repository.merge('base_branch', 'head_branch')
+        assert isinstance(commit, github3.repos.commit.RepoCommit)
 
     def test_milestone(self):
         """Test the ability to retrieve a milestone on a repository."""

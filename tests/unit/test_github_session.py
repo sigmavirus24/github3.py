@@ -172,7 +172,11 @@ class TestGitHubSession:
         s = self.build_session()
         assert s.two_factor_auth_cb is None
         # You have to have a sense of humor ;)
-        not_so_anonymous = lambda *args: 'foo'
+
+        def _not_so_anonymous(*args):
+            return 'foo'
+
+        not_so_anonymous = _not_so_anonymous
         s.two_factor_auth_callback(not_so_anonymous)
         assert s.two_factor_auth_cb is not_so_anonymous
 
