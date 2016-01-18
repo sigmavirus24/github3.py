@@ -571,6 +571,19 @@ class TestRepository(helper.UnitHelper):
     def test_import_issue(self):
         """Verify the request for importing an issue into a repository."""
         data = {
+            'title': 'Foo',
+            'body': 'Foobar body',
+            'created_at': '2014-03-16T17:15:42Z',
+            'assignee': 'octocat',
+            'milestone': 1,
+            'closed': True,
+            'labels': ['easy', 'bug'],
+            'comments': [{
+                'created_at': '2014-03-18T17:15:42Z',
+                'body': 'comment body'
+            }]
+        }
+        issue = {
             'issue': {
                 'title': 'Foo',
                 'body': 'Foobar body',
@@ -579,20 +592,20 @@ class TestRepository(helper.UnitHelper):
                 'milestone': 1,
                 'closed': True,
                 'labels': ['easy', 'bug'],
-                'comments': {
-                    'created_at': '2014-03-18T17:15:42Z',
-                    'body': 'comment body'
-                }
-
-            }
+            },
+            'comments': [{
+                'created_at': '2014-03-18T17:15:42Z',
+                'body': 'comment body'
+            }]
         }
         with mock.patch.object(GitHubCore, '_remove_none') as rm_none:
-            self.instance.import_issue(**data['issue'])
-            assert rm_none.called is True
+            self.instance.import_issue(**data)
+            rm_none.assert_any_call(issue['issue'])
+            rm_none.assert_any_call(issue)
 
         self.post_called_with(
             url_for('import/issues'),
-            data=data,
+            data=issue,
             headers={
                 'Accept': 'application/vnd.github.golden-comet-preview+json'
             }

@@ -1306,10 +1306,11 @@ class Repository(GitHubCore):
                 'milestone': milestone,
                 'closed': closed,
                 'labels': labels,
-                'comments': comments
-            }
+            },
+            'comments': comments
         }
 
+        self._remove_none(issue)
         self._remove_none(issue['issue'])
         url = self._build_url('import/issues', base_url=self._api)
 
