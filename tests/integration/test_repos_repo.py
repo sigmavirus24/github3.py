@@ -599,6 +599,26 @@ class TestRepository(helper.IntegrationHelper):
 
         isinstance(imported_issue, github3.repos.issue_import.ImportedIssue)
 
+    def test_import_issue_with_comments(self):
+        """
+        Test the ability to import an issue with comments on a repoitory.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name('import_issue_with_comments')
+        with self.recorder.use_cassette(cassette_name):
+            issue = {
+                'title': 'foo',
+                'body': 'bar',
+                'created_at': '2014-03-16T17:15:42Z',
+                'comments': [{
+                    'body': 'fake comments'
+                }]
+            }
+            repository = self.gh.repository('github3py', 'test_rename1')
+            imported_issue = repository.import_issue(**issue)
+
+        isinstance(imported_issue, github3.repos.issue_import.ImportedIssue)
+
     def test_issue_events(self):
         """Test that a user can iterate over issue events in a repo."""
         cassette_name = self.cassette_name('issue_events')
