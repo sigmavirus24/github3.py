@@ -409,7 +409,11 @@ class TestGitHub(helper.UnitHelper):
         self.instance.pubsubhubbub(**data)
         self.session.post.assert_called_once_with(
             url_for('hub'),
-            body
+            body,
+            headers={
+                'Content-Type':
+                'application/x-www-form-urlencoded'
+            }
         )
 
     def test_pubsubhubbub_secret(self):
@@ -426,7 +430,11 @@ class TestGitHub(helper.UnitHelper):
         self.instance.pubsubhubbub(**data)
         self.session.post.assert_called_once_with(
             url_for('hub'),
-            body
+            body,
+            headers={
+                'Content-Type':
+                'application/x-www-form-urlencoded'
+            }
         )
 
     def test_pubsubhubbub_required_callback(self):
