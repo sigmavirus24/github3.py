@@ -1282,7 +1282,9 @@ class Repository(GitHubCore):
     @requires_auth
     def import_issue(self, title, body, created_at, assignee=None,
                      milestone=None, closed=None, labels=None, comments=None):
-        """Import issue into this repository.
+        """Import an issue into the repository.
+
+        See also: https://gist.github.com/jonmagic/5282384165e0f86ef105
 
         :param string title: (required) Title of issue
         :param string body: (required) Body of issue
