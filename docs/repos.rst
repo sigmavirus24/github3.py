@@ -12,6 +12,7 @@ This part of the documentation covers:
 - :class:`Deployment <github3.repos.deployment.Deployment>`
 - :class:`DeploymentStatus <github3.repos.deployment.DeploymentStatus>`
 - :class:`Hook <github3.repos.hook.Hook>`
+- :class:`ImportedIssue <github3.repos.issue_import.ImportedIssue>`
 - :class:`PagesInfo <github3.repos.pages.PagesInfo>`
 - :class:`PagesBuild <github3.repos.pages.PagesBuild>`
 - :class:`Release <github3.repos.release.Release>`
@@ -86,6 +87,13 @@ Repository Objects
 
 .. autoclass:: github3.repos.hook.Hook
     :members:
+
+---------
+
+.. module:: github3.repos.imported_issue
+
+.. autoclass:: github3.repos.issue_import.ImportedIssue
+     :members:
 
 ---------
 
