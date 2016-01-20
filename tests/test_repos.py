@@ -15,47 +15,6 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_milestone(self):
-        self.response('milestone', 200)
-        self.get(self.api + 'milestones/2')
-
-        assert isinstance(self.repo.milestone(2),
-                          github3.issues.milestone.Milestone)
-        self.mock_assertions()
-
-    def test_parent(self):
-        json = self.repo.as_dict().copy()
-        json['parent'] = json.copy()
-        r = repos.Repository(json)
-        assert isinstance(r.parent, repos.Repository)
-
-    def test_permissions(self):
-        json = load('repo')
-        permissions = {"admin": True, "push": True, "pull": True}
-        assert json['permissions'] == permissions
-        assert self.repo.permissions == permissions
-
-    def test_pull_request(self):
-        self.response('pull', 200)
-        self.get(self.api + 'pulls/2')
-
-        assert isinstance(self.repo.pull_request(2), github3.pulls.PullRequest)
-        self.mock_assertions()
-
-    def test_readme(self):
-        self.response('readme', 200)
-        self.get(self.api + 'readme')
-
-        assert isinstance(self.repo.readme(), repos.contents.Contents)
-        self.mock_assertions()
-
-    def test_ref(self):
-        self.response('ref', 200)
-        self.get(self.api + 'git/refs/fakesha')
-
-        assert isinstance(self.repo.ref('fakesha'), github3.git.Reference)
-        self.mock_assertions()
-
     def test_remove_collaborator(self):
         self.response('', 204)
         self.delete(self.api + 'collaborators/login')

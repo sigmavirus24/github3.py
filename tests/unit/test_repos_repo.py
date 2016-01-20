@@ -765,6 +765,51 @@ class TestRepository(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('pages'))
 
+    def test_parent(self):
+        """Verify that parent of repository can be retrieved."""
+        parent = self.instance.parent
+        assert isinstance(parent, Repository)
+
+    def test_permission(self):
+        """Verify permissions of a repository can be retrieved."""
+        permissions = {
+            'admin': False,
+            'push': False,
+            'pull': True
+        }
+        assert self.instance.permissions == permissions
+
+    def test_pull_request(self):
+        """Verify the request for retrieving a pull request."""
+        self.instance.pull_request(1)
+        self.session.get.assert_called_once_with(
+            url_for('pulls/1')
+        )
+
+    def test_pull_request_required_number(self):
+        """Verify the request for retrieving a pull request."""
+        self.instance.pull_request(-1)
+        assert self.session.get.called is False
+
+    def test_readme(self):
+        """Verify the request for retrieving the README."""
+        self.instance.readme()
+        self.session.get.assert_called_once_with(
+            url_for('readme')
+        )
+
+    def test_ref(self):
+        """Verify the request for retrieving a reference."""
+        self.instance.ref('heads/develop')
+        self.session.get.assert_called_once_with(
+            url_for('git/refs/heads/develop')
+        )
+
+    def test_ref_required_ref(self):
+        """Verify the request for retrieving a reference."""
+        self.instance.ref('')
+        assert self.session.get.called is False
+
     def test_release_from_tag(self):
         """Test the request for retrieving release by tag name"""
         self.instance.release_from_tag('v1.0.0')
