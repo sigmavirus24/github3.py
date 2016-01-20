@@ -15,12 +15,8 @@ env:
 
 matrix:
   include:
-    - python: 2.6
-      env: TOXENV=py26 REQUESTS_VERSION="===2.0.1"
     - python: 2.7
       env: TOXENV=py27 REQUESTS_VERSION="===2.0.1"
-    - python: 3.2
-      env: TOXENV=py32 REQUESTS_VERSION="===2.0.1"
     - python: 3.3
       env: TOXENV=py33 REQUESTS_VERSION="===2.0.1"
     - python: 3.4
@@ -29,12 +25,8 @@ matrix:
       env: TOXENV=py35 REQUESTS_VERSION="===2.0.1"
     - python: pypy
       env: TOXENV=pypy REQUESTS_VERSION="===2.0.1"
-    - python: 2.6
-      env: TOXENV=py26 REQUESTS_VERSION=""
     - python: 2.7
       env: TOXENV=py27 REQUESTS_VERSION=""
-    - python: 3.2
-      env: TOXENV=py32 REQUESTS_VERSION=""
     - python: 3.3
       env: TOXENV=py33 REQUESTS_VERSION=""
     - python: 3.4
