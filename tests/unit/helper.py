@@ -52,6 +52,14 @@ class UnitHelper(unittest.TestCase):
     # Sub-classes must also assign a dictionary to this during definition
     example_data = {}
 
+    def assert_requires_auth(self, func):
+        """
+        Assert error is raised if function is called without
+        authentication.
+        """
+        with pytest.raises(github3.AuthenticationFailed):
+            func()
+
     def create_mocked_session(self):
         """Use mock to auto-spec a GitHubSession and return an instance."""
         MockedSession = mock.create_autospec(github3.session.GitHubSession)

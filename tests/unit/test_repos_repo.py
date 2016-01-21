@@ -818,6 +818,62 @@ class TestRepository(helper.UnitHelper):
             url_for('releases/tags/v1.0.0')
         )
 
+    def test_remove_collaborator(self):
+        """Verify the request for removing a collaborator."""
+        self.instance.remove_collaborator('octocat')
+
+        self.session.delete.assert_called_once_with(
+            url_for('collaborators/octocat')
+        )
+
+    def test_remove_collaborator_required_username(self):
+        """Verify the request for removing a collaborator."""
+        assert self.instance.remove_collaborator('') is False
+
+        assert self.session.delete.called is False
+
+    def test_source(self):
+        """Verify that the source of the repository can be retrieved."""
+        source = self.instance.source
+
+        assert isinstance(source, Repository)
+
+    def test_subscription(self):
+        """Verify the request for retrieving the subscription on a repo."""
+        self.instance.subscription()
+
+        self.session.get.assert_called_once_with(
+            url_for('subscription')
+        )
+
+    def test_tag(self):
+        """Verify the request for retrieving an annotated tag."""
+        self.instance.tag('fake-sha')
+
+        self.session.get.assert_called_once_with(
+            url_for('git/tags/fake-sha')
+        )
+
+    def test_tag_required_sha(self):
+        """Verify the request for retrieving an annotated tag."""
+        self.instance.tag('')
+
+        assert self.session.get.called is False
+
+    def test_tree(self):
+        """Verify the request for retrieving a tree."""
+        self.instance.tree('fake-sha')
+
+        self.session.get.assert_called_once_with(
+            url_for('git/trees/fake-sha')
+        )
+
+    def test_tree_required_sha(self):
+        """Verify the request for retrieving a tree."""
+        self.instance.tree('')
+
+        assert self.session.get.called is False
+
 
 class TestRepositoryIterator(helper.UnitIteratorHelper):
 
@@ -1381,7 +1437,24 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         with pytest.raises(GitHubError):
             self.instance.pages_builds()
 
+    def test_remove_collaborator(self):
+        """Show that a user must be authenticated to remove a collaborator."""
+        self.assert_requires_auth(self.instance.remove_collaborator)
+
+    def test_subscription(self):
+        """
+        Show that a user must be authenticated to retrieve the
+        subscription.
+        """
+        self.assert_requires_auth(self.instance.subscription)
+
     def test_teams(self):
         """Show that a user must be authenticated to list teams on a repo."""
         with pytest.raises(GitHubError):
             self.instance.teams()
+
+    def test_update_label(self):
+        """
+        Show that a user must be authenticated to update a label on a repo.
+        """
+        self.assert_requires_auth(self.instance.update_label)
