@@ -226,7 +226,6 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
             func()
 
 
-
 class UnitGitHubObjectHelper(UnitHelper):
 
     """Base class for GitHubObject unit tests."""
