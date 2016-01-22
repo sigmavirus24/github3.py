@@ -217,6 +217,14 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
         self.session.auth = None
         self.session.has_auth.return_value = False
 
+    def assert_requires_auth(self, func):
+        """
+        Assert error is raised if function is called without
+        authentication.
+        """
+        with pytest.raises(github3.AuthenticationFailed):
+            func()
+
 
 class UnitGitHubObjectHelper(UnitHelper):
 

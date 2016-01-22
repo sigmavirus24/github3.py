@@ -898,6 +898,16 @@ class TestRepository(helper.IntegrationHelper):
             with pytest.raises(exc.UnprocessableResponseBody):
                 list(repository.refs('heads/develop'))
 
+    def test_remove_collaborator(self):
+        """Test the ability to remove a collaborator on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('remove_collaborator')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'test_rename1')
+            removed_collaborator = repository.remove_collaborator('littleboyd')
+
+        assert removed_collaborator is True
+
     def test_stargazers(self):
         """Test the ability to retrieve the stargazers on a repository."""
         cassette_name = self.cassette_name('stargazers')
@@ -936,15 +946,34 @@ class TestRepository(helper.IntegrationHelper):
         for user in subscribers:
             assert isinstance(user, github3.users.User)
 
-    def test_subscription(self):
+    def test_subscribe(self):
         """Test the ability to subscribe to a repository's notifications."""
         self.basic_login()
-        cassette_name = self.cassette_name('subscription')
+        cassette_name = self.cassette_name('subscribe')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('vcr', 'vcr')
             assert repository is not None
             subscription = repository.subscribe()
             assert subscription.subscribed is True
+
+    def test_subscription(self):
+        """Test the ability to retreive a repository's subscription."""
+        self.token_login()
+        cassette_name = self.cassette_name('subscription')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            subscription = repository.subscription()
+
+        assert isinstance(subscription, github3.notifications.Subscription)
+
+    def test_tag(self):
+        """Test the ability to retrieve an annotated tag."""
+        cassette_name = self.cassette_name('tag')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            tag = repository.tag('bf1eca5702d6408ab8dbf395c49c2c903a116d33')
+
+        assert isinstance(tag, github3.git.Tag)
 
     def test_tags(self):
         """Test the ability to retrieve a repository's tags."""
@@ -970,3 +999,12 @@ class TestRepository(helper.IntegrationHelper):
         assert len(teams) > 0
         for team in teams:
             assert isinstance(team, github3.orgs.Team)
+
+    def test_tree(self):
+        """Test the ability to retrieve a tree from a repository."""
+        cassette_name = self.cassette_name('tree')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            tree = repository.tree('52a3f30e05cf434285e775979f01f1a8355049a7')
+
+        assert isinstance(tree, github3.git.Tree)

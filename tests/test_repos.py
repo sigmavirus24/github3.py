@@ -15,55 +15,8 @@ class TestRepository(BaseCase):
         self.repo = repos.Repository(self.repo.as_dict(), self.g)
         self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
 
-    def test_remove_collaborator(self):
-        self.response('', 204)
-        self.delete(self.api + 'collaborators/login')
-
-        self.assertRaises(github3.GitHubError, self.repo.remove_collaborator,
-                          None)
-        self.not_called()
-
-        self.login()
-        assert self.repo.remove_collaborator(None) is False
-        self.not_called()
-
-        assert self.repo.remove_collaborator('login')
-        self.mock_assertions()
-
     def test_repr(self):
         assert repr(self.repo) == '<Repository [sigmavirus24/github3.py]>'
-
-    def test_source(self):
-        json = self.repo.as_dict().copy()
-        json['source'] = json.copy()
-        r = repos.Repository(json)
-        assert isinstance(r.source, repos.Repository)
-
-    def test_subscription(self):
-        self.response('subscription')
-        self.get(self.api + 'subscription')
-
-        self.assertRaises(github3.GitHubError, self.repo.subscription)
-        self.not_called()
-
-        self.login()
-        s = self.repo.subscription()
-        assert isinstance(s, github3.notifications.Subscription)
-        self.mock_assertions()
-
-    def test_tag(self):
-        self.response('tag')
-        self.get(self.api + 'git/tags/fakesha')
-
-        assert isinstance(self.repo.tag('fakesha'), github3.git.Tag)
-        self.mock_assertions()
-
-    def test_tree(self):
-        self.response('tree')
-        self.get(self.api + 'git/trees/fakesha')
-
-        assert isinstance(self.repo.tree('fakesha'), github3.git.Tree)
-        self.mock_assertions()
 
     def test_update_label(self):
         self.response('label')
