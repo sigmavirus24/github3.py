@@ -785,6 +785,15 @@ class TestRepository(helper.IntegrationHelper):
         for notification in notifications:
             assert isinstance(notification, github3.notifications.Thread)
 
+    def test_pull_request(self):
+        """Test that a user can retrieve a pull request from a repo."""
+        cassette_name = self.cassette_name('pull_request')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            pull_request = repository.pull_request(546)
+
+        assert isinstance(pull_request, github3.pulls.PullRequest)
+
     def test_pull_requests(self):
         """Test that a user can retrieve the pull requests from a repo."""
         cassette_name = self.cassette_name('pull_requests')
@@ -810,6 +819,24 @@ class TestRepository(helper.IntegrationHelper):
                 if last_pr:
                     assert last_pr.updated_at < pr.updated_at
                 last_pr = pr
+
+    def test_readme(self):
+        """Test the ability to retrieve the README."""
+        cassette_name = self.cassette_name('readme')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            readme = repository.readme()
+
+        assert isinstance(readme, github3.repos.contents.Contents)
+
+    def test_ref(self):
+        """Test the ability to retrieve a ref."""
+        cassette_name = self.cassette_name('ref')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            ref = repository.ref('tags/0.9.3')
+
+        assert isinstance(ref, github3.git.Reference)
 
     def test_release(self):
         """Test the ability to retrieve a single release."""
