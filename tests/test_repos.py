@@ -18,26 +18,6 @@ class TestRepository(BaseCase):
     def test_repr(self):
         assert repr(self.repo) == '<Repository [sigmavirus24/github3.py]>'
 
-    def test_update_label(self):
-        self.response('label')
-        self.patch(self.api + 'labels/Bug')
-        self.conf = {'data': {'name': 'big_bug', 'color': 'fafafa'}}
-
-        self.assertRaises(github3.GitHubError, self.repo.update_label,
-                          'foo', 'bar')
-        self.not_called()
-
-        self.login()
-        with mock.patch.object(repos.Repository, 'label') as l:
-            l.return_value = None
-            assert self.repo.update_label('foo', 'bar') is False
-            self.not_called()
-
-        with mock.patch.object(repos.Repository, 'label') as l:
-            l.return_value = github3.issues.label.Label(load('label'), self.g)
-            assert self.repo.update_label('big_bug', 'fafafa')
-
-        self.mock_assertions()
 
     def test_equality(self):
         assert self.repo == repos.Repository(load('repo'))
