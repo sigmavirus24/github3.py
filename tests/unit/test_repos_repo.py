@@ -1452,9 +1452,3 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that a user must be authenticated to list teams on a repo."""
         with pytest.raises(GitHubError):
             self.instance.teams()
-
-    def test_update_label(self):
-        """
-        Show that a user must be authenticated to update a label on a repo.
-        """
-        self.assert_requires_auth(self.instance.update_label)

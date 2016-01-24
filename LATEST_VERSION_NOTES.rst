@@ -10,7 +10,9 @@ Breaking Changes (since 1.0.0a2)
 
 - Move ``Users#delete_email_addresses`` to ``GitHub#delete_email_addresses``.
 
-- Remove ``Users#add_email_address`` and ``Users#delete_eail_address``.
+- Remove ``Users#add_email_address`` and ``Users#delete_email_address``.
+
+- Remove ``Repository#update_label``.
 
 Features Added (since 1.0.0a2)
 ``````````````````````````````
