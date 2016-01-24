@@ -1008,14 +1008,3 @@ class TestRepository(helper.IntegrationHelper):
             tree = repository.tree('52a3f30e05cf434285e775979f01f1a8355049a7')
 
         assert isinstance(tree, github3.git.Tree)
-
-    def test_update_label(self):
-        """Test the ability to update a label on a repository."""
-        self.token_login()
-        cassette_name = self.cassette_name('update_label')
-        with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            updated_label = repository.update_label('impossible', '006b75',
-                                                    new_name='possible')
-
-        assert updated_label is True

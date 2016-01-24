@@ -874,39 +874,6 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.get.called is False
 
-    def test_update_label(self):
-        """Verify the request for updating a label."""
-        with mock.patch.object(Repository, 'label') as mocked_label:
-            mocked_label.return_value.update.return_value = True
-            update = self.instance.update_label('easy', 'ffffff',
-                                                new_name='hard')
-            assert update is True
-            mocked_label.assert_called_once_with('easy')
-            mocked_label.return_value.update.assert_called_once_with(
-                'hard',
-                'ffffff'
-            )
-
-    def test_update_label_missing_new_name(self):
-        """Verify the request for updating a label."""
-        with mock.patch.object(Repository, 'label') as mocked_label:
-            mocked_label.return_value.update.return_value = True
-            update = self.instance.update_label('easy', 'ffffff')
-            assert update is True
-            mocked_label.assert_called_once_with('easy')
-            mocked_label.return_value.update.assert_called_once_with(
-                'easy',
-                'ffffff'
-            )
-
-    def test_update_label_required_existing_label(self):
-        """Verify the request for updating a label."""
-        with mock.patch.object(Repository, 'label') as mocked_label:
-            mocked_label.return_value = None
-            update = self.instance.update_label('easy', 'ffffff',
-                                                new_name='hard')
-            assert update is False
-
 
 class TestRepositoryIterator(helper.UnitIteratorHelper):
 
@@ -1485,9 +1452,3 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that a user must be authenticated to list teams on a repo."""
         with pytest.raises(GitHubError):
             self.instance.teams()
-
-    def test_update_label(self):
-        """
-        Show that a user must be authenticated to update a label on a repo.
-        """
-        self.assert_requires_auth(self.instance.update_label)
