@@ -71,7 +71,7 @@ class TestRepository(helper.UnitHelper):
         data = {
             'path': 'hello.txt',
             'message': 'my commit message',
-            'content': 'bXkgbmV3IGZpbGUgY29udGVudHM=',
+            'content': b'bXkgbmV3IGZpbGUgY29udGVudHM=',
             'committer': {
                 'name': 'Scott Chacon',
                 'email': 'schacon@gmail.com'
