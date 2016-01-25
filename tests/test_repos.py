@@ -22,30 +22,6 @@ class TestRepository(BaseCase):
     def test_equality(self):
         assert self.repo == repos.Repository(load('repo'))
 
-    def test_create_file(self):
-        self.response('create_content', 201)
-        self.put(self.api + 'contents/setup.py')
-        self.conf = {'data': {'message': 'Foo bar',
-                              'content': 'Zm9vIGJhciBib2d1cw==',
-                              'branch': 'develop',
-                              'author': {'name': 'Ian', 'email': 'foo'},
-                              'committer': {'name': 'Ian', 'email': 'foo'}}}
-
-        self.assertRaises(github3.GitHubError, self.repo.create_file,
-                          None, None, None)
-
-        self.not_called()
-        self.login()
-
-        ret = self.repo.create_file('setup.py', 'Foo bar', b'foo bar bogus',
-                                    'develop',
-                                    {'name': 'Ian', 'email': 'foo'},
-                                    {'name': 'Ian', 'email': 'foo'})
-        assert isinstance(ret, dict)
-        assert isinstance(ret['commit'], github3.git.Commit)
-        assert isinstance(ret['content'], repos.contents.Contents)
-        self.mock_assertions()
-
     def test_weekly_commit_count(self):
         self.response('weekly_commit_count', ETag='"foobarbogus"')
         self.request.return_value.headers['Last-Modified'] = 'foo'

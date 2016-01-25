@@ -236,6 +236,34 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(deployment, github3.repos.deployment.Deployment)
 
+    def test_create_file(self):
+        """Test the ability to create a file on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_file')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            data = {
+                'path': 'hello.txt',
+                'message': 'my commit message',
+                'content': 'bXkgbmV3IGZpbGUgY29udGVudHM=',
+                'branch': 'develop',
+                'committer': {
+                    'name': 'Matt Chung',
+                    'email': 'hello@itsmemattchung.com'
+                }
+            }
+
+            created_file = repository.create_file(**data)
+
+        assert isinstance(
+            created_file['content'],
+            github3.repos.contents.Contents
+        )
+        assert isinstance(
+            created_file['commit'],
+            github3.git.Commit
+        )
+
     def test_create_fork(self):
         """Test the ability to fork a repository."""
         self.token_login()

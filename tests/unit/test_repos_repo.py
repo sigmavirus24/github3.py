@@ -3,6 +3,7 @@ import datetime
 import mock
 import pytest
 
+from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
 from github3.repos.repo import Repository
@@ -17,6 +18,10 @@ url_for = helper.create_url_helper(
 get_repo_example_data = helper.create_example_data_helper(
     'repos_repo_example'
 )
+create_file_contents_example_data = helper.create_example_data_helper(
+    'create_file_contents_example'
+)
+create_file_contents_example_data = create_file_contents_example_data()
 repo_example_data = get_repo_example_data()
 
 
@@ -60,6 +65,48 @@ class TestRepository(helper.UnitHelper):
         self.instance.asset(0)
 
         assert self.session.get.called is False
+
+    def test_create_file(self):
+        """Verify the request for creating a file on a repository."""
+        data = {
+            'path': 'hello.txt',
+            'message': 'my commit message',
+            'content': 'bXkgbmV3IGZpbGUgY29udGVudHM=',
+            'committer': {
+                'name': 'Scott Chacon',
+                'email': 'schacon@gmail.com'
+            }
+        }
+
+        with mock.patch.object(GitHubCore, '_json') as _json:
+            _json.return_value = create_file_contents_example_data
+            self.instance.create_file(**data)
+
+        b64_encoded_content = b64encode(data['content']).decode('utf-8')
+        data.update({
+            'content': b64_encoded_content
+        })
+        del(data['path'])
+
+        self.put_called_with(
+            url_for('contents/hello.txt'),
+            data=data
+        )
+
+    def test_create_file_required_content(self):
+        """Verify the request for creating a file on a repository."""
+        data = {
+            'path': 'hello.txt',
+            'message': 'my commit message',
+            'content': 123,
+            'committer': {
+                'name': 'Scott Chacon',
+                'email': 'schacon@gmail.com'
+            }
+        }
+
+        with pytest.raises(ValueError):
+            self.instance.create_file(**data)
 
     def test_create_fork(self):
         """Verify the request to fork a repository."""
@@ -1304,6 +1351,12 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that creating a tag requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.create_ref('some ref', 'some sha')
+
+    def test_create_file(self):
+        """
+        Verify that creating a file on a repository requires authentication.
+        """
+        self.assert_requires_auth(self.instance.create_file)
 
     def test_create_fork(self):
         """Verify that creating a fork requires authentication."""
