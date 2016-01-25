@@ -78,9 +78,7 @@ class TestRepository(helper.UnitHelper):
             }
         }
 
-        with mock.patch.object(GitHubCore, '_json') as _json:
-            _json.return_value = create_file_contents_example_data
-            self.instance.create_file(**data)
+        self.instance.create_file(**data)
 
         b64_encoded_content = b64encode(data['content']).decode('utf-8')
         data.update({

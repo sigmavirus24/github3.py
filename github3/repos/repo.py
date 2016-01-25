@@ -743,7 +743,7 @@ class Repository(GitHubCore):
                     'author': validate_commmitter(author)}
             self._remove_none(data)
             json = self._json(self._put(url, data=dumps(data)), 201)
-            if 'content' in json and 'commit' in json:
+            if json and 'content' in json and 'commit' in json:
                 json['content'] = Contents(json['content'], self)
                 json['commit'] = Commit(json['commit'], self)
         return json
