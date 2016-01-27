@@ -11,6 +11,9 @@ from github3.models import GitHubCore
 
 from . import helper
 
+contents_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
+)
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
 )
@@ -1529,6 +1532,29 @@ class TestContents(helper.UnitHelper):
     described_class = Contents
     example_data = content_example_data
 
+    def test_delete(self):
+        """Verify the request for deleting content from a repository."""
+        data = {
+            'message': 'Deleting file from repository',
+            'branch': 'featureA',
+            'committer': {
+                'name': 'Octocat',
+                'email': 'octocat@github.com'
+            },
+            'author': {
+                'name': 'Octocat',
+                'email': 'octocat@github.com'
+            }
+        }
+        self.instance.delete(**data)
+        data.update({
+            'sha': '3f4f0b9a43d13376679ee5710958ca88baa7c421'
+        })
+        self.delete_called_with(
+            contents_url_for(),
+            data=data
+        )
+
     def test_git_url(self):
         """Veriy instance contains git url."""
         assert self.instance.links['git'] == self.instance.git_url
@@ -1536,3 +1562,23 @@ class TestContents(helper.UnitHelper):
     def test_html_url(self):
         """Verify instance contains html url."""
         assert self.instance.links['html'] == self.instance.html_url
+
+    def test_str(self):
+        """Verify that instance string is formatted properly."""
+        assert str(self.instance) == '<Content [{0}]>'.format(
+            self.instance.path
+        )
+
+
+class TestContentsRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+
+    """Unit test for Content methods that require Auth."""
+
+    described_class = Contents
+    example_data = content_example_data
+
+    def test_delete(self):
+        """
+        Show that deleting content from a repository requires authentication.
+        """
+        self.assert_requires_auth(self.instance.delete)

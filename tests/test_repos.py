@@ -21,29 +21,6 @@ class TestContents(BaseCase):
         contents.sha = 'fakesha'
         assert self.contents != contents
 
-    def test_repr(self):
-        assert repr(self.contents) == '<Content [{0}]>'.format('README.rst')
-
-    @pytest.mark.xfail
-    def test_delete(self):
-        self.response('create_content', 200)
-        self.delete(self.api)
-        self.conf = {
-            'data': {
-                'message': 'foo',
-                'sha': self.contents.sha,
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.contents.delete, None)
-
-        self.not_called()
-        self.login()
-
-        c = self.contents.delete('foo')
-        assert isinstance(c, github3.git.Commit)
-        self.mock_assertions()
-
     @pytest.mark.xfail
     def test_update(self):
         self.response('create_content', 200)

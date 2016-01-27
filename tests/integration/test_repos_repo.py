@@ -1050,3 +1050,19 @@ class TestRepository(helper.IntegrationHelper):
         assert isinstance(weekly_commit_count, dict)
         assert len(weekly_commit_count.get('owner')) == 52
         assert len(weekly_commit_count.get('all')) == 52
+
+
+class TestContents(helper.IntegrationHelper):
+
+    """Integration test for Contents object."""
+
+    def test_delete(self):
+        """Test the ability to delete content from a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            content = repository.readme()
+            deleted = content.delete('Deleting readme from repository')
+
+        assert deleted

@@ -116,9 +116,9 @@ class Contents(GitHubCore):
                     'author': validate_commmitter(author)}
             self._remove_none(data)
             json = self._json(self._delete(self._api, data=dumps(data)), 200)
-            if 'commit' in json:
+            if json and 'commit' in json:
                 json['commit'] = Commit(json['commit'], self)
-            if 'content' in json:
+            if json and 'content' in json:
                 json['content'] = self._instance_or_null(Contents,
                                                          json['content'])
         return json
