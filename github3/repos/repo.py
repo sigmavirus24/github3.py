@@ -1935,12 +1935,12 @@ class Repository(GitHubCore):
         """
         url = self._build_url('stats', 'participation', base_url=self._api)
         resp = self._get(url)
-        if resp.status_code == 202:
+        if resp and resp.status_code == 202:
             return {}
         json = self._json(resp, 200)
-        if json.get('ETag'):
+        if json and json.get('ETag'):
             del json['ETag']
-        if json.get('Last-Modified'):
+        if json and json.get('Last-Modified'):
             del json['Last-Modified']
         return json
 

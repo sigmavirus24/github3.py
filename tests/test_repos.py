@@ -4,41 +4,6 @@ import pytest
 from github3 import repos
 from tests.utils import (BaseCase, load, mock)
 
-
-class TestRepository(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestRepository, self).__init__(methodName)
-        self.repo = repos.Repository(load('repo'))
-
-    def setUp(self):
-        super(TestRepository, self).setUp()
-        self.repo = repos.Repository(self.repo.as_dict(), self.g)
-        self.api = 'https://api.github.com/repos/sigmavirus24/github3.py/'
-
-    def test_repr(self):
-        assert repr(self.repo) == '<Repository [sigmavirus24/github3.py]>'
-
-
-    def test_equality(self):
-        assert self.repo == repos.Repository(load('repo'))
-
-    def test_weekly_commit_count(self):
-        self.response('weekly_commit_count', ETag='"foobarbogus"')
-        self.request.return_value.headers['Last-Modified'] = 'foo'
-        self.get(self.api + 'stats/participation')
-
-        w = self.repo.weekly_commit_count()
-        self.assertTrue(w.get('owner') is not None)
-        self.assertTrue(w.get('all') is not None)
-
-        self.mock_assertions()
-
-        self.response('', 202)
-        w = self.repo.weekly_commit_count()
-        self.assertEqual(w, {})
-        self.mock_assertions()
-
-
 class TestContents(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestContents, self).__init__(methodName)
@@ -55,35 +20,6 @@ class TestContents(BaseCase):
         assert self.contents == contents
         contents.sha = 'fakesha'
         assert self.contents != contents
-
-    def test_git_url(self):
-        assert self.contents.links['git'] == self.contents.git_url
-
-    def test_html_url(self):
-        assert self.contents.links['html'] == self.contents.html_url
-
-    def test_repr(self):
-        assert repr(self.contents) == '<Content [{0}]>'.format('README.rst')
-
-    @pytest.mark.xfail
-    def test_delete(self):
-        self.response('create_content', 200)
-        self.delete(self.api)
-        self.conf = {
-            'data': {
-                'message': 'foo',
-                'sha': self.contents.sha,
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.contents.delete, None)
-
-        self.not_called()
-        self.login()
-
-        c = self.contents.delete('foo')
-        assert isinstance(c, github3.git.Commit)
-        self.mock_assertions()
 
     @pytest.mark.xfail
     def test_update(self):

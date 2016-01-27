@@ -6,11 +6,14 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
-from github3.repos.repo import Repository
+from github3.repos.repo import Repository, Contents
 from github3.models import GitHubCore
 
 from . import helper
 
+contents_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
+)
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
 )
@@ -18,9 +21,13 @@ url_for = helper.create_url_helper(
 get_repo_example_data = helper.create_example_data_helper(
     'repos_repo_example'
 )
+get_content_example_data = helper.create_example_data_helper(
+    'content_example'
+)
 create_file_contents_example_data = helper.create_example_data_helper(
     'create_file_contents_example'
 )
+content_example_data = get_content_example_data()
 create_file_contents_example_data = create_file_contents_example_data()
 repo_example_data = get_repo_example_data()
 
@@ -919,6 +926,20 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_str(self):
+        """Verify instance string is formatted correctly."""
+        owner = self.instance.owner
+        repository = self.instance.name
+        assert str(self.instance) == '{0}/{1}'.format(owner, repository)
+
+    def test_weekly_commit_count(self):
+        """Verify the request for retrieving total commit counts."""
+        self.instance.weekly_commit_count()
+
+        self.session.get.assert_called_once_with(
+            url_for('stats/participation')
+        )
+
 
 class TestRepositoryIterator(helper.UnitIteratorHelper):
 
@@ -1503,3 +1524,61 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that a user must be authenticated to list teams on a repo."""
         with pytest.raises(GitHubError):
             self.instance.teams()
+
+
+class TestContents(helper.UnitHelper):
+    "Unit tests for content methods."""
+
+    described_class = Contents
+    example_data = content_example_data
+
+    def test_delete(self):
+        """Verify the request for deleting content from a repository."""
+        data = {
+            'message': 'Deleting file from repository',
+            'branch': 'featureA',
+            'committer': {
+                'name': 'Octocat',
+                'email': 'octocat@github.com'
+            },
+            'author': {
+                'name': 'Octocat',
+                'email': 'octocat@github.com'
+            }
+        }
+        self.instance.delete(**data)
+        data.update({
+            'sha': '3f4f0b9a43d13376679ee5710958ca88baa7c421'
+        })
+        self.delete_called_with(
+            contents_url_for(),
+            data=data
+        )
+
+    def test_git_url(self):
+        """Veriy instance contains git url."""
+        assert self.instance.links['git'] == self.instance.git_url
+
+    def test_html_url(self):
+        """Verify instance contains html url."""
+        assert self.instance.links['html'] == self.instance.html_url
+
+    def test_str(self):
+        """Verify that instance string is formatted properly."""
+        assert str(self.instance) == '<Content [{0}]>'.format(
+            self.instance.path
+        )
+
+
+class TestContentsRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+
+    """Unit test for Content methods that require Auth."""
+
+    described_class = Contents
+    example_data = content_example_data
+
+    def test_delete(self):
+        """
+        Show that deleting content from a repository requires authentication.
+        """
+        self.assert_requires_auth(self.instance.delete)
