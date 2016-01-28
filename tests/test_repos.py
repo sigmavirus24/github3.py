@@ -4,46 +4,6 @@ import pytest
 from github3 import repos
 from tests.utils import (BaseCase, load, mock)
 
-class TestContents(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestContents, self).__init__(methodName)
-        self.contents = repos.contents.Contents(load('readme'))
-        self.api = self.contents._api
-
-    def setUp(self):
-        super(TestContents, self).setUp()
-        self.contents = repos.contents.Contents(self.contents.as_dict(),
-                                                self.g)
-
-    def test_equality(self):
-        contents = repos.contents.Contents(load('readme'))
-        assert self.contents == contents
-        contents.sha = 'fakesha'
-        assert self.contents != contents
-
-    @pytest.mark.xfail
-    def test_update(self):
-        self.response('create_content', 200)
-        self.put(self.api)
-        self.conf = {
-            'data': {
-                'message': 'foo',
-                'content': 'Zm9vIGJhciBib2d1cw==',
-                'sha': self.contents.sha,
-            }
-        }
-
-        self.assertRaises(github3.GitHubError, self.contents.update,
-                          None, None)
-
-        self.not_called()
-        self.login()
-
-        ret = self.contents.update('foo', b'foo bar bogus')
-        assert isinstance(ret, github3.git.Commit)
-        self.mock_assertions()
-
-
 class TestHook(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestHook, self).__init__(methodName)
@@ -54,26 +14,6 @@ class TestHook(BaseCase):
     def setUp(self):
         super(TestHook, self).setUp()
         self.hook = repos.hook.Hook(self.hook.as_dict(), self.g)
-
-    def test_equality(self):
-        h = repos.hook.Hook(load('hook'))
-        assert self.hook == h
-        h._uniq = 1
-        assert self.hook != h
-
-    def test_repr(self):
-        assert repr(self.hook) == '<Hook [readthedocs]>'
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.hook.delete)
-        self.not_called()
-
-        self.login()
-        assert self.hook.delete()
-        self.mock_assertions()
 
     def test_edit(self):
         self.response('hook', 200)
