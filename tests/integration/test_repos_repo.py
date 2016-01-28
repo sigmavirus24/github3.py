@@ -1066,3 +1066,32 @@ class TestContents(helper.IntegrationHelper):
             deleted = content.delete('Deleting readme from repository')
 
         assert deleted
+
+    def test_update(self):
+        """Test the ability to update a file's content from a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('update')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            content = repository.readme()
+            update = content.update(message='Updating README.md',
+                                    content=b'HELLO')
+
+        assert isinstance(update, dict)
+        assert isinstance(update['content'], github3.repos.contents.Contents)
+        assert isinstance(update['commit'], github3.git.Commit)
+
+
+class TestHook(helper.IntegrationHelper):
+
+    """Integration tests for Hook object."""
+
+    def test_delete(self):
+        self.token_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7096472)
+            deleted = hook.delete()
+
+        assert deleted is True

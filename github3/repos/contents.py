@@ -156,10 +156,10 @@ class Contents(GitHubCore):
                     'author': validate_commmitter(author)}
             self._remove_none(data)
             json = self._json(self._put(self._api, data=dumps(data)), 200)
-            if 'content' in json:
+            if json and 'content' in json:
                 self._update_attributes(json['content'])
                 json['content'] = self
-            if 'commit' in json:
+            if json and 'commit' in json:
                 json['commit'] = Commit(json['commit'], self)
         return json
 

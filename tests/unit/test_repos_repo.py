@@ -6,13 +6,16 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
-from github3.repos.repo import Repository, Contents
+from github3.repos.repo import Repository, Contents, Hook
 from github3.models import GitHubCore
 
 from . import helper
 
 contents_url_for = helper.create_url_helper(
     'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
+)
+hook_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/hooks/1'
 )
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
@@ -24,11 +27,15 @@ get_repo_example_data = helper.create_example_data_helper(
 get_content_example_data = helper.create_example_data_helper(
     'content_example'
 )
+get_hook_example_data = helper.create_example_data_helper(
+    'hook_example'
+)
 create_file_contents_example_data = helper.create_example_data_helper(
     'create_file_contents_example'
 )
 content_example_data = get_content_example_data()
 create_file_contents_example_data = create_file_contents_example_data()
+hook_example_data = get_hook_example_data()
 repo_example_data = get_repo_example_data()
 
 
@@ -1569,6 +1576,37 @@ class TestContents(helper.UnitHelper):
             self.instance.path
         )
 
+    def test_update(self):
+        """
+        Verify the request for updating a file's contents on a repository.
+        """
+        data = {
+            'message': 'Updating content files.',
+            'content': b'Updated content here.'
+        }
+
+        self.instance.update(**data)
+        data.update({
+            'content': b64encode(data['content']).decode('utf-8'),
+            'sha': self.instance.sha
+        })
+
+        self.put_called_with(
+            contents_url_for(),
+            data=data
+        )
+
+    def test_update_required_content(self):
+        """
+        Verify the request for updating a file's contents on a repository.
+        """
+        data = {
+            'message': 'Updating content files.',
+            'content': 1,
+        }
+        with pytest.raises(ValueError):
+            self.instance.update(**data)
+
 
 class TestContentsRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
@@ -1580,5 +1618,44 @@ class TestContentsRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def test_delete(self):
         """
         Show that deleting content from a repository requires authentication.
+        """
+        self.assert_requires_auth(self.instance.delete)
+
+    def test_update(self):
+        """
+        Show that updating a file's content on a repository requires
+        authentication.
+        """
+        self.assert_requires_auth(self.instance.update)
+
+
+class TestHook(helper.UnitHelper):
+
+    """Test methods on Hook class."""
+
+    described_class = Hook
+    example_data = hook_example_data
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance) == '<Hook [{0}]>'.format(self.instance.name)
+
+    def test_edit(self):
+        """Verify the request for editing a hook."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(
+            hook_url_for()
+        )
+
+
+class TestHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+
+    """Test methods on Hook object that require authentication."""
+
+    def delete(self):
+        """
+        Show that a user must be authenticated to delete a hook on a
+        repository.
         """
         self.assert_requires_auth(self.instance.delete)
