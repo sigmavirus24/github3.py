@@ -68,7 +68,7 @@ setup(
                  "(http://developer.github.com/v3)"),
     long_description="\n\n".join([open("README.rst").read(),
                                   open("LATEST_VERSION_NOTES.rst").read()]),
-    license=open('LICENSE').read(),
+    license='3-clause BSD',
     author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
     url="https://github3py.readthedocs.org",
@@ -77,6 +77,7 @@ setup(
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved',
+        'License :: OSI Approved :: BSD License',
         'Intended Audience :: Developers',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
@@ -89,7 +90,7 @@ setup(
     ],
     extras_require={
         'test': kwargs['tests_require'],
-        ';python_version<="2.7"': SNI_requirements,
+        'sni': SNI_requirements,
     },
     cmdclass={'test': PyTest},
     **kwargs
