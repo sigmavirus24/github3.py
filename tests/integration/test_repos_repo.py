@@ -1095,3 +1095,43 @@ class TestHook(helper.IntegrationHelper):
             deleted = hook.delete()
 
         assert deleted is True
+
+    def test_edit(self):
+        """Test the ability to edit a hook on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7112180)
+            data = {
+                'config': {
+                    'url': 'https://requestb.in/15u72q01',
+                    'content_type': 'json'
+                },
+                'events': ['pull_request'],
+            }
+            edited = hook.edit(**data)
+
+        assert edited
+
+    def test_ping(self):
+        """Test the ability to ping a hook on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('ping')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7112180)
+            pinged = hook.ping()
+
+        assert pinged
+
+    def test_test(self):
+        """Test the ability to test a hook on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('test')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7112180)
+            tested = hook.test()
+
+        assert tested

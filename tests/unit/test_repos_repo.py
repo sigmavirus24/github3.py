@@ -1640,12 +1640,54 @@ class TestHook(helper.UnitHelper):
         """Show that instance string is formatted correctly."""
         assert str(self.instance) == '<Hook [{0}]>'.format(self.instance.name)
 
-    def test_edit(self):
-        """Verify the request for editing a hook."""
+    def test_delete(self):
+        """Verify the request for editing a hook on a repository."""
         self.instance.delete()
 
         self.session.delete.assert_called_once_with(
             hook_url_for()
+        )
+
+    def test_edit(self):
+        """Verify the request for editing a hook on a repository."""
+        config = {
+            'url': 'https://fake-url.com',
+            'content_type': 'json'
+        }
+
+        self.instance.edit(config=config, events=['push'], add_events=['pull'],
+                           rm_events=['release'])
+        data = {
+            'config': config,
+            'events': ['push'],
+            'add_events': ['pull'],
+            'remove_events': ['release'],
+            'active': True
+        }
+        self.patch_called_with(
+            hook_url_for(),
+            data=data
+        )
+
+    def test_edit_failed(self):
+        """Verify the request for editing a hook on a repository."""
+
+        assert self.instance.edit() is False
+
+    def test_ping(self):
+        """Verify the request for ping a hook on a repository."""
+        self.instance.ping()
+
+        self.post_called_with(
+            hook_url_for('pings'),
+        )
+
+    def test_test(self):
+        """Verify the request for testing a hook on a repository."""
+        self.instance.test()
+
+        self.post_called_with(
+            hook_url_for('tests'),
         )
 
 
@@ -1653,9 +1695,30 @@ class TestHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test methods on Hook object that require authentication."""
 
-    def delete(self):
+    described_class = Hook
+    example_data = hook_example_data
+
+    def test_delete(self):
         """
         Show that a user must be authenticated to delete a hook on a
         repository.
         """
         self.assert_requires_auth(self.instance.delete)
+
+    def test_edit(self):
+        """
+        Show that a user must be authenticated to edit a hook on a repository.
+        """
+        self.assert_requires_auth(self.instance.edit)
+
+    def test_ping(self):
+        """
+        Show that a user must be authenticated to ping a hook on a repository.
+        """
+        self.assert_requires_auth(self.instance.ping)
+
+    def test_test(self):
+        """
+        Show that a user must be authenticated to test a hook on a repository.
+        """
+        self.assert_requires_auth(self.instance.test)
