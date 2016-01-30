@@ -1282,6 +1282,32 @@ class Repository(GitHubCore):
         return self._instance_or_null(ImportedIssue, json)
 
     @requires_auth
+    def imported_issues(self, number=-1, since=None, etag=None):
+        """Retrieve imported issues
+
+        :param int number: (optional), number of imported issues to return.
+            Default: -1 returns all branches
+        :param since: (optional), Only commits after this date will
+            be returned. This can be a `datetime` or an `ISO8601` formatted
+            date string.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`ImportedIssue <github3.repos.
+            issue_import.ImportedIssue>`
+        """
+
+        data = {
+            'since': since
+        }
+
+        self._remove_none(data)
+        url = self._build_url('import/issues', base_url=self._api)
+
+        return self._iter(int(number), url, ImportedIssue, etag=etag,
+                          params=data,
+                          headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+
+    @requires_auth
     def import_issue(self, title, body, created_at, assignee=None,
                      milestone=None, closed=None, labels=None, comments=None):
         """Import an issue into the repository.
