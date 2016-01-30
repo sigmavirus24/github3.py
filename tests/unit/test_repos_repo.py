@@ -6,11 +6,14 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
-from github3.repos.repo import Repository, Contents, Hook
+from github3.repos.repo import Repository, Contents, Hook, RepoComment
 from github3.models import GitHubCore
 
 from . import helper
 
+comment_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/comments/1'
+)
 contents_url_for = helper.create_url_helper(
     'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
 )
@@ -24,6 +27,9 @@ url_for = helper.create_url_helper(
 get_repo_example_data = helper.create_example_data_helper(
     'repos_repo_example'
 )
+get_comment_example_data = helper.create_example_data_helper(
+    'comment_example'
+)
 get_content_example_data = helper.create_example_data_helper(
     'content_example'
 )
@@ -33,6 +39,7 @@ get_hook_example_data = helper.create_example_data_helper(
 create_file_contents_example_data = helper.create_example_data_helper(
     'create_file_contents_example'
 )
+comment_example_data = get_comment_example_data()
 content_example_data = get_content_example_data()
 create_file_contents_example_data = create_file_contents_example_data()
 hook_example_data = get_hook_example_data()
@@ -1722,3 +1729,60 @@ class TestHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         Show that a user must be authenticated to test a hook on a repository.
         """
         self.assert_requires_auth(self.instance.test)
+
+
+class TestRepoComment(helper.UnitHelper):
+
+    """Unit test for methods on RepoComment object."""
+
+    example_data = comment_example_data
+    described_class = RepoComment
+
+    def test_delete(self):
+        """Verify the request for deleting a comment on a repository."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(
+            comment_url_for()
+        )
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Repository Comment')
+
+    def test_update(self):
+        """Verify the request for updating a comment on a repository."""
+        data = {
+            'body': 'new body'
+        }
+        self.instance.update(body=data['body'])
+
+        self.post_called_with(
+            comment_url_for(),
+            data=data
+        )
+
+
+class TestRepoCommentRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+
+    """
+    Unit test for methods that require authentication on RepoCommment
+    object.
+    """
+
+    described_class = RepoComment
+    example_data = comment_example_data
+
+    def test_delete(self):
+        """
+        Show that a user must be authenticated to delete a comment on a
+        repository.
+        """
+        self.assert_requires_auth(self.instance.delete)
+
+    def test_update(self):
+        """
+        Show that a user must be authenticated to update a comment on a
+        repository.
+        """
+        self.assert_requires_auth(self.instance.update)

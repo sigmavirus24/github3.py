@@ -1135,3 +1135,30 @@ class TestHook(helper.IntegrationHelper):
             tested = hook.test()
 
         assert tested
+
+
+class TestRepoComment(helper.IntegrationHelper):
+
+    """Integration tests for RepoComment object."""
+
+    def test_delete(self):
+        """Test the ability to delete a repository comment."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comment = repository.commit_comment(15779192)
+            deleted = comment.delete()
+
+        assert deleted
+
+    def test_update(self):
+        """Test the ability to update a repository comment."""
+        self.token_login()
+        cassette_name = self.cassette_name('update')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comment = repository.commit_comment(15779254)
+            updated = comment.update(body='Updated by integration test')
+
+        assert updated

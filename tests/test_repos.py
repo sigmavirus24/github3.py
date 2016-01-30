@@ -5,48 +5,6 @@ from github3 import repos
 from tests.utils import (BaseCase, load, mock)
 
 
-class TestRepoComment(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestRepoComment, self).__init__(methodName)
-        self.comment = repos.comment.RepoComment(load('repo_comment'))
-        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "comments/1380832")
-
-    def setUp(self):
-        super(TestRepoComment, self).setUp()
-        self.comment = repos.comment.RepoComment(self.comment.as_dict(),
-                                                 self.g)
-
-    def test_delete(self):
-        self.response('', 204)
-        self.delete(self.api)
-
-        self.assertRaises(github3.GitHubError, self.comment.delete)
-
-        self.not_called()
-        self.login()
-
-        assert self.comment.delete()
-        self.mock_assertions()
-
-    def test_repr(self):
-        assert repr(self.comment).startswith('<Repository Comment')
-
-    def test_update(self):
-        self.post(self.api)
-        self.response('repo_comment', 200)
-        self.conf = {'data': {'body': 'This is a comment body'}}
-
-        self.assertRaises(github3.GitHubError, self.comment.update, 'foo')
-
-        self.login()
-        assert self.comment.update(None) is False
-        self.not_called()
-
-        assert self.comment.update('This is a comment body')
-        self.mock_assertions()
-
-
 class TestRepoCommit(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestRepoCommit, self).__init__(methodName)
