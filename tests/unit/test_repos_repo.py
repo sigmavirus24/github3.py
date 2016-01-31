@@ -6,13 +6,18 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
-from github3.repos.repo import Repository, Contents, Hook, RepoComment
+from github3.repos.repo import (Repository, Contents, Hook, RepoComment,
+                                RepoCommit)
 from github3.models import GitHubCore
 
 from . import helper
 
 comment_url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/comments/1'
+)
+commit_url_for = helper.create_url_helper(
+    ('https://api.github.com/repos/octocat/Hello-World/'
+     'commits/6dcb09b5b57875f334f61aebed695e2e4193db5e')
 )
 contents_url_for = helper.create_url_helper(
     'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
@@ -30,6 +35,9 @@ get_repo_example_data = helper.create_example_data_helper(
 get_comment_example_data = helper.create_example_data_helper(
     'comment_example'
 )
+get_commit_example_data = helper.create_example_data_helper(
+    'commit_example'
+)
 get_content_example_data = helper.create_example_data_helper(
     'content_example'
 )
@@ -40,6 +48,7 @@ create_file_contents_example_data = helper.create_example_data_helper(
     'create_file_contents_example'
 )
 comment_example_data = get_comment_example_data()
+commit_example_data = get_commit_example_data()
 content_example_data = get_content_example_data()
 create_file_contents_example_data = create_file_contents_example_data()
 hook_example_data = get_hook_example_data()
@@ -1786,3 +1795,36 @@ class TestRepoCommentRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         repository.
         """
         self.assert_requires_auth(self.instance.update)
+
+
+class TestRepoCommit(helper.UnitHelper):
+
+    """Unit tests for RepoCommit object."""
+
+    described_class = RepoCommit
+    example_data = commit_example_data
+
+    def test_diff(self):
+        """Verify the request for retrieving the diff for a commit."""
+        self.instance.diff()
+
+        self.session.get.assert_called_once_with(
+            commit_url_for(),
+            headers={'Accept': 'application/vnd.github.diff'}
+        )
+
+    def test_patch(self):
+        """
+        Verify the request for retrieving the patch formatted diff for a
+        commit.
+        """
+        self.instance.patch()
+
+        self.session.get.assert_called_once_with(
+            commit_url_for(),
+            headers={'Accept': 'application/vnd.github.patch'}
+        )
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Repository Commit')

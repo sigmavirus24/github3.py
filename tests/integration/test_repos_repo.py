@@ -1162,3 +1162,32 @@ class TestRepoComment(helper.IntegrationHelper):
             updated = comment.update(body='Updated by integration test')
 
         assert updated
+
+
+class TestRepoCommit(helper.IntegrationHelper):
+
+    """Integration tests for RepoCommit object."""
+
+    def test_diff(self):
+        """Test the ability to retrieve a diff for a commit."""
+        cassette_name = self.cassette_name('diff')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.commit(
+                '51cfbf8cbf98b0ba5006b3490f553bc05d4461e4'
+            )
+            diff = commit.diff()
+
+        assert diff
+
+    def test_patch(self):
+        """Test the ability to retrieve a patch for a commit."""
+        cassette_name = self.cassette_name('patch')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.commit(
+                '51cfbf8cbf98b0ba5006b3490f553bc05d4461e4'
+            )
+            patch = commit.patch()
+
+        assert patch

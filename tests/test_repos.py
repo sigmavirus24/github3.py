@@ -5,39 +5,6 @@ from github3 import repos
 from tests.utils import (BaseCase, load, mock)
 
 
-class TestRepoCommit(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestRepoCommit, self).__init__(methodName)
-        self.commit = repos.commit.RepoCommit(load('commit'))
-        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "commits/76dcc6cb4b9860034be81b7e58adc286a115aa97")
-
-    def test_equality(self):
-        c = repos.commit.RepoCommit(load('commit'))
-        assert self.commit == c
-        c._uniq = 'fake'
-        assert self.commit != c
-
-    def test_repr(self):
-        assert repr(self.commit).startswith('<Repository Commit')
-
-    def test_diff(self):
-        self.response('archive', 200)
-        self.get(self.api)
-        self.conf.update(headers={'Accept': 'application/vnd.github.diff'})
-
-        assert self.commit.diff().startswith(b'archive_data')
-        self.mock_assertions()
-
-    def test_patch(self):
-        self.response('archive', 200)
-        self.get(self.api)
-        self.conf.update(headers={'Accept': 'application/vnd.github.patch'})
-
-        assert self.commit.patch().startswith(b'archive_data')
-        self.mock_assertions()
-
-
 class TestComparison(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestComparison, self).__init__(methodName)
