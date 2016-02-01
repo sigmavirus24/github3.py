@@ -166,6 +166,6 @@ Note that you **can not** change your login name via the API.
 
 This is the same as::
 
-    me = g.user()
+    me = g.me() # or me = g.user(your_user_name)
     if me.update(new_name, blog, company, bio=bio):
         print('Profile updated.')
