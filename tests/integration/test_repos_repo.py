@@ -1191,3 +1191,30 @@ class TestRepoCommit(helper.IntegrationHelper):
             patch = commit.patch()
 
         assert patch
+
+
+class TestComparison(helper.IntegrationHelper):
+
+    """Integration test for Comparison object."""
+
+    def test_diff(self):
+        """Test the ability to retrieve a diff for a comparison."""
+        cassette_name = self.cassette_name('diff')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comparison = repository.compare_commits(base='master',
+                                                    head='develop')
+            diff = comparison.diff()
+
+        assert diff
+
+    def test_patch(self):
+        """Test the ability to retrieve a diff for a comparison."""
+        cassette_name = self.cassette_name('patch')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comparison = repository.compare_commits(base='master',
+                                                    head='develop')
+            patch = comparison.patch()
+
+        assert patch

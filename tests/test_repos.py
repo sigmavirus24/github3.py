@@ -5,40 +5,6 @@ from github3 import repos
 from tests.utils import (BaseCase, load, mock)
 
 
-class TestComparison(BaseCase):
-    def __init__(self, methodName='runTest'):
-        super(TestComparison, self).__init__(methodName)
-        self.comp = repos.comparison.Comparison(load('comparison'))
-        self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
-                    "compare/a811e1a270f65eecb65755eca38d888cbefcb0a7..."
-                    "76dcc6cb4b9860034be81b7e58adc286a115aa97")
-
-    def test_repr(self):
-        assert repr(self.comp).startswith('<Comparison ')
-
-    def test_equality(self):
-        comp = repos.comparison.Comparison(load('comparison'))
-        assert self.comp == comp
-        comp.commits.pop(0)
-        assert self.comp != comp
-
-    def test_diff(self):
-        self.response('archive', 200)
-        self.get(self.api)
-        self.conf.update(headers={'Accept': 'application/vnd.github.diff'})
-
-        assert self.comp.diff().startswith(b'archive_data')
-        self.mock_assertions()
-
-    def test_patch(self):
-        self.response('archive', 200)
-        self.get(self.api)
-        self.conf.update(headers={'Accept': 'application/vnd.github.patch'})
-
-        assert self.comp.patch().startswith(b'archive_data')
-        self.mock_assertions()
-
-
 class TestAsset(BaseCase):
     def __init__(self, methodName='runTest'):
         super(TestAsset, self).__init__(methodName)
