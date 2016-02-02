@@ -302,8 +302,10 @@ class GitHub(GitHubCore):
         """Create a new key for the authenticated user.
 
         :param str title: (required), key title
-        :param key: (required), actual key contents, accepts path as a string
-            or file-like object
+        :param str key: (required), actual key contents, accepts path
+            as a string or file-like object
+        :param bool read_only: (optional), restrict key access to read-only,
+            default to False
         :returns: :class:`Key <github3.users.Key>`
         """
         json = None
