@@ -12,9 +12,6 @@ class TestAsset(BaseCase):
         self.api = ("https://api.github.com/repos/sigmavirus24/github3.py/"
                     "releases/assets/37945")
 
-    def test_repr(self):
-        assert repr(self.asset) == '<Asset [github3.py-0.7.1.tar.gz]>'
-
     @pytest.mark.xfail
     def test_download(self):
         headers = {'content-disposition': 'filename=foo'}
