@@ -6,11 +6,26 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
-from github3.repos.repo import Repository, Contents, Hook
+from github3.repos.release import Asset
+from github3.repos.repo import (Comparison, Contents, Hook, RepoComment,
+                                RepoCommit, Repository)
 from github3.models import GitHubCore
 
 from . import helper
 
+asset_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/releases/assets/1'
+)
+comment_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/comments/1'
+)
+commit_url_for = helper.create_url_helper(
+    ('https://api.github.com/repos/octocat/Hello-World/'
+     'commits/6dcb09b5b57875f334f61aebed695e2e4193db5e')
+)
+compare_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/compare/master...topic'
+)
 contents_url_for = helper.create_url_helper(
     'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
 )
@@ -21,8 +36,20 @@ url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
 )
 
+get_asset_example_data = helper.create_example_data_helper(
+    'asset_example'
+)
 get_repo_example_data = helper.create_example_data_helper(
     'repos_repo_example'
+)
+get_comment_example_data = helper.create_example_data_helper(
+    'comment_example'
+)
+get_commit_example_data = helper.create_example_data_helper(
+    'commit_example'
+)
+get_compare_example_data = helper.create_example_data_helper(
+    'compare_example'
 )
 get_content_example_data = helper.create_example_data_helper(
     'content_example'
@@ -33,6 +60,10 @@ get_hook_example_data = helper.create_example_data_helper(
 create_file_contents_example_data = helper.create_example_data_helper(
     'create_file_contents_example'
 )
+asset_example_data = get_asset_example_data()
+comment_example_data = get_comment_example_data()
+commit_example_data = get_commit_example_data()
+compare_example_data = get_compare_example_data()
 content_example_data = get_content_example_data()
 create_file_contents_example_data = create_file_contents_example_data()
 hook_example_data = get_hook_example_data()
@@ -1640,12 +1671,54 @@ class TestHook(helper.UnitHelper):
         """Show that instance string is formatted correctly."""
         assert str(self.instance) == '<Hook [{0}]>'.format(self.instance.name)
 
-    def test_edit(self):
-        """Verify the request for editing a hook."""
+    def test_delete(self):
+        """Verify the request for editing a hook on a repository."""
         self.instance.delete()
 
         self.session.delete.assert_called_once_with(
             hook_url_for()
+        )
+
+    def test_edit(self):
+        """Verify the request for editing a hook on a repository."""
+        config = {
+            'url': 'https://fake-url.com',
+            'content_type': 'json'
+        }
+
+        self.instance.edit(config=config, events=['push'], add_events=['pull'],
+                           rm_events=['release'])
+        data = {
+            'config': config,
+            'events': ['push'],
+            'add_events': ['pull'],
+            'remove_events': ['release'],
+            'active': True
+        }
+        self.patch_called_with(
+            hook_url_for(),
+            data=data
+        )
+
+    def test_edit_failed(self):
+        """Verify the request for editing a hook on a repository."""
+
+        assert self.instance.edit() is False
+
+    def test_ping(self):
+        """Verify the request for ping a hook on a repository."""
+        self.instance.ping()
+
+        self.post_called_with(
+            hook_url_for('pings'),
+        )
+
+    def test_test(self):
+        """Verify the request for testing a hook on a repository."""
+        self.instance.test()
+
+        self.post_called_with(
+            hook_url_for('tests'),
         )
 
 
@@ -1653,9 +1726,161 @@ class TestHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test methods on Hook object that require authentication."""
 
-    def delete(self):
+    described_class = Hook
+    example_data = hook_example_data
+
+    def test_delete(self):
         """
         Show that a user must be authenticated to delete a hook on a
         repository.
         """
         self.assert_requires_auth(self.instance.delete)
+
+    def test_edit(self):
+        """
+        Show that a user must be authenticated to edit a hook on a repository.
+        """
+        self.assert_requires_auth(self.instance.edit)
+
+    def test_ping(self):
+        """
+        Show that a user must be authenticated to ping a hook on a repository.
+        """
+        self.assert_requires_auth(self.instance.ping)
+
+    def test_test(self):
+        """
+        Show that a user must be authenticated to test a hook on a repository.
+        """
+        self.assert_requires_auth(self.instance.test)
+
+
+class TestRepoComment(helper.UnitHelper):
+
+    """Unit test for methods on RepoComment object."""
+
+    example_data = comment_example_data
+    described_class = RepoComment
+
+    def test_delete(self):
+        """Verify the request for deleting a comment on a repository."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(
+            comment_url_for()
+        )
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Repository Comment')
+
+    def test_update(self):
+        """Verify the request for updating a comment on a repository."""
+        data = {
+            'body': 'new body'
+        }
+        self.instance.update(body=data['body'])
+
+        self.post_called_with(
+            comment_url_for(),
+            data=data
+        )
+
+
+class TestRepoCommentRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+
+    """
+    Unit test for methods that require authentication on RepoCommment
+    object.
+    """
+
+    described_class = RepoComment
+    example_data = comment_example_data
+
+    def test_delete(self):
+        """
+        Show that a user must be authenticated to delete a comment on a
+        repository.
+        """
+        self.assert_requires_auth(self.instance.delete)
+
+    def test_update(self):
+        """
+        Show that a user must be authenticated to update a comment on a
+        repository.
+        """
+        self.assert_requires_auth(self.instance.update)
+
+
+class TestRepoCommit(helper.UnitHelper):
+
+    """Unit tests for RepoCommit object."""
+
+    described_class = RepoCommit
+    example_data = commit_example_data
+
+    def test_diff(self):
+        """Verify the request for retrieving the diff for a commit."""
+        self.instance.diff()
+
+        self.session.get.assert_called_once_with(
+            commit_url_for(),
+            headers={'Accept': 'application/vnd.github.diff'}
+        )
+
+    def test_patch(self):
+        """
+        Verify the request for retrieving the patch formatted diff for a
+        commit.
+        """
+        self.instance.patch()
+
+        self.session.get.assert_called_once_with(
+            commit_url_for(),
+            headers={'Accept': 'application/vnd.github.patch'}
+        )
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Repository Commit')
+
+
+class TestComparison(helper.UnitHelper):
+
+    """Unit test for Comparison object."""
+    described_class = Comparison
+    example_data = compare_example_data
+
+    def test_diff(self):
+        """Verify the request for retrieving a diff for this comparison."""
+        self.instance.diff()
+
+        self.session.get.assert_called_once_with(
+            compare_url_for(),
+            headers={'Accept': 'application/vnd.github.diff'}
+        )
+
+    def test_patch(self):
+        """Verify the request for retrieving a diff for this comparison."""
+        self.instance.patch()
+
+        self.session.get.assert_called_once_with(
+            compare_url_for(),
+            headers={'Accept': 'application/vnd.github.patch'}
+        )
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Comparison')
+
+
+class TestAsset(helper.UnitHelper):
+
+    """Unit test for Asset object."""
+
+    described_class = Asset
+    example_data = asset_example_data
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Asset ')
