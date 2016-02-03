@@ -1095,3 +1095,126 @@ class TestHook(helper.IntegrationHelper):
             deleted = hook.delete()
 
         assert deleted is True
+
+    def test_edit(self):
+        """Test the ability to edit a hook on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('edit')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7112180)
+            data = {
+                'config': {
+                    'url': 'https://requestb.in/15u72q01',
+                    'content_type': 'json'
+                },
+                'events': ['pull_request'],
+            }
+            edited = hook.edit(**data)
+
+        assert edited
+
+    def test_ping(self):
+        """Test the ability to ping a hook on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('ping')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7112180)
+            pinged = hook.ping()
+
+        assert pinged
+
+    def test_test(self):
+        """Test the ability to test a hook on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('test')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'delete_contents')
+            hook = repository.hook(7112180)
+            tested = hook.test()
+
+        assert tested
+
+
+class TestRepoComment(helper.IntegrationHelper):
+
+    """Integration tests for RepoComment object."""
+
+    def test_delete(self):
+        """Test the ability to delete a repository comment."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comment = repository.commit_comment(15779192)
+            deleted = comment.delete()
+
+        assert deleted
+
+    def test_update(self):
+        """Test the ability to update a repository comment."""
+        self.token_login()
+        cassette_name = self.cassette_name('update')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comment = repository.commit_comment(15779254)
+            updated = comment.update(body='Updated by integration test')
+
+        assert updated
+
+
+class TestRepoCommit(helper.IntegrationHelper):
+
+    """Integration tests for RepoCommit object."""
+
+    def test_diff(self):
+        """Test the ability to retrieve a diff for a commit."""
+        cassette_name = self.cassette_name('diff')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.commit(
+                '51cfbf8cbf98b0ba5006b3490f553bc05d4461e4'
+            )
+            diff = commit.diff()
+
+        assert diff
+
+    def test_patch(self):
+        """Test the ability to retrieve a patch for a commit."""
+        cassette_name = self.cassette_name('patch')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.commit(
+                '51cfbf8cbf98b0ba5006b3490f553bc05d4461e4'
+            )
+            patch = commit.patch()
+
+        assert patch
+
+
+class TestComparison(helper.IntegrationHelper):
+
+    """Integration test for Comparison object."""
+
+    def test_diff(self):
+        """Test the ability to retrieve a diff for a comparison."""
+        cassette_name = self.cassette_name('diff')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comparison = repository.compare_commits(base='master',
+                                                    head='develop')
+            diff = comparison.diff()
+
+        assert diff
+
+    def test_patch(self):
+        """Test the ability to retrieve a diff for a comparison."""
+        cassette_name = self.cassette_name('patch')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            comparison = repository.compare_commits(base='master',
+                                                    head='develop')
+            patch = comparison.patch()
+
+        assert patch

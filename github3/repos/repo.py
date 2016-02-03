@@ -826,6 +826,8 @@ class Repository(GitHubCore):
 
         :param str title: (required), title of key
         :param str key: (required), key text
+        :param bool read_only: (optional), restrict key access to read-only,
+            default is False
         :returns: :class:`Key <github3.users.Key>` if successful, else None
         """
         json = None

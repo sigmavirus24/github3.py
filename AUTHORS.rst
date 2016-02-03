@@ -3,10 +3,14 @@ Development Lead
 
 - Ian Cordasco <graffatcolmingov@gmail.com>
 
+- Matt Chung (@itsmemattchung)
+
 Maintainer(s)
 `````````````
 
 - Barry Morrison (@esacteksab)
+
+- Matt Chung (@itsmemattchung)
 
 Requests
 ````````
