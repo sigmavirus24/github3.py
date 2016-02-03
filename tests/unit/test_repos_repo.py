@@ -6,16 +6,12 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.null import NullObject
-from github3.repos.release import Asset
 from github3.repos.repo import (Comparison, Contents, Hook, RepoComment,
                                 RepoCommit, Repository)
 from github3.models import GitHubCore
 
 from . import helper
 
-asset_url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/releases/assets/1'
-)
 comment_url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/comments/1'
 )
@@ -34,10 +30,6 @@ hook_url_for = helper.create_url_helper(
 )
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
-)
-
-get_asset_example_data = helper.create_example_data_helper(
-    'asset_example'
 )
 get_repo_example_data = helper.create_example_data_helper(
     'repos_repo_example'
@@ -60,7 +52,6 @@ get_hook_example_data = helper.create_example_data_helper(
 create_file_contents_example_data = helper.create_example_data_helper(
     'create_file_contents_example'
 )
-asset_example_data = get_asset_example_data()
 comment_example_data = get_comment_example_data()
 commit_example_data = get_commit_example_data()
 compare_example_data = get_compare_example_data()
@@ -1891,15 +1882,3 @@ class TestComparison(helper.UnitHelper):
     def test_str(self):
         """Show that instance string is formatted correctly."""
         assert str(self.instance).startswith('<Comparison')
-
-
-class TestAsset(helper.UnitHelper):
-
-    """Unit test for Asset object."""
-
-    described_class = Asset
-    example_data = asset_example_data
-
-    def test_str(self):
-        """Show that instance string is formatted correctly."""
-        assert str(self.instance).startswith('<Asset ')

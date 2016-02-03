@@ -3,6 +3,7 @@ from github3.repos.release import Release, Asset
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper, mock,
                      create_example_data_helper)
 
+import github3
 import json
 import pytest
 
@@ -140,6 +141,25 @@ class TestAsset(UnitHelper):
         )
         assert stream.called is False
 
+    def test_download_with_302(self):
+        """Verify the request to download an Asset file."""
+        with mock.patch.object(github3.models.GitHubCore, '_get') as get:
+            get.return_value.status_code = 302
+            get.return_value.headers = {'location': 'https://fakeurl'}
+            self.instance.download()
+            data = {
+                'headers': {
+                    'Content-Type': None,
+                    'Accept': 'application/octet-stream'
+                },
+                'stream': True
+            }
+            assert get.call_count == 2
+            get.assert_any_call(
+                'https://fakeurl',
+                **data
+            )
+
     def test_edit_without_label(self):
         self.instance.edit('new name')
         self.session.patch.assert_called_once_with(
@@ -157,3 +177,7 @@ class TestAsset(UnitHelper):
         assert json.loads(kwargs['data']) == {
             'name': 'new name', 'label': 'label'
             }
+
+    def test_str(self):
+        """Verify that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<Asset ')
