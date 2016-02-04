@@ -39,3 +39,13 @@ class TestGitHubIterator(UnitHelper):
         i = GitHubIterator(count, url, cls, session, headers=headers)
         assert i.headers != {}
         assert i.headers.get('Accept') == 'foo'
+
+    def test_stores_etag_properly(self):
+        session, url, count, cls = self.session, self.url, self.count, self.cls
+        i = GitHubIterator(count, url, cls, session, etag='"foobarbogus"')
+        assert i.headers != {}
+        assert i.headers.get('If-None-Match') == '"foobarbogus"'
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance).startswith('<GitHubIterator')

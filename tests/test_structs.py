@@ -11,15 +11,6 @@ class TestGitHubIterator(BaseCase):
         self.i = GitHubIterator(self.num, self.api_url, github3.users.User,
                                 self.g)
 
-    def test_headers(self):
-        i = GitHubIterator(self.i.count, self.i.url, self.i.cls, self.g,
-                           etag='"foobarbogus"')
-        assert i.headers.get('If-None-Match') == '"foobarbogus"'
-
-    def test_repr(self):
-        assert repr(self.i) == '<GitHubIterator [{0}, /users]>'.format(
-            self.num)
-
     def test_nexts(self):
         self.response('user', _iter=True)
         self.get(self.api_url)
@@ -54,17 +45,6 @@ class TestGitHubIterator(BaseCase):
 
         assert isinstance(next(self.i), github3.users.User)
 
-        self.assertRaises(StopIteration, next, self.i)
-
-        self.mock_assertions()
-
-    def test_count_reaches_0(self):
-        self.response('user', _iter=True)
-        self.get(self.api_url)
-        self.conf = {'params': {'per_page': 1}, 'headers': {}}
-        self.i = GitHubIterator(1, self.api_url, github3.users.User, self.g)
-
-        assert isinstance(next(self.i), github3.users.User)
         self.assertRaises(StopIteration, next, self.i)
 
         self.mock_assertions()
