@@ -534,11 +534,11 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :param since: (optional), Only commits after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
         :type since: datetime or string
         :param until: (optional), Only commits before this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
         :type until: datetime or string
 
@@ -1283,12 +1283,14 @@ class Repository(GitHubCore):
 
     @requires_auth
     def imported_issues(self, number=-1, since=None, etag=None):
-        """Retrieve imported issues
+        """Retrieve the collection of imported issues via the API.
+
+        See also: https://gist.github.com/jonmagic/5282384165e0f86ef105
 
         :param int number: (optional), number of imported issues to return.
             Default: -1 returns all branches
         :param since: (optional), Only commits after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
@@ -1297,7 +1299,7 @@ class Repository(GitHubCore):
         """
 
         data = {
-            'since': since
+            'since': timestamp_parameter(since)
         }
 
         self._remove_none(data)
@@ -1423,7 +1425,7 @@ class Repository(GitHubCore):
             ('created', 'updated', 'comments', 'created')
         :param str direction: (optional), accepted values: ('asc', 'desc')
         :param since: (optional), Only issues after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string, e.g., 2012-05-20T23:10:27Z
         :type since: datetime or string
         :param int number: (optional), Number of issues to return.
