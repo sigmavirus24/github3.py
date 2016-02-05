@@ -612,6 +612,19 @@ class TestRepository(helper.IntegrationHelper):
         assert isinstance(imported_issue,
                           github3.repos.issue_import.ImportedIssue)
 
+    def test_imported_issues(self):
+        """Test the ability to retrieve imported issues."""
+        self.token_login()
+        cassette_name = self.cassette_name('imported_issues')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'test_rename1')
+            imported_issues = list(repository.imported_issues())
+
+        assert len(imported_issues) > 0
+        for imported_issue in imported_issues:
+            assert isinstance(imported_issue,
+                              github3.repos.issue_import.ImportedIssue)
+
     def test_import_issue(self):
         """Test the ability to import an issue."""
         self.token_login()

@@ -1175,6 +1175,19 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
             headers={}
         )
 
+    def test_imported_issues(self):
+        """Verify the request for retreiving imported issues."""
+        i = self.instance.imported_issues(since='2015-03-15')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('import/issues'),
+            params={'per_page': 100, 'since': '2015-03-15'},
+            headers={
+                'Accept': 'application/vnd.github.golden-comet-preview+json'
+            }
+        )
+
     def test_issue_events(self):
         """Test the ability to iterate over a repository's issue events."""
         i = self.instance.issue_events()
@@ -1503,6 +1516,12 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
             self.instance.import_issue(title='foo',
                                        body='Foobar body',
                                        created_at='2014-03-16T17:15:42Z')
+
+    def test_imported_issues(self):
+        """
+        Show that a user must be authenticated to retrieve imported issues.
+        """
+        self.assert_requires_auth(self.instance.imported_issues)
 
     def test_imported_issue(self):
         """

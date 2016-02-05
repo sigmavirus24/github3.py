@@ -534,11 +534,11 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :param since: (optional), Only commits after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
         :type since: datetime or string
         :param until: (optional), Only commits before this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
         :type until: datetime or string
 
@@ -1282,6 +1282,35 @@ class Repository(GitHubCore):
         return self._instance_or_null(ImportedIssue, json)
 
     @requires_auth
+    def imported_issues(self, number=-1, since=None, etag=None):
+        """Retrieve the collection of imported issues via the API.
+
+        See also: https://gist.github.com/jonmagic/5282384165e0f86ef105
+
+        :param int number: (optional), number of imported issues to return.
+            Default: -1 returns all branches
+        :param since: (optional), Only imported issues after this date will
+            be returned. This can be a ``datetime`` instance, ISO8601
+            formatted date string, or a string formatted like so:
+            ``2016-02-04`` i.e. ``%Y-%m-%d``
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`ImportedIssue <github3.repos.
+            issue_import.ImportedIssue>`
+        """
+
+        data = {
+            'since': timestamp_parameter(since)
+        }
+
+        self._remove_none(data)
+        url = self._build_url('import/issues', base_url=self._api)
+
+        return self._iter(int(number), url, ImportedIssue, etag=etag,
+                          params=data,
+                          headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+
+    @requires_auth
     def import_issue(self, title, body, created_at, assignee=None,
                      milestone=None, closed=None, labels=None, comments=None):
         """Import an issue into the repository.
@@ -1397,7 +1426,7 @@ class Repository(GitHubCore):
             ('created', 'updated', 'comments', 'created')
         :param str direction: (optional), accepted values: ('asc', 'desc')
         :param since: (optional), Only issues after this date will
-            be returned. This can be a `datetime` or an `ISO8601` formatted
+            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string, e.g., 2012-05-20T23:10:27Z
         :type since: datetime or string
         :param int number: (optional), Number of issues to return.
