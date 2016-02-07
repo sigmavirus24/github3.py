@@ -227,7 +227,7 @@ class Asset(GitHubCore):
             }
         resp = self._get(self._api, allow_redirects=False, stream=True,
                          headers=headers)
-        if resp and resp.status_code == 302:
+        if resp.status_code == 302:
             # Amazon S3 will reject the redirected request unless we omit
             # certain request headers
             headers.update({
