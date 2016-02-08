@@ -177,7 +177,3 @@ class TestAsset(UnitHelper):
         assert json.loads(kwargs['data']) == {
             'name': 'new name', 'label': 'label'
             }
-
-    def test_str(self):
-        """Verify that instance string is formatted correctly."""
-        assert str(self.instance).startswith('<Asset ')
