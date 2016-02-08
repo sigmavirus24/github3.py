@@ -12,7 +12,7 @@ from json import dumps
 from github3.auths import Authorization
 from uritemplate import URITemplate
 from .events import Event
-from .models import GitHubObject, GitHubCore, BaseAccount
+from .models import GitHubCore, BaseAccount
 from .decorators import requires_auth
 
 
@@ -74,7 +74,7 @@ class Key(GitHubCore):
         return False
 
 
-class Plan(GitHubObject):
+class Plan(GitHubCore):
     """The :class:`Plan <Plan>` object. This makes interacting with the plan
     information about a user easier. Please see GitHub's `Authenticated User
     <http://developer.github.com/v3/users/#get-the-authenticated-user>`_

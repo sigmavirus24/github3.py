@@ -11,12 +11,12 @@ from __future__ import unicode_literals
 
 from json import dumps
 from base64 import b64decode
-from .models import GitHubObject, GitHubCore, BaseCommit
+from .models import GitHubCore, BaseCommit
 from .users import User
 from .decorators import requires_auth
 
 
-class Blob(GitHubObject):
+class Blob(GitHubCore):
 
     """The :class:`Blob <Blob>` object.
 
@@ -216,7 +216,7 @@ class Tree(GitData):
         return self._instance_or_null(Tree, json)
 
 
-class Hash(GitHubObject):
+class Hash(GitHubCore):
 
     """The :class:`Hash <Hash>` object.
 
