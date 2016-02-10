@@ -195,6 +195,8 @@ class Asset(GitHubCore):
         #: URL to download the asset.
         #: Request headers must include ``Accept: application/octet-stream``.
         self.download_url = self._api
+        # User friendly download URL
+        self.browser_download_url = asset.get('browser_download_url')
         #: GitHub id of the asset
         self.id = asset.get('id')
         #: Short description of the asset
