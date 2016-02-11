@@ -1,6 +1,6 @@
 .. vim: set tw=100
 
-1.0.0a3: 201z-xx-yy
+1.0.0a3: 2016-02-11
 ~~~~~~~~~~~~~~~~~~~
 
 Breaking Changes (since 1.0.0a2)
@@ -67,6 +67,11 @@ Features Added (since 1.0.0a2)
 - Add ``GistFile#content`` to retrieve the contents of a file in a gist from
   the API.
 
+- Add support for the alpha `bulk issue import API`_
+
+.. _bulk issue import API:
+    https://gist.github.com/jonmagic/5282384165e0f86ef105
+
 Bugs Fixed (since 1.0.0a2)
 ``````````````````````````
 
@@ -75,7 +80,14 @@ Bugs Fixed (since 1.0.0a2)
 
 - Fix AttributeError when ``IssueEvent`` has assignee.
 
-- Correctly set the ``message`` attribute on ``RepoCommit`` instances
+- Correctly set the ``message`` attribute on ``RepoCommit`` instances.
+
+- Include ``browser_download_url`` on ``Asset`` instances.
+
+- (Packaging related) Fix ``setup.py`` to use proper values for certain
+  parameters.
+
+- Fix ``ValueError`` for ``Repository#create_file``.
 
 1.0.0a2: 2015-07-14
 ~~~~~~~~~~~~~~~~~~~
