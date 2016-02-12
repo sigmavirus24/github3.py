@@ -219,6 +219,13 @@ class TestIssue(helper.UnitHelper):
         self.instance.state = 'closed'
         assert self.instance.is_closed() is True
 
+    def test_is_locked(self):
+        """Test an issue is locked."""
+        assert self.instance.is_locked() is False
+
+        self.instance.locked = 'true'
+        assert self.instance.is_locked() is True
+
     def test_issue_137(self):
         """
         GitHub sometimes returns `pull` as part of of the `html_url` for Issue
