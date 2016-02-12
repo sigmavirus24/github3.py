@@ -223,7 +223,7 @@ class TestIssue(helper.UnitHelper):
         """Test an issue is locked."""
         assert self.instance.is_locked() is False
 
-        self.instance.locked = 'true'
+        self.instance.locked = True
         assert self.instance.is_locked() is True
 
     def test_issue_137(self):
