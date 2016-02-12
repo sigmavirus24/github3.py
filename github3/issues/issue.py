@@ -69,6 +69,8 @@ class Issue(GitHubCore):
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels_url) if labels_url else None
+        #: Locked status
+        self.locked = issue.get('locked')
         #: :class:`Milestone <github3.issues.milestone.Milestone>` this
         #: issue was assigned to.
         self.milestone = None
