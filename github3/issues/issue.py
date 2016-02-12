@@ -247,9 +247,7 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        if self.locked:
-            return True
-        return False
+        return self.locked
 
     def labels(self, number=-1, etag=None):
         """Iterate over the labels associated with this issue.
