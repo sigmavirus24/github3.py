@@ -66,6 +66,11 @@ class TestIssueRequiresAuth(helper.UnitHelper):
         with pytest.raises(github3.AuthenticationFailed):
             self.instance.edit()
 
+    def test_lock(self):
+        """Verify that locking an issue requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.lock()
+
     def test_remove_all_labels(self):
         """Verify that removing all labels requires authentication."""
         with pytest.raises(github3.AuthenticationFailed):
@@ -80,6 +85,11 @@ class TestIssueRequiresAuth(helper.UnitHelper):
         """Verify that reopening an issue equires authentication."""
         with pytest.raises(github3.AuthenticationFailed):
             self.instance.reopen()
+
+    def test_unlock(self):
+        """Verify that unlocking an issue requires authentication."""
+        with pytest.raises(github3.AuthenticationFailed):
+            self.instance.unlock()
 
 
 class TestIssue(helper.UnitHelper):
@@ -155,6 +165,15 @@ class TestIssue(helper.UnitHelper):
         """Verify request is not made when comment body is empty."""
         self.instance.create_comment(body='')
         assert self.session.post.called is False
+
+    def test_create_lock(self):
+        """Verify the request for removing a lock from an issue."""
+        self.instance.lock()
+
+        self.session.put.assert_called_once_with(
+            url_for('lock'),
+            headers={'Accept': 'application/vnd.github.the-key-preview+json'}
+        )
 
     def test_comment_positive_id(self):
         """Verify the request for retrieving an issue comment."""
@@ -265,6 +284,15 @@ class TestIssue(helper.UnitHelper):
 
         self.session.delete.assert_called_once_with(
             url_for('labels/enhancement')
+        )
+
+    def test_remove_lock(self):
+        """Verify the request for removing a lock from an issue."""
+        self.instance.unlock()
+
+        self.session.delete.assert_called_once_with(
+            url_for('lock'),
+            headers={'Accept': 'application/vnd.github.the-key-preview+json'}
         )
 
     def test_reopen(self):
