@@ -69,6 +69,8 @@ class Issue(GitHubCore):
         labels_url = issue.get('labels_url')
         #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(labels_url) if labels_url else None
+        #: Locked status
+        self.locked = issue.get('locked')
         #: :class:`Milestone <github3.issues.milestone.Milestone>` this
         #: issue was assigned to.
         self.milestone = None
@@ -237,6 +239,15 @@ class Issue(GitHubCore):
         :returns: bool
         """
         if self.closed_at or (self.state == 'closed'):
+            return True
+        return False
+
+    def is_locked(self):
+        """Checks if the issue is locked.
+
+        :returns: bool
+        """
+        if self.locked:
             return True
         return False
 
