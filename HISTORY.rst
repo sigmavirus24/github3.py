@@ -1,6 +1,13 @@
 History/Changelog
 -----------------
 
+0.9.5: 2016-02-15
+~~~~~~~~~~~~~~~~~
+
+- Fix Validation Error stemming from ``Repository#create_status`` having
+  poorly chosen default arguments and not removing ``None`` values from the
+  body of the request.
+
 0.9.4: 2015-04-17
 ~~~~~~~~~~~~~~~~~
 
