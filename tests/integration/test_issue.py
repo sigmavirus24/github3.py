@@ -119,6 +119,18 @@ class TestIssue(IntegrationHelper):
             for label in issue.labels():
                 assert isinstance(label, github3.issues.label.Label)
 
+    def test_lock(self):
+        """Test the ability to lock an issue."""
+        self.token_login()
+        cassette_name = self.cassette_name('lock')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='adrianmoisey',
+                                  repository='temptest',
+                                  number=1)
+            locked = issue.lock()
+
+        assert locked is True
+
     def test_pull_request(self):
         """Test the ability to retrieve the PR associated with an issue."""
         cassette_name = self.cassette_name('pull_request')
@@ -181,6 +193,18 @@ class TestIssue(IntegrationHelper):
         assert len(replaced_labels) == len(labels)
         for replaced_label in replaced_labels:
             assert isinstance(replaced_label, github3.issues.issue.Label)
+
+    def test_unlock(self):
+        """Test the ability to lock an issue."""
+        self.token_login()
+        cassette_name = self.cassette_name('unlock')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='adrianmoisey',
+                                  repository='temptest',
+                                  number=1)
+            unlocked = issue.unlock()
+
+        assert unlocked is True
 
 
 class TestLabel(IntegrationHelper):
