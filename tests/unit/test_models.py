@@ -4,7 +4,7 @@ import requests
 
 from datetime import datetime, timedelta
 from github3 import exceptions, GitHubError
-from github3.models import GitHubCore, GitHubObject
+from github3.models import GitHubCore
 from unittest import TestCase
 from . import helper
 
@@ -16,16 +16,6 @@ class MyTestRefreshClass(GitHubCore):
         self._api = example_data['url']
         self.last_modified = example_data['last_modified']
         self.etag = example_data['etag']
-
-
-class MyGetAttrTestClass(GitHubObject):
-    """Subclass for testing getattr on GitHubObject."""
-
-    def __init__(self, example_data, session=None):
-        super(MyGetAttrTestClass, self).__init__(example_data)
-
-    def _update_attributes(self, json_data):
-        self.fake_attr = json_data.get('fake_attr')
 
 
 class TestGitHubError(TestCase):
@@ -55,30 +45,6 @@ class TestGitHubError(TestCase):
         assert str(self.instance) == '400 m'
 
 
-class TestGitHubObject(helper.UnitHelper):
-    """Test methods on GitHubObject class."""
-
-    described_class = MyGetAttrTestClass
-    example_data = {
-        'fake_attr': 'foo',
-        'another_fake_attr': 'bar'
-    }
-
-    def test_from_json(self):
-        """Verify that method returns GitHubObject from json."""
-        github_object = GitHubObject.from_json('{}')
-        assert isinstance(github_object, GitHubObject)
-
-    def test_exposes_attributes(self):
-        """Verify JSON attributes are exposed even if not explicitly set."""
-        assert self.instance.another_fake_attr == 'bar'
-
-    def test_missingattribute(self):
-        """Test AttributeError is raised when attribute is not in JSON."""
-        with pytest.raises(AttributeError):
-            self.instance.missingattribute
-
-
 class TestGitHubCore(helper.UnitHelper):
 
     described_class = MyTestRefreshClass
@@ -90,7 +56,8 @@ class TestGitHubCore(helper.UnitHelper):
     example_data = {
         'url': url,
         'last_modified': last_modified,
-        'etag': etag
+        'etag': etag,
+        'fake_attr': 'foo',
     }
 
     def test_boolean(self):
@@ -130,6 +97,15 @@ class TestGitHubCore(helper.UnitHelper):
 
         assert boolean is False
 
+    def test_exposes_attributes(self):
+        """Verify JSON attributes are exposed even if not explicitly set."""
+        assert self.instance.fake_attr == 'foo'
+
+    def test_from_json(self):
+        """Verify that method returns GitHubObject from json."""
+        github_core = GitHubCore.from_json('{}')
+        assert isinstance(github_core, GitHubCore)
+
     def test_json(self):
         """Verify JSON information is retrieved correctly."""
         response = requests.Response()
@@ -149,6 +125,11 @@ class TestGitHubCore(helper.UnitHelper):
 
         json = self.instance._json(response, 200)
         assert json is None
+
+    def test_missingattribute(self):
+        """Test AttributeError is raised when attribute is not in JSON."""
+        with pytest.raises(AttributeError):
+            self.instance.missingattribute
 
     def test_refresh(self):
         """Verify the request of refreshing an object."""
