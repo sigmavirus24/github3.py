@@ -23,12 +23,26 @@ __timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
 
-class GitHubObject(object):
-    """The :class:`GitHubObject <GitHubObject>` object. A basic class to be
-    subclassed by GitHubCore and other classes that would otherwise subclass
-    object."""
-    def __init__(self, json):
-        super(GitHubObject, self).__init__()
+class GitHubCore(object):
+
+    """The base object for all objects that require a session.
+
+    The :class:`GitHubCore <GitHubCore>` object provides some
+    basic attributes and methods to other sub-classes that are very useful to
+    have.
+    """
+
+    def __init__(self, json, session=None):
+        if hasattr(session, 'session'):
+            # i.e. session is actually a GitHubCore instance
+            session = session.session
+        elif session is None:
+            session = GitHubSession()
+        self.session = session
+
+        # set a sane default
+        self._github_url = 'https://api.github.com'
+
         if json is not None:
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
@@ -87,9 +101,6 @@ class GitHubObject(object):
             return dt.replace(tzinfo=UTC())
         return None
 
-    def _repr(self):
-        return '<github3-object at 0x{0:x}>'.format(id(self))
-
     def __repr__(self):
         repr_string = self._repr()
         if is_py2:
@@ -114,28 +125,6 @@ class GitHubObject(object):
 
     def __hash__(self):
         return hash(self._uniq)
-
-
-class GitHubCore(GitHubObject):
-
-    """The base object for all objects that require a session.
-
-    The :class:`GitHubCore <GitHubCore>` object provides some
-    basic attributes and methods to other sub-classes that are very useful to
-    have.
-    """
-
-    def __init__(self, json, session=None):
-        if hasattr(session, 'session'):
-            # i.e. session is actually a GitHubCore instance
-            session = session.session
-        elif session is None:
-            session = GitHubSession()
-        self.session = session
-
-        # set a sane default
-        self._github_url = 'https://api.github.com'
-        super(GitHubCore, self).__init__(json)
 
     def _repr(self):
         return '<github3-core at 0x{0:x}>'.format(id(self))
