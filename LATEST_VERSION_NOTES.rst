@@ -1,5 +1,20 @@
 .. vim: set tw=100
 
+1.0.0a4: 2016-02-19
+~~~~~~~~~~~~~~~~~~~
+
+Features Added (since 1.0.0a3)
+``````````````````````````````
+
+- Add support for the Issue locking API currently in Preview Mode
+
+Bugs Fixed (since 1.0.0a3)
+``````````````````````````
+
+- Fix the dependencies and requirements. In 1.0.0a3 we moved to using the
+  ``setup.cfg`` file to define optional dependencies for wheels. By doing
+  so we accidentally left out our actual hard dependencies.
+
 1.0.0a3: 2016-02-11
 ~~~~~~~~~~~~~~~~~~~
 
