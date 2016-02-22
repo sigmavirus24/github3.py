@@ -520,7 +520,7 @@ class Repository(GitHubCore):
         return self._instance_or_null(RepoComment, json)
 
     def commits(self, sha=None, path=None, author=None, number=-1, etag=None,
-                since=None, until=None):
+                since=None, until=None, per_page=None):
         r"""Iterate over commits in this repository.
 
         :param str sha: (optional), sha or branch to start listing commits
@@ -541,13 +541,15 @@ class Repository(GitHubCore):
             be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
         :type until: datetime or string
+        :param int per_page: (optional), commits listing page size
 
         :returns: generator of
             :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
         """
         params = {'sha': sha, 'path': path, 'author': author,
                   'since': timestamp_parameter(since),
-                  'until': timestamp_parameter(until)}
+                  'until': timestamp_parameter(until),
+                  'per_page': per_page}
 
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)

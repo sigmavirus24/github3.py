@@ -1087,6 +1087,18 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
             headers={}
         )
 
+    def test_commits_per_page(self):
+        """Test the ability to specify page size for commits listing."""
+
+        i = self.instance.commits(per_page=10)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('commits'),
+            params={'per_page': 10},
+            headers={}
+        )
+
     def test_commits_sha_path(self):
         """Test the ability to filter commits by branch and path."""
         i = self.instance.commits(sha='branch', path='tests/')

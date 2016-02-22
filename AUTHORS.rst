@@ -124,3 +124,5 @@ Contributors
 - Christophe Lecointe (@christophelec)
 
 - Abhijeet Kasurde (@akasurde)
+
+- Alexander Koshelev <daevaorn@gmail.com>
