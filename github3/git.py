@@ -206,6 +206,12 @@ class Tree(GitData):
     def _repr(self):
         return '<Tree [{0}]>'.format(self.sha)
 
+    def __eq__(self, other):
+        return self.as_dict() == other.as_dict()
+
+    def __ne__(self, other):
+        return self.as_dict() != other.as_dict()
+
     def recurse(self):
         """Recurse into the tree.
 
