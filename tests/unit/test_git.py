@@ -20,6 +20,17 @@ class TestTree(UnitHelper):
     described_class = github3.git.Tree
     example_data = get_example_data()
 
+    def test_eq(self):
+        """Assert that two trees are equal."""
+        tree = github3.git.Tree(get_example_data())
+        assert self.instance == tree
+
+    def test_ne(self):
+        """Assert that two trees are not equal."""
+        tree = github3.git.Tree(get_example_data())
+        tree._json_data['truncated'] = True
+        assert self.instance != tree
+
     def test_repr(self):
         """Assert Tree in in the repr."""
         assert isinstance(self.instance, github3.git.Tree)
@@ -36,7 +47,7 @@ class TestTree(UnitHelper):
 
 class TestCommit(UnitHelper):
 
-    "Commit unit test."""
+    """Commit unit test."""
 
     described_class = github3.git.Commit
     example_data = get_commit_example_data()

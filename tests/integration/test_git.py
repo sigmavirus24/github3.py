@@ -7,6 +7,17 @@ class TestTree(IntegrationHelper):
 
     """Integration tests for methods on the Test class."""
 
+    def test_inequality(self):
+        """Test that a tree and its recursed tree are not equal."""
+        cassette_name = self.cassette_name('ne')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            tree = repository.tree(
+                '96726db07528a87b7c1f266ed42cd321070470c2'
+            )
+            recursed = tree.recurse()
+            assert tree != recursed
+
     def test_recurse(self):
         """Test recurse on tree"""
         cassette_name = self.cassette_name('recurse')
