@@ -3,7 +3,7 @@
 github3
 =======
 
-See http://github3py.rtfd.org/ for documentation.
+See http://github3.readthedocs.org/ for documentation.
 
 :copyright: (c) 2012-2014 by Ian Cordasco
 :license: Modified BSD, see LICENSE for more details
