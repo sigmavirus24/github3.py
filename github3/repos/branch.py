@@ -43,7 +43,7 @@ class Branch(GitHubCore):
 
         See: https://git.io/vaqIw
 
-        :param differs_from string: (optional), sha to compare against
+        :param str differs_from: (optional), sha to compare against
         :returns: string of the SHA or None
         """
         # If-None-Match returns 200 instead of 304 value does not have quotes
