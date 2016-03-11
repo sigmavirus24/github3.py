@@ -77,4 +77,4 @@ class TestBranch(IntegrationHelper):
             sha = 'fakesha12'
             latest_sha = branch.latest_sha(differs_from=sha)
 
-        assert isinstance(latest_sha, str)
+        assert latest_sha
