@@ -42,3 +42,17 @@ def betamax_simple_body(request):
 def enterprise_url(request):
     """Configure class with enterprise url."""
     request.cls.enterprise_url = 'https://enterprise.github3.com'
+
+
+class IfNoneMatchMatcher(betamax.BaseMatcher):
+
+    name = 'if-none-match'
+
+    def match(self, request, recorded_request):
+        request_header  = request.headers.get('If-None-Match')
+        recorded_header = recorded_request['headers'].get('If-None-Match')
+        matches = True if request_header == recorded_header else False
+        return matches
+
+
+betamax.Betamax.register_request_matcher(IfNoneMatchMatcher)

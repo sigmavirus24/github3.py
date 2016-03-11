@@ -38,6 +38,26 @@ class Branch(GitHubCore):
     def _repr(self):
         return '<Repository Branch [{0}]>'.format(self.name)
 
+    def latest_sha(self, differs_from=''):
+        """Check if SHA-1 is the same as remote branch
+
+        See: https://git.io/vaqIw
+
+        :param differs_from string: (optional), sha to compare against
+        :returns: strring of the SHA or None
+        """
+        # If-None-Match returns 200 instead of 304 value does not have quotes
+        headers = {
+            'Accept': 'application/vnd.github.chitauri-preview+sha',
+            'If-None-Match': '"{0}"'.format(differs_from)
+        }
+        base = self._api.split('/branches', 1)[0]
+        url = self._build_url('commits', self.name, base_url=base)
+        resp = self._get(url, headers=headers)
+        if resp:
+            sha = None if self._boolean(resp, 304, 200) else resp.content
+            return sha
+
     def protect(self, enforcement=None, status_checks=None):
         """Enable force push protection and configure status check enforcement.
 
