@@ -44,7 +44,7 @@ class Branch(GitHubCore):
         See: https://git.io/vaqIw
 
         :param differs_from string: (optional), sha to compare against
-        :returns: strring of the SHA or None
+        :returns: string of the SHA or None
         """
         # If-None-Match returns 200 instead of 304 value does not have quotes
         headers = {
@@ -54,9 +54,9 @@ class Branch(GitHubCore):
         base = self._api.split('/branches', 1)[0]
         url = self._build_url('commits', self.name, base_url=base)
         resp = self._get(url, headers=headers)
-        if resp:
-            sha = None if self._boolean(resp, 304, 200) else resp.content
-            return sha
+        if self._boolean(resp, 200, 304):
+            return resp.content
+        return None
 
     def protect(self, enforcement=None, status_checks=None):
         """Enable force push protection and configure status check enforcement.
