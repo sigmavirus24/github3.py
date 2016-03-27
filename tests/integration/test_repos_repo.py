@@ -826,6 +826,17 @@ class TestRepository(helper.IntegrationHelper):
         for notification in notifications:
             assert isinstance(notification, github3.notifications.Thread)
 
+    def test_original_license(self):
+        """
+        Test that a repository's license can be retrieved at repository load.
+        """
+        cassette_name = self.cassette_name('original_license')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            assert isinstance(repository.original_license,
+                              github3.licenses.License)
+
     def test_pull_request(self):
         """Test that a user can retrieve a pull request from a repo."""
         cassette_name = self.cassette_name('pull_request')

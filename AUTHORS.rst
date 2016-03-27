@@ -126,3 +126,5 @@ Contributors
 - Abhijeet Kasurde (@akasurde)
 
 - Matthew Krueger (@mlkrueger1987)
+
+- Dejan Svetec (@dsvetec)
