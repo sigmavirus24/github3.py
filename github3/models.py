@@ -262,7 +262,7 @@ class GitHubCore(object):
             as described in the `Conditional Requests`_ section of the docs
         :returns: self
         """
-        headers = {}
+        headers = getattr(self, 'CUSTOM_HEADERS', {})
         if conditional:
             if self.last_modified:
                 headers['If-Modified-Since'] = self.last_modified

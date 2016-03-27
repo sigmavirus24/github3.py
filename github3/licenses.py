@@ -19,6 +19,7 @@ class License(GitHubCore):
     }
 
     def _update_attributes(self, license):
+        self._api = license.get('url', '')
         self.name = license.get('name')
         self.permitted = license.get('permitted')
         self.category = license.get('category')
