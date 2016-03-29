@@ -1135,7 +1135,8 @@ class GitHub(GitHubCore):
         json = None
         if owner and repository:
             url = self._build_url('repos', owner, repository)
-            json = self._json(self._get(url), 200)
+            json = self._json(self._get(url, headers=License.CUSTOM_HEADERS),
+                              200)
         return self._instance_or_null(Repository, json)
 
     def repository_with_id(self, number):

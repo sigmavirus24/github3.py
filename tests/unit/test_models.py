@@ -141,6 +141,22 @@ class TestGitHubCore(helper.UnitHelper):
             headers=expected_headers,
         )
 
+    def test_refresh_custom_headers(self):
+        """Verify the request of refreshing an object."""
+        self.instance.CUSTOM_HEADERS = {
+            'Accept': 'application/vnd.github.drax-preview+json'
+        }
+        expected_headers = {
+            'Accept': 'application/vnd.github.drax-preview+json'
+        }
+
+        self.instance.refresh()
+
+        self.session.get.assert_called_once_with(
+            self.url,
+            headers=expected_headers,
+        )
+
     def test_refresh_last_modified(self):
         """Verify the request of refreshing an object."""
         expected_headers = {

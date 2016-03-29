@@ -113,6 +113,12 @@ class Repository(GitHubCore):
         self.id = repo.get('id', 0)
         #: Language property.
         self.language = repo.get('language', '')
+
+        # License containing only key, name, url & featured
+        #: :class:`License <github3.licenses.License>` object representing the
+        #: repository license.
+        self.original_license = License(repo.get('license', {}), self)
+
         #: Mirror property.
         self.mirror_url = repo.get('mirror_url', '')
 

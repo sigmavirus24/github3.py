@@ -495,7 +495,10 @@ class TestGitHub(helper.UnitHelper):
         """Verify the GET request for a repository."""
         self.instance.repository('user', 'repo')
 
-        self.session.get.assert_called_once_with(url_for('repos/user/repo'))
+        self.session.get.assert_called_once_with(
+            url_for('repos/user/repo'),
+            headers={'Accept': 'application/vnd.github.drax-preview+json'}
+        )
 
     def test_repository_with_invalid_repo(self):
         """Verify there is no call made for invalid repo combos."""
