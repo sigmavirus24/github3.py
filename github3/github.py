@@ -1009,8 +1009,11 @@ class GitHub(GitHubCore):
             # This is not JSON data. It is meant to be form data
             # application/x-www-form-urlencoded works fine here, no need for
             # multipart/form-data
-            status = self._boolean(self._post(url, data=data, json=False), 204,
-                                   404)
+            status = self._boolean(self._post(url, data=data, json=False,
+                                   headers={
+                                       'Content-Type':
+                                       'application/x-www-form-urlencoded'
+                                   }), 204, 404)
         return status
 
     def pull_request(self, owner, repository, number):
