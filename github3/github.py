@@ -998,7 +998,8 @@ class GitHub(GitHubCore):
         :returns: bool
         """
         from re import match
-        m = match('https?://[\w\d\-\.\:]+/\w+/[\w\._-]+/events/\w+', topic)
+        m = match('https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+',
+                  topic)
         status = False
         if mode and topic and callback and m:
             data = [('hub.mode', mode), ('hub.topic', topic),
