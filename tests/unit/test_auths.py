@@ -1,6 +1,5 @@
 """Unit tests for the auths module."""
 import github3
-import pytest
 
 from . import helper
 
@@ -62,20 +61,16 @@ class TestAuthorizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     def test_add_scopes(self):
         """Test that adding scopes requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.add_scopes()
+        self.assert_requires_auth(self.instance.add_scopes)
 
     def test_delete(self):
         """Test that deleteing an authorization requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.delete()
+        self.assert_requires_auth(self.instance.delete)
 
     def test_remove_scopes(self):
         """Test that removing scopes requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.remove_scopes()
+        self.assert_requires_auth(self.instance.remove_scopes)
 
     def test_replace_scopes(self):
         """Test that replacing scopes requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.replace_scopes()
+        self.assert_requires_auth(self.instance.replace_scopes)

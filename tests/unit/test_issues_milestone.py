@@ -1,7 +1,6 @@
 """Unit tests for the Milestone class."""
 import datetime
 import github3
-import pytest
 
 from . import helper
 
@@ -22,8 +21,7 @@ class TestMilestoneRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     def test_delete(self):
         """Test that deleting milestone requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.delete()
+        self.assert_requires_auth(self.instance.delete)
 
     def test_update(self):
         """Test that updating a milestone requires authentication."""
@@ -33,8 +31,7 @@ class TestMilestoneRequiresAuth(helper.UnitRequiresAuthenticationHelper):
             'description': ':sparkles:',
             'due_on': '2013-12-31T23:59:59Z'
         }
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.update(**data)
+        self.assert_requires_auth(self.instance.update, **data)
 
 
 class TestMilestone(helper.UnitHelper):

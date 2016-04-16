@@ -51,25 +51,13 @@ from .api import (
     zen
 )
 from .github import GitHub, GitHubEnterprise, GitHubStatus
-from .exceptions import (
-    BadRequest, AuthenticationFailed, ForbiddenError, GitHubError,
-    MethodNotAllowed, NotFoundError, ServerError, NotAcceptable,
-    UnprocessableEntity
-)
+from .exceptions import GitHubError
 
 __all__ = (
-    'AuthenticationFailed',
-    'BadRequest',
-    'ForbiddenError',
     'GitHub',
     'GitHubEnterprise',
     'GitHubError',
     'GitHubStatus',
-    'MethodNotAllowed',
-    'NotAcceptable',
-    'NotFoundError',
-    'ServerError',
-    'UnprocessableEntity',
     'authorize',
     'login',
     'enterprise_login',
