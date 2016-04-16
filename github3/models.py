@@ -13,6 +13,8 @@ from requests.compat import urlparse, is_py2
 from datetime import datetime
 from logging import getLogger
 
+import requests
+
 from . import exceptions
 from .decorators import requires_auth
 from .null import NullObject
@@ -176,27 +178,38 @@ class GitHubCore(object):
                 raise exceptions.error_for(response)
         return False
 
+    def _request(self, method, *args, **kwargs):
+        try:
+            request_method = getattr(self.session, method)
+            return request_method(*args, **kwargs)
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                ) as exc:
+            raise exceptions.ConnectionError(exc)
+        except requests.exceptions.RequestException as exc:
+            raise exceptions.TransportError(exc)
+
     def _delete(self, url, **kwargs):
         __logs__.debug('DELETE %s with %s', url, kwargs)
-        return self.session.delete(url, **kwargs)
+        return self._request('delete', url, **kwargs)
 
     def _get(self, url, **kwargs):
         __logs__.debug('GET %s with %s', url, kwargs)
-        return self.session.get(url, **kwargs)
+        return self._request('get', url, **kwargs)
 
     def _patch(self, url, **kwargs):
         __logs__.debug('PATCH %s with %s', url, kwargs)
-        return self.session.patch(url, **kwargs)
+        return self._request('patch', url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
             data = dumps(data) if data is not None else data
         __logs__.debug('POST %s with %s, %s', url, data, kwargs)
-        return self.session.post(url, data, **kwargs)
+        return self._request('post', url, data, **kwargs)
 
     def _put(self, url, **kwargs):
         __logs__.debug('PUT %s with %s', url, kwargs)
-        return self.session.put(url, **kwargs)
+        return self._request('put', url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
