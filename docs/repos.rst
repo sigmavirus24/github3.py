@@ -22,6 +22,7 @@ This part of the documentation covers:
 - :class:`RepoCommit <github3.repos.commit.RepoCommit>`
 - :class:`Comparison <github3.repos.comparison.Comparison>`
 - :class:`Status <github3.repos.status.Status>`
+- :class:`CombinedStatus <github3.repos.status.CombinedStatus>`
 - :class:`ContributorStats <github3.repos.stats.ContributorStats>`
 
 None of these objects should be instantiated directly by the user (developer).
@@ -149,6 +150,13 @@ about `comments <http://developer.github.com/v3/repos/comments/>`_.
 .. module:: github3.repos.status
 
 .. autoclass:: github3.repos.status.Status
+    :members:
+
+---------
+
+.. module:: github3.repos.status
+
+.. autoclass:: github3.repos.status.CombinedStatus
     :members:
 
 ---------

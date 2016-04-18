@@ -91,6 +91,16 @@ class RepoCommit(models.BaseCommit):
                          headers={'Accept': 'application/vnd.github.patch'})
         return resp.content if self._boolean(resp, 200, 404) else b''
 
+    def status(self):
+        """Retrieve the combined status for this commit.
+
+        :returns: the combined status for this commit
+        :rtype: :class:`~github3.repos.status.Status`
+        """
+        url = self._build_url('status', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(status.CombinedStatus, json)
+
     def statuses(self):
         """Retrieve the statuses for this commit.
 

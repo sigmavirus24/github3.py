@@ -142,3 +142,6 @@ Contributors
 - Alexander Koshelev <daevaorn@gmail.com>
 
 - Gabi Davar (@mindw)
+
+- Björn Kautler (@Vampire)
+
