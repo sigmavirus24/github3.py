@@ -87,7 +87,7 @@ Then we construct our test class and indicate which class we will be testing
 
 We can then use the `GitHub API documentation about Releases 
 <http://developer.github.com/v3/repos/releases/>`_ to retrieve example release 
-data. We then can use that as example data for our like so:
+data. We then can use that as example data for our test like so:
 
 .. code:: python
 
