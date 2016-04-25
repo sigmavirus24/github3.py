@@ -1,6 +1,5 @@
 """Unit tests for the Issue class."""
 import github3
-import pytest
 import mock
 
 from github3.issues.label import Label
@@ -31,7 +30,7 @@ get_issue_label_example_data = helper.create_example_data_helper(
 )
 
 
-class TestIssueRequiresAuth(helper.UnitHelper):
+class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test Issue methods that require Authentication."""
 
@@ -43,53 +42,44 @@ class TestIssueRequiresAuth(helper.UnitHelper):
 
     def test_add_labels(self):
         """Verify that adding a label requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.add_labels('enhancement')
+        self.assert_requires_auth(self.instance.add_labels, 'enhancement')
 
     def test_assign(self):
         """Verify that assigning an issue requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.assign('sigmavirus24')
+        self.assert_requires_auth(self.instance.assign, 'sigmavirus24')
 
     def test_close(self):
         """Verify that closing an issue requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.close()
+        self.assert_requires_auth(self.instance.close)
 
     def test_create_comment(self):
         """Verify that creating a comment requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.create_comment(body='comment body')
+        self.assert_requires_auth(self.instance.create_comment,
+                                  body='comment body')
 
     def test_edit_comment(self):
         """Verify that editing a comment requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.edit()
+        self.assert_requires_auth(self.instance.edit)
 
     def test_lock(self):
         """Verify that locking an issue requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.lock()
+        self.assert_requires_auth(self.instance.lock)
 
     def test_remove_all_labels(self):
         """Verify that removing all labels requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.remove_all_labels()
+        self.assert_requires_auth(self.instance.remove_all_labels)
 
     def test_remove_label(self):
         """Verify that removing a label requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.remove_label('enhancement')
+        self.assert_requires_auth(self.instance.remove_label, 'enhancement')
 
     def test_reopen(self):
         """Verify that reopening an issue equires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.reopen()
+        self.assert_requires_auth(self.instance.reopen)
 
     def test_unlock(self):
         """Verify that unlocking an issue requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.unlock()
+        self.assert_requires_auth(self.instance.unlock)
 
 
 class TestIssue(helper.UnitHelper):
@@ -369,8 +359,7 @@ class TestLabelRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     def test_delete(self):
         """Test that deleting a label requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.delete()
+        self.assert_requires_auth(self.instance.delete)
 
     def test_update(self):
         """Test that updating label requires authentication."""
@@ -379,8 +368,7 @@ class TestLabelRequiresAuth(helper.UnitRequiresAuthenticationHelper):
             'color': 'afafaf'
         }
 
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.update(**data)
+        self.assert_requires_auth(self.instance.update, **data)
 
 
 class TestLabel(helper.UnitHelper):

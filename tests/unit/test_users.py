@@ -71,13 +71,12 @@ class TestUserKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     def test_update(self):
         """Test that updating a key requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.update(title='New Title', key='Fake key')
+        self.assert_requires_auth(self.instance.update, title='New Title',
+                                  key='Fake key')
 
     def test_delete(self):
         """Test that deleting a key requires authentication."""
-        with pytest.raises(github3.AuthenticationFailed):
-            self.instance.delete()
+        self.assert_requires_auth(self.instance.delete)
 
 
 class TestUserKey(helper.UnitHelper):

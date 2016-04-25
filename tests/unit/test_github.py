@@ -1,6 +1,6 @@
 import pytest
 
-from github3 import AuthenticationFailed, GitHubEnterprise, GitHubError
+from github3 import GitHubEnterprise, GitHubError
 from github3.github import GitHub, GitHubStatus
 
 from . import helper
@@ -1232,138 +1232,113 @@ class TestGitHubRequiresAuthentication(
 
     def test_add_email_addresses(self):
         """Verify a user must be authenticated to add email addresses."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.add_email_addresses([])
+        self.assert_requires_auth(self.instance.add_email_addresses, [])
 
     def test_authorization(self):
         """A user must be authenticated to retrieve an authorization."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.authorization(1)
+        self.assert_requires_auth(self.instance.authorization, 1)
 
     def test_authorizations(self):
         """Show that one needs to authenticate to use #authorizations."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.authorizations()
+        self.assert_requires_auth(self.instance.authorizations)
 
     def test_create_issue(self):
         """Show that GitHub#create_issue requires auth."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.create_issue('owner', 'repo', 'title')
+        self.assert_requires_auth(self.instance.create_issue,
+                                  'owner', 'repo', 'title')
 
     def test_create_key(self):
         """Show that GitHub#create_key requires auth."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.create_key('title', 'key')
+        self.assert_requires_auth(self.instance.create_key, 'title', 'key')
 
     def test_create_repository(self):
         """Show that GitHub#create_repository requires auth."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.create_repository('repo')
+        self.assert_requires_auth(self.instance.create_repository, 'repo')
 
     def test_delete_email_addresses(self):
         """Verify a user must be authenticated to delete email addresses."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.delete_email_addresses([])
+        self.assert_requires_auth(self.instance.delete_email_addresses, [])
 
     def test_emails(self):
         """Show that one needs to authenticate to use #emails."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.emails()
+        self.assert_requires_auth(self.instance.emails)
 
     def test_feeds(self):
         """Show that one needs to authenticate to use #feeds."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.feeds()
+        self.assert_requires_auth(self.instance.feeds)
 
     def test_follow(self):
         """Show that one needs to authenticate to use #follow."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.follow('foo')
+        self.assert_requires_auth(self.instance.follow, 'foo')
 
     def test_gists(self):
         """Show that one needs to authenticate to use #gists."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.gists()
+        self.assert_requires_auth(self.instance.gists)
 
     def test_is_following(self):
         """Show that GitHub#is_following requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.is_following('foo')
+        self.assert_requires_auth(self.instance.is_following, 'foo')
 
     def test_is_starred(self):
         """Show that GitHub#is_starred requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.is_starred('foo', 'bar')
+        self.assert_requires_auth(self.instance.is_starred, 'foo', 'bar')
 
     def test_issues(self):
         """Show that one needs to authenticate to use #issues."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.issues()
+        self.assert_requires_auth(self.instance.issues)
 
     def test_key(self):
         """Show that retrieving user key requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.key(1)
+        self.assert_requires_auth(self.instance.key, 1)
 
     def test_keys(self):
         """Show that one needs to authenticate to use #keys."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.keys()
+        self.assert_requires_auth(self.instance.keys)
 
     def test_me(self):
         """Show that GitHub#me requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.me()
+        self.assert_requires_auth(self.instance.me)
 
     def test_notifications(self):
         """Show that one needs to authenticate to use #gists."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.notifications()
+        self.assert_requires_auth(self.instance.notifications)
 
     def test_organization_issues(self):
         """Show that one needs to authenticate to use #organization_issues."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.organization_issues('org')
+        self.assert_requires_auth(self.instance.organization_issues, 'org')
 
     def test_organizations(self):
         """Show that one needs to authenticate to use #organizations."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.organizations()
+        self.assert_requires_auth(self.instance.organizations)
 
     def test_pubsubhubbub(self):
         """Show that one needs to authenticate to use pull request."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.pubsubhubbub(mode='', topic='', callback='')
+        self.assert_requires_auth(self.instance.pubsubhubbub,
+                                  mode='', topic='', callback='')
 
     def test_repositories(self):
         """Show that one needs to authenticate to use #repositories."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.repositories()
+        self.assert_requires_auth(self.instance.repositories)
 
     def test_star(self):
         """Show that starring a repository requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.star(username='', repo='')
+        self.assert_requires_auth(self.instance.star, username='', repo='')
 
     def test_starred(self):
         """Show that one needs to authenticate to use #starred."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.starred()
+        self.assert_requires_auth(self.instance.starred)
 
     def test_unfollow(self):
         """Show that unfollowing a user requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.unfollow('foo')
+        self.assert_requires_auth(self.instance.unfollow, 'foo')
 
     def test_unstar(self):
         """Show that unstarring requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.unstar(username='', repo='')
+        self.assert_requires_auth(self.instance.unstar, username='', repo='')
 
     def test_user_issues(self):
         """Show that GitHub#user_issues requires authentication."""
-        with pytest.raises(AuthenticationFailed):
-            self.instance.user_issues()
+        self.assert_requires_auth(self.instance.user_issues)
 
 
 class TestGitHubAuthorizations(helper.UnitHelper):

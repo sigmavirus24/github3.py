@@ -34,7 +34,32 @@ class GitHubError(Exception):
         return self.msg
 
 
-class UnprocessableResponseBody(GitHubError):
+class ResponseError(GitHubError):
+    """The base exception for errors stemming from GitHub responses."""
+    pass
+
+
+class TransportError(GitHubError):
+    """Catch-all exception for errors coming from Requests."""
+
+    msg_format = 'An error occurred while making a request to GitHub: {0}'
+
+    def __init__(self, exception):
+        Exception.__init__(self, exception)
+        self.exception = exception
+        self.msg = self.msg_format.format(str(exception))
+
+    def __str__(self):
+        return '{0}: {1}'.format(type(self.exception), self.msg)
+
+
+class ConnectionError(TransportError):
+    """Exception for errors in connecting to or reading data from GitHub."""
+
+    msg_format = 'A connection-level exception occurred: {0}'
+
+
+class UnprocessableResponseBody(ResponseError):
     """Exception class for response objects that cannot be handled."""
     def __init__(self, message, body):
         Exception.__init__(self, message)
@@ -48,12 +73,12 @@ class UnprocessableResponseBody(GitHubError):
         return self.message
 
 
-class BadRequest(GitHubError):
+class BadRequest(ResponseError):
     """Exception class for 400 responses."""
     pass
 
 
-class AuthenticationFailed(GitHubError):
+class AuthenticationFailed(ResponseError):
     """Exception class for 401 responses.
 
     Possible reasons:
@@ -64,7 +89,7 @@ class AuthenticationFailed(GitHubError):
     pass
 
 
-class ForbiddenError(GitHubError):
+class ForbiddenError(ResponseError):
     """Exception class for 403 responses.
 
     Possible reasons:
@@ -75,32 +100,32 @@ class ForbiddenError(GitHubError):
     pass
 
 
-class NotFoundError(GitHubError):
+class NotFoundError(ResponseError):
     """Exception class for 404 responses."""
     pass
 
 
-class MethodNotAllowed(GitHubError):
+class MethodNotAllowed(ResponseError):
     """Exception class for 405 responses."""
     pass
 
 
-class NotAcceptable(GitHubError):
+class NotAcceptable(ResponseError):
     """Exception class for 406 responses."""
     pass
 
 
-class UnprocessableEntity(GitHubError):
+class UnprocessableEntity(ResponseError):
     """Exception class for 422 responses."""
     pass
 
 
-class ClientError(GitHubError):
+class ClientError(ResponseError):
     """Catch-all for 400 responses that aren't specific errors."""
     pass
 
 
-class ServerError(GitHubError):
+class ServerError(ResponseError):
     """Exception class for 5xx responses."""
     pass
 
