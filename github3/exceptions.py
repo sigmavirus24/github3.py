@@ -130,6 +130,11 @@ class ServerError(ResponseError):
     pass
 
 
+class UnavailableForLegalReasons(ResponseError):
+    """Exception class for 451 responses."""
+    pass
+
+
 error_classes = {
     400: BadRequest,
     401: AuthenticationFailed,
@@ -138,6 +143,7 @@ error_classes = {
     405: MethodNotAllowed,
     406: NotAcceptable,
     422: UnprocessableEntity,
+    451: UnavailableForLegalReasons,
 }
 
 
