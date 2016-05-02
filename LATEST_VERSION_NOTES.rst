@@ -1,5 +1,10 @@
 .. vim: set tw=100
 
+Unreleased
+~~~~~~~~~~
+
+- Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
+
 1.0.0a4: 2016-02-19
 ~~~~~~~~~~~~~~~~~~~
 

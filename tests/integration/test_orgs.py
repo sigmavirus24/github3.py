@@ -110,12 +110,21 @@ class TestOrganization(IntegrationHelper):
             assert o.is_public_member('defunkt') is False
 
     def test_events(self):
-        """Test the ability to retrieve an organization's event stream."""
-        cassette_name = self.cassette_name('events')
+        """Test retrieving an organization's public event stream."""
+        cassette_name = self.cassette_name('public_events')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
 
             for event in o.events():
+                assert isinstance(event, github3.events.Event)
+
+    def test_public_events(self):
+        """Test retrieving an organization's public event stream."""
+        cassette_name = self.cassette_name('public_events')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+
+            for event in o.public_events():
                 assert isinstance(event, github3.events.Event)
 
     def test_members(self):

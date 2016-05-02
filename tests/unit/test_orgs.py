@@ -1,3 +1,4 @@
+import mock
 import pytest
 
 from github3 import GitHubError
@@ -215,7 +216,9 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
         'url': url_for()
     }
 
-    def test_events(self):
+
+    @mock.patch('warnings.warn')
+    def test_events(self, warn_mock):
         """Show that one can iterate over an organization's events."""
         i = self.instance.events()
         self.get_next(i)
@@ -225,6 +228,10 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             params={'per_page': 100},
             headers={}
         )
+
+        warn_mock.assert_called_once_with(
+            'This method is deprecated. Please use ``public_events`` instead.',
+            DeprecationWarning)
 
     def test_members(self):
         """Show that one can iterate over all members."""
@@ -277,6 +284,17 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('members'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_public_events(self):
+        """Show that one can iterate over an organization's public events."""
+        i = self.instance.public_events()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('events'),
             params={'per_page': 100},
             headers={}
         )
