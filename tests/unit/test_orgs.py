@@ -216,6 +216,15 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
         'url': url_for()
     }
 
+    def test_all_events(self):
+        i = self.instance.all_events(username='dummy')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/users/dummy/events/orgs/github',
+            params={'per_page': 100},
+            headers={}
+        )
 
     @mock.patch('warnings.warn')
     def test_events(self, warn_mock):
