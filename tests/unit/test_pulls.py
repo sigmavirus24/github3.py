@@ -93,9 +93,18 @@ class TestPullRequest(helper.UnitHelper):
         """Show that a user can merge a Pull Request."""
         self.instance.merge()
 
-        self.session.put.assert_called_once_with(
+        self.put_called_with(
             url_for('merge'),
-            data='{"commit_message": ""}'
+            data={"squash": False, "commit_message": ""}
+        )
+
+    def test_merge_squash_message(self):
+        """Show that a user can merge a Pull Request."""
+        self.instance.merge('commit message', squash=True)
+
+        self.put_called_with(
+            url_for('merge'),
+            data={"squash": True, "commit_message": "commit message"}
         )
 
     def test_patch(self):
