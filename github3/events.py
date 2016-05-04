@@ -8,6 +8,8 @@ This module contains the class(es) related to Events
 """
 from __future__ import unicode_literals
 
+import copy
+
 from .models import GitHubCore
 
 
@@ -30,6 +32,10 @@ class Event(GitHubCore):
     """
 
     def _update_attributes(self, event):
+        # If we don't copy this, then we end up altering _json_data which we do
+        # not want to do:
+        event = copy.deepcopy(event)
+
         from .users import User
         from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.

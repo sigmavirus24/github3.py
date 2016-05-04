@@ -117,6 +117,7 @@ class TestOrganization(IntegrationHelper):
 
             for event in o.events():
                 assert isinstance(event, github3.events.Event)
+                assert isinstance(event.as_json(), str)
 
     def test_members(self):
         """Test the ability to retrieve an organization's members."""
