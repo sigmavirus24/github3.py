@@ -313,14 +313,18 @@ class PullRequest(models.GitHubCore):
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
-    def merge(self, commit_message='', sha=None):
+    def merge(self, commit_message='', sha=None, squash=False):
         """Merge this pull request.
 
         :param str commit_message: (optional), message to be used for the
             merge commit
+        :param str sha: (optional), SHA that pull request head must match
+            to merge.
+        :param bool squash: (optional), commit a single commit to the
+            head branch.
         :returns: bool
         """
-        parameters = {'commit_message': commit_message}
+        parameters = {'commit_message': commit_message, 'squash': squash}
         if sha:
             parameters['sha'] = sha
         url = self._build_url('merge', base_url=self._api)
