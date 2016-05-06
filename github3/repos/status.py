@@ -25,7 +25,8 @@ class Status(GitHubCore):
         #: datetime object representing the creation of the status object
         self.created_at = self._strptime(status.get('created_at'))
         #: :class:`User <github3.users.User>` who created the object
-        self.creator = User(status.get('creator'))
+        if status.get('creator'):
+            self.creator = User(status.get('creator'))
         #: Short description of the Status
         self.description = status.get('description')
         #: GitHub ID for the status object
@@ -39,3 +40,21 @@ class Status(GitHubCore):
 
     def _repr(self):
         return '<Status [{s.id}:{s.state}]>'.format(s=self)
+
+class CombinedStatus(GitHubCore):
+    """The :class:`CombinedStatus <CombinedStatus>` object. This represents combined
+    information from the Repo Status API.
+
+    See also: http://developer.github.com/v3/repos/statuses/
+    """
+    def _update_attributes(self, combined_status):
+        #: State of the combined status, e.g., 'success', 'pending', 'failure'
+        self.state = combined_status.get('state')
+        #: Total count of sub-statuses
+        self.total_count = combined_status.get('total_count')
+        #: List of :class:`Status <github3.repos.status.Status>`
+        #: objects.
+        self.statuses = [Status(status) for status in combined_status.get('statuses')]
+
+    def _repr(self):
+        return '<CombinedStatus [{s.state}:{s.total_count} sub-statuses]>'.format(s=self)
