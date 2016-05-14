@@ -107,7 +107,7 @@ class TestPullRequest(BaseCase):
     def test_merge(self):
         self.response('merge', 200)
         self.put(self.api + '/merge')
-        self.conf = {'data': None}
+        self.conf = {'data': {'commit_message': ''}}
 
         self.assertRaises(github3.GitHubError, self.pull.merge)
 

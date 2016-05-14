@@ -79,6 +79,8 @@ class GitHubIterator(GitHubCore, Iterator):
                 json = json.items()
 
             for i in json:
+                if i is None:  # Temporary fix for GitHub Enterprise and #304
+                    continue
                 yield cls(i, self) if issubclass(cls, GitHubCore) else cls(i)
                 self.count -= 1 if self.count > 0 else 0
                 if self.count == 0:

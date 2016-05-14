@@ -8,10 +8,10 @@ This module contains the class(es) related to Events
 """
 from __future__ import unicode_literals
 
-from .models import GitHubObject
+from .models import GitHubCore
 
 
-class Event(GitHubObject):
+class Event(GitHubCore):
 
     """The :class:`Event <Event>` object. It structures and handles the data
     returned by via the `Events <http://developer.github.com/v3/events>`_
@@ -29,8 +29,8 @@ class Event(GitHubObject):
 
     """
 
-    def __init__(self, event):
-        super(Event, self).__init__(event)
+    def __init__(self, event, session=None):
+        super(Event, self).__init__(event, session)
         from .users import User
         from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
@@ -48,7 +48,7 @@ class Event(GitHubObject):
         handler = _payload_handlers.get(self.type, identity)
         #: Dictionary with the payload. Payload structure is defined by type_.
         #  _type: http://developer.github.com/v3/events/types
-        self.payload = handler(event.get('payload'))
+        self.payload = handler(event.get('payload'), self)
         #: Return ``tuple(owner, repository_name)``
         self.repo = event.get('repo')
         if self.repo is not None:
@@ -74,94 +74,102 @@ class Event(GitHubObject):
         return self.public
 
 
-def _commitcomment(payload):
+def _commitcomment(payload, session):
     from .repos.comment import RepoComment
     if payload.get('comment'):
-        payload['comment'] = RepoComment(payload['comment'], None)
+        payload['comment'] = RepoComment(payload['comment'], session)
     return payload
 
 
-def _follow(payload):
+def _follow(payload, session):
     from .users import User
     if payload.get('target'):
-        payload['target'] = User(payload['target'], None)
+        payload['target'] = User(payload['target'], session)
     return payload
 
 
-def _forkev(payload):
+def _forkev(payload, session):
     from .repos import Repository
     if payload.get('forkee'):
-        payload['forkee'] = Repository(payload['forkee'], None)
+        payload['forkee'] = Repository(payload['forkee'], session)
     return payload
 
 
-def _gist(payload):
+def _gist(payload, session):
     from .gists import Gist
     if payload.get('gist'):
-        payload['gist'] = Gist(payload['gist'], None)
+        payload['gist'] = Gist(payload['gist'], session)
     return payload
 
 
-def _issuecomm(payload):
+def _issuecomm(payload, session):
     from .issues import Issue
     from .issues.comment import IssueComment
     if payload.get('issue'):
-        payload['issue'] = Issue(payload['issue'], None)
+        payload['issue'] = Issue(payload['issue'], session)
     if payload.get('comment'):
-        payload['comment'] = IssueComment(payload['comment'], None)
+        payload['comment'] = IssueComment(payload['comment'], session)
     return payload
 
 
-def _issueevent(payload):
+def _issueevent(payload, session):
     from .issues import Issue
     if payload.get('issue'):
-        payload['issue'] = Issue(payload['issue'], None)
+        payload['issue'] = Issue(payload['issue'], session)
     return payload
 
 
-def _member(payload):
+def _member(payload, session):
     from .users import User
     if payload.get('member'):
-        payload['member'] = User(payload['member'], None)
+        payload['member'] = User(payload['member'], session)
     return payload
 
 
-def _pullreqev(payload):
+def _pullreqev(payload, session):
     from .pulls import PullRequest
     if payload.get('pull_request'):
-        payload['pull_request'] = PullRequest(payload['pull_request'], None)
+        payload['pull_request'] = PullRequest(payload['pull_request'],
+                                              session)
     return payload
 
 
-def _pullreqcomm(payload):
-    from .pulls import ReviewComment
-    if payload.get('comment'):
-        payload['comment'] = ReviewComment(payload['comment'], None)
+def _pullreqcomm(payload, session):
+    from .pulls import PullRequest, ReviewComment
+    # Transform the Pull Request attribute
+    pull = payload.get('pull_request')
+    if pull:
+        payload['pull_request'] = PullRequest(pull, session)
+
+    # Transform the Comment attribute
+    comment = payload.get('comment')
+    if comment:
+        payload['comment'] = ReviewComment(comment, session)
     return payload
 
 
-def _release(payload):
+def _release(payload, session):
     from .repos.release import Release
     release = payload.get('release')
     if release:
-        payload['release'] = Release(release)
+        payload['release'] = Release(release, session)
     return payload
 
 
-def _team(payload):
+def _team(payload, session):
     from .orgs import Team
     from .repos import Repository
     from .users import User
     if payload.get('team'):
-        payload['team'] = Team(payload['team'], None)
+        payload['team'] = Team(payload['team'], session)
     if payload.get('repo'):
-        payload['repo'] = Repository(payload['repo'], None)
+        payload['repo'] = Repository(payload['repo'], session)
     if payload.get('sender'):
-        payload['sender'] = User(payload['sender'], None)
+        payload['sender'] = User(payload['sender'], session)
     return payload
 
 
-def identity(x):
+def identity(x, session):
     return x
 
 
@@ -177,7 +185,7 @@ _payload_handlers = {
     'IssueCommentEvent': _issuecomm,
     'IssuesEvent': _issueevent,
     'MemberEvent': _member,
-    'PublicEvent': lambda x: '',
+    'PublicEvent': identity,
     'PullRequestEvent': _pullreqev,
     'PullRequestReviewCommentEvent': _pullreqcomm,
     'PushEvent': identity,

@@ -1000,7 +1000,7 @@ class GitHub(GitHubCore):
         :returns: bool
         """
         from re import match
-        m = match('https://[\w\d\-\.\:]+/\w+/[\w\._-]+/events/\w+', topic)
+        m = match('https?://[\w\d\-\.\:]+/\w+/[\w\._-]+/events/\w+', topic)
         status = False
         if mode and topic and callback and m:
             data = [('hub.mode', mode), ('hub.topic', topic),
@@ -1478,7 +1478,7 @@ class GitHub(GitHubCore):
 class GitHubEnterprise(GitHub):
     """For GitHub Enterprise users, this object will act as the public API to
     your instance. You must provide the URL to your instance upon
-    initializaiton and can provide the rest of the login details just like in
+    initialization and can provide the rest of the login details just like in
     the :class:`GitHub <GitHub>` object.
 
     There is no need to provide the end of the url (e.g., /api/v3/), that will

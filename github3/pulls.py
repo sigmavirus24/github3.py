@@ -183,7 +183,7 @@ class PullRequest(GitHubCore):
         #: GitHub.com url for review comments (not a template)
         self.review_comments_url = pull.get('review_comments_url')
 
-        m = match('https://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)?/\d+',
+        m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)?/\d+',
                   self.issue_url)
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = m.groups()
@@ -233,7 +233,7 @@ class PullRequest(GitHubCore):
         """
         url = self._build_url('comments', base_url=self._api)
         data = {'body': body, 'commit_id': commit_id, 'path': path,
-                'position': str(position)}
+                'position': int(position)}
         json = self._json(self._post(url, data=data), 201)
         return ReviewComment(json, self) if json else None
 
@@ -300,18 +300,18 @@ class PullRequest(GitHubCore):
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
-    def merge(self, commit_message=''):
+    def merge(self, commit_message='', sha=None):
         """Merge this pull request.
 
         :param str commit_message: (optional), message to be used for the
             merge commit
         :returns: bool
         """
-        data = None
-        if commit_message:
-            data = dumps({'commit_message': commit_message})
+        parameters = {'commit_message': commit_message}
+        if sha:
+            parameters['sha'] = sha
         url = self._build_url('merge', base_url=self._api)
-        json = self._json(self._put(url, data=data), 200)
+        json = self._json(self._put(url, data=dumps(parameters)), 200)
         self.merge_commit_sha = json['sha']
         return json['merged']
 

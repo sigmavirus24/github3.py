@@ -1,6 +1,34 @@
 History/Changelog
 -----------------
 
+0.9.5: 2016-02-15
+~~~~~~~~~~~~~~~~~
+
+- Fix Validation Error stemming from ``Repository#create_status`` having
+  poorly chosen default arguments and not removing ``None`` values from the
+  body of the request.
+
+0.9.4: 2015-04-17
+~~~~~~~~~~~~~~~~~
+
+- In ``PullRequest#create_review_comment`` coerce the position argument to an 
+  integer instead of coercing it to a string. Reported by Paul Tagliamonte in
+  #374.
+
+- Backport support for the ``context`` parameter in
+  ``Repository#create_status``
+
+- Add support for ``Repository.permissions`` attribute
+
+- Backport of support for allowing ``Event``\ s to keep the same session as
+  other objects.
+
+- Skip objects that are ``None`` while iterating over them (see issues #304 
+  and #305) reported by Marc Abramowitz
+
+- Fix URL regular expression for GitHub Enterprise instances by Marc 
+  Abramowitz
+
 0.9.3: 2014-11-04
 ~~~~~~~~~~~~~~~~~
 
