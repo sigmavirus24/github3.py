@@ -285,6 +285,7 @@ class GitHubCore(object):
         headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)
         if json is not None:
+            self._json_data = json
             self._update_attributes(json)
         return self
 
