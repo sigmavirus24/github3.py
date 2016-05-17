@@ -8,7 +8,6 @@ This module contains all the classes relating to pull requests.
 """
 from __future__ import unicode_literals
 
-from re import match
 from json import dumps
 
 from . import models
@@ -178,10 +177,8 @@ class PullRequest(models.GitHubCore):
         #: GitHub.com url for review comments (not a template)
         self.review_comments_url = pull.get('review_comments_url')
 
-        m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)?/\d+',
-                  self.issue_url)
         #: Returns ('owner', 'repository') this issue was filed on.
-        self.repository = m.groups()
+        self.repository = self.base.repo
         #: The state of the pull
         self.state = pull.get('state')
         #: The title of the request

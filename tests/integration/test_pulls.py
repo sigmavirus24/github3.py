@@ -130,6 +130,14 @@ class TestPullRequest(IntegrationHelper):
             p = self.get_pull_request(num=241)
             assert p.update(p.title) is True
 
+    def test_repository(self):
+        """Show that the pull request has the owner repository."""
+        self.basic_login()
+        cassette_name = self.cassette_name('single')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request()
+            assert p.repository == ('sigmavirus24', 'github3.py')
+
 
 class TestReviewComment(IntegrationHelper):
 
