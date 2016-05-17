@@ -137,7 +137,7 @@ class Repository(GitHubCore):
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
         #: repository owner.
-        self.owner = User(repo.get('owner', {}), self)
+        self.owner = User(repo.get('owner') or {}, self)
 
         #: Is this repository private?
         self.private = repo.get('private')
