@@ -1,4 +1,5 @@
 import io
+import json
 import pytest
 import requests
 
@@ -183,6 +184,21 @@ class TestGitHubCore(helper.UnitHelper):
             self.url,
             headers=expected_headers,
         )
+
+    def test_refresh_json(self):
+        """Verify refreshing an object updates stored json data."""
+        expected_data = {
+            'changed_files': 4
+        }
+        response = requests.Response()
+        response.status_code = 200
+        response.raw = io.BytesIO(json.dumps(expected_data).encode('utf8'))
+        self.session.get.return_value = response
+
+        self.instance.refresh()
+
+        assert 'changed_files' in self.instance.as_dict()
+        assert self.instance.changed_files == 4
 
     def test_strptime(self):
         """Verify that method converts ISO 8601 formatted string."""
