@@ -14,8 +14,9 @@ from .models import GitHubCore
 class Event(GitHubCore):
 
     """The :class:`Event <Event>` object. It structures and handles the data
-    returned by via the `Events <https://developer.github.com/v3/activity/events>`_
-    section of the GitHub API.
+    returned by via the
+    `Events <https://developer.github.com/v3/activity/events>`_ section
+    of the GitHub API.
 
     Two events can be compared like so::
 
