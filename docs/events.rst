@@ -34,4 +34,4 @@ Having individual handlers as we have now which modify the payload to use our
 objects when available is more sensible.
 
 .. links
-.. _type: http://developer.github.com/v3/events/types
+.. _type: https://developer.github.com/v3/activity/events/types
