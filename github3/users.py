@@ -360,14 +360,14 @@ class User(BaseAccount):
             'desc'
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.repo.StarredRepository`
         """
-        from .repos import Repository
+        from .repos import Repository, StarredRepository
 
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
         url = self.starred_urlt.expand(owner=None, repo=None)
-        return self._iter(int(number), url, Repository, params, etag,
+        return self._iter(int(number), url, StarredRepository, params, etag,
                           headers=Repository.STAR_HEADERS)
 
     def subscriptions(self, number=-1, etag=None):

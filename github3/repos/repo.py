@@ -1984,6 +1984,27 @@ class Repository(GitHubCore):
         return json
 
 
+class StarredRepository(GitHubCore):
+
+    """The :class:`~github3.repos.repo.StarredRepository` object.
+
+    It represents how GitHub sends back a repository a user has starred, e.g.,
+    from :meth:`~github3.users.User.starred_repositories`.
+
+    See also:
+    https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
+
+    """
+
+    def _update_attributes(self, starred_repository):
+        self.starred_at = self._strptime(starred_repository.get('starred_at'))
+        self.repository = Repository(starred_repository.get('repo'), self)
+        self.repo = self.repository
+
+    def _repr(self):
+        return '<StarredRepository [{0!r}]>'.format(self.repository)
+
+
 def repo_issue_params(milestone=None,
                       state=None,
                       assignee=None,
