@@ -8,5 +8,6 @@ See also: http://developer.github.com/v3/repos/
 """
 
 from .repo import Repository
+from .repo import StarredRepository
 
-__all__ = [Repository]
+__all__ = ('Repository', 'StarredRepository')

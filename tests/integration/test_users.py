@@ -140,7 +140,7 @@ class TestUser(IntegrationHelper):
 
         assert len(repos) > 0
         for starred in repos:
-            assert isinstance(starred, github3.repos.Repository)
+            assert isinstance(starred, github3.repos.StarredRepository)
             assert isinstance(starred.starred_at, datetime.datetime)
 
     def test_subscriptions(self):

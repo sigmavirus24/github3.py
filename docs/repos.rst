@@ -6,6 +6,7 @@ Repository
 This part of the documentation covers:
 
 - :class:`Repository <github3.repos.repo.Repository>`
+- :class:`StarredRepository <github3.repos.repo.StarredRepository>`
 - :class:`Asset <github3.repos.release.Asset>`
 - :class:`Branch <github3.repos.branch.Branch>`
 - :class:`Contents <github3.repos.contents.Contents>`
@@ -41,6 +42,11 @@ Repository Objects
 .. module:: github3.repos.repo
 
 .. autoclass:: github3.repos.repo.Repository
+    :inherited-members:
+
+---------
+
+.. autoclass:: github3.repos.repo.StarredRepository
     :inherited-members:
 
 ---------
