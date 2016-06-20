@@ -26,7 +26,7 @@ GitHub Object
 GitHubEnterprise Object
 -----------------------
 
-This has all of the same attributes ass the :class:`GitHub <GitHub>` object so 
+This has all of the same attributes as the :class:`GitHub <GitHub>` object so 
 for brevity's sake, I'm not listing all of it's inherited members.
 
 .. autoclass:: GitHubEnterprise
