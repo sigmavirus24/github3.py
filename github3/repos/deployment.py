@@ -6,41 +6,40 @@ from ..users import User
 
 
 class Deployment(GitHubCore):
+
     def _update_attributes(self, deployment):
-        self._api = deployment.get('url')
+        self._api = self._get_attribute(deployment, 'url')
 
         #: GitHub's id of this deployment
-        self.id = deployment.get('id')
+        self.id = self._get_attribute(deployment, 'id')
 
         #: SHA of the branch on GitHub
-        self.sha = deployment.get('sha')
+        self.sha = self._get_attribute(deployment, 'sha')
 
         #: The reference used to create the Deployment, e.g.,
         #: `deploy-20140526`
-        self.ref = deployment.get('ref')
+        self.ref = self._get_attribute(deployment, 'ref')
 
         #: User object representing the creator of the deployment
-        self.creator = deployment.get('creator')
-        if self.creator:
-            self.creator = User(self.creator, self)
+        self.creator = self._class_attribute(deployment, 'creator', User, self)
 
         #: JSON string payload of the Deployment
-        self.payload = deployment.get('payload')
+        self.payload = self._get_attribute(deployment, 'payload')
 
         #: Date the Deployment was created
-        self.created_at = self._strptime(deployment.get('created_at'))
+        self.created_at = self._strptime_attribute(deployment, 'created_at')
 
         #: Date the Deployment was updated
-        self.updated_at = self._strptime(deployment.get('updated_at'))
+        self.updated_at = self._strptime_attribute(deployment, 'updated_at')
 
         #: Description of the deployment
-        self.description = deployment.get('description')
+        self.description = self._get_attribute(deployment, 'description')
 
         #: Target for the deployment, e.g., 'production', 'staging'
-        self.environment = deployment.get('environment')
+        self.environment = self._get_attribute(deployment, 'environment')
 
         #: URL to get the statuses of this deployment
-        self.statuses_url = deployment.get('statuses_url')
+        self.statuses_url = self._get_attribute(deployment, 'statuses_url')
 
     def _repr(self):
         return '<Deployment [{0} @ {1}]>'.format(self.id, self.sha)
@@ -83,43 +82,42 @@ class Deployment(GitHubCore):
 
 
 class DeploymentStatus(GitHubCore):
+
     def _update_attributes(self, status):
-        self._api = status.get('url')
+        self._api = self._get_attribute(status, 'url')
 
         #: GitHub's id for this deployment status
-        self.id = status.get('id')
+        self.id = self._get_attribute(status, 'id')
 
         #: State of the deployment status
-        self.state = status.get('state')
+        self.state = self._get_attribute(status, 'state')
 
         #: Creater of the deployment status
-        self.creator = status.get('creator')
-        if self.creator:
-            self.creator = User(self.creator, self)
+        self.creator = self._class_attribute(status, 'creator', User, self)
 
         #: JSON payload as a string
-        self.payload = status.get('payload', {})
+        self.payload = self._get_attribute(status, 'payload', {})
 
         #: Target URL of the deployment
-        self.target_url = status.get('target_url')
+        self.target_url = self._get_attribute(status, 'target_url')
 
         #: Date the deployment status was created
-        self.created_at = self._strptime(status.get('created_at'))
+        self.created_at = self._strptime_attribute(status, 'created_at')
 
         #: Date the deployment status was updated
-        self.updated_at = self._strptime(status.get('updated_at'))
+        self.updated_at = self._strptime_attribute(status, 'updated_at')
 
         #: Description of the deployment
-        self.description = status.get('description')
+        self.description = self._get_attribute(status, 'description')
 
         #: :class:`Deployment` representing the deployment this status is
         #: associated with
-        self.deployment = status.get('deployment')
-        if self.deployment:
-            self.deployment = Deployment(self.deployment, self)
+        self.deployment = self._class_attribute(
+            status, 'deployment', Deployment, self
+        )
 
         #: URL for the deployment this status is associated with
-        self.deployment_url = status.get('deployment_url')
+        self.deployment_url = self._get_attribute(status, 'deployment_url')
 
     def _repr(self):
         return '<DeploymentStatus [{0}]>'.format(self.id)

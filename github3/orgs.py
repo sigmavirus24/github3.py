@@ -9,14 +9,15 @@ This module contains all of the classes related to organizations.
 from __future__ import unicode_literals
 
 import warnings
-
 from json import dumps
+
+from uritemplate import URITemplate
+
+from .decorators import requires_auth
 from .events import Event
 from .models import BaseAccount, GitHubCore
 from .repos import Repository
 from .users import User
-from .decorators import requires_auth
-from uritemplate import URITemplate
 
 
 class Team(GitHubCore):
@@ -41,22 +42,30 @@ class Team(GitHubCore):
     members_roles = frozenset(['member', 'maintainer', 'all'])
 
     def _update_attributes(self, team):
-        self._api = team.get('url', '')
+        self._api = self._get_attribute(team, 'url')
+
         #: This team's name.
-        self.name = team.get('name')
+        self.name = self._get_attribute(team, 'name')
+
         #: Unique ID of the team.
-        self.id = team.get('id')
+        self.id = self._get_attribute(team, 'id')
+
         #: Permission level of the group.
-        self.permission = team.get('permission')
+        self.permission = self._get_attribute(team, 'permission')
+
         #: Number of members in this team.
-        self.members_count = team.get('members_count')
-        members = team.get('members_url')
+        self.members_count = self._get_attribute(team, 'members_count')
+
         #: Members URL Template. Expands with ``member``.
-        self.members_urlt = URITemplate(members) if members else None
+        self.members_urlt = self._class_attribute(
+            team, 'members_url', URITemplate
+        )
+
         #: Number of repos owned by this team.
-        self.repos_count = team.get('repos_count')
+        self.repos_count = self._get_attribute(team, 'repos_count')
+
         #: Repositories url (not a template).
-        self.repositories_url = team.get('repositories_url')
+        self.repositories_url = self._get_attribute(team, 'repositories_url')
 
     def _repr(self):
         return '<Team [{0}]>'.format(self.name)
@@ -260,19 +269,19 @@ class Organization(BaseAccount):
         self.type = self.type or 'Organization'
 
         #: Events url (not a template)
-        self.events_url = org.get('events_url')
+        self.events_url = self._get_attribute(org, 'events_url')
         #: Number of private repositories.
-        self.private_repos = org.get('private_repos', 0)
+        self.private_repos = self._get_attribute(org, 'private_repos')
 
-        members = org.get('members_url')
-        #: Members URL Template. Expands with ``member``
-        self.members_urlt = URITemplate(members) if members else None
-
-        members = org.get('public_members_url')
         #: Public Members URL Template. Expands with ``member``
-        self.public_members_urlt = URITemplate(members) if members else None
+        self.public_members_urlt = self._class_attribute(
+            org,
+            'public_members_url',
+            URITemplate
+        )
+
         #: Repositories url (not a template)
-        self.repos_url = org.get('repos_url')
+        self.repos_url = self._get_attribute(org, 'repos_url')
 
     @requires_auth
     def add_member(self, username, team_id):
@@ -592,13 +601,23 @@ class Membership(GitHubCore):
         return '<Membership [{0}]>'.format(self.organization)
 
     def _update_attributes(self, membership):
-        self._api = membership.get('url')
-        self.organization = Organization(membership.get('organization', {}),
-                                         self)
-        self.state = membership.get('state', '')
-        self.organization_url = membership.get('organization_url')
-        self.active = self.state.lower() == 'active'
-        self.pending = self.state.lower() == 'pending'
+        self._api = self._get_attribute(membership, 'url')
+
+        self.organization = self._class_attribute(
+            membership, 'organization', Organization, self
+        )
+
+        self.organization_url = self._get_attribute(
+            membership, 'organization_url'
+        )
+
+        self.state = self._get_attribute(membership, 'state')
+        self.active = self.state
+        if self.active and self.active is not self.Empty:
+            self.active = self.state.lower() == 'active'
+        self.pending = self.state
+        if self.pending and self.pending is not self.Empty:
+            self.pending = self.state.lower() == 'pending'
 
     @requires_auth
     def edit(self, state):

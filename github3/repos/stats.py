@@ -26,17 +26,19 @@ class ContributorStats(GitHubCore):
 
     def _update_attributes(self, stats_object):
         #: Contributor in particular that this relates to
-        self.author = User(stats_object.get('author', {}), self)
+        self.author = self._class_attribute(stats_object, 'author', User, self)
         #: Total number of commits authored by ``author``.
-        self.total = stats_object.get('total')
+        self.total = self._get_attribute(stats_object, 'total')
         #: List of weekly dictionaries.
-        self.weeks = stats_object.get('weeks', [])
+        self.weeks = self._get_attribute(stats_object, 'weeks', [])
         #: Alternative collection of weekly dictionaries
         #: This provides a datetime object and easy to remember keys for each
         #: element in the list.
         #: 'w' -> 'start of week', 'a' -> 'Number of additions',
         #: 'd' -> 'Number of deletions', 'c' -> 'Number of commits'
-        self.alt_weeks = [alternate_week(w) for w in self.weeks]
+        self.alt_weeks = self.weeks
+        if self.alt_weeks and self.alt_weeks is not self.Empty:
+            self.alt_weeks = [alternate_week(w) for w in self.weeks]
 
     def _repr(self):
         return '<Contributor Statistics [{0}]>'.format(self.author)

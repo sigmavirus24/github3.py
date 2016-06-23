@@ -31,25 +31,34 @@ class Authorization(GitHubCore):
     """
 
     def _update_attributes(self, auth):
-        self._api = auth.get('url')
+        self._api = self._get_attribute(auth, 'url')
+
         #: Details about the application (name, url)
-        self.app = auth.get('app', {})
+        self.app = self._get_attribute(auth, 'app', {})
+
         #: Returns the Authorization token
-        self.token = auth.get('token', '')
+        self.token = self._get_attribute(auth, 'token')
+
         #: App name
-        self.name = self.app.get('name', '')
+        self.name = self._get_attribute(self.app, 'name')
+
         #: URL about the note
-        self.note_url = auth.get('note_url') or ''
+        self.note_url = self._get_attribute(auth, 'note_url')
+
         #: Note about the authorization
-        self.note = auth.get('note') or ''
+        self.note = self._get_attribute(auth, 'note')
+
         #: List of scopes this applies to
-        self.scopes = auth.get('scopes', [])
+        self.scopes = self._get_attribute(auth, 'scopes')
+
         #: Unique id of the authorization
-        self.id = auth.get('id', 0)
+        self.id = self._get_attribute(auth, 'id')
+
         #: datetime object representing when the authorization was created.
-        self.created_at = self._strptime(auth.get('created_at'))
+        self.created_at = self._strptime_attribute(auth, 'created_at')
+
         #: datetime object representing when the authorization was updated.
-        self.updated_at = self._strptime(auth.get('updated_at'))
+        self.updated_at = self._strptime_attribute(auth, 'updated_at')
 
     def _repr(self):
         return '<Authorization [{0}]>'.format(self.name)

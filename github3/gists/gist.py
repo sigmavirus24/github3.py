@@ -41,60 +41,65 @@ class Gist(GitHubCore):
 
     def _update_attributes(self, data):
         #: Number of comments on this gist
-        self.comments_count = data.get('comments', 0)
+        self.comments_count = self._get_attribute(data, 'comments')
 
         #: Unique id for this gist.
-        self.id = '{0}'.format(data.get('id', ''))
+        self.data = self._get_attribute(data, 'id')
+        if self.data and self.data is not self.Empty:
+            self.data = '{0}'.format(data['id'])
 
         #: Description of the gist
-        self.description = data.get('description', '')
+        self.description = self._get_attribute(data, 'description')
 
         # e.g. https://api.github.com/gists/1
-        self._api = data.get('url', '')
+        self._api = self._get_attribute(data, 'url')
 
         #: URL of this gist at Github, e.g., https://gist.github.com/1
-        self.html_url = data.get('html_url')
+        self.html_url = self._get_attribute(data, 'html_url')
         #: Boolean describing if the gist is public or private
-        self.public = data.get('public')
+        self.public = self._get_attribute(data, 'public')
 
-        self._forks = data.get('forks', [])
+        self._forks = self._get_attribute(data, 'forks')
 
         #: Git URL to pull this gist, e.g., git://gist.github.com/1.git
-        self.git_pull_url = data.get('git_pull_url', '')
+        self.git_pull_url = self._get_attribute(data, 'git_pull_url')
 
         #: Git URL to push to gist, e.g., git@gist.github.com/1.git
-        self.git_push_url = data.get('git_push_url', '')
+        self.git_push_url = self._get_attribute(data, 'git_push_url')
 
         #: datetime object representing when the gist was created.
-        self.created_at = self._strptime(data.get('created_at'))
+        self.created_at = self._strptime_attribute(data, 'created_at')
 
         #: datetime object representing the last time this gist was updated.
-        self.updated_at = self._strptime(data.get('updated_at'))
+        self.updated_at = self._strptime_attribute(data, 'updated_at')
 
-        owner = data.get('owner')
         #: :class:`User <github3.users.User>` object representing the owner of
         #: the gist.
-        self.owner = User(owner, self) if owner else None
+        self.owner = self._class_attribute(data, 'owner', User, self)
 
-        self._files = [GistFile(data['files'][f]) for f in data['files']]
+        self._files = self._get_attribute(data, 'files', [])
+        if self._files and self._files is not self.Empty:
+            self._files = [GistFile(self._files[f]) for f in self._files]
 
         #: History of this gist, list of
         #: :class:`GistHistory <github3.gists.history.GistHistory>`
-        self.history = [GistHistory(h, self) for h in data.get('history', [])]
+        self.history = self._get_attribute(data, 'history', [])
+        if self.history and self.history is not self.Empty:
+            self.history = [GistHistory(h, self) for h in self.history]
 
         # New urls
 
         #: Comments URL (not a template)
-        self.comments_url = data.get('comments_url', '')
+        self.comments_url = self._get_attribute(data, 'comments_url')
 
         #: Commits URL (not a template)
-        self.commits_url = data.get('commits_url', '')
+        self.commits_url = self._get_attribute(data, 'commits_url')
 
         #: Forks URL (not a template)
-        self.forks_url = data.get('forks_url', '')
+        self.forks_url = self._get_attribute(data, 'forks_url')
 
         #: Whether the content of this Gist has been truncated or not
-        self.truncated = data.get('truncated')
+        self.truncated = self._get_attribute(data, 'truncated')
 
     def __str__(self):
         return self.id

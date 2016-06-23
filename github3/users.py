@@ -9,11 +9,13 @@ This module contains everything relating to Users.
 from __future__ import unicode_literals
 
 from json import dumps
+
 from github3.auths import Authorization
 from uritemplate import URITemplate
-from .events import Event
-from .models import GitHubCore, BaseAccount
+
 from .decorators import requires_auth
+from .events import Event
+from .models import BaseAccount, GitHubCore
 
 
 class Key(GitHubCore):
@@ -32,13 +34,16 @@ class Key(GitHubCore):
     """
 
     def _update_attributes(self, key, session=None):
-        self._api = key.get('url', '')
+        self._api = self._get_attribute(key, 'url')
+
         #: The text of the actual key
-        self.key = key.get('key')
+        self.key = self._get_attribute(key, 'key')
+
         #: The unique id of the key at GitHub
-        self.id = key.get('id')
+        self.id = self._get_attribute(key, 'id')
+
         #: The title the user gave to the key
-        self.title = key.get('title')
+        self.title = self._get_attribute(key, 'title')
 
     def _repr(self):
         return '<User Key [{0}]>'.format(self.title)
@@ -83,13 +88,16 @@ class Plan(GitHubCore):
 
     def _update_attributes(self, plan):
         #: Number of collaborators
-        self.collaborators = plan.get('collaborators')
+        self.collaborators = self._get_attribute(plan, 'collaborators')
+
         #: Name of the plan
-        self.name = plan.get('name')
+        self.name = self._get_attribute(plan, 'name')
+
         #: Number of private repos
-        self.private_repos = plan.get('private_repos')
+        self.private_repos = self._get_attribute(plan, 'private_repos')
+
         #: Space allowed
-        self.space = plan.get('space')
+        self.space = self._get_attribute(plan, 'space')
 
     def _repr(self):
         return '<Plan [{0}]>'.format(self.name)  # (No coverage)
@@ -115,11 +123,13 @@ class Email(GitHubCore):
 
     def _update_attributes(self, email):
         #: Email address
-        self.email = email.get('email')
+        self.email = self._get_attribute(email, 'email')
+
         #: Whether the address has been verified
-        self.verified = email.get('verified')
+        self.verified = self._get_attribute(email, 'verified')
+
         #: Whether the address is the primary address
-        self.primary = email.get('primary')
+        self.primary = self._get_attribute(email, 'primary')
 
     def _repr(self):
         return '<Email [{0}]>'.format(self.email)
@@ -150,69 +160,78 @@ class User(BaseAccount):
             self.type = 'User'
 
         #: ID of the user's image on Gravatar
-        self.gravatar_id = user.get('gravatar_id', '')
+        self.gravatar_id = self._get_attribute(user, 'gravatar_id')
         #: True -- for hire, False -- not for hire
-        self.hireable = user.get('hireable', False)
+        self.hireable = self._get_attribute(user, 'hireable', False)
 
         # The number of public_gists
         #: Number of public gists
-        self.public_gists = user.get('public_gists', 0)
+        self.public_gists = self._get_attribute(user, 'public_gists')
 
         # Private information
         #: How much disk consumed by the user
-        self.disk_usage = user.get('disk_usage', 0)
+        self.disk_usage = self._get_attribute(user, 'disk_usage')
 
         #: Number of private repos owned by this user
-        self.owned_private_repos = user.get('owned_private_repos', 0)
+        self.owned_private_repos = self._get_attribute(
+            user, 'owned_private_repos'
+        )
         #: Number of private gists owned by this user
-        self.total_private_gists = user.get('total_private_gists', 0)
+        self.total_private_gists = self._get_attribute(
+            user, 'total_private_gists'
+        )
         #: Total number of private repos
-        self.total_private_repos = user.get('total_private_repos', 0)
+        self.total_private_repos = self._get_attribute(
+            user, 'total_private_repos'
+        )
 
         #: Which plan this user is on
-        self.plan = Plan(user.get('plan', {}))
+        self.plan = self._class_attribute(user, 'plan', Plan)
 
-        events_url = user.get('events_url', '')
         #: Events URL Template. Expands with ``privacy``
-        self.events_urlt = URITemplate(events_url) if events_url else None
+        self.events_urlt = self._class_attribute(
+            user, 'events_url', URITemplate)
 
         #: Followers URL (not a template)
-        self.followers_url = user.get('followers_url', '')
+        self.followers_url = self._get_attribute(user, 'followers_url')
 
-        furl = user.get('following_url', '')
         #: Following URL Template. Expands with ``other_user``
-        self.following_urlt = URITemplate(furl) if furl else None
+        self.following_urlt = self._class_attribute(
+            user, 'following_url', URITemplate
+        )
 
-        gists_url = user.get('gists_url', '')
         #: Gists URL Template. Expands with ``gist_id``
-        self.gists_urlt = URITemplate(gists_url) if gists_url else None
+        self.gists_urlt = self._class_attribute(user, 'gists_url', URITemplate)
 
         #: Organizations URL (not a template)
-        self.organizations_url = user.get('organizations_url', '')
+        self.organizations_url = self._get_attribute(user, 'organizations_url')
 
         #: Received Events URL (not a template)
-        self.received_events_url = user.get('received_events_url', '')
+        self.received_events_url = self._get_attribute(
+            user, 'received_events_url'
+        )
 
         #: Repostories URL (not a template)
-        self.repos_url = user.get('repos_url', '')
+        self.repos_url = self._get_attribute(user, 'repos_url')
 
-        starred_url = user.get('starred_url', '')
         #: Starred URL Template. Expands with ``owner`` and ``repo``
-        self.starred_urlt = URITemplate(starred_url) if starred_url else None
+        self.starred_urlt = self._class_attribute(
+            user, 'starred_url', URITemplate
+        )
 
         #: Subscriptions URL (not a template)
-        self.subscriptions_url = user.get('subscriptions_url', '')
+        self.subscriptions_url = self._get_attribute(user, 'subscriptions_url')
 
         #: Number of repo contributions. Only appears in ``repo.contributors``
-        contributions = user.get('contributions')
+        contributions = self._get_attribute(user, 'contributions')
         # The refresh method uses __init__ to replace the attributes on the
         # instance with what it receives from the /users/:username endpoint.
         # What that means is that contributions is no longer returned and as
         # such is changed because it doesn't exist. This guards against that.
-        if contributions is not None:
+        if contributions is not None and contributions is not self.Empty:
             self.contributions = contributions
 
-        self._uniq = user.get('id', None)
+        self._uniq = self._get_attribute(user, 'id')
 
     def __str__(self):
         return self.login

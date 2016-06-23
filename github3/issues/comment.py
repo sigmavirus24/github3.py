@@ -25,15 +25,14 @@ class IssueComment(BaseComment):
     def _update_attributes(self, comment):
         super(IssueComment, self)._update_attributes(comment)
 
-        user = comment.get('user')
         #: :class:`User <github3.users.User>` who made the comment
-        self.user = User(user, self) if user else None
+        self.user = self._class_attribute(comment, 'user', User, self)
 
         #: Issue url (not a template)
-        self.issue_url = comment.get('issue_url')
+        self.issue_url = self._get_attribute(comment, 'issue_url')
 
         #: Html url (not a template)
-        self.html_url = comment.get('html_url')
+        self.html_url = self._get_attribute(comment, 'html_url')
 
     def _repr(self):
         return '<Issue Comment [{0}]>'.format(self.user.login)

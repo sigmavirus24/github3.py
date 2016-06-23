@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from re import match
 from json import dumps
+from re import match
+
+from uritemplate import URITemplate
+
 from ..decorators import requires_auth
+from ..models import GitHubCore
+from ..users import User
 from .comment import IssueComment, issue_comment_params
 from .event import IssueEvent
 from .label import Label
 from .milestone import Milestone
-from ..models import GitHubCore
-from ..users import User
-from uritemplate import URITemplate
 
 
 class Issue(GitHubCore):
@@ -38,70 +40,91 @@ class Issue(GitHubCore):
     }
 
     def _update_attributes(self, issue):
-        self._api = issue.get('url', '')
+        self._api = self._get_attribute(issue, 'url', '')
+
         #: :class:`User <github3.users.User>` representing the user the issue
         #: was assigned to.
-        self.assignee = issue.get('assignee')
-        if self.assignee:
-            self.assignee = User(issue.get('assignee'), self)
+        self.assignee = self._class_attribute(issue, 'assignee', User, self)
+
         #: Body (description) of the issue.
-        self.body = issue.get('body', '')
+        self.body = self._get_attribute(issue, 'body')
+
         #: HTML formatted body of the issue.
-        self.body_html = issue.get('body_html', '')
+        self.body_html = self._get_attribute(issue, 'body_html')
+
         #: Plain text formatted body of the issue.
-        self.body_text = issue.get('body_text', '')
+        self.body_text = self._get_attribute(issue, 'body_text')
 
         # If an issue is still open, this field will be None
         #: datetime object representing when the issue was closed.
-        self.closed_at = self._strptime(issue.get('closed_at'))
+        self.closed_at = self._strptime_attribute(issue, 'closed_at')
 
         #: Number of comments on this issue.
-        self.comments_count = issue.get('comments')
+        self.comments_count = self._get_attribute(issue, 'comments')
+
         #: Comments url (not a template)
-        self.comments_url = issue.get('comments_url')
+        self.comments_url = self._get_attribute(issue, 'comments_url')
+
         #: datetime object representing when the issue was created.
-        self.created_at = self._strptime(issue.get('created_at'))
+        self.created_at = self._strptime_attribute(issue, 'created_at')
+
         #: Events url (not a template)
-        self.events_url = issue.get('events_url')
+        self.events_url = self._get_attribute(issue, 'events_url')
+
         #: URL to view the issue at GitHub.
-        self.html_url = issue.get('html_url')
+        self.html_url = self._get_attribute(issue, 'html_url')
+
         #: Unique ID for the issue.
-        self.id = issue.get('id')
+        self.id = self._get_attribute(issue, 'id')
+
         #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
         #: on this issue.
-        self.original_labels = [
-            Label(l, self) for l in issue.get('labels')
-        ]
-        labels_url = issue.get('labels_url')
+        self.original_labels = self._get_attribute(issue, 'labels', [])
+        if self.original_labels and self.original_labels is not self.Empty:
+            self.original_labels = [
+                Label(l, self) for l in self.original_labels
+            ]
+
         #: Labels URL Template. Expand with ``name``
-        self.labels_urlt = URITemplate(labels_url) if labels_url else None
+        self.labels_urlt = self._get_attribute(
+            issue, 'labels_url', URITemplate
+        )
+
         #: Locked status
-        self.locked = issue.get('locked')
+        self.locked = self._get_attribute(issue, 'locked')
+
         #: :class:`Milestone <github3.issues.milestone.Milestone>` this
         #: issue was assigned to.
-        self.milestone = None
-        if issue.get('milestone'):
-            self.milestone = Milestone(issue.get('milestone'), self)
-        #: Issue number (e.g. #15)
-        self.number = issue.get('number')
-        #: Dictionary URLs for the pull request (if they exist)
-        self.pull_request_urls = issue.get('pull_request', {})
-        m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)/\d+',
-                  self.html_url)
-        #: Returns ('owner', 'repository') this issue was filed on.
-        self.repository = m.groups()
-        #: State of the issue, e.g., open, closed
-        self.state = issue.get('state')
-        #: Title of the issue.
-        self.title = issue.get('title')
-        #: datetime object representing the last time the issue was updated.
-        self.updated_at = self._strptime(issue.get('updated_at'))
-        #: :class:`User <github3.users.User>` who opened the issue.
-        self.user = User(issue.get('user'), self)
+        self.milestone = self._class_attribute(
+            issue, 'milestone', Milestone, self)
 
-        closed_by = issue.get('closed_by')
+        #: Issue number (e.g. #15)
+        self.number = self._get_attribute(issue, 'number')
+
+        #: Dictionary URLs for the pull request (if they exist)
+        self.pull_request_urls = self._get_attribute(issue, 'pull_request', {})
+
+        #: Returns ('owner', 'repository') this issue was filed on.
+        self.repository = self.Empty
+        if self.html_url and self.html_url is not self.Empty:
+            m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)/\d+',
+                      self.html_url)
+            self.repository = m.groups()
+
+        #: State of the issue, e.g., open, closed
+        self.state = self._get_attribute(issue, 'state')
+
+        #: Title of the issue.
+        self.title = self._get_attribute(issue, 'title')
+
+        #: datetime object representing the last time the issue was updated.
+        self.updated_at = self._strptime_attribute(issue, 'updated_at')
+
+        #: :class:`User <github3.users.User>` who opened the issue.
+        self.user = self._class_attribute(issue, 'user', User, self)
+
         #: :class:`User <github3.users.User>` who closed the issue.
-        self.closed_by = User(closed_by, self) if closed_by else None
+        self.closed_by = self._class_attribute(issue, 'closed_by', User, self)
 
     def _repr(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
