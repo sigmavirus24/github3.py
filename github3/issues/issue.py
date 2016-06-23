@@ -31,12 +31,6 @@ class Issue(GitHubCore):
 
     """
 
-    # The Accept header will likely be removable once the feature is out of
-    # preview mode. See: https://git.io/vgXmB
-    LOCKING_PREVIEW_HEADERS = {
-        'Accept': 'application/vnd.github.the-key-preview+json'
-    }
-
     def _update_attributes(self, issue):
         self._api = issue.get('url', '')
         #: :class:`User <github3.users.User>` representing the user the issue
@@ -266,10 +260,9 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        headers = Issue.LOCKING_PREVIEW_HEADERS
 
         url = self._build_url('lock', base_url=self._api)
-        return self._boolean(self._put(url, headers=headers), 204, 404)
+        return self._boolean(self._put(url), 204, 404)
 
     def pull_request(self):
         """Retrieve the pull request associated with this issue.
@@ -333,7 +326,6 @@ class Issue(GitHubCore):
 
         :returns: bool
         """
-        headers = Issue.LOCKING_PREVIEW_HEADERS
 
         url = self._build_url('lock', base_url=self._api)
-        return self._boolean(self._delete(url, headers=headers), 204, 404)
+        return self._boolean(self._delete(url), 204, 404)
