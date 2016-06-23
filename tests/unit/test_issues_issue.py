@@ -162,7 +162,6 @@ class TestIssue(helper.UnitHelper):
 
         self.session.put.assert_called_once_with(
             url_for('lock'),
-            headers={'Accept': 'application/vnd.github.the-key-preview+json'}
         )
 
     def test_comment_positive_id(self):
@@ -282,7 +281,6 @@ class TestIssue(helper.UnitHelper):
 
         self.session.delete.assert_called_once_with(
             url_for('lock'),
-            headers={'Accept': 'application/vnd.github.the-key-preview+json'}
         )
 
     def test_reopen(self):
