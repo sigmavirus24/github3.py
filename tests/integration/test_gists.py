@@ -79,7 +79,6 @@ class TestGist(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             gists = self.gh.gists_by('sigmavirus24')
             assert gists is not None
-            print(gists)
             for gist in gists:
                 files = gist.files()
                 for _file in files:
