@@ -78,14 +78,16 @@ class Team(GitHubCore):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_repository(self, repository):
+    def add_repository(self, repository, permission=''):
         """Add ``repository`` to this team.
 
         :param str repository: (required), form: 'user/repo'
+        :param str permission: (optional), ('pull', 'push', 'admin')
         :returns: bool
         """
+        data = {'permission': permission}
         url = self._build_url('repos', repository, base_url=self._api)
-        return self._boolean(self._put(url), 204, 404)
+        return self._boolean(self._put(url, data=dumps(data)), 204, 404)
 
     @requires_auth
     def delete(self):

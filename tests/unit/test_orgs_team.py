@@ -24,7 +24,13 @@ class TestTeam(helper.UnitHelper):
         """Show that one can add a repository to an organization team."""
         self.instance.add_repository('name-of-repo')
 
-        self.session.put.assert_called_once_with(url_for('repos/name-of-repo'))
+        self.put_called_with(url_for('repos/name-of-repo'),
+                             data={'permission': ''})
+
+        self.instance.add_repository('name-of-repo', permission='push')
+
+        self.put_called_with(url_for('repos/name-of-repo'),
+                             data={'permission': 'push'})
 
     def test_delete(self):
         """Show that a user can delete an organization team."""
