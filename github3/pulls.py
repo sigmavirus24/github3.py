@@ -46,6 +46,7 @@ class PullDestination(models.GitHubCore):
         if dest.get('repo'):
             self._repo_name = dest['repo'].get('name')
             self._repo_owner = dest['repo']['owner'].get('login')
+            self.repository = Repository(self.repository, self)
         self.repo = (self._repo_owner, self._repo_name)
 
     def _repr(self):
