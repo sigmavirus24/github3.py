@@ -18,7 +18,7 @@ from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
 from uritemplate import URITemplate
-
+from .repos.repo import Repository
 
 class PullDestination(models.GitHubCore):
     
@@ -46,7 +46,6 @@ class PullDestination(models.GitHubCore):
         if dest.get('repo'):
             self._repo_name = dest['repo'].get('name')
             self._repo_owner = dest['repo']['owner'].get('login')
-            from .repos.repo import Repository
             self.repository = Repository(self.repository, self)
         self.repo = (self._repo_owner, self._repo_name)
 
