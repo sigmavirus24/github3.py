@@ -22,7 +22,6 @@ from uritemplate import URITemplate
 
 class PullDestination(models.GitHubCore):
     
-    from .repos.repo import Repository
     """The :class:`PullDestination <PullDestination>` object.
 
     See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
@@ -45,6 +44,7 @@ class PullDestination(models.GitHubCore):
         self._repo_name = ''
         self._repo_owner = ''
         if dest.get('repo'):
+            from .repos.repo import Repository
             self._repo_name = dest['repo'].get('name')
             self._repo_owner = dest['repo']['owner'].get('login')
             self.repository = Repository(self.repository, self)
