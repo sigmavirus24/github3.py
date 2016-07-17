@@ -21,6 +21,7 @@ from uritemplate import URITemplate
 
 
 class PullDestination(models.GitHubCore):
+    
     from .repos.repo import Repository
     """The :class:`PullDestination <PullDestination>` object.
 
