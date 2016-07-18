@@ -20,9 +20,7 @@ from .issues.comment import IssueComment
 from uritemplate import URITemplate
 
 class PullDestination(models.GitHubCore):
-    
     """The :class:`PullDestination <PullDestination>` object.
-
     See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
     """
 
