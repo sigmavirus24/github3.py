@@ -83,3 +83,4 @@ Contributors
 
 - Lars Holm Nielsen (@larshankat)
 
+- Ryan Pitts (@ryanpitts)
