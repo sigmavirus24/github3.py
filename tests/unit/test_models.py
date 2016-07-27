@@ -107,6 +107,11 @@ class TestGitHubCore(helper.UnitHelper):
         github_core = GitHubCore.from_json('{}')
         assert isinstance(github_core, GitHubCore)
 
+    def test_instance_or_null(self):
+        """Verify method raises exception when json is not a dict."""
+        with pytest.raises(exceptions.UnprocessableResponseBody):
+            self.instance._instance_or_null(GitHubCore, [])
+
     def test_json(self):
         """Verify JSON information is retrieved correctly."""
         response = requests.Response()
