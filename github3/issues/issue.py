@@ -242,6 +242,13 @@ class Issue(GitHubCore):
             return True
         return False
 
+    def is_locked(self):
+        """Checks if the issue is locked.
+
+        :returns: bool
+        """
+        return self.locked
+
     def labels(self, number=-1, etag=None):
         """Iterate over the labels associated with this issue.
 
