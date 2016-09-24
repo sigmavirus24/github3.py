@@ -1,6 +1,13 @@
 History/Changelog
 -----------------
 
+0.9.6: 2016-09-24
+~~~~~~~~~~~~~~~~~
+
+- Add branch parameter to Repository Contents delete and update calls.
+
+- Cap dependency on uritemplate.py to always be less than 3.0
+
 0.9.5: 2016-02-15
 ~~~~~~~~~~~~~~~~~
 
