@@ -38,6 +38,11 @@ class Issue(GitHubCore):
         self.assignee = issue.get('assignee')
         if self.assignee:
             self.assignee = User(issue.get('assignee'), self)
+        self.assignees = issue.get('assignees')
+        if self.assignees:
+            self.assignees = [
+                User(assignee) for assignee in self.assignees
+            ]
         #: Body (description) of the issue.
         self.body = issue.get('body', '')
         #: HTML formatted body of the issue.
@@ -193,7 +198,7 @@ class Issue(GitHubCore):
 
     @requires_auth
     def edit(self, title=None, body=None, assignee=None, state=None,
-             milestone=None, labels=None):
+             milestone=None, labels=None, assignees=None):
         """Edit this issue.
 
         :param str title: Title of the issue
@@ -204,6 +209,9 @@ class Issue(GitHubCore):
         :param int milestone: the NUMBER (not title) of the milestone to
             assign this to [1]_, or 0 to remove the milestone
         :param list labels: list of labels to apply this to
+        :param assignees: (optional), login of the users to assign the
+            issue to
+        :type assignees: list of strings
         :returns: bool
 
         .. [1] Milestone numbering starts at 1, i.e. the first milestone you
@@ -211,7 +219,8 @@ class Issue(GitHubCore):
         """
         json = None
         data = {'title': title, 'body': body, 'assignee': assignee,
-                'state': state, 'milestone': milestone, 'labels': labels}
+                'state': state, 'milestone': milestone, 'labels': labels,
+                'assignees': assignees}
         self._remove_none(data)
         if data:
             if 'milestone' in data and data['milestone'] == 0:

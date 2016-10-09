@@ -226,6 +226,21 @@ class TestRepository(helper.UnitHelper):
             data=data
         )
 
+    def test_create_issue_multiple_assignees(self):
+        """Verify the request to create an issue with multiple assignees."""
+        data = {
+            'title': 'Unit Issue',
+            'body': 'Fake body',
+            'assignees': ['itsmemattchung', 'sigmavirus24'],
+            'milestone': 1,
+            'labels': ['bug', 'enhancement']
+        }
+        self.instance.create_issue(**data)
+        self.post_called_with(
+            url_for('issues'),
+            data=data
+        )
+
     def test_create_issue_require_valid_issue(self):
         """Test that we check the validity of an issue."""
         self.instance.create_issue(title=None)

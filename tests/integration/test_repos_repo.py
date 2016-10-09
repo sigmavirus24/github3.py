@@ -307,6 +307,43 @@ class TestRepository(helper.IntegrationHelper):
             issue = repository.create_issue(**data)
             assert isinstance(issue, github3.issues.issue.Issue)
 
+    def test_create_issue_multiple_assignees(self):
+        """
+        Test the ability to create an issue with multiple assignees
+        for a repository.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name('create_issue_multiple_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            data = {
+                'title': 'Create Issue Integration Test',
+                'body': 'Delete me after',
+                'assignees': ['itsmemattchung', 'sigmavirus24']
+            }
+            issue = repository.create_issue(**data)
+            assert isinstance(issue, github3.issues.issue.Issue)
+
+    def test_create_issue_both_assignee_and_assignees(self):
+        """
+        Test the ability to create an issue with both assignee
+        and assignees.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name(
+            'create_issue_both_assignee_and_assignees'
+        )
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            data = {
+                'title': 'Create Issue Integration Test',
+                'body': 'Delete me after',
+                'assignee': 'itsmemattchung',
+                'assignees': ['itsmemattchung', 'sigmavirus24']
+            }
+            with pytest.raises(exc.UnprocessableEntity):
+                repository.create_issue(**data)
+
     def test_create_key(self):
         """Test the ability to deploy a key."""
         self.token_login()
@@ -600,6 +637,15 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             issue = repository.issue(525)
         assert isinstance(issue, github3.issues.issue.Issue)
+
+    def test_issue_with_multiple_assignees(self):
+        """Test the ability to retrieve an issue from a repository."""
+        cassette_name = self.cassette_name('issue_multiple_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            issue = repository.issue(637)
+        assert isinstance(issue, github3.issues.issue.Issue)
+        assert isinstance(issue.assignees, list)
 
     def test_imported_issue(self):
         """Test the ability to retrieve an imported issue by id."""
