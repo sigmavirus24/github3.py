@@ -687,14 +687,15 @@ class Repository(GitHubCore):
         return self._instance_or_null(Commit, json)
 
     @requires_auth
-    def create_deployment(self, ref, force=False, payload='',
+    def create_deployment(self, ref, required_contexts=[], payload='',
                           auto_merge=False, description='', environment=None):
         """Create a deployment.
 
         :param str ref: (required), The ref to deploy. This can be a branch,
             tag, or sha.
-        :param bool force: Optional parameter to bypass any ahead/behind
-            checks or commit status checks. Default: False
+        :param list required_contexts Optional array of status contexts
+            verified against commit status checks. To bypass checking
+            entirely pass an empty array. Default: []
         :param str payload: Optional JSON payload with extra information about
             the deployment. Default: ""
         :param bool auto_merge: Optional parameter to merge the default branch
@@ -707,7 +708,7 @@ class Repository(GitHubCore):
         json = None
         if ref:
             url = self._build_url('deployments', base_url=self._api)
-            data = {'ref': ref, 'force': force, 'payload': payload,
+            data = {'ref': ref, 'required_contexts': required_contexts, 'payload': payload,
                     'auto_merge': auto_merge, 'description': description,
                     'environment': environment}
             self._remove_none(data)
