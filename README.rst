@@ -17,10 +17,10 @@ Dependencies
 ------------
 
 - requests_  by Kenneth Reitz
-- uritemplate.py_ by Ian Cordasco
+- uritemplate_ by Ian Cordasco
 
 .. _requests: https://github.com/kennethreitz/requests
-.. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
+.. _uritemplate: https://github.com/sigmavirus24/uritemplate
 
 Contributing
 ------------
