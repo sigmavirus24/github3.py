@@ -52,7 +52,7 @@ class TestUserAdministration(UnitHelper):
         return self.base_url + 'users/' + example_data['login'] + path
 
     def url_for_admin(self, path=''):
-        return self.base_url + 'admin/users/' + str(example_data['id']) + path
+        return self.base_url + 'admin/users/' + str(example_data['login']) + path
 
     def test_delete_user(self):
         """Show that an admin can ask for user deletion."""
