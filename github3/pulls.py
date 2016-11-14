@@ -311,7 +311,7 @@ class PullRequest(models.GitHubCore):
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
-    def merge(self, commit_message='', sha=None, squash=False):
+    def merge(self, commit_message=None, sha=None, squash=False):
         """Merge this pull request.
 
         :param str commit_message: (optional), message to be used for the
@@ -322,9 +322,11 @@ class PullRequest(models.GitHubCore):
             head branch.
         :returns: bool
         """
-        parameters = {'commit_message': commit_message, 'squash': squash}
+        parameters = {'squash': squash}
         if sha:
             parameters['sha'] = sha
+        if commit_message is not None:
+            parameters['commit_message'] = commit_message
         url = self._build_url('merge', base_url=self._api)
         json = self._json(self._put(url, data=dumps(parameters)), 200)
         if not json:
