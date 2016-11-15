@@ -95,7 +95,7 @@ class TestPullRequest(helper.UnitHelper):
 
         self.put_called_with(
             url_for('merge'),
-            data={"squash": False, "commit_message": ""}
+            data={"squash": False}
         )
 
     def test_merge_squash_message(self):
