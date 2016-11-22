@@ -75,6 +75,7 @@ class TestGitHubCore(helper.UnitHelper):
         """Verify boolean tests for response codes correctly."""
         response = requests.Response()
         response.status_code = 512
+        response.raw = io.BytesIO()
         with pytest.raises(exceptions.GitHubError):
             self.instance._boolean(response=response,
                                    true_code=200,
