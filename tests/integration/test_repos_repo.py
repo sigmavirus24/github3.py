@@ -3,6 +3,7 @@ import github3
 import github3.exceptions as exc
 
 import pytest
+import requests
 
 from . import helper
 
@@ -472,6 +473,8 @@ class TestRepository(helper.IntegrationHelper):
             for d in repository.deployments():
                 assert isinstance(d, github3.repos.deployment.Deployment)
 
+    @pytest.mark.xfail(requests.__build__ >= 0x021100,
+                       reason="Requests breaks our recorded cassettes")
     def test_directory_contents(self):
         """Test that a directory's contents can be retrieved."""
         cassette_name = self.cassette_name('directory_contents')
