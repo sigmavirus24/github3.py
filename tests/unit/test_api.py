@@ -46,6 +46,15 @@ class TestAPI(unittest.TestCase):
             github3.authorize(*args)
             gh().authorize.assert_called_once_with(*args)
 
+    def test_authorize_with_github_argument(self):
+        """Show that github3.authorize can use an existing GitHub object."""
+        args = ('login',  'password', ['scope'], 'note', 'url.com', '', '')
+        github = mock.Mock(spec_set=github3.GitHub)
+        with mock.patch('github3.api.GitHub') as gh:
+            github3.authorize(*args, github=github)
+            gh().assert_not_called()
+            github.authorize.assert_called_once_with(*args)
+
     def test_create_gist(self):
         """Show that github3.create_gist proxies to GitHub."""
         args = ('description', {'files': ['file']})
