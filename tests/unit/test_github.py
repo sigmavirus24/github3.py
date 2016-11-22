@@ -10,6 +10,7 @@ def url_for(path=''):
     """Simple function to generate URLs with the base GitHub URL."""
     return 'https://api.github.com/' + path.strip('/')
 
+
 enterprise_url_for = helper.create_url_helper('https://enterprise.github3.com')
 
 

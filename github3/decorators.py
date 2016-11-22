@@ -94,6 +94,7 @@ def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
     r._content = r.raw.read()
     return r
 
+
 # Use mock decorators when generating documentation, so all functino signatures
 # are displayed correctly
 if os.getenv('GENERATING_DOCUMENTATION', None) == 'github3':

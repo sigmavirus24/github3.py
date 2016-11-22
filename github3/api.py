@@ -100,6 +100,8 @@ def enterprise_login(username=None, password=None, token=None, url=None,
 
 def emojis():
     return gh.emojis()
+
+
 emojis.__doc__ = gh.emojis.__doc__
 
 
@@ -401,6 +403,8 @@ def octocat(say=None):
 
 def organization(name):
     return gh.organization(name)
+
+
 organization.__doc__ = gh.organization.__doc__
 
 
@@ -418,11 +422,15 @@ def pull_request(owner, repository, number):
 
 def rate_limit():
     return gh.rate_limit()
+
+
 rate_limit.__doc__ = gh.rate_limit.__doc__
 
 
 def repository(owner, repository):
     return gh.repository(owner, repository)
+
+
 repository.__doc__ = gh.repository.__doc__
 
 
@@ -636,6 +644,8 @@ def search_users(query, sort=None, order=None, per_page=None,
 
 def user(username):
     return gh.user(username)
+
+
 user.__doc__ = gh.user.__doc__
 
 
