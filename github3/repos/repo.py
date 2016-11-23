@@ -708,9 +708,9 @@ class Repository(GitHubCore):
         json = None
         if ref:
             url = self._build_url('deployments', base_url=self._api)
-            data = {'ref': ref, 'required_contexts': required_contexts, 'payload': payload,
-                    'auto_merge': auto_merge, 'description': description,
-                    'environment': environment}
+            data = {'ref': ref, 'required_contexts': required_contexts,
+                    'payload': payload, 'auto_merge': auto_merge,
+                    'description': description, 'environment': environment}
             self._remove_none(data)
             json = self._json(self._post(url, data=data),
                               201)
