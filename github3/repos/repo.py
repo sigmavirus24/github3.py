@@ -693,7 +693,7 @@ class Repository(GitHubCore):
 
         :param str ref: (required), The ref to deploy. This can be a branch,
             tag, or sha.
-        :param list required_contexts Optional array of status contexts
+        :param list required_contexts: Optional array of status contexts
             verified against commit status checks. To bypass checking
             entirely pass an empty array. Default: []
         :param str payload: Optional JSON payload with extra information about
