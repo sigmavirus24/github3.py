@@ -1,5 +1,8 @@
 """Integration tests for Issues."""
 import github3
+import github3.exceptions as exc
+
+import pytest
 
 from .helper import IntegrationHelper
 
@@ -97,6 +100,42 @@ class TestIssue(IntegrationHelper):
             edited = issue.edit(title='Integration test for editing an issue')
 
         assert edited is True
+
+    def test_edit_multiple_assignees(self):
+        """
+        Test the ability to edit an issue with multiple
+        assignees.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name('edit_multiple_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='sigmavirus24',
+                                  repository='github3.py',
+                                  number=637)
+            assignees = ['itsmemattchung', 'sigmavirus24']
+            edited = issue.edit(title='Integration test for editing an issue',
+                                assignees=assignees)
+
+        assert edited is True
+
+    def test_edit_both_assignee_and_assignees(self):
+        """
+        Test the ability to edit an issue with both
+        assignee and assignees.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name(
+            'edit_both_assignee_and_assignees'
+        )
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='sigmavirus24',
+                                  repository='github3.py',
+                                  number=637)
+            assignees = ['itsmemattchung', 'sigmavirus24']
+            with pytest.raises(exc.UnprocessableEntity):
+                issue.edit(title='Integration test for editing an issue',
+                           assignee='itsmemattchung',
+                           assignees=assignees)
 
     def test_events(self):
         """Test the ability to iterate over issue events."""

@@ -800,7 +800,8 @@ class Repository(GitHubCore):
                      body=None,
                      assignee=None,
                      milestone=None,
-                     labels=None):
+                     labels=None,
+                     assignees=None):
         """Create an issue on this repository.
 
         :param str title: (required), title of the issue
@@ -814,11 +815,15 @@ class Repository(GitHubCore):
         :param labels: (optional), labels to apply to this
             issue
         :type labels: list of strings
+        :param assignees: (optional), login of the users to assign the
+            issue to
+        :type assignees: list of strings
         :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
             otherwise None
         """
         issue = {'title': title, 'body': body, 'assignee': assignee,
-                 'milestone': milestone, 'labels': labels}
+                 'milestone': milestone, 'labels': labels,
+                 'assignees': assignees}
         self._remove_none(issue)
         json = None
 

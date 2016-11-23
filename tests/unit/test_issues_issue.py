@@ -184,6 +184,21 @@ class TestIssue(helper.UnitHelper):
             data=data
         )
 
+    def test_edit_multiple_assignees(self):
+        """Verify the request for editing an issue with assignees."""
+        data = {
+            'title': 'issue title',
+            'body': 'issue body',
+            'assignees': ['itsmemattchung', 'sigmavirus24'],
+            'state': 'closed',
+            'labels': []
+        }
+        self.instance.edit(**data)
+        self.patch_called_with(
+            url_for(),
+            data=data
+        )
+
     def test_edit_milestone(self):
         """Verify the request for editing an issue."""
         data = {
