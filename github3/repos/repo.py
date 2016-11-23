@@ -687,7 +687,7 @@ class Repository(GitHubCore):
         return self._instance_or_null(Commit, json)
 
     @requires_auth
-    def create_deployment(self, ref, required_contexts=[], payload='',
+    def create_deployment(self, ref, required_contexts=None, payload='',
                           auto_merge=False, description='', environment=None):
         """Create a deployment.
 
@@ -707,6 +707,8 @@ class Repository(GitHubCore):
         """
         json = None
         if ref:
+            if required_contexts is None:
+                required_contexts = []
             url = self._build_url('deployments', base_url=self._api)
             data = {'ref': ref, 'required_contexts': required_contexts,
                     'payload': payload, 'auto_merge': auto_merge,
