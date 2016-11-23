@@ -231,9 +231,9 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('create_deployment')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('adrianmoisey', 'temptest')
             assert repository is not None
-            deployment = repository.create_deployment('0.8.2')
+            deployment = repository.create_deployment('adrianmoisey-patch-1')
 
         assert isinstance(deployment, github3.repos.deployment.Deployment)
 
