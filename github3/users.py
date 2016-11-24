@@ -391,7 +391,7 @@ class User(BaseAccount):
         :param str login: (required), new name of the user
         :returns: bool
         """
-        url = self._build_url('admin', 'users', self.id)
+        url = self._build_url('admin', 'users', self.login)
         payload = {'login': login}
         resp = self._boolean(self._patch(url, data=payload), 202, 403)
         return resp
@@ -407,7 +407,7 @@ class User(BaseAccount):
             i.e., 'gist', 'user'
         :returns: :class:`Authorization <Authorization>`
         """
-        url = self._build_url('admin', 'users', self.id, 'authorizations')
+        url = self._build_url('admin', 'users', self.login, 'authorizations')
         data = {}
 
         if scopes:
@@ -425,7 +425,7 @@ class User(BaseAccount):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('admin', 'users', self.id, 'authorizations')
+        url = self._build_url('admin', 'users', self.login, 'authorizations')
 
         return self._boolean(self._delete(url), 204, 403)
 
@@ -494,5 +494,5 @@ class User(BaseAccount):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('admin', 'users', self.id)
+        url = self._build_url('admin', 'users', self.login)
         return self._boolean(self._delete(url), 204, 403)
