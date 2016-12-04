@@ -44,6 +44,8 @@ class Team(GitHubCore):
         self._api = team.get('url', '')
         #: This team's name.
         self.name = team.get('name')
+        #: This team's slug.
+        self.slug = team.get('slug')
         #: Unique ID of the team.
         self.id = team.get('id')
         #: Permission level of the group.
