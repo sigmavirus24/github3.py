@@ -1615,7 +1615,7 @@ class Repository(GitHubCore):
             :class:`Milestone <github3.issues.milestone.Milestone>`\ s
         """
         url = self._build_url('milestones', base_url=self._api)
-        accepted = {'state': ('open', 'closed'),
+        accepted = {'state': ('open', 'closed', 'all'),
                     'sort': ('due_date', 'completeness'),
                     'direction': ('asc', 'desc')}
         params = {'state': state, 'sort': sort, 'direction': direction}
