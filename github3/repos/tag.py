@@ -19,13 +19,16 @@ class RepoTag(GitHubCore):
     """
     def _update_attributes(self, tag):
         #: Name of the tag.
-        self.name = tag.get('name')
+        self.name = self._get_attribute(tag, 'name')
+
         #: URL for the GitHub generated zipball associated with the tag.
-        self.zipball_url = tag.get('zipball_url')
+        self.zipball_url = self._get_attribute(tag, 'zipball_url')
+
         #: URL for the GitHub generated tarball associated with the tag.
-        self.tarball_url = tag.get('tarball_url')
+        self.tarball_url = self._get_attribute(tag, 'tarball_url')
+
         #: Dictionary containing the SHA and URL of the commit.
-        self.commit = tag.get('commit', {})
+        self.commit = self._get_attribute(tag, 'commit', {})
 
     def _repr(self):
         return '<Repository Tag [{0}]>'.format(self)

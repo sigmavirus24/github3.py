@@ -19,18 +19,18 @@ class License(GitHubCore):
     }
 
     def _update_attributes(self, license):
-        self._api = license.get('url', '')
-        self.name = license.get('name')
-        self.permitted = license.get('permitted')
-        self.category = license.get('category')
-        self.forbidden = license.get('forbidden')
-        self.featured = license.get('featured')
-        self.html_url = license.get('html_url')
-        self.body = license.get('body')
-        self.key = license.get('key')
-        self.description = license.get('description')
-        self.implementation = license.get('implementation')
-        self.required = license.get('required')
+        self._api = self._get_attribute(license, 'url')
+        self.name = self._get_attribute(license, 'name')
+        self.permitted = self._get_attribute(license, 'permitted')
+        self.category = self._get_attribute(license, 'category')
+        self.forbidden = self._get_attribute(license, 'forbidden')
+        self.featured = self._get_attribute(license, 'featured')
+        self.html_url = self._get_attribute(license, 'html_url')
+        self.body = self._get_attribute(license, 'body')
+        self.key = self._get_attribute(license, 'key')
+        self.description = self._get_attribute(license, 'description')
+        self.implementation = self._get_attribute(license, 'implementation')
+        self.required = self._get_attribute(license, 'required')
 
     def _repr(self):
         return '<License [{0}]>'.format(self.name)

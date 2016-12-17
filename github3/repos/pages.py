@@ -5,16 +5,16 @@ from ..models import GitHubCore
 
 class PagesInfo(GitHubCore):
     def _update_attributes(self, info):
-        self._api = info.get('url')
+        self._api = self._get_attribute(info, 'url')
 
         #: Status of the pages site, e.g., built
-        self.status = info.get('status')
+        self.status = self._get_attribute(info, 'status')
 
         #: CName used for the pages site
-        self.cname = info.get('cname')
+        self.cname = self._get_attribute(info, 'cname')
 
         #: Boolean indicating whether there is a custom 404 for the pages site
-        self.custom_404 = info.get('custom_404')
+        self.custom_404 = self._get_attribute(info, 'custom_404')
 
     def _repr(self):
         info = self.cname or ''
@@ -26,30 +26,30 @@ class PagesInfo(GitHubCore):
 
 class PagesBuild(GitHubCore):
     def _update_attributes(self, build):
-        self._api = build.get('url')
+        self._api = self._get_attribute(build, 'url')
 
         #: Status of the pages build, e.g., building
-        self.status = build.get('status')
+        self.status = self._get_attribute(build, 'status')
 
         #: Error dictionary containing the error message
-        self.error = build.get('error')
+        self.error = self._get_attribute(build, 'error')
 
         from ..users import User
         #: :class:`User <github3.users.User>` representing who pushed the
         #: commit
-        self.pusher = User(build.get('pusher'))
+        self.pusher = self._class_attribute(build, 'pusher', User)
 
         #: SHA of the commit that triggered the build
-        self.commit = build.get('commit')
+        self.commit = self._get_attribute(build, 'commit')
 
         #: Time the build took to finish
-        self.duration = build.get('duration')
+        self.duration = self._get_attribute(build, 'duration')
 
         #: Datetime the build was created
-        self.created_at = self._strptime(build.get('created_at'))
+        self.created_at = self._strptime_attribute(build, 'created_at')
 
         #: Datetime the build was updated
-        self.updated_at = self._strptime(build.get('updated_at'))
+        self.updated_at = self._strptime_attribute(build, 'updated_at')
 
     def _repr(self):
         return '<Pages Build [{0}/{1}]>'.format(self.commit, self.status)

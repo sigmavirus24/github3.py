@@ -40,27 +40,31 @@ class Event(GitHubCore):
         from .users import User
         from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
-        self.actor = User(event.get('actor')) if event.get('actor') else None
+        self.actor = self._class_attribute(event, 'actor', User)
         #: datetime object representing when the event was created.
-        self.created_at = self._strptime(event.get('created_at'))
+        self.created_at = self._strptime_attribute(event, 'created_at')
+
         #: Unique id of the event
-        self.id = event.get('id')
+        self.id = self._get_attribute(event, 'id')
+
         #: List all possible types of Events
-        self.org = None
-        if event.get('org'):
-            self.org = Organization(event.get('org'))
+        self.org = self._class_attribute(event, 'org', Organization)
+
         #: Event type https://developer.github.com/v3/activity/events/types/
-        self.type = event.get('type')
+        self.type = self._get_attribute(event, 'type')
         handler = _payload_handlers.get(self.type, identity)
+
         #: Dictionary with the payload. Payload structure is defined by type_.
         #  _type: http://developer.github.com/v3/events/types
-        self.payload = handler(event.get('payload'), self)
+        self.payload = self._class_attribute(event, 'payload', handler, self)
+
         #: Return ``tuple(owner, repository_name)``
-        self.repo = event.get('repo')
-        if self.repo is not None:
+        self.repo = self._get_attribute(event, 'repo')
+        if self.repo and self.repo is not self.Empty:
             self.repo = tuple(self.repo['name'].split('/'))
+
         #: Indicates whether the Event is public or not.
-        self.public = event.get('public')
+        self.public = self._get_attribute(event, 'public')
 
     def _repr(self):
         return '<Event [{0}]>'.format(self.type[:-5])

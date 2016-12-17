@@ -31,12 +31,10 @@ class GistComment(BaseComment):
     """
 
     def _update_attributes(self, comment):
-        self._api = comment.get('url')
+        self._api = self._get_attribute(comment, 'url')
         #: :class:`User <github3.users.User>` who made the comment
         #: Unless it is not associated with an account
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)  # (No coverage)
+        self.user = self._class_attribute(comment, 'user', User, self)
 
     def _repr(self):
         return '<Gist Comment [{0}]>'.format(self.user.login)

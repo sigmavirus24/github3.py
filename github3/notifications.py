@@ -32,29 +32,39 @@ class Thread(GitHubCore):
     http://developer.github.com/v3/activity/notifications/#view-a-single-thread
     """
     def _update_attributes(self, notif):
-        self._api = notif.get('url')
+        self._api = self._get_attribute(notif, 'url')
+
         #: Comment responsible for the notification
-        self.comment = notif.get('comment', {})
+        self.comment = self._get_attribute(notif, 'comment', {})
+
         #: Thread information
-        self.thread = notif.get('thread', {})
+        self.thread = self._get_attribute(notif, 'thread', {})
 
         from .repos import Repository
         #: Repository the comment was made on
-        self.repository = Repository(notif.get('repository', {}), self)
+        self.repository = self._class_attribute(
+            notif, 'repository', Repository, self
+        )
+
         #: When the thread was last updated
-        self.updated_at = self._strptime(notif.get('updated_at'))
+        self.updated_at = self._strptime_attribute(notif, 'updated_at')
+
         #: Id of the thread
-        self.id = notif.get('id')
+        self.id = self._get_attribute(notif, 'id')
+
         #: Dictionary of urls for the thread
-        self.urls = notif.get('urls')
+        self.urls = self._get_attribute(notif, 'urls')
+
         #: datetime object representing the last time the user read the thread
-        self.last_read_at = self._strptime(notif.get('last_read_at'))
+        self.last_read_at = self._strptime_attribute(notif, 'last_read_at')
+
         #: The reason you're receiving the notification
-        self.reason = notif.get('reason')
+        self.reason = self._get_attribute(notif, 'reason')
+
         #: Subject of the Notification, e.g., which issue/pull/diff is this in
         #: relation to. This is a dictionary
-        self.subject = notif.get('subject')
-        self.unread = notif.get('unread')
+        self.subject = self._get_attribute(notif, 'subject')
+        self.unread = self._get_attribute(notif, 'unread')
 
     def _repr(self):
         return '<Thread [{0}]>'.format(self.subject.get('title'))
@@ -112,17 +122,23 @@ class Subscription(GitHubCore):
     """
 
     def _update_attributes(self, sub):
-        self._api = sub.get('url')
+        self._api = self._get_attribute(sub, 'url')
+
         #: reason user is subscribed to this thread/repository
-        self.reason = sub.get('reason')
+        self.reason = self._get_attribute(sub, 'reason')
+
         #: datetime representation of when the subscription was created
-        self.created_at = self._strptime(sub.get('created_at'))
+        self.created_at = self._strptime_attribute(sub, 'created_at')
+
         #: API url of the thread if it exists
-        self.thread_url = sub.get('thread_url')
+        self.thread_url = self._get_attribute(sub, 'thread_url')
+
         #: API url of the repository if it exists
-        self.repository_url = sub.get('repository_url')
-        self.ignored = sub.get('ignored', False)
-        self.subscribed = sub.get('subscribed', False)
+        self.repository_url = self._get_attribute(sub, 'repository_url')
+
+        self.ignored = self._get_attribute(sub, 'ignored', False)
+
+        self.subscribed = self._get_attribute(sub, 'subscribed', False)
 
     def _repr(self):
         return '<Subscription [{0}]>'.format(self.subscribed)

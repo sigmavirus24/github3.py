@@ -237,8 +237,8 @@ class TestGistFile(helper.UnitHelper):
     example_data = gist_example_short_data()
 
     def test_no_original_content(self):
-        """Show that attribute original content is None."""
-        assert self.instance.original_content is None
+        """Show that attribute original content is Empty."""
+        assert self.instance.original_content is self.instance.Empty
 
     def test_get_file_content_from_raw_url(self):
         """Verify the request made to retrieve a GistFile's content."""

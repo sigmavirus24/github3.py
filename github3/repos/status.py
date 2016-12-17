@@ -21,21 +21,28 @@ class Status(GitHubCore):
     def _update_attributes(self, status):
         #: A string label to differentiate this status from the status of
         #: other systems
-        self.context = status.get('context')
+        self.context = self._get_attribute(status, 'context')
+
         #: datetime object representing the creation of the status object
-        self.created_at = self._strptime(status.get('created_at'))
+        self.created_at = self._strptime_attribute(status, 'created_at')
+
         #: :class:`User <github3.users.User>` who created the object
-        self.creator = User(status.get('creator'))
+        self.creator = self._class_attribute(status, 'creator', User)
+
         #: Short description of the Status
-        self.description = status.get('description')
+        self.description = self._get_attribute(status, 'description')
+
         #: GitHub ID for the status object
-        self.id = status.get('id')
+        self.id = self._get_attribute(status, 'id')
+
         #: State of the status, e.g., 'success', 'pending', 'failed', 'error'
-        self.state = status.get('state')
+        self.state = self._get_attribute(status, 'state')
+
         #: URL to view more information about the status
-        self.target_url = status.get('target_url')
+        self.target_url = self._get_attribute(status, 'target_url')
+
         #: datetime object representing the last time the status was updated
-        self.updated_at = self._strptime(status.get('updated_at'))
+        self.updated_at = self._strptime_attribute(status, 'updated_at')
 
     def _repr(self):
         return '<Status [{s.id}:{s.state}]>'.format(s=self)

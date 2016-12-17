@@ -19,19 +19,24 @@ class GistFile(GitHubCore):
 
     """
 
-    def _update_attributes(self, attributes):
+    def _update_attributes(self, gistfile):
         #: The raw URL for the file at GitHub.
-        self.raw_url = attributes.get('raw_url')
+        self.raw_url = self._get_attribute(gistfile, 'raw_url')
+
         #: The name of the file.
-        self.filename = attributes.get('filename')
+        self.filename = self._get_attribute(gistfile, 'filename')
+
         #: The name of the file.
-        self.name = attributes.get('filename')
+        self.name = self._get_attribute(gistfile, 'filename')
+
         #: The language associated with the file.
-        self.language = attributes.get('language')
+        self.language = self._get_attribute(gistfile, 'language')
+
         #: The size of the file.
-        self.size = attributes.get('size')
+        self.size = self._get_attribute(gistfile, 'size')
+
         #: The content of the file.
-        self.original_content = attributes.get('content')
+        self.original_content = self._get_attribute(gistfile, 'content')
 
     def _repr(self):
         return '<Gist File [{0}]>'.format(self.name)

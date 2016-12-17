@@ -68,6 +68,7 @@ Modules
 
     api
     auths
+    empty
     events
     gists
     git
@@ -120,10 +121,10 @@ Dependencies
 Contributing
 ------------
 
-I'm maintaining two public copies of the project. The first can be found on 
-GitHub_ and the second on BitBucket_. I would prefer pull requests to take 
-place on GitHub, but feel free to do them via BitBucket. Please make sure to 
-add yourself to the list of contributors in AUTHORS.rst, especially if you're 
+I'm maintaining two public copies of the project. The first can be found on
+GitHub_ and the second on BitBucket_. I would prefer pull requests to take
+place on GitHub, but feel free to do them via BitBucket. Please make sure to
+add yourself to the list of contributors in AUTHORS.rst, especially if you're
 going to be working on the list below.
 
 .. links
@@ -137,12 +138,12 @@ In order of importance:
 
 Documentation
 
-    I know I'm not the best at writing documentation so if you want to clarify 
+    I know I'm not the best at writing documentation so if you want to clarify
     or correct something, please do so.
 
 Examples
 
-    Have a clever example that takes advantage of github3.py? Feel free to 
+    Have a clever example that takes advantage of github3.py? Feel free to
     share it.
 
 Running the Unittests
@@ -160,8 +161,8 @@ We test against PyPy and the following versions of Python:
 - 3.3
 - 3.4
 
-If you simply run ``tox`` it will run tests against all of these versions of 
-python and run ``flake8`` against the codebase as well. If you want to run 
+If you simply run ``tox`` it will run tests against all of these versions of
+python and run ``flake8`` against the codebase as well. If you want to run
 against one specific version, you can do::
 
     tox -e py34
@@ -170,8 +171,8 @@ And if you want to run tests against a specific file, you can do::
 
     tox -e py34 -- tests/uni/test_github.py
 
-To run the tests, ``tox`` uses ``py.test`` so you can pass any options or 
-parameters to ``py.test`` after specifying ``--``. For example, you can get 
+To run the tests, ``tox`` uses ``py.test`` so you can pass any options or
+parameters to ``py.test`` after specifying ``--``. For example, you can get
 more verbose output by doing::
 
     tox -e py34 -- -vv
@@ -206,50 +207,50 @@ Testimonials
 
 .. raw:: html
 
-    <blockquote class="twitter-tweet"><p>gotta hand it to @<a 
-    href="https://twitter.com/sigmavirus24">sigmavirus24</a> ... github3.py is 
+    <blockquote class="twitter-tweet"><p>gotta hand it to @<a
+    href="https://twitter.com/sigmavirus24">sigmavirus24</a> ... github3.py is
     really well written. It will soon be powering the github stuff on
     @<a href="https://twitter.com/workforpie">workforpie</a>
-    </p>&mdash; Brad Montgomery # (@bkmontgomery) <a 
+    </p>&mdash; Brad Montgomery # (@bkmontgomery) <a
     href="https://twitter.com/bkmontgomery/status/325644863561400320">April 20, 2013</a>
     </blockquote>
 
-    <blockquote class="twitter-tweet"><p>awesome github v3 api wrapper in 
-    python <a href="https://t.co/PhD0Aj5X" 
-    title="https://github.com/sigmavirus24/github3.py">github.com/sigmavirus24/g#</a></p>&mdash; 
-    Mahdi Yusuf (@myusuf3) <a 
-    href="https://twitter.com/myusuf3/status/258571050927915008">October 17, 
+    <blockquote class="twitter-tweet"><p>awesome github v3 api wrapper in
+    python <a href="https://t.co/PhD0Aj5X"
+    title="https://github.com/sigmavirus24/github3.py">github.com/sigmavirus24/g#</a></p>&mdash;
+    Mahdi Yusuf (@myusuf3) <a
+    href="https://twitter.com/myusuf3/status/258571050927915008">October 17,
     2012</a></blockquote>
 
     <blockquote class="twitter-tweet">
-    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> github3 is 
-    awesome! Made my life much easier tonight, which is a very good 
-    thing.</p>&mdash; Mike Grouchy (@mgrouchy) <a 
-    href="https://twitter.com/mgrouchy/status/316370772782350336">March 26, 
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> github3 is
+    awesome! Made my life much easier tonight, which is a very good
+    thing.</p>&mdash; Mike Grouchy (@mgrouchy) <a
+    href="https://twitter.com/mgrouchy/status/316370772782350336">March 26,
     2013</a></blockquote>
 
     <blockquote class="twitter-tweet" data-conversation="none">
-    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> "There are 
-    so many Python client libraries for GitHub API, I tried all of them, and 
-    my conclusion is: github3.py is the best."</p>&mdash; Hong Minhee 
-    (@hongminhee) <a 
-    href="https://twitter.com/hongminhee/status/315295733899210752">March 23, 
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> "There are
+    so many Python client libraries for GitHub API, I tried all of them, and
+    my conclusion is: github3.py is the best."</p>&mdash; Hong Minhee
+    (@hongminhee) <a
+    href="https://twitter.com/hongminhee/status/315295733899210752">March 23,
     2013</a></blockquote>
 
     <blockquote class="twitter-tweet">
-    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> I cannot 
-    wait to use your github package for <a 
-    href="https://twitter.com/search/%23zci">#zci</a>. Do you have it packaged 
-    for debian by any chance?</p>&mdash; Zygmunt Krynicki (@zygoon) <a 
-    href="https://twitter.com/zygoon/status/316608301527887872">March 26, 
+    <p>@<a href="https://twitter.com/sigmavirus24">sigmavirus24</a> I cannot
+    wait to use your github package for <a
+    href="https://twitter.com/search/%23zci">#zci</a>. Do you have it packaged
+    for debian by any chance?</p>&mdash; Zygmunt Krynicki (@zygoon) <a
+    href="https://twitter.com/zygoon/status/316608301527887872">March 26,
     2013</a></blockquote>
 
     <blockquote class="twitter-tweet">
-    <p>Developing against github3.py's API is a joy, kudos to @<a 
-    href="https://twitter.com/sigmavirus24">sigmavirus24</a></p>&mdash; 
-    Alejandro Gomez (@dialelo) <a 
-    href="https://twitter.com/dialelo/status/316846075015229440">March 27, 
+    <p>Developing against github3.py's API is a joy, kudos to @<a
+    href="https://twitter.com/sigmavirus24">sigmavirus24</a></p>&mdash;
+    Alejandro Gomez (@dialelo) <a
+    href="https://twitter.com/dialelo/status/316846075015229440">March 27,
     2013</a></blockquote>
 
-    <script async src="//platform.twitter.com/widgets.js" 
+    <script async src="//platform.twitter.com/widgets.js"
     charset="utf-8"></script>

@@ -9,11 +9,12 @@ that can be accessed via the GitHub API.
 """
 from __future__ import unicode_literals
 
-from json import dumps
 from base64 import b64decode, b64encode
+from json import dumps
+
+from ..decorators import requires_auth
 from ..git import Commit
 from ..models import GitHubCore
-from ..decorators import requires_auth
 
 
 class Contents(GitHubCore):
@@ -32,28 +33,32 @@ class Contents(GitHubCore):
 
     See also: http://developer.github.com/v3/repos/contents/
     """
+
     def _update_attributes(self, content):
         # links
-        self._api = content.get('url')
+        self._api = self._get_attribute(content, 'url')
+
         #: Dictionary of links
-        self.links = content.get('_links')
+        self.links = self._get_attribute(content, '_links')
 
         #: URL of the README on github.com
-        self.html_url = content.get('html_url')
+        self.html_url = self._get_attribute(content, 'html_url')
 
         #: URL for the git api pertaining to the README
-        self.git_url = content.get('git_url')
+        self.git_url = self._get_attribute(content, 'git_url')
 
         #: git:// URL of the content if it is a submodule
-        self.submodule_git_url = content.get('submodule_git_url')
+        self.submodule_git_url = self._get_attribute(
+            content, 'submodule_git_url'
+        )
 
         # should always be 'base64'
         #: Returns encoding used on the content.
-        self.encoding = content.get('encoding', '')
+        self.encoding = self._get_attribute(content, 'encoding')
 
         # content, base64 encoded and decoded
         #: Base64-encoded content of the file.
-        self.content = content.get('content')
+        self.content = self._get_attribute(content, 'content')
 
         #: Decoded content of the file as a bytes object. If we try to decode
         #: to character set for you, we might encounter an exception which
@@ -63,23 +68,24 @@ class Contents(GitHubCore):
         #: ``content.decoded.decode('utf-8')``.
         #: .. versionchanged:: 0.5.2
         self.decoded = self.content
-        if self.encoding == 'base64' and self.content:
+        if self.encoding == 'base64' and self.content and \
+                self.content is not self.Empty:
             self.decoded = b64decode(self.content.encode())
 
         # file name, path, and size
         #: Name of the content.
-        self.name = content.get('name', '')
+        self.name = self._get_attribute(content, 'name')
         #: Path to the content.
-        self.path = content.get('path', '')
+        self.path = self._get_attribute(content, 'path')
         #: Size of the content
-        self.size = content.get('size', 0)
+        self.size = self._get_attribute(content, 'size')
         #: SHA string.
-        self.sha = content.get('sha', '')
+        self.sha = self._get_attribute(content, 'sha')
         #: Type of content. ('file', 'symlink', 'submodule')
-        self.type = content.get('type', '')
+        self.type = self._get_attribute(content, 'type')
         #: Target will only be set of type is a symlink. This is what the link
         #: points to
-        self.target = content.get('target', '')
+        self.target = self._get_attribute(content, 'target')
 
         self._uniq = self.sha
 

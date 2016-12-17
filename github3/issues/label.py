@@ -13,11 +13,11 @@ class Label(GitHubCore):
     See also: http://developer.github.com/v3/issues/labels/
     """
     def _update_attributes(self, label):
-        self._api = label.get('url', '')
+        self._api = self._get_attribute(label, 'url')
         #: Color of the label, e.g., 626262
-        self.color = label.get('color')
+        self.color = self._get_attribute(label, 'color')
         #: Name of the label, e.g., 'bug'
-        self.name = label.get('name')
+        self.name = self._get_attribute(label, 'name')
 
         self._uniq = self._api
 

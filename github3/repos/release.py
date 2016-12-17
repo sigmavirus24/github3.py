@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import json
 
+from uritemplate import URITemplate
+
+from .. import utils
 from ..decorators import requires_auth
 from ..exceptions import error_for
 from ..models import GitHubCore
-from .. import utils
-from uritemplate import URITemplate
 
 
 class Release(GitHubCore):
@@ -21,40 +23,60 @@ class Release(GitHubCore):
     CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
 
     def _update_attributes(self, release):
-        self._api = release.get('url')
+        self._api = self._get_attribute(release, 'url')
+
         #: List of :class:`Asset <Asset>` objects for this release
-        self.original_assets = [
-            Asset(i, self) for i in release.get('assets', [])
-        ]
+        self.original_assets = self._get_attribute(release, 'assets', [])
+        if self.original_assets and self.original_assets is not self.Empty:
+            self.original_assets = [
+                Asset(i, self) for i in self.original_assets
+            ]
+
         #: URL for uploaded assets
-        self.assets_url = release.get('assets_url')
+        self.assets_url = self._get_attribute(release, 'assets_url')
+
         #: Body of the release (the description)
-        self.body = release.get('body')
+        self.body = self._get_attribute(release, 'body')
+
         #: Date the release was created
-        self.created_at = self._strptime(release.get('created_at'))
+        self.created_at = self._strptime_attribute(release, 'created_at')
+
         #: Boolean whether value is True or False
-        self.draft = release.get('draft')
+        self.draft = self._get_attribute(release, 'draft')
+
         #: HTML URL of the release
-        self.html_url = release.get('html_url')
+        self.html_url = self._get_attribute(release, 'html_url')
+
         #: GitHub id
-        self.id = release.get('id')
+        self.id = self._get_attribute(release, 'id')
+
         #: Name given to the release
-        self.name = release.get('name')
+        self.name = self._get_attribute(release, 'name')
+
         #: Boolean whether release is a prerelease
-        self.prerelease = release.get('prerelease')
+        self.prerelease = self._get_attribute(release, 'prerelease')
+
         #: Date the release was published
-        self.published_at = self._strptime(release.get('published_at'))
+        self.published_at = self._strptime_attribute(release, 'published_at')
+
         #: Name of the tag
-        self.tag_name = release.get('tag_name')
+        self.tag_name = self._get_attribute(release, 'tag_name')
+
         #: URL to download a tarball of the release
-        self.tarball_url = release.get('tarball_url')
+        self.tarball_url = self._get_attribute(release, 'tarball_url')
+
         #: "Commit" that this release targets
-        self.target_commitish = release.get('target_commitish')
-        upload_url = release.get('upload_url')
+        self.target_commitish = self._get_attribute(
+            release, 'target_commitish'
+        )
+
         #: URITemplate to upload an asset with
-        self.upload_urlt = URITemplate(upload_url) if upload_url else None
+        self.upload_urlt = self._class_attribute(
+            release, 'upload_url', URITemplate
+        )
+
         #: URL to download a zipball of the release
-        self.zipball_url = release.get('zipball_url')
+        self.zipball_url = self._get_attribute(release, 'zipball_url')
 
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
@@ -185,30 +207,42 @@ class Release(GitHubCore):
 class Asset(GitHubCore):
 
     def _update_attributes(self, asset):
-        self._api = asset.get('url')
+        self._api = self._get_attribute(asset, 'url')
+
         #: Content-Type provided when the asset was created
-        self.content_type = asset.get('content_type')
+        self.content_type = self._get_attribute(asset, 'content_type')
+
         #: Date the asset was created
-        self.created_at = self._strptime(asset.get('created_at'))
+        self.created_at = self._strptime_attribute(asset, 'created_at')
+
         #: Number of times the asset was downloaded
-        self.download_count = asset.get('download_count')
+        self.download_count = self._get_attribute(asset, 'download_count')
+
         #: URL to download the asset.
         #: Request headers must include ``Accept: application/octet-stream``.
         self.download_url = self._api
+
         # User friendly download URL
-        self.browser_download_url = asset.get('browser_download_url')
+        self.browser_download_url = self._get_attribute(
+            asset, 'browser_download_url')
+
         #: GitHub id of the asset
-        self.id = asset.get('id')
+        self.id = self._get_attribute(asset, 'id')
+
         #: Short description of the asset
-        self.label = asset.get('label')
+        self.label = self._get_attribute(asset, 'label')
+
         #: Name of the asset
-        self.name = asset.get('name')
+        self.name = self._get_attribute(asset, 'name')
+
         #: Size of the asset
-        self.size = asset.get('size')
+        self.size = self._get_attribute(asset, 'size')
+
         #: State of the asset, e.g., "uploaded"
-        self.state = asset.get('state')
+        self.state = self._get_attribute(asset, 'state')
+
         #: Date the asset was updated
-        self.updated_at = self._strptime(asset.get('updated_at'))
+        self.updated_at = self._strptime_attribute(asset, 'updated_at')
 
     def _repr(self):
         return '<Asset [{0}]>'.format(self.name)
@@ -226,7 +260,7 @@ class Asset(GitHubCore):
         """
         headers = {
             'Accept': 'application/octet-stream'
-            }
+        }
         resp = self._get(self._api, allow_redirects=False, stream=True,
                          headers=headers)
         if resp.status_code == 302:
@@ -234,7 +268,7 @@ class Asset(GitHubCore):
             # certain request headers
             headers.update({
                 'Content-Type': None,
-                })
+            })
 
             with self.session.no_auth():
                 resp = self._get(resp.headers['location'], stream=True,

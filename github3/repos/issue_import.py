@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from ..models import GitHubCore
+
+
 """
 github3.repos.issue_import
 ==========================
@@ -21,15 +23,20 @@ class ImportedIssue(GitHubCore):
         'Accept': 'application/vnd.github.golden-comet-preview+json'
     }
 
-    def _update_attributes(self, json):
-        self.id = json.get('id', None)
-        self.status = json.get('status', None)
-        self.url = json.get('url', None)
+    def _update_attributes(self, issue):
+        self.id = self._get_attribute(issue, 'id')
+
+        self.status = self._get_attribute(issue, 'status')
+
+        self.url = self._get_attribute(issue, 'url')
+
         # Since created_at and updated_at returns slightly different format
         # we can't use self._strptime
         # For example, repo correctly returns '2015-04-15T03:40:51Z'
         # For ImportedIssue, the format is '2016-01-14T10:57:56-08:00'
-        self.created_at = json.get('created_at', None)
-        self.updated_at = json.get('updated_at', None)
-        self.import_issues_url = json.get('import_issues_url')
-        self.repository_url = json.get('repository_url', None)
+        self.created_at = self._get_attribute(issue, 'created_at')
+        self.updated_at = self._get_attribute(issue, 'updated_at')
+        self.import_issues_url = self._get_attribute(
+            issue, 'import_issues_url'
+        )
+        self.repository_url = self._get_attribute(issue, 'repository_url')
