@@ -113,6 +113,8 @@ class PullRequest(models.GitHubCore):
 
     def _update_attributes(self, pull):
         self._api = pull.get('url', '')
+        pull = self._json(self._get(self._api), 200)
+
         #: Base of the merge
         self.base = PullDestination(pull.get('base'), 'Base')
         #: Body of the pull request message
