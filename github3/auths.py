@@ -8,11 +8,13 @@ This module contains the Authorization object.
 """
 from __future__ import unicode_literals
 
-from .decorators import requires_basic_auth
-from .models import GitHubCore
+import base64
+
+from . import decorators
+from . import models
 
 
-class Authorization(GitHubCore):
+class Authorization(models.GitHubCore):
 
     """The :class:`Authorization <Authorization>` object.
 
@@ -30,11 +32,13 @@ class Authorization(GitHubCore):
 
     """
 
+    CUSTOM_HEADERS = {'Accept': 'application/vnd.github.mirage-preview+json'}
+
     def _update_attributes(self, auth):
         self._api = auth.get('url')
         #: Details about the application (name, url)
         self.app = auth.get('app', {})
-        #: Returns the Authorization token
+        #: **DEPRECATED** Returns the Authorization token
         self.token = auth.get('token', '')
         #: App name
         self.name = self.app.get('name', '')
@@ -50,6 +54,17 @@ class Authorization(GitHubCore):
         self.created_at = self._strptime(auth.get('created_at'))
         #: datetime object representing when the authorization was updated.
         self.updated_at = self._strptime(auth.get('updated_at'))
+        #: Last eight characters of the associated OAuth token
+        self.token_last_eight = auth.get('token_last_eight')
+        #: base64-encoded of the SHA-256 digest of the token
+        self.hashed_token = auth.get('hashed_token')
+        #: SHA-256 digest of the token (derived from ``hashed_token``)
+        self.sha256_hashed_token = None
+        if self.hashed_token:
+            self.sha256_hashed_token = base64.b64decode(self.hashed_token)
+        #: A string that distinguishes the new authorization from others for
+        #: the same client ID and user
+        self.fingerprint = auth.get('fingerprint')
 
     def _repr(self):
         return '<Authorization [{0}]>'.format(self.name)
@@ -68,7 +83,7 @@ class Authorization(GitHubCore):
 
         return False
 
-    @requires_basic_auth
+    @decorators.requires_basic_auth
     def add_scopes(self, scopes, note=None, note_url=None):
         """Adds the scopes to this authorization.
 
@@ -84,12 +99,12 @@ class Authorization(GitHubCore):
         """
         return self._update({'add_scopes': scopes}, note, note_url)
 
-    @requires_basic_auth
+    @decorators.requires_basic_auth
     def delete(self):
         """Delete this authorization."""
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @requires_basic_auth
+    @decorators.requires_basic_auth
     def remove_scopes(self, scopes, note=None, note_url=None):
         """Remove the scopes from this authorization.
 
@@ -105,7 +120,7 @@ class Authorization(GitHubCore):
         """
         return self._update({'rm_scopes': scopes}, note, note_url)
 
-    @requires_basic_auth
+    @decorators.requires_basic_auth
     def replace_scopes(self, scopes, note=None, note_url=None):
         """Replace the scopes on this authorization.
 
