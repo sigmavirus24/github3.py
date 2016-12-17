@@ -199,12 +199,12 @@ class GitHubCore(object):
                 del(data[k])
 
     def _instance_or_null(self, instance_class, json):
-        if not json:
-            return NullObject(instance_class.__name__)
-        if not isinstance(json, dict):
+        if json is not None and not isinstance(json, dict):
             raise exceptions.UnprocessableResponseBody(
                 "GitHub's API returned a body that could not be handled", json
             )
+        if not json:
+            return NullObject(instance_class.__name__)
         try:
             return instance_class(json, self)
         except TypeError:  # instance_class is not a subclass of GitHubCore
