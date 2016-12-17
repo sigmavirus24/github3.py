@@ -9,10 +9,8 @@ This module contains the RepoCommit class alone
 from __future__ import unicode_literals
 
 from . import status
+from .. import git, models, users
 from .comment import RepoComment
-from .. import git
-from .. import models
-from .. import users
 
 
 class RepoCommit(models.BaseCommit):
@@ -31,40 +29,44 @@ class RepoCommit(models.BaseCommit):
         c1.sha != c2.sha
 
     """
+
     def _update_attributes(self, commit):
         super(RepoCommit, self)._update_attributes(commit)
-        #: :class:`User <github3.users.User>` who authored the commit.
-        self.author = commit.get('author')
-        if self.author:
-            self.author = users.User(self.author, self)
-        #: :class:`User <github3.users.User>` who committed the commit.
-        self.committer = commit.get('committer')
-        if self.committer:
-            self.committer = users.User(self.committer, self)
-        #: :class:`Commit <github3.git.Commit>`.
-        self.commit = commit.get('commit')
-        if self.commit:
-            self.commit = git.Commit(self.commit, self)
 
-        self.sha = commit.get('sha')
+        #: :class:`User <github3.users.User>` who authored the commit.
+        self.author = self._class_attribute(commit, 'author', users.User, self)
+
+        #: :class:`User <github3.users.User>` who committed the commit.
+        self.committer = self._class_attribute(
+            commit, 'committer', users.User, self
+        )
+
+        #: :class:`Commit <github3.git.Commit>`.
+        self.commit = self._class_attribute(commit, 'commit', git.Commit, self)
+
+        self.sha = self._get_attribute(commit, 'sha')
+
         #: The number of additions made in the commit.
         self.additions = 0
+
         #: The number of deletions made in the commit.
         self.deletions = 0
+
         #: Total number of changes in the files.
         self.total = 0
-        if commit.get('stats'):
+        stats = self._get_attribute(commit, 'stats')
+        if stats and stats is not self.Empty:
             self.additions = commit['stats'].get('additions')
             self.deletions = commit['stats'].get('deletions')
             self.total = commit['stats'].get('total')
 
         #: The files that were modified by this commit.
-        self.files = commit.get('files', [])
+        self.files = self._get_attribute(commit, 'files', [])
 
         self._uniq = self.sha
 
         #: The commit message
-        self.message = getattr(self.commit, 'message', None)
+        self.message = getattr(self.commit, 'message', self.Empty)
 
     def _repr(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])

@@ -46,12 +46,19 @@ class TestMilestone(helper.UnitHelper):
 
         assert self.session.delete.called
 
-    def test_empty_creator(self):
-        """Show that creator is None when json attribute is empty."""
+    def test_none_creator(self):
+        """Show that creator is None when json attribute is set to None."""
         json = self.instance.as_dict().copy()
         json['creator'] = None
         milestone = github3.issues.milestone.Milestone(json)
         assert milestone.creator is None
+
+    def test_empty_creator(self):
+        """Show that creator is Empty when the json attribute is left out."""
+        json = self.instance.as_dict().copy()
+        del json['creator']
+        milestone = github3.issues.milestone.Milestone(json)
+        assert milestone.creator is milestone.Empty
 
     def test_due_on(self):
         """Show that due on attribute is a datetime object."""

@@ -14,34 +14,43 @@ class Milestone(GitHubCore):
 
     See also: http://developer.github.com/v3/issues/milestones/
     """
-    def _update_attributes(self, mile):
-        self._api = mile.get('url', '')
+    def _update_attributes(self, milestone):
+        self._api = self._get_attribute(milestone, 'url', '')
+
         #: Identifying number associated with milestone.
-        self.number = mile.get('number')
+        self.number = self._get_attribute(milestone, 'number')
+
         #: State of the milestone, e.g., open or closed.
-        self.state = mile.get('state')
+        self.state = self._get_attribute(milestone, 'state')
+
         #: Title of the milestone, e.g., 0.2.
-        self.title = mile.get('title')
+        self.title = self._get_attribute(milestone, 'title')
+
         #: Description of this milestone.
-        self.description = mile.get('description')
+        self.description = self._get_attribute(milestone, 'description')
+
         #: :class:`User <github3.users.User>` object representing the creator
         #: of the milestone.
-        self.creator = None
-        if mile.get('creator'):
-            self.creator = User(mile.get('creator'), self)
+        self.creator = self._class_attribute(milestone, 'creator', User, self)
+
         #: Number of issues associated with this milestone which are still
         #: open.
-        self.open_issues = mile.get('open_issues')
+        self.open_issues = self._get_attribute(milestone, 'open_issues')
+
         #: The number of closed issues associated with this milestone.
-        self.closed_issues = mile.get('closed_issues')
+        self.closed_issues = self._get_attribute(milestone, 'closed_issues')
+
         #: datetime object representing when the milestone was created.
-        self.created_at = self._strptime(mile.get('created_at'))
+        self.created_at = self._strptime_attribute(milestone, 'created_at')
+
         #: datetime representing when this milestone is due.
-        self.due_on = self._strptime(mile.get('due_on'))
+        self.due_on = self._strptime_attribute(milestone, 'due_on')
+
         #: datetime object representing when the milestone was updated.
-        self.updated_at = self._strptime(mile.get('updated_at'))
+        self.updated_at = self._strptime_attribute(milestone, 'updated_at')
+
         #: string representing the milestone's ID.
-        self.id = mile.get('id')
+        self.id = self._get_attribute(milestone, 'id')
 
     def _repr(self):
         return '<Milestone [{0}]>'.format(self)

@@ -8,10 +8,17 @@ from ..repos import Repository
 class RepositorySearchResult(GitHubCore):
     def _update_attributes(self, data):
         result = data.copy()
+
         #: Score of the result
-        self.score = result.pop('score')
+        self.score = self._get_attribute(result, 'score')
+        if 'score' in result:
+            del result['score']
+
         #: Text matches
-        self.text_matches = result.pop('text_matches', [])
+        self.text_matches = self._get_attribute(result, 'text_matches', [])
+        if 'text_matches' in result:
+            del result['text_matches']
+
         #: Repository object
         self.repository = Repository(result, self)
 

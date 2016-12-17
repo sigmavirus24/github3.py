@@ -31,32 +31,48 @@ class Comparison(GitHubCore):
     See also:
     http://developer.github.com/v3/repos/commits/#compare-two-commits
     """
+
     def _update_attributes(self, compare):
-        self._api = compare.get('url', '')
+        self._api = self._get_attribute(compare, 'url')
+
         #: URL to view the comparison at GitHub
-        self.html_url = compare.get('html_url')
+        self.html_url = self._get_attribute(compare, 'html_url')
+
         #: Permanent link to this comparison.
-        self.permalink_url = compare.get('permalink_url')
+        self.permalink_url = self._get_attribute(compare, 'permalink_url')
+
         #: URL to see the diff between the two commits.
-        self.diff_url = compare.get('diff_url')
+        self.diff_url = self._get_attribute(compare, 'diff_url')
+
         #: Patch URL at GitHub for the comparison.
-        self.patch_url = compare.get('patch_url')
+        self.patch_url = self._get_attribute(compare, 'patch_url')
+
         #: :class:`RepoCommit <github3.repos.commit.RepoCommit>` object
         #: representing the base of comparison.
-        self.base_commit = RepoCommit(compare.get('base_commit'), None)
+        self.base_commit = self._class_attribute(
+            compare, 'base_commit', RepoCommit, None
+        )
+
         #: Behind or ahead.
-        self.status = compare.get('status')
+        self.status = self._get_attribute(compare, 'status')
+
         #: Number of commits ahead by.
-        self.ahead_by = compare.get('ahead_by')
+        self.ahead_by = self._get_attribute(compare, 'ahead_by')
+
         #: Number of commits behind by.
-        self.behind_by = compare.get('behind_by')
+        self.behind_by = self._get_attribute(compare, 'behind_by')
+
         #: Number of commits difference in the comparison.
-        self.total_commits = compare.get('total_commits')
+        self.total_commits = self._get_attribute(compare, 'total_commits')
+
         #: List of :class:`RepoCommit <github3.repos.commit.RepoCommit>`
         #: objects.
-        self.commits = [RepoCommit(com) for com in compare.get('commits')]
+        self.commits = self._get_attribute(compare, 'commits', [])
+        if self.commits and self.commits is not self.Empty:
+            self.commits = [RepoCommit(com) for com in self.commits]
+
         #: List of dicts describing the files modified.
-        self.files = compare.get('files', [])
+        self.files = self._get_attribute(compare, 'files', [])
 
         self._uniq = self.commits
 

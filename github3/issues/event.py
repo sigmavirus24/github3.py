@@ -27,56 +27,45 @@ class IssueEvent(GitHubCore):
         #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
         #    'mentioned', 'assigned')
         #: The type of event, e.g., closed
-        self.event = event.get('event')
+        self.event = self._get_attribute(event, 'event')
         #: SHA of the commit.
-        self.commit_id = event.get('commit_id')
-        self._api = event.get('url', '')
+        self.commit_id = self._get_attribute(event, 'commit_id')
+        self._api = self._get_attribute(event, 'url')
 
         #: :class:`Issue <github3.issues.Issue>` where this comment was made.
-        self.issue = event.get('issue')
-        if self.issue:
-            from .issue import Issue
-            self.issue = Issue(self.issue, self)
+        from .issue import Issue
+        self.issue = self._class_attribute(event, 'issue', Issue, self)
 
         #: :class:`User <github3.users.User>` who caused this event.
-        self.actor = event.get('actor')
-        if self.actor:
-            self.actor = User(self.actor, self)
-
-        #: :class:`User <github3.users.User>` that generated the event.
-        self.actor = event.get('actor')
-        if self.actor:
-            self.actor = User(self.actor, self)
+        self.actor = self._class_attribute(event, 'actor', User, self)
 
         #: Number of comments
-        self.comments = event.get('comments', 0)
+        self.comments = self._get_attribute(event, 'comments')
 
         #: datetime object representing when the event was created.
-        self.created_at = self._strptime(event.get('created_at'))
+        self.created_at = self._strptime_attribute(event, 'created_at')
 
         #: Dictionary of links for the pull request
-        self.pull_request = event.get('pull_request', {})
+        self.pull_request = self._get_attribute(event, 'pull_request', {})
 
         #: Dictionary containing label details
-        self.label = event.get('label', {})
+        self.label = self._get_attribute(event, 'label', {})
 
         #: The integer ID of the event
-        self.id = event.get('id')
+        self.id = self._get_attribute(event, 'id')
 
         #: :class:`User <github3.users.User>` that is assigned
-        self.assignee = event.get('assignee')
-        if self.assignee:
-            self.assignee = User(self.assignee, self)
+        self.assignee = self._class_attribute(event, 'assignee', User, self)
 
         #: Dictionary containing milestone details
-        self.milestone = event.get('milestone', {})
+        self.milestone = self._get_attribute(event, 'milestone', {})
 
         #: Dictionary containing to and from attributes
-        self.rename = event.get('rename', {})
+        self.rename = self._get_attribute(event, 'rename', {})
 
         self._uniq = self.commit_id
 
     def _repr(self):
         return '<Issue Event [{0} by {1}]>'.format(
             self.event, self.actor
-            )
+        )

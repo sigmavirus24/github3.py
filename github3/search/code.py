@@ -6,24 +6,35 @@ from ..repos import Repository
 
 
 class CodeSearchResult(GitHubCore):
+
     def _update_attributes(self, data):
-        self._api = data.get('url')
+        self._api = self._get_attribute(data, 'url')
+
         #: Filename the match occurs in
-        self.name = data.get('name')
+        self.name = self._get_attribute(data, 'name')
+
         #: Path in the repository to the file
-        self.path = data.get('path')
+        self.path = self._get_attribute(data, 'path')
+
         #: SHA in which the code can be found
-        self.sha = data.get('sha')
+        self.sha = self._get_attribute(data, 'sha')
+
         #: URL to the Git blob endpoint
-        self.git_url = data.get('git_url')
+        self.git_url = self._get_attribute(data, 'git_url')
+
         #: URL to the HTML view of the blob
-        self.html_url = data.get('html_url')
+        self.html_url = self._get_attribute(data, 'html_url')
+
         #: Repository the code snippet belongs to
-        self.repository = Repository(data.get('repository', {}), self)
+        self.repository = self._class_attribute(
+            data, 'repository', Repository, self
+        )
+
         #: Score of the result
-        self.score = data.get('score')
+        self.score = self._get_attribute(data, 'score')
+
         #: Text matches
-        self.text_matches = data.get('text_matches', [])
+        self.text_matches = self._get_attribute(data, 'text_matches', [])
 
     def _repr(self):
         return '<CodeSearchResult [{0}]>'.format(self.path)

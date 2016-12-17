@@ -30,21 +30,28 @@ class Hook(GitHubCore):
     See also: http://developer.github.com/v3/repos/hooks/
     """
     def _update_attributes(self, hook, session=None):
-        self._api = hook.get('url', '')
+        self._api = self._get_attribute(hook, 'url')
+
         #: datetime object representing when this hook was last updated.
-        self.updated_at = self._strptime(hook.get('updated_at'))
+        self.updated_at = self._strptime_attribute(hook, 'updated_at')
+
         #: datetime object representing the date the hook was created.
-        self.created_at = self._strptime(hook.get('created_at'))
+        self.created_at = self._strptime_attribute(hook, 'created_at')
+
         #: The name of the hook.
-        self.name = hook.get('name')
+        self.name = self._get_attribute(hook, 'name')
+
         #: Events which trigger the hook.
-        self.events = hook.get('events')
+        self.events = self._get_attribute(hook, 'events')
+
         #: Whether or not this Hook is marked as active on GitHub
-        self.active = hook.get('active')
+        self.active = self._get_attribute(hook, 'active')
+
         #: Dictionary containing the configuration for the Hook.
-        self.config = hook.get('config')
+        self.config = self._get_attribute(hook, 'config')
+
         #: Unique id of the hook.
-        self.id = hook.get('id')
+        self.id = self._get_attribute(hook, 'id')
 
     def _repr(self):
         return '<Hook [{0}]>'.format(self.name)

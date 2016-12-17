@@ -30,22 +30,27 @@ class RepoComment(BaseComment):
     """
     def _update_attributes(self, comment):
         super(RepoComment, self)._update_attributes(comment)
+
         #: Commit id on which the comment was made.
-        self.commit_id = comment.get('commit_id')
+        self.commit_id = self._get_attribute(comment, 'commit_id')
+
         #: URL of the comment on GitHub.
-        self.html_url = comment.get('html_url')
+        self.html_url = self._get_attribute(comment, 'html_url')
+
         #: The line number where the comment is located.
-        self.line = comment.get('line')
+        self.line = self._get_attribute(comment, 'line')
+
         #: The path to the file where the comment was made.
-        self.path = comment.get('path')
+        self.path = self._get_attribute(comment, 'path')
+
         #: The position in the diff where the comment was made.
-        self.position = comment.get('position')
+        self.position = self._get_attribute(comment, 'position')
+
         #: datetime object representing when the comment was updated.
-        self.updated_at = self._strptime(comment.get('updated_at'))
+        self.updated_at = self._strptime_attribute(comment, 'updated_at')
+
         #: Login of the user who left the comment.
-        self.user = None
-        if comment.get('user'):
-            self.user = User(comment.get('user'), self)
+        self.user = self._class_attribute(comment, 'user', User, self)
 
     def _repr(self):
         return '<Repository Comment [{0}/{1}]>'.format(

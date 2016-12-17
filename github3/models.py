@@ -8,15 +8,16 @@ This module provides the basic models used in github3.py
 """
 from __future__ import unicode_literals
 
-from json import dumps, loads
-from requests.compat import urlparse, is_py2
 from datetime import datetime
+from json import dumps, loads
 from logging import getLogger
 
 import requests
+from requests.compat import is_py2, urlparse
 
 from . import exceptions
 from .decorators import requires_auth
+from .empty import Empty
 from .null import NullObject
 from .session import GitHubSession
 from .utils import UTC
@@ -34,6 +35,9 @@ class GitHubCore(object):
     have.
     """
 
+    # Set the Empty singleton so model.Empty can be used.
+    Empty = Empty
+
     def __init__(self, json, session=None):
         if hasattr(session, 'session'):
             # i.e. session is actually a GitHubCore instance
@@ -45,7 +49,7 @@ class GitHubCore(object):
         # set a sane default
         self._github_url = 'https://api.github.com'
 
-        if json is not None:
+        if json is not None and json is not self.Empty:
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
             self._uniq = json.get('url', None)
@@ -59,7 +63,7 @@ class GitHubCore(object):
         """Proxy access to stored JSON."""
         if attribute not in self._json_data:
             raise AttributeError(attribute)
-        value = self._json_data.get(attribute, None)
+        value = self._json_data.get(attribute)
         setattr(self, attribute, value)
         return value
 
@@ -87,7 +91,62 @@ class GitHubCore(object):
         """
         return dumps(self._json_data)
 
-    def _strptime(self, time_str):
+    @classmethod
+    def _get_attribute(cls, data, attribute, fallback=None):
+        """Return the attribute from the json data.
+
+        :param dict data: dictionary used to put together the model or Empty
+        :param str attribute: key of the attribute
+        :param any fallback: return value if original return value is falsy
+        :returns: value paired with key in dict, Empty or fallback
+        :rtype: any or Empty
+        """
+        if data is not cls.Empty and attribute in data:
+            result = data[attribute]
+            if result is None:
+                return fallback
+            return result
+        return cls.Empty
+
+    @classmethod
+    def _class_attribute(cls, data, attribute, cl, *args, **kwargs):
+        """Return the attribute from the json data and instantiate the class.
+
+        :param dict data: dictionary used to put together the model or Empty
+        :param str attribute: key of the attribute
+        :param class cl: class that will be instantiated
+        :returns: instantiated class or Empty
+        :rtype: object or Empty
+        """
+        value = cls._get_attribute(data, attribute)
+        if value and value is not cls.Empty:
+            return cl(
+                value,
+                *args,
+                **kwargs
+            )
+        return value
+
+    @classmethod
+    def _strptime_attribute(cls, data, attribute):
+        """Get a datetime object from a dict, return Empty if it wan't found.
+
+        This is equivalent to calling::
+
+            cls._strptime(data[attribute]) if attribute in data else Empty
+
+        :param dict data: dictionary used to put together the model or Empty
+        :param str attribute: key of the attribute
+        :returns: timezone-aware datetime object or Empty
+        :rtype: datetime or Empty
+        """
+        result = cls._get_attribute(data, attribute)
+        if result and result is not cls.Empty:
+            return cls._strptime(result)
+        return result
+
+    @classmethod
+    def _strptime(cls, time_str):
         """Convert an ISO 8601 formatted string to a datetime object.
 
         We assume that the ISO 8601 formatted string is in UTC and we create
@@ -140,7 +199,7 @@ class GitHubCore(object):
                 del(data[k])
 
     def _instance_or_null(self, instance_class, json):
-        if json is None:
+        if not json:
             return NullObject(instance_class.__name__)
         if not isinstance(json, dict):
             raise exceptions.UnprocessableResponseBody(
@@ -221,7 +280,8 @@ class GitHubCore(object):
 
     @_api.setter
     def _api(self, uri):
-        self._uri = urlparse(uri)
+        if uri and uri is not self.Empty:
+            self._uri = urlparse(uri)
         self.url = uri
 
     def _iter(self, count, url, cls, params=None, etag=None, headers=None):
@@ -296,26 +356,32 @@ class BaseComment(GitHubCore):
 
     def _update_attributes(self, comment):
         #: Unique ID of the comment.
-        self.id = comment.get('id')
+        self.id = self._get_attribute(comment, 'id')
+
         #: Body of the comment. (As written by the commenter)
-        self.body = comment.get('body')
+        self.body = self._get_attribute(comment, 'body')
+
         #: Body of the comment formatted as plain-text. (Stripped of markdown,
         #: etc.)
-        self.body_text = comment.get('body_text')
-        #: Body of the comment formatted as html.
-        self.body_html = comment.get('body_html')
-        #: datetime object representing when the comment was created.
-        self.created_at = self._strptime(comment.get('created_at'))
-        #: datetime object representing when the comment was updated.
-        self.updated_at = self._strptime(comment.get('updated_at'))
+        self.body_text = self._get_attribute(comment, 'body_text')
 
-        self._api = comment.get('url', '')
-        self.links = comment.get('_links')
+        #: Body of the comment formatted as html.
+        self.body_html = self._get_attribute(comment, 'body_html')
+
+        #: datetime object representing when the comment was created.
+        self.created_at = self._strptime_attribute(comment, 'created_at')
+
+        #: datetime object representing when the comment was updated.
+        self.updated_at = self._strptime_attribute(comment, 'updated_at')
+
+        self._api = self._get_attribute(comment, 'url')
+        self.links = self._get_attribute(comment, '_links', {})
         #: The url of this comment at GitHub
         self.html_url = ''
+
         #: The url of the pull request, if it exists
         self.pull_request_url = ''
-        if self.links:
+        if self.links and self.links is not self.Empty:
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
@@ -337,7 +403,7 @@ class BaseComment(GitHubCore):
         """
         if body:
             json = self._json(self._patch(self._api,
-                              data=dumps({'body': body})), 200)
+                                          data=dumps({'body': body})), 200)
             if json:
                 self._update_attributes(json)
                 return True
@@ -353,16 +419,20 @@ class BaseCommit(GitHubCore):
     """
 
     def _update_attributes(self, commit):
-        self._api = commit.get('url', '')
+        self._api = self._get_attribute(commit, 'url')
+
         #: SHA of this commit.
-        self.sha = commit.get('sha')
+        self.sha = self._get_attribute(commit, 'sha')
+
         #: Commit message
-        self.message = commit.get('message')
+        self.message = self._get_attribute(commit, 'message')
+
         #: List of parents to this commit.
-        self.parents = commit.get('parents', [])
+        self.parents = self._get_attribute(commit, 'parents', [])
+
         #: URL to view the commit on GitHub
-        self.html_url = commit.get('html_url', '')
-        if not self.sha:
+        self.html_url = self._get_attribute(commit, 'html_url')
+        if not self.sha or self.sha is self.Empty:
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]
 
@@ -380,54 +450,56 @@ class BaseAccount(GitHubCore):
 
     def _update_attributes(self, acct):
         #: Tells you what type of account this is
-        self.type = None
-        if acct.get('type'):
-            self.type = acct.get('type')
-        self._api = acct.get('url', '')
+        self.type = self._get_attribute(acct, 'type')
+
+        self._api = self._get_attribute(acct, 'url')
 
         #: URL of the avatar at gravatar
-        self.avatar_url = acct.get('avatar_url', '')
+        self.avatar_url = self._get_attribute(acct, 'avatar_url')
+
         #: URL of the blog
-        self.blog = acct.get('blog', '')
+        self.blog = self._get_attribute(acct, 'blog')
+
         #: Name of the company
-        self.company = acct.get('company', '')
+        self.company = self._get_attribute(acct, 'company')
 
         #: datetime object representing the date the account was created
-        self.created_at = self._strptime(acct.get('created_at'))
+        self.created_at = self._strptime_attribute(acct, 'created_at')
 
         #: E-mail address of the user/org
-        self.email = acct.get('email')
+        self.email = self._get_attribute(acct, 'email')
 
         # The number of people following this acct
         #: Number of followers
-        self.followers_count = acct.get('followers', 0)
+        self.followers_count = self._get_attribute(acct, 'followers')
 
         # The number of people this acct follows
         #: Number of people the user is following
-        self.following_count = acct.get('following', 0)
+        self.following_count = self._get_attribute(acct, 'following')
 
         #: Unique ID of the account
-        self.id = acct.get('id', 0)
+        self.id = self._get_attribute(acct, 'id')
+
         #: Location of the user/org
-        self.location = acct.get('location', '')
+        self.location = self._get_attribute(acct, 'location')
+
         #: User name of the user/organization
-        self.login = acct.get('login', '')
+        self.login = self._get_attribute(acct, 'login')
 
         # e.g. first_name last_name
         #: Real name of the user/org
-        self.name = acct.get('name') or ''
-        self.name = self.name
+        self.name = self._get_attribute(acct, 'name')
 
         # The number of public_repos
         #: Number of public repos owned by the user/org
-        self.public_repos_count = acct.get('public_repos', 0)
+        self.public_repos_count = self._get_attribute(acct, 'public_repos')
 
         # e.g. https://github.com/self._login
         #: URL of the user/org's profile
-        self.html_url = acct.get('html_url', '')
+        self.html_url = self._get_attribute(acct, 'html_url')
 
         #: Markdown formatted biography
-        self.bio = acct.get('bio')
+        self.bio = self._get_attribute(acct, 'bio')
 
     def _repr(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
