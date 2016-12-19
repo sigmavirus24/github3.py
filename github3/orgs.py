@@ -267,6 +267,11 @@ class Organization(BaseAccount):
     # Roles available to members in an organization.
     members_roles = frozenset(['all', 'admin', 'member'])
 
+    def _all_events_url(self, username):
+        url_parts = list(self._uri)
+        url_parts[2] = 'users/{}/events{}'.format(username, url_parts[2])
+        return self._uri.__class__(*url_parts).geturl()
+
     def _update_attributes(self, org):
         super(Organization, self)._update_attributes(org)
         self.type = self.type or 'Organization'
@@ -465,8 +470,39 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
+    def all_events(self, number=-1, etag=None, username=None):
+        r"""Iterate over all org events visible to the authenticated user.
+
+        :param int number: (optional), number of events to return. Default: -1
+            iterates over all events available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :param str username: (required), the username of the currently
+            authenticated user.
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        """
+        url = self._all_events_url(username)
+        return self._iter(int(number), url, Event, etag=etag)
+
     def events(self, number=-1, etag=None):
-        r"""Iterate over events for this org.
+        r"""Iterate over public events for this org (deprecated).
+
+        :param int number: (optional), number of events to return. Default: -1
+            iterates over all events available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Event <github3.events.Event>`\ s
+
+        Deprecated: Use ``public_events`` instead.
+        """
+
+        warnings.warn(
+            'This method is deprecated. Please use ``public_events`` instead.',
+            DeprecationWarning)
+        return self.public_events(number, etag=etag)
+
+    def public_events(self, number=-1, etag=None):
+        r"""Iterate over public events for this org.
 
         :param int number: (optional), number of events to return. Default: -1
             iterates over all events available.
