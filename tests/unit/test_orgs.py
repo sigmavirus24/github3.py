@@ -213,7 +213,8 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
     described_class = Organization
 
     example_data = {
-        'url': url_for()
+        'url': url_for(),
+        'login': 'github',
     }
 
     def test_all_events(self):
