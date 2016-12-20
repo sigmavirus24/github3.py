@@ -125,6 +125,7 @@ Contributors
 
 - Abhijeet Kasurde (@akasurde)
 
+<<<<<<< HEAD
 - Matthew Krueger (@mlkrueger1987)
 
 - Dejan Svetec (@dsvetec)
@@ -138,3 +139,5 @@ Contributors
 - Goodwillcoding (@goodwillcoding)
 
 - Andreas Backx (@AndreasBackx)
+
+- Alexander Koshelev <daevaorn@gmail.com>
