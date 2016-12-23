@@ -125,7 +125,6 @@ Contributors
 
 - Abhijeet Kasurde (@akasurde)
 
-<<<<<<< HEAD
 - Matthew Krueger (@mlkrueger1987)
 
 - Dejan Svetec (@dsvetec)
