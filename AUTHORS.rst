@@ -140,3 +140,5 @@ Contributors
 - Andreas Backx (@AndreasBackx)
 
 - Alexander Koshelev <daevaorn@gmail.com>
+
+- Gabi Davar (@mindw)

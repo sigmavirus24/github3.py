@@ -135,7 +135,8 @@ class TestAsset(IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
             asset = next(release.assets())
-            _, filename = tempfile.mkstemp()
+            fd, filename = tempfile.mkstemp()
+            os.close(fd)
             asset.download(filename)
 
         with open(filename, 'rb') as fd:
@@ -153,7 +154,8 @@ class TestAsset(IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.release(76677)
             asset = next(release.assets())
-            _, filename = tempfile.mkstemp()
+            fd, filename = tempfile.mkstemp()
+            os.close(fd)
             assert asset.session.auth is not None
             asset.download(filename)
             assert asset.session.auth is not None
