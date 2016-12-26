@@ -1,0 +1,35 @@
+version: build-{build}-{branch}
+
+environment:
+  matrix:
+    # http://www.appveyor.com/docs/installed-software#python lists available
+    # versions
+    - PYTHON: "C:\\Python27"
+      TOXENV: py27
+    - PYTHON: "C:\\Python27-x64"
+      TOXENV: py27
+    - PYTHON: "C:\\Python33"
+      TOXENV: py33
+    - PYTHON: "C:\\Python33-x64"
+      TOXENV: py33
+    - PYTHON: "C:\\Python34"
+      TOXENV: py34
+    - PYTHON: "C:\\Python34-x64"
+      TOXENV: py34
+    - PYTHON: "C:\\Python35"
+      TOXENV: py35    
+    - PYTHON: "C:\\Python35-x64"
+      TOXENV: py35    
+
+init:
+  - "echo %PYTHON%"
+
+install:
+  - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - python --version
+  - python -m pip install -U pip setuptools tox
+
+build: false
+
+test_script:
+  - tox -v
