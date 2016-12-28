@@ -11,6 +11,7 @@ reference_url_for = create_url_helper('https://api.github.com/repos/'
                                       'git/refs/heads/featureA')
 
 get_commit_example_data = create_example_data_helper('commit_example')
+get_git_tag_example_data = create_example_data_helper('git_tag_example')
 get_reference_example_data = create_example_data_helper('reference_example')
 
 
@@ -63,6 +64,22 @@ class TestCommit(UnitHelper):
     def test_author_as_User(self):
         """Show that commit_as_Author() returns instance of User."""
         user = self.instance.author_as_User()
+        assert isinstance(user, github3.users.User)
+
+
+class TestGitTag(UnitHelper):
+
+    """Git Tag unit test."""
+
+    described_class = github3.git.Tag
+    example_data = get_git_tag_example_data()
+
+    def test_repr(self):
+        assert repr(self.instance).startswith('<Tag')
+
+    def test_tagger_as_User(self):
+        """Show that tagger_as_User() returns instance of User."""
+        user = self.instance.tagger_as_User()
         assert isinstance(user, github3.users.User)
 
 
