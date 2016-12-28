@@ -6,6 +6,7 @@ Unreleased
 - Add ``Organization#all_events``.
 - Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
 - Fix test failtures on windows caused by unclosed file handles.
+- Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
 
 1.0.0a4: 2016-02-19
 ~~~~~~~~~~~~~~~~~~~
