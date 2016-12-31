@@ -154,8 +154,6 @@ about `comments <http://developer.github.com/v3/repos/comments/>`_.
 
 ---------
 
-.. module:: github3.repos.status
-
 .. autoclass:: github3.repos.status.CombinedStatus
     :members:
 

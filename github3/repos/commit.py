@@ -95,7 +95,7 @@ class RepoCommit(models.BaseCommit):
         """Retrieve the combined status for this commit.
 
         :returns: the combined status for this commit
-        :rtype: :class:`~github3.repos.status.Status`
+        :rtype: :class:`~github3.repos.status.CombinedStatus`
         """
         url = self._build_url('status', base_url=self._api)
         json = self._json(self._get(url), 200)
