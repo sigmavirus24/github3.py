@@ -42,7 +42,7 @@ this in a virtual enviroment. These need to be installed for the tests to run.
 
 .. _betamax: https://github.com/sigmavirus24/betamax
 .. _coverage: http://nedbatchelder.com/code/coverage/
-.. _mock: http://mock.readthedocs.org/en/latest/
+.. _mock: https://mock.readthedocs.io/en/latest/
 
 License
 -------
@@ -56,7 +56,7 @@ Examples
 
 See the docs_ for more examples.
 
-.. _docs: http://github3py.readthedocs.org/en/latest/index.html#more-examples
+.. _docs: https://github3py.readthedocs.io/en/latest/index.html#more-examples
 
 Testing
 ~~~~~~~

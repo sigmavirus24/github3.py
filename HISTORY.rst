@@ -69,10 +69,10 @@
 - Allow users to pass a two-factor authentication callback to 
   ``GitHub#authorize``.
 
-.. _single authorization: https://github3py.readthedocs.org/en/latest/github.html#github3.github.GitHub.revoke_authorization
-.. _all authorizations: https://github3py.readthedocs.org/en/latest/github.html#github3.github.GitHub.revoke_authorizations
-.. _ping: https://github3py.readthedocs.org/en/latest/repos.html?highlight=ping#github3.repos.hook.Hook.ping
-.. _Repository's collaborators: https://github3py.readthedocs.org/en/latest/repos.html#github3.repos.repo.Repository.iter_collaborators
+.. _single authorization: https://github3py.readthedocs.io/en/latest/github.html#github3.github.GitHub.revoke_authorization
+.. _all authorizations: https://github3py.readthedocs.io/en/latest/github.html#github3.github.GitHub.revoke_authorizations
+.. _ping: https://github3py.readthedocs.io/en/latest/repos.html?highlight=ping#github3.repos.hook.Hook.ping
+.. _Repository's collaborators: https://github3py.readthedocs.io/en/latest/repos.html#github3.repos.repo.Repository.iter_collaborators
 .. _pagination changes: https://developer.github.com/changes/2014-03-18-paginating-method-changes/
 .. _stargarzers_url: https://github.com/sigmavirus24/github3.py/pull/240
 
