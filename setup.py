@@ -71,7 +71,7 @@ setup(
     license='3-clause BSD',
     author="Ian Cordasco",
     author_email="graffatcolmingov@gmail.com",
-    url="https://github3py.readthedocs.org",
+    url="https://github3py.readthedocs.io",
     packages=packages,
     install_requires=requires,
     classifiers=[

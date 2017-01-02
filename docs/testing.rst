@@ -264,4 +264,4 @@ Betamax sanitizes information like that before saving the cassette. It never
 does hurt to double check though.
 
 .. _Betamax: https://github.com/sigmavirus24/betamax
-.. _cassettes: https://betamax.readthedocs.org/en/latest/cassettes.html
+.. _cassettes: https://betamax.readthedocs.io/en/latest/cassettes.html
