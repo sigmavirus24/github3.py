@@ -509,6 +509,18 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
+    def invitations(self, number=-1, etag=None):
+        r"""Iterate over outstanding invitations to this organization.
+
+        :returns: generator of 
+        """
+        headers = { 'Accept': 'application/vnd.github.korra-preview', 
+                }
+        params = {}
+        url = self._build_url('invitations', base_url=self._api)
+        return self._iter(int(number), url, dict, params=params, etag=etag,
+                          headers=headers)
+
     def members(self, filter=None, role=None, number=-1, etag=None):
         r"""Iterate over members of this organization.
 
