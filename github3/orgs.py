@@ -554,10 +554,9 @@ class Organization(BaseAccount):
     def invitations(self, number=-1, etag=None):
         r"""Iterate over outstanding invitations to this organization.
 
-        :returns: generator of 
+        :returns: generator of
         """
-        headers = { 'Accept': 'application/vnd.github.korra-preview', 
-                }
+        headers = {'Accept': 'application/vnd.github.korra-preview', }
         params = {}
         url = self._build_url('invitations', base_url=self._api)
         return self._iter(int(number), url, dict, params=params, etag=etag,
