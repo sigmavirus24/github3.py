@@ -33,5 +33,5 @@ For example:
     g = github3.login('sigmavirus24', 'my_password',
                       two_factor_callback=my_two_factor_function)
 
-Then each the API tells github3.py it requires a Two Factor Authentication 
+Then each time the API tells github3.py it requires a Two Factor Authentication 
 code, github3.py will call ``my_two_factor_function`` which prompt you for it.
