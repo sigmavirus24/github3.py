@@ -408,6 +408,21 @@ class PullRequest(models.GitHubCore):
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, ReviewComment, etag=etag)
 
+    def reviews(self, number=-1, etag=None):
+        r"""Iterate over the reviews associated with this pull request.
+
+        :param int number: (optional), number of reviews to return. Default:
+            -1 returns all available files.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`PullReview <PullReview>`\ s
+        """
+        # Accept the preview headers for reviews
+        headers = {'Accept': 'application/vnd.github.black-cat-preview+json'}
+        url = self._build_url('reviews', base_url=self._api)
+        return self._iter(int(number), url, PullReview, etag=etag,
+                          headers=headers)
+
     @requires_auth
     def update(self, title=None, body=None, state=None):
         """Update this pull request.
@@ -428,6 +443,41 @@ class PullRequest(models.GitHubCore):
             self._update_attributes(json)
             return True
         return False
+
+
+class PullReview(models.GitHubCore):
+
+    """The :class:`PullReview <PullReview>` object.
+
+    See also: https://developer.github.com/v3/pulls/reviews/
+    """
+
+    def _update_attributes(self, preview):
+        #: ID of the review
+        self.id = self._get_attribute(preview, 'id')
+
+        #: SHA of the commit the review is on
+        self.commit_id = self._get_attribute(preview, 'commit_id')
+
+        #: :class:`User <github3.users.User>` who made the comment
+        self.user = self._class_attribute(preview, 'user', User, self)
+
+        #: State of the review
+        self.state = self._get_attribute(preview, 'state')
+
+        #: datetime object representing when the event was created.
+        self.created_at = self._strptime_attribute(preview, 'created_at')
+
+        #: Body text of the review
+        self.body = self._get_attribute(preview, 'body')
+
+        #: API URL for the Pull Request
+        self.pull_request_url = self._get_attribute(
+            preview, 'pull_request_url'
+        )
+
+    def _repr(self):
+        return '<Pull Request Review [{0}]>'.format(self.id)
 
 
 class ReviewComment(models.BaseComment):

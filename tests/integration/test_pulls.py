@@ -106,6 +106,14 @@ class TestPullRequest(IntegrationHelper):
             assert isinstance(patch, bytes)
             assert len(patch) > 0
 
+    def test_pull_reviews(self):
+        """Show that one can iterate over a PR's reviews."""
+        cassette_name = self.cassette_name('pull_reviews')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=671)
+            for pull_review in p.reviews():
+                assert isinstance(pull_review, github3.pulls.PullReview)
+
     def test_reopen(self):
         """Show that one can reopen an open Pull Request."""
         self.basic_login()
@@ -137,6 +145,31 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             assert p.repository == ('sigmavirus24', 'github3.py')
+
+
+class TestPullReview(IntegrationHelper):
+    """Integration tests for the PullFile object."""
+    def get_pull_request_review(self, owner, repo, pull_number, review):
+        p = self.gh.pull_request(owner, repo, pull_number)
+
+        for pull_review in p.reviews():
+            if pull_review.id == review:
+                break
+        else:
+            assert False, "Could not find '{0}'".format(review)
+
+        return pull_review
+
+    def test_user(self):
+        """Show that a user can retrieve the user of a PR review."""
+        cassette_name = self.cassette_name('pull_reviews')
+        with self.recorder.use_cassette(cassette_name):
+            pull_review = self.get_pull_request_review(
+                owner='sigmavirus24', repo='github3.py', pull_number=671,
+                review=18663174
+            )
+            user = pull_review.user
+            assert isinstance(user, github3.users.User)
 
 
 class TestReviewComment(IntegrationHelper):

@@ -228,6 +228,17 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
             headers={}
         )
 
+    def test_reviews(self):
+        """Show that a user can retrieve the reviews from a Pull Request."""
+        i = self.instance.reviews()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('reviews'),
+            params={'per_page': 100},
+            headers={'Accept': 'application/vnd.github.black-cat-preview+json'}
+        )
+
 
 class TestReviewComment(helper.UnitHelper):
     """Unit tests for the ReviewComment class."""
