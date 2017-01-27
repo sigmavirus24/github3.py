@@ -1135,8 +1135,9 @@ class TestContents(helper.IntegrationHelper):
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'delete_contents')
-            content = repository.readme()
-            deleted = content.delete('Deleting readme from repository')
+            repository.create_file('test.txt', 'Create test.txt', b'testing')
+            content = repository.file_contents('test.txt')
+            deleted = content.delete('Deleting test.txt from repository')
 
         assert deleted
 
@@ -1146,13 +1147,17 @@ class TestContents(helper.IntegrationHelper):
         cassette_name = self.cassette_name('update')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'delete_contents')
-            content = repository.readme()
-            update = content.update(message='Updating README.md',
+            repository.create_file('test.txt', 'Create test.txt', b'testing')
+            content = repository.file_contents('test.txt')
+            update = content.update(message='Updating test.txt',
                                     content=b'HELLO')
+            assert isinstance(update, dict)
+            assert isinstance(update['content'],
+                              github3.repos.contents.Contents)
+            assert isinstance(update['commit'], github3.git.Commit)
 
-        assert isinstance(update, dict)
-        assert isinstance(update['content'], github3.repos.contents.Contents)
-        assert isinstance(update['commit'], github3.git.Commit)
+            # Clean-up
+            update['content'].delete('Deleting test.txt from repository')
 
 
 class TestHook(helper.IntegrationHelper):
