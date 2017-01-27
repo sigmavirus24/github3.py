@@ -13,11 +13,13 @@ from ..users import User
 
 
 class Status(GitHubCore):
-    """The :class:`Status <Status>` object. This represents information from
-    the Repo Status API.
+    """The :class:`Status <Status>` object.
+
+    This represents information from the Repo Status API.
 
     See also: http://developer.github.com/v3/repos/statuses/
     """
+
     def _update_attributes(self, status):
         #: A string label to differentiate this status from the status of
         #: other systems
@@ -49,11 +51,13 @@ class Status(GitHubCore):
 
 
 class CombinedStatus(GitHubCore):
-    """The :class:`CombinedStatus <CombinedStatus>` object. This represents
-    combined information from the Repo Status API.
+    """The :class:`CombinedStatus <CombinedStatus>` object.
+
+    This represents combined information from the Repo Status API.
 
     See also: http://developer.github.com/v3/repos/statuses/
     """
+
     def _update_attributes(self, combined_status):
         #: State of the combined status, e.g., 'success', 'pending', 'failure'
         self.state = self._get_attribute(combined_status, 'state')
