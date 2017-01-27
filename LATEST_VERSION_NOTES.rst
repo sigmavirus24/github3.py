@@ -7,6 +7,8 @@ Unreleased
 - Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
 - Fix test failtures on windows caused by unclosed file handles.
 - Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
+- Add ``Repo.statuses`` and a corresponding ``repo.status.CombinedStatus`` to
+  get a combined view of commit statuses for a given ref.
 
 1.0.0a4: 2016-02-19
 ~~~~~~~~~~~~~~~~~~~

@@ -5,8 +5,18 @@ from . import helper
 
 
 class TestRepoCommit(helper.IntegrationHelper):
-
     """Integration tests for the RepoCommit object."""
+
+    def test_status(self):
+        """Verify that we can retrieve the combined status for a commit."""
+        cassette_name = self.cassette_name('status')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.commit(
+                '9aa43ea48c762b19e8191ae2c5c5fcb87fe30b44'
+            )
+            combined_status = commit.status()
+        assert isinstance(combined_status, github3.repos.status.CombinedStatus)
 
     def test_statuses(self):
         """Test the ability to retrieve statuses on a commit."""
