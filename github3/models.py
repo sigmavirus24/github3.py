@@ -276,7 +276,10 @@ class GitHubCore(object):
 
     @property
     def _api(self):
-        return "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
+        value = "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
+        if self._uri.query:
+            value += '?{}'.format(self._uri.query)
+        return value
 
     @_api.setter
     def _api(self, uri):
