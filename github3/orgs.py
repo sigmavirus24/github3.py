@@ -551,6 +551,7 @@ class Organization(BaseAccount):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
+    @requires_auth
     def invitations(self, number=-1, etag=None):
         r"""Iterate over outstanding invitations to this organization.
 
