@@ -216,3 +216,24 @@ class TestGitHubCore(helper.UnitHelper):
     def test_strptime_time_str_required(self):
         """Verify that method converts ISO 8601 formatted string."""
         assert self.instance._strptime('') is None
+
+
+class TestGitHubCoreIssue672(helper.UnitHelper):
+
+    described_class = MyTestRefreshClass
+    last_modified = datetime.now().strftime(
+        '%a, %d %b %Y %H:%M:%S GMT'
+    )
+    url = 'https://api.github.com/foo?bar=1'
+    etag = '644b5b0155e6404a9cc4bd9d8b1ae730'
+    example_data = {
+        'url': url,
+        'last_modified': last_modified,
+        'etag': etag,
+        'fake_attr': 'foo',
+    }
+
+    def test_issue_672(self):
+        """Verify that _api property contains URL query"""
+        assert '?' in self.instance._api
+        assert self.instance._api == self.url

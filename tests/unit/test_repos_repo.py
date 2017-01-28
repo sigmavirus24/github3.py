@@ -24,6 +24,7 @@ compare_url_for = helper.create_url_helper(
 )
 contents_url_for = helper.create_url_helper(
     'https://api.github.com/repos/github3py/github3.py/contents/README.rst'
+    '?ref=master'
 )
 hook_url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/hooks/1'
