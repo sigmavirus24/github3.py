@@ -146,3 +146,5 @@ Contributors
 - Björn Kautler (@Vampire)
 
 - David Prothero (@dprothero)
+
+- Hal Wine (@hwine)
