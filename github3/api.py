@@ -47,8 +47,7 @@ def login(username=None, password=None, token=None, two_factor_callback=None):
 
         To allow you to specify either a username and password combination or
         a token, none of the parameters are required. If you provide none of
-        them, you will receive a
-        :class:`NullObject <github3.null.NullObject>`
+        them, you will receive ``None``.
 
     :param str username: login name
     :param str password: password for the login
@@ -75,8 +74,7 @@ def enterprise_login(username=None, password=None, token=None, url=None,
 
         To allow you to specify either a username and password combination or
         a token, none of the parameters are required. If you provide none of
-        them, you will receive a
-        :class:`NullObject <github3.structs.NullObject>`
+        them, you will receive ``None``.
 
     :param str username: login name
     :param str password: password for the login
