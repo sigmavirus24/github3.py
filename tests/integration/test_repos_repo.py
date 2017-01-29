@@ -522,8 +522,6 @@ class TestRepository(helper.IntegrationHelper):
         for (filename, content) in contents:
             assert content.name == filename
             assert isinstance(content, github3.repos.contents.Contents)
-            assert content.content is content.Empty
-            assert content.decoded is content.Empty
 
     def test_edit(self):
         """Test the ability to edit a repository."""
