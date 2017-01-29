@@ -284,15 +284,7 @@ class GitHub(GitHubCore):
         if owner and repository and title:
             repo = self.repository(owner, repository)
 
-        # repo can be None or a NullObject.
-        # If repo is None, than one of owner, repository, or title were
-        # False-y. If repo is a NullObject then owner/repository 404's.
-
         if repo is not None:
-            # If repo is a NullObject then that's most likely because the
-            # repository was not found (404). In that case, calling the
-            # create_issue method will still return <NullObject('Repository')>
-            # which will ideally help the user understand what went wrong.
             return repo.create_issue(title, body, assignee, milestone, labels)
 
         return self._instance_or_null(Issue, None)

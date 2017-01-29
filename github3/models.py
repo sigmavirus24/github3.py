@@ -17,7 +17,6 @@ from requests.compat import is_py2, urlparse
 
 from . import exceptions
 from .decorators import requires_auth
-from .null import NullObject
 from .session import GitHubSession
 from .utils import UTC
 
@@ -198,7 +197,7 @@ class GitHubCore(object):
                 "GitHub's API returned a body that could not be handled", json
             )
         if not json:
-            return NullObject(instance_class.__name__)
+            return None
         try:
             return instance_class(json, self)
         except TypeError:  # instance_class is not a subclass of GitHubCore
