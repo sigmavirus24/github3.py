@@ -7,12 +7,12 @@ from json import dumps
 from github3.auths import Authorization
 from uritemplate import URITemplate
 
+from . import models
 from .decorators import requires_auth
 from .events import Event
-from .models import GitHubCore
 
 
-class Key(GitHubCore):
+class Key(models.GitHubCore):
     """The :class:`Key <Key>` object.
 
     Please see GitHub's `Key Documentation`_ for more information.
@@ -67,7 +67,7 @@ class Key(GitHubCore):
         return False
 
 
-class Plan(GitHubCore):
+class Plan(models.GitHubCore):
     """The :class:`Plan <Plan>` object.
 
     Please see GitHub's `Authenticated User`_ documentation for more details.
@@ -103,7 +103,7 @@ class Plan(GitHubCore):
         return self.name == 'free'  # (No coverage)
 
 
-class Email(GitHubCore):
+class Email(models.GitHubCore):
     """The :class:`Email` object.
 
     Please see GitHub's `Emails documentation`_ for more information.
@@ -129,7 +129,7 @@ class Email(GitHubCore):
         return self.email
 
 
-class User(GitHubCore):
+class _User(models.GitHubCore):
     """The :class:`User <User>` object.
 
     This handles and structures information in the `User section`_.
@@ -149,133 +149,56 @@ class User(GitHubCore):
     """
 
     def _update_attributes(self, user):
-        #: Tells you what type of account this is
-        self.type = self._get_attribute(user, 'type')
-        if not self.type:
-            self.type = 'User'
-
-        self._api = self._get_attribute(user, 'url')
-
         #: URL of the avatar at gravatar
-        self.avatar_url = self._get_attribute(user, 'avatar_url')
+        self.avatar_url = user['avatar_url']
 
-        #: URL of the blog
-        self.blog = self._get_attribute(user, 'blog')
+        #: Events URL Template. Expands with ``privacy``
+        self.events_urlt = URITemplate(user['events_url'])
 
-        #: Name of the company
-        self.company = self._get_attribute(user, 'company')
+        #: Followers URL (not a template)
+        self.followers_url = user['followers_url']
 
-        #: datetime object representing the date the account was created
-        self.created_at = self._strptime_attribute(user, 'created_at')
+        #: Following URL Template. Expands with ``other_user``
+        self.following_urlt = URITemplate(user['following_url'])
 
-        #: E-mail address of the user/org
-        self.email = self._get_attribute(user, 'email')
+        #: Gists URL Template. Expands with ``gist_id``
+        self.gists_urlt = URITemplate(user['gists_url'])
 
-        # The number of people following this user
-        #: Number of followers
-        self.followers_count = self._get_attribute(user, 'followers')
-
-        # The number of people this user follows
-        #: Number of people the user is following
-        self.following_count = self._get_attribute(user, 'following')
-
-        #: Unique ID of the account
-        self.id = self._get_attribute(user, 'id')
-
-        #: Location of the user/org
-        self.location = self._get_attribute(user, 'location')
-
-        #: User name of the user/organization
-        self.login = self._get_attribute(user, 'login')
-
-        # e.g. first_name last_name
-        #: Real name of the user/org
-        self.name = self._get_attribute(user, 'name')
-
-        # The number of public_repos
-        #: Number of public repos owned by the user/org
-        self.public_repos_count = self._get_attribute(user, 'public_repos')
+        #: ID of the user's image on Gravatar
+        self.gravatar_id = user['gravatar_id']
 
         # e.g. https://github.com/self._login
         #: URL of the user/org's profile
-        self.html_url = self._get_attribute(user, 'html_url')
+        self.html_url = user['html_url']
 
-        #: Markdown formatted biography
-        self.bio = self._get_attribute(user, 'bio')
+        #: Unique ID of the account
+        self.id = user['id']
 
-        #: ID of the user's image on Gravatar
-        self.gravatar_id = self._get_attribute(user, 'gravatar_id')
-        #: True -- for hire, False -- not for hire
-        self.hireable = self._get_attribute(user, 'hireable', False)
-
-        # The number of public_gists
-        #: Number of public gists
-        self.public_gists = self._get_attribute(user, 'public_gists')
-
-        # Private information
-        #: How much disk consumed by the user
-        self.disk_usage = self._get_attribute(user, 'disk_usage')
-
-        #: Number of private repos owned by this user
-        self.owned_private_repos = self._get_attribute(
-            user, 'owned_private_repos'
-        )
-        #: Number of private gists owned by this user
-        self.total_private_gists = self._get_attribute(
-            user, 'total_private_gists'
-        )
-        #: Total number of private repos
-        self.total_private_repos = self._get_attribute(
-            user, 'total_private_repos'
-        )
-
-        #: Which plan this user is on
-        self.plan = self._class_attribute(user, 'plan', Plan)
-
-        #: Events URL Template. Expands with ``privacy``
-        self.events_urlt = self._class_attribute(
-            user, 'events_url', URITemplate)
-
-        #: Followers URL (not a template)
-        self.followers_url = self._get_attribute(user, 'followers_url')
-
-        #: Following URL Template. Expands with ``other_user``
-        self.following_urlt = self._class_attribute(
-            user, 'following_url', URITemplate
-        )
-
-        #: Gists URL Template. Expands with ``gist_id``
-        self.gists_urlt = self._class_attribute(user, 'gists_url', URITemplate)
+        #: User name of the user
+        self.login = user['login']
 
         #: Organizations URL (not a template)
-        self.organizations_url = self._get_attribute(user, 'organizations_url')
+        self.organizations_url = user['organizations_url']
 
         #: Received Events URL (not a template)
-        self.received_events_url = self._get_attribute(
-            user, 'received_events_url'
-        )
+        self.received_events_url = user['received_events_url']
 
         #: Repostories URL (not a template)
-        self.repos_url = self._get_attribute(user, 'repos_url')
+        self.repos_url = user['repos_url']
+
+        self.site_admin = user['site_admin']
 
         #: Starred URL Template. Expands with ``owner`` and ``repo``
-        self.starred_urlt = self._class_attribute(
-            user, 'starred_url', URITemplate
-        )
+        self.starred_urlt = URITemplate(user['starred_url'])
 
         #: Subscriptions URL (not a template)
-        self.subscriptions_url = self._get_attribute(user, 'subscriptions_url')
+        self.subscriptions_url = user['subscriptions_url']
 
-        #: Number of repo contributions. Only appears in ``repo.contributors``
-        contributions = self._get_attribute(user, 'contributions')
-        # The refresh method uses __init__ to replace the attributes on the
-        # instance with what it receives from the /users/:username endpoint.
-        # What that means is that contributions is no longer returned and as
-        # such is changed because it doesn't exist. This guards against that.
-        if contributions is not None:
-            self.contributions = contributions
+        self.type = user['type']
 
-        self._uniq = self._get_attribute(user, 'id')
+        self.url = self._api = user['url']
+
+        self._uniq = self.id
 
     def __str__(self):
         return self.login
@@ -332,7 +255,7 @@ class User(GitHubCore):
         :returns: generator of :class:`User <User>`\ s
         """
         url = self._build_url('followers', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, ShortUser, etag=etag)
 
     def following(self, number=-1, etag=None):
         r"""Iterate over the users being followed by this user.
@@ -344,7 +267,7 @@ class User(GitHubCore):
         :returns: generator of :class:`User <User>`\ s
         """
         url = self._build_url('following', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, ShortUser, etag=etag)
 
     def keys(self, number=-1, etag=None):
         r"""Iterate over the public keys of this user.
@@ -572,3 +495,117 @@ class User(GitHubCore):
         """
         url = self._build_url('admin', 'users', self.login)
         return self._boolean(self._delete(url), 204, 403)
+
+
+class ShortUser(_User):
+    """Object for the shortened representation of a User.
+
+    GitHub's API returns different amounts of information about users based
+    upon how that information is retrieved. Often times, when iterating over
+    several users, GitHub will return less information. To provide a clear
+    distinction between the types of users, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionadded:: 1.0.0
+    """
+
+    pass
+
+
+class User(_User):
+    """Object for the full representation of a User.
+
+    GitHub's API returns different amounts of information about users based
+    upon how that information is retrieved. This object exists to represent
+    the full amount of information returned for a specific user. For example,
+    you would receive this class when calling
+    :meth:`~github3.github.GitHub.user`. To provide a clear distinction
+    between the types of users, github3.py uses different classes with
+    different sets of attributes.
+
+    This object no longer contains information about the currently
+    authenticated user (e.g., :meth:`~github3.github.GitHub.me`).
+
+    .. versionchanged:: 1.0.0
+    """
+
+    def _update_attributes(self, user):
+        super(User, self)._update_attributes(user)
+        #: Markdown formatted biography
+        self.bio = user['bio']
+
+        #: URL of the blog
+        self.blog = user['blog']
+
+        #: Name of the company
+        self.company = user['company']
+
+        #: datetime object representing the date the account was created
+        self.created_at = self._strptime(user['created_at'])
+
+        #: E-mail address of the user/org
+        self.email = user['email']
+
+        # The number of people following this user
+        #: Number of followers
+        self.followers_count = user['followers']
+
+        # The number of people this user follows
+        #: Number of people the user is following
+        self.following_count = user['following']
+
+        #: True -- for hire, False -- not for hire
+        self.hireable = user['hireable']
+
+        #: Location of the user/org
+        self.location = user['location']
+
+        # e.g. first_name last_name
+        #: Real name of the user/org
+        self.name = user['name']
+
+        # The number of public_gists
+        #: Number of public gists
+        self.public_gists_count = user['public_gists']
+
+        # The number of public_repos
+        #: Number of public repos owned by the user/org
+        self.public_repos_count = user['public_repos']
+
+        self.updated_at = self._strptime(user['updated_at'])
+
+
+class AuthenticatedUser(User):
+    """Object to represent the currently authenticated user.
+
+    This is returned by :meth:`~github3.github.GitHub.me`. It contains the
+    extra informtation that is not returned for other users such as the
+    currently authenticated user's plan and private email information.
+
+    .. versionadded:: 1.0.0
+    """
+
+    def _update_attributes(self, user):
+        #: How much disk consumed by the user
+        self.disk_usage = user['disk_usage']
+
+        #: Number of private repos owned by this user
+        self.owned_private_repos = user['owned_private_repos']
+
+        #: Number of private gists owned by this user
+        self.total_private_gists = user['total_private_gists']
+
+        #: Total number of private repos
+        self.total_private_repos = user['total_private_repos']
+
+        #: Which plan this user is on
+        self.plan = Plan(user['plan'])
+
+        #: Number of repo contributions. Only appears in ``repo.contributors``
+        contributions = user.get('contributions')
+        # The refresh method uses __init__ to replace the attributes on the
+        # instance with what it receives from the /users/:username endpoint.
+        # What that means is that contributions is no longer returned and as
+        # such is changed because it doesn't exist. This guards against that.
+        if contributions is not None:
+            self.contributions = contributions
