@@ -68,7 +68,6 @@ Modules
 
     api
     auths
-    empty
     events
     gists
     git
