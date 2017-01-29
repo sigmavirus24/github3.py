@@ -29,7 +29,7 @@ class Blob(GitHubCore):
 
         #: Raw content of the blob.
         self.content = self._get_attribute(blob, 'content')
-        if self.content is not None and self.content is not self.Empty:
+        if self.content is not None:
             self.content = self.content.encode()
 
         #: Encoding of the raw content.
@@ -37,7 +37,7 @@ class Blob(GitHubCore):
 
         #: Decoded content of the blob.
         self.decoded = self.content
-        if self.encoding == 'base64' and self.content is not self.Empty:
+        if self.encoding == 'base64':
             self.decoded = b64decode(self.content)
 
         #: Size of the blob in bytes
@@ -217,7 +217,7 @@ class Tree(GitData):
 
         #: list of :class:`Hash <Hash>` objects
         self.tree = self._get_attribute(tree, 'tree', [])
-        if self.tree and self.tree is not self.Empty:
+        if self.tree:
             self.tree = [Hash(t) for t in self.tree]
 
     def _repr(self):

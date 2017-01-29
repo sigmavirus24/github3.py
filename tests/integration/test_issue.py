@@ -146,7 +146,6 @@ class TestIssue(IntegrationHelper):
             issue = repository.issue(218)
             for event in issue.events():
                 assert isinstance(event, github3.issues.event.IssueEvent)
-                assert event.issue is event.Empty
                 assert isinstance(event.actor, github3.users.User)
 
     def test_labels(self):

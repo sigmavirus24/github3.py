@@ -45,7 +45,7 @@ class Gist(GitHubCore):
 
         #: Unique id for this gist.
         self.data = self._get_attribute(data, 'id')
-        if self.data and self.data is not self.Empty:
+        if self.data:
             self.data = '{0}'.format(data['id'])
 
         #: Description of the gist
@@ -78,13 +78,13 @@ class Gist(GitHubCore):
         self.owner = self._class_attribute(data, 'owner', User, self)
 
         self._files = self._get_attribute(data, 'files', [])
-        if self._files and self._files is not self.Empty:
+        if self._files:
             self._files = [GistFile(self._files[f]) for f in self._files]
 
         #: History of this gist, list of
         #: :class:`GistHistory <github3.gists.history.GistHistory>`
         self.history = self._get_attribute(data, 'history', [])
-        if self.history and self.history is not self.Empty:
+        if self.history:
             self.history = [GistHistory(h, self) for h in self.history]
 
         # New urls

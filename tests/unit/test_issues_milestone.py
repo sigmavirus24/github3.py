@@ -53,13 +53,6 @@ class TestMilestone(helper.UnitHelper):
         milestone = github3.issues.milestone.Milestone(json)
         assert milestone.creator is None
 
-    def test_empty_creator(self):
-        """Show that creator is Empty when the json attribute is left out."""
-        json = self.instance.as_dict().copy()
-        del json['creator']
-        milestone = github3.issues.milestone.Milestone(json)
-        assert milestone.creator is milestone.Empty
-
     def test_due_on(self):
         """Show that due on attribute is a datetime object."""
         json = self.instance.as_dict().copy()

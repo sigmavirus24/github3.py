@@ -60,7 +60,7 @@ class Event(GitHubCore):
 
         #: Return ``tuple(owner, repository_name)``
         self.repo = self._get_attribute(event, 'repo')
-        if self.repo and self.repo is not self.Empty:
+        if self.repo:
             self.repo = tuple(self.repo['name'].split('/'))
 
         #: Indicates whether the Event is public or not.

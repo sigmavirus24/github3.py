@@ -55,7 +55,7 @@ class RepoCommit(models.BaseCommit):
         #: Total number of changes in the files.
         self.total = 0
         stats = self._get_attribute(commit, 'stats')
-        if stats and stats is not self.Empty:
+        if stats:
             self.additions = commit['stats'].get('additions')
             self.deletions = commit['stats'].get('deletions')
             self.total = commit['stats'].get('total')
@@ -66,7 +66,7 @@ class RepoCommit(models.BaseCommit):
         self._uniq = self.sha
 
         #: The commit message
-        self.message = getattr(self.commit, 'message', self.Empty)
+        self.message = getattr(self.commit, 'message', None)
 
     def _repr(self):
         return '<Repository Commit [{0}]>'.format(self.sha[:7])

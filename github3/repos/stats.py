@@ -37,7 +37,7 @@ class ContributorStats(GitHubCore):
         #: 'w' -> 'start of week', 'a' -> 'Number of additions',
         #: 'd' -> 'Number of deletions', 'c' -> 'Number of commits'
         self.alt_weeks = self.weeks
-        if self.alt_weeks and self.alt_weeks is not self.Empty:
+        if self.alt_weeks:
             self.alt_weeks = [alternate_week(w) for w in self.weeks]
 
     def _repr(self):

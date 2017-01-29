@@ -31,8 +31,7 @@ class Branch(GitHubCore):
         #: Provides the branch's protection status.
         self.protection = self._get_attribute(branch, 'protection')
 
-        if self.links and self.links is not self.Empty and \
-                'self' in self.links:
+        if self.links and 'self' in self.links:
             self._api = self.links['self']
         elif isinstance(self.commit, RepoCommit):
             # Branches obtained via `repo.branches` don't have links.

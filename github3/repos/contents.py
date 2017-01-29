@@ -68,8 +68,7 @@ class Contents(GitHubCore):
         #: ``content.decoded.decode('utf-8')``.
         #: .. versionchanged:: 0.5.2
         self.decoded = self.content
-        if self.encoding == 'base64' and self.content and \
-                self.content is not self.Empty:
+        if self.encoding == 'base64' and self.content:
             self.decoded = b64decode(self.content.encode())
 
         # file name, path, and size

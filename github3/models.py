@@ -17,7 +17,6 @@ from requests.compat import is_py2, urlparse
 
 from . import exceptions
 from .decorators import requires_auth
-from .empty import Empty
 from .null import NullObject
 from .session import GitHubSession
 from .utils import UTC
@@ -27,16 +26,12 @@ __logs__ = getLogger(__package__)
 
 
 class GitHubCore(object):
-
     """The base object for all objects that require a session.
 
     The :class:`GitHubCore <GitHubCore>` object provides some
     basic attributes and methods to other sub-classes that are very useful to
     have.
     """
-
-    # Set the Empty singleton so model.Empty can be used.
-    Empty = Empty
 
     def __init__(self, json, session=None):
         if hasattr(session, 'session'):
@@ -49,7 +44,7 @@ class GitHubCore(object):
         # set a sane default
         self._github_url = 'https://api.github.com'
 
-        if json is not None and json is not self.Empty:
+        if json is not None:
             self.etag = json.pop('ETag', None)
             self.last_modified = json.pop('Last-Modified', None)
             self._uniq = json.get('url', None)
@@ -95,31 +90,30 @@ class GitHubCore(object):
     def _get_attribute(cls, data, attribute, fallback=None):
         """Return the attribute from the json data.
 
-        :param dict data: dictionary used to put together the model or Empty
+        :param dict data: dictionary used to put together the model
         :param str attribute: key of the attribute
         :param any fallback: return value if original return value is falsy
-        :returns: value paired with key in dict, Empty or fallback
-        :rtype: any or Empty
+        :returns: value paired with key in dict, fallback
         """
-        if data is not cls.Empty and attribute in data:
-            result = data[attribute]
-            if result is None:
-                return fallback
-            return result
-        return cls.Empty
+        if data is None or not isinstance(data, dict):
+            return None
+        result = data.get(attribute)
+        if result is None:
+            return fallback
+        return result
 
     @classmethod
     def _class_attribute(cls, data, attribute, cl, *args, **kwargs):
         """Return the attribute from the json data and instantiate the class.
 
-        :param dict data: dictionary used to put together the model or Empty
+        :param dict data: dictionary used to put together the model or None
         :param str attribute: key of the attribute
         :param class cl: class that will be instantiated
-        :returns: instantiated class or Empty
-        :rtype: object or Empty
+        :returns: instantiated class or None
+        :rtype: object or None
         """
         value = cls._get_attribute(data, attribute)
-        if value and value is not cls.Empty:
+        if value:
             return cl(
                 value,
                 *args,
@@ -129,19 +123,19 @@ class GitHubCore(object):
 
     @classmethod
     def _strptime_attribute(cls, data, attribute):
-        """Get a datetime object from a dict, return Empty if it wan't found.
+        """Get a datetime object from a dict, return None if it wan't found.
 
         This is equivalent to calling::
 
-            cls._strptime(data[attribute]) if attribute in data else Empty
+            cls._strptime(data[attribute]) if attribute in data else None
 
-        :param dict data: dictionary used to put together the model or Empty
+        :param dict data: dictionary used to put together the model
         :param str attribute: key of the attribute
-        :returns: timezone-aware datetime object or Empty
-        :rtype: datetime or Empty
+        :returns: timezone-aware datetime object
+        :rtype: datetime
         """
         result = cls._get_attribute(data, attribute)
-        if result and result is not cls.Empty:
+        if result:
             return cls._strptime(result)
         return result
 
@@ -283,7 +277,7 @@ class GitHubCore(object):
 
     @_api.setter
     def _api(self, uri):
-        if uri and uri is not self.Empty:
+        if uri:
             self._uri = urlparse(uri)
         self.url = uri
 
@@ -384,7 +378,7 @@ class BaseComment(GitHubCore):
 
         #: The url of the pull request, if it exists
         self.pull_request_url = ''
-        if self.links and self.links is not self.Empty:
+        if self.links:
             self.html_url = self.links.get('html')
             self.pull_request_url = self.links.get('pull_request')
 
@@ -435,7 +429,7 @@ class BaseCommit(GitHubCore):
 
         #: URL to view the commit on GitHub
         self.html_url = self._get_attribute(commit, 'html_url')
-        if not self.sha or self.sha is self.Empty:
+        if not self.sha:
             i = self._api.rfind('/')
             self.sha = self._api[i + 1:]
 

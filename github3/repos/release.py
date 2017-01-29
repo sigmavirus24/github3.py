@@ -27,7 +27,7 @@ class Release(GitHubCore):
 
         #: List of :class:`Asset <Asset>` objects for this release
         self.original_assets = self._get_attribute(release, 'assets', [])
-        if self.original_assets and self.original_assets is not self.Empty:
+        if self.original_assets:
             self.original_assets = [
                 Asset(i, self) for i in self.original_assets
             ]
