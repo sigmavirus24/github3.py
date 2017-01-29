@@ -223,7 +223,7 @@ class PullRequest(models.GitHubCore):
 
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = self.base
-        if self.repository and self.repository is not self.Empty:
+        if self.repository:
             self.repository = self.base.repo
 
         #: The state of the pull

@@ -647,10 +647,10 @@ class Membership(GitHubCore):
 
         self.state = self._get_attribute(membership, 'state')
         self.active = self.state
-        if self.active and self.active is not self.Empty:
+        if self.active:
             self.active = self.state.lower() == 'active'
         self.pending = self.state
-        if self.pending and self.pending is not self.Empty:
+        if self.pending:
             self.pending = self.state.lower() == 'pending'
 
     @requires_auth

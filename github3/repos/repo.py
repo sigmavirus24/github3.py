@@ -1304,7 +1304,7 @@ class Repository(GitHubCore):
             otherwise None
         """
         json = {}
-        if sha and sha is not self.Empty:
+        if sha:
             url = self._build_url('git', 'commits', sha, base_url=self._api)
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Commit, json)

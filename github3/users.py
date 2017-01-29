@@ -228,7 +228,7 @@ class User(BaseAccount):
         # instance with what it receives from the /users/:username endpoint.
         # What that means is that contributions is no longer returned and as
         # such is changed because it doesn't exist. This guards against that.
-        if contributions is not None and contributions is not self.Empty:
+        if contributions is not None:
             self.contributions = contributions
 
         self._uniq = self._get_attribute(user, 'id')

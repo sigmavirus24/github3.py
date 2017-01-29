@@ -68,7 +68,7 @@ class Comparison(GitHubCore):
         #: List of :class:`RepoCommit <github3.repos.commit.RepoCommit>`
         #: objects.
         self.commits = self._get_attribute(compare, 'commits', [])
-        if self.commits and self.commits is not self.Empty:
+        if self.commits:
             self.commits = [RepoCommit(com) for com in self.commits]
 
         #: List of dicts describing the files modified.
