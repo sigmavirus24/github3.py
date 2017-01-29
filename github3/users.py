@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.users
-=============
-
-This module contains everything relating to Users.
-
-"""
+"""This module contains everything relating to Users."""
 from __future__ import unicode_literals
 
 from json import dumps
@@ -19,18 +13,12 @@ from .models import BaseAccount, GitHubCore
 
 
 class Key(GitHubCore):
-    """The :class:`Key <Key>` object. Please see GitHub's `Key Documentation
-    <http://developer.github.com/v3/users/keys/>`_ for more information.
+    """The :class:`Key <Key>` object.
 
-    Two key instances can be checked like so::
+    Please see GitHub's `Key Documentation`_ for more information.
 
-        k1 == k2
-        k1 != k2
-
-    And is equivalent to::
-
-        k1.id == k2.id
-        k1.id != k2.id
+    .. _Key Documentation:
+        http://developer.github.com/v3/users/keys/
     """
 
     def _update_attributes(self, key, session=None):
@@ -53,7 +41,7 @@ class Key(GitHubCore):
 
     @requires_auth
     def delete(self):
-        """Delete this Key"""
+        """Delete this key."""
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
@@ -80,10 +68,12 @@ class Key(GitHubCore):
 
 
 class Plan(GitHubCore):
-    """The :class:`Plan <Plan>` object. This makes interacting with the plan
-    information about a user easier. Please see GitHub's `Authenticated User
-    <http://developer.github.com/v3/users/#get-the-authenticated-user>`_
-    documentation for more specifics.
+    """The :class:`Plan <Plan>` object.
+
+    Please see GitHub's `Authenticated User`_ documentation for more details.
+
+    .. _Authenticated User:
+        http://developer.github.com/v3/users/#get-the-authenticated-user
     """
 
     def _update_attributes(self, plan):
@@ -106,7 +96,7 @@ class Plan(GitHubCore):
         return self.name
 
     def is_free(self):
-        """Checks if this is a free plan.
+        """Check if this is a free plan.
 
         :returns: bool
         """
@@ -114,11 +104,12 @@ class Plan(GitHubCore):
 
 
 class Email(GitHubCore):
-
     """The :class:`Email` object.
 
-    Please see GitHub's `Emails documentation
-    <https://developer.github.com/v3/users/emails/>` for more information.
+    Please see GitHub's `Emails documentation`_ for more information.
+
+    .. _Emails documentation:
+        https://developer.github.com/v3/users/emails/
     """
 
     def _update_attributes(self, email):
@@ -139,8 +130,9 @@ class Email(GitHubCore):
 
 
 class User(BaseAccount):
-    """The :class:`User <User>` object. This handles and structures information
-    in the `User section <http://developer.github.com/v3/users/>`_.
+    """The :class:`User <User>` object.
+
+    This handles and structures information in the `User section`_.
 
     Two user instances can be checked like so::
 
@@ -152,6 +144,8 @@ class User(BaseAccount):
         u1.id == u2.id
         u1.id != u2.id
 
+    .. _User section:
+        http://developer.github.com/v3/users/
     """
 
     def _update_attributes(self, user):
@@ -249,7 +243,7 @@ class User(BaseAccount):
         return self._boolean(self._get(url), 204, 404)
 
     def is_following(self, username):
-        """Checks if this user is following ``username``.
+        """Check if this user is following ``username``.
 
         :param str username: (required)
         :returns: bool
@@ -259,7 +253,7 @@ class User(BaseAccount):
         return self._boolean(self._get(url), 204, 404)
 
     def events(self, public=False, number=-1, etag=None):
-        """Iterate over events performed by this user.
+        r"""Iterate over events performed by this user.
 
         :param bool public: (optional), only list public events for the
             authenticated user
@@ -276,7 +270,7 @@ class User(BaseAccount):
         return self._iter(int(number), url, Event, etag=etag)
 
     def followers(self, number=-1, etag=None):
-        """Iterate over the followers of this user.
+        r"""Iterate over the followers of this user.
 
         :param int number: (optional), number of followers to return. Default:
             -1 returns all available
@@ -288,7 +282,7 @@ class User(BaseAccount):
         return self._iter(int(number), url, User, etag=etag)
 
     def following(self, number=-1, etag=None):
-        """Iterate over the users being followed by this user.
+        r"""Iterate over the users being followed by this user.
 
         :param int number: (optional), number of users to return. Default: -1
             returns all available users
@@ -300,7 +294,7 @@ class User(BaseAccount):
         return self._iter(int(number), url, User, etag=etag)
 
     def keys(self, number=-1, etag=None):
-        """Iterate over the public keys of this user.
+        r"""Iterate over the public keys of this user.
 
         .. versionadded:: 0.5
 
@@ -315,8 +309,9 @@ class User(BaseAccount):
 
     @requires_auth
     def organization_events(self, org, number=-1, etag=None):
-        """Iterate over events as they appear on the user's organization
-        dashboard. You must be authenticated to view this.
+        r"""Iterate over events from the user's organization dashboard.
+
+        .. note:: You must be authenticated to view this.
 
         :param str org: (required), name of the organization
         :param int number: (optional), number of events to return. Default: -1
@@ -331,9 +326,10 @@ class User(BaseAccount):
         return self._iter(int(number), url, Event, etag=etag)
 
     def received_events(self, public=False, number=-1, etag=None):
-        """Iterate over events that the user has received. If the user is the
-        authenticated user, you will see private and public events, otherwise
-        you will only see public events.
+        r"""Iterate over events that the user has received.
+
+        If the user is the authenticated user, you will see private and public
+        events, otherwise you will only see public events.
 
         :param bool public: (optional), determines if the authenticated user
             sees both private and public or just public
@@ -350,7 +346,7 @@ class User(BaseAccount):
         return self._iter(int(number), url, Event, etag=etag)
 
     def organizations(self, number=-1, etag=None):
-        """Iterate over organizations the user is member of
+        r"""Iterate over organizations the user is member of.
 
         :param int number: (optional), number of organizations to return.
             Default: -1 returns all available organization
@@ -404,8 +400,12 @@ class User(BaseAccount):
 
     @requires_auth
     def rename(self, login):
-        """Rename the user. This is only available for administrators of
-        a GitHub Enterprise instance.
+        """Rename the user.
+
+        .. note::
+
+            This is only available for administrators of a GitHub Enterprise
+            instance.
 
         :param str login: (required), new name of the user
         :returns: bool
@@ -506,10 +506,14 @@ class User(BaseAccount):
 
     @requires_auth
     def delete(self):
-        """Delete the user. Per GitHub API documentation, it is often preferable
-        to suspend the user.
+        """Delete the user.
 
-        This is only available for admins of a GitHub Enterprise instance.
+        Per GitHub API documentation, it is often preferable to suspend the
+        user.
+
+        .. note::
+
+            This is only available for admins of a GitHub Enterprise instance.
 
         :returns: bool -- True if successful, False otherwise
         """
