@@ -5,7 +5,6 @@ import pytest
 
 from base64 import b64encode
 from github3 import GitHubError
-from github3.null import NullObject
 from github3.repos.repo import (Comparison, Contents, Hook, RepoComment,
                                 RepoCommit, Repository)
 from github3.models import GitHubCore
@@ -80,7 +79,6 @@ class TestRepository(helper.UnitHelper):
     def test_add_null_collaborator(self):
         """Verify no request is made when adding `None` as a collaborator."""
         self.instance.add_collaborator(None)
-        self.instance.add_collaborator(NullObject())
 
         assert self.session.put.called is False
 

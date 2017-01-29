@@ -6,6 +6,7 @@ except ImportError:
 import github3
 import json
 import os.path
+import sys
 import pytest
 import unittest
 
@@ -173,7 +174,7 @@ class UnitIteratorHelper(UnitHelper):
         # Retrieve a mocked session object
         session = super(UnitIteratorHelper, self).create_mocked_session(*args)
         # Initialize a NullObject which has magical properties
-        null = github3.null.NullObject()
+        null = NullObject()
         # Set it as the return value for every method
         session.delete.return_value = null
         session.get.return_value = null
@@ -263,3 +264,59 @@ class UnitGitHubEnterpriseHelper(UnitHelper):
         # internet
         self.instance._build_url = self.build_url
         self.after_setup()
+
+
+is_py3 = (3, 0) <= sys.version_info < (4, 0)
+
+
+class NullObject(object):
+    def __init__(self, initializer=None):
+        self.__dict__['initializer'] = initializer
+
+    def __int__(self):
+        return 0
+
+    def __bool__(self):
+        return False
+
+    __nonzero__ = __bool__
+
+    def __str__(self):
+        return ''
+
+    def __unicode__(self):
+        return '' if is_py3 else ''.decode()
+
+    def __repr__(self):
+        return '<NullObject({0})>'.format(
+            repr(self.__getattribute__('initializer'))
+            )
+
+    def __getitem__(self, index):
+        return self
+
+    def __setitem__(self, index, value):
+        pass
+
+    def __getattr__(self, attr):
+        return self
+
+    def __setattr__(self, attr, value):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def __contains__(self, other):
+        return False
+
+    def __iter__(self):
+        return iter([])
+
+    def __next__(self):
+        raise StopIteration
+
+    next = __next__
+
+    def is_null(self):
+        return True
