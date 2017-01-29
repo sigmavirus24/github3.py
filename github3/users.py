@@ -9,7 +9,7 @@ from uritemplate import URITemplate
 
 from .decorators import requires_auth
 from .events import Event
-from .models import BaseAccount, GitHubCore
+from .models import GitHubCore
 
 
 class Key(GitHubCore):
@@ -129,7 +129,7 @@ class Email(GitHubCore):
         return self.email
 
 
-class User(BaseAccount):
+class User(GitHubCore):
     """The :class:`User <User>` object.
 
     This handles and structures information in the `User section`_.
@@ -149,9 +149,59 @@ class User(BaseAccount):
     """
 
     def _update_attributes(self, user):
-        super(User, self)._update_attributes(user)
+        #: Tells you what type of account this is
+        self.type = self._get_attribute(user, 'type')
         if not self.type:
             self.type = 'User'
+
+        self._api = self._get_attribute(user, 'url')
+
+        #: URL of the avatar at gravatar
+        self.avatar_url = self._get_attribute(user, 'avatar_url')
+
+        #: URL of the blog
+        self.blog = self._get_attribute(user, 'blog')
+
+        #: Name of the company
+        self.company = self._get_attribute(user, 'company')
+
+        #: datetime object representing the date the account was created
+        self.created_at = self._strptime_attribute(user, 'created_at')
+
+        #: E-mail address of the user/org
+        self.email = self._get_attribute(user, 'email')
+
+        # The number of people following this user
+        #: Number of followers
+        self.followers_count = self._get_attribute(user, 'followers')
+
+        # The number of people this user follows
+        #: Number of people the user is following
+        self.following_count = self._get_attribute(user, 'following')
+
+        #: Unique ID of the account
+        self.id = self._get_attribute(user, 'id')
+
+        #: Location of the user/org
+        self.location = self._get_attribute(user, 'location')
+
+        #: User name of the user/organization
+        self.login = self._get_attribute(user, 'login')
+
+        # e.g. first_name last_name
+        #: Real name of the user/org
+        self.name = self._get_attribute(user, 'name')
+
+        # The number of public_repos
+        #: Number of public repos owned by the user/org
+        self.public_repos_count = self._get_attribute(user, 'public_repos')
+
+        # e.g. https://github.com/self._login
+        #: URL of the user/org's profile
+        self.html_url = self._get_attribute(user, 'html_url')
+
+        #: Markdown formatted biography
+        self.bio = self._get_attribute(user, 'bio')
 
         #: ID of the user's image on Gravatar
         self.gravatar_id = self._get_attribute(user, 'gravatar_id')
@@ -229,6 +279,9 @@ class User(BaseAccount):
 
     def __str__(self):
         return self.login
+
+    def _repr(self):
+        return '<User [{s.login}:{s.name}]>'.format(s=self)
 
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.
