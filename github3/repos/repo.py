@@ -14,6 +14,8 @@ from json import dumps
 
 from uritemplate import URITemplate
 
+from .. import users
+
 from ..decorators import requires_auth
 from ..events import Event
 from ..git import Blob, Commit, Reference, Tag, Tree
@@ -25,7 +27,6 @@ from ..licenses import License
 from ..models import GitHubCore
 from ..notifications import Subscription, Thread
 from ..pulls import PullRequest
-from ..users import Key, User
 from ..utils import stream_response_to_file, timestamp_parameter
 from .branch import Branch
 from .comment import RepoComment
@@ -141,7 +142,8 @@ class Repository(GitHubCore):
         # Repository owner's name
         #: :class:`User <github3.users.User>` object representing the
         #: repository owner.
-        self.owner = self._class_attribute(repo, 'owner', User, self)
+        self.owner = self._class_attribute(
+            repo, 'owner', users.ShortUser, self)
 
         #: Is this repository private?
         self.private = self._get_attribute(repo, 'private')
@@ -451,10 +453,10 @@ class Repository(GitHubCore):
             -1 returns all available assignees
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.User`\ s
         """
         url = self._build_url('assignees', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def blob(self, sha):
         """Get the blob indicated by ``sha``.
@@ -529,10 +531,10 @@ class Repository(GitHubCore):
             Default: -1 returns all comments
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('collaborators', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def comments(self, number=-1, etag=None):
         r"""Iterate over comments on all commits in the repository.
@@ -672,13 +674,13 @@ class Repository(GitHubCore):
             Default: -1 returns all contributors
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
             params = {'anon': 'true'}
-        return self._iter(int(number), url, User, params, etag)
+        return self._iter(int(number), url, users.ShortUser, params, etag)
 
     @requires_auth
     def create_blob(self, content, encoding):
@@ -911,14 +913,14 @@ class Repository(GitHubCore):
         :param str key: (required), key text
         :param bool read_only: (optional), restrict key access to read-only,
             default is False
-        :returns: :class:`Key <github3.users.Key>` if successful, else None
+        :returns: :class:`~github3.users.Key` if successful, else None
         """
         json = None
         if title and key:
             data = {'title': title, 'key': key, 'read_only': read_only}
             url = self._build_url('keys', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Key, json)
+        return self._instance_or_null(users.Key, json)
 
     @requires_auth
     def create_label(self, name, color):
@@ -1530,13 +1532,13 @@ class Repository(GitHubCore):
         """Get the specified deploy key.
 
         :param int id_num: (required), id of the key
-        :returns: :class:`Key <github3.users.Key>` if successful, else None
+        :returns: :class:`~github3.users.Key` if successful, else None
         """
         json = None
         if int(id_num) > 0:
             url = self._build_url('keys', str(id_num), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return Key(json, self) if json else None
+        return users.Key(json, self) if json else None
 
     @requires_auth
     def keys(self, number=-1, etag=None):
@@ -1546,10 +1548,10 @@ class Repository(GitHubCore):
             returns all available keys
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Key <github3.users.Key>`\ s
+        :returns: generator of :class:`~github3.users.Key`\ s
         """
         url = self._build_url('keys', base_url=self._api)
-        return self._iter(int(number), url, Key, etag=etag)
+        return self._iter(int(number), url, users.Key, etag=etag)
 
     def label(self, name):
         """Get the label specified by ``name``.
@@ -1912,10 +1914,10 @@ class Repository(GitHubCore):
             Default: -1 returns all subscribers available
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('stargazers', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def statuses(self, sha, number=-1, etag=None):
         r"""Iterate over the statuses for a specific SHA.
@@ -1963,10 +1965,10 @@ class Repository(GitHubCore):
             Default: -1 returns all subscribers available
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`
+        :returns: generator of :class:`~github3.users.ShortUser`
         """
         url = self._build_url('subscribers', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     @requires_auth
     def subscription(self):

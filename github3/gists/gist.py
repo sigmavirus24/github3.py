@@ -9,12 +9,14 @@ This module contains the Gist class alone for simplicity.
 from __future__ import unicode_literals
 
 from json import dumps
+
+from .. import users
+
 from ..models import GitHubCore
 from ..decorators import requires_auth
 from .comment import GistComment
 from .file import GistFile
 from .history import GistHistory
-from ..users import User
 
 
 class Gist(GitHubCore):
@@ -75,7 +77,9 @@ class Gist(GitHubCore):
 
         #: :class:`User <github3.users.User>` object representing the owner of
         #: the gist.
-        self.owner = self._class_attribute(data, 'owner', User, self)
+        self.owner = self._class_attribute(
+            data, 'owner', users.ShortUser, self,
+        )
 
         self._files = self._get_attribute(data, 'files', [])
         if self._files:

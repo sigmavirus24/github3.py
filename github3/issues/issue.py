@@ -6,9 +6,10 @@ from re import match
 
 from uritemplate import URITemplate
 
+from .. import users
+
 from ..decorators import requires_auth
 from ..models import GitHubCore
-from ..users import User
 from .comment import IssueComment, issue_comment_params
 from .event import IssueEvent
 from .label import Label
@@ -38,11 +39,12 @@ class Issue(GitHubCore):
 
         #: :class:`User <github3.users.User>` representing the user the issue
         #: was assigned to.
-        self.assignee = self._class_attribute(issue, 'assignee', User, self)
+        self.assignee = self._class_attribute(
+            issue, 'assignee', users.ShortUser, self)
         self.assignees = self._get_attribute(issue, 'assignees')
         if self.assignees:
             self.assignees = [
-                User(assignee) for assignee in self.assignees
+                users.ShortUser(assignee) for assignee in self.assignees
             ]
 
         #: Body (description) of the issue.
@@ -120,10 +122,12 @@ class Issue(GitHubCore):
         self.updated_at = self._strptime_attribute(issue, 'updated_at')
 
         #: :class:`User <github3.users.User>` who opened the issue.
-        self.user = self._class_attribute(issue, 'user', User, self)
+        self.user = self._class_attribute(
+            issue, 'user', users.ShortUser, self)
 
         #: :class:`User <github3.users.User>` who closed the issue.
-        self.closed_by = self._class_attribute(issue, 'closed_by', User, self)
+        self.closed_by = self._class_attribute(
+            issue, 'closed_by', users.ShortUser, self)
 
     def _repr(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
