@@ -266,7 +266,7 @@ class TestGitHub(IntegrationHelper):
 
     def test_all_events(self):
         """Test the ability to iterate over all public events."""
-        cassette_name = self.cassette_name('iter_events')
+        cassette_name = self.cassette_name('all_events')
         with self.recorder.use_cassette(cassette_name):
             for e in self.gh.all_events(number=25):
                 assert isinstance(e, github3.events.Event)
