@@ -13,6 +13,25 @@ import copy
 from .models import GitHubCore
 
 
+class EventUser(GitHubCore):
+    """The class that represents the user information returned in Events."""
+
+    def _update_attributes(self, user):
+        self.avatar_url = user['avatar_url']
+        self.display_login = user['display_login']
+        self.gravatar_id = user['id']
+        self.id = user['id']
+        self.login = user['login']
+        self._api = self.url = user['url']
+
+    def to_user(self):
+        """Retrieve a full User object for this EventUser."""
+        from . import users
+        url = self._build_url('users', self.login)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(users.User, json)
+
+
 class Event(GitHubCore):
 
     """The :class:`Event <Event>` object. It structures and handles the data
@@ -37,10 +56,9 @@ class Event(GitHubCore):
         # not want to do:
         event = copy.deepcopy(event)
 
-        from .users import User
         from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
-        self.actor = self._class_attribute(event, 'actor', User)
+        self.actor = self._class_attribute(event, 'actor', EventUser)
         #: datetime object representing when the event was created.
         self.created_at = self._strptime_attribute(event, 'created_at')
 
@@ -83,9 +101,8 @@ def _commitcomment(payload, session):
 
 
 def _follow(payload, session):
-    from .users import User
     if payload.get('target'):
-        payload['target'] = User(payload['target'], session)
+        payload['target'] = EventUser(payload['target'], session)
     return payload
 
 
@@ -121,9 +138,8 @@ def _issueevent(payload, session):
 
 
 def _member(payload, session):
-    from .users import User
     if payload.get('member'):
-        payload['member'] = User(payload['member'], session)
+        payload['member'] = EventUser(payload['member'], session)
     return payload
 
 
@@ -160,13 +176,12 @@ def _release(payload, session):
 def _team(payload, session):
     from .orgs import Team
     from .repos import Repository
-    from .users import User
     if payload.get('team'):
         payload['team'] = Team(payload['team'], session)
     if payload.get('repo'):
         payload['repo'] = Repository(payload['repo'], session)
     if payload.get('sender'):
-        payload['sender'] = User(payload['sender'], session)
+        payload['sender'] = EventUser(payload['sender'], session)
     return payload
 
 
