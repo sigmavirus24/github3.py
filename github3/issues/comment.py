@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from .. import users
 from ..utils import timestamp_parameter
 from ..models import BaseComment
-from ..users import User
 
 
 class IssueComment(BaseComment):
@@ -26,7 +26,9 @@ class IssueComment(BaseComment):
         super(IssueComment, self)._update_attributes(comment)
 
         #: :class:`User <github3.users.User>` who made the comment
-        self.user = self._class_attribute(comment, 'user', User, self)
+        self.user = self._class_attribute(
+            comment, 'user', users.ShortUser, self,
+        )
 
         #: Issue url (not a template)
         self.issue_url = self._get_attribute(comment, 'issue_url')
