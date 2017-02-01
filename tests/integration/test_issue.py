@@ -146,7 +146,7 @@ class TestIssue(IntegrationHelper):
             issue = repository.issue(218)
             for event in issue.events():
                 assert isinstance(event, github3.issues.event.IssueEvent)
-                assert isinstance(event.actor, github3.users.User)
+                assert isinstance(event.actor, github3.users.ShortUser)
 
     def test_labels(self):
         """Test the ability to iterate over issue labels."""

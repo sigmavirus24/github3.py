@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from .. import users
 from ..models import GitHubCore
-from ..users import User
 
 
 class IssueEvent(GitHubCore):
@@ -37,7 +37,9 @@ class IssueEvent(GitHubCore):
         self.issue = self._class_attribute(event, 'issue', Issue, self)
 
         #: :class:`User <github3.users.User>` who caused this event.
-        self.actor = self._class_attribute(event, 'actor', User, self)
+        self.actor = self._class_attribute(
+            event, 'actor', users.ShortUser, self,
+        )
 
         #: Number of comments
         self.comments = self._get_attribute(event, 'comments')
@@ -55,7 +57,9 @@ class IssueEvent(GitHubCore):
         self.id = self._get_attribute(event, 'id')
 
         #: :class:`User <github3.users.User>` that is assigned
-        self.assignee = self._class_attribute(event, 'assignee', User, self)
+        self.assignee = self._class_attribute(
+            event, 'assignee', users.ShortUser, self,
+        )
 
         #: Dictionary containing milestone details
         self.milestone = self._get_attribute(event, 'milestone', {})
