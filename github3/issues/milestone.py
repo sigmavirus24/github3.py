@@ -2,10 +2,12 @@
 from __future__ import unicode_literals
 
 from json import dumps
+
+from .. import users
+
 from ..decorators import requires_auth
 from .label import Label
 from ..models import GitHubCore
-from ..users import User
 
 
 class Milestone(GitHubCore):
@@ -31,7 +33,9 @@ class Milestone(GitHubCore):
 
         #: :class:`User <github3.users.User>` object representing the creator
         #: of the milestone.
-        self.creator = self._class_attribute(milestone, 'creator', User, self)
+        self.creator = self._class_attribute(
+            milestone, 'creator', users.ShortUser, self
+        )
 
         #: Number of issues associated with this milestone which are still
         #: open.

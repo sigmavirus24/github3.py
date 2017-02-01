@@ -186,7 +186,7 @@ class _User(models.GitHubCore):
         #: Repostories URL (not a template)
         self.repos_url = user['repos_url']
 
-        self.site_admin = user['site_admin']
+        self.site_admin = user.get('site_admin')
 
         #: Starred URL Template. Expands with ``owner`` and ``repo``
         self.starred_urlt = URITemplate(user['starred_url'])
