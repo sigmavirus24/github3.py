@@ -583,6 +583,11 @@ class AuthenticatedUser(User):
     currently authenticated user's plan and private email information.
 
     .. versionadded:: 1.0.0
+
+    .. versionchanged:: 1.0.0
+
+        The ``total_private_gists`` attribute is no longer returned by
+        GitHub's API and so is removed.
     """
 
     def _update_attributes(self, user):
@@ -591,9 +596,6 @@ class AuthenticatedUser(User):
 
         #: Number of private repos owned by this user
         self.owned_private_repos = user['owned_private_repos']
-
-        #: Number of private gists owned by this user
-        self.total_private_gists = user['total_private_gists']
 
         #: Total number of private repos
         self.total_private_repos = user['total_private_repos']
