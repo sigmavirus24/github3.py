@@ -86,7 +86,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()
             for member in t.members():
-                assert isinstance(member, github3.users.User)
+                assert isinstance(member, github3.users.ShortUser)
 
     def test_can_filter_members_by_role(self):
         """Test the ability to filter an team's members by role."""
@@ -95,7 +95,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()
             for member in t.members(role='all'):
-                assert isinstance(member, github3.users.User)
+                assert isinstance(member, github3.users.ShortUser)
 
     def test_repositories(self):
         """Show that a user can retrieve a team's repositories."""

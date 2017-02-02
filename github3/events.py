@@ -18,7 +18,7 @@ class EventUser(GitHubCore):
 
     def _update_attributes(self, user):
         self.avatar_url = user['avatar_url']
-        self.display_login = user['display_login']
+        self.display_login = user.get('display_login')
         self.gravatar_id = user['id']
         self.id = user['id']
         self.login = user['login']

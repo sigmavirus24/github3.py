@@ -13,11 +13,12 @@ from json import dumps
 
 from uritemplate import URITemplate
 
+from . import users
+
 from .decorators import requires_auth
 from .events import Event
 from .models import BaseAccount, GitHubCore
 from .repos import Repository
-from .users import User
 
 
 class Team(GitHubCore):
@@ -176,8 +177,8 @@ class Team(GitHubCore):
             params['role'] = role
             headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, params=params, etag=etag,
-                          headers=headers)
+        return self._iter(int(number), url, users.ShortUser, params=params,
+                          etag=etag, headers=headers)
 
     @requires_auth
     def repositories(self, number=-1, etag=None):
@@ -532,8 +533,8 @@ class Organization(BaseAccount):
             params['role'] = role
             headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, User, params=params, etag=etag,
-                          headers=headers)
+        return self._iter(int(number), url, users.ShortUser, params=params,
+                          etag=etag, headers=headers)
 
     def public_members(self, number=-1, etag=None):
         r"""Iterate over public members of this organization.
@@ -545,7 +546,7 @@ class Organization(BaseAccount):
         :returns: generator of :class:`User <github3.users.User>`\ s
         """
         url = self._build_url('public_members', base_url=self._api)
-        return self._iter(int(number), url, User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def repositories(self, type='', number=-1, etag=None):
         r"""Iterate over repos for this organization.
