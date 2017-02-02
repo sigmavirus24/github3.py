@@ -38,7 +38,7 @@ class TestGitHubIterator(IntegrationHelper):
         cassette_name = self.cassette_name('count_reaches_0')
         with self.recorder.use_cassette(cassette_name):
             users_iter = self.gh.all_users(number=1)
-            assert isinstance(next(users_iter), github3.users.User)
+            assert isinstance(next(users_iter), github3.users.ShortUser)
             with pytest.raises(StopIteration):
                 next(users_iter)
 
@@ -47,4 +47,4 @@ class TestGitHubIterator(IntegrationHelper):
         cassette_name = self.cassette_name('next')
         with self.recorder.use_cassette(cassette_name):
             users_iter = self.gh.all_users(number=10)
-            assert isinstance(next(users_iter), github3.users.User)
+            assert isinstance(next(users_iter), github3.users.ShortUser)

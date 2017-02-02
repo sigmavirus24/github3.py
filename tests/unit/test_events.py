@@ -54,7 +54,7 @@ class TestPayLoadHandlers(TestCase):
         """Show that the event type is a FollowEvent."""
         follower = {'target': get_user_example_data()}
         github3.events._follow(follower, None)
-        assert isinstance(follower['target'], github3.users.User)
+        assert isinstance(follower['target'], github3.events.EventUser)
 
     def test_forkev(self):
         """Show that the event type is a ForkEvent."""
@@ -89,7 +89,7 @@ class TestPayLoadHandlers(TestCase):
         """Show that the event type is a MemberEvent."""
         member = {'member': get_user_example_data()}
         github3.events._member(member, None)
-        assert isinstance(member['member'], github3.users.User)
+        assert isinstance(member['member'], github3.events.EventUser)
 
     def test_pullreqev(self):
         """Show that the event type is a PullRequestEvent."""

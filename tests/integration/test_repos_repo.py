@@ -28,7 +28,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('kennethreitz', 'requests')
             assert repository is not None
             for assignee in repository.assignees():
-                assert isinstance(assignee, github3.users.User)
+                assert isinstance(assignee, github3.users.ShortUser)
 
     def test_blob(self):
         """Test the ability to retrieve blob on a repository."""
@@ -83,7 +83,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for collaborator in repository.collaborators():
-                assert isinstance(collaborator, github3.users.User)
+                assert isinstance(collaborator, github3.users.ShortUser)
 
     def test_comments(self):
         """Test the ability to retrieve comments on a repository."""
@@ -146,7 +146,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for contributor in repository.contributors():
-                assert isinstance(contributor, github3.users.User)
+                assert isinstance(contributor, github3.users.ShortUser)
                 assert isinstance(contributor.contributions, int)
 
     def test_create_blob(self):
@@ -1017,7 +1017,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(stargazers) > 0
         for user in stargazers:
-            assert isinstance(user, github3.users.User)
+            assert isinstance(user, github3.users.ShortUser)
 
     def test_statuses(self):
         """Test the ability to retrieve a commit's statuses."""
@@ -1043,7 +1043,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(subscribers) > 0
         for user in subscribers:
-            assert isinstance(user, github3.users.User)
+            assert isinstance(user, github3.users.ShortUser)
 
     def test_subscribe(self):
         """Test the ability to subscribe to a repository's notifications."""

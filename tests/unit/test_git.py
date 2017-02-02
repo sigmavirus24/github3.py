@@ -56,16 +56,6 @@ class TestCommit(UnitHelper):
     def test_repr(self):
         assert repr(self.instance).startswith('<Commit')
 
-    def test_committer_as_User(self):
-        """Show that commit_as_User() returns instance of User."""
-        user = self.instance.committer_as_User()
-        assert isinstance(user, github3.users.User)
-
-    def test_author_as_User(self):
-        """Show that commit_as_Author() returns instance of User."""
-        user = self.instance.author_as_User()
-        assert isinstance(user, github3.users.User)
-
 
 class TestGitTag(UnitHelper):
 
@@ -76,11 +66,6 @@ class TestGitTag(UnitHelper):
 
     def test_repr(self):
         assert repr(self.instance).startswith('<Tag')
-
-    def test_tagger_as_User(self):
-        """Show that tagger_as_User() returns instance of User."""
-        user = self.instance.tagger_as_User()
-        assert isinstance(user, github3.users.User)
 
 
 class TestReference(UnitHelper):

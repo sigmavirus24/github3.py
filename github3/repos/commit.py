@@ -33,12 +33,11 @@ class RepoCommit(models.BaseCommit):
     def _update_attributes(self, commit):
         super(RepoCommit, self)._update_attributes(commit)
 
-        #: :class:`User <github3.users.User>` who authored the commit.
-        self.author = self._class_attribute(commit, 'author', users.User, self)
-
-        #: :class:`User <github3.users.User>` who committed the commit.
+        self.author = self._class_attribute(
+            commit, 'author', users.ShortUser, self
+        )
         self.committer = self._class_attribute(
-            commit, 'committer', users.User, self
+            commit, 'author', users.ShortUser, self
         )
 
         #: :class:`Commit <github3.git.Commit>`.

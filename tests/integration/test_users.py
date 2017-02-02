@@ -60,7 +60,7 @@ class TestUser(IntegrationHelper):
 
         assert len(followers) > 0
         for follower in followers:
-            assert isinstance(follower, github3.users.User)
+            assert isinstance(follower, github3.users.ShortUser)
 
     def test_following(self):
         """Show that a user can retrieve users that a user is following."""
@@ -71,7 +71,7 @@ class TestUser(IntegrationHelper):
 
         assert len(following) > 0
         for person in following:
-            assert isinstance(person, github3.users.User)
+            assert isinstance(person, github3.users.ShortUser)
 
     def test_keys(self):
         """Show that a user can retrieve any user's public keys."""

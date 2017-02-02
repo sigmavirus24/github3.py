@@ -8,9 +8,10 @@ This module contains the RepoComment class
 """
 from __future__ import unicode_literals
 
+from .. import users
+
 from ..decorators import requires_auth
 from ..models import BaseComment
-from ..users import User
 
 
 class RepoComment(BaseComment):
@@ -50,7 +51,9 @@ class RepoComment(BaseComment):
         self.updated_at = self._strptime_attribute(comment, 'updated_at')
 
         #: Login of the user who left the comment.
-        self.user = self._class_attribute(comment, 'user', User, self)
+        self.user = self._class_attribute(
+            comment, 'user', users.ShortUser, self
+        )
 
     def _repr(self):
         return '<Repository Comment [{0}/{1}]>'.format(

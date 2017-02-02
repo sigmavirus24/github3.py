@@ -2,8 +2,10 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+
+from .. import users
+
 from ..models import GitHubCore
-from ..users import User
 
 
 def alternate_week(week):
@@ -26,7 +28,9 @@ class ContributorStats(GitHubCore):
 
     def _update_attributes(self, stats_object):
         #: Contributor in particular that this relates to
-        self.author = self._class_attribute(stats_object, 'author', User, self)
+        self.author = self._class_attribute(
+            stats_object, 'author', users.ShortUser, self
+        )
         #: Total number of commits authored by ``author``.
         self.total = self._get_attribute(stats_object, 'total')
         #: List of weekly dictionaries.
