@@ -262,11 +262,11 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('iter_all_users')
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.all_users(number=25):
-                assert isinstance(u, github3.users.User)
+                assert isinstance(u, github3.users.ShortUser)
 
     def test_all_events(self):
         """Test the ability to iterate over all public events."""
-        cassette_name = self.cassette_name('iter_events')
+        cassette_name = self.cassette_name('all_events')
         with self.recorder.use_cassette(cassette_name):
             for e in self.gh.all_events(number=25):
                 assert isinstance(e, github3.events.Event)
@@ -276,7 +276,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('followers_of')
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.followers_of('sigmavirus24', number=25):
-                assert isinstance(u, github3.users.User)
+                assert isinstance(u, github3.users.ShortUser)
 
     def test_followers(self):
         """
@@ -288,7 +288,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('followers_auth')
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.followers():
-                assert isinstance(u, github3.users.User)
+                assert isinstance(u, github3.users.ShortUser)
 
     def test_user_teams(self):
         """Test the ability to iterate over a user's teams."""

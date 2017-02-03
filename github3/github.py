@@ -145,10 +145,10 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :param int per_page: (optional), number of users to list per request
-        :returns: generator of :class:`User <github3.users.User>`
+        :returns: generator of :class:`~github3.users.ShortUser`
         """
         url = self._build_url('users')
-        return self._iter(int(number), url, users.User, etag=etag,
+        return self._iter(int(number), url, users.ShortUser, etag=etag,
                           params={'per_page': per_page, 'since': since})
 
     @requires_basic_auth
@@ -447,7 +447,7 @@ class GitHub(GitHubCore):
         return resp
 
     def followed_by(self, username, number=-1, etag=None):
-        """Iterate over users being followed by ``username``.
+        r"""Iterate over users being followed by ``username``.
 
         .. versionadded:: 1.0.0
 
@@ -458,14 +458,14 @@ class GitHub(GitHubCore):
             returns all people you follow
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('users', username, 'following')
-        return self._iter(int(number), url, users.User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     @requires_auth
     def followers(self, number=-1, etag=None):
-        """Iterate over followers of the authenticated user.
+        r"""Iterate over followers of the authenticated user.
 
         .. versionadded:: 1.0.0
 
@@ -475,13 +475,13 @@ class GitHub(GitHubCore):
             -1 returns all followers
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('user', 'followers')
-        return self._iter(int(number), url, users.User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def followers_of(self, username, number=-1, etag=None):
-        """Iterate over followers of ``username``.
+        r"""Iterate over followers of ``username``.
 
         .. versionadded:: 1.0.0
 
@@ -492,14 +492,14 @@ class GitHub(GitHubCore):
             -1 returns all followers
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('users', username, 'followers')
-        return self._iter(int(number), url, users.User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     @requires_auth
     def following(self, number=-1, etag=None):
-        """Iterate over users the authenticated user is following.
+        r"""Iterate over users the authenticated user is following.
 
         .. versionadded:: 1.0.0
 
@@ -509,10 +509,10 @@ class GitHub(GitHubCore):
             returns all people you follow
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`User <github3.users.User>`\ s
+        :returns: generator of :class:`~github3.users.ShortUser`\ s
         """
         url = self._build_url('user', 'following')
-        return self._iter(int(number), url, users.User, etag=etag)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def gist(self, id_num):
         """Retrieve the gist using the specified id number.
@@ -800,18 +800,18 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def me(self):
-        """Retrieves the info for the authenticated user.
+        """Retrieve the info for the authenticated user.
 
         .. versionadded:: 1.0
 
             This was separated from the ``user`` method.
 
         :returns: The representation of the authenticated user.
-        :rtype: :class:`User <github3.users.User>`
+        :rtype: :class:`~github3.users.AuthenticatedUser`
         """
         url = self._build_url('user')
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(users.User, json)
+        return self._instance_or_null(users.AuthenticatedUser, json)
 
     @requires_auth
     def membership_in(self, organization):
@@ -1588,10 +1588,10 @@ class GitHub(GitHubCore):
         return False
 
     def user(self, username):
-        """Returns a User object for the specified user name.
+        """Retrieve a User object for the specified user name.
 
         :param str username: name of the user
-        :returns: :class:`User <github3.users.User>`
+        :returns: :class:`~github3.users.User`
         """
         url = self._build_url('users', username)
         json = self._json(self._get(url), 200)
@@ -1657,7 +1657,7 @@ class GitHub(GitHubCore):
         """Get the user's information with id ``number``.
 
         :param int number: the user's id number
-        :returns: :class:`User <github3.users.User>`
+        :returns: :class:`~github3.users.User`
         """
         number = int(number)
         json = None

@@ -34,10 +34,10 @@ class PagesBuild(GitHubCore):
         #: Error dictionary containing the error message
         self.error = self._get_attribute(build, 'error')
 
-        from ..users import User
+        from .. import users
         #: :class:`User <github3.users.User>` representing who pushed the
         #: commit
-        self.pusher = self._class_attribute(build, 'pusher', User)
+        self.pusher = self._class_attribute(build, 'pusher', users.ShortUser)
 
         #: SHA of the commit that triggered the build
         self.commit = self._get_attribute(build, 'commit')

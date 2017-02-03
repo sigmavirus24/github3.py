@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 from json import dumps
 from base64 import b64decode
 from .models import GitHubCore, BaseCommit
-from .users import User
 from .decorators import requires_auth
 
 
@@ -91,22 +90,6 @@ class Commit(BaseCommit):
 
     def _repr(self):
         return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
-
-    def author_as_User(self):
-        """Attempt to return the author attribute as a
-        :class:`User <github3.users.User>`. No guarantees are made about the
-        validity of this object, i.e., having a login or created_at object.
-
-        """
-        return User(self.author, self)
-
-    def committer_as_User(self):
-        """Attempt to return the committer attribute as a
-        :class:`User <github3.users.User>` object. No guarantees are made
-        about the validity of this object.
-
-        """
-        return User(self.committer, self)
 
 
 class Reference(GitHubCore):
@@ -194,14 +177,6 @@ class Tag(GitData):
 
     def _repr(self):
         return '<Tag [{0}]>'.format(self.tag)
-
-    def tagger_as_User(self):
-        """Attempt to return the tagger attribute as a
-        :class:`User <github3.users.User>`. No guarantees are made about the
-        validity of this object, i.e., having a login or created_at object.
-
-        """
-        return User(self.tagger, self)
 
 
 class Tree(GitData):

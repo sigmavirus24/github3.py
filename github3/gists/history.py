@@ -8,8 +8,8 @@ Module containing the logic for the GistHistory object.
 """
 from __future__ import unicode_literals
 
+from .. import users
 from ..models import GitHubCore
-from ..users import User
 
 
 class GistHistory(GitHubCore):
@@ -35,7 +35,9 @@ class GistHistory(GitHubCore):
         self.version = self._get_attribute(history, 'version')
 
         #: user who made these changes
-        self.user = self._class_attribute(history, 'user', User, self)
+        self.user = self._class_attribute(
+            history, 'user', users.ShortUser, self,
+        )
 
         #: dict containing the change status; see also: deletions, additions,
         #: total

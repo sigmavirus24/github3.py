@@ -67,7 +67,7 @@ class TestOrganization(IntegrationHelper):
 
             # Get a public member of the organization
             public_member = next(o.public_members())
-            assert isinstance(public_member, github3.users.User)
+            assert isinstance(public_member, github3.users.ShortUser)
 
             # Conceal their membership
             assert o.conceal_member(public_member) is True
@@ -149,7 +149,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.members():
-                assert isinstance(member, github3.users.User)
+                assert isinstance(member, github3.users.ShortUser)
 
     @pytest.mark.xfail(
         reason="sigmavirus24 needs to actually write a test for this."
@@ -166,7 +166,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.members(filter='2fa_disabled'):
-                assert isinstance(member, github3.users.User)
+                assert isinstance(member, github3.users.ShortUser)
 
     def test_can_filter_members_by_role(self):
         """Test the ability to filter an organization's members by role."""
@@ -176,7 +176,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.members(role='all'):
-                assert isinstance(member, github3.users.User)
+                assert isinstance(member, github3.users.ShortUser)
 
     def test_public_members(self):
         """Test the ability to retrieve an organization's public members."""
@@ -186,7 +186,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.public_members():
-                assert isinstance(member, github3.users.User)
+                assert isinstance(member, github3.users.ShortUser)
 
     def test_repositories(self):
         """Test the ability to retrieve an organization's repositories."""

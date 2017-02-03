@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from .. import users
+
 from ..models import GitHubCore
-from ..users import User
 
 
 class Deployment(GitHubCore):
@@ -21,7 +22,9 @@ class Deployment(GitHubCore):
         self.ref = self._get_attribute(deployment, 'ref')
 
         #: User object representing the creator of the deployment
-        self.creator = self._class_attribute(deployment, 'creator', User, self)
+        self.creator = self._class_attribute(
+            deployment, 'creator', users.ShortUser, self
+        )
 
         #: JSON string payload of the Deployment
         self.payload = self._get_attribute(deployment, 'payload')
@@ -93,7 +96,9 @@ class DeploymentStatus(GitHubCore):
         self.state = self._get_attribute(status, 'state')
 
         #: Creater of the deployment status
-        self.creator = self._class_attribute(status, 'creator', User, self)
+        self.creator = self._class_attribute(
+            status, 'creator', users.ShortUser, self
+        )
 
         #: JSON payload as a string
         self.payload = self._get_attribute(status, 'payload', {})

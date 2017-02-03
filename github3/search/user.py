@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from .. import users
 from ..models import GitHubCore
-from ..users import User
 
 
 class UserSearchResult(GitHubCore):
@@ -20,7 +20,7 @@ class UserSearchResult(GitHubCore):
             del result['text_matches']
 
         #: User object matching the search
-        self.user = User(result, self)
+        self.user = users.ShortUser(result, self)
 
     def _repr(self):
         return '<UserSearchResult [{0}]>'.format(self.user)

@@ -8,8 +8,8 @@ Module containing the logic for a GistComment
 """
 from __future__ import unicode_literals
 
+from .. import users
 from ..models import BaseComment
-from ..users import User
 
 
 class GistComment(BaseComment):
@@ -34,7 +34,9 @@ class GistComment(BaseComment):
         self._api = self._get_attribute(comment, 'url')
         #: :class:`User <github3.users.User>` who made the comment
         #: Unless it is not associated with an account
-        self.user = self._class_attribute(comment, 'user', User, self)
+        self.user = self._class_attribute(
+            comment, 'user', users.ShortUser, self,
+        )
 
     def _repr(self):
         return '<Gist Comment [{0}]>'.format(self.user.login)

@@ -13,12 +13,12 @@ from json import dumps
 from uritemplate import URITemplate
 
 from . import models
+from . import users
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
 from .repos.commit import RepoCommit
 from .repos.contents import Contents
-from .users import User
 
 
 class PullDestination(models.GitHubCore):
@@ -39,7 +39,7 @@ class PullDestination(models.GitHubCore):
         #: :class:`User <github3.users.User>` representing the owner
         self.user = None
         if dest.get('user'):
-            self.user = User(dest.get('user'), None)
+            self.user = users.ShortUser(dest.get('user'), None)
         #: SHA of the commit at the head
         self.sha = dest.get('sha')
         self._repo_name = ''
@@ -198,7 +198,9 @@ class PullRequest(models.GitHubCore):
         self.mergeable_state = self._get_attribute(pull, 'mergeable_state')
 
         #: :class:`User <github3.users.User>` who merged this pull
-        self.merged_by = self._class_attribute(pull, 'merged_by', User, self)
+        self.merged_by = self._class_attribute(
+            pull, 'merged_by', users.ShortUser, self,
+        )
 
         #: Number of the pull/issue on the repository
         self.number = self._get_attribute(pull, 'number')
@@ -237,11 +239,13 @@ class PullRequest(models.GitHubCore):
 
         #: :class:`User <github3.users.User>` object representing the creator
         #: of the pull request
-        self.user = self._class_attribute(pull, 'user', User, self)
+        self.user = self._class_attribute(pull, 'user', users.ShortUser, self)
 
         #: :class:`User <github3.users.User>` object representing the assignee
         #: of the pull request
-        self.assignee = self._class_attribute(pull, 'assignee', User, self)
+        self.assignee = self._class_attribute(
+            pull, 'assignee', users.ShortUser, self,
+        )
 
     def _repr(self):
         return '<Pull Request [#{0}]>'.format(self.number)
@@ -460,7 +464,9 @@ class PullReview(models.GitHubCore):
         self.commit_id = self._get_attribute(preview, 'commit_id')
 
         #: :class:`User <github3.users.User>` who made the comment
-        self.user = self._class_attribute(preview, 'user', User, self)
+        self.user = self._class_attribute(
+            preview, 'user', users.ShortUser, self,
+        )
 
         #: State of the review
         self.state = self._get_attribute(preview, 'state')
@@ -502,7 +508,9 @@ class ReviewComment(models.BaseComment):
     def _update_attributes(self, comment):
         super(ReviewComment, self)._update_attributes(comment)
         #: :class:`User <github3.users.User>` who made the comment
-        self.user = self._class_attribute(comment, 'user', User, self)
+        self.user = self._class_attribute(
+            comment, 'user', users.ShortUser, self,
+        )
 
         #: Original position inside the file
         self.original_position = self._get_attribute(

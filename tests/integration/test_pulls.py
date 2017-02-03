@@ -113,7 +113,7 @@ class TestPullRequest(IntegrationHelper):
             p = self.get_pull_request(num=671)
             for pull_review in p.reviews():
                 assert isinstance(pull_review, github3.pulls.PullReview)
-                assert isinstance(pull_review.user, github3.users.User)
+                assert isinstance(pull_review.user, github3.users.ShortUser)
 
     def test_reopen(self):
         """Show that one can reopen an open Pull Request."""

@@ -8,8 +8,9 @@ This module contains the Status object for GitHub's commit status API
 """
 from __future__ import unicode_literals
 
+from .. import users
+
 from ..models import GitHubCore
-from ..users import User
 
 
 class Status(GitHubCore):
@@ -29,7 +30,9 @@ class Status(GitHubCore):
         self.created_at = self._strptime_attribute(status, 'created_at')
 
         #: :class:`User <github3.users.User>` who created the object
-        self.creator = self._class_attribute(status, 'creator', User)
+        self.creator = self._class_attribute(
+            status, 'creator', users.ShortUser
+        )
 
         #: Short description of the Status
         self.description = self._get_attribute(status, 'description')
