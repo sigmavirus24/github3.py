@@ -147,6 +147,7 @@ class _User(models.GitHubCore):
     .. _User section:
         http://developer.github.com/v3/users/
     """
+    class_name = '_User'
 
     def _update_attributes(self, user):
         #: URL of the avatar at gravatar
@@ -204,7 +205,7 @@ class _User(models.GitHubCore):
         return self.login
 
     def _repr(self):
-        return '<User [{s.login}:{s.name}]>'.format(s=self)
+        return '<{s.class_name} [{s.login}:{s.name}]>'.format(s=self)
 
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.
@@ -509,7 +510,7 @@ class ShortUser(_User):
     .. versionadded:: 1.0.0
     """
 
-    pass
+    class_name = 'ShortUser'
 
 
 class User(_User):
@@ -528,6 +529,8 @@ class User(_User):
 
     .. versionchanged:: 1.0.0
     """
+
+    class_name = 'User'
 
     def _update_attributes(self, user):
         super(User, self)._update_attributes(user)
@@ -589,6 +592,8 @@ class AuthenticatedUser(User):
         The ``total_private_gists`` attribute is no longer returned by
         GitHub's API and so is removed.
     """
+
+    class_name = 'AuthenticatedUser'
 
     def _update_attributes(self, user):
         #: How much disk consumed by the user

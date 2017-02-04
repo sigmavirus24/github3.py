@@ -43,343 +43,152 @@ from .status import Status
 from .tag import RepoTag
 
 
-class Repository(GitHubCore):
+class _Repository(GitHubCore):
+    """This class serves as the base for all other Repository objects.
 
-    """The :class:`Repository <Repository>` object.
-
-    It represents how GitHub sends information about repositories.
-
-    Two repository instances can be checked like so::
-
-        r1 == r2
-        r1 != r2
-
-    And is equivalent to::
-
-        r1.id == r2.id
-        r1.id != r2.id
-
-    See also: http://developer.github.com/v3/repos/
-
+    Sub-classes should need only to override the ``_update_attributes``
+    method to ensure that all attributes are present on the object.
     """
 
     STAR_HEADERS = {
         'Accept': 'application/vnd.github.v3.star+json'
     }
 
-    def _update_attributes(self, repo):
-        self._api = self._get_attribute(repo, 'url')
+    class_name = '_Repository'
 
-        #: URL used to clone via HTTPS.
-        self.clone_url = self._get_attribute(repo, 'clone_url')
-        #: ``datetime`` object representing when the Repository was created.
-        self.created_at = self._strptime_attribute(repo, 'created_at')
+    def _update_attributes(self, repo):
+        self.url = self._api = repo['url']
+
+        #: Archive URL Template. Expand with ``archive_format`` and ``ref``
+        self.archive_urlt = URITemplate(repo['archive_url'])
+
+        #: Assignees URL Template. Expand with ``user``
+        self.assignees_urlt = URITemplate(repo['assignees_url'])
+
+        #: Blobs URL Template. Expand with ``sha``
+        self.blobs_urlt = URITemplate(repo['blobs_url'])
+
+        #: Branches URL Template. Expand with ``branch``
+        self.branches_urlt = URITemplate(repo['branches_url'])
+
+        self.collaborators_urlt = URITemplate(repo['collaborators_url'])
+
+        #: Comments URL Template. Expand with ``number``
+        self.comments_urlt = URITemplate(repo['comments_url'])
+
+        #: Commits URL Template. Expand with ``sha``
+        self.commits_urlt = URITemplate(repo['commits_url'])
+
+        #: Comparison URL Template. Expand with ``base`` and ``head``
+        self.compare_urlt = URITemplate(repo['compare_url'])
+
+        #: Contents URL Template. Expand with ``path``
+        self.contents_urlt = URITemplate(repo['contents_url'])
+
+        #: Contributors url (not a template)
+        self.contributors_url = repo['contributors_url']
+
+        self.deployments_url = repo['deployments_url']
+
         #: Description of the repository.
         self.description = self._get_attribute(repo, 'description')
 
-        #: The number of forks of this repository.
-        self.forks_count = self._get_attribute(repo, 'forks_count')
-        #: The number of forks of this repository. For backward compatibility
-        self.fork_count = self.forks_count
-
-        #: Is this repository a fork?
-        self.fork = self._get_attribute(repo, 'fork')
-
-        #: Full name as login/name
-        self.full_name = self._get_attribute(repo, 'full_name')
-
-        # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
-        #: Plain git url for an anonymous clone.
-        self.git_url = self._get_attribute(repo, 'git_url')
-        #: Whether or not this repository has downloads enabled
-        self.has_downloads = self._get_attribute(repo, 'has_downloads')
-        #: Whether or not this repository has an issue tracker
-        self.has_issues = self._get_attribute(repo, 'has_issues')
-        #: Whether or not this repository has the wiki enabled
-        self.has_wiki = self._get_attribute(repo, 'has_wiki')
-
-        # e.g. https://sigmavirus24.github.com/github3.py
-        #: URL of the home page for the project.
-        self.homepage = self._get_attribute(repo, 'homepage')
-
-        #: URL of the pure diff of the pull request
-        self.diff_url = self._get_attribute(repo, 'diff_url')
-
-        #: URL of the pure patch of the pull request
-        self.patch_url = self._get_attribute(repo, 'patch_url')
-
-        #: API URL of the issue representation of this Pull Request
-        self.issue_url = self._get_attribute(repo, 'issue_url')
-
-        # e.g. https://github.com/sigmavirus24/github3.py
-        #: URL of the project at GitHub.
-        self.html_url = self._get_attribute(repo, 'html_url')
-        #: Unique id of the repository.
-        self.id = self._get_attribute(repo, 'id')
-        #: Language property.
-        self.language = self._get_attribute(repo, 'language')
-
-        # License containing only key, name, url & featured
-        #: :class:`License <github3.licenses.License>` object representing the
-        #: repository license.
-        self.original_license = self._class_attribute(
-            repo, 'license', License, self
-        )
-
-        #: Mirror property.
-        self.mirror_url = self._get_attribute(repo, 'mirror_url')
-
-        # Repository name, e.g. github3.py
-        #: Name of the repository.
-        self.name = self._get_attribute(repo, 'name')
-
-        #: Number of open issues on the repository. DEPRECATED
-        self.open_issues = self._get_attribute(repo, 'open_issues')
-
-        #: Number of open issues on the repository
-        self.open_issues_count = self._get_attribute(repo, 'open_issues_count')
-
-        # Repository owner's name
-        #: :class:`User <github3.users.User>` object representing the
-        #: repository owner.
-        self.owner = self._class_attribute(
-            repo, 'owner', users.ShortUser, self)
-
-        #: Is this repository private?
-        self.private = self._get_attribute(repo, 'private')
-
-        #: Permissions for this repository
-        self.permissions = self._get_attribute(repo, 'permissions')
-
-        #: ``datetime`` object representing the last time commits were pushed
-        #: to the repository.
-        self.pushed_at = self._strptime_attribute(repo, 'pushed_at')
-        #: Size of the repository.
-        self.size = self._get_attribute(repo, 'size')
-
-        # The number of stargazers
-        #: Number of users who starred the repository
-        self.stargazers_count = self._get_attribute(repo, 'stargazers_count')
-
-        #: ``datetime`` object representing when the repository was starred
-        self.starred_at = self._strptime_attribute(repo, 'starred_at')
-
-        # SSH url e.g. git@github.com/sigmavirus24/github3.py
-        #: URL to clone the repository via SSH.
-        self.ssh_url = self._get_attribute(repo, 'ssh_url')
-        #: If it exists, url to clone the repository via SVN.
-        self.svn_url = self._get_attribute(repo, 'svn_url')
-        #: ``datetime`` object representing the last time the repository was
-        #: updated.
-        self.updated_at = self._strptime_attribute(repo, 'updated_at')
-
-        # The number of watchers
-        #: Number of users watching the repository.
-        self.watchers = self._get_attribute(repo, 'watchers')
-
-        #: Parent of this fork, if it exists :class:`Repository`
-        self.source = self._class_attribute(repo, 'source', Repository, self)
-
-        #: Parent of this fork, if it exists :class:`Repository`
-        self.parent = self._class_attribute(repo, 'parent', Repository, self)
-
-        #: default branch for the repository
-        self.default_branch = self._get_attribute(repo, 'default_branch')
-
-        #: master (default) branch for the repository
-        self.master_branch = self._get_attribute(repo, 'master_branch')
-
-        #: Teams url (not a template)
-        self.teams_url = self._get_attribute(repo, 'teams_url')
-
-        #: Hooks url (not a template)
-        self.hooks_url = self._get_attribute(repo, 'hooks_url')
+        #: Downloads url (not a template)
+        self.downloads_url = repo['downloads_url']
 
         #: Events url (not a template)
-        self.events_url = self._get_attribute(repo, 'events_url')
+        self.events_url = repo['events_url']
 
-        #: Tags url (not a template)
-        self.tags_url = self._get_attribute(repo, 'tags_url')
+        #: Is this repository a fork?
+        self.fork = repo['fork']
+        self.forks_url = repo['forks_url']
+
+        #: Full name as login/name
+        self.full_name = repo['full_name']
+
+        #: Git commits URL Template. Expand with ``sha``
+        self.git_commits_urlt = URITemplate(repo['git_commits_url'])
+
+        #: Git refs URL Template. Expand with ``sha``
+        self.git_refs_urlt = URITemplate(repo['git_refs_url'])
+
+        #: Git tags URL Template. Expand with ``sha``
+        self.git_tags_urlt = URITemplate(repo['git_tags_url'])
+
+        #: Hooks url (not a template)
+        self.hooks_url = repo['hooks_url']
+
+        #: URL of the project at GitHub.
+        self.html_url = repo['html_url']
+
+        #: Unique id of the repository.
+        self.id = repo['id']
+
+        #: Issue comment URL Template. Expand with ``number``
+        self.issue_comment_urlt = URITemplate(repo['issue_comment_url'])
+
+        #: Issue events URL Template. Expand with ``number``
+        self.issue_events_urlt = URITemplate(repo['issue_events_url'])
+
+        #: Issues URL Template. Expand with ``number``
+        self.issues_urlt = URITemplate(repo['issues_url'])
+
+        self.keys_urlt = URITemplate(repo['keys_url'])
+
+        #: Labels URL Template. Expand with ``name``
+        self.labels_urlt = URITemplate(repo['labels_url'])
 
         #: Languages url (not a template)
-        self.languages_url = self._get_attribute(repo, 'languages_url')
-
-        #: Stargazers url (not a template)
-        self.stargazers_url = self._get_attribute(repo, 'stargazers_url')
-
-        #: Contributors url (not a template)
-        self.contributors_url = self._get_attribute(repo, 'contributors_url')
-
-        #: Subscribers url (not a template)
-        self.subscribers_url = self._get_attribute(repo, 'subscribers_url')
-
-        #: Subscription url (not a template)
-        self.subscription_url = self._get_attribute(repo, 'subscription_url')
+        self.languages_url = repo['languages_url']
 
         #: Merges url (not a template)
         self.merges_url = self._get_attribute(repo, 'merges_url')
 
-        #: Downloads url (not a template)
-        self.download_url = self._get_attribute(repo, 'downloads_url')
-
-        # Template URLS
-        #: Issue events URL Template. Expand with ``number``
-        self.issue_events_urlt = self._class_attribute(
-            repo,
-            'issue_events_url',
-            URITemplate
-        )
-
-        #: Assignees URL Template. Expand with ``user``
-        self.assignees_urlt = self._class_attribute(
-            repo,
-            'assignees_url',
-            URITemplate
-        )
-
-        #: Branches URL Template. Expand with ``branch``
-        self.branches_urlt = self._class_attribute(
-            repo,
-            'branches_url',
-            URITemplate
-        )
-
-        #: Blobs URL Template. Expand with ``sha``
-        self.blobs_urlt = self._class_attribute(
-            repo,
-            'blobs_url',
-            URITemplate
-        )
-
-        #: Git tags URL Template. Expand with ``sha``
-        self.git_tags_urlt = self._class_attribute(
-            repo,
-            'git_tags_url',
-            URITemplate
-        )
-
-        #: Git refs URL Template. Expand with ``sha``
-        self.git_refs_urlt = self._class_attribute(
-            repo,
-            'git_refs_url',
-            URITemplate
-        )
-
-        #: Trres URL Template. Expand with ``sha``
-        self.trees_urlt = self._class_attribute(
-            repo,
-            'trees_url',
-            URITemplate
-        )
-
-        #: Statuses URL Template. Expand with ``sha``
-        self.statuses_urlt = self._class_attribute(
-            repo,
-            'statuses_url',
-            URITemplate
-        )
-
-        #: Commits URL Template. Expand with ``sha``
-        self.commits_urlt = self._class_attribute(
-            repo,
-            'commits_url',
-            URITemplate
-        )
-
-        #: Git commits URL Template. Expand with ``sha``
-        self.git_commits_urlt = self._class_attribute(
-            repo,
-            'git_commits_url',
-            URITemplate
-        )
-
-        #: Comments URL Template. Expand with ``number``
-        self.comments_urlt = self._class_attribute(
-            repo,
-            'comments_url',
-            URITemplate
-        )
-
-        #: Pull Request Review Comments URL
-        self.review_comments_url = self._class_attribute(
-            repo,
-            'review_comments_url',
-            URITemplate
-        )
-
-        #: Pull Request Review Comments URL Template. Expand with ``number``
-        self.issue_events_urlt = self._class_attribute(
-            repo,
-            'review_comment_url',
-            URITemplate
-        )
-
-        #: Issue comment URL Template. Expand with ``number``
-        self.issue_comment_urlt = self._class_attribute(
-            repo,
-            'issue_comment_url',
-            URITemplate
-        )
-
-        #: Contents URL Template. Expand with ``path``
-        self.contents_urlt = self._class_attribute(
-            repo,
-            'contents_url',
-            URITemplate
-        )
-
-        #: Comparison URL Template. Expand with ``base`` and ``head``
-        self.compare_urlt = self._class_attribute(
-            repo,
-            'compare_url',
-            URITemplate
-        )
-
-        #: Archive URL Template. Expand with ``archive_format`` and ``ref``
-        self.archive_urlt = self._class_attribute(
-            repo,
-            'archive_url',
-            URITemplate
-        )
-
-        #: Issues URL Template. Expand with ``number``
-        self.issues_urlt = self._class_attribute(
-            repo,
-            'issues_url',
-            URITemplate
-        )
-
-        #: Pull Requests URL Template. Expand with ``number``
-        self.pulls_urlt = self._class_attribute(
-            repo,
-            'pulls_url',
-            URITemplate
-        )
-
         #: Milestones URL Template. Expand with ``number``
-        self.milestones_urlt = self._class_attribute(
-            repo,
-            'milestones_url',
-            URITemplate
-        )
+        self.milestones_urlt = URITemplate(repo['milestones_url'])
+
+        #: Name of the repository.
+        self.name = repo['name']
 
         #: Notifications URL Template. Expand with ``since``, ``all``,
         #: ``participating``
-        self.notifications_urlt = self._class_attribute(
-            repo,
-            'notifications_url',
-            URITemplate
-        )
+        self.notifications_urlt = URITemplate(repo['notifications_url'])
 
-        #: Labels URL Template. Expand with ``name``
-        self.labels_urlt = self._class_attribute(
-            repo,
-            'labels_url',
-            URITemplate
-        )
+        #: :class:`~github3.users.ShortUser` object representing the
+        #: repository owner.
+        self.owner = users.ShortUser(repo['owner'], self)
+
+        #: Is this repository private?
+        self.private = repo['private']
+
+        #: Pull Requests URL Template. Expand with ``number``
+        self.pulls_urlt = URITemplate(repo['pulls_url'])
+
+        self.releases_urlt = URITemplate(repo['releases_url'])
+
+        #: Stargazers url (not a template)
+        self.stargazers_url = repo['stargazers_url']
+
+        #: Statuses URL Template. Expand with ``sha``
+        self.statuses_urlt = URITemplate(repo['statuses_url'])
+
+        #: Subscribers url (not a template)
+        self.subscribers_url = repo['subscribers_url']
+
+        #: Subscription url (not a template)
+        self.subscription_url = repo['subscription_url']
+
+        #: Tags url (not a template)
+        self.tags_url = repo['tags_url']
+
+        #: Teams url (not a template)
+        self.teams_url = repo['teams_url']
+
+        #: Trres URL Template. Expand with ``sha``
+        self.trees_urlt = URITemplate(repo['trees_url'])
 
     def _repr(self):
-        return '<Repository [{0}]>'.format(self)
+        return '<{0} [{1}]>'.format(self.class_name, self)
 
     def __str__(self):
         return self.full_name
@@ -2059,6 +1868,172 @@ class Repository(GitHubCore):
         if json and json.get('Last-Modified'):
             del json['Last-Modified']
         return json
+
+
+class ShortRepository(_Repository):
+    """This represents a Repository object returned in collections.
+
+    GitHub's API returns different amounts of information about repositories
+    based upon how that information is retrieved. This object exists to
+    represent the full amount of information returned for a specific
+    repository. For example, you would receive this class when calling
+    :meth:`~github3.github.GitHub.repository`. To provide a clear distinction
+    between the types of repositories, github3.py uses different classes with
+    different sets of attributes.
+
+    .. versionadded:: 1.0.0
+    """
+
+    class_name = 'ShortRepository'
+
+
+class Repository(_Repository):
+
+    """The :class:`Repository <Repository>` object.
+
+    It represents how GitHub sends information about repositories.
+
+    Two repository instances can be checked like so::
+
+        r1 == r2
+        r1 != r2
+
+    And is equivalent to::
+
+        r1.id == r2.id
+        r1.id != r2.id
+
+    See also: http://developer.github.com/v3/repos/
+
+    """
+
+    class_name = 'Repository'
+
+    def _update_attributes(self, repo):
+        super(Repository, self)._update_attributes(repo)
+
+        #: URL used to clone via HTTPS.
+        self.clone_url = repo['clone_url']
+
+        #: ``datetime`` object representing when the Repository was created.
+        self.created_at = self._strptime(repo['created_at'])
+
+        #: default branch for the repository
+        self.default_branch = repo['default_branch']
+
+        #: The number of forks of this repository.
+        self.forks_count = repo['forks_count']
+
+        #: The number of forks of this repository. For backward compatibility
+        self.fork_count = self.forks_count
+
+        # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
+        #: Plain git url for an anonymous clone.
+        self.git_url = repo['git_url']
+
+        #: Whether or not this repository has downloads enabled
+        self.has_downloads = repo['has_downloads']
+
+        #: Whether or not this repository has an issue tracker
+        self.has_issues = repo['has_issues']
+
+        self.has_pages = repo['has_pages']
+
+        #: Whether or not this repository has the wiki enabled
+        self.has_wiki = repo['has_wiki']
+
+        # e.g. https://sigmavirus24.github.com/github3.py
+        #: URL of the home page for the project.
+        self.homepage = repo['homepage']
+
+        #: Language property.
+        self.language = repo['language']
+
+        # License containing only key, name, url & featured
+        #: :class:`License <github3.licenses.License>` object representing the
+        #: repository license.
+        self.original_license = License(repo['license'], self)
+
+        #: Mirror property.
+        self.mirror_url = repo['mirror_url']
+
+        self.network_count = repo['network_count']
+
+        #: Number of open issues on the repository. DEPRECATED
+        self.open_issues = repo['open_issues']
+
+        #: Number of open issues on the repository
+        self.open_issues_count = repo['open_issues_count']
+
+        #: ``datetime`` object representing the last time commits were pushed
+        #: to the repository.
+        self.pushed_at = self._strptime(repo['pushed_at'])
+
+        #: Size of the repository.
+        self.size = repo['size']
+
+        # SSH url e.g. git@github.com/sigmavirus24/github3.py
+        #: URL to clone the repository via SSH.
+        self.ssh_url = repo['ssh_url']
+
+        # The number of stargazers
+        #: Number of users who starred the repository
+        self.stargazers_count = repo['stargazers_count']
+
+        self.subscribers_count = repo['subscribers_count']
+
+        #: If it exists, url to clone the repository via SVN.
+        self.svn_url = self._get_attribute(repo, 'svn_url')
+
+        #: ``datetime`` object representing the last time the repository was
+        #: updated.
+        self.updated_at = self._strptime_attribute(repo, 'updated_at')
+
+        # The number of watchers
+        #: Number of users watching the repository.
+        self.watchers_count = self.watchers = repo['watchers_count']
+
+        # .......... OLD ...... Deprecated?
+
+        #: URL of the pure diff of the pull request
+        self.diff_url = self._get_attribute(repo, 'diff_url')
+
+        #: URL of the pure patch of the pull request
+        self.patch_url = self._get_attribute(repo, 'patch_url')
+
+        #: API URL of the issue representation of this Pull Request
+        self.issue_url = self._get_attribute(repo, 'issue_url')
+
+        #: Permissions for this repository
+        self.permissions = self._get_attribute(repo, 'permissions')
+
+        #: ``datetime`` object representing when the repository was starred
+        self.starred_at = self._strptime_attribute(repo, 'starred_at')
+
+        #: Parent of this fork, if it exists :class:`Repository`
+        self.source = self._class_attribute(repo, 'source', Repository, self)
+
+        #: Parent of this fork, if it exists :class:`Repository`
+        self.parent = self._class_attribute(repo, 'parent', Repository, self)
+
+        #: master (default) branch for the repository
+        self.master_branch = self._get_attribute(repo, 'master_branch')
+
+        # Template URLS
+
+        #: Pull Request Review Comments URL
+        self.review_comments_url = self._class_attribute(
+            repo,
+            'review_comments_url',
+            URITemplate
+        )
+
+        #: Pull Request Review Comments URL Template. Expand with ``number``
+        self.issue_events_urlt = self._class_attribute(
+            repo,
+            'review_comment_url',
+            URITemplate
+        )
 
 
 class StarredRepository(GitHubCore):
