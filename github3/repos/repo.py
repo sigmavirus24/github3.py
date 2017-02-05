@@ -1964,6 +1964,88 @@ class ShortRepository(_Repository):
         ``labels_urlt.variables`` for the list of variables that can
         be passed to ``labels_urlt.expand()``.
 
+    .. attribute:: languages_url
+
+        The URL to retrieve this repository's list of languages.
+
+    .. attribute:: merges_url
+
+        The URL to retrieve this repository's list of merges.
+
+    .. attribute:: milestones_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``milestones_urlt.variables`` for the list of variables that can
+        be passed to ``milestones_urlt.expand()``.
+
+    .. attribute:: name
+
+        The name of the repository, e.g., ``github3.py``.
+
+    .. attribute:: notifications_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``notifications_urlt.variables`` for the list of variables that can
+        be passed to ``notifications_urlt.expand()``.
+
+    .. attribute:: owner
+
+        The owner of the repository, e.g., ``sigmavirus24``.
+
+    .. attribute:: private
+
+        Whether the repository is private or public.
+
+    .. attribute:: pulls_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``pulls_urlt.variables`` for the list of variables that can
+        be passed to ``pulls_urlt.expand()``.
+
+    .. attribute:: releases_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``releases_urlt.variables`` for the list of variables that can
+        be passed to ``releases_urlt.expand()``.
+
+    .. attribute:: stargazers_url
+
+        The URL to retrieve this repository's list of stargazers.
+
+    .. attribute:: statuses_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``statuses_urlt.variables`` for the list of variables that can
+        be passed to ``statuses_urlt.expand()``.
+
+    .. attribute:: subscribers_url
+
+        The URL to retrieve this repository's list of subscribers.
+
+    .. attribute:: subscription_url
+
+        The URL to modify subscription to this repository.
+
+    .. attribute:: tags_url
+
+        The URL to retrieve this repository's list of tags.
+
+    .. attribute:: teams_url
+
+        The URL to retrieve this repository's list of teams.
+
+    .. attribute:: trees_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``trees_urlt.variables`` for the list of variables that can
+        be passed to ``trees_urlt.expand()``.
+
     .. versionadded:: 1.0.0
     """
 
