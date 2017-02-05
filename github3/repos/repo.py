@@ -56,133 +56,49 @@ class _Repository(GitHubCore):
 
     def _update_attributes(self, repo):
         self.url = self._api = repo['url']
-
-        #: Archive URL Template. Expand with ``archive_format`` and ``ref``
         self.archive_urlt = URITemplate(repo['archive_url'])
-
-        #: Assignees URL Template. Expand with ``user``
         self.assignees_urlt = URITemplate(repo['assignees_url'])
-
-        #: Blobs URL Template. Expand with ``sha``
         self.blobs_urlt = URITemplate(repo['blobs_url'])
-
-        #: Branches URL Template. Expand with ``branch``
         self.branches_urlt = URITemplate(repo['branches_url'])
-
         self.collaborators_urlt = URITemplate(repo['collaborators_url'])
-
-        #: Comments URL Template. Expand with ``number``
         self.comments_urlt = URITemplate(repo['comments_url'])
-
-        #: Commits URL Template. Expand with ``sha``
         self.commits_urlt = URITemplate(repo['commits_url'])
-
-        #: Comparison URL Template. Expand with ``base`` and ``head``
         self.compare_urlt = URITemplate(repo['compare_url'])
-
-        #: Contents URL Template. Expand with ``path``
         self.contents_urlt = URITemplate(repo['contents_url'])
-
-        #: Contributors url (not a template)
         self.contributors_url = repo['contributors_url']
-
         self.deployments_url = repo['deployments_url']
-
-        #: Description of the repository.
         self.description = self._get_attribute(repo, 'description')
-
-        #: Downloads url (not a template)
         self.downloads_url = repo['downloads_url']
-
-        #: Events url (not a template)
         self.events_url = repo['events_url']
-
-        #: Is this repository a fork?
         self.fork = repo['fork']
         self.forks_url = repo['forks_url']
-
-        #: Full name as login/name
         self.full_name = repo['full_name']
-
-        #: Git commits URL Template. Expand with ``sha``
         self.git_commits_urlt = URITemplate(repo['git_commits_url'])
-
-        #: Git refs URL Template. Expand with ``sha``
         self.git_refs_urlt = URITemplate(repo['git_refs_url'])
-
-        #: Git tags URL Template. Expand with ``sha``
         self.git_tags_urlt = URITemplate(repo['git_tags_url'])
-
-        #: Hooks url (not a template)
         self.hooks_url = repo['hooks_url']
-
-        #: URL of the project at GitHub.
         self.html_url = repo['html_url']
-
-        #: Unique id of the repository.
         self.id = repo['id']
-
-        #: Issue comment URL Template. Expand with ``number``
         self.issue_comment_urlt = URITemplate(repo['issue_comment_url'])
-
-        #: Issue events URL Template. Expand with ``number``
         self.issue_events_urlt = URITemplate(repo['issue_events_url'])
-
-        #: Issues URL Template. Expand with ``number``
         self.issues_urlt = URITemplate(repo['issues_url'])
-
         self.keys_urlt = URITemplate(repo['keys_url'])
-
-        #: Labels URL Template. Expand with ``name``
         self.labels_urlt = URITemplate(repo['labels_url'])
-
-        #: Languages url (not a template)
         self.languages_url = repo['languages_url']
-
-        #: Merges url (not a template)
         self.merges_url = self._get_attribute(repo, 'merges_url')
-
-        #: Milestones URL Template. Expand with ``number``
         self.milestones_urlt = URITemplate(repo['milestones_url'])
-
-        #: Name of the repository.
         self.name = repo['name']
-
-        #: Notifications URL Template. Expand with ``since``, ``all``,
-        #: ``participating``
         self.notifications_urlt = URITemplate(repo['notifications_url'])
-
-        #: :class:`~github3.users.ShortUser` object representing the
-        #: repository owner.
         self.owner = users.ShortUser(repo['owner'], self)
-
-        #: Is this repository private?
         self.private = repo['private']
-
-        #: Pull Requests URL Template. Expand with ``number``
         self.pulls_urlt = URITemplate(repo['pulls_url'])
-
         self.releases_urlt = URITemplate(repo['releases_url'])
-
-        #: Stargazers url (not a template)
         self.stargazers_url = repo['stargazers_url']
-
-        #: Statuses URL Template. Expand with ``sha``
         self.statuses_urlt = URITemplate(repo['statuses_url'])
-
-        #: Subscribers url (not a template)
         self.subscribers_url = repo['subscribers_url']
-
-        #: Subscription url (not a template)
         self.subscription_url = repo['subscription_url']
-
-        #: Tags url (not a template)
         self.tags_url = repo['tags_url']
-
-        #: Teams url (not a template)
         self.teams_url = repo['teams_url']
-
-        #: Trres URL Template. Expand with ``sha``
         self.trees_urlt = URITemplate(repo['trees_url'])
 
     def _repr(self):
@@ -1877,6 +1793,177 @@ class ShortRepository(_Repository):
     between the types of repositories, github3.py uses different classes with
     different sets of attributes.
 
+    This object only has the following attributes:
+
+    .. attribute:: url
+
+        The GitHub API URL for this repository, e.g.,
+        ``https://api.github.com/repos/sigmavirus24/github3.py``.
+
+    .. attribute:: archive_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``archive_urlt.variables`` for the list of variables that can
+        be passed to ``archive_urlt.expand()``.
+
+    .. attribute:: assignees_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``assignees_urlt.variables`` for the list of variables that can
+        be passed to ``assignees_urlt.expand()``.
+
+    .. attribute:: blobs_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``blobs_urlt.variables`` for the list of variables that can
+        be passed to ``blobs_urlt.expand()``.
+
+    .. attribute:: branches_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``branches_urlt.variables`` for the list of variables that can
+        be passed to ``branches_urlt.expand()``.
+
+    .. attribute:: collaborators_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``collaborators_urlt.variables`` for the list of variables that can
+        be passed to ``collaborators_urlt.expand()``.
+
+    .. attribute:: comments_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``comments_urlt.variables`` for the list of variables that can
+        be passed to ``comments_urlt.expand()``.
+
+    .. attribute:: commits_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``commits_urlt.variables`` for the list of variables that can
+        be passed to ``commits_urlt.expand()``.
+
+    .. attribute:: compare_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``compare_urlt.variables`` for the list of variables that can
+        be passed to ``compare_urlt.expand()``.
+
+    .. attribute:: contents_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``contents_urlt.variables`` for the list of variables that can
+        be passed to ``contents_urlt.expand()``.
+
+    .. attribute:: contributors_url
+
+        The URL to retrieve this repository's list of contributors.
+
+    .. attribute:: deployments_url
+
+        The URL to retrieve this repository's list of deployments.
+
+    .. attribute:: description
+
+        The administrator created description of the repository.
+
+    .. attribute:: downloads_url
+
+        The URL to retrieve this repository's list of downloads.
+
+    .. attribute:: events_url
+
+        The URL to retrieve this repository's list of events.
+
+    .. attribute:: fork
+
+        Whether or not this repository is a fork of another.
+
+    .. attribute:: forks_url
+
+        The URL to retrieve this repository's list of forks.
+
+    .. attribute:: full_name
+
+        The full name of this repository, e.g., ``sigmavirus24/github3.py``.
+
+    .. attribute:: git_commits_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``git_commits_urlt.variables`` for the list of variables that can
+        be passed to ``git_commits_urlt.expand()``.
+
+    .. attribute:: git_refs_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``git_refs_urlt.variables`` for the list of variables that can
+        be passed to ``git_refs_urlt.expand()``.
+
+    .. attribute:: git_tags_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``git_tags_urlt.variables`` for the list of variables that can
+        be passed to ``git_tags_urlt.expand()``.
+
+    .. attribute:: hooks_url
+
+        The URL to retrieve this repository's list of hooks.
+
+    .. attribute:: html_url
+
+        The HTML URL of this repository, e.g.,
+        ``https://github.com/sigmavirus24/github3.py``.
+
+    .. attibute:: id
+
+        The unique GitHub assigned numerical id of this repository.
+
+    .. attribute:: issue_comment_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``issue_comment_urlt.variables`` for the list of variables that can
+        be passed to ``issue_comment_urlt.expand()``.
+
+    .. attribute:: issue_events_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``issue_events_urlt.variables`` for the list of variables that can
+        be passed to ``issue_events_urlt.expand()``.
+
+    .. attribute:: issues_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``issues_urlt.variables`` for the list of variables that can
+        be passed to ``issues_urlt.expand()``.
+
+    .. attribute:: keys_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``keys_urlt.variables`` for the list of variables that can
+        be passed to ``keys_urlt.expand()``.
+
+    .. attribute:: labels_urlt
+
+        The :class:`~uritemplate.URITemplate` object representing the
+        URI template returned by GitHub's API. Check
+        ``labels_urlt.variables`` for the list of variables that can
+        be passed to ``labels_urlt.expand()``.
+
     .. versionadded:: 1.0.0
     """
 
@@ -1884,108 +1971,155 @@ class ShortRepository(_Repository):
 
 
 class Repository(_Repository):
-    """The :class:`Repository <Repository>` object.
+    """This organizes the full representation of a single Repository.
 
-    It represents how GitHub sends information about repositories.
+    The full representation of a Repository is not returned in collections but
+    instead in individual requests, e.g.,
+    :meth:`~github3.github.GitHub.repository`.
 
-    Two repository instances can be checked like so::
+    This object has all the same attributes as
+    :class:`~github3.repos.repo.ShortRepository` as well as:
 
-        r1 == r2
-        r1 != r2
+    .. attribute:: clone_url
 
-    And is equivalent to::
+        This is the URL that can be used to clone the repository via HTTPS,
+        e.g., ``https://github.com/sigmavirus24/github3.py.git``.
 
-        r1.id == r2.id
-        r1.id != r2.id
+    .. attribute:: created_at
+
+        A parsed :class:`~datetime.datetime` object representing the date the
+        repository was created.
+
+    .. attribute:: default_branch
+
+        This is the default branch of the repository as configured by its
+        administrator(s).
+
+    .. attribute:: forks_count
+
+        This is the number of forks of the repository.
+
+    .. attribute:: git_url
+
+        This is the URL that can be used to clone the repository via the Git
+        protocol, e.g., ``git://github.com/sigmavirus24/github3.py``.
+
+    .. attribute:: has_downloads
+
+        This is a boolean attribute that conveys whether or not the repository
+        has downloads.
+
+    .. attribute:: has_issues
+
+        This is a boolean attribute that conveys whether or not the repository
+        has issues.
+
+    .. attribute:: has_pages
+
+        This is a boolean attribute that conveys whether or not the repository
+        has pages.
+
+    .. attribute:: has_wiki
+
+        This is a boolean attribute that conveys whether or not the repository
+        has a wiki.
+
+    .. attribute:: homepage
+
+        This is the administrator set homepage URL for the project. This may
+        not be provided.
+
+    .. attribute:: language
+
+        This is the language GitHub has detected for the repository.
+
+    .. attribute:: original_license
+
+        This is the :class:`~github3.license.License` returned as part of the
+        repository. To retrieve the most recent license, see the
+        :meth:`~github3.repos.repo.Repository.license` method.
+
+    .. attribute:: mirror_url
+
+        The URL that GitHub is mirroring the repository from.
+
+    .. attribute:: network_count
+
+        The size of the repository's "network".
+
+    .. attribute:: open_issues_count
+
+        The number of issues currently open on the repository.
+
+    .. attribute:: pushed_at
+
+        A parsed :class:`~datetime.datetime` object representing the date a
+        push was last made to the repository.
+
+    .. attribute:: size
+
+        The size of the repository.
+
+    .. attribute:: ssh_url
+
+        This is the URL that can be used to clone the repository via the SSH
+        protocol, e.g., ``ssh@github.com:sigmavirus24/github3.py.git``.
+
+    .. attribute:: stargazers_count
+
+        The number of people who have starred this repository.
+
+    .. attribute:: subscribers_count
+
+        The number of people watching (or who have subscribed to notifications
+        about) this repository.
+
+    .. attribute:: svn_url
+
+        This is the URL that can be used to clone the repository via SVN,
+        e.g., ``ssh@github.com:sigmavirus24/github3.py.git``.
+
+    .. attribute:: updated_at
+
+        A parsed :class:`~datetime.datetime` object representing the date a
+        the repository was last updated by its administrator(s).
+
+    .. attribute:: watchers_count
+
+        The number of people watching this repository.
+
 
     See also: http://developer.github.com/v3/repos/
-
     """
 
     class_name = 'Repository'
 
     def _update_attributes(self, repo):
         super(Repository, self)._update_attributes(repo)
-
-        #: URL used to clone via HTTPS.
         self.clone_url = repo['clone_url']
-
-        #: ``datetime`` object representing when the Repository was created.
         self.created_at = self._strptime(repo['created_at'])
-
-        #: default branch for the repository
         self.default_branch = repo['default_branch']
-
-        #: The number of forks of this repository.
         self.forks_count = repo['forks_count']
-
-        #: The number of forks of this repository. For backward compatibility
         self.fork_count = self.forks_count
-
-        # Clone url using git, e.g. git://github.com/sigmavirus24/github3.py
-        #: Plain git url for an anonymous clone.
         self.git_url = repo['git_url']
-
-        #: Whether or not this repository has downloads enabled
         self.has_downloads = repo['has_downloads']
-
-        #: Whether or not this repository has an issue tracker
         self.has_issues = repo['has_issues']
-
         self.has_pages = repo['has_pages']
-
-        #: Whether or not this repository has the wiki enabled
         self.has_wiki = repo['has_wiki']
-
-        # e.g. https://sigmavirus24.github.com/github3.py
-        #: URL of the home page for the project.
         self.homepage = repo['homepage']
-
-        #: Language property.
         self.language = repo['language']
-
-        # License containing only key, name, url & featured
-        #: :class:`License <github3.licenses.License>` object representing the
-        #: repository license.
         self.original_license = License(repo['license'], self)
-
-        #: Mirror property.
         self.mirror_url = repo['mirror_url']
-
         self.network_count = repo['network_count']
-
-        #: Number of open issues on the repository. DEPRECATED
         self.open_issues = repo['open_issues']
-
-        #: Number of open issues on the repository
         self.open_issues_count = repo['open_issues_count']
-
-        #: ``datetime`` object representing the last time commits were pushed
-        #: to the repository.
         self.pushed_at = self._strptime(repo['pushed_at'])
-
-        #: Size of the repository.
         self.size = repo['size']
-
-        # SSH url e.g. git@github.com/sigmavirus24/github3.py
-        #: URL to clone the repository via SSH.
         self.ssh_url = repo['ssh_url']
-
-        # The number of stargazers
-        #: Number of users who starred the repository
         self.stargazers_count = repo['stargazers_count']
-
         self.subscribers_count = repo['subscribers_count']
-
-        #: If it exists, url to clone the repository via SVN.
         self.svn_url = self._get_attribute(repo, 'svn_url')
-
-        #: ``datetime`` object representing the last time the repository was
-        #: updated.
         self.updated_at = self._strptime_attribute(repo, 'updated_at')
-
-        # The number of watchers
-        #: Number of users watching the repository.
         self.watchers_count = self.watchers = repo['watchers_count']
 
         # .......... OLD ...... Deprecated?
