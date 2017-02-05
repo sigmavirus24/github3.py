@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-github3.repos.repo
-==================
+"""This module contains Repository objects.
 
-This module contains the Repository object which is used to access the various
-parts of GitHub's Repository API.
+The Repository objects represent various different repository representations
+returned by GitHub.
 
 """
 from __future__ import unicode_literals
@@ -1192,7 +1190,6 @@ class _Repository(GitHubCore):
         :returns: generator of :class:`ImportedIssue <github3.repos.
             issue_import.ImportedIssue>`
         """
-
         data = {
             'since': timestamp_parameter(since)
         }
@@ -1223,7 +1220,6 @@ class _Repository(GitHubCore):
         :returns: :class:`ImportedIssue <github3.repos.
             issue_import.ImportedIssue>`
         """
-
         issue = {
             'issue': {
                 'title': title,
@@ -1421,7 +1417,7 @@ class _Repository(GitHubCore):
         return self._instance_or_null(Release, json)
 
     def license(self):
-        """Get the contents of a license for the repo
+        """Get the contents of a license for the repo.
 
         :returns: :class:`License <github3.licenses.License>`
         """
@@ -1888,7 +1884,6 @@ class ShortRepository(_Repository):
 
 
 class Repository(_Repository):
-
     """The :class:`Repository <Repository>` object.
 
     It represents how GitHub sends information about repositories.
@@ -2037,11 +2032,11 @@ class Repository(_Repository):
 
 
 class StarredRepository(GitHubCore):
+    """This object represents the data returned about a user's starred repos.
 
-    """The :class:`~github3.repos.repo.StarredRepository` object.
-
-    It represents how GitHub sends back a repository a user has starred, e.g.,
-    from :meth:`~github3.users.User.starred_repositories`.
+    GitHub used to send back the ``starred_at`` attribute on Repositories but
+    then changed the structure to a new object that separates that from the
+    Repository representation. This consolidates the two.
 
     See also:
     https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
