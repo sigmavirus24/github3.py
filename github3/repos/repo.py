@@ -2044,16 +2044,8 @@ class StarredRepository(GitHubCore):
     """
 
     def _update_attributes(self, starred_repository):
-        self.starred_at = self._strptime_attribute(
-            starred_repository,
-            'starred_at'
-        )
-        self.repository = self._class_attribute(
-            starred_repository,
-            'repo',
-            Repository,
-            self
-        )
+        self.starred_at = self._strptime(starred_repository['starred_at'])
+        self.repository = Repository(starred_repository['repo'], self)
         self.repo = self.repository
 
     def _repr(self):
