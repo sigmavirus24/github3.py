@@ -2254,6 +2254,17 @@ class StarredRepository(GitHubCore):
     then changed the structure to a new object that separates that from the
     Repository representation. This consolidates the two.
 
+    Attributes:
+
+    .. attribute:: starred_at
+
+        A parsed :class:`~datetime.datetime` object representing the date a
+        the repository was starred.
+
+    .. attribute:: repository
+
+        The :class:`Repository` that was starred by the user.
+
     See also:
     https://developer.github.com/v3/activity/starring/#list-repositories-being-starred
 
