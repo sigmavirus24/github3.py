@@ -327,6 +327,48 @@ class Organization(BaseAccount):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
+    def invite(self, username, role=None):
+        """Invite the user to join this organization.
+
+        This returns a dictionary like so::
+
+            {'state': 'pending', 'url': 'https://api.github.com/orgs/...'}
+
+        :param str username: (required), user to invite to join this
+                            organization.
+        :param str role: (optional) role from members_roles
+        :returns: dictionary
+        """
+        data = {}
+        if role in self.members_roles:
+            data['role'] = role
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._json(self._put(url, data=dumps(data)), 200)
+
+    @requires_auth
+    def membership(self, username):
+        """Obtain the membership status of ``username``
+
+        Impliments
+        https://developer.github.com/v3/orgs/members/#get-organization-membership
+
+        :param str username: (required), username name of the user
+        :returns: dictonary
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._json(self._get(url), 200, 404)
+
+    @requires_auth
+    def remove_membership(self, username):
+        """Remove ``username`` from this organization.
+
+        :param str username: (required), username of the member to remove
+        :returns: bool
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
     def add_repository(self, repository, team_id):
         """Add ``repository`` to ``team``.
 
@@ -513,9 +555,7 @@ class Organization(BaseAccount):
     def invitations(self, number=-1, etag=None):
         r"""Iterate over outstanding invitations to this organization.
 
-        Implements https://developer.github.com/v3/orgs/members/#list-pending-organization-invitations
-
-        :returns: generator of :class:dict
+        :returns: generator of
         """
         headers = {'Accept': 'application/vnd.github.korra-preview', }
         params = {}
