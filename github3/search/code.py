@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from ..models import GitHubCore
-from ..repos import Repository
+from .. import models
+from .. import repos
 
 
-class CodeSearchResult(GitHubCore):
+class CodeSearchResult(models.GitHubCore):
 
     def _update_attributes(self, data):
         self._api = self._get_attribute(data, 'url')
@@ -27,7 +27,7 @@ class CodeSearchResult(GitHubCore):
 
         #: Repository the code snippet belongs to
         self.repository = self._class_attribute(
-            data, 'repository', Repository, self
+            data, 'repository', repos.ShortRepository, self
         )
 
         #: Score of the result
