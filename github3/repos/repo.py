@@ -2190,19 +2190,23 @@ class Repository(_Repository):
         self.has_wiki = repo['has_wiki']
         self.homepage = repo['homepage']
         self.language = repo['language']
-        self.original_license = License(repo['license'], self)
         self.mirror_url = repo['mirror_url']
-        self.network_count = repo['network_count']
         self.open_issues = repo['open_issues']
         self.open_issues_count = repo['open_issues_count']
         self.pushed_at = self._strptime(repo['pushed_at'])
         self.size = repo['size']
         self.ssh_url = repo['ssh_url']
         self.stargazers_count = repo['stargazers_count']
-        self.subscribers_count = repo['subscribers_count']
         self.svn_url = self._get_attribute(repo, 'svn_url')
         self.updated_at = self._strptime_attribute(repo, 'updated_at')
         self.watchers_count = self.watchers = repo['watchers_count']
+
+        # Some repositories do not have these attributes at all
+        self.original_license = repo.get('license')
+        if self.original_license is not None:
+            self.original_license = License(self.original_license, self)
+        self.network_count = repo.get('network_count')
+        self.subscribers_count = repo.get('subscribers_count')
 
         # .......... OLD ...... Deprecated?
 

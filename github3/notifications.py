@@ -40,10 +40,10 @@ class Thread(GitHubCore):
         #: Thread information
         self.thread = self._get_attribute(notif, 'thread', {})
 
-        from .repos import Repository
+        from . import repos
         #: Repository the comment was made on
         self.repository = self._class_attribute(
-            notif, 'repository', Repository, self
+            notif, 'repository', repos.ShortRepository, self
         )
 
         #: When the thread was last updated
