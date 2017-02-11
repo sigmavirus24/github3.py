@@ -9,8 +9,8 @@ class TestMilestone(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            milestone = repository.milestone(14)
+            repository = self.gh.repository('github3py', 'delete_contents')
+            milestone = repository.create_milestone('test-milestone')
             assert milestone.delete() is True
 
     def test_update(self):
@@ -18,8 +18,8 @@ class TestMilestone(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('update')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
-            milestone = repository.milestone(14)
+            repository = self.gh.repository('github3py', 'delete_contents')
+            milestone = repository.create_milestone('test-milestone')
             assert milestone.update(
                 title='integration', description='delete me'
             ) is True

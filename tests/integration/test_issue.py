@@ -253,8 +253,8 @@ class TestLabel(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
-            label = repository.label('deleteme')
+            repository = self.gh.repository('github3py', 'delete_contents')
+            label = repository.create_label('deleteme', 'ffffff')
             assert label.delete()
 
     def test_update(self):
@@ -262,6 +262,7 @@ class TestLabel(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('update')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
-            label = repository.label('integration')
+            repository = self.gh.repository('github3py', 'delete_contents')
+            label = repository.create_label('integration', 'ffffff')
             assert label.update('integration', '5319e7')
+            label.delete()
