@@ -22,7 +22,10 @@ class TestPullRequest(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('close')
         with self.recorder.use_cassette(cassette_name):
-            p = self.get_pull_request(num=241)
+            p = self.get_pull_request(
+                repository='github3py/delete_contents',
+                num=2,
+            )
             assert p.close() is True
 
     def test_create_comment(self):
@@ -120,7 +123,10 @@ class TestPullRequest(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('reopen')
         with self.recorder.use_cassette(cassette_name):
-            p = self.get_pull_request(num=241)
+            p = self.get_pull_request(
+                repository='github3py/delete_contents',
+                num=2,
+            )
             assert p.reopen() is True
 
     def test_review_comments(self):
@@ -136,7 +142,10 @@ class TestPullRequest(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('update')
         with self.recorder.use_cassette(cassette_name):
-            p = self.get_pull_request(num=241)
+            p = self.get_pull_request(
+                repository='github3py/delete_contents',
+                num=2,
+            )
             assert p.update(p.title) is True
 
     def test_repository(self):
@@ -157,7 +166,7 @@ class TestReviewComment(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('reply')
         with self.recorder.use_cassette(cassette_name):
-            p = self.gh.pull_request('sigmavirus24', 'github3.py', 286)
+            p = self.gh.pull_request('github3py', 'delete_contents', 2)
             c = next(p.review_comments())
             comment = c.reply('Replying to comments is fun.')
         assert isinstance(comment, github3.pulls.ReviewComment)

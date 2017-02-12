@@ -17,7 +17,7 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('add_collaborator')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('testgh3', 'collaborators')
+            repository = self.gh.repository('github3py', 'delete_contents')
             assert repository
             assert repository.add_collaborator('sigmavirus24')
 

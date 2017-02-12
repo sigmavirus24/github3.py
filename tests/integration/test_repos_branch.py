@@ -17,7 +17,7 @@ class TestBranch(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('protect')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
-            repository = self.gh.repository('bboe', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             branch = repository.branch('develop')
 
             # Initial change
@@ -48,7 +48,7 @@ class TestBranch(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('unprotect')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('bboe', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             branch = next(repository.branches(protected=True))
             branch.unprotect()
             assert branch.protection == expected
@@ -61,7 +61,7 @@ class TestBranch(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             branch = repository.branch('develop')
-            sha = '872c813ffb7a40c96c3252d764e4838444905ad9'
+            sha = 'b58ff53ce9607f71aeb06f46eefe991f83c5e83e'
             latest_sha = branch.latest_sha(differs_from=sha)
 
         assert latest_sha is None
