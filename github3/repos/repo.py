@@ -26,6 +26,7 @@ from ..issues.milestone import Milestone
 from ..licenses import License
 from ..models import GitHubCore
 from ..notifications import Subscription, Thread
+from ..projects import Project
 from ..pulls import PullRequest
 from ..utils import stream_response_to_file, timestamp_parameter
 from .branch import Branch
@@ -962,6 +963,24 @@ class Repository(GitHubCore):
         if data:
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(Milestone, json)
+
+    @requires_auth
+    def create_project(self, name, body=None):
+        """Create a project for this repository.
+
+        :param str name: (required), name of the project
+        :param str body: (optional), body of the project
+        :returns: :class:`Project <github3.projects.Project>` if
+            successful, otherwise None
+        """
+        url = self._build_url('projects', base_url=self._api)
+        data = {'name': name, 'body': body}
+        self._remove_none(data)
+        json = None
+        if data:
+            json = self._json(self._post(
+                url, data=data, headers=Project.CUSTOM_HEADERS), 201)
+        return self._instance_or_null(Project, json)
 
     @requires_auth
     def create_pull(self, title, base, head, body=None):

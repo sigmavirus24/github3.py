@@ -8,6 +8,7 @@ from github3 import GitHubError
 from github3.repos.repo import (Comparison, Contents, Hook, RepoComment,
                                 RepoCommit, Repository)
 from github3.models import GitHubCore
+from github3.projects import Project
 
 from . import helper
 
@@ -343,6 +344,19 @@ class TestRepository(helper.UnitHelper):
             data={
                 'title': 'foo'
             }
+        )
+
+    def test_create_project(self):
+        """Verify the request for creating a project."""
+        data = {
+            'name': 'test-project',
+            'body': 'project body'
+        }
+        self.instance.create_project(**data)
+        self.post_called_with(
+            url_for('projects'),
+            data=data,
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_create_pull_private_required_data(self):
@@ -1464,6 +1478,11 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that deploying a key requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.create_key('key name', 'ssh-rsa ...')
+
+    def test_create_project(self):
+        """Verify that creating a project requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_project('name', 'body')
 
     def test_create_pull(self):
         """Verify that creating a pull request requires authentication."""

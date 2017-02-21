@@ -386,6 +386,17 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(milestone, github3.issues.milestone.Milestone)
 
+    def test_create_project(self):
+        """Test the ability to create a project on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_repo_project')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            project = repository.create_project(
+                'test-project', body='test body')
+
+        assert isinstance(project, github3.projects.Project)
+
     def test_create_pull(self):
         """Test the ability to create a pull request on a repository."""
         self.token_login()
