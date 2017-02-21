@@ -159,6 +159,95 @@ class ProjectColumn(models.GitHubCore):
     def _repr(self):
         return '<ProjectColumn [#{0}]>'.format(self.id)
 
+    def card(self, id):
+        """Get a project card with the given ID.
+
+        :param int id: (required), the card ID
+        :returns: :class:`ProjectCard <github3.projects.ProjectCard>` or None
+        """
+        url = self._build_url(
+            'projects/columns/cards', str(id), base_url=self._github_url)
+        json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(ProjectCard, json)
+
+    def cards(self, number=-1, etag=None):
+        """Iterate over the cards in this column.
+
+        :param int number: (optional), number of cards to return. Default:
+            -1 returns all available cards.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of
+            :class:`ProjectCard <github3.project.ProjectCard>`
+        """
+        url = self._build_url(
+            'projects/columns',
+            str(self.id),
+            'cards',
+            base_url=self._github_url
+        )
+        return self._iter(
+            int(number),
+            url,
+            ProjectCard,
+            headers=Project.CUSTOM_HEADERS,
+            etag=etag
+        )
+
+    @requires_auth
+    def create_card_with_content_id(self, content_id, content_type):
+        """Create a content card in this project column.
+
+        :param int content_id: (required), the ID of the content
+        :param str content_type: (required), the type of the content
+        :returns: :class:`ProjectCard <github3.projects.ProjectCard>` or none
+        """
+        if not content_id or not content_type:
+            return None
+
+        url = self._build_url(
+            'projects/columns',
+            str(self.id),
+            'cards',
+            base_url=self._github_url
+        )
+        json = None
+        data = {'content_id': content_id, 'content_type': content_type}
+        json = self._json(self._post(
+            url, data=data, headers=Project.CUSTOM_HEADERS), 201)
+        return self._instance_or_null(ProjectCard, json)
+
+    @requires_auth
+    def create_card_with_issue(self, issue):
+        """Create a card in this project column linked with an Issue.
+
+        :param :class:`Issue <github3.issues.Issue>`: (required), an issue
+            with which to link the card
+        :returns: :class:`ProjectCard <github3.projects.ProjectCard>` or none
+        """
+        if not issue:
+            return None
+        return self.create_card_with_content_id(issue.id, 'Issue')
+
+    @requires_auth
+    def create_card_with_note(self, note):
+        """Create a note card in this project column.
+
+        :param str note: (required), the note content
+        :returns: :class:`ProjectCard <github3.projects.ProjectCard>` or none
+        """
+        url = self._build_url(
+            'projects/columns',
+            str(self.id),
+            'cards',
+            base_url=self._github_url
+        )
+        json = None
+        if note:
+            json = self._json(self._post(
+                url, data={'note': note}, headers=Project.CUSTOM_HEADERS), 201)
+        return self._instance_or_null(ProjectCard, json)
+
     @requires_auth
     def delete(self):
         """Delete this column.
@@ -206,6 +295,94 @@ class ProjectColumn(models.GitHubCore):
         if data:
             url = self._build_url(
                 'projects/columns', self.id, base_url=self._github_url)
+            json = self._json(self._patch(
+                url, data=dumps(data), headers=Project.CUSTOM_HEADERS), 200)
+
+        if json:
+            self._update_attributes(json)
+            return True
+        return False
+
+
+class ProjectCard(models.GitHubCore):
+    """The :class:`ProjectCard <ProjectCard>` object.
+
+    See http://developer.github.com/v3/projects/cards/
+    """
+
+    def _update_attributes(self, project_card):
+        #: The URL of this card's parent column
+        self.column_url = self._get_attribute(project_card, 'column_url')
+
+        #: The URL of this card's associated content
+        self.content_url = self._get_attribute(project_card, 'content_url')
+
+        #: datetime object representing the last time the object was created
+        self.created_at = self._strptime_attribute(project_card, 'created_at')
+
+        #: The ID of this card
+        self.id = self._get_attribute(project_card, 'id')
+
+        #: The note attached to the card
+        self.note = self._get_attribute(project_card, 'note')
+
+        #: datetime object representing the last time the object was changed
+        self.updated_at = self._strptime_attribute(project_card, 'updated_at')
+
+    def _repr(self):
+        return '<ProjectCard [#{0}]>'.format(self.id)
+
+    @requires_auth
+    def delete(self):
+        """Delete this card.
+
+        :returns: bool
+        """
+        url = self._build_url(
+            'projects/columns/cards', self.id, base_url=self._github_url)
+        return self._boolean(self._delete(
+            url, headers=Project.CUSTOM_HEADERS), 204, 404)
+
+    @requires_auth
+    def move(self, position, column_id):
+        """Move this card.
+
+        :param str position: (required), can be one of `top`, `bottom`, or
+            `after:<card-id>`, where `<card-id>` is the id value of a card
+            in the same column, or in the new column specified by `column_id`.
+        :param int column_id: (required), the id value of a column in the
+            same project.
+        :returns: bool
+        """
+        if not position or not column_id:
+            return False
+
+        url = self._build_url(
+            'projects/columns/cards',
+            self.id,
+            'moves',
+            base_url=self._github_url
+        )
+        data = {'position': position, 'column_id': column_id}
+        return self._boolean(self._post(
+            url, data=data, headers=Project.CUSTOM_HEADERS), 201, 404)
+
+    @requires_auth
+    def update(self, note=None):
+        """Update this card.
+
+        :param str note: (optional), the card's note content. Only valid for
+            cards without another type of content, so this cannot be specified
+            if the card already has a content_id and content_type.
+        :returns: bool
+        """
+        data = {'note': note}
+        json = None
+        self._remove_none(data)
+
+        if data:
+            url = self._build_url(
+                'projects/columns/cards', self.id, base_url=self._github_url)
             json = self._json(self._patch(
                 url, data=dumps(data), headers=Project.CUSTOM_HEADERS), 200)
 
