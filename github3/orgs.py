@@ -565,6 +565,35 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
+    def project(self, id, etag=None):
+        """Return the organization project with the given ID.
+
+        :param int id: (required), ID number of the project
+        :returns: :class:`Project <github3.projects.Project>` if successful,
+            otherwise None
+        """
+        url = self._build_url('projects', id, base_url=self._github_url)
+        json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(Project, json)
+
+    def projects(self, number=-1, etag=None):
+        """Iterate over projects for this organization.
+
+        :param int number: (optional), number of members to return. Default:
+            -1 will return all available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Project <github3.projects.Project>`
+        """
+        url = self._build_url('projects', base_url=self._api)
+        return self._iter(
+            int(number),
+            url,
+            Project,
+            etag=etag,
+            headers=Project.CUSTOM_HEADERS
+        )
+
     def repositories(self, type='', number=-1, etag=None):
         r"""Iterate over repos for this organization.
 

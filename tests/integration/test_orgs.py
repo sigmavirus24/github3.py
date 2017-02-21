@@ -188,6 +188,29 @@ class TestOrganization(IntegrationHelper):
             for member in o.members(role='all'):
                 assert isinstance(member, github3.users.ShortUser)
 
+    def test_project(self):
+        """Test the ability to retrieve a single organization project."""
+        self.token_login()
+        cassette_name = self.cassette_name('project')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+
+            # Grab a project, any project
+            first_project = next(o.projects())
+
+            fetched_project = o.project(first_project.id)
+            assert first_project == fetched_project
+
+    def test_projects(self):
+        """Test the ability to retrieve an organization's projects."""
+        self.token_login()
+        cassette_name = self.cassette_name('projects')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization()
+
+            for project in o.projects():
+                assert isinstance(project, github3.projects.Project)
+
     def test_public_members(self):
         """Test the ability to retrieve an organization's public members."""
         self.basic_login()

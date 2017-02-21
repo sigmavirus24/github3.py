@@ -119,6 +119,15 @@ class TestOrganization(helper.UnitHelper):
             url_for('public_members/username')
         )
 
+    def test_project(self):
+        """Show that a user can access a single organization project."""
+        self.instance.project(400435)
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/projects/400435',
+            headers=Project.CUSTOM_HEADERS
+        )
+
     def test_publicize_member(self):
         """Show that a user can publicize their own membership."""
         self.instance.publicize_member('username')
@@ -315,6 +324,17 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             url_for('members'),
             params={'per_page': 100},
             headers={}
+        )
+
+    def test_projects(self):
+        """Show that a user can access all organization projects."""
+        i = self.instance.projects()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects'),
+            params={'per_page': 100},
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_public_events(self):
