@@ -48,6 +48,16 @@ class TestOrganization(IntegrationHelper):
             team = self.get_team(o)
             assert o.add_repository('github3py/urllib3', team.id) is True
 
+    def test_create_project(self):
+        """Test the ability to create a project in an organization."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_org_project')
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            o = self.get_organization(name='github3py')
+            r = o.create_project('test-project', body='test body')
+            assert isinstance(r, github3.projects.Project)
+            assert r.delete() is True
+
     def test_create_repository(self):
         """Test the ability to create a repository in an organization."""
         self.basic_login()

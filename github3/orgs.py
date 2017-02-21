@@ -18,6 +18,7 @@ from . import users
 from .decorators import requires_auth
 from .events import Event
 from .models import BaseAccount, GitHubCore
+from .projects import Project
 from .repos import Repository
 
 
@@ -345,6 +346,22 @@ class Organization(BaseAccount):
 
         url = self._build_url('teams', str(team_id), 'repos', str(repository))
         return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def create_project(self, name, body=''):
+        """Create a project for this organization.
+
+        If the client is authenticated and a member of the organization, this
+        will create a new project in the organization.
+
+        :param str name: (required), name of the project
+        :param str body: (optional), the body of the project
+        """
+        url = self._build_url('projects', base_url=self._api)
+        data = {'name': name, 'body': body}
+        json = self._json(self._post(
+            url, data, headers=Project.CUSTOM_HEADERS), 201)
+        return self._instance_or_null(Project, json)
 
     @requires_auth
     def create_repository(self, name, description='', homepage='',

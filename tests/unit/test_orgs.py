@@ -3,6 +3,7 @@ import pytest
 
 from github3 import GitHubError
 from github3.orgs import Organization
+from github3.projects import Project
 
 from . import helper
 
@@ -37,6 +38,19 @@ class TestOrganization(helper.UnitHelper):
 
         self.session.delete.assert_called_once_with(
             url_for('public_members/concealed')
+        )
+
+    def test_create_project(self):
+        """Show that one can create a project in an organization."""
+        self.instance.create_project('test-project', body='project body')
+
+        self.post_called_with(
+            url_for('projects'),
+            data={
+                'name': 'test-project',
+                'body': 'project body'
+            },
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_create_repository(self):
@@ -172,6 +186,11 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that one must be authenticated to conceal a member."""
         with pytest.raises(GitHubError):
             self.instance.conceal_member('user')
+
+    def test_create_project(self):
+        """Show that one must be authenticated to create a project."""
+        with pytest.raises(GitHubError):
+            self.instance.create_project('name', 'body')
 
     def test_create_repository(self):
         """Show that one must be authenticated to create a repo for an org."""
