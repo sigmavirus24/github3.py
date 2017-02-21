@@ -888,6 +888,15 @@ class TestRepository(helper.UnitHelper):
         }
         assert self.instance.permissions == permissions
 
+    def test_project(self):
+        """Show that a user can access a single repository project."""
+        self.instance.project(400435)
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/projects/400435',
+            headers=Project.CUSTOM_HEADERS
+        )
+
     def test_pull_request(self):
         """Verify the request for retrieving a pull request."""
         self.instance.pull_request(1)
@@ -1316,6 +1325,17 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
             url_for('pages/builds'),
             params={'per_page': 100},
             headers={}
+        )
+
+    def test_projects(self):
+        """Show that a user can access all repository projects."""
+        i = self.instance.projects()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects'),
+            params={'per_page': 100},
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_pull_requests(self):

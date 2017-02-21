@@ -57,6 +57,26 @@ class TestRepository(helper.IntegrationHelper):
             for branch in repository.branches():
                 assert isinstance(branch, github3.repos.branch.Branch)
 
+    def test_project(self):
+        """Test the ability to retrieve a single repository project."""
+        self.token_login()
+        cassette_name = self.cassette_name('project')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            project = repository.project(400543)
+            assert isinstance(project, github3.projects.Project)
+
+    def test_projects(self):
+        """Test the ability to retrieve an repository's projects."""
+        self.token_login()
+        cassette_name = self.cassette_name('projects')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            for project in repository.projects():
+                assert isinstance(project, github3.projects.Project)
+
     def test_protected_branches(self):
         """Test the ability to retrieve protected branches in a repository."""
         cassette_name = self.cassette_name('branches_protected')
