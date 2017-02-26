@@ -17,7 +17,7 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('add_collaborator')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'delete_contents')
+            repository = self.gh.repository('gh3test', 'my-new-repo')
             assert repository
             assert repository.add_collaborator('sigmavirus24')
 
@@ -78,6 +78,7 @@ class TestRepository(helper.IntegrationHelper):
 
     def test_collaborators(self):
         """Test the ability to retrieve the collaborators on a repository."""
+        self.token_login()
         cassette_name = self.cassette_name('collaborators')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
@@ -154,7 +155,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_blob')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             content = 'VGVzdCBibG9i\n'
             encoding = 'base64'
             sha = '30f2c645388832f70d37ab2b47eb9ea527e5ae7c'
@@ -165,7 +166,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_comment')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             body = ('Early morning commits are a good idea. '
                     'It is just me. Me migrating unit/integration tests.')
             sha = '1ad1d8309317a4240d5f17b23a2e7dab25e4cb10'
@@ -177,7 +178,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_commit')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             data = {'message': 'My commit message',
                     'author': {
                         'name': 'Matt Chung',
@@ -198,7 +199,7 @@ class TestRepository(helper.IntegrationHelper):
         cassette_name = self.cassette_name(('create_commit_with_'
                                             'empty_committer'))
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             data = {'message': 'My commit message',
                     'author': {
                         'name': 'Matt Chung',
@@ -231,9 +232,9 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('create_deployment')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('adrianmoisey', 'temptest')
+            repository = self.gh.repository('github3py', 'delete_contents')
             assert repository is not None
-            deployment = repository.create_deployment('adrianmoisey-patch-1')
+            deployment = repository.create_deployment('0.1.0')
 
         assert isinstance(deployment, github3.repos.deployment.Deployment)
 
@@ -242,7 +243,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_file')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             data = {
                 'path': 'hello.txt',
                 'message': 'my commit message',
@@ -271,11 +272,11 @@ class TestRepository(helper.IntegrationHelper):
         betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
         cassette_name = self.cassette_name('create_fork')
         with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('kennethreitz', 'requests')
             forked_repo = repository.create_fork()
             assert isinstance(forked_repo, github3.repos.Repository)
 
-            org_forked_repo = repository.create_fork('mattchung')
+            org_forked_repo = repository.create_fork('github3py')
             assert isinstance(org_forked_repo, github3.repos.Repository)
 
     def test_create_hook(self):
@@ -283,7 +284,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_hook')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             data = {
                 'name': 'web',
                 'config': {
@@ -350,7 +351,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_key')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             key = ('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZn4/RGE9YQrfjq7wSr'
                    'YkdtKH3r1rEIkx/4Nv1AG/PqE4AWKSVzKkqhurnqKtctVCLtU9pNFIjl/'
                    'XvNluTW3zrfqKjgaDdiBtWwecWzSbQqugfzmwFqCE4smJkP8e7+e9Fd1k'
@@ -391,29 +392,27 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_pull')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             pull_request = repository.create_pull(
-                title='Migrate some test cases from test_repo_repo',
+                title='Update forked repo',
                 base='develop',
-                head='itsmemattchung:tests/migrate-repos',
-                body='Migrated create_pull to tests/unit'
+                head='sigmavirus24:develop',
+                body='Testing the ability to create a pull request',
             )
 
         assert isinstance(pull_request, github3.pulls.PullRequest)
 
     def test_create_pull_from_issue(self):
-        """
-        Test the ability to create a pull request from an issue on a
-        repository.
-        """
+        """Verify creation of a pull request from an issue."""
         self.token_login()
         cassette_name = self.cassette_name('create_pull_from_issue')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'fork_this')
+            issue = repository.create_issue('Test create pull from issue')
             pull_request = repository.create_pull_from_issue(
-                issue=536,
-                base='develop',
-                head='itsmemattchung:tests/migrate-repos',
+                issue=issue.number,
+                base='master',
+                head='sigmavirus24:master',
             )
 
         assert isinstance(pull_request, github3.pulls.PullRequest)
@@ -437,7 +436,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_status')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             status = repository.create_status(
                 sha='24893ec07db2a12073703258f0089f105906d2e4',
                 state='failure'
@@ -480,7 +479,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('delete_key')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             assert repository.delete_key(15312662) is True
 
     def test_delete_subscription(self):
@@ -528,7 +527,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             assert repository.edit('github3py') is True
 
     def test_events(self):
@@ -581,7 +580,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('hook')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             hook = repository.hook(6818702)
         assert isinstance(hook, github3.repos.hook.Hook)
 
@@ -814,7 +813,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('mark_notifications')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             marked = repository.mark_notifications('2016-01-12T00:00:00Z')
         assert marked is True
 
@@ -823,7 +822,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('merge')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'github3.py')
             commit = repository.merge('base_branch', 'head_branch')
         assert isinstance(commit, github3.repos.commit.RepoCommit)
 
