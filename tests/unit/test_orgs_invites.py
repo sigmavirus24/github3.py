@@ -32,6 +32,8 @@ class TestInvitesRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     example_data = get_org_example_data()
 
     def test_get_invitations_requires_auth(self):
-        """Show that getting outstanding invitations requires authentication."""
+        """
+            Show that getting outstanding invitations requires authentication.
+        """
         with pytest.raises(GitHubError):
             self.instance.invitations()
