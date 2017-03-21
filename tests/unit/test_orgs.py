@@ -153,6 +153,49 @@ class TestOrganization(helper.UnitHelper):
 
         assert self.session.get.called is False
 
+    def test_invite(self):
+        """Show that a user can be invited to an org"""
+        self.instance.invite('user')
+
+        self.session.put.assert_called_once_with(
+            'https://api.github.com/orgs/github/memberships/user',
+            data='{}'
+        )
+
+    def test_invite_requires_valid_role(self):
+        """Show that a user can be invited to an org"""
+        self.instance.invite('user', role='Freddy')
+
+        self.session.put.assert_called_once_with(
+            'https://api.github.com/orgs/github/memberships/user',
+            data='{}'
+        )
+
+    def test_invite_passes_optional_role(self):
+        """Show that a user can be invited to an org"""
+        self.instance.invite('user', role='admin')
+
+        self.session.put.assert_called_once_with(
+            'https://api.github.com/orgs/github/memberships/user',
+            data='{"role": "admin"}'
+        )
+
+    def test_membership(self):
+        """Show that a user's invitation status can be queried"""
+        self.instance.membership('user')
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/orgs/github/memberships/user'
+        )
+
+    def test_remove_membership(self):
+        """Show that one can cancel a membership in an organization."""
+        self.instance.remove_membership('username')
+
+        self.session.delete.assert_called_once_with(
+            url_for('memberships/username')
+        )
+
 
 class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     described_class = Organization
@@ -207,6 +250,34 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that a user must be authenticated to retrieve a team."""
         with pytest.raises(GitHubError):
             self.instance.team(10)
+
+    def test_invitations(self):
+        """
+            Show that getting outstanding invitations requires authentication.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.invitations()
+
+    def test_invite(self):
+        """
+            Show that inviting a member requires authentication.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.invite()
+
+    def test_membership(self):
+        """
+            Show that inviting a member requires authentication.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.membership()
+
+    def test_remove_membership(self):
+        """
+            Show that inviting a member requires authentication.
+        """
+        with pytest.raises(GitHubError):
+            self.instance.remove_membership()
 
 
 class TestOrganizationIterator(helper.UnitIteratorHelper):
@@ -359,3 +430,14 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
 
         with pytest.raises(GitHubError):
             self.instance.teams()
+
+    def test_invitations(self):
+        """Show that one can iterate over outstanding invitations."""
+        i = self.instance.invitations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('invitations'),
+            params={'per_page': 100},
+            headers={'Accept': 'application/vnd.github.korra-preview'}
+        )

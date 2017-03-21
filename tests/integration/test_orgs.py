@@ -14,8 +14,10 @@ class TestOrganization(IntegrationHelper):
 
     betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
 
-    def get_organization(self, name='github3py'):
+    def get_organization(self, name='github3py', auth_needed=False):
         """Get the organization for each test."""
+        if auth_needed:
+            self.token_login()
         o = self.gh.organization(name)
         assert isinstance(o, github3.orgs.Organization)
         return o
@@ -255,3 +257,32 @@ class TestOrganization(IntegrationHelper):
 
             fetched_team = o.team(first_team.id)
             assert first_team == fetched_team
+
+    def test_invitations(self):
+        """Show that a user can retrieve an org's invites."""
+        cassette_name = self.cassette_name('invitations')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization('mozillatw', auth_needed=True)
+            for invite in o.invitations():
+                assert isinstance(invite, dict)
+
+    def test_invite(self):
+        """Show that a user can invite a new member."""
+        cassette_name = self.cassette_name('invite')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization('Thunderbird-client', auth_needed=True)
+            assert o.invite('AFineOldWine', role='member')
+
+    def test_membership(self):
+        """Show that a user can obtain the membership status."""
+        cassette_name = self.cassette_name('membership')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization('Thunderbird-client', auth_needed=True)
+            assert o.membership('AFineOldWine')
+
+    def test_remove_membership(self):
+        """Show that a user can remove a member or invite."""
+        cassette_name = self.cassette_name('remove_membership')
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization('Thunderbird-client', auth_needed=True)
+            assert o.remove_membership('AFineOldWine')
