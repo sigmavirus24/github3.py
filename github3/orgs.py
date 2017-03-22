@@ -362,6 +362,8 @@ class Organization(BaseAccount):
     def remove_membership(self, username):
         """Remove ``username`` from this organization.
 
+        Unlike ``remove_member``, this will cancel a pending invitation.
+
         :param str username: (required), username of the member to remove
         :returns: bool
         """
