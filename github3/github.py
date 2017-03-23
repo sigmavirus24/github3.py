@@ -253,11 +253,12 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
-                     milestone=None, labels=[]):
+                     assignees=None, milestone=None, labels=[]):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
-        ``body``, ``assignee``, ``milestone``, ``labels`` are all optional.
+        ``body``, ``assignee``, ``assignees``, ``milestone``, ``labels``
+        are all optional.
 
         .. warning::
 
@@ -274,6 +275,8 @@ class GitHub(GitHubCore):
             formatted
         :param str assignee: (optional), Login of person to assign
             the issue to
+        :param assignees: (optional), logins of the users to assign the
+            issue to
         :param int milestone: (optional), id number of the milestone to
             attribute this issue to (e.g. ``m`` is a :class:`Milestone
             <github3.issues.Milestone>` object, ``m.number`` is what you pass
@@ -286,7 +289,8 @@ class GitHub(GitHubCore):
             repo = self.repository(owner, repository)
 
         if repo is not None:
-            return repo.create_issue(title, body, assignee, milestone, labels)
+            return repo.create_issue(title, body, assignee, assignees,
+                                     milestone, labels)
 
         return self._instance_or_null(Issue, None)
 
