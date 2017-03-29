@@ -601,7 +601,7 @@ class AuthenticatedUser(User):
         self.total_private_repos = user.get('total_private_repos', 0)
 
         #: Which plan this user is on
-        self.plan = Plan(user.get('plan',{}))
+        self.plan = Plan(user.get('plan', {}))
 
         #: Number of repo contributions. Only appears in ``repo.contributors``
         contributions = user.get('contributions')
