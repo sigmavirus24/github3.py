@@ -17,7 +17,7 @@ class TestBranch(IntegrationHelper):
             },
             u'required_pull_request_reviews': {
                 u'include_admins': True,
-               u'url': u'https://api.github.com/repos/discogestalt/github3.py/branches/protected/protection/required_pull_request_reviews'
+                u'url': u'https://api.github.com/repos/discogestalt/github3.py/branches/protected/protection/required_pull_request_reviews'
             },
             u'required_status_checks': {
                 u'contexts': [],
