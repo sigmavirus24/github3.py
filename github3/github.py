@@ -1748,12 +1748,12 @@ class GitHubEnterprise(GitHub):
         :param str login: (required), The user's username.
         :param str email: (required), The user's email address.
 
-        :returns: :class:`User <github3.users.User>`, if successful
+        :returns: :class:`ShortUser <github3.users.ShortUser>`, if successful
         """
         url = self._build_url('admin', 'users')
         payload = {'login': login, 'email': email}
         json_data = self._json(self._post(url, data=payload), 201)
-        return self._instance_or_null(users.User, json_data)
+        return self._instance_or_null(users.ShortUser, json_data)
 
     @requires_auth
     def admin_stats(self, option):
