@@ -6,6 +6,9 @@ get_example_data = helper.create_example_data_helper('repos_branch_example')
 url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/commits/master'
 )
+protection_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/branches/master/protection'
+)
 
 
 class TestBranch(helper.UnitHelper):
@@ -24,4 +27,16 @@ class TestBranch(helper.UnitHelper):
         self.session.get.assert_called_once_with(
             url_for(),
             headers=headers
+        )
+
+    def test_protection_full(self):
+        """Verify the request for retrieving the full
+        protection config for a branch."""
+        headers = {
+            'Accept': 'application/vnd.github.loki-preview+json',
+        }
+        self.instance.protection_full()
+        self.session.get.assert_called_once_with(
+            protection_url_for(),
+            headers=headers,
         )
