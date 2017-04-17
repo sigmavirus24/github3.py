@@ -3,11 +3,12 @@ import github3
 from . import helper
 
 get_example_data = helper.create_example_data_helper('repos_branch_example')
+api_base = 'https://api.github.com/repos/octocat/Hello-World'
 url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/commits/master'
+    '{}/commits/master'.format(api_base)
 )
 protection_url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/branches/master/protection'
+    '{}/branches/master/protection'.format(api_base)
 )
 
 
