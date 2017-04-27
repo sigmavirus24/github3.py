@@ -18,7 +18,7 @@ from .gists import Gist
 from .issues import Issue, issue_params
 from .models import GitHubCore
 from .orgs import Membership, Organization, Team
-from .projects import Project, ProjectColumn
+from .projects import Project, ProjectCard, ProjectColumn
 from .pulls import PullRequest
 from .repos.repo import Repository, repo_issue_params
 from .search import (CodeSearchResult, IssueSearchResult,
@@ -960,6 +960,20 @@ class GitHub(GitHubCore):
             json = self._json(self._get(
                 url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(Project, json)
+
+    def project_card(self, number):
+        """Return the ProjectCard with id ``number``.
+
+        :param int number: id of the project card
+        :returns: :class:`ProjectCard <github3.projects.ProjectCard>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('projects', 'columns', 'cards', str(number))
+            json = self._json(self._get(
+                url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(ProjectCard, json)
 
     def project_column(self, number):
         """Return the ProjectColumn with id ``number``.

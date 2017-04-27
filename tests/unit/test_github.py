@@ -407,6 +407,15 @@ class TestGitHub(helper.UnitHelper):
             headers=Project.CUSTOM_HEADERS
         )
 
+    def test_project_card(self):
+        """Test the ability to retrieve a project card by its id."""
+        self.instance.project_card(2665856)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects/columns/cards/2665856'),
+            headers=Project.CUSTOM_HEADERS
+        )
+
     def test_project_column(self):
         """Test the ability to retrieve a project column by its id."""
         self.instance.project_column(957217)

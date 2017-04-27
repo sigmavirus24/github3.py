@@ -368,6 +368,15 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(r, github3.projects.Project)
 
+    def test_project_card(self):
+        """Test the ability to retrieve a project card by its id."""
+        self.token_login()
+        cassette_name = self.cassette_name('project_card')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.project_card(2665856)
+
+        assert isinstance(r, github3.projects.ProjectCard)
+
     def test_project_column(self):
         """Test the ability to retrieve a project column by its id."""
         self.token_login()
