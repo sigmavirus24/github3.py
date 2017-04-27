@@ -18,7 +18,7 @@ from .gists import Gist
 from .issues import Issue, issue_params
 from .models import GitHubCore
 from .orgs import Membership, Organization, Team
-from .projects import Project
+from .projects import Project, ProjectColumn
 from .pulls import PullRequest
 from .repos.repo import Repository, repo_issue_params
 from .search import (CodeSearchResult, IssueSearchResult,
@@ -960,6 +960,20 @@ class GitHub(GitHubCore):
             json = self._json(self._get(
                 url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(Project, json)
+
+    def project_column(self, number):
+        """Return the ProjectColumn with id ``number``.
+
+        :param int number: id of the project column
+        :returns: :class:`ProjectColumn <github3.projects.ProjectColumn>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('projects', 'columns', str(number))
+            json = self._json(self._get(
+                url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(ProjectColumn, json)
 
     def public_gists(self, number=-1, etag=None):
         """Retrieve all public gists and iterate over them.
