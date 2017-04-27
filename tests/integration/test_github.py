@@ -359,6 +359,15 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(o, github3.orgs.Organization)
 
+    def test_project(self):
+        """Test the ability to retrieve a project by its id."""
+        self.token_login()
+        cassette_name = self.cassette_name('project')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.project(398318)
+
+        assert isinstance(r, github3.projects.Project)
+
     def test_pubsubhubbub(self):
         """Test the ability to create a pubsubhubbub hook."""
         self.token_login()
