@@ -604,7 +604,7 @@ class GitHub(GitHubCore):
     def issue(self, username, repository, number):
         """Fetch issue from owner/repository.
 
-        :param str username: (required), owner of the repository
+        :param str owner: (required), owner of the repository
         :param str repository: (required), name of the repository
         :param int number: (required), issue number
         :return: :class:`Issue <github3.issues.Issue>`
