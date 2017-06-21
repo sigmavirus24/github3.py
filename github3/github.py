@@ -601,7 +601,7 @@ class GitHub(GitHubCore):
             json = self._boolean(self._get(url), 204, 404)
         return json
 
-    def issue(self, username, repository, number):
+    def issue(self, owner, repository, number):
         """Fetch issue from owner/repository.
 
         :param str owner: (required), owner of the repository
