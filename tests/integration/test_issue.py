@@ -16,7 +16,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('add_labels')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=497)
 
@@ -31,7 +31,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('assign')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=497)
             assigned = issue.assign('itsmemattchung')
@@ -42,7 +42,7 @@ class TestIssue(IntegrationHelper):
         """Test the ability to retrieve an issue comment."""
         cassette_name = self.cassette_name('comment')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=497)
             comment = issue.comment('165547512')
@@ -66,7 +66,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('closed')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
 
@@ -79,7 +79,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_comment')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
 
@@ -94,7 +94,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
             edited = issue.edit(title='Integration test for editing an issue')
@@ -109,7 +109,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('edit_multiple_assignees')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=637)
             assignees = ['itsmemattchung', 'sigmavirus24']
@@ -128,7 +128,7 @@ class TestIssue(IntegrationHelper):
             'edit_both_assignee_and_assignees'
         )
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=637)
             assignees = ['itsmemattchung', 'sigmavirus24']
@@ -162,7 +162,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('lock')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='adrianmoisey',
+            issue = self.gh.issue(owner='adrianmoisey',
                                   repository='temptest',
                                   number=1)
             locked = issue.lock()
@@ -184,7 +184,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('remove_all_labels')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
             labels = issue.remove_all_labels()
@@ -196,7 +196,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('reopen')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
             reopened = issue.reopen()
@@ -208,7 +208,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('remove_label')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
             labels = issue.remove_label('in progress')
@@ -222,7 +222,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('replace_labels')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='sigmavirus24',
+            issue = self.gh.issue(owner='sigmavirus24',
                                   repository='github3.py',
                                   number=509)
             labels = ['in progress', 'easy']
@@ -237,7 +237,7 @@ class TestIssue(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('unlock')
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(username='adrianmoisey',
+            issue = self.gh.issue(owner='adrianmoisey',
                                   repository='temptest',
                                   number=1)
             unlocked = issue.unlock()
