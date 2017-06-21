@@ -601,17 +601,17 @@ class GitHub(GitHubCore):
             json = self._boolean(self._get(url), 204, 404)
         return json
 
-    def issue(self, username, repository, number):
+    def issue(self, owner, repository, number):
         """Fetch issue from owner/repository.
 
-        :param str username: (required), owner of the repository
+        :param str owner: (required), owner of the repository
         :param str repository: (required), name of the repository
         :param int number: (required), issue number
         :return: :class:`Issue <github3.issues.Issue>`
         """
         json = None
-        if username and repository and int(number) > 0:
-            url = self._build_url('repos', username, repository, 'issues',
+        if owner and repository and int(number) > 0:
+            url = self._build_url('repos', owner, repository, 'issues',
                                   str(number))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Issue, json)
