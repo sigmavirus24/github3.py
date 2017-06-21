@@ -610,8 +610,8 @@ class GitHub(GitHubCore):
         :return: :class:`Issue <github3.issues.Issue>`
         """
         json = None
-        if username and repository and int(number) > 0:
-            url = self._build_url('repos', username, repository, 'issues',
+        if owner and repository and int(number) > 0:
+            url = self._build_url('repos', owner, repository, 'issues',
                                   str(number))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Issue, json)
