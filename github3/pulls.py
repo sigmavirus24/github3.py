@@ -427,11 +427,8 @@ class PullRequest(models.GitHubCore):
             endpoint
         :returns: generator of :class:`PullReview <PullReview>`\ s
         """
-        # Accept the preview headers for reviews
-        headers = {'Accept': 'application/vnd.github.black-cat-preview+json'}
         url = self._build_url('reviews', base_url=self._api)
-        return self._iter(int(number), url, PullReview, etag=etag,
-                          headers=headers)
+        return self._iter(int(number), url, PullReview, etag=etag)
 
     @requires_auth
     def update(self, title=None, body=None, state=None):
