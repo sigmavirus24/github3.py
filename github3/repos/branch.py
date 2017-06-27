@@ -61,27 +61,33 @@ class Branch(GitHubCore):
             return resp.content
         return None
 
-    def protect(self, enforcement=None, status_checks=None):
+    def protect(self, status_checks=None):
         """Enable force push protection and configure status check enforcement.
 
         See: http://git.io/v4Gvu
 
-        :param str enforcement: (optional), Specifies the enforcement level of
-            the status checks. Must be one of 'off', 'non_admins', or
-            'everyone'. Use `None` or omit to use the already associated value.
         :param list status_checks: (optional), An list of strings naming
             status checks that must pass before merging. Use `None` or omit to
             use the already associated value.
         """
         previous_values = self.protection['required_status_checks']
-        if enforcement is None:
-            enforcement = previous_values['enforcement_level']
         if status_checks is None:
             status_checks = previous_values['contexts']
 
-        edit = {'protection': {'enabled': True, 'required_status_checks': {
-            'enforcement_level': enforcement, 'contexts': status_checks}}}
-        json = self._json(self._patch(self._api, data=dumps(edit),
+        edit = {
+            'required_status_checks': {
+                'strict': True, # TODO configurable
+                'contexts': status_checks
+            },
+            'enforce_admins': True, # TODO configurable
+            'restrictions': None, # TODO configurable
+            'required_pull_request_reviews': {
+                'dismiss_stale_reviews': False, # TODO configurable
+                'dismissal_restrictions': {} # TODO configurable
+            }
+        }
+        url = self._build_url('protection', base_url=self._api)
+        json = self._json(self._put(url, data=dumps(edit),
                                       headers=self.PREVIEW_HEADERS), 200)
         self._update_attributes(json)
         return True
