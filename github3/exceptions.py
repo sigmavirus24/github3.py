@@ -115,6 +115,16 @@ class NotAcceptable(ResponseError):
     pass
 
 
+class Conflict(ResponseError):
+    """Exception class for 409 responses.
+
+    Possible reasons:
+
+    - Head branch was modified (SHA sums do not match)
+    """
+    pass
+
+
 class UnprocessableEntity(ResponseError):
     """Exception class for 422 responses."""
     pass
@@ -142,6 +152,7 @@ error_classes = {
     404: NotFoundError,
     405: MethodNotAllowed,
     406: NotAcceptable,
+    409: Conflict,
     422: UnprocessableEntity,
     451: UnavailableForLegalReasons,
 }
