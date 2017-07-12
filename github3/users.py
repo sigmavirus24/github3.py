@@ -592,16 +592,16 @@ class AuthenticatedUser(User):
 
     def _update_attributes(self, user):
         #: How much disk consumed by the user
-        self.disk_usage = user['disk_usage']
+        self.disk_usage = user.get('disk_usage', 0)
 
         #: Number of private repos owned by this user
-        self.owned_private_repos = user['owned_private_repos']
+        self.owned_private_repos = user.get('owned_private_repos', 0)
 
         #: Total number of private repos
-        self.total_private_repos = user['total_private_repos']
+        self.total_private_repos = user.get('total_private_repos', 0)
 
         #: Which plan this user is on
-        self.plan = Plan(user['plan'])
+        self.plan = Plan(user.get('plan', {}))
 
         #: Number of repo contributions. Only appears in ``repo.contributors``
         contributions = user.get('contributions')
