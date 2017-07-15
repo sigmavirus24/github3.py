@@ -9,7 +9,7 @@ Creating a Blob Object
 ----------------------
 
 One of the really cool (and under used, it seems) parts of the GitHub API 
-involves the ability to create commit and blob objects.
+involves the ability to create blob objects.
 
 .. code-block:: python
 
