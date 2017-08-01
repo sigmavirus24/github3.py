@@ -1086,7 +1086,7 @@ class Repository(GitHubCore):
 
     @requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
-                   lightweight=False):
+                   lightweight=False, update=False):
         """Create a tag in this repository.
 
         By default, this method creates an annotated tag. If you wish to
@@ -1109,6 +1109,8 @@ class Repository(GitHubCore):
             tagger and the date it was tagged
         :param bool lightweight: (optional), if False, create an annotated
             tag, otherwise create a lightweight tag (a Reference).
+        :param bool update: (optional), if True, force the update of an
+            existing annotated tag.
         :returns: If lightweight == False: :class:`Tag <github3.git.Tag>` if
             successful, else None. If lightweight == True: :class:`Reference
             <github3.git.Reference>`
@@ -1123,7 +1125,11 @@ class Repository(GitHubCore):
             url = self._build_url('git', 'tags', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
             if json:
-                self.create_ref('refs/tags/' + tag, json.get('sha'))
+                if update:
+                    self.update_ref('refs/tags/' + tag, json.get('sha'),
+                                    force=True)
+                else:
+                    self.create_ref('refs/tags/' + tag, json.get('sha'))
         return self._instance_or_null(Tag, json)
 
     @requires_auth

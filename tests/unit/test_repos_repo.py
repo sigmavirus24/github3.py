@@ -526,6 +526,35 @@ class TestRepository(helper.UnitHelper):
             },
         )
 
+    def test_create_tag_that_is_not_lightweight_and_forced(self):
+        """Verify we can create an annotated tag."""
+        self.instance.create_tag(
+            tag='tag-name',
+            message='message',
+            sha='my-sha',
+            obj_type='commit',
+            tagger={'name': 'Ian Cordasco',
+                    'email': 'example@example.com',
+                    'date': '2015-11-01T12:16:00Z'},
+            lightweight=False,
+            update=True
+        )
+
+        self.post_called_with(
+            url_for('git/tags'),
+            data={
+                'tag': 'tag-name',
+                'message': 'message',
+                'object': 'my-sha',
+                'type': 'commit',
+                'tagger': {
+                    'name': 'Ian Cordasco',
+                    'email': 'example@example.com',
+                    'date': '2015-11-01T12:16:00Z',
+                },
+            },
+        )
+
     def test_create_tree(self):
         """Verify the request to create a tree."""
         self.instance.create_tree([{'foo': 'bar'}])
