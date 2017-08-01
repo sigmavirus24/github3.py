@@ -1012,6 +1012,25 @@ class Repository(GitHubCore):
         return self._instance_or_null(Reference, json)
 
     @requires_auth
+    def update_ref(self, ref, sha, force=False):
+        """Update a reference in this repository.
+
+        :param str ref: (required), fully qualified name of the reference,
+            e.g. ``refs/heads/master``. If it doesn't start with ``refs`` and
+            contain at least two slashes, GitHub's API will reject it.
+        :param str sha: (required), SHA1 value to set the reference to
+        :param bool force: (optional), force update of a pre-existing ref.
+        :returns: :class:`Reference <github3.git.Reference>` if successful
+            else None
+        """
+        json = None
+        if ref and ref.startswith('refs') and ref.count('/') >= 2 and sha:
+            data = {'sha': sha, 'force': force}
+            url = self._build_url('git', ref, base_url=self._api)
+            json = self._json(self._patch(url, data=dumps(data)), 200)
+        return self._instance_or_null(Reference, json)
+
+    @requires_auth
     def create_release(self, tag_name, target_commitish=None, name=None,
                        body=None, draft=False, prerelease=False):
         """Create a release for this repository.

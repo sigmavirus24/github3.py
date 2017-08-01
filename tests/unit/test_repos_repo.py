@@ -440,6 +440,34 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.post.called is False
 
+    def test_update_ref(self):
+        """Verify the request to update a reference."""
+        ref = 'refs/heads/foo'
+        sha = 'my-fake-sha'
+        self.instance.update_ref(ref, sha)
+
+        self.patch_called_with(
+            url_for('git/' + ref),
+            data={
+                'sha': sha,
+                'force': False,
+            }
+        )
+
+    def test_update_ref_force(self):
+        """Verify the request to force update a reference."""
+        ref = 'refs/heads/foo'
+        sha = 'my-fake-sha'
+        self.instance.update_ref(ref, sha, force=True)
+
+        self.patch_called_with(
+            url_for('git/' + ref),
+            data={
+                'sha': sha,
+                'force': True,
+            }
+        )
+
     def test_create_status(self):
         """Verify the request for creating a status on a commit."""
         data = {
