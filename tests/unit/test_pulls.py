@@ -144,6 +144,13 @@ class TestPullRequest(helper.UnitHelper):
             }
         )
 
+    def test_attributes(self):
+        """Show that we extract attributes correctly."""
+        assert self.instance.merge_commit_sha == \
+            'e5bd3914e2e596debea16f433f57875b5b90bcd6'
+        assert not self.instance.merged
+        assert self.instance.mergeable
+
 
 class TestPullRequestRequiresAuthentication(
         helper.UnitRequiresAuthenticationHelper):

@@ -185,6 +185,12 @@ class PullRequest(models.GitHubCore):
         #: Dictionary of _links. Changed in 1.0
         self.links = self._get_attribute(pull, '_links', {})
 
+        #: If unmerged, holds the sha of the commit to test mergability.
+        #: If merged, holds commit sha of the merge commit, squashed commit on
+        #: the base branch or the commit that the base branch was updated to
+        #: after rebasing the PR.
+        self.merge_commit_sha = self._get_attribute(pull, 'merge_commit_sha')
+
         #: Boolean representing whether the pull request has been merged
         self.merged = self._get_attribute(pull, 'merged')
 
