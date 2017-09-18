@@ -1072,9 +1072,25 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('collaborators'),
-            params={'per_page': 100},
+            params={'affiliation': 'all', 'per_page': 100},
             headers={}
         )
+
+    def test_collaborators_valid_affiliation(self):
+        """Test the iterating over repo collaborators with an affiliation."""
+        i = self.instance.collaborators(affiliation='direct')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('collaborators'),
+            params={'affiliation': 'direct', 'per_page': 100},
+            headers={}
+        )
+
+    def test_collaborators_invalid_affiliation(self):
+        """Test invalid affiliation requests raise ValueError."""
+        with pytest.raises(ValueError):
+            self.instance.collaborators(affiliation='invalid')
 
     def test_comments(self):
         """Test the ability to iterate over the comments on a repository."""
@@ -1223,7 +1239,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         )
 
     def test_imported_issues(self):
-        """Verify the request for retreiving imported issues."""
+        """Verify the request for retrieving imported issues."""
         i = self.instance.imported_issues(since='2015-03-15')
         self.get_next(i)
 

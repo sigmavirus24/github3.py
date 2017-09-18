@@ -505,30 +505,6 @@ class _User(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 403)
 
 
-class Contributor(_User):
-    """Object for the specialized representation of a contributor.
-
-    When retrieving a repository's contributors, GitHub returns the same
-    information as a :class:`~github3.users.ShortUser` with an additional
-    attribute:
-
-    .. versionadded:: 1.0.0
-
-        This class was added in version 1.0.0
-
-    .. attribute:: contributions_count
-
-        The number of contributions a contributor has made to the repository
-
-    """
-
-    class_name = 'Contributor'
-
-    def _update_attributes(self, contributor):
-        super(Contributor, self)._update_attributes(contributor)
-        self.contributions = contributor['contributions']
-
-
 class User(_User):
     """Object for the full representation of a User.
 
@@ -765,3 +741,57 @@ class AuthenticatedUser(User):
         self.plan = user.get('plan')
         if self.plan is not None:
             self.plan = Plan(self.plan, self)
+
+
+class Collaborator(_User):
+    """Object for the representation of a collaborator.
+
+    When retrieving a repository's contributors, GitHub returns the same
+    information as a :class:`~github3.users.ShortUser` with an additional
+    attribute:
+
+    .. versionadded:: 1.0.3
+
+        This class was added in version 1.0.3
+
+    .. attribute:: permissions
+
+        Admin, push, and pull permissions of a collaborator
+    """
+
+    class_name = 'Collaborator'
+    _refresh_to = User
+
+    def _update_attributes(self, user):
+        super(Collaborator, self)._update_attributes(user)
+
+        self.permissions = user['permissions']
+
+
+class Contributor(_User):
+    """Object for the specialized representation of a contributor.
+
+    When retrieving a repository's contributors, GitHub returns the same
+    information as a :class:`~github3.users.ShortUser` with an additional
+    attribute:
+
+    .. versionadded:: 1.0.0
+
+        This class was added in version 1.0.0
+
+    .. versionadded:: 1.0.3
+
+        Refresh was implemented in version 1.0.3.
+
+    .. attribute:: contributions_count
+
+        The number of contributions a contributor has made to the repository
+
+    """
+
+    class_name = 'Contributor'
+    _refresh_to = User
+
+    def _update_attributes(self, contributor):
+        super(Contributor, self)._update_attributes(contributor)
+        self.contributions = contributor['contributions']
