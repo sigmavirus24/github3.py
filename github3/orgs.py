@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.orgs
-============
-
-This module contains all of the classes related to organizations.
-
-"""
+"""This module contains all of the classes related to organizations."""
 from __future__ import unicode_literals
 
 import warnings
@@ -26,18 +20,10 @@ class Team(GitHubCore):
 
     """The :class:`Team <Team>` object.
 
-    Two team instances can be checked like so::
+    Please see GitHub's `Team Documentation`_ for more information.
 
-        t1 == t2
-        t1 != t2
-
-    And is equivalent to::
-
-        t1.id == t2.id
-        t1.id != t2.id
-
-    See also: http://developer.github.com/v3/orgs/teams/
-
+    .. _Team Documentation:
+        http://developer.github.com/v3/orgs/teams/
     """
 
     # Roles available to members on a team.
@@ -248,18 +234,10 @@ class Organization(BaseAccount):
 
     """The :class:`Organization <Organization>` object.
 
-    Two organization instances can be checked like so::
+    Please see GitHub's `Organization Documentation`_ for more information.
 
-        o1 == o2
-        o1 != o2
-
-    And is equivalent to::
-
-        o1.id == o2.id
-        o1.id != o2.id
-
-    See also: http://developer.github.com/v3/orgs/
-
+    .. _Organization Documentation:
+        http://developer.github.com/v3/orgs/
     """
 
     # Filters available when listing members. Note: ``"2fa_disabled"``
