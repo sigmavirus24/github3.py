@@ -7,16 +7,15 @@ from json import dumps
 
 from uritemplate import URITemplate
 
-from . import users
+from . import users, models
 
 from .decorators import requires_auth
 from .events import Event
-from .models import BaseAccount, GitHubCore
 from .projects import Project
 from .repos import Repository
 
 
-class Team(GitHubCore):
+class Team(models.GitHubCore):
 
     """The :class:`Team <Team>` object.
 
@@ -230,7 +229,7 @@ class Team(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
 
-class Organization(BaseAccount):
+class Organization(models.GitHubCore):
 
     """The :class:`Organization <Organization>` object.
 
@@ -248,13 +247,65 @@ class Organization(BaseAccount):
     members_roles = frozenset(['all', 'admin', 'member'])
 
     def _update_attributes(self, org):
-        super(Organization, self)._update_attributes(org)
-        self.type = self.type or 'Organization'
+        # Set the type of object
+        self.type = self._get_attribute(org, 'type')
+        if not self.type:
+            self.type = 'Organization'
+
+        self._api = self._get_attribute(org, 'url')
+
+        #: URL of the avatar at gravatar
+        self.avatar_url = self._get_attribute(org, 'avatar_url')
+
+        #: URL of the blog
+        self.blog = self._get_attribute(org, 'blog')
+
+        #: Name of the company
+        self.company = self._get_attribute(org, 'company')
+
+        #: datetime object representing the date the account was created
+        self.created_at = self._strptime_attribute(org, 'created_at')
+
+        #: E-mail address of the org
+        self.email = self._get_attribute(org, 'email')
+
+        # The number of people following this org
+        #: Number of followers
+        self.followers_count = self._get_attribute(org, 'followers')
+
+        # The number of people this org follows
+        #: Number of people the org is following
+        self.following_count = self._get_attribute(org, 'following')
+
+        #: Unique ID of the account
+        self.id = self._get_attribute(org, 'id')
+
+        #: Location of the org
+        self.location = self._get_attribute(org, 'location')
+
+        #: Name of the organization
+        self.login = self._get_attribute(org, 'login')
+
+        # e.g. first_name last_name
+        #: Real name of the org
+        self.name = self._get_attribute(org, 'name')
+
+        # The number of public_repos
+        #: Number of public repos owned by the org
+        self.public_repos_count = self._get_attribute(org, 'public_repos')
+
+        # e.g. https://github.com/self._login
+        #: URL of the org's profile
+        self.html_url = self._get_attribute(org, 'html_url')
+
+        #: Description of the org
+        self.description = self._get_attribute(org, 'description')
 
         #: Events url (not a template)
         self.events_url = self._get_attribute(org, 'events_url')
+
         #: Number of private repositories.
-        self.private_repos = self._get_attribute(org, 'private_repos')
+        self.private_repos = self._get_attribute(org, 'owned_private_repos')
 
         #: Public Members URL Template. Expands with ``member``
         self.public_members_urlt = self._class_attribute(
@@ -265,6 +316,9 @@ class Organization(BaseAccount):
 
         #: Repositories url (not a template)
         self.repos_url = self._get_attribute(org, 'repos_url')
+
+    def _repr(self):
+        return '<Organization [{s.login}:{s.name}]>'.format(s=self)
 
     @requires_auth
     def add_member(self, username, team_id):
@@ -652,7 +706,7 @@ class Organization(BaseAccount):
         return self._instance_or_null(Team, json)
 
 
-class Membership(GitHubCore):
+class Membership(models.GitHubCore):
 
     """The wrapper for information about Team and Organization memberships."""
 
@@ -689,7 +743,7 @@ class Membership(GitHubCore):
         """
         if state and state.lower() == 'active':
             data = dumps({'state': state.lower()})
-            json = self._json(self._patch(self._api, data=data))
+            json = self._json(self._patch(self._api, data=data), 200)
             self._update_attributes(json)
             return True
         return False
