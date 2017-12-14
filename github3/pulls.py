@@ -472,7 +472,7 @@ class PullReview(models.GitHubCore):
         self.state = self._get_attribute(preview, 'state')
 
         #: datetime object representing when the event was created.
-        self.created_at = self._strptime_attribute(preview, 'created_at')
+        self.submitted_at = self._strptime_attribute(preview, 'submitted_at')
 
         #: Body text of the review
         self.body = self._get_attribute(preview, 'body')
