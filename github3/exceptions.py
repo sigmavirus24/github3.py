@@ -18,7 +18,7 @@ class GitHubError(Exception):
             #: List of errors provided by GitHub
             if error.get('errors'):
                 self.errors = error.get('errors')
-        except:  # Amazon S3 error
+        except Exception:  # Amazon S3 error
             self.msg = resp.content or '[No message]'
 
     def __repr__(self):

@@ -216,10 +216,10 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to retrieve a list of gitignore templates."""
         cassette_name = self.cassette_name('gitignore_templates')
         with self.recorder.use_cassette(cassette_name):
-            l = self.gh.gitignore_templates()
+            thelist = self.gh.gitignore_templates()
 
-        assert l != []
-        assert isinstance(l, list)
+        assert thelist != []
+        assert isinstance(thelist, list)
 
     def test_is_following(self):
         """Test the ability to check if a user is being followed."""
