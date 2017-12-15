@@ -593,7 +593,7 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('hooks')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'fork_this')
             assert repository is not None
             hooks = list(repository.hooks())
 
