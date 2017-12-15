@@ -34,6 +34,22 @@ class GitHubError(Exception):
         return self.msg
 
 
+class IncompleteResponse(GitHubError):
+    """Exception for a response that doesn't have everything it should."""
+
+    def __init__(self, json, exception):
+        self.response = None
+        self.code = None
+        self.json = json
+        self.errors = []
+        self.exception = exception
+        self.msg = (
+            "The library was expecting more data in the response (%r)."
+            " Either GitHub modified it's response body, or your token"
+            " is not properly scoped to retrieve this information."
+        ) % (exception,)
+
+
 class ResponseError(GitHubError):
     """The base exception for errors stemming from GitHub responses."""
     pass
