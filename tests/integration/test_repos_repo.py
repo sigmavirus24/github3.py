@@ -452,7 +452,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('github3py', 'fork_this')
             assert repository is not None
             tag = repository.create_tag(
-                tag='tag-name',
+                tag='tag-name-redux',
                 message='Test annotated tag creation',
                 sha='5145c9682d46d714c31ae0b5fbe30a83039a96e5',
                 obj_type='commit',
@@ -470,7 +470,7 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'my-new-repo')
+            repository = self.gh.repository('gh3test', 'my-new-repo')
             assert repository is not None
             assert repository.delete() is True
 
@@ -478,9 +478,12 @@ class TestRepository(helper.IntegrationHelper):
         """Test the ability to delete a key from a repository."""
         self.token_login()
         cassette_name = self.cassette_name('delete_key')
+        with open('tests/id_rsa.pub', 'r') as fd:
+            key_contents = fd.read()
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'github3.py')
-            assert repository.delete_key(15312662) is True
+            key = repository.create_key('Key Name', key_contents)
+            assert repository.delete_key(key.id) is True
 
     def test_delete_subscription(self):
         """Test the ability to delete a subscription from a repository."""
@@ -581,7 +584,8 @@ class TestRepository(helper.IntegrationHelper):
         cassette_name = self.cassette_name('hook')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'github3.py')
-            hook = repository.hook(6818702)
+            hook_id = next(repository.hooks()).id
+            hook = repository.hook(hook_id)
         assert isinstance(hook, github3.repos.hook.Hook)
 
     def test_hooks(self):

@@ -2191,7 +2191,6 @@ class Repository(_Repository):
         self.homepage = repo['homepage']
         self.language = repo['language']
         self.mirror_url = repo['mirror_url']
-        self.open_issues = repo['open_issues']
         self.open_issues_count = repo['open_issues_count']
         self.pushed_at = self._strptime(repo['pushed_at'])
         self.size = repo['size']
