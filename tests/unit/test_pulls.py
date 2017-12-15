@@ -243,7 +243,7 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('reviews'),
             params={'per_page': 100},
-            headers={'Accept': 'application/vnd.github.black-cat-preview+json'}
+            headers={}
         )
 
 
