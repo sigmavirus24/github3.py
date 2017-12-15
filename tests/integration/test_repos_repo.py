@@ -751,9 +751,23 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('key')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'fork_this')
             assert repository is not None
-            key = repository.key(8820641)
+            key = ('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZn4/RGE9YQrfjq7wSr'
+                   'YkdtKH3r1rEIkx/4Nv1AG/PqE4AWKSVzKkqhurnqKtctVCLtU9pNFIjl/'
+                   'XvNluTW3zrfqKjgaDdiBtWwecWzSbQqugfzmwFqCE4smJkP8e7+e9Fd1k'
+                   'GOGyqVJLBLfIUdEbHN3Ws40Z9OXgrJ/tiNdg1HHgAOjpknCMrQI8NDP9o'
+                   '9CLuE/AfNVzRNOzpf/rrdZ4YW4kcDhbcQ8X7DGCnbvY9wUp3lDmSvVy6z'
+                   'olYwLziYqsGjw0kLHvIzHdbGCjp+50iZSBrm29AlWa9eRsGskiUTIk6SA'
+                   'Q8Fm5qKNkCtPYQ6YmjRiKyDtsMoqfjzDkyEPLv mattchung@Matts-Ma'
+                   'cBook-Air.local')
+            data = {
+                'title': 'Deploy Key',
+                'key': key
+            }
+            created_key = repository.create_key(**data)
+            key = repository.key(created_key.id)
+            key.delete()
 
         assert isinstance(key, github3.users.Key)
 
@@ -762,9 +776,23 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('keys')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'fork_this')
             assert repository is not None
+            key = ('ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZn4/RGE9YQrfjq7wSr'
+                   'YkdtKH3r1rEIkx/4Nv1AG/PqE4AWKSVzKkqhurnqKtctVCLtU9pNFIjl/'
+                   'XvNluTW3zrfqKjgaDdiBtWwecWzSbQqugfzmwFqCE4smJkP8e7+e9Fd1k'
+                   'GOGyqVJLBLfIUdEbHN3Ws40Z9OXgrJ/tiNdg1HHgAOjpknCMrQI8NDP9o'
+                   '9CLuE/AfNVzRNOzpf/rrdZ4YW4kcDhbcQ8X7DGCnbvY9wUp3lDmSvVy6z'
+                   'olYwLziYqsGjw0kLHvIzHdbGCjp+50iZSBrm29AlWa9eRsGskiUTIk6SA'
+                   'Q8Fm5qKNkCtPYQ6YmjRiKyDtsMoqfjzDkyEPLv mattchung@Matts-Ma'
+                   'cBook-Air.local')
+            data = {
+                'title': 'Deploy Key',
+                'key': key
+            }
+            created_key = repository.create_key(**data)
             keys = list(repository.keys())
+            created_key.delete()
 
         assert len(keys) > 0
         for key in keys:
