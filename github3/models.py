@@ -48,7 +48,10 @@ class GitHubCore(object):
             self.last_modified = json.pop('Last-Modified', None)
             self._uniq = json.get('url', None)
         self._json_data = json
-        self._update_attributes(json)
+        try:
+            self._update_attributes(json)
+        except KeyError as kerr:
+            raise exceptions.IncompleteResponse(json, kerr)
 
     def _update_attributes(self, json):
         pass
