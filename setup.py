@@ -23,7 +23,7 @@ SNI_requirements = [
     'pyasn1'
 ]
 
-kwargs['tests_require'] = ['betamax >=0.2.0', 'pytest',
+kwargs['tests_require'] = ['betamax >=0.2.0', 'pytest <3.3.0',
                            'betamax-matchers>=0.1.0']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2 ==0.5.1')
