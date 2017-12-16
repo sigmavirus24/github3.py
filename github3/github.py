@@ -17,7 +17,7 @@ from .events import Event
 from .gists import Gist
 from .issues import Issue, issue_params
 from .models import GitHubCore
-from .orgs import Membership, Organization, Team
+from .orgs import Membership, ShortOrganization, Organization, Team
 from .projects import Project, ProjectCard, ProjectColumn
 from .pulls import PullRequest
 from .repos.repo import Repository, repo_issue_params
@@ -106,11 +106,11 @@ class GitHub(GitHubCore):
             endpoint
         :param int per_page: (optional), number of organizations to list per
             request
-        :returns: generator of :class:`Organization
-            <github3.orgs.Organization>`
+        :returns: generator of :class:`ShortOrganization
+            <github3.orgs.ShortOrganization>`
         """
         url = self._build_url('organizations')
-        return self._iter(int(number), url, Organization,
+        return self._iter(int(number), url, ShortOrganization,
                           params={'since': since, 'per_page': per_page},
                           etag=etag)
 
@@ -922,10 +922,10 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Organization <github3.orgs.Organization>`\ s
+            :class:`ShortOrganization <github3.orgs.ShortOrganization>`\ s
         """
         url = self._build_url('user', 'orgs')
-        return self._iter(int(number), url, Organization, etag=etag)
+        return self._iter(int(number), url, ShortOrganization, etag=etag)
 
     def organizations_with(self, username, number=-1, etag=None):
         """Iterate over organizations with ``username`` as a public member.
@@ -940,11 +940,11 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Organization <github3.orgs.Organization>`\ s
+            :class:`ShortOrganization <github3.orgs.ShortOrganization>`\ s
         """
         if username:
             url = self._build_url('users', username, 'orgs')
-            return self._iter(int(number), url, Organization, etag=etag)
+            return self._iter(int(number), url, ShortOrganization, etag=etag)
         return iter([])
 
     def project(self, number):

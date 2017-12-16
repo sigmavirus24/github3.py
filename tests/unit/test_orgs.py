@@ -11,6 +11,8 @@ url_for = helper.create_url_helper('https://api.github.com/orgs/github')
 
 get_org_example_data = helper.create_example_data_helper('org_example')
 
+example_data = get_org_example_data()
+
 
 class TestOrganization(helper.UnitHelper):
     described_class = Organization
@@ -240,10 +242,7 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 class TestOrganizationIterator(helper.UnitIteratorHelper):
     described_class = Organization
 
-    example_data = {
-        'url': url_for(),
-        'login': 'github',
-    }
+    example_data = example_data.copy()
 
     def test_all_events(self):
         i = self.instance.all_events(username='dummy')

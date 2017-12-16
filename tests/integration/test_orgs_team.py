@@ -13,7 +13,7 @@ class TestTeam(IntegrationHelper):
 
     def setUp(self):
         super(TestTeam, self).setUp()
-        self.basic_login()
+        self.auto_login()
 
     def get_organization(self, organization='github3py'):
         """Get the desired organization."""
@@ -90,7 +90,7 @@ class TestTeam(IntegrationHelper):
 
     def test_can_filter_members_by_role(self):
         """Test the ability to filter an team's members by role."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('members_roles')
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()

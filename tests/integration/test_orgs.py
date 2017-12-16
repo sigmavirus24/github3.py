@@ -32,7 +32,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_add_member(self):
         """Test the ability to add a member to an organization."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('add_member')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -41,7 +41,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_add_repository(self):
         """Test the ability to add a repository to an organization."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('add_repository')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -60,7 +60,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_create_repository(self):
         """Test the ability to create a repository in an organization."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('create_repository')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
             o = self.get_organization()
@@ -70,7 +70,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_conceal_member(self):
         """Test the ability to conceal a User's membership."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('conceal_member')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -86,7 +86,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_create_team(self):
         """Test the ability to create a new team."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('create_team')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
             o = self.get_organization()
@@ -97,7 +97,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_edit(self):
         """Test the ability to edit an organization."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
             o = self.get_organization()
@@ -124,7 +124,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_all_events(self):
         """Test retrieving organization's complete event stream."""
-        self.token_login()
+        self.auto_login()
         cassette_name = self.cassette_name('all_events')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization('praw-dev')
@@ -153,7 +153,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_members(self):
         """Test the ability to retrieve an organization's members."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('members')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -180,7 +180,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_can_filter_members_by_role(self):
         """Test the ability to filter an organization's members by role."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('members_roles')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -213,7 +213,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_public_members(self):
         """Test the ability to retrieve an organization's public members."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('public_members')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -232,7 +232,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_teams(self):
         """Test the ability to retrieve an organization's teams."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('teams')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -242,7 +242,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_publicize_member(self):
         """Test the ability to publicize a member of the organization."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('publicize_member')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -252,11 +252,11 @@ class TestOrganization(IntegrationHelper):
             with pytest.raises(github3.GitHubError):
                 o.publicize_member('esacteksab')
 
-            assert o.publicize_member('sigmavirus24') is True
+            assert o.publicize_member('omgjlk') is True
 
     def test_remove_member(self):
         """Test the ability to remove a member of the organization."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('remove_member')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -269,7 +269,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_remove_repository(self):
         """Test the ability to remove a repository from a team."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('remove_repository')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
@@ -278,7 +278,7 @@ class TestOrganization(IntegrationHelper):
 
     def test_team(self):
         """Test the ability retrieve an individual team by id."""
-        self.basic_login()
+        self.auto_login()
         cassette_name = self.cassette_name('team')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
