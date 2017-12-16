@@ -838,10 +838,7 @@ class TestRepository(helper.IntegrationHelper):
             assert isinstance(license, github3.licenses.License)
 
     def test_mark_notifications(self):
-        """
-        Test the ability to mark all notifications on a repository
-        as read.
-        """
+        """Verify we can mark all notifications on a repository as read."""
         self.token_login()
         cassette_name = self.cassette_name('mark_notifications')
         with self.recorder.use_cassette(cassette_name):
@@ -854,8 +851,8 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('merge')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'github3.py')
-            commit = repository.merge('base_branch', 'head_branch')
+            repository = self.gh.repository('github3py', 'fork_this')
+            commit = repository.merge('master', 'new-branch')
         assert isinstance(commit, github3.repos.commit.RepoCommit)
 
     def test_milestone(self):
