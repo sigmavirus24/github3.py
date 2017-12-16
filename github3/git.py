@@ -78,12 +78,14 @@ class Commit(BaseCommit):
         self.author = self._get_attribute(commit, 'author', {})
         # If GH returns nil/None then make sure author is a dict
         self._author_name = self._get_attribute(self.author, 'name')
+        self.auth_date = self._strptime_attribute(self.author, 'date')
 
         #: dict containing similar information to the author attribute
         self.committer = self._get_attribute(commit, 'committer', {})
         # blank the data if GH returns no data
 
         self._commit_name = self._get_attribute(self.committer, 'name')
+        self.commit_date = self._strptime_attribute(self.committer, 'date')
 
         #: :class:`Tree <Tree>` the commit belongs to.
         self.tree = self._class_attribute(commit, 'tree', Tree, self)
