@@ -1006,6 +1006,7 @@ class TestRepository(helper.IntegrationHelper):
 
     def test_refs(self):
         """Test the ability to retrieve the references from a repository."""
+        self.token_login()
         cassette_name = self.cassette_name('refs')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
@@ -1089,7 +1090,10 @@ class TestRepository(helper.IntegrationHelper):
         cassette_name = self.cassette_name('subscription')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
+            assert repository is not None
+            repository.subscribe()
             subscription = repository.subscription()
+            repository.delete_subscription()
 
         assert isinstance(subscription, github3.notifications.Subscription)
 
