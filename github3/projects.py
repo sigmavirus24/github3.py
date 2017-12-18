@@ -23,33 +23,31 @@ class Project(models.GitHubCore):
     }
 
     def _update_attributes(self, project):
-        self._api = self._get_attribute(project, 'url')
+        self._api = project['url']
 
         #: The body of the project
-        self.body = self._get_attribute(project, 'body')
+        self.body = project['body']
 
         #: datetime object representing when the project was created
-        self.created_at = self._strptime_attribute(project, 'created_at')
+        self.created_at = self._strptime(project['created_at'])
 
         #: The user who created this project
-        self.creator = self._class_attribute(
-            project, 'creator', users.ShortUser, self,
-        )
+        self.creator = users.ShortUser(project['creator'], self)
 
         #: The unique ID of the project
-        self.id = self._get_attribute(project, 'id')
+        self.id = project['id']
 
         #: The name of this project
-        self.name = self._get_attribute(project, 'name')
+        self.name = project['name']
 
         #: The number of the project
-        self.number = self._get_attribute(project, 'number')
+        self.number = project['number']
 
         #: The owner repo or organisation of this project
-        self.owner_url = self._get_attribute(project, 'owner_url')
+        self.owner_url = project['owner_url']
 
         #: datetime object representing the last time the object was changed
-        self.updated_at = self._strptime_attribute(project, 'updated_at')
+        self.updated_at = self._strptime(project['updated_at'])
 
     def _repr(self):
         return '<Project [#{0}]>'.format(self.id)
@@ -140,21 +138,19 @@ class ProjectColumn(models.GitHubCore):
 
     def _update_attributes(self, project_column):
         #: datetime object representing the last time the object was created
-        self.created_at = self._strptime_attribute(
-            project_column, 'created_at')
+        self.created_at = self._strptime(project_column['created_at'])
 
         #: The ID of this column
-        self.id = self._get_attribute(project_column, 'id')
+        self.id = project_column['id']
 
         #: The name of this column
-        self.name = self._get_attribute(project_column, 'name')
+        self.name = project_column['name']
 
         #: The URL of this column's project
-        self.project_url = self._get_attribute(project_column, 'project_url')
+        self.project_url = project_column['project_url']
 
         #: datetime object representing the last time the object was changed
-        self.updated_at = self._strptime_attribute(
-            project_column, 'updated_at')
+        self.updated_at = self._strptime(project_column['updated_at'])
 
     def _repr(self):
         return '<ProjectColumn [#{0}]>'.format(self.id)
@@ -312,22 +308,22 @@ class ProjectCard(models.GitHubCore):
 
     def _update_attributes(self, project_card):
         #: The URL of this card's parent column
-        self.column_url = self._get_attribute(project_card, 'column_url')
+        self.column_url = project_card['column_url']
 
         #: The URL of this card's associated content
-        self.content_url = self._get_attribute(project_card, 'content_url')
+        self.content_url = project_card.get('content_url')
 
         #: datetime object representing the last time the object was created
-        self.created_at = self._strptime_attribute(project_card, 'created_at')
+        self.created_at = project_card['created_at']
 
         #: The ID of this card
-        self.id = self._get_attribute(project_card, 'id')
+        self.id = project_card['id']
 
         #: The note attached to the card
-        self.note = self._get_attribute(project_card, 'note')
+        self.note = project_card['note']
 
         #: datetime object representing the last time the object was changed
-        self.updated_at = self._strptime_attribute(project_card, 'updated_at')
+        self.updated_at = project_card['updated_at']
 
     def _repr(self):
         return '<ProjectCard [#{0}]>'.format(self.id)

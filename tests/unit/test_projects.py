@@ -190,7 +190,7 @@ class TestProjectColumnAuth(helper.UnitRequiresAuthenticationHelper):
     """Test ProjectColumn methods that require authentication."""
 
     described_class = projects.ProjectColumn
-    example_data = get_project_example_data()
+    example_data = get_project_column_example_data()
 
     def test_create_card_with_content_id(self):
         """Verify that creating a content ID card requires authentication."""
