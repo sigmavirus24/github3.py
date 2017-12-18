@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.pulls
-=============
-
-This module contains all the classes relating to pull requests.
-
-"""
+"""This module contains all the classes relating to pull requests."""
 from __future__ import unicode_literals
 
 from json import dumps
@@ -24,7 +18,10 @@ from .repos.contents import Contents
 class PullDestination(models.GitHubCore):
     """The :class:`PullDestination <PullDestination>` object.
 
-    See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
+    Please see GitHub's `PullRequest Documentation`_ for more information.
+
+    .. _PullRequest Documentation:
+        http://developer.github.com/v3/pulls/#get-a-single-pull-request
     """
 
     def __init__(self, dest, direction):
@@ -58,7 +55,10 @@ class PullFile(models.GitHubCore):
 
     """The :class:`PullFile <PullFile>` object.
 
-    See also: http://developer.github.com/v3/pulls/#list-pull-requests-files
+    Please see GitHub's `PR Files Documentation`_ for more information.
+
+    .. _PR Files Documentation:
+        http://developer.github.com/v3/pulls/#list-pull-requests-files
     """
 
     def _update_attributes(self, pfile):
@@ -108,17 +108,10 @@ class PullRequest(models.GitHubCore):
 
     """The :class:`PullRequest <PullRequest>` object.
 
-    Two pull request instances can be checked like so::
+    Please see GitHub's `PullRequests Documentation`_ for more information.
 
-        p1 == p2
-        p1 != p2
-
-    And is equivalent to::
-
-        p1.id == p2.id
-        p1.id != p2.id
-
-    See also: http://developer.github.com/v3/pulls/
+    .. _PullRequests Documentation:
+        http://developer.github.com/v3/pulls/
     """
 
     def _update_attributes(self, pull):
@@ -456,7 +449,10 @@ class PullReview(models.GitHubCore):
 
     """The :class:`PullReview <PullReview>` object.
 
-    See also: https://developer.github.com/v3/pulls/reviews/
+    Please see GitHub's `PullReview Documentation`_ for more information.
+
+    .. _PullReview Documentation:
+        https://developer.github.com/v3/pulls/reviews/
     """
 
     def _update_attributes(self, preview):
@@ -493,19 +489,10 @@ class ReviewComment(models.BaseComment):
 
     """The :class:`ReviewComment <ReviewComment>` object.
 
-    This is used to represent comments on pull requests.
+    Please see GitHub's `Pull Comments Documentation`_ for more information.
 
-    Two comment instances can be checked like so::
-
-        c1 == c2
-        c1 != c2
-
-    And is equivalent to::
-
-        c1.id == c2.id
-        c1.id != c2.id
-
-    See also: http://developer.github.com/v3/pulls/comments/
+    .. _Pull Comments Documentation:
+        http://developer.github.com/v3/pulls/comments/
     """
 
     def _update_attributes(self, comment):
