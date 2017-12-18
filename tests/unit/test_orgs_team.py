@@ -25,7 +25,7 @@ class TestTeam(helper.UnitHelper):
         self.instance.add_repository('name-of-repo')
 
         self.put_called_with(url_for('repos/name-of-repo'),
-                             data={'permission': ''})
+                             data={})
 
         self.instance.add_repository('name-of-repo', permission='push')
 

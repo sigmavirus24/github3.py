@@ -248,7 +248,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('all_organizations')
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.all_organizations(number=25):
-                assert isinstance(r, github3.orgs.Organization)
+                assert isinstance(r, github3.orgs.ShortOrganization)
 
     def test_all_repositories(self):
         """Test the ability to iterate over all of the repositories."""

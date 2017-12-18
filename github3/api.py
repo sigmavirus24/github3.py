@@ -285,7 +285,7 @@ def organizations_with(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of
-        :class:`Organization <github3.orgs.Organization>`
+        :class:`ShortOrganization <github3.orgs.ShortOrganization>`
 
     """
     return gh.organizations_with(username, number, etag)

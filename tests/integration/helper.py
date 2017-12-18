@@ -25,6 +25,14 @@ class IntegrationHelper(unittest.TestCase):
     def basic_login(self):
         self.gh.login(self.user, self.password)
 
+    def auto_login(self):
+        """Log in appropriately based on discovered credentials"""
+
+        if self.token:
+            self.token_login()
+        else:
+            self.basic_login()
+
     def cassette_name(self, method, cls=None):
         class_name = cls or self.described_class
         return '_'.join([class_name, method])

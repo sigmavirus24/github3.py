@@ -33,12 +33,12 @@ class TestEvent(UnitHelper):
         assert Event.list_types() == sorted(handlers.keys())
 
     def test_org(self):
-        """Show that an event contains an organization instance."""
+        """Show that an event contains an event organization instance."""
         json = self.instance.as_dict().copy()
         org = get_org_example_data()
         json['org'] = org
         event = github3.events.Event(json)
-        assert isinstance(event.org, github3.orgs.Organization)
+        assert isinstance(event.org, github3.events.EventOrganization)
 
 
 class TestPayLoadHandlers(TestCase):
