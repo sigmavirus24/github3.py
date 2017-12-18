@@ -1123,7 +1123,7 @@ class TestRepository(helper.IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('teams')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'github3.py')
+            repository = self.gh.repository('github3py', 'fork_this')
             assert repository is not None
             teams = list(repository.teams())
 
