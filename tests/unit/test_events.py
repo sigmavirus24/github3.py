@@ -96,7 +96,7 @@ class TestPayLoadHandlers(TestCase):
         pull_request = {'pull_request': get_pull_request_example_data()}
         github3.events._pullreqev(pull_request, None)
         assert isinstance(pull_request['pull_request'],
-                          github3.pulls.PullRequest)
+                          github3.events.EventPullRequest)
 
     def test_pullreqcomment(self):
         """Show that the event type is a PullRequestReviewCommentEvent."""

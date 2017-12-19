@@ -430,7 +430,7 @@ class TestRepository(helper.IntegrationHelper):
                 body='Migrated create_pull to tests/unit'
             )
 
-        assert isinstance(pull_request, github3.pulls.PullRequest)
+        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
 
     def test_create_pull_from_issue(self):
         """
@@ -447,7 +447,7 @@ class TestRepository(helper.IntegrationHelper):
                 head='itsmemattchung:tests/migrate-repos',
             )
 
-        assert isinstance(pull_request, github3.pulls.PullRequest)
+        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
 
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
@@ -934,7 +934,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(pulls) > 0
         for pull in pulls:
-            assert isinstance(pull, github3.pulls.PullRequest)
+            assert isinstance(pull, github3.pulls.ShortPullRequest)
 
     def test_pull_requests_accepts_sort_and_direction(self):
         """Test that pull_requests now takes a sort parameter."""

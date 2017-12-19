@@ -50,6 +50,24 @@ class EventOrganization(GitHubCore):
         return self._instance_or_null(orgs.Organization, json)
 
 
+class EventPullRequest(GitHubCore):
+    """The class that represents the pr information returned in Events."""
+
+    def _update_attributes(self, pull):
+        self.id = pull['id']
+        self.number = pull['number']
+        self.state = pull['state']
+        self.title = pull['title']
+        self.locked = pull['locked']
+        self._api = self.url = pull['url']
+
+    def to_pull(self):
+        """Retrieve a full PullRequest object for this EventPullRequest."""
+        from . import pulls
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(pulls.PullRequest, json)
+
+
 class Event(GitHubCore):
 
     """The :class:`Event <Event>` object. It structures and handles the data
@@ -161,19 +179,18 @@ def _member(payload, session):
 
 
 def _pullreqev(payload, session):
-    from .pulls import PullRequest
     if payload.get('pull_request'):
-        payload['pull_request'] = PullRequest(payload['pull_request'],
-                                              session)
+        payload['pull_request'] = EventPullRequest(payload['pull_request'],
+                                                   session)
     return payload
 
 
 def _pullreqcomm(payload, session):
-    from .pulls import PullRequest, ReviewComment
+    from .pulls import ReviewComment
     # Transform the Pull Request attribute
     pull = payload.get('pull_request')
     if pull:
-        payload['pull_request'] = PullRequest(pull, session)
+        payload['pull_request'] = EventPullRequest(pull, session)
 
     # Transform the Comment attribute
     comment = payload.get('comment')

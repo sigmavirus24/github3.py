@@ -27,7 +27,7 @@ from ..licenses import License
 from ..models import GitHubCore
 from ..notifications import Subscription, Thread
 from ..projects import Project
-from ..pulls import PullRequest
+from ..pulls import ShortPullRequest, PullRequest
 from ..utils import stream_response_to_file, timestamp_parameter
 from .branch import Branch
 from .comment import RepoComment
@@ -391,7 +391,7 @@ class Repository(GitHubCore):
         if data:
             url = self._build_url('pulls', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(PullRequest, json)
+        return self._instance_or_null(ShortPullRequest, json)
 
     @requires_auth
     def add_collaborator(self, username):
@@ -990,8 +990,8 @@ class Repository(GitHubCore):
         :param str base: (required), e.g., 'master'
         :param str head: (required), e.g., 'username:branch'
         :param str body: (optional), markdown formatted description
-        :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
-            successful, else None
+        :returns: :class:`ShortPullRequest <github3.pulls.ShortPullRequest>`
+            if successful, else None
         """
         data = {'title': title, 'body': body, 'base': base,
                 'head': head}
@@ -1004,8 +1004,8 @@ class Repository(GitHubCore):
         :param int issue: (required), issue number
         :param str base: (required), e.g., 'master'
         :param str head: (required), e.g., 'username:branch'
-        :returns: :class:`PullRequest <github3.pulls.PullRequest>` if
-            successful, else None
+        :returns: :class:`ShortPullRequest <github3.pulls.ShortPullRequest>`
+            if successful, else None
         """
         if int(issue) > 0:
             data = {'issue': issue, 'base': base, 'head': head}
@@ -1842,7 +1842,7 @@ class Repository(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`PullRequest <github3.pulls.PullRequest>`\ s
+            :class:`ShortPullRequest <github3.pulls.ShortPullRequest>`\ s
         """
         url = self._build_url('pulls', base_url=self._api)
         params = {}
@@ -1854,7 +1854,7 @@ class Repository(GitHubCore):
 
         params.update(head=head, base=base, sort=sort, direction=direction)
         self._remove_none(params)
-        return self._iter(int(number), url, PullRequest, params, etag)
+        return self._iter(int(number), url, ShortPullRequest, params, etag)
 
     def readme(self):
         """Get the README for this repository.
