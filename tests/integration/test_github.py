@@ -62,7 +62,7 @@ class TestGitHub(IntegrationHelper):
 
     def test_create_issue(self):
         """Test the ability of a GitHub instance to create a new issue."""
-        self.token_login()
+        self.auto_login()
         cassette_name = self.cassette_name('create_issue')
         with self.recorder.use_cassette(cassette_name):
             i = self.gh.create_issue(
