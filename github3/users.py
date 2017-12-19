@@ -510,7 +510,8 @@ class ShortUser(_User):
     .. versionadded:: 1.0.0
     """
 
-    pass
+    def _repr(self):
+        return '<User [{s.login}]>'.format(s=self)
 
 
 class User(_User):
