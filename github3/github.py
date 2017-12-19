@@ -253,7 +253,7 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
-                     assignees=None, milestone=None, labels=[]):
+                     milestone=None, labels=[], assignees=None):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
@@ -289,8 +289,8 @@ class GitHub(GitHubCore):
             repo = self.repository(owner, repository)
 
         if repo is not None:
-            return repo.create_issue(title, body, assignee, assignees,
-                                     milestone, labels)
+            return repo.create_issue(title, body, assignee, milestone,
+                                     labels, assignees)
 
         return self._instance_or_null(Issue, None)
 

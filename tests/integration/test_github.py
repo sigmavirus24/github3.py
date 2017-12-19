@@ -74,6 +74,25 @@ class TestGitHub(IntegrationHelper):
         assert i.title == 'Test issue creation'
         assert i.body == "Let's see how well this works with Betamax"
 
+    def test_create_issue_multiple_assignees(self):
+        """
+        Test the ability of a GitHub instance to create a new issue.
+        with multipole assignees
+        """
+        self.auto_login()
+        cassette_name = self.cassette_name('create_issue_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            i = self.gh.create_issue(
+                'github3py', 'fork_this', 'Test issue creation assignees',
+                "Let's see how well this works with Betamax",
+                assignees=['omgjlk', 'sigmavirus24']
+                )
+
+        assert isinstance(i, github3.issues.Issue)
+        assert i.title == 'Test issue creation assignees'
+        assert i.body == "Let's see how well this works with Betamax"
+        assert ['omgjlk', 'sigmavirus24'] == [a.login for a in i.assignees]
+
     def test_create_key(self):
         """Test the ability to create a key and delete it."""
         self.basic_login()
