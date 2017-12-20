@@ -218,7 +218,8 @@ class ProjectColumn(models.GitHubCore):
         """Create a card in this project column linked with an Issue.
 
         :param :class:`Issue <github3.issues.Issue>`: (required), an issue
-            with which to link the card
+            with which to link the card. Can also be
+            :class:`ShortIssue <github3.issues.ShortIssue>`.
         :returns: :class:`ProjectCard <github3.projects.ProjectCard>` or none
         """
         if not issue:

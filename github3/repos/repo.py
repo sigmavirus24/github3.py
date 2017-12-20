@@ -19,7 +19,7 @@ from .. import users
 from ..decorators import requires_auth
 from ..events import Event
 from ..git import Blob, Commit, Reference, Tag, Tree
-from ..issues import Issue, issue_params
+from ..issues import ShortIssue, Issue, issue_params
 from ..issues.event import IssueEvent
 from ..issues.label import Label
 from ..issues.milestone import Milestone
@@ -891,8 +891,8 @@ class Repository(GitHubCore):
         :param assignees: (optional), login of the users to assign the
             issue to
         :type assignees: list of strings
-        :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
-            otherwise None
+        :returns: :class:`ShortIssue <github3.issues.ShortIssue>` if
+            successful, otherwise None
         """
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels,
@@ -904,7 +904,7 @@ class Repository(GitHubCore):
             url = self._build_url('issues', base_url=self._api)
             json = self._json(self._post(url, data=issue), 201)
 
-        return self._instance_or_null(Issue, json)
+        return self._instance_or_null(ShortIssue, json)
 
     @requires_auth
     def create_key(self, title, key, read_only=False):
@@ -1487,7 +1487,7 @@ class Repository(GitHubCore):
         """Get the issue specified by ``number``.
 
         :param int number: (required), number of the issue on this repository
-        :returns: :class:`Issue <github3.issues.issue.Issue>` if successful,
+        :returns: :class:`Issue <github3.issues.Issue>` if successful,
             otherwise None
         """
         json = None
@@ -1537,14 +1537,15 @@ class Repository(GitHubCore):
             By default all issues are returned
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.issue.Issue>`\ s
+        :returns: generator of
+            :class:`ShortIssue <github3.issues.ShortIssue>`\ s
         """
         url = self._build_url('issues', base_url=self._api)
 
         params = repo_issue_params(milestone, state, assignee, mentioned,
                                    labels, sort, direction, since)
 
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     @requires_auth
     def key(self, id_num):

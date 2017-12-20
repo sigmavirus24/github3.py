@@ -75,7 +75,7 @@ class TestPayLoadHandlers(TestCase):
             'comment': get_comment_example_data()
         }
         github3.events._issuecomm(comment, None)
-        assert isinstance(comment['issue'], github3.issues.Issue)
+        assert isinstance(comment['issue'], github3.events.EventIssue)
         assert isinstance(comment['comment'],
                           github3.issues.comment.IssueComment)
 
@@ -83,7 +83,7 @@ class TestPayLoadHandlers(TestCase):
         """Show that the event type is a IssueEvent."""
         comment = {'issue': get_issue_example_data()}
         github3.events._issueevent(comment, None)
-        assert isinstance(comment['issue'], github3.issues.Issue)
+        assert isinstance(comment['issue'], github3.events.EventIssue)
 
     def test_member(self):
         """Show that the event type is a MemberEvent."""

@@ -15,7 +15,7 @@ from .decorators import (requires_auth, requires_basic_auth,
                          requires_app_credentials)
 from .events import Event
 from .gists import Gist
-from .issues import Issue, issue_params
+from .issues import ShortIssue, Issue, issue_params
 from .models import GitHubCore
 from .orgs import Membership, ShortOrganization, Organization, Team
 from .projects import Project, ProjectCard, ProjectColumn
@@ -282,7 +282,8 @@ class GitHub(GitHubCore):
             <github3.issues.Milestone>` object, ``m.number`` is what you pass
             here.)
         :param list labels: (optional), List of label names.
-        :returns: :class:`Issue <github3.issues.Issue>` if successful
+        :returns: :class:`ShortIssue <github3.issues.ShortIssue>` if
+            successful
         """
         repo = None
         if owner and repository and title:
@@ -292,7 +293,7 @@ class GitHub(GitHubCore):
             return repo.create_issue(title, body, assignee, milestone,
                                      labels, assignees)
 
-        return self._instance_or_null(Issue, None)
+        return self._instance_or_null(ShortIssue, None)
 
     @requires_auth
     def create_key(self, title, key, read_only=False):
@@ -650,12 +651,12 @@ class GitHub(GitHubCore):
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`
         """
         url = self._build_url('issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     def issues_on(self, username, repository, milestone=None, state=None,
                   assignee=None, mentioned=None, labels=None, sort=None,
@@ -689,14 +690,15 @@ class GitHub(GitHubCore):
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of
+            :class:`ShortIssue <github3.issues.ShortIssue>`\ s
         """
         if username and repository:
             url = self._build_url('repos', username, repository, 'issues')
 
             params = repo_issue_params(milestone, state, assignee, mentioned,
                                        labels, sort, direction, since)
-            return self._iter(int(number), url, Issue, params=params,
+            return self._iter(int(number), url, ShortIssue, params=params,
                               etag=etag)
         return iter([])
 
@@ -907,12 +909,12 @@ class GitHub(GitHubCore):
             -1, returns all available issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`
         """
         url = self._build_url('orgs', name, 'issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     @requires_auth
     def organizations(self, number=-1, etag=None):
@@ -1679,13 +1681,13 @@ class GitHub(GitHubCore):
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`
         """
         url = self._build_url('user', 'issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
         params.update(per_page=per_page)
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     @requires_auth
     def user_teams(self, number=-1, etag=None):
