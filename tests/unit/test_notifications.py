@@ -30,7 +30,7 @@ class TestThread(UnitHelper):
         assert repr(self.instance) == '<Thread [{0}]>'.format(
             self.instance.subject.get('title'))
 
-    def test_delete_description(self):
+    def test_delete_subscription(self):
         """Show that a user can delete a subscription."""
         self.instance.delete_subscription()
 
