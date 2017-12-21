@@ -316,7 +316,7 @@ class TestRepository(helper.IntegrationHelper):
 
     def test_create_issue(self):
         """Test the ability to create an issue for a repository."""
-        self.token_login()
+        self.auto_login()
         cassette_name = self.cassette_name('create_issue')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
@@ -326,7 +326,7 @@ class TestRepository(helper.IntegrationHelper):
                 'assignee': 'itsmemattchung'
             }
             issue = repository.create_issue(**data)
-            assert isinstance(issue, github3.issues.issue.Issue)
+            assert isinstance(issue, github3.issues.issue.ShortIssue)
 
     def test_create_issue_multiple_assignees(self):
         """
@@ -343,7 +343,7 @@ class TestRepository(helper.IntegrationHelper):
                 'assignees': ['itsmemattchung', 'sigmavirus24']
             }
             issue = repository.create_issue(**data)
-            assert isinstance(issue, github3.issues.issue.Issue)
+            assert isinstance(issue, github3.issues.issue.ShortIssue)
 
     def test_create_issue_both_assignee_and_assignees(self):
         """
@@ -749,6 +749,8 @@ class TestRepository(helper.IntegrationHelper):
         for ev in events:
             assert isinstance(ev, github3.issues.event.IssueEvent)
 
+    @pytest.mark.xfail(requests.__build__ >= 0x021100,
+                       reason="Requests 2.11.0 breaks our cassettes.")
     def test_issues_sorts_ascendingly(self):
         """Test that issues will be returned in ascending order."""
         cassette_name = self.cassette_name('issues_ascending')
@@ -760,13 +762,15 @@ class TestRepository(helper.IntegrationHelper):
         assert len(issues) > 0
         last_issue = None
         for issue in issues:
-            assert isinstance(issue, github3.issues.Issue)
+            assert isinstance(issue, github3.issues.ShortIssue)
             if last_issue:
                 assert last_issue.number < issue.number
             last_issue = issue
 
+    @pytest.mark.xfail(requests.__build__ >= 0x021100,
+                       reason="Requests 2.11.0 breaks our cassettes.")
     def test_issues_accepts_state_all(self):
-        """Test that the state parameter accets 'all'."""
+        """Test that the state parameter accepts 'all'."""
         cassette_name = self.cassette_name('issues_state_all')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'betamax')

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from ..models import GitHubCore
-from ..issues import Issue
+from ..issues import ShortIssue
 
 
 class IssueSearchResult(GitHubCore):
@@ -20,7 +20,7 @@ class IssueSearchResult(GitHubCore):
             del result['text_matches']
 
         #: Issue object
-        self.issue = Issue(result, self)
+        self.issue = ShortIssue(result, self)
 
     def _repr(self):
         return '<IssueSearchResult [{0}]>'.format(self.issue)

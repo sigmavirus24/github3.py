@@ -70,7 +70,7 @@ class TestGitHub(IntegrationHelper):
                 "Let's see how well this works with Betamax"
                 )
 
-        assert isinstance(i, github3.issues.Issue)
+        assert isinstance(i, github3.issues.ShortIssue)
         assert i.title == 'Test issue creation'
         assert i.body == "Let's see how well this works with Betamax"
 
@@ -88,7 +88,7 @@ class TestGitHub(IntegrationHelper):
                 assignees=['omgjlk', 'sigmavirus24']
                 )
 
-        assert isinstance(i, github3.issues.Issue)
+        assert isinstance(i, github3.issues.ShortIssue)
         assert i.title == 'Test issue creation assignees'
         assert i.body == "Let's see how well this works with Betamax"
         assert ['omgjlk', 'sigmavirus24'] == [a.login for a in i.assignees]
@@ -522,7 +522,7 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to use the issues search endpoint."""
         cassette_name = self.cassette_name('search_issues')
         with self.recorder.use_cassette(cassette_name):
-            issues = self.gh.search_issues('github3 labels:bugs')
+            issues = self.gh.search_issues('github3 label:Bug')
             assert isinstance(next(issues), github3.search.IssueSearchResult)
 
         assert isinstance(issues, github3.structs.SearchIterator)

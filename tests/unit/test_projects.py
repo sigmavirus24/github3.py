@@ -18,6 +18,9 @@ get_project_card_example_data = helper.create_example_data_helper(
 get_project_column_example_data = helper.create_example_data_helper(
     'project_column_example'
 )
+get_issue_example_data = helper.create_example_data_helper(
+    'issue_example'
+)
 
 
 url_for = helper.create_url_helper(
@@ -138,7 +141,8 @@ class TestProjectColumn(helper.UnitHelper):
 
     def test_create_card_with_issue(self):
         """Show that a user can create a new project card with an Issue."""
-        issue = issues.Issue({'id': 1})
+        issue_data = get_issue_example_data()
+        issue = issues.Issue(issue_data)
 
         self.instance.create_card_with_issue(issue)
         self.post_called_with(

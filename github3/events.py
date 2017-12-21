@@ -68,6 +68,24 @@ class EventPullRequest(GitHubCore):
         return self._instance_or_null(pulls.PullRequest, json)
 
 
+class EventIssue(GitHubCore):
+    """The class that represents the issue information returned in Events."""
+
+    def _update_attributes(self, issue):
+        self.id = issue['id']
+        self.number = issue['number']
+        self.state = issue['state']
+        self.title = issue['title']
+        self.locked = issue['locked']
+        self._api = self.url = issue['url']
+
+    def to_issue(self):
+        """Retrieve a full Issue object for this EventIssue."""
+        from . import issues
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(issues.Issue, json)
+
+
 class Event(GitHubCore):
 
     """The :class:`Event <Event>` object. It structures and handles the data
@@ -156,19 +174,17 @@ def _gist(payload, session):
 
 
 def _issuecomm(payload, session):
-    from .issues import Issue
     from .issues.comment import IssueComment
     if payload.get('issue'):
-        payload['issue'] = Issue(payload['issue'], session)
+        payload['issue'] = EventIssue(payload['issue'], session)
     if payload.get('comment'):
         payload['comment'] = IssueComment(payload['comment'], session)
     return payload
 
 
 def _issueevent(payload, session):
-    from .issues import Issue
     if payload.get('issue'):
-        payload['issue'] = Issue(payload['issue'], session)
+        payload['issue'] = EventIssue(payload['issue'], session)
     return payload
 
 

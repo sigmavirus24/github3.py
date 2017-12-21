@@ -9,8 +9,9 @@ See also: http://developer.github.com/v3/issues/
 
 from ..utils import timestamp_parameter
 from .issue import Issue
+from .issue import ShortIssue
 
-__all__ = [Issue]
+__all__ = ['Issue', 'ShortIssue']
 
 
 def issue_params(filter, state, labels, sort, direction, since):
