@@ -102,7 +102,7 @@ class TestUser(IntegrationHelper):
 
     def test_organization_events(self):
         """Show that a user can retrieve their events on an organization."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name('organization_events')
         with self.recorder.use_cassette(cassette_name):
             user = self.gh.me()
@@ -122,9 +122,10 @@ class TestUser(IntegrationHelper):
 
     def test_received_events(self):
         """Show that a user can retrieve any user's received events."""
+        self.token_login()
         cassette_name = self.cassette_name('received_events')
         with self.recorder.use_cassette(cassette_name):
-            user = self.gh.user('sigmavirus24')
+            user = self.gh.me()
             events = list(user.received_events(number=25))
 
         assert len(events) > 0
