@@ -12,7 +12,7 @@ get_pr_example_data = helper.create_example_data_helper(
 
 
 url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/pulls/1'
+    'https://api.github.com/repos/octocat/Hello-World/pulls/1347'
 )
 
 
