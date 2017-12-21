@@ -29,7 +29,7 @@ class PullDestination(models.GitHubCore):
 
     def __init__(self, dest, direction):
         super(PullDestination, self).__init__(dest)
-        from .repos.repo import Repository
+        from .repos.repo import ShortRepository
         #: Direction of the merge with respect to this destination
         self.direction = direction
         #: Full reference string of the object
@@ -47,7 +47,7 @@ class PullDestination(models.GitHubCore):
         if dest.get('repo'):
             self._repo_name = dest['repo'].get('name')
             self._repo_owner = dest['repo']['owner'].get('login')
-            self.repository = Repository(dest.get('repo'), self)
+            self.repository = ShortRepository(dest.get('repo'), self)
         self.repo = (self._repo_owner, self._repo_name)
 
     def _repr(self):

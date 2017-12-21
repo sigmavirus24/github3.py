@@ -596,6 +596,7 @@ class AuthenticatedUser(User):
     class_name = 'AuthenticatedUser'
 
     def _update_attributes(self, user):
+        super(AuthenticatedUser, self)._update_attributes(user)
         #: How much disk consumed by the user
         self.disk_usage = user['disk_usage']
 

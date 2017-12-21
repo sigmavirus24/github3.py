@@ -105,8 +105,8 @@ class TestUser(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('organization_events')
         with self.recorder.use_cassette(cassette_name):
-            user = self.gh.user('sigmavirus24')
-            events = list(user.organization_events('pdfkit', 25))
+            user = self.gh.me()
+            events = list(user.organization_events('github3py', 25))
 
         assert len(events) > 0
         for event in events:
