@@ -15,6 +15,10 @@ url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/pulls/1347'
 )
 
+review_comment_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/pulls/1/comments'
+)
+
 
 class TestPullRequest(helper.UnitHelper):
     """PullRequest unit tests."""
@@ -254,8 +258,8 @@ class TestReviewComment(helper.UnitHelper):
         self.instance.reply('foo')
 
         self.post_called_with(
-            url_for('comments'),
-            data={'body': 'foo', 'in_reply_to': '1'}
+            review_comment_url_for(),
+            data={'body': 'foo', 'in_reply_to': 1}
         )
 
     def test_reply_requires_authentication(self):
