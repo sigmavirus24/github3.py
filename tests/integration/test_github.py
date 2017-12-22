@@ -62,7 +62,7 @@ class TestGitHub(IntegrationHelper):
 
     def test_create_issue(self):
         """Test the ability of a GitHub instance to create a new issue."""
-        self.token_login()
+        self.auto_login()
         cassette_name = self.cassette_name('create_issue')
         with self.recorder.use_cassette(cassette_name):
             i = self.gh.create_issue(
@@ -70,9 +70,28 @@ class TestGitHub(IntegrationHelper):
                 "Let's see how well this works with Betamax"
                 )
 
-        assert isinstance(i, github3.issues.Issue)
+        assert isinstance(i, github3.issues.ShortIssue)
         assert i.title == 'Test issue creation'
         assert i.body == "Let's see how well this works with Betamax"
+
+    def test_create_issue_multiple_assignees(self):
+        """
+        Test the ability of a GitHub instance to create a new issue.
+        with multipole assignees
+        """
+        self.auto_login()
+        cassette_name = self.cassette_name('create_issue_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            i = self.gh.create_issue(
+                'github3py', 'fork_this', 'Test issue creation assignees',
+                "Let's see how well this works with Betamax",
+                assignees=['omgjlk', 'sigmavirus24']
+                )
+
+        assert isinstance(i, github3.issues.ShortIssue)
+        assert i.title == 'Test issue creation assignees'
+        assert i.body == "Let's see how well this works with Betamax"
+        assert ['omgjlk', 'sigmavirus24'] == [a.login for a in i.assignees]
 
     def test_create_key(self):
         """Test the ability to create a key and delete it."""
@@ -216,10 +235,10 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to retrieve a list of gitignore templates."""
         cassette_name = self.cassette_name('gitignore_templates')
         with self.recorder.use_cassette(cassette_name):
-            l = self.gh.gitignore_templates()
+            thelist = self.gh.gitignore_templates()
 
-        assert l != []
-        assert isinstance(l, list)
+        assert thelist != []
+        assert isinstance(thelist, list)
 
     def test_is_following(self):
         """Test the ability to check if a user is being followed."""
@@ -248,7 +267,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('all_organizations')
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.all_organizations(number=25):
-                assert isinstance(r, github3.orgs.Organization)
+                assert isinstance(r, github3.orgs.ShortOrganization)
 
     def test_all_repositories(self):
         """Test the ability to iterate over all of the repositories."""
@@ -358,6 +377,33 @@ class TestGitHub(IntegrationHelper):
             o = self.gh.organization('github3py')
 
         assert isinstance(o, github3.orgs.Organization)
+
+    def test_project(self):
+        """Test the ability to retrieve a project by its id."""
+        self.token_login()
+        cassette_name = self.cassette_name('project')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.project(398318)
+
+        assert isinstance(r, github3.projects.Project)
+
+    def test_project_card(self):
+        """Test the ability to retrieve a project card by its id."""
+        self.token_login()
+        cassette_name = self.cassette_name('project_card')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.project_card(2665856)
+
+        assert isinstance(r, github3.projects.ProjectCard)
+
+    def test_project_column(self):
+        """Test the ability to retrieve a project column by its id."""
+        self.token_login()
+        cassette_name = self.cassette_name('project_column')
+        with self.recorder.use_cassette(cassette_name):
+            r = self.gh.project_column(957217)
+
+        assert isinstance(r, github3.projects.ProjectColumn)
 
     def test_pubsubhubbub(self):
         """Test the ability to create a pubsubhubbub hook."""
@@ -476,7 +522,7 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to use the issues search endpoint."""
         cassette_name = self.cassette_name('search_issues')
         with self.recorder.use_cassette(cassette_name):
-            issues = self.gh.search_issues('github3 labels:bugs')
+            issues = self.gh.search_issues('github3 label:Bug')
             assert isinstance(next(issues), github3.search.IssueSearchResult)
 
         assert isinstance(issues, github3.structs.SearchIterator)

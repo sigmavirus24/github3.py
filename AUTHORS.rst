@@ -146,3 +146,11 @@ Contributors
 - Björn Kautler (@Vampire)
 
 - David Prothero (@dprothero)
+
+- Jesse Keating (@omgjlk)
+
+- @rco-ableton
+
+- Mark Troyer (@discogestalt)
+
+- Becca James (@beccasjames)

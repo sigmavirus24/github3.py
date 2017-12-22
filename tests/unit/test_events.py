@@ -33,12 +33,12 @@ class TestEvent(UnitHelper):
         assert Event.list_types() == sorted(handlers.keys())
 
     def test_org(self):
-        """Show that an event contains an organization instance."""
+        """Show that an event contains an event organization instance."""
         json = self.instance.as_dict().copy()
         org = get_org_example_data()
         json['org'] = org
         event = github3.events.Event(json)
-        assert isinstance(event.org, github3.orgs.Organization)
+        assert isinstance(event.org, github3.events.EventOrganization)
 
 
 class TestPayLoadHandlers(TestCase):
@@ -75,7 +75,7 @@ class TestPayLoadHandlers(TestCase):
             'comment': get_comment_example_data()
         }
         github3.events._issuecomm(comment, None)
-        assert isinstance(comment['issue'], github3.issues.Issue)
+        assert isinstance(comment['issue'], github3.events.EventIssue)
         assert isinstance(comment['comment'],
                           github3.issues.comment.IssueComment)
 
@@ -83,7 +83,7 @@ class TestPayLoadHandlers(TestCase):
         """Show that the event type is a IssueEvent."""
         comment = {'issue': get_issue_example_data()}
         github3.events._issueevent(comment, None)
-        assert isinstance(comment['issue'], github3.issues.Issue)
+        assert isinstance(comment['issue'], github3.events.EventIssue)
 
     def test_member(self):
         """Show that the event type is a MemberEvent."""
@@ -96,7 +96,7 @@ class TestPayLoadHandlers(TestCase):
         pull_request = {'pull_request': get_pull_request_example_data()}
         github3.events._pullreqev(pull_request, None)
         assert isinstance(pull_request['pull_request'],
-                          github3.pulls.PullRequest)
+                          github3.events.EventPullRequest)
 
     def test_pullreqcomment(self):
         """Show that the event type is a PullRequestReviewCommentEvent."""

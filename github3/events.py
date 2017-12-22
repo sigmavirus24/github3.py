@@ -32,6 +32,60 @@ class EventUser(GitHubCore):
         return self._instance_or_null(users.User, json)
 
 
+class EventOrganization(GitHubCore):
+    """The class that represents the org information returned in Events."""
+
+    def _update_attributes(self, org):
+        self.avatar_url = org['avatar_url']
+        self.gravatar_id = org['id']
+        self.id = org['id']
+        self.login = org['login']
+        self._api = self.url = org['url']
+
+    def to_org(self):
+        """Retrieve a full Organization object for this EventOrganization."""
+        from . import orgs
+        url = self._build_url('orgs', self.login)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(orgs.Organization, json)
+
+
+class EventPullRequest(GitHubCore):
+    """The class that represents the pr information returned in Events."""
+
+    def _update_attributes(self, pull):
+        self.id = pull['id']
+        self.number = pull['number']
+        self.state = pull['state']
+        self.title = pull['title']
+        self.locked = pull['locked']
+        self._api = self.url = pull['url']
+
+    def to_pull(self):
+        """Retrieve a full PullRequest object for this EventPullRequest."""
+        from . import pulls
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(pulls.PullRequest, json)
+
+
+class EventIssue(GitHubCore):
+    """The class that represents the issue information returned in Events."""
+
+    def _update_attributes(self, issue):
+        self.id = issue['id']
+        self.number = issue['number']
+        self.state = issue['state']
+        self.title = issue['title']
+        self.locked = issue['locked']
+        self._api = self.url = issue['url']
+
+    def to_issue(self):
+        """Retrieve a full Issue object for this EventIssue."""
+        from . import issues
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(issues.Issue, json)
+
+
 class Event(GitHubCore):
 
     """The :class:`Event <Event>` object. It structures and handles the data
@@ -56,7 +110,6 @@ class Event(GitHubCore):
         # not want to do:
         event = copy.deepcopy(event)
 
-        from .orgs import Organization
         #: :class:`User <github3.users.User>` object representing the actor.
         self.actor = self._class_attribute(event, 'actor', EventUser)
         #: datetime object representing when the event was created.
@@ -66,7 +119,7 @@ class Event(GitHubCore):
         self.id = self._get_attribute(event, 'id')
 
         #: List all possible types of Events
-        self.org = self._class_attribute(event, 'org', Organization)
+        self.org = self._class_attribute(event, 'org', EventOrganization)
 
         #: Event type https://developer.github.com/v3/activity/events/types/
         self.type = self._get_attribute(event, 'type')
@@ -121,19 +174,17 @@ def _gist(payload, session):
 
 
 def _issuecomm(payload, session):
-    from .issues import Issue
     from .issues.comment import IssueComment
     if payload.get('issue'):
-        payload['issue'] = Issue(payload['issue'], session)
+        payload['issue'] = EventIssue(payload['issue'], session)
     if payload.get('comment'):
         payload['comment'] = IssueComment(payload['comment'], session)
     return payload
 
 
 def _issueevent(payload, session):
-    from .issues import Issue
     if payload.get('issue'):
-        payload['issue'] = Issue(payload['issue'], session)
+        payload['issue'] = EventIssue(payload['issue'], session)
     return payload
 
 
@@ -144,19 +195,18 @@ def _member(payload, session):
 
 
 def _pullreqev(payload, session):
-    from .pulls import PullRequest
     if payload.get('pull_request'):
-        payload['pull_request'] = PullRequest(payload['pull_request'],
-                                              session)
+        payload['pull_request'] = EventPullRequest(payload['pull_request'],
+                                                   session)
     return payload
 
 
 def _pullreqcomm(payload, session):
-    from .pulls import PullRequest, ReviewComment
+    from .pulls import ReviewComment
     # Transform the Pull Request attribute
     pull = payload.get('pull_request')
     if pull:
-        payload['pull_request'] = PullRequest(pull, session)
+        payload['pull_request'] = EventPullRequest(pull, session)
 
     # Transform the Comment attribute
     comment = payload.get('comment')

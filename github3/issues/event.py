@@ -32,11 +32,12 @@ class IssueEvent(GitHubCore):
         self.commit_id = self._get_attribute(event, 'commit_id')
         self._api = self._get_attribute(event, 'url')
 
-        #: :class:`Issue <github3.issues.Issue>` where this comment was made.
-        from .issue import Issue
-        self.issue = self._class_attribute(event, 'issue', Issue, self)
+        #: :class:`ShortIssue <github3.issues.ShortIssue>` where this comment
+        #:  was made.
+        from .issue import ShortIssue
+        self.issue = self._class_attribute(event, 'issue', ShortIssue, self)
 
-        #: :class:`User <github3.users.User>` who caused this event.
+        #: :class:`User <github3.users.ShortUser>` who caused this event.
         self.actor = self._class_attribute(
             event, 'actor', users.ShortUser, self,
         )

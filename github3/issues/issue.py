@@ -7,127 +7,107 @@ from re import match
 from uritemplate import URITemplate
 
 from .. import users
+from .. import models
 
 from ..decorators import requires_auth
-from ..models import GitHubCore
 from .comment import IssueComment, issue_comment_params
 from .event import IssueEvent
 from .label import Label
 from .milestone import Milestone
 
 
-class Issue(GitHubCore):
+class _Issue(models.GitHubCore):
+    """The :class:`Issue <Issue>` object.
 
-    """The :class:`Issue <Issue>` object. It structures and handles the data
-    returned via the `Issues <http://developer.github.com/v3/issues>`_ section
-    of the GitHub API.
+    Please see GitHub's `Issue Documentation`_ for more information.
 
-    Two issue instances can be checked like so::
-
-        i1 == i2
-        i1 != i2
-
-    And is equivalent to::
-
-        i1.id == i2.id
-        i1.id != i2.id
-
+    .. _Issue Documentation:
+        http://developer.github.com/v3/issues
     """
 
     def _update_attributes(self, issue):
-        self._api = self._get_attribute(issue, 'url', '')
+        self._api = issue['url']
 
+        # Assignment may be none/empty if the issue hasn't been assigned to
+        # anybody. The key is there though, so just grab it.
         #: :class:`User <github3.users.User>` representing the user the issue
         #: was assigned to.
-        self.assignee = self._class_attribute(
-            issue, 'assignee', users.ShortUser, self)
-        self.assignees = self._get_attribute(issue, 'assignees')
+        self.assignee = issue['assignee']
+        if self.assignee:
+            self.assignee = users.ShortUser(self.assignee)
+        self.assignees = issue['assignees']
         if self.assignees:
             self.assignees = [
                 users.ShortUser(assignee) for assignee in self.assignees
             ]
 
         #: Body (description) of the issue.
-        self.body = self._get_attribute(issue, 'body')
-
-        #: HTML formatted body of the issue.
-        self.body_html = self._get_attribute(issue, 'body_html')
-
-        #: Plain text formatted body of the issue.
-        self.body_text = self._get_attribute(issue, 'body_text')
+        self.body = issue['body']
 
         # If an issue is still open, this field will be None
         #: datetime object representing when the issue was closed.
         self.closed_at = self._strptime_attribute(issue, 'closed_at')
 
         #: Number of comments on this issue.
-        self.comments_count = self._get_attribute(issue, 'comments')
+        self.comments_count = issue['comments']
 
-        #: Comments url (not a template)
+        #: Comments url (not a template) # MAKE A LOOP
         self.comments_url = self._get_attribute(issue, 'comments_url')
 
         #: datetime object representing when the issue was created.
         self.created_at = self._strptime_attribute(issue, 'created_at')
 
-        #: Events url (not a template)
+        #: Events url (not a template) # MAKE A LOOP
         self.events_url = self._get_attribute(issue, 'events_url')
 
-        #: URL to view the issue at GitHub.
+        #: URL to view the issue at GitHub. # MAKE A LOOP
         self.html_url = self._get_attribute(issue, 'html_url')
 
         #: Unique ID for the issue.
-        self.id = self._get_attribute(issue, 'id')
+        self.id = issue['id']
 
         #: Returns the list of :class:`Label <github3.issues.label.Label>`\ s
         #: on this issue.
-        self.original_labels = self._get_attribute(issue, 'labels', [])
-        if self.original_labels:
-            self.original_labels = [
-                Label(l, self) for l in self.original_labels
-            ]
+        self.original_labels = issue['labels']
+        self.original_labels = [
+            Label(l, self) for l in self.original_labels
+        ]
 
         #: Labels URL Template. Expand with ``name``
-        self.labels_urlt = self._get_attribute(
-            issue, 'labels_url', URITemplate
-        )
+        self.labels_urlt = URITemplate(issue['labels_url'])
 
         #: Locked status
-        self.locked = self._get_attribute(issue, 'locked')
+        self.locked = issue['locked']
 
         #: :class:`Milestone <github3.issues.milestone.Milestone>` this
         #: issue was assigned to.
-        self.milestone = self._class_attribute(
-            issue, 'milestone', Milestone, self)
+        self.milestone = issue['milestone']
+        if self.milestone:
+            self.milestone = Milestone(self.milestone)
 
         #: Issue number (e.g. #15)
-        self.number = self._get_attribute(issue, 'number')
+        self.number = issue['number']
 
         #: Dictionary URLs for the pull request (if they exist)
         self.pull_request_urls = self._get_attribute(issue, 'pull_request', {})
 
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = None
-        if self.html_url:
-            m = match('https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)/\d+',
-                      self.html_url)
-            self.repository = m.groups()
+        m = match(r'https?://[\w\d\-\.\:]+/(\S+)/(\S+)/(?:issues|pull)/\d+',
+                  self.html_url)
+        self.repository = m.groups()
 
         #: State of the issue, e.g., open, closed
-        self.state = self._get_attribute(issue, 'state')
+        self.state = issue['state']
 
         #: Title of the issue.
-        self.title = self._get_attribute(issue, 'title')
+        self.title = issue['title']
 
         #: datetime object representing the last time the issue was updated.
         self.updated_at = self._strptime_attribute(issue, 'updated_at')
 
         #: :class:`User <github3.users.User>` who opened the issue.
-        self.user = self._class_attribute(
-            issue, 'user', users.ShortUser, self)
-
-        #: :class:`User <github3.users.User>` who closed the issue.
-        self.closed_by = self._class_attribute(
-            issue, 'closed_by', users.ShortUser, self)
+        self.user = users.ShortUser(issue['user'])
 
     def _repr(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
@@ -146,7 +126,7 @@ class Issue(GitHubCore):
 
     @requires_auth
     def assign(self, username):
-        """Assigns user ``username`` to this issue. This is a short cut for
+        """Assign user ``username`` to this issue. This is a short cut for
         ``issue.edit``.
 
         :param str username: username of the person to assign this issue to
@@ -270,7 +250,7 @@ class Issue(GitHubCore):
         return self._iter(int(number), url, IssueEvent)
 
     def is_closed(self):
-        """Checks if the issue is closed.
+        """Check if the issue is closed.
 
         :returns: bool
         """
@@ -314,7 +294,7 @@ class Issue(GitHubCore):
 
     @requires_auth
     def remove_label(self, name):
-        """Removes label ``name`` from this issue.
+        """Remove label ``name`` from this issue.
 
         :param str name: (required), name of the label to remove
         :returns: list of :class:`Label`
@@ -365,3 +345,48 @@ class Issue(GitHubCore):
 
         url = self._build_url('lock', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
+
+
+class ShortIssue(_Issue):
+    """Object for the shortened representation of an Issue.
+
+    GitHub's API returns different amounts of information about issues based
+    upon how that information is retrieved. Often times, when iterating over
+    several issues, GitHub will return less information. To provide a clear
+    distinction between the types of issues, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionadded:: 1.0.0
+    """
+
+    pass
+
+
+class Issue(_Issue):
+    """Object for the full representation of an Issue.
+
+    GitHub's API returns different amounts of information about issues based
+    upon how that information is retrieved. This object exists to represent
+    the full amount of information returned for a specific issue. For example,
+    you would receive this class when calling
+    :meth:`~github3.github.GitHub.issue`. To provide a clear
+    distinction between the types of issues, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionchanged:: 1.0.0
+    """
+
+    def _update_attributes(self, issue):
+        super(Issue, self)._update_attributes(issue)
+
+        #: HTML formatted body of the issue.
+        self.body_html = issue['body_html']
+
+        #: Plain text formatted body of the issue.
+        self.body_text = issue['body_text']
+
+        # This maybe None if it hasn't been closed, but the key will exist
+        #: :class:`User <github3.users.User>` who closed the issue.
+        self.closed_by = issue['closed_by']
+        if self.closed_by:
+            self.closed_by = users.ShortUser(self.closed_by)

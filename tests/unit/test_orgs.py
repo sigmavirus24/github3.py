@@ -3,12 +3,15 @@ import pytest
 
 from github3 import GitHubError
 from github3.orgs import Organization
+from github3.projects import Project
 
 from . import helper
 
 url_for = helper.create_url_helper('https://api.github.com/orgs/github')
 
 get_org_example_data = helper.create_example_data_helper('org_example')
+
+example_data = get_org_example_data()
 
 
 class TestOrganization(helper.UnitHelper):
@@ -37,6 +40,19 @@ class TestOrganization(helper.UnitHelper):
 
         self.session.delete.assert_called_once_with(
             url_for('public_members/concealed')
+        )
+
+    def test_create_project(self):
+        """Show that one can create a project in an organization."""
+        self.instance.create_project('test-project', body='project body')
+
+        self.post_called_with(
+            url_for('projects'),
+            data={
+                'name': 'test-project',
+                'body': 'project body'
+            },
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_create_repository(self):
@@ -103,6 +119,15 @@ class TestOrganization(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(
             url_for('public_members/username')
+        )
+
+    def test_project(self):
+        """Show that a user can access a single organization project."""
+        self.instance.project(400435)
+
+        self.session.get.assert_called_once_with(
+            'https://api.github.com/projects/400435',
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_publicize_member(self):
@@ -173,6 +198,11 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         with pytest.raises(GitHubError):
             self.instance.conceal_member('user')
 
+    def test_create_project(self):
+        """Show that one must be authenticated to create a project."""
+        with pytest.raises(GitHubError):
+            self.instance.create_project('name', 'body')
+
     def test_create_repository(self):
         """Show that one must be authenticated to create a repo for an org."""
         with pytest.raises(GitHubError):
@@ -212,10 +242,7 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 class TestOrganizationIterator(helper.UnitIteratorHelper):
     described_class = Organization
 
-    example_data = {
-        'url': url_for(),
-        'login': 'github',
-    }
+    example_data = example_data.copy()
 
     def test_all_events(self):
         i = self.instance.all_events(username='dummy')
@@ -296,6 +323,17 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             url_for('members'),
             params={'per_page': 100},
             headers={}
+        )
+
+    def test_projects(self):
+        """Show that a user can access all organization projects."""
+        i = self.instance.projects()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects'),
+            params={'per_page': 100},
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_public_events(self):

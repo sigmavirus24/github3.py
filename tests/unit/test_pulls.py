@@ -148,6 +148,13 @@ class TestPullRequest(helper.UnitHelper):
             }
         )
 
+    def test_attributes(self):
+        """Show that we extract attributes correctly."""
+        assert self.instance.merge_commit_sha == \
+            'f13731c44acf96f2e5d6f0080f54e09215e36248'
+        assert not self.instance.merged
+        assert not self.instance.mergeable
+
 
 class TestPullRequestRequiresAuthentication(
         helper.UnitRequiresAuthenticationHelper):
@@ -240,7 +247,7 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('reviews'),
             params={'per_page': 100},
-            headers={'Accept': 'application/vnd.github.black-cat-preview+json'}
+            headers={}
         )
 
 

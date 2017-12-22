@@ -118,7 +118,7 @@ class TestUser(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             u = self.gh.user('sigmavirus24')
             for o in u.organizations(number=25):
-                assert isinstance(o, github3.orgs.Organization)
+                assert isinstance(o, github3.orgs.ShortOrganization)
 
     def test_received_events(self):
         """Show that a user can retrieve any user's received events."""

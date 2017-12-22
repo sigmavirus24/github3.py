@@ -15,9 +15,10 @@ from .decorators import (requires_auth, requires_basic_auth,
                          requires_app_credentials)
 from .events import Event
 from .gists import Gist
-from .issues import Issue, issue_params
+from .issues import ShortIssue, Issue, issue_params
 from .models import GitHubCore
-from .orgs import Membership, Organization, Team
+from .orgs import Membership, ShortOrganization, Organization, Team
+from .projects import Project, ProjectCard, ProjectColumn
 from .pulls import PullRequest
 from .repos import repo
 from .search import (CodeSearchResult, IssueSearchResult,
@@ -105,11 +106,11 @@ class GitHub(GitHubCore):
             endpoint
         :param int per_page: (optional), number of organizations to list per
             request
-        :returns: generator of :class:`Organization
-            <github3.orgs.Organization>`
+        :returns: generator of :class:`ShortOrganization
+            <github3.orgs.ShortOrganization>`
         """
         url = self._build_url('organizations')
-        return self._iter(int(number), url, Organization,
+        return self._iter(int(number), url, ShortOrganization,
                           params={'since': since, 'per_page': per_page},
                           etag=etag)
 
@@ -252,11 +253,12 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
-                     milestone=None, labels=[]):
+                     milestone=None, labels=[], assignees=None):
         """Create an issue on the project 'repository' owned by 'owner'
         with title 'title'.
 
-        ``body``, ``assignee``, ``milestone``, ``labels`` are all optional.
+        ``body``, ``assignee``, ``assignees``, ``milestone``, ``labels``
+        are all optional.
 
         .. warning::
 
@@ -273,21 +275,25 @@ class GitHub(GitHubCore):
             formatted
         :param str assignee: (optional), Login of person to assign
             the issue to
+        :param assignees: (optional), logins of the users to assign the
+            issue to
         :param int milestone: (optional), id number of the milestone to
             attribute this issue to (e.g. ``m`` is a :class:`Milestone
             <github3.issues.Milestone>` object, ``m.number`` is what you pass
             here.)
         :param list labels: (optional), List of label names.
-        :returns: :class:`Issue <github3.issues.Issue>` if successful
+        :returns: :class:`ShortIssue <github3.issues.ShortIssue>` if
+            successful
         """
         repo = None
         if owner and repository and title:
             repo = self.repository(owner, repository)
 
         if repo is not None:
-            return repo.create_issue(title, body, assignee, milestone, labels)
+            return repo.create_issue(title, body, assignee, milestone,
+                                     labels, assignees)
 
-        return self._instance_or_null(Issue, None)
+        return self._instance_or_null(ShortIssue, None)
 
     @requires_auth
     def create_key(self, title, key, read_only=False):
@@ -645,12 +651,12 @@ class GitHub(GitHubCore):
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`
         """
         url = self._build_url('issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     def issues_on(self, username, repository, milestone=None, state=None,
                   assignee=None, mentioned=None, labels=None, sort=None,
@@ -684,7 +690,8 @@ class GitHub(GitHubCore):
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+        :returns: generator of
+            :class:`ShortIssue <github3.issues.ShortIssue>`\ s
         """
         if username and repository:
             url = self._build_url('repos', username, repository, 'issues')
@@ -693,7 +700,7 @@ class GitHub(GitHubCore):
                 milestone, state, assignee, mentioned,
                 labels, sort, direction, since,
             )
-            return self._iter(int(number), url, Issue, params=params,
+            return self._iter(int(number), url, ShortIssue, params=params,
                               etag=etag)
         return iter([])
 
@@ -904,12 +911,12 @@ class GitHub(GitHubCore):
             -1, returns all available issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`
         """
         url = self._build_url('orgs', name, 'issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     @requires_auth
     def organizations(self, number=-1, etag=None):
@@ -923,10 +930,10 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Organization <github3.orgs.Organization>`\ s
+            :class:`ShortOrganization <github3.orgs.ShortOrganization>`\ s
         """
         url = self._build_url('user', 'orgs')
-        return self._iter(int(number), url, Organization, etag=etag)
+        return self._iter(int(number), url, ShortOrganization, etag=etag)
 
     def organizations_with(self, username, number=-1, etag=None):
         """Iterate over organizations with ``username`` as a public member.
@@ -941,12 +948,54 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Organization <github3.orgs.Organization>`\ s
+            :class:`ShortOrganization <github3.orgs.ShortOrganization>`\ s
         """
         if username:
             url = self._build_url('users', username, 'orgs')
-            return self._iter(int(number), url, Organization, etag=etag)
+            return self._iter(int(number), url, ShortOrganization, etag=etag)
         return iter([])
+
+    def project(self, number):
+        """Return the Project with id ``number``.
+
+        :param int number: id of the project
+        :returns: :class:`Project <github3.projects.Project>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('projects', str(number))
+            json = self._json(self._get(
+                url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(Project, json)
+
+    def project_card(self, number):
+        """Return the ProjectCard with id ``number``.
+
+        :param int number: id of the project card
+        :returns: :class:`ProjectCard <github3.projects.ProjectCard>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('projects', 'columns', 'cards', str(number))
+            json = self._json(self._get(
+                url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(ProjectCard, json)
+
+    def project_column(self, number):
+        """Return the ProjectColumn with id ``number``.
+
+        :param int number: id of the project column
+        :returns: :class:`ProjectColumn <github3.projects.ProjectColumn>`
+        """
+        number = int(number)
+        json = None
+        if number > 0:
+            url = self._build_url('projects', 'columns', str(number))
+            json = self._json(self._get(
+                url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(ProjectColumn, json)
 
     def public_gists(self, number=-1, etag=None):
         """Retrieve all public gists and iterate over them.
@@ -1638,13 +1687,13 @@ class GitHub(GitHubCore):
             Default: -1 returns all issues
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Issue <github3.issues.Issue>`
+        :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`
         """
         url = self._build_url('user', 'issues')
         # issue_params will handle the since parameter
         params = issue_params(filter, state, labels, sort, direction, since)
         params.update(per_page=per_page)
-        return self._iter(int(number), url, Issue, params, etag)
+        return self._iter(int(number), url, ShortIssue, params, etag)
 
     @requires_auth
     def user_teams(self, number=-1, etag=None):
@@ -1711,12 +1760,12 @@ class GitHubEnterprise(GitHub):
         :param str login: (required), The user's username.
         :param str email: (required), The user's email address.
 
-        :returns: :class:`User <github3.users.User>`, if successful
+        :returns: :class:`ShortUser <github3.users.ShortUser>`, if successful
         """
         url = self._build_url('admin', 'users')
         payload = {'login': login, 'email': email}
         json_data = self._json(self._post(url, data=payload), 201)
-        return self._instance_or_null(users.User, json_data)
+        return self._instance_or_null(users.ShortUser, json_data)
 
     @requires_auth
     def admin_stats(self, option):

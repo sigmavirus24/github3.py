@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.orgs
-============
-
-This module contains all of the classes related to organizations.
-
-"""
+"""This module contains all of the classes related to organizations."""
 from __future__ import unicode_literals
 
 import warnings
@@ -13,30 +7,22 @@ from json import dumps
 
 from uritemplate import URITemplate
 
-from . import users
+from . import users, models
 
 from .decorators import requires_auth
 from .events import Event
-from .models import BaseAccount, GitHubCore
+from .projects import Project
 from .repos import Repository
 
 
-class Team(GitHubCore):
+class Team(models.GitHubCore):
 
     """The :class:`Team <Team>` object.
 
-    Two team instances can be checked like so::
+    Please see GitHub's `Team Documentation`_ for more information.
 
-        t1 == t2
-        t1 != t2
-
-    And is equivalent to::
-
-        t1.id == t2.id
-        t1.id != t2.id
-
-    See also: http://developer.github.com/v3/orgs/teams/
-
+    .. _Team Documentation:
+        http://developer.github.com/v3/orgs/teams/
     """
 
     # Roles available to members on a team.
@@ -92,11 +78,16 @@ class Team(GitHubCore):
     def add_repository(self, repository, permission=''):
         """Add ``repository`` to this team.
 
+        If a permission is not provided, the team's default permission
+        will be assigned, by GitHub.
+
         :param str repository: (required), form: 'user/repo'
         :param str permission: (optional), ('pull', 'push', 'admin')
         :returns: bool
         """
-        data = {'permission': permission}
+        data = {}
+        if permission:
+            data = {'permission': permission}
         url = self._build_url('repos', repository, base_url=self._api)
         return self._boolean(self._put(url, data=dumps(data)), 204, 404)
 
@@ -243,22 +234,14 @@ class Team(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
 
-class Organization(BaseAccount):
+class _Organization(models.GitHubCore):
 
     """The :class:`Organization <Organization>` object.
 
-    Two organization instances can be checked like so::
+    Please see GitHub's `Organization Documentation`_ for more information.
 
-        o1 == o2
-        o1 != o2
-
-    And is equivalent to::
-
-        o1.id == o2.id
-        o1.id != o2.id
-
-    See also: http://developer.github.com/v3/orgs/
-
+    .. _Organization Documentation:
+        http://developer.github.com/v3/orgs/
     """
 
     # Filters available when listing members. Note: ``"2fa_disabled"``
@@ -269,23 +252,30 @@ class Organization(BaseAccount):
     members_roles = frozenset(['all', 'admin', 'member'])
 
     def _update_attributes(self, org):
-        super(Organization, self)._update_attributes(org)
-        self.type = self.type or 'Organization'
+        #: URL of the avatar at gravatar
+        self.avatar_url = org['avatar_url']
 
-        #: Events url (not a template)
-        self.events_url = self._get_attribute(org, 'events_url')
-        #: Number of private repositories.
-        self.private_repos = self._get_attribute(org, 'private_repos')
+        # Set the type of object (this doens't come through API data)
+        self.type = 'Organization'
+
+        self.url = self._api = org['url']
+
+        #: Unique ID of the account
+        self.id = org['id']
+
+        #: Name of the organization
+        self.login = org['login']
 
         #: Public Members URL Template. Expands with ``member``
-        self.public_members_urlt = self._class_attribute(
-            org,
-            'public_members_url',
-            URITemplate
-        )
+        self.public_members_urlt = URITemplate(org['public_members_url'])
 
-        #: Repositories url (not a template)
-        self.repos_url = self._get_attribute(org, 'repos_url')
+        #: Various urls (not templates)
+        for urltype in ('avatar_url', 'events_url', 'issues_url',
+                        'repos_url'):
+            setattr(self, urltype, org[urltype])
+
+    def _repr(self):
+        return '<Organization [{s.login}:{s.name}]>'.format(s=self)
 
     @requires_auth
     def add_member(self, username, team_id):
@@ -327,7 +317,7 @@ class Organization(BaseAccount):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_repository(self, repository, team_id):
+    def add_repository(self, repository, team_id):  # FIXME(jlk): add perms
         """Add ``repository`` to ``team``.
 
         .. versionchanged:: 1.0
@@ -345,6 +335,22 @@ class Organization(BaseAccount):
 
         url = self._build_url('teams', str(team_id), 'repos', str(repository))
         return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def create_project(self, name, body=''):
+        """Create a project for this organization.
+
+        If the client is authenticated and a member of the organization, this
+        will create a new project in the organization.
+
+        :param str name: (required), name of the project
+        :param str body: (optional), the body of the project
+        """
+        url = self._build_url('projects', base_url=self._api)
+        data = {'name': name, 'body': body}
+        json = self._json(self._post(
+            url, data, headers=Project.CUSTOM_HEADERS), 201)
+        return self._instance_or_null(Project, json)
 
     @requires_auth
     def create_repository(self, name, description='', homepage='',
@@ -398,7 +404,7 @@ class Organization(BaseAccount):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def create_team(self, name, repo_names=[], permission=''):
+    def create_team(self, name, repo_names=[], permission='pull'):
         """Create a new team and return it.
 
         This only works if the authenticated user owns this organization.
@@ -548,6 +554,35 @@ class Organization(BaseAccount):
         url = self._build_url('public_members', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
+    def project(self, id, etag=None):
+        """Return the organization project with the given ID.
+
+        :param int id: (required), ID number of the project
+        :returns: :class:`Project <github3.projects.Project>` if successful,
+            otherwise None
+        """
+        url = self._build_url('projects', id, base_url=self._github_url)
+        json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(Project, json)
+
+    def projects(self, number=-1, etag=None):
+        """Iterate over projects for this organization.
+
+        :param int number: (optional), number of members to return. Default:
+            -1 will return all available.
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`Project <github3.projects.Project>`
+        """
+        url = self._build_url('projects', base_url=self._api)
+        return self._iter(
+            int(number),
+            url,
+            Project,
+            etag=etag,
+            headers=Project.CUSTOM_HEADERS
+        )
+
     def repositories(self, type='', number=-1, etag=None):
         r"""Iterate over repos for this organization.
 
@@ -628,7 +663,75 @@ class Organization(BaseAccount):
         return self._instance_or_null(Team, json)
 
 
-class Membership(GitHubCore):
+class ShortOrganization(_Organization):
+    """Object for the shortened representation of an Organization.
+
+    GitHub's API returns different amounts of information about orgs based
+    upon how that information is retrieved. Often times, when iterating over
+    several orgs, GitHub will return less information. To provide a clear
+    distinction between the types of orgs, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionadded:: 1.0.0
+    """
+
+    pass
+
+
+class Organization(_Organization):
+    """Object for the full representation of a Organization.
+
+    GitHub's API returns different amounts of information about orgs based
+    upon how that information is retrieved. This object exists to represent
+    the full amount of information returned for a specific org. For example,
+    you would receive this class when calling
+    :meth:`~github3.github.GitHub.organization`. To provide a clear
+    distinction between the types of orgs, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionchanged:: 1.0.0
+    """
+
+    def _update_attributes(self, org):
+        super(Organization, self)._update_attributes(org)
+
+        # this may be blank if the org hasn't set it
+        #: URL of the blog
+        self.blog = self._get_attribute(org, 'blog')
+
+        #: Name of the company
+        self.company = self._get_attribute(org, 'company')
+
+        #: datetime object representing the date the account was created
+        self.created_at = org['created_at']
+
+        #: E-mail address of the org
+        self.email = self._get_attribute(org, 'email')
+
+        # The number of people following this org
+        #: Number of followers
+        self.followers_count = org['followers']
+
+        # The number of people this org follows
+        #: Number of people the org is following
+        self.following_count = org['following']
+
+        #: Location of the org
+        self.location = self._get_attribute(org, 'location')
+
+        #: Display name of the org
+        self.name = self._get_attribute(org, 'name')
+
+        # The number of public_repos
+        #: Number of public repos owned by the org
+        self.public_repos_count = org['public_repos']
+
+        # e.g. https://github.com/self._login
+        #: URL of the org's profile
+        self.html_url = org['html_url']
+
+
+class Membership(models.GitHubCore):
 
     """The wrapper for information about Team and Organization memberships."""
 
@@ -639,7 +742,7 @@ class Membership(GitHubCore):
         self._api = self._get_attribute(membership, 'url')
 
         self.organization = self._class_attribute(
-            membership, 'organization', Organization, self
+            membership, 'organization', ShortOrganization, self
         )
 
         self.organization_url = self._get_attribute(
@@ -665,7 +768,7 @@ class Membership(GitHubCore):
         """
         if state and state.lower() == 'active':
             data = dumps({'state': state.lower()})
-            json = self._json(self._patch(self._api, data=data))
+            json = self._json(self._patch(self._api, data=data), 200)
             self._update_attributes(json)
             return True
         return False

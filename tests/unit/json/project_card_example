@@ -1,0 +1,8 @@
+{
+  "column_url": "https://api.github.com/projects/columns/367",
+  "content_url": "https://api.github.com/repos/api-playground/projects-test/issues/3",
+  "id": 1478,
+  "note": "Add payload for delete Project column",
+  "created_at": "2016-09-05T14:21:06Z",
+  "updated_at": "2016-09-05T14:20:22Z"
+}

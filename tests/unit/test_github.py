@@ -2,6 +2,7 @@ import pytest
 
 from github3 import GitHubEnterprise, GitHubError
 from github3.github import GitHub, GitHubStatus
+from github3.projects import Project
 
 from . import helper
 
@@ -395,6 +396,33 @@ class TestGitHub(helper.UnitHelper):
         self.instance.organization(username='github3py')
         self.session.get.assert_called_once_with(
             url_for('orgs/github3py')
+        )
+
+    def test_project(self):
+        """Test the ability to retrieve a project by its id."""
+        self.instance.project(400543)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects/400543'),
+            headers=Project.CUSTOM_HEADERS
+        )
+
+    def test_project_card(self):
+        """Test the ability to retrieve a project card by its id."""
+        self.instance.project_card(2665856)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects/columns/cards/2665856'),
+            headers=Project.CUSTOM_HEADERS
+        )
+
+    def test_project_column(self):
+        """Test the ability to retrieve a project column by its id."""
+        self.instance.project_column(957217)
+
+        self.session.get.assert_called_once_with(
+            url_for('projects/columns/957217'),
+            headers=Project.CUSTOM_HEADERS
         )
 
     def test_pubsubhubbub(self):

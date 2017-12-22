@@ -266,7 +266,7 @@ def issues_on(owner, repository, milestone=None, state=None, assignee=None,
         Default: -1 returns all issues
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
-    :returns: generator of :class:`Issue <github3.issues.Issue>`\ s
+    :returns: generator of :class:`ShortIssue <github3.issues.ShortIssue>`\ s
 
     """
     if owner and repository:
@@ -285,7 +285,7 @@ def organizations_with(username, number=-1, etag=None):
     :param str etag: (optional), ETag from a previous request to the same
         endpoint
     :returns: generator of
-        :class:`Organization <github3.orgs.Organization>`
+        :class:`ShortOrganization <github3.orgs.ShortOrganization>`
 
     """
     return gh.organizations_with(username, number, etag)

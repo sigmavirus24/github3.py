@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.pulls
-=============
-
-This module contains all the classes relating to pull requests.
-
-"""
+"""This module contains all the classes relating to pull requests."""
 from __future__ import unicode_literals
 
 from json import dumps
@@ -24,7 +18,10 @@ from .repos.contents import Contents
 class PullDestination(models.GitHubCore):
     """The :class:`PullDestination <PullDestination>` object.
 
-    See also: http://developer.github.com/v3/pulls/#get-a-single-pull-request
+    Please see GitHub's `PullRequest Documentation`_ for more information.
+
+    .. _PullRequest Documentation:
+        http://developer.github.com/v3/pulls/#get-a-single-pull-request
     """
 
     def __init__(self, dest, direction):
@@ -58,7 +55,10 @@ class PullFile(models.GitHubCore):
 
     """The :class:`PullFile <PullFile>` object.
 
-    See also: http://developer.github.com/v3/pulls/#list-pull-requests-files
+    Please see GitHub's `PR Files Documentation`_ for more information.
+
+    .. _PR Files Documentation:
+        http://developer.github.com/v3/pulls/#list-pull-requests-files
     """
 
     def _update_attributes(self, pfile):
@@ -104,124 +104,60 @@ class PullFile(models.GitHubCore):
         return self._instance_or_null(Contents, json)
 
 
-class PullRequest(models.GitHubCore):
+class _PullRequest(models.GitHubCore):
 
     """The :class:`PullRequest <PullRequest>` object.
 
-    Two pull request instances can be checked like so::
+    Please see GitHub's `PullRequests Documentation`_ for more information.
 
-        p1 == p2
-        p1 != p2
-
-    And is equivalent to::
-
-        p1.id == p2.id
-        p1.id != p2.id
-
-    See also: http://developer.github.com/v3/pulls/
+    .. _PullRequests Documentation:
+        http://developer.github.com/v3/pulls/
     """
 
     def _update_attributes(self, pull):
-        self._api = self._get_attribute(pull, 'url')
+        self._api = pull['url']
 
         #: Base of the merge
-        self.base = self._class_attribute(
-            pull, 'base', PullDestination, 'Base'
-        )
+        self.base = PullDestination(pull['base'], 'Base')
 
         #: Body of the pull request message
-        self.body = self._get_attribute(pull, 'body')
+        self.body = pull['body']
 
         #: Body of the pull request as HTML
-        self.body_html = self._get_attribute(pull, 'body_html')
+        self.body_html = pull['body_html']
 
         #: Body of the pull request as plain text
-        self.body_text = self._get_attribute(pull, 'body_text')
-
-        #: Number of additions on this pull request
-        self.additions_count = self._get_attribute(pull, 'additions')
-
-        #: Number of deletions on this pull request
-        self.deletions_count = self._get_attribute(pull, 'deletions')
+        self.body_text = pull['body_text']
 
         #: datetime object representing when the pull was closed
         self.closed_at = self._strptime_attribute(pull, 'closed_at')
 
-        #: Number of comments
-        self.comments_count = self._get_attribute(pull, 'comments')
-
-        #: Comments url (not a template)
-        self.comments_url = self._get_attribute(pull, 'comments_url')
-
-        #: Number of commits
-        self.commits_count = self._get_attribute(pull, 'commits')
-
-        #: GitHub.com url of commits in this pull request
-        self.commits_url = self._get_attribute(pull, 'commits_url')
-
         #: datetime object representing when the pull was created
         self.created_at = self._strptime_attribute(pull, 'created_at')
 
-        #: URL to view the diff associated with the pull
-        self.diff_url = self._get_attribute(pull, 'diff_url')
-
         #: The new head after the pull request
-        self.head = self._class_attribute(
-            pull, 'head', PullDestination, 'Head'
-        )
-
-        #: The URL of the pull request
-        self.html_url = self._get_attribute(pull, 'html_url')
+        self.head = PullDestination(pull['head'], 'Head')
 
         #: The unique id of the pull request
         self.id = self._get_attribute(pull, 'id')
 
-        #: The URL of the associated issue
-        self.issue_url = self._get_attribute(pull, 'issue_url')
-
-        #: Statuses URL
-        self.statuses_url = self._get_attribute(pull, 'statuses_url')
-
         #: Dictionary of _links. Changed in 1.0
         self.links = self._get_attribute(pull, '_links', {})
 
-        #: Boolean representing whether the pull request has been merged
-        self.merged = self._get_attribute(pull, 'merged')
+        #: If unmerged, holds the sha of the commit to test mergability.
+        #: If merged, holds commit sha of the merge commit, squashed commit on
+        #: the base branch or the commit that the base branch was updated to
+        #: after rebasing the PR.
+        self.merge_commit_sha = pull['merge_commit_sha']
 
         #: datetime object representing when the pull was merged
         self.merged_at = self._strptime_attribute(pull, 'merged_at')
 
-        #: Whether the pull is deemed mergeable by GitHub
-        self.mergeable = self._get_attribute(pull, 'mergeable', False)
-
-        #: Whether it would be a clean merge or not
-        self.mergeable_state = self._get_attribute(pull, 'mergeable_state')
-
-        #: :class:`User <github3.users.User>` who merged this pull
-        self.merged_by = self._class_attribute(
-            pull, 'merged_by', users.ShortUser, self,
-        )
-
         #: Number of the pull/issue on the repository
-        self.number = self._get_attribute(pull, 'number')
-
-        #: The URL of the patch
-        self.patch_url = self._get_attribute(pull, 'patch_url')
+        self.number = pull['number']
 
         #: Review comment URL Template. Expands with ``number``
-        self.review_comment_url = self._class_attribute(
-            pull, 'review_comment_url', URITemplate
-        )
-
-        #: Number of review comments on the pull request
-        self.review_comments_count = self._get_attribute(
-            pull, 'review_comments'
-        )
-
-        #: GitHub.com url for review comments (not a template)
-        self.review_comments_url = self._get_attribute(
-            pull, 'review_comments_url'
-        )
+        self.review_comment_url = URITemplate(pull['review_comment_url'])
 
         #: Returns ('owner', 'repository') this issue was filed on.
         self.repository = self.base
@@ -229,23 +165,29 @@ class PullRequest(models.GitHubCore):
             self.repository = self.base.repo
 
         #: The state of the pull
-        self.state = self._get_attribute(pull, 'state')
+        self.state = pull['state']
 
         #: The title of the request
-        self.title = self._get_attribute(pull, 'title')
+        self.title = pull['title']
 
         #: datetime object representing the last time the object was changed
         self.updated_at = self._strptime_attribute(pull, 'updated_at')
 
-        #: :class:`User <github3.users.User>` object representing the creator
-        #: of the pull request
-        self.user = self._class_attribute(pull, 'user', users.ShortUser, self)
+        #: :class:`User <github3.users.ShortUser>` object representing the
+        #:  creator of the pull request
+        self.user = users.ShortUser(pull['user'])
 
-        #: :class:`User <github3.users.User>` object representing the assignee
-        #: of the pull request
+        # This is only present if the PR has been assigned.
+        #: :class:`User <github3.users.ShortUser>` object representing the
+        #: assignee of the pull request
         self.assignee = self._class_attribute(
             pull, 'assignee', users.ShortUser, self,
         )
+
+        for urltype in ['comments_url', 'commits_url', 'diff_url',
+                        'html_url', 'issue_url', 'statuses_url',
+                        'patch_url', 'review_comments_url']:
+            setattr(self, urltype, pull[urltype])
 
     def _repr(self):
         return '<Pull Request [#{0}]>'.format(self.number)
@@ -421,11 +363,8 @@ class PullRequest(models.GitHubCore):
             endpoint
         :returns: generator of :class:`PullReview <PullReview>`\ s
         """
-        # Accept the preview headers for reviews
-        headers = {'Accept': 'application/vnd.github.black-cat-preview+json'}
         url = self._build_url('reviews', base_url=self._api)
-        return self._iter(int(number), url, PullReview, etag=etag,
-                          headers=headers)
+        return self._iter(int(number), url, PullReview, etag=etag)
 
     @requires_auth
     def update(self, title=None, body=None, state=None, base=None,
@@ -460,11 +399,80 @@ class PullRequest(models.GitHubCore):
         return False
 
 
+class ShortPullRequest(_PullRequest):
+    """Object for the shortened representation of a PullRequest
+
+    GitHub's API returns different amounts of information about prs based
+    upon how that information is retrieved. Often times, when iterating over
+    several prs, GitHub will return less information. To provide a clear
+    distinction between the types of prs, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionadded:: 1.0.0
+    """
+
+    pass
+
+
+class PullRequest(_PullRequest):
+    """Object for the full representation of a PullRequest.
+
+    GitHub's API returns different amounts of information about prs based
+    upon how that information is retrieved. This object exists to represent
+    the full amount of information returned for a specific pr. For example,
+    you would receive this class when calling
+    :meth:`~github3.github.GitHub.pull_request`. To provide a clear
+    distinction between the types of prs, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionchanged:: 1.0.0
+    """
+
+    def _update_attributes(self, pull):
+        super(PullRequest, self)._update_attributes(pull)
+
+        #: Number of additions on this pull request
+        self.additions_count = pull['additions']
+
+        #: Number of deletions on this pull request
+        self.deletions_count = pull['deletions']
+
+        #: Number of comments
+        self.comments_count = pull['comments']
+
+        #: Number of commits
+        self.commits_count = pull['commits']
+
+        #: Boolean representing whether the pull request has been merged
+        self.merged = pull['merged']
+
+        # This can be True, False, or None(Null). None is when the
+        # mergeability is still being computed. We default to False
+        # in that case.
+        #: Whether the pull is deemed mergeable by GitHub
+        self.mergeable = self._get_attribute(pull, 'mergeable', False)
+
+        #: Whether it would be a clean merge or not
+        self.mergeable_state = pull['mergeable_state']
+
+        # This may? be None(Null) while mergeability is being determined
+        #: :class:`User <github3.users.User>` who merged this pull
+        self.merged_by = self._class_attribute(
+            pull, 'merged_by', users.ShortUser, self,
+        )
+
+        #: Number of review comments on the pull request
+        self.review_comments_count = pull['review_comments']
+
+
 class PullReview(models.GitHubCore):
 
     """The :class:`PullReview <PullReview>` object.
 
-    See also: https://developer.github.com/v3/pulls/reviews/
+    Please see GitHub's `PullReview Documentation`_ for more information.
+
+    .. _PullReview Documentation:
+        https://developer.github.com/v3/pulls/reviews/
     """
 
     def _update_attributes(self, preview):
@@ -483,7 +491,7 @@ class PullReview(models.GitHubCore):
         self.state = self._get_attribute(preview, 'state')
 
         #: datetime object representing when the event was created.
-        self.created_at = self._strptime_attribute(preview, 'created_at')
+        self.submitted_at = self._strptime_attribute(preview, 'submitted_at')
 
         #: Body text of the review
         self.body = self._get_attribute(preview, 'body')
@@ -501,19 +509,10 @@ class ReviewComment(models.BaseComment):
 
     """The :class:`ReviewComment <ReviewComment>` object.
 
-    This is used to represent comments on pull requests.
+    Please see GitHub's `Pull Comments Documentation`_ for more information.
 
-    Two comment instances can be checked like so::
-
-        c1 == c2
-        c1 != c2
-
-    And is equivalent to::
-
-        c1.id == c2.id
-        c1.id != c2.id
-
-    See also: http://developer.github.com/v3/pulls/comments/
+    .. _Pull Comments Documentation:
+        http://developer.github.com/v3/pulls/comments/
     """
 
     def _update_attributes(self, comment):

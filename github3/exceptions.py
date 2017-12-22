@@ -18,7 +18,7 @@ class GitHubError(Exception):
             #: List of errors provided by GitHub
             if error.get('errors'):
                 self.errors = error.get('errors')
-        except:  # Amazon S3 error
+        except Exception:  # Amazon S3 error
             self.msg = resp.content or '[No message]'
 
     def __repr__(self):
@@ -32,6 +32,22 @@ class GitHubError(Exception):
     def message(self):
         """The actual message returned by the API."""
         return self.msg
+
+
+class IncompleteResponse(GitHubError):
+    """Exception for a response that doesn't have everything it should."""
+
+    def __init__(self, json, exception):
+        self.response = None
+        self.code = None
+        self.json = json
+        self.errors = []
+        self.exception = exception
+        self.msg = (
+            "The library was expecting more data in the response (%r)."
+            " Either GitHub modified it's response body, or your token"
+            " is not properly scoped to retrieve this information."
+        ) % (exception,)
 
 
 class ResponseError(GitHubError):
@@ -115,6 +131,16 @@ class NotAcceptable(ResponseError):
     pass
 
 
+class Conflict(ResponseError):
+    """Exception class for 409 responses.
+
+    Possible reasons:
+
+    - Head branch was modified (SHA sums do not match)
+    """
+    pass
+
+
 class UnprocessableEntity(ResponseError):
     """Exception class for 422 responses."""
     pass
@@ -142,6 +168,7 @@ error_classes = {
     404: NotFoundError,
     405: MethodNotAllowed,
     406: NotAcceptable,
+    409: Conflict,
     422: UnprocessableEntity,
     451: UnavailableForLegalReasons,
 }
