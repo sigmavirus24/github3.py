@@ -2,16 +2,11 @@ import github3
 import os
 import tempfile
 
-import pytest
-import requests
-
 from .helper import IntegrationHelper
 
 
 class TestRelease(IntegrationHelper):
 
-    @pytest.mark.xfail(requests.__build__ >= 0x021100,
-                       reason="Requests 2.11.0 breaks our cassettes")
     def test_archive(self):
         """Test the ability to download a release archive."""
         cassette_name = self.cassette_name('archive')
@@ -76,7 +71,7 @@ class TestRelease(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('create_release_upload_asset')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
@@ -95,9 +90,11 @@ class TestRelease(IntegrationHelper):
     def test_upload_asset_with_a_label(self):
         """Test the ability to upload an asset to a release with a label."""
         self.token_login()
-        cassette_name = self.cassette_name('create_release')
+        cassette_name = self.cassette_name(
+            'create_release_upload_asset_with_label'
+        )
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
             release = repository.create_release(
                 '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
                 'To be deleted'
@@ -121,9 +118,16 @@ class TestAsset(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('delete')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'github3.py')
-            release = repository.release(833407)
-            asset = release.asset(370020)
+            repository = self.gh.repository('github3py', 'delete_contents')
+            release = repository.create_release(
+                '0.1.0', 'master', '0.1.0 fake release with upload',
+                'To be deleted'
+                )
+            file_contents = 'Hello World'
+            asset = release.upload_asset(
+                'text/plain', 'test_repos_release.py', file_contents,
+                'test-label',
+            )
             assert asset.delete() is True
 
     def test_download(self):
@@ -170,9 +174,9 @@ class TestAsset(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('create_release_edit')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
+            repository = self.gh.repository('github3py', 'delete_contents')
             release = repository.create_release(
-                '0.8.0.pre', 'develop', '0.8.0 fake release with upload',
+                '0.1.0', 'master', '0.1.0 fake release with upload',
                 'To be deleted'
                 )
         cassette_name = self.cassette_name('edit')

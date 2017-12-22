@@ -20,7 +20,7 @@ from .models import GitHubCore
 from .orgs import Membership, ShortOrganization, Organization, Team
 from .projects import Project, ProjectCard, ProjectColumn
 from .pulls import PullRequest
-from .repos.repo import Repository, repo_issue_params
+from .repos import repo
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
 from .structs import SearchIterator
@@ -126,10 +126,10 @@ class GitHub(GitHubCore):
             endpoint
         :param int per_page: (optional), number of repositories to list per
             request
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository`
         """
         url = self._build_url('repositories')
-        return self._iter(int(number), url, Repository,
+        return self._iter(int(number), url, repo.ShortRepository,
                           params={'since': since, 'per_page': per_page},
                           etag=etag)
 
@@ -344,7 +344,7 @@ class GitHub(GitHubCore):
                 'auto_init': auto_init,
                 'gitignore_template': gitignore_template}
         json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Repository, json)
+        return self._instance_or_null(repo.Repository, json)
 
     @requires_auth
     def delete_email_addresses(self, addresses=[]):
@@ -696,8 +696,10 @@ class GitHub(GitHubCore):
         if username and repository:
             url = self._build_url('repos', username, repository, 'issues')
 
-            params = repo_issue_params(milestone, state, assignee, mentioned,
-                                       labels, sort, direction, since)
+            params = repo.repo_issue_params(
+                milestone, state, assignee, mentioned,
+                labels, sort, direction, since,
+            )
             return self._iter(int(number), url, ShortIssue, params=params,
                               etag=etag)
         return iter([])
@@ -1119,7 +1121,7 @@ class GitHub(GitHubCore):
             Default: -1 returns all repositories
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository`
             objects
         """
         url = self._build_url('user', 'repos')
@@ -1132,7 +1134,8 @@ class GitHub(GitHubCore):
         if direction in ('asc', 'desc'):
             params.update(direction=direction)
 
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, repo.ShortRepository, params,
+                          etag)
 
     def repositories_by(self, username, type=None, sort=None, direction=None,
                         number=-1, etag=None):
@@ -1154,7 +1157,7 @@ class GitHub(GitHubCore):
             Default: -1 returns all repositories
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository`
             objects
         """
         url = self._build_url('users', username, 'repos')
@@ -1167,7 +1170,8 @@ class GitHub(GitHubCore):
         if direction in ('asc', 'desc'):
             params.update(direction=direction)
 
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, repo.ShortRepository, params,
+                          etag)
 
     def repository(self, owner, repository):
         """Returns a Repository object for the specified combination of
@@ -1182,7 +1186,7 @@ class GitHub(GitHubCore):
             url = self._build_url('repos', owner, repository)
             json = self._json(self._get(url, headers=License.CUSTOM_HEADERS),
                               200)
-        return self._instance_or_null(Repository, json)
+        return self._instance_or_null(repo.Repository, json)
 
     def repository_with_id(self, number):
         """Returns the Repository with id ``number``.
@@ -1195,7 +1199,7 @@ class GitHub(GitHubCore):
         if number > 0:
             url = self._build_url('repositories', str(number))
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Repository, json)
+        return self._instance_or_null(repo.Repository, json)
 
     @requires_app_credentials
     def revoke_authorization(self, access_token):
@@ -1524,12 +1528,13 @@ class GitHub(GitHubCore):
             Default: -1 returns all repositories
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository>`
         """
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
         url = self._build_url('user', 'starred')
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, repo.ShortRepository, params,
+                          etag)
 
     def starred_by(self, username, sort=None, direction=None, number=-1,
                    etag=None):
@@ -1549,12 +1554,13 @@ class GitHub(GitHubCore):
             Default: -1 returns all repositories
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository`
         """
         params = {'sort': sort, 'direction': direction}
         self._remove_none(params)
         url = self._build_url('users', str(username), 'starred')
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, repo.ShortRepository, params,
+                          etag)
 
     @requires_auth
     def subscriptions(self, number=-1, etag=None):
@@ -1564,10 +1570,10 @@ class GitHub(GitHubCore):
             Default: -1 returns all repositories
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository`
         """
         url = self._build_url('user', 'subscriptions')
-        return self._iter(int(number), url, Repository, etag=etag)
+        return self._iter(int(number), url, repo.ShortRepository, etag=etag)
 
     def subscriptions_for(self, username, number=-1, etag=None):
         """Iterate over repositories subscribed to by ``username``.
@@ -1578,10 +1584,10 @@ class GitHub(GitHubCore):
             Default: -1 returns all repositories
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <github3.repos.Repository>`
+        :returns: generator of :class:`~github3.repos.ShortRepository`
         """
         url = self._build_url('users', str(username), 'subscriptions')
-        return self._iter(int(number), url, Repository, etag=etag)
+        return self._iter(int(number), url, repo.ShortRepository, etag=etag)
 
     @requires_auth
     def unfollow(self, username):

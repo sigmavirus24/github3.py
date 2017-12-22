@@ -114,7 +114,7 @@ class TestGitHub(IntegrationHelper):
                                           description='Test repo creation')
 
         assert isinstance(r, github3.repos.Repository)
-        assert str(r) == 'sigmavirus24/my-new-repo'
+        assert str(r).endswith('/my-new-repo')
 
     def test_delete_email_addresses(self):
         """Delete email addresses from authenticated user's account."""
@@ -274,7 +274,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('iter_all_repos')
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.all_repositories(number=25):
-                assert isinstance(r, github3.repos.repo.Repository)
+                assert isinstance(r, github3.repos.ShortRepository)
 
     def test_all_users(self):
         """Test the ability to iterate over all of the users."""
@@ -458,14 +458,14 @@ class TestGitHub(IntegrationHelper):
         self.basic_login()
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.repositories():
-                assert isinstance(r, github3.repos.Repository)
+                assert isinstance(r, github3.repos.ShortRepository)
 
     def test_repositories_by(self):
         """Test the ability to retrieve a user's repositories."""
         cassette_name = self.cassette_name('repositories_by')
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.repositories_by('dstufft'):
-                assert isinstance(r, github3.repos.Repository)
+                assert isinstance(r, github3.repos.ShortRepository)
 
     def test_search_code(self):
         """Test the ability to use the code search endpoint."""

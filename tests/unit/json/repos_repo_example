@@ -37,6 +37,7 @@
   "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
   "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
   "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+  "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
   "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
   "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
   "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
@@ -74,6 +75,12 @@
   "size": 108,
   "default_branch": "master",
   "open_issues_count": 0,
+  "topics": [
+    "octocat",
+    "atom",
+    "electron",
+    "API"
+  ],
   "has_issues": true,
   "has_wiki": true,
   "has_pages": false,
@@ -86,7 +93,11 @@
     "push": false,
     "pull": true
   },
+  "allow_rebase_merge": true,
+  "allow_squash_merge": true,
+  "allow_merge_commit": true,
   "subscribers_count": 42,
+  "network_count": 0,
   "organization": {
     "login": "octocat",
     "id": 1,
@@ -131,7 +142,7 @@
     "full_name": "octocat/Hello-World",
     "description": "This your first repo!",
     "private": false,
-    "fork": true,
+    "fork": false,
     "url": "https://api.github.com/repos/octocat/Hello-World",
     "html_url": "https://github.com/octocat/Hello-World",
     "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
@@ -145,6 +156,7 @@
     "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
     "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
     "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
     "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
     "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
     "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
@@ -182,6 +194,12 @@
     "size": 108,
     "default_branch": "master",
     "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
     "has_issues": true,
     "has_wiki": true,
     "has_pages": false,
@@ -193,7 +211,12 @@
       "admin": false,
       "push": false,
       "pull": true
-    }
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
   },
   "source": {
     "id": 1296269,
@@ -220,7 +243,7 @@
     "full_name": "octocat/Hello-World",
     "description": "This your first repo!",
     "private": false,
-    "fork": true,
+    "fork": false,
     "url": "https://api.github.com/repos/octocat/Hello-World",
     "html_url": "https://github.com/octocat/Hello-World",
     "archive_url": "http://api.github.com/repos/octocat/Hello-World/{archive_format}{/ref}",
@@ -234,6 +257,7 @@
     "compare_url": "http://api.github.com/repos/octocat/Hello-World/compare/{base}...{head}",
     "contents_url": "http://api.github.com/repos/octocat/Hello-World/contents/{+path}",
     "contributors_url": "http://api.github.com/repos/octocat/Hello-World/contributors",
+    "deployments_url": "http://api.github.com/repos/octocat/Hello-World/deployments",
     "downloads_url": "http://api.github.com/repos/octocat/Hello-World/downloads",
     "events_url": "http://api.github.com/repos/octocat/Hello-World/events",
     "forks_url": "http://api.github.com/repos/octocat/Hello-World/forks",
@@ -271,6 +295,12 @@
     "size": 108,
     "default_branch": "master",
     "open_issues_count": 0,
+    "topics": [
+      "octocat",
+      "atom",
+      "electron",
+      "API"
+    ],
     "has_issues": true,
     "has_wiki": true,
     "has_pages": false,
@@ -282,6 +312,11 @@
       "admin": false,
       "push": false,
       "pull": true
-    }
+    },
+    "allow_rebase_merge": true,
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "subscribers_count": 42,
+    "network_count": 0
   }
 }

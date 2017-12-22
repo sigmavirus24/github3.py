@@ -39,10 +39,7 @@ class TestReference(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('update')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('itsmemattchung', 'github3.py')
-            reference = repository.ref(
-                'heads/migrate-tests/git-integration-test'
-            )
-            assert reference.update(
-                'b8bcee4db99325949c4171590b8fbcc8354d54d8'
-            ) is True
+            repository = self.gh.repository('github3py', 'delete_contents')
+            reference = repository.ref('heads/master')
+            sha = '778bece4968df36ba739f3f1c50b0cc8979c36ca'
+            assert reference.update(sha) is True

@@ -15,7 +15,7 @@ class TestDeployment(IntegrationHelper):
 
     def test_create_status(self):
         """Show that a user can create a deployment status."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name('create_status')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')

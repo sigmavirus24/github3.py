@@ -26,7 +26,7 @@ class PullDestination(models.GitHubCore):
 
     def __init__(self, dest, direction):
         super(PullDestination, self).__init__(dest)
-        from .repos.repo import Repository
+        from .repos.repo import ShortRepository
         #: Direction of the merge with respect to this destination
         self.direction = direction
         #: Full reference string of the object
@@ -44,7 +44,7 @@ class PullDestination(models.GitHubCore):
         if dest.get('repo'):
             self._repo_name = dest['repo'].get('name')
             self._repo_owner = dest['repo']['owner'].get('login')
-            self.repository = Repository(dest.get('repo'), self)
+            self.repository = ShortRepository(dest.get('repo'), self)
         self.repo = (self._repo_owner, self._repo_name)
 
     def _repr(self):
@@ -367,15 +367,26 @@ class _PullRequest(models.GitHubCore):
         return self._iter(int(number), url, PullReview, etag=etag)
 
     @requires_auth
-    def update(self, title=None, body=None, state=None):
+    def update(self, title=None, body=None, state=None, base=None,
+               maintainer_can_modify=None):
         """Update this pull request.
 
         :param str title: (optional), title of the pull
         :param str body: (optional), body of the pull request
         :param str state: (optional), ('open', 'closed')
+        :param str base: (optional), Name of the branch on the current
+            repository that the changes should be pulled into.
+        :param bool maintainer_can_modify: (optional), Indicates whether
+            a maintainer is allowed to modify the pull request or not.
         :returns: bool
         """
-        data = {'title': title, 'body': body, 'state': state}
+        data = {
+            'title': title,
+            'body': body,
+            'state': state,
+            'base': base,
+            'maintainer_can_modify': maintainer_can_modify,
+        }
         json = None
         self._remove_none(data)
 
@@ -552,7 +563,7 @@ class ReviewComment(models.BaseComment):
         """
         url = self._build_url('comments', base_url=self.pull_request_url)
         index = self._api.rfind('/') + 1
-        in_reply_to = self._api[index:]
+        in_reply_to = int(self._api[index:])
         json = self._json(self._post(url, data={
             'body': body, 'in_reply_to': in_reply_to
         }), 201)

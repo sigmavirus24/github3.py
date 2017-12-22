@@ -76,10 +76,10 @@ class CombinedStatus(GitHubCore):
         statuses = self._get_attribute(combined_status, 'statuses', [])
         self.statuses = [Status(s) for s in statuses]
 
-        from . import Repository
+        from . import repo
         #: Repository the combined status belongs too.
         self.repository = self._class_attribute(
-            combined_status, 'repository', Repository, self
+            combined_status, 'repository', repo.ShortRepository, self
         )
 
         #: commit URL

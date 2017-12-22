@@ -23,18 +23,18 @@ SNI_requirements = [
     'pyasn1'
 ]
 
-kwargs['tests_require'] = ['betamax >=0.2.0', 'pytest <3.3.0',
+kwargs['tests_require'] = ['betamax>=0.8.0', 'pytest>2.3.5',
                            'betamax-matchers>=0.1.0']
 if sys.version_info < (3, 0):
     kwargs['tests_require'].append('unittest2 ==0.5.1')
 if sys.version_info < (3, 3):
-    kwargs['tests_require'].append('mock ==1.0.1')
+    kwargs['tests_require'].append('mock')
 
 if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py bdist_wheel sdist upload")
     sys.exit()
 
-requires.extend(["requests >= 2.0", "uritemplate >= 3.0.0"])
+requires.extend(["requests >= 2.18", "uritemplate >= 3.0.0"])
 
 __version__ = ''
 with open('github3/__about__.py', 'r') as fd:

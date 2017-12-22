@@ -12,7 +12,11 @@ get_pr_example_data = helper.create_example_data_helper(
 
 
 url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/pulls/1'
+    'https://api.github.com/repos/octocat/Hello-World/pulls/1347'
+)
+
+review_comment_url_for = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/pulls/1/comments'
 )
 
 
@@ -146,10 +150,10 @@ class TestPullRequest(helper.UnitHelper):
 
     def test_attributes(self):
         """Show that we extract attributes correctly."""
-        assert self.instance.merge_commit_sha == \
-            'f13731c44acf96f2e5d6f0080f54e09215e36248'
+        assert (self.instance.merge_commit_sha ==
+                'e5bd3914e2e596debea16f433f57875b5b90bcd6')
         assert not self.instance.merged
-        assert not self.instance.mergeable
+        assert self.instance.mergeable
 
 
 class TestPullRequestRequiresAuthentication(
@@ -261,8 +265,8 @@ class TestReviewComment(helper.UnitHelper):
         self.instance.reply('foo')
 
         self.post_called_with(
-            url_for('comments'),
-            data={'body': 'foo', 'in_reply_to': '1'}
+            review_comment_url_for(),
+            data={'body': 'foo', 'in_reply_to': 1}
         )
 
     def test_reply_requires_authentication(self):

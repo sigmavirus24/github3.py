@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from ..models import GitHubCore
-from ..repos import Repository
+from .. import models
+from .. import repos
 
 
-class RepositorySearchResult(GitHubCore):
+class RepositorySearchResult(models.GitHubCore):
     def _update_attributes(self, data):
         result = data.copy()
 
@@ -20,7 +20,7 @@ class RepositorySearchResult(GitHubCore):
             del result['text_matches']
 
         #: Repository object
-        self.repository = Repository(result, self)
+        self.repository = repos.ShortRepository(result, self)
 
     def _repr(self):
         return '<RepositorySearchResult [{0}]>'.format(self.repository)

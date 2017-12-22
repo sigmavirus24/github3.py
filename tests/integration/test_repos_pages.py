@@ -6,7 +6,7 @@ from .helper import IntegrationHelper
 class TestRepositoryPages(IntegrationHelper):
     def test_latest_pages_build(self):
         """Test the ability to retrieve the latest pages build for a repo."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name('latest_pages_build')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
@@ -19,7 +19,7 @@ class TestRepositoryPages(IntegrationHelper):
         """
         Test the ability to retrieve information about a repository's pages.
         """
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name('pages')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
@@ -30,7 +30,7 @@ class TestRepositoryPages(IntegrationHelper):
 
     def test_pages_builds(self):
         """Test the ability to list the pages builds."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name('pages_builds')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
