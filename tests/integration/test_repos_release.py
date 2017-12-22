@@ -2,9 +2,6 @@ import github3
 import os
 import tempfile
 
-import pytest
-import requests
-
 from .helper import IntegrationHelper
 
 

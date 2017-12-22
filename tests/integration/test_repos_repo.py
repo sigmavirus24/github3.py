@@ -3,7 +3,6 @@ import github3
 import github3.exceptions as exc
 
 import pytest
-import requests
 
 from . import helper
 

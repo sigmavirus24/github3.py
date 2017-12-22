@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Organization."""
 import pytest
-import requests
 
 import github3
 
