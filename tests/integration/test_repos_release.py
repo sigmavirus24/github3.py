@@ -10,8 +10,6 @@ from .helper import IntegrationHelper
 
 class TestRelease(IntegrationHelper):
 
-    @pytest.mark.xfail(requests.__build__ >= 0x021100,
-                       reason="Requests 2.11.0 breaks our cassettes")
     def test_archive(self):
         """Test the ability to download a release archive."""
         cassette_name = self.cassette_name('archive')

@@ -543,8 +543,6 @@ class TestRepository(helper.IntegrationHelper):
             for d in repository.deployments():
                 assert isinstance(d, github3.repos.deployment.Deployment)
 
-    @pytest.mark.xfail(requests.__build__ >= 0x021100,
-                       reason="Requests breaks our recorded cassettes")
     def test_directory_contents(self):
         """Test that a directory's contents can be retrieved."""
         cassette_name = self.cassette_name('directory_contents')
@@ -752,8 +750,6 @@ class TestRepository(helper.IntegrationHelper):
         for ev in events:
             assert isinstance(ev, github3.issues.event.IssueEvent)
 
-    @pytest.mark.xfail(requests.__build__ >= 0x021100,
-                       reason="Requests 2.11.0 breaks our cassettes.")
     def test_issues_sorts_ascendingly(self):
         """Test that issues will be returned in ascending order."""
         cassette_name = self.cassette_name('issues_ascending')
@@ -770,8 +766,6 @@ class TestRepository(helper.IntegrationHelper):
                 assert last_issue.number < issue.number
             last_issue = issue
 
-    @pytest.mark.xfail(requests.__build__ >= 0x021100,
-                       reason="Requests 2.11.0 breaks our cassettes.")
     def test_issues_accepts_state_all(self):
         """Test that the state parameter accepts 'all'."""
         cassette_name = self.cassette_name('issues_state_all')

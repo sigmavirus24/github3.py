@@ -104,8 +104,6 @@ class TestOrganization(IntegrationHelper):
 
             assert o.edit(location='Madison, WI') is True
 
-    @pytest.mark.xfail(requests.__build__ >= 0x021100,
-                       reason="Requests 2.11.0 breaks our cassettes.")
     def test_is_member(self):
         """Test the ability to check if a User is a member of the org."""
         cassette_name = self.cassette_name('is_member')
