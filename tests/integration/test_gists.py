@@ -62,8 +62,14 @@ class TestGist(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name):
-            gist = self.gh.gist(6647085)
-            assert gist is not None
+            gist = self.gh.create_gist(
+                'Title', {
+                    'filename.py': {
+                        'content': '# -*- coding: utf-8 -*-'
+                    }
+                }
+            )
+            assert isinstance(gist, github3.gists.Gist)
             assert gist.edit('Updated description', files={
                 'filename.py': {
                     'content': '# New content',
@@ -80,9 +86,8 @@ class TestGist(IntegrationHelper):
             gists = self.gh.gists_by('sigmavirus24')
             assert gists is not None
             for gist in gists:
-                files = gist.files()
-                for _file in files:
-                    assert isinstance(_file, github3.gists.file.GistFile)
+                for _file in gist.files.values():
+                    assert isinstance(_file, github3.gists.file.ShortGistFile)
 
     def test_fork(self):
         """Show that a user can fork another user's gist."""
@@ -92,8 +97,8 @@ class TestGist(IntegrationHelper):
             gist = self.gh.gist('8de9b9b0ae2e45383d85')
             assert gist is not None
             forked = gist.fork()
-            assert isinstance(forked, github3.gists.Gist)
-            assert str(forked.owner) == 'sigmavirus24'
+            assert isinstance(forked, github3.gists.ShortGist)
+            assert str(forked.owner) == 'gh3test'
 
     def test_forks(self):
         """Show that a user can iterate over the forks of a gist."""
@@ -102,8 +107,8 @@ class TestGist(IntegrationHelper):
                                         preserve_exact_body_bytes=True):
             gist = self.gh.gist(1834570)
             assert gist is not None
-            for commit in gist.forks():
-                assert isinstance(commit, github3.gists.gist.Gist)
+            for fork in gist.forks():
+                assert isinstance(fork, github3.gists.ShortGist)
 
     def test_is_starred(self):
         """Show that a user can check if they've starred a gist."""
@@ -112,7 +117,10 @@ class TestGist(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             gist = self.gh.gist(1834570)
             assert gist is not None
+            gist.star()
             assert gist.is_starred() is True
+            gist.unstar()
+            assert gist.is_starred() is False
 
     def test_star(self):
         """Show that a user can star a gist."""
