@@ -7,6 +7,18 @@ class TestBranch(IntegrationHelper):
 
     betamax_kwargs = {'match_requests_on': ['method', 'uri', 'json-body']}
 
+    def test_protection_full(self):
+        self.token_login()
+        cassette_name = self.cassette_name('protection_full')
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            repository = self.gh.repository('discogestalt', 'github3.py')
+            branch = repository.branch('protected')
+            pf = branch.protection_full()
+            assert pf['enforce_admins']['enabled']
+            assert pf['required_pull_request_reviews']['include_admins']
+            assert pf['required_status_checks']['include_admins']
+            assert pf['required_status_checks']['strict']
+
     def test_protect(self):
         expected = {
             'enabled': True,

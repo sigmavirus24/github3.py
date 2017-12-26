@@ -61,6 +61,17 @@ class Branch(GitHubCore):
             return resp.content
         return None
 
+    def protection_full(self):
+        """Return the full branch protection configuration for a repository
+
+        See: http://git.io/v4Gvu
+
+        :returns: dict of the branch protection settings
+        """
+        url = self._build_url('protection', base_url=self._api)
+        json = self._json(self._get(url, headers=self.PREVIEW_HEADERS), 200)
+        return json
+
     def protect(self, enforcement=None, status_checks=None):
         """Enable force push protection and configure status check enforcement.
 

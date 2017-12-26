@@ -3,8 +3,12 @@ import github3
 from . import helper
 
 get_example_data = helper.create_example_data_helper('repos_branch_example')
+api_base = 'https://api.github.com/repos/octocat/Hello-World'
 url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/commits/master'
+    '{}/commits/master'.format(api_base)
+)
+protection_url_for = helper.create_url_helper(
+    '{}/branches/master/protection'.format(api_base)
 )
 
 
@@ -24,4 +28,16 @@ class TestBranch(helper.UnitHelper):
         self.session.get.assert_called_once_with(
             url_for(),
             headers=headers
+        )
+
+    def test_protection_full(self):
+        """Verify the request for retrieving the full
+        protection config for a branch."""
+        headers = {
+            'Accept': 'application/vnd.github.loki-preview+json',
+        }
+        self.instance.protection_full()
+        self.session.get.assert_called_once_with(
+            protection_url_for(),
+            headers=headers,
         )
