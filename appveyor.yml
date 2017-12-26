@@ -1,6 +1,7 @@
 version: build-{build}-{branch}
 
 environment:
+  GH_RECORD_MODE: "none"
   matrix:
     # http://www.appveyor.com/docs/installed-software#python lists available
     # versions
