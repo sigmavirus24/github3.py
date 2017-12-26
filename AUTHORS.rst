@@ -154,3 +154,5 @@ Contributors
 - Mark Troyer (@discogestalt)
 
 - Becca James (@beccasjames)
+
+- Walid Ziouche (@01walid)
