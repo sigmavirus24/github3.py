@@ -43,3 +43,13 @@ class TestRepoCommit(helper.IntegrationHelper):
 
         for comment in comments:
             assert isinstance(comment, github3.repos.comment.RepoComment)
+
+    def test_author_is_not_committer(self):
+        """Test we are not confusing author and committer on a commit."""
+        cassette_name = self.cassette_name('author_committer')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            commit = repository.commit(
+                '6a0470c992dd97d97fa0fee503153b125141ca4c'
+            )
+            assert commit.author != commit.committer

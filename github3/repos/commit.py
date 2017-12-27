@@ -37,7 +37,7 @@ class RepoCommit(models.BaseCommit):
             commit, 'author', users.ShortUser, self
         )
         self.committer = self._class_attribute(
-            commit, 'author', users.ShortUser, self
+            commit, 'committer', users.ShortUser, self
         )
 
         #: :class:`Commit <github3.git.Commit>`.
