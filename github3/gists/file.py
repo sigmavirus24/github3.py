@@ -57,7 +57,7 @@ class ShortGistFile(_GistFile):
         The file size in bytes.
     """
 
-    pass
+    class_name = 'ShortGistFile'
 
 
 class GistFile(_GistFile):
@@ -78,6 +78,8 @@ class GistFile(_GistFile):
         entirety.
 
     """
+
+    class_name = 'GistFile'
 
     def _update_attributes(self, gistfile):
         super(GistFile, self)._update_attributes(gistfile)
