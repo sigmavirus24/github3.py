@@ -1,0 +1,9 @@
+{
+  "filename": ".gertty.yaml",
+  "type": "text/x-yaml",
+  "language": "YAML",
+  "raw_url": "https://gist.githubusercontent.com/sigmavirus24/e20f1e6c9ca010cabc523a7356217f5a/raw/0e8bfa0d58f40c153ec1c8762ad48b8f5bc4be72/.gertty.yaml",
+  "size": 1022,
+  "truncated": false,
+  "content": "palettes:\n  - name: solarized\n    comment: ['dark blue', '']\n    comment-name: ['white,bold', '']\n    context-button: ['white,bold', '']\n    filename: ['light gray', '']\n    focused-filename: ['light magenta', '']\n    focused: ['black', 'light gray']\n    focused-added-line: ['light gray', 'dark green']\n    focused-added-word: ['white', 'dark gray']\n    focused-context-button: ['dark magenta,bold', '']\n    focused-removed-line: ['light gray', 'dark red']\n    focused-line-number: ['dark gray', 'light gray']\n    focused-link: ['light gray', 'dark blue']\n    focused-unsubscribed-project: ['light magenta,bold', 'white']\n    focused-reviewed-change: ['white,bold', 'dark magenta']\n    focused-starred-change: ['white,bold', 'dark blue']\n    footer: ['brown', '']\n    line-number: ['light gray', '']\n    reviewed-change: ['dark magenta', '']\n    starred-change: ['dark green', '']\n    test-SUCCESS: ['dark green', '']\n    test-FAILURE: ['light red', '']\n    unsubscribed-project: ['light magenta', '']\n\npalette: solarized"
+}

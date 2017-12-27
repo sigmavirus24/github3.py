@@ -14,14 +14,16 @@ gist_history_example_data = helper.create_example_data_helper(
 gist_comment_example_data = helper.create_example_data_helper(
     'gist_comment_example'
 )
+gist_file_example_data = helper.create_example_data_helper(
+    'gist_file_example'
+)
 
 url_for = helper.create_url_helper(
-    'https://api.github.com/gists/b4c7ac7be6e591d0d155'
+    'https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a'
 )
 
 
 class TestGist(helper.UnitHelper):
-
     """Test regular Gist methods."""
 
     described_class = github3.gists.Gist
@@ -74,7 +76,7 @@ class TestGist(helper.UnitHelper):
 
     def test_file(self):
         """Show that each file object is an instance of GistFile."""
-        _file = self.instance._files[0]
+        _file = list(self.instance.files.values())[0]
         assert isinstance(_file, github3.gists.file.GistFile)
 
     def test_is_starred(self):
@@ -101,7 +103,6 @@ class TestGist(helper.UnitHelper):
 
 
 class TestGistRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test Gist methods which require authentication."""
 
     described_class = github3.gists.Gist
@@ -144,7 +145,6 @@ class TestGistRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestGistIterators(helper.UnitIteratorHelper):
-
     """Test Gist methods that return Iterators."""
 
     described_class = github3.gists.Gist
@@ -174,7 +174,7 @@ class TestGistIterators(helper.UnitIteratorHelper):
 
     def test_files(self):
         """Show that iterating over a gist's files does not make a request."""
-        files = list(self.instance.files())
+        files = list(self.instance.files.values())
         assert len(files) > 0
 
         assert self.session.get.called is False
@@ -192,7 +192,6 @@ class TestGistIterators(helper.UnitIteratorHelper):
 
 
 class TestGistHistory(helper.UnitHelper):
-
     """Test Gist History."""
 
     described_class = github3.gists.history.GistHistory
@@ -207,9 +206,14 @@ class TestGistHistory(helper.UnitHelper):
         history._uniq = 'foo'
         assert self.instance != history
 
+    def test_gist(self):
+        """Verify we retrieve a Gist for this point in history."""
+        self.instance.gist()
+
+        self.session.get.assert_called_once_with(self.instance.url)
+
 
 class TestGistComment(helper.UnitHelper):
-
     """Test Gist Comments."""
 
     described_class = github3.gists.comment.GistComment
@@ -230,11 +234,10 @@ class TestGistComment(helper.UnitHelper):
 
 
 class TestGistFile(helper.UnitHelper):
-
     """Test Gist File."""
 
     described_class = github3.gists.file.GistFile
-    example_data = gist_example_short_data()
+    example_data = gist_file_example_data()
 
     def test_get_file_content_from_raw_url(self):
         """Verify the request made to retrieve a GistFile's content."""

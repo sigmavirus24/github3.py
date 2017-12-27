@@ -14,7 +14,7 @@ from .auths import Authorization
 from .decorators import (requires_auth, requires_basic_auth,
                          requires_app_credentials)
 from .events import Event
-from .gists import Gist
+from . import gists
 from .issues import ShortIssue, Issue, issue_params
 from .models import GitHubCore
 from .orgs import Membership, ShortOrganization, Organization, Team
@@ -243,13 +243,14 @@ class GitHub(GitHubCore):
             for content, e.g. ``{'spam.txt': {'content': 'File contents
             ...'}}``
         :param bool public: (optional), make the gist public if True
-        :returns: :class:`Gist <github3.gists.Gist>`
+        :returns: the created gist if successful, otherwise ``None``
+        :rtype: :class:`~github3.gists.gist.Gist`
         """
         new_gist = {'description': description, 'public': public,
                     'files': files}
         url = self._build_url('gists')
         json = self._json(self._post(url, data=new_gist), 201)
-        return self._instance_or_null(Gist, json)
+        return self._instance_or_null(gists.Gist, json)
 
     @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
@@ -524,11 +525,12 @@ class GitHub(GitHubCore):
         """Retrieve the gist using the specified id number.
 
         :param int id_num: (required), unique id of the gist
-        :returns: :class:`Gist <github3.gists.Gist>`
+        :returns: the gist identified by ``id_num``
+        :rtype: :class:`~github3.gists.gist.Gist`
         """
         url = self._build_url('gists', str(id_num))
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Gist, json)
+        return self._instance_or_null(gists.Gist, json)
 
     @requires_auth
     def gists(self, number=-1, etag=None):
@@ -540,10 +542,11 @@ class GitHub(GitHubCore):
             returns all available gists
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        :returns: generator of short gists
+        :rtype: :class:~github3.gists.ShortGist>`
         """
         url = self._build_url('gists')
-        return self._iter(int(number), url, Gist, etag=etag)
+        return self._iter(int(number), url, gists.ShortGist, etag=etag)
 
     def gists_by(self, username, number=-1, etag=None):
         """Iterate over the gists owned by a user.
@@ -555,10 +558,11 @@ class GitHub(GitHubCore):
             returns all available gists
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        :returns: generator of short gists owned by the specified user
+        :rtype: :class:`~github3.gists.ShortGist`
         """
         url = self._build_url('users', username, 'gists')
-        return self._iter(int(number), url, Gist, etag=etag)
+        return self._iter(int(number), url, gists.ShortGist, etag=etag)
 
     def gitignore_template(self, language):
         """Return the template for language.
@@ -1006,10 +1010,11 @@ class GitHub(GitHubCore):
             returns all available gists
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Gist <github3.gists.Gist>`\ s
+        :returns: generator of short gists
+        :rtype: :class:`~github3.gists.gist.ShortGist`
         """
         url = self._build_url('gists', 'public')
-        return self._iter(int(number), url, Gist, etag=etag)
+        return self._iter(int(number), url, gists.ShortGist, etag=etag)
 
     @requires_auth
     def organization_memberships(self, state=None, number=-1, etag=None):
