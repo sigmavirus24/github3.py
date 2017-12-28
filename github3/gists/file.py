@@ -16,7 +16,7 @@ class _GistFile(GitHubCore):
         self.type = gistfile['type']
 
     def _repr(self):
-        return '<{s.class_name} [{s.name}]>'.format(s=self)
+        return '<{s.class_name} [{s.filename}]>'.format(s=self)
 
     def content(self):
         """Retrieve contents of file from key 'raw_url'.
