@@ -956,7 +956,7 @@ class _Repository(GitHubCore):
     @requires_auth
     def edit(self, name, description=None, homepage=None, private=None,
              has_issues=None, has_wiki=None, has_downloads=None,
-             default_branch=None):
+             default_branch=None, archived=None):
         """Edit this repository.
 
         :param str name: (required), name of the repository
@@ -980,12 +980,15 @@ class _Repository(GitHubCore):
         :param str default_branch: (optional), If not ``None``, change the
             default branch for this repository. API default: ``None`` - leave
             value unchanged.
+        :param bool archived: (optional), If not ``None``, toggle the archived
+            attribute on the repository to control whether it is archived or
+            not.
         :returns: bool -- True if successful, False otherwise
         """
         edit = {'name': name, 'description': description, 'homepage': homepage,
                 'private': private, 'has_issues': has_issues,
                 'has_wiki': has_wiki, 'has_downloads': has_downloads,
-                'default_branch': default_branch}
+                'default_branch': default_branch, 'archived': archived}
         self._remove_none(edit)
         json = None
         if edit:
@@ -2107,6 +2110,11 @@ class Repository(_Repository):
     This object has all the same attributes as
     :class:`~github3.repos.repo.ShortRepository` as well as:
 
+    .. attribute:: archived
+
+        A boolean attribute that describes whether the current repository has
+        been archived or not.
+
     .. attribute:: clone_url
 
         This is the URL that can be used to clone the repository via HTTPS,
@@ -2223,6 +2231,7 @@ class Repository(_Repository):
 
     def _update_attributes(self, repo):
         super(Repository, self)._update_attributes(repo)
+        self.archived = repo['archived']
         self.clone_url = repo['clone_url']
         self.created_at = self._strptime(repo['created_at'])
         self.default_branch = repo['default_branch']
@@ -2232,67 +2241,24 @@ class Repository(_Repository):
         self.has_downloads = repo['has_downloads']
         self.has_issues = repo['has_issues']
         self.has_pages = repo['has_pages']
+        self.has_projects = repo['has_projects']
         self.has_wiki = repo['has_wiki']
         self.homepage = repo['homepage']
         self.language = repo['language']
+        self.original_license = repo['license']
+        if self.original_license is not None:
+            self.original_license = License(self.original_license, self)
         self.mirror_url = repo['mirror_url']
+        self.network_count = repo['network_count']
         self.open_issues_count = repo['open_issues_count']
         self.pushed_at = self._strptime(repo['pushed_at'])
         self.size = repo['size']
         self.ssh_url = repo['ssh_url']
         self.stargazers_count = repo['stargazers_count']
+        self.subscribers_count = repo['subscribers_count']
         self.svn_url = self._get_attribute(repo, 'svn_url')
         self.updated_at = self._strptime_attribute(repo, 'updated_at')
         self.watchers_count = self.watchers = repo['watchers_count']
-
-        # Some repositories do not have these attributes at all
-        self.original_license = repo.get('license')
-        if self.original_license is not None:
-            self.original_license = License(self.original_license, self)
-        self.network_count = repo.get('network_count')
-        self.subscribers_count = repo.get('subscribers_count')
-
-        # .......... OLD ...... Deprecated?
-
-        #: URL of the pure diff of the pull request
-        self.diff_url = self._get_attribute(repo, 'diff_url')
-
-        #: URL of the pure patch of the pull request
-        self.patch_url = self._get_attribute(repo, 'patch_url')
-
-        #: API URL of the issue representation of this Pull Request
-        self.issue_url = self._get_attribute(repo, 'issue_url')
-
-        #: Permissions for this repository
-        self.permissions = self._get_attribute(repo, 'permissions')
-
-        #: ``datetime`` object representing when the repository was starred
-        self.starred_at = self._strptime_attribute(repo, 'starred_at')
-
-        #: Parent of this fork, if it exists :class:`Repository`
-        self.source = self._class_attribute(repo, 'source', Repository, self)
-
-        #: Parent of this fork, if it exists :class:`Repository`
-        self.parent = self._class_attribute(repo, 'parent', Repository, self)
-
-        #: master (default) branch for the repository
-        self.master_branch = self._get_attribute(repo, 'master_branch')
-
-        # Template URLS
-
-        #: Pull Request Review Comments URL
-        self.review_comments_url = self._class_attribute(
-            repo,
-            'review_comments_url',
-            URITemplate
-        )
-
-        #: Pull Request Review Comments URL Template. Expand with ``number``
-        self.issue_events_urlt = self._class_attribute(
-            repo,
-            'review_comment_url',
-            URITemplate
-        )
 
 
 class StarredRepository(GitHubCore):
