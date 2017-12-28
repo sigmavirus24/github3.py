@@ -104,23 +104,35 @@ class Plan(models.GitHubCore):
 
 
 class Email(models.GitHubCore):
-    """The :class:`Email` object.
+    """The object used to represent an AuthenticatedUser's email.
 
     Please see GitHub's `Emails documentation`_ for more information.
 
     .. _Emails documentation:
         https://developer.github.com/v3/users/emails/
+
+    The attributes represented on this object include:
+
+    .. attribute:: email
+
+        The email address as a string
+
+    .. attribute:: verified
+
+        A boolean value representing whether the address has been verified or
+        not
+
+    .. attribute:: primary
+
+        A boolean value representing whether the address is the primary
+        address for the user or not
     """
 
     def _update_attributes(self, email):
-        #: Email address
-        self.email = self._get_attribute(email, 'email')
-
-        #: Whether the address has been verified
-        self.verified = self._get_attribute(email, 'verified')
-
-        #: Whether the address is the primary address
-        self.primary = self._get_attribute(email, 'primary')
+        self.email = email['email']
+        self.verified = email['verified']
+        self.primary = email['primary']
+        self.visibility = email['visibility']
 
     def _repr(self):
         return '<Email [{0}]>'.format(self.email)
