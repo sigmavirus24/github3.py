@@ -16,13 +16,17 @@ env:
 matrix:
   include:
     - python: 2.7
-      env: TOXENV=py27 REQUESTS_VERSION=""
+      env: TOXENV=py27
     - python: 3.4
-      env: TOXENV=py34 REQUESTS_VERSION=""
+      env: TOXENV=py34
     - python: 3.5
-      env: TOXENV=py35 REQUESTS_VERSION=""
+      env: TOXENV=py35
+    - python: 3.6
+      env: TOXENV=py36
+    - python: nightly
+      env: TOXENV=py37
     - python: pypy
-      env: TOXENV=pypy REQUESTS_VERSION=""
+      env: TOXENV=pypy
     - env: TOXENV=py27-flake8
     - env: TOXENV=py34-flake8
     - env: TOXENV=docstrings
