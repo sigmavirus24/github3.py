@@ -1,4 +1,5 @@
 from github3.repos.release import Release, Asset
+from github3.users import ShortUser
 
 from .helper import (UnitHelper, UnitIteratorHelper, create_url_helper, mock,
                      create_example_data_helper)
@@ -28,6 +29,10 @@ class TestRelease(UnitHelper):
 
     def test_has_upload_urlt(self):
         assert self.instance.upload_urlt is not None
+
+    def test_has_author(self):
+        assert self.instance.author is not None
+        assert isinstance(self.instance.author, ShortUser)
 
     # Method tests
     def test_tarball_archive(self):

@@ -7,6 +7,7 @@ from uritemplate import URITemplate
 
 from .. import utils
 from .. import models
+from .. import users
 from ..decorators import requires_auth
 from ..exceptions import error_for
 
@@ -61,6 +62,10 @@ class Release(models.GitHubCore):
 
         #: URITemplate to upload an asset with
         self.upload_urlt = URITemplate(release['upload_url'])
+
+        #: :class:`User <github3.users.ShortUser>` object representing the
+        #:  creator of the release
+        self.author = users.ShortUser(release['author'])
 
         #: URLs to various attributes
         for urltype in ['assets_url', 'html_url', 'tarball_url',
