@@ -8,7 +8,10 @@ import json
 import pytest
 
 url_for = create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/releases'
+    'https://api.github.com/repos/sigmavirus24/github3.py/releases'
+)
+uploads_url_for = create_url_helper(
+    'https://uploads.github.com/repos/sigmavirus24/github3.py/releases'
 )
 
 get_release_example_data = create_example_data_helper('repos_release_example')
@@ -32,7 +35,8 @@ class TestRelease(UnitHelper):
         self.instance.archive(format='tarball')
 
         self.session.get.assert_called_once_with(
-            'https://api.github.com/repos/octocat/Hello-World/tarball/v1.0.0',
+            'https://api.github.com/repos/sigmavirus24/github3.py/'
+            'tarball/v0.7.1',
             allow_redirects=True,
             stream=True
         )
@@ -42,7 +46,8 @@ class TestRelease(UnitHelper):
         self.instance.archive(format='zipball')
 
         self.session.get.assert_called_once_with(
-            'https://api.github.com/repos/octocat/Hello-World/zipball/v1.0.0',
+            'https://api.github.com/repos/sigmavirus24/github3.py/'
+            'zipball/v0.7.1',
             allow_redirects=True,
             stream=True
         )
@@ -56,8 +61,7 @@ class TestRelease(UnitHelper):
     def test_delete(self):
         self.instance.delete()
         self.session.delete.assert_called_once_with(
-            self.example_data['url'],
-            headers={'Accept': 'application/vnd.github.manifold-preview'}
+            self.example_data['url']
         )
 
     def test_upload_asset(self):
@@ -69,7 +73,8 @@ class TestRelease(UnitHelper):
                 'text/plain', 'test_repos_release.py', content,
             )
             self.post_called_with(
-                url_for('/1/assets?name=%s' % 'test_repos_release.py'),
+                uploads_url_for('/76677/assets?name=%s' %
+                                'test_repos_release.py'),
                 data=content,
                 headers={
                     'Content-Type': 'text/plain'
@@ -85,7 +90,7 @@ class TestRelease(UnitHelper):
                 'text/plain', 'test_repos_release.py', content, 'test-label'
             )
             self.post_called_with(
-                url_for('/1/assets?name=%s&label=%s' % (
+                uploads_url_for('/76677/assets?name=%s&label=%s' % (
                     'test_repos_release.py', 'test-label')),
                 data=content,
                 headers={
@@ -107,7 +112,7 @@ class TestReleaseIterators(UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('1/assets'),
+            url_for('76677/assets'),
             params={'per_page': 100},
             headers={}
         )
@@ -123,8 +128,7 @@ class TestAsset(UnitHelper):
         self.instance.delete()
 
         self.session.delete.assert_called_once_with(
-            url_for('/assets/1'),
-            headers=Release.CUSTOM_HEADERS
+            url_for('/assets/37944')
         )
 
     @pytest.mark.xfail
@@ -134,7 +138,7 @@ class TestAsset(UnitHelper):
             self.instance.download()
 
         self.session.get.assert_called_once_with(
-            url_for('/assets/1'),
+            url_for('/assets/37944'),
             stream=True,
             allow_redirects=False,
             headers={'Accept': 'application/octect-stream'}
@@ -164,16 +168,13 @@ class TestAsset(UnitHelper):
         self.instance.edit('new name')
         self.session.patch.assert_called_once_with(
             self.example_data['url'],
-            data='{"name": "new name"}',
-            headers={'Accept': 'application/vnd.github.manifold-preview'}
+            data='{"name": "new name"}'
         )
 
     def test_edit_with_label(self):
         self.instance.edit('new name', 'label')
-        headers = {'Accept': 'application/vnd.github.manifold-preview'}
         _, args, kwargs = list(self.session.patch.mock_calls[0])
         assert self.example_data['url'] in args
-        assert kwargs['headers'] == headers
         assert json.loads(kwargs['data']) == {
             'name': 'new name', 'label': 'label'
             }

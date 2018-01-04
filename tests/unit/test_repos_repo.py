@@ -92,8 +92,7 @@ class TestRepository(helper.UnitHelper):
         self.instance.asset(1)
 
         self.session.get.assert_called_once_with(
-            url_for('releases/assets/1'),
-            headers={'Accept': 'application/vnd.github.manifold-preview'}
+            url_for('releases/assets/1')
         )
 
     def test_asset_requires_a_positive_id(self):
@@ -1390,7 +1389,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('releases'),
             params={'per_page': 100},
-            headers={'Accept': 'application/vnd.github.manifold-preview'}
+            headers={}
         )
 
     def test_stargazers(self):

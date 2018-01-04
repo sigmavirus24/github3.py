@@ -166,8 +166,7 @@ class _Repository(GitHubCore):
         if int(id) > 0:
             url = self._build_url('releases', 'assets', str(id),
                                   base_url=self._api)
-            data = self._json(self._get(url, headers=Release.CUSTOM_HEADERS),
-                              200)
+            data = self._json(self._get(url), 200)
         return self._instance_or_null(Asset, data)
 
     def assignees(self, number=-1, etag=None):
@@ -778,9 +777,7 @@ class _Repository(GitHubCore):
         self._remove_none(data)
 
         url = self._build_url('releases', base_url=self._api)
-        json = self._json(self._post(
-            url, data=data, headers=Release.CUSTOM_HEADERS
-            ), 201)
+        json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(Release, json)
 
     @requires_auth
@@ -1659,7 +1656,6 @@ class _Repository(GitHubCore):
         """
         url = self._build_url('releases', base_url=self._api)
         iterator = self._iter(int(number), url, Release, etag=etag)
-        iterator.headers.update(Release.CUSTOM_HEADERS)
         return iterator
 
     @requires_auth

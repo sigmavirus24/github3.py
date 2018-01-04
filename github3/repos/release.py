@@ -6,77 +6,66 @@ import json
 from uritemplate import URITemplate
 
 from .. import utils
+from .. import models
 from ..decorators import requires_auth
 from ..exceptions import error_for
-from ..models import GitHubCore
 
 
-class Release(GitHubCore):
+class Release(models.GitHubCore):
 
     """The :class:`Release <Release>` object.
 
     It holds the information GitHub returns about a release from a
     :class:`Repository <github3.repos.repo.Repository>`.
 
+    Please see GitHub's `Releases Documentation`_ for more information.
+
+    .. _Releases Documentation:
+        https://developer.github.com/v3/repos/releases/
     """
 
-    CUSTOM_HEADERS = {'Accept': 'application/vnd.github.manifold-preview'}
-
     def _update_attributes(self, release):
-        self._api = self._get_attribute(release, 'url')
+        self._api = self.url = release['url']
 
         #: List of :class:`Asset <Asset>` objects for this release
-        self.original_assets = self._get_attribute(release, 'assets', [])
-        if self.original_assets:
-            self.original_assets = [
-                Asset(i, self) for i in self.original_assets
-            ]
-
-        #: URL for uploaded assets
-        self.assets_url = self._get_attribute(release, 'assets_url')
+        self.original_assets = [
+            Asset(i, self) for i in release['assets']
+        ]
 
         #: Body of the release (the description)
-        self.body = self._get_attribute(release, 'body')
+        self.body = release['body']
 
         #: Date the release was created
         self.created_at = self._strptime_attribute(release, 'created_at')
 
         #: Boolean whether value is True or False
-        self.draft = self._get_attribute(release, 'draft')
-
-        #: HTML URL of the release
-        self.html_url = self._get_attribute(release, 'html_url')
+        self.draft = release['draft']
 
         #: GitHub id
-        self.id = self._get_attribute(release, 'id')
+        self.id = release['id']
 
         #: Name given to the release
-        self.name = self._get_attribute(release, 'name')
+        self.name = release['name']
 
         #: Boolean whether release is a prerelease
-        self.prerelease = self._get_attribute(release, 'prerelease')
+        self.prerelease = release['prerelease']
 
         #: Date the release was published
         self.published_at = self._strptime_attribute(release, 'published_at')
 
         #: Name of the tag
-        self.tag_name = self._get_attribute(release, 'tag_name')
-
-        #: URL to download a tarball of the release
-        self.tarball_url = self._get_attribute(release, 'tarball_url')
+        self.tag_name = release['tag_name']
 
         #: "Commit" that this release targets
-        self.target_commitish = self._get_attribute(
-            release, 'target_commitish'
-        )
+        self.target_commitish = release['target_commitish']
 
         #: URITemplate to upload an asset with
-        self.upload_urlt = self._class_attribute(
-            release, 'upload_url', URITemplate
-        )
+        self.upload_urlt = URITemplate(release['upload_url'])
 
-        #: URL to download a zipball of the release
-        self.zipball_url = self._get_attribute(release, 'zipball_url')
+        #: URLs to various attributes
+        for urltype in ['assets_url', 'html_url', 'tarball_url',
+                        'zipball_url']:
+            setattr(self, urltype, release[urltype])
 
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
@@ -131,13 +120,15 @@ class Release(GitHubCore):
 
     @requires_auth
     def delete(self):
-        """Users with push access to the repository can delete a release.
+        """Delete this release.
+
+        Users with push access to the repository can delete a release.
 
         :returns: True if successful; False if not successful
         """
         url = self._api
         return self._boolean(
-            self._delete(url, headers=Release.CUSTOM_HEADERS),
+            self._delete(url),
             204,
             404
         )
@@ -145,7 +136,9 @@ class Release(GitHubCore):
     @requires_auth
     def edit(self, tag_name=None, target_commitish=None, name=None, body=None,
              draft=None, prerelease=None):
-        """Users with push access to the repository can edit a release.
+        """Edit this release.
+
+        Users with push access to the repository can edit a release.
 
         If the edit is successful, this object will update itself.
 
@@ -171,8 +164,7 @@ class Release(GitHubCore):
         self._remove_none(data)
 
         r = self.session.patch(
-            url, data=json.dumps(data), headers=Release.CUSTOM_HEADERS
-        )
+            url, data=json.dumps(data))
 
         successful = self._boolean(r, 200, 404)
         if successful:
@@ -204,42 +196,41 @@ class Release(GitHubCore):
         raise error_for(r)
 
 
-class Asset(GitHubCore):
+class Asset(models.GitHubCore):
 
     def _update_attributes(self, asset):
-        self._api = self._get_attribute(asset, 'url')
+        self._api = asset['url']
 
         #: Content-Type provided when the asset was created
-        self.content_type = self._get_attribute(asset, 'content_type')
+        self.content_type = asset['content_type']
 
         #: Date the asset was created
-        self.created_at = self._strptime_attribute(asset, 'created_at')
+        self.created_at = asset['created_at']
 
         #: Number of times the asset was downloaded
-        self.download_count = self._get_attribute(asset, 'download_count')
+        self.download_count = asset['download_count']
 
         #: URL to download the asset.
         #: Request headers must include ``Accept: application/octet-stream``.
         self.download_url = self._api
 
         # User friendly download URL
-        self.browser_download_url = self._get_attribute(
-            asset, 'browser_download_url')
+        self.browser_download_url = asset['browser_download_url']
 
         #: GitHub id of the asset
-        self.id = self._get_attribute(asset, 'id')
+        self.id = asset['id']
 
         #: Short description of the asset
-        self.label = self._get_attribute(asset, 'label')
+        self.label = asset['label']
 
         #: Name of the asset
-        self.name = self._get_attribute(asset, 'name')
+        self.name = asset['name']
 
         #: Size of the asset
-        self.size = self._get_attribute(asset, 'size')
+        self.size = asset['size']
 
         #: State of the asset, e.g., "uploaded"
-        self.state = self._get_attribute(asset, 'state')
+        self.state = asset['state']
 
         #: Date the asset was updated
         self.updated_at = self._strptime_attribute(asset, 'updated_at')
@@ -287,9 +278,7 @@ class Asset(GitHubCore):
         """
         url = self._api
         return self._boolean(
-            self._delete(url, headers=Release.CUSTOM_HEADERS),
-            204,
-            404
+            self._delete(url), 204, 404
         )
 
     def edit(self, name, label=None):
@@ -305,8 +294,7 @@ class Asset(GitHubCore):
         self._remove_none(edit_data)
         r = self._patch(
             self._api,
-            data=json.dumps(edit_data),
-            headers=Release.CUSTOM_HEADERS
+            data=json.dumps(edit_data)
         )
         successful = self._boolean(r, 200, 404)
         if successful:
