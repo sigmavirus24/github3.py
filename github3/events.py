@@ -31,6 +31,8 @@ class EventUser(GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(users.User, json)
 
+    refresh = to_user
+
 
 class EventOrganization(GitHubCore):
     """The class that represents the org information returned in Events."""
@@ -48,6 +50,8 @@ class EventOrganization(GitHubCore):
         url = self._build_url('orgs', self.login)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(orgs.Organization, json)
+
+    refresh = to_org
 
 
 class EventPullRequest(GitHubCore):
@@ -67,6 +71,8 @@ class EventPullRequest(GitHubCore):
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
 
+    refresh = to_pull
+
 
 class EventIssue(GitHubCore):
     """The class that represents the issue information returned in Events."""
@@ -84,6 +90,8 @@ class EventIssue(GitHubCore):
         from . import issues
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(issues.Issue, json)
+
+    refresh = to_issue
 
 
 class Event(GitHubCore):
