@@ -6,7 +6,7 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.repos.repo import (Comparison, Contents, Hook, RepoComment,
-                                RepoCommit, Repository)
+                                RepoCommit, Repository, ShortRepository)
 from github3.models import GitHubCore
 from github3.projects import Project
 
@@ -33,7 +33,7 @@ url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World'
 )
 get_repo_example_data = helper.create_example_data_helper(
-    'repos_repo_example'
+    'repo_example'
 )
 get_comment_example_data = helper.create_example_data_helper(
     'comment_example'
@@ -876,7 +876,7 @@ class TestRepository(helper.UnitHelper):
     def test_parent(self):
         """Verify that parent of repository can be retrieved."""
         parent = self.instance.parent
-        assert isinstance(parent, Repository)
+        assert isinstance(parent, ShortRepository)
 
     def test_permission(self):
         """Verify permissions of a repository can be retrieved."""
@@ -953,7 +953,7 @@ class TestRepository(helper.UnitHelper):
         """Verify that the source of the repository can be retrieved."""
         source = self.instance.source
 
-        assert isinstance(source, Repository)
+        assert isinstance(source, ShortRepository)
 
     def test_subscription(self):
         """Verify the request for retrieving the subscription on a repo."""

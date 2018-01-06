@@ -128,7 +128,7 @@ class _Repository(GitHubCore):
             return False
         url = self._build_url('collaborators', str(username),
                               base_url=self._api)
-        return self._boolean(self._put(url), 204, 404)
+        return self._boolean(self._put(url), 201, 404)
 
     def archive(self, format, path='', ref='master'):
         """Get the tarball or zipball archive for this repo at ref.
@@ -1032,13 +1032,13 @@ class _Repository(GitHubCore):
             returns all forks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <Repository>`
+        :returns: generator of :class:`~github3.repos.repo.ShortRepository`
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
         if sort in ('newest', 'oldest', 'watchers'):
             params = {'sort': sort}
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, ShortRepository, params, etag)
 
     def git_commit(self, sha):
         """Get a single (git) commit.
@@ -1175,7 +1175,7 @@ class _Repository(GitHubCore):
         data = self._post(url, data=issue,
                           headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
 
-        json = self._json(data, 200)
+        json = self._json(data, 202)
         return self._instance_or_null(ImportedIssue, json)
 
     def is_assignee(self, username):
@@ -2186,6 +2186,12 @@ class Repository(_Repository):
 
         The number of issues currently open on the repository.
 
+    .. attribute:: parent
+
+        A representation of the parent repository as
+        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
+        no parent then this will be ``None``.
+
     .. attribute:: pushed_at
 
         A parsed :class:`~datetime.datetime` object representing the date a
@@ -2194,6 +2200,12 @@ class Repository(_Repository):
     .. attribute:: size
 
         The size of the repository.
+
+    .. attribute:: source
+
+        A representation of the source repository as
+        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
+        no source then this will be ``None``.
 
     .. attribute:: ssh_url
 
@@ -2251,8 +2263,14 @@ class Repository(_Repository):
         self.mirror_url = repo['mirror_url']
         self.network_count = repo['network_count']
         self.open_issues_count = repo['open_issues_count']
+        self.parent = repo.get('parent', None)
+        if self.parent is not None:
+            self.parent = ShortRepository(self.parent, self)
         self.pushed_at = self._strptime(repo['pushed_at'])
         self.size = repo['size']
+        self.source = repo.get('source', None)
+        if self.source is not None:
+            self.source = ShortRepository(self.source, self)
         self.ssh_url = repo['ssh_url']
         self.stargazers_count = repo['stargazers_count']
         self.subscribers_count = repo['subscribers_count']
@@ -2286,7 +2304,7 @@ class StarredRepository(GitHubCore):
 
     def _update_attributes(self, starred_repository):
         self.starred_at = self._strptime(starred_repository['starred_at'])
-        self.repository = Repository(starred_repository['repo'], self)
+        self.repository = ShortRepository(starred_repository['repo'], self)
         self.repo = self.repository
 
     def _repr(self):

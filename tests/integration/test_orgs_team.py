@@ -103,7 +103,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()
             for repository in t.repositories():
-                assert isinstance(repository, github3.repos.Repository)
+                assert isinstance(repository, github3.repos.ShortRepository)
 
     def test_remove_member(self):
         """Show a user can remove a member from a team."""

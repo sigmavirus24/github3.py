@@ -168,9 +168,9 @@ def _follow(payload, session):
 
 
 def _forkev(payload, session):
-    from .repos import Repository
+    from .repos import ShortRepository
     if payload.get('forkee'):
-        payload['forkee'] = Repository(payload['forkee'], session)
+        payload['forkee'] = ShortRepository(payload['forkee'], session)
     return payload
 
 
@@ -233,11 +233,11 @@ def _release(payload, session):
 
 def _team(payload, session):
     from .orgs import Team
-    from .repos import Repository
+    from .repos import ShortRepository
     if payload.get('team'):
         payload['team'] = Team(payload['team'], session)
     if payload.get('repo'):
-        payload['repo'] = Repository(payload['repo'], session)
+        payload['repo'] = ShortRepository(payload['repo'], session)
     if payload.get('sender'):
         payload['sender'] = EventUser(payload['sender'], session)
     return payload

@@ -23,6 +23,7 @@ class TestMilestone(IntegrationHelper):
             assert milestone.update(
                 title='integration', description='delete me'
             ) is True
+            assert milestone.delete() is True
 
     def test_labels(self):
         """Test the ability to iterate over milestone labels."""

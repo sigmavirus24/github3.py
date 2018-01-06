@@ -17,7 +17,7 @@ class TestBranch(helper.UnitHelper):
     def test_latest_sha(self):
         """Verify the request for retreiving the latest_sha."""
         headers = {
-            'Accept': 'application/vnd.github.chitauri-preview+sha',
+            'Accept': 'application/vnd.github.v3.sha',
             'If-None-Match': '"123"'
         }
         self.instance.latest_sha(differs_from='123')
