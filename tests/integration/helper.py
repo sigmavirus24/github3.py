@@ -4,6 +4,7 @@ import github3
 import os
 import pytest
 import unittest
+import uuid
 
 
 @pytest.mark.usefixtures('betamax_simple_body')
@@ -16,8 +17,20 @@ class IntegrationHelper(unittest.TestCase):
         self.session = self.gh.session
         self.recorder = betamax.Betamax(self.session)
 
+    def make_user_agent_string(self):
+        using_travis = (os.environ.get('TRAVIS', 'false').lower() == 'true')
+        if using_travis:
+            return 'github3.py-ci-{}/{}'.format(
+                uuid.uuid4().hex, github3.__version__,
+            )
+        else:
+            return ''
+
     def get_client(self):
-        return github3.GitHub()
+        client = github3.GitHub()
+        user_agent_string = self.make_user_agent_string()
+        client.set_user_agent(user_agent_string)
+        return client
 
     def token_login(self):
         self.gh.login(token=self.token)
