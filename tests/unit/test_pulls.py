@@ -99,16 +99,16 @@ class TestPullRequest(helper.UnitHelper):
 
         self.put_called_with(
             url_for('merge'),
-            data={"squash": False}
+            data={"merge_method": "merge"}
         )
 
     def test_merge_squash_message(self):
         """Show that a user can merge a Pull Request."""
-        self.instance.merge('commit message', squash=True)
+        self.instance.merge('commit message', merge_method='squash')
 
         self.put_called_with(
             url_for('merge'),
-            data={"squash": True, "commit_message": "commit message"}
+            data={"merge_method": "squash", "commit_message": "commit message"}
         )
 
     def test_patch(self):
