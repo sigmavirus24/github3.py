@@ -310,7 +310,8 @@ class _PullRequest(models.GitHubCore):
             merge commit
         :param str sha: (optional), SHA that pull request head must match
             to merge.
-        :param str merge_method: (optional), Change the merge method. Either 'merge', 'squash' or 'rebase'. Default is 'merge'.
+        :param str merge_method: (optional), Change the merge method.
+            Either 'merge', 'squash' or 'rebase'. Default is 'merge'.
         :returns: bool
         """
         parameters = {'merge_method': merge_method}
