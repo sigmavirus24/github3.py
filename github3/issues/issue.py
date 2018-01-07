@@ -83,7 +83,7 @@ class _Issue(models.GitHubCore):
         #: issue was assigned to.
         self.milestone = issue['milestone']
         if self.milestone:
-            self.milestone = Milestone(self.milestone)
+            self.milestone = Milestone(self.milestone, self)
 
         #: Issue number (e.g. #15)
         self.number = issue['number']
