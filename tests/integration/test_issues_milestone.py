@@ -28,6 +28,11 @@ class TestMilestone(IntegrationHelper):
         """Test the ability to iterate over milestone labels."""
         cassette_name = self.cassette_name('labels')
         with self.recorder.use_cassette(cassette_name):
+            cassette = self.recorder.current_cassette
+            print('Cassette path:{} record_mode:{} is_recording:{}'.format(
+                cassette.cassette_path, cassette.record_mode,
+                cassette.is_recording()
+            ))
             issue = self.gh.issue('sigmavirus24', 'github3.py', 206)
             milestone = issue.milestone
             assert milestone is not None
