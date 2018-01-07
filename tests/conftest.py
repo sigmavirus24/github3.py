@@ -16,6 +16,7 @@ with betamax.Betamax.configure() as config:
     record_mode = os.environ.get('GH_RECORD_MODE', 'once')
 
     config.default_cassette_options['record_mode'] = record_mode
+    print('Betamax record mode: {}'.format(record_mode))
 
     config.define_cassette_placeholder(
         '<AUTH_TOKEN>',

@@ -4,7 +4,7 @@ before_script:
 - pip install tox
 
 # test script
-script:  tox
+script:  tox -- -s
 notifications:
   on_success: change
   on_failure: always
