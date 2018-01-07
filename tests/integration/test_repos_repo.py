@@ -581,6 +581,18 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('github3py', 'github3.py')
             assert repository.edit('github3py') is True
 
+    def test_archive_a_repository(self):
+        """Verify we can archive a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('archive_a_repository')
+        with self.recorder.use_cassette(cassette_name):
+            organization = self.gh.organization('testgh3py')
+            repository = organization.create_repository('archive-me')
+            assert repository.archived is False
+            repository.edit(name='i-have-been-archived', archived=True)
+            assert repository.archived is True
+            repository.delete()
+
     def test_events(self):
         """Test that a user can iterate over the events from a repository."""
         cassette_name = self.cassette_name('events')
