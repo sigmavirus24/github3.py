@@ -51,7 +51,7 @@ class Branch(GitHubCore):
         """
         # If-None-Match returns 200 instead of 304 value does not have quotes
         headers = {
-            'Accept': 'application/vnd.github.chitauri-preview+sha',
+            'Accept': 'application/vnd.github.v3.sha',
             'If-None-Match': '"{0}"'.format(differs_from)
         }
         base = self._api.split('/branches', 1)[0]
@@ -73,10 +73,12 @@ class Branch(GitHubCore):
             status checks that must pass before merging. Use `None` or omit to
             use the already associated value.
         """
-        previous_values = self.protection['required_status_checks']
-        if enforcement is None:
+        previous_values = None
+        if self.protection:
+            previous_values = self.protection['required_status_checks']
+        if enforcement is None and previous_values:
             enforcement = previous_values['enforcement_level']
-        if status_checks is None:
+        if status_checks is None and previous_values:
             status_checks = previous_values['contexts']
 
         edit = {'protection': {'enabled': True, 'required_status_checks': {

@@ -225,7 +225,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for repo in o.repositories():
-                assert isinstance(repo, github3.repos.Repository)
+                assert isinstance(repo, github3.repos.ShortRepository)
 
     def test_teams(self):
         """Test the ability to retrieve an organization's teams."""

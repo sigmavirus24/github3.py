@@ -60,7 +60,7 @@ class TestPayLoadHandlers(TestCase):
         """Show that the event type is a ForkEvent."""
         forkee = {'forkee': get_repo_example_data()}
         github3.events._forkev(forkee, None)
-        assert isinstance(forkee['forkee'], github3.repos.Repository)
+        assert isinstance(forkee['forkee'], github3.repos.ShortRepository)
 
     def test_gist(self):
         """Show that the event type is a GistEvent."""
@@ -114,4 +114,4 @@ class TestPayLoadHandlers(TestCase):
 
         github3.events._team(team, None)
         assert isinstance(team['team'], github3.orgs.Team)
-        assert isinstance(team['repo'], github3.repos.Repository)
+        assert isinstance(team['repo'], github3.repos.ShortRepository)

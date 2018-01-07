@@ -372,9 +372,9 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
-        from .repos import Repository
+        from .repos import ShortRepository
         url = self._build_url('subscriptions', base_url=self._api)
-        return self._iter(int(number), url, Repository, etag=etag)
+        return self._iter(int(number), url, ShortRepository, etag=etag)
 
     @requires_auth
     def rename(self, login):

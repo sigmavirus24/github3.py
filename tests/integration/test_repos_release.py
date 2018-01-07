@@ -66,9 +66,13 @@ class TestRelease(IntegrationHelper):
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'charade')
-            release = repository.release(85783)
+            release = repository.create_release(
+                '0.8.0.pre', 'develop', '0.8.0 fake release',
+                'To be deleted'
+                )
             assert release.edit(body='Test editing a release') is True
             assert release.body == 'Test editing a release'
+            release.delete()
 
     def test_upload_asset(self):
         """Test the ability to upload an asset to a release."""

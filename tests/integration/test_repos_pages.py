@@ -9,7 +9,7 @@ class TestRepositoryPages(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('latest_pages_build')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'delete_contents')
             assert repository is not None
             latest_build = repository.latest_pages_build()
 
@@ -22,7 +22,7 @@ class TestRepositoryPages(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('pages')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'delete_contents')
             assert repository is not None
             pages_info = repository.pages()
 
@@ -33,7 +33,7 @@ class TestRepositoryPages(IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name('pages_builds')
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            repository = self.gh.repository('github3py', 'delete_contents')
             assert repository is not None
             for build in repository.pages_builds():
                 assert isinstance(build, github3.repos.pages.PagesBuild)

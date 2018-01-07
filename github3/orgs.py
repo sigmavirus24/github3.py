@@ -12,7 +12,7 @@ from . import users, models
 from .decorators import requires_auth
 from .events import Event
 from .projects import Project
-from .repos import Repository
+from .repos import Repository, ShortRepository
 
 
 class Team(models.GitHubCore):
@@ -184,7 +184,7 @@ class Team(models.GitHubCore):
         """
         headers = {'Accept': 'application/vnd.github.ironman-preview+json'}
         url = self._build_url('repos', base_url=self._api)
-        return self._iter(int(number), url, Repository, etag=etag,
+        return self._iter(int(number), url, ShortRepository, etag=etag,
                           headers=headers)
 
     @requires_auth
@@ -599,7 +599,7 @@ class _Organization(models.GitHubCore):
         params = {}
         if type in ('all', 'public', 'member', 'private', 'forks', 'sources'):
             params['type'] = type
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, ShortRepository, params, etag)
 
     @requires_auth
     def teams(self, number=-1, etag=None):
