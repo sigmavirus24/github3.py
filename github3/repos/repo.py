@@ -128,7 +128,7 @@ class _Repository(GitHubCore):
             return False
         url = self._build_url('collaborators', str(username),
                               base_url=self._api)
-        return self._boolean(self._put(url), 204, 404)
+        return self._boolean(self._put(url), 201, 404)
 
     def archive(self, format, path='', ref='master'):
         """Get the tarball or zipball archive for this repo at ref.
@@ -956,7 +956,7 @@ class _Repository(GitHubCore):
     @requires_auth
     def edit(self, name, description=None, homepage=None, private=None,
              has_issues=None, has_wiki=None, has_downloads=None,
-             default_branch=None):
+             default_branch=None, archived=None):
         """Edit this repository.
 
         :param str name: (required), name of the repository
@@ -980,12 +980,15 @@ class _Repository(GitHubCore):
         :param str default_branch: (optional), If not ``None``, change the
             default branch for this repository. API default: ``None`` - leave
             value unchanged.
+        :param bool archived: (optional), If not ``None``, toggle the archived
+            attribute on the repository to control whether it is archived or
+            not.
         :returns: bool -- True if successful, False otherwise
         """
         edit = {'name': name, 'description': description, 'homepage': homepage,
                 'private': private, 'has_issues': has_issues,
                 'has_wiki': has_wiki, 'has_downloads': has_downloads,
-                'default_branch': default_branch}
+                'default_branch': default_branch, 'archived': archived}
         self._remove_none(edit)
         json = None
         if edit:
@@ -1029,13 +1032,13 @@ class _Repository(GitHubCore):
             returns all forks
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Repository <Repository>`
+        :returns: generator of :class:`~github3.repos.repo.ShortRepository`
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
         if sort in ('newest', 'oldest', 'watchers'):
             params = {'sort': sort}
-        return self._iter(int(number), url, Repository, params, etag)
+        return self._iter(int(number), url, ShortRepository, params, etag)
 
     def git_commit(self, sha):
         """Get a single (git) commit.
@@ -1172,7 +1175,7 @@ class _Repository(GitHubCore):
         data = self._post(url, data=issue,
                           headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
 
-        json = self._json(data, 200)
+        json = self._json(data, 202)
         return self._instance_or_null(ImportedIssue, json)
 
     def is_assignee(self, username):
@@ -2107,6 +2110,11 @@ class Repository(_Repository):
     This object has all the same attributes as
     :class:`~github3.repos.repo.ShortRepository` as well as:
 
+    .. attribute:: archived
+
+        A boolean attribute that describes whether the current repository has
+        been archived or not.
+
     .. attribute:: clone_url
 
         This is the URL that can be used to clone the repository via HTTPS,
@@ -2178,6 +2186,12 @@ class Repository(_Repository):
 
         The number of issues currently open on the repository.
 
+    .. attribute:: parent
+
+        A representation of the parent repository as
+        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
+        no parent then this will be ``None``.
+
     .. attribute:: pushed_at
 
         A parsed :class:`~datetime.datetime` object representing the date a
@@ -2186,6 +2200,12 @@ class Repository(_Repository):
     .. attribute:: size
 
         The size of the repository.
+
+    .. attribute:: source
+
+        A representation of the source repository as
+        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
+        no source then this will be ``None``.
 
     .. attribute:: ssh_url
 
@@ -2223,6 +2243,7 @@ class Repository(_Repository):
 
     def _update_attributes(self, repo):
         super(Repository, self)._update_attributes(repo)
+        self.archived = repo['archived']
         self.clone_url = repo['clone_url']
         self.created_at = self._strptime(repo['created_at'])
         self.default_branch = repo['default_branch']
@@ -2232,67 +2253,30 @@ class Repository(_Repository):
         self.has_downloads = repo['has_downloads']
         self.has_issues = repo['has_issues']
         self.has_pages = repo['has_pages']
+        self.has_projects = repo['has_projects']
         self.has_wiki = repo['has_wiki']
         self.homepage = repo['homepage']
         self.language = repo['language']
+        self.original_license = repo['license']
+        if self.original_license is not None:
+            self.original_license = License(self.original_license, self)
         self.mirror_url = repo['mirror_url']
+        self.network_count = repo['network_count']
         self.open_issues_count = repo['open_issues_count']
+        self.parent = repo.get('parent', None)
+        if self.parent is not None:
+            self.parent = ShortRepository(self.parent, self)
         self.pushed_at = self._strptime(repo['pushed_at'])
         self.size = repo['size']
+        self.source = repo.get('source', None)
+        if self.source is not None:
+            self.source = ShortRepository(self.source, self)
         self.ssh_url = repo['ssh_url']
         self.stargazers_count = repo['stargazers_count']
+        self.subscribers_count = repo['subscribers_count']
         self.svn_url = self._get_attribute(repo, 'svn_url')
         self.updated_at = self._strptime_attribute(repo, 'updated_at')
         self.watchers_count = self.watchers = repo['watchers_count']
-
-        # Some repositories do not have these attributes at all
-        self.original_license = repo.get('license')
-        if self.original_license is not None:
-            self.original_license = License(self.original_license, self)
-        self.network_count = repo.get('network_count')
-        self.subscribers_count = repo.get('subscribers_count')
-
-        # .......... OLD ...... Deprecated?
-
-        #: URL of the pure diff of the pull request
-        self.diff_url = self._get_attribute(repo, 'diff_url')
-
-        #: URL of the pure patch of the pull request
-        self.patch_url = self._get_attribute(repo, 'patch_url')
-
-        #: API URL of the issue representation of this Pull Request
-        self.issue_url = self._get_attribute(repo, 'issue_url')
-
-        #: Permissions for this repository
-        self.permissions = self._get_attribute(repo, 'permissions')
-
-        #: ``datetime`` object representing when the repository was starred
-        self.starred_at = self._strptime_attribute(repo, 'starred_at')
-
-        #: Parent of this fork, if it exists :class:`Repository`
-        self.source = self._class_attribute(repo, 'source', Repository, self)
-
-        #: Parent of this fork, if it exists :class:`Repository`
-        self.parent = self._class_attribute(repo, 'parent', Repository, self)
-
-        #: master (default) branch for the repository
-        self.master_branch = self._get_attribute(repo, 'master_branch')
-
-        # Template URLS
-
-        #: Pull Request Review Comments URL
-        self.review_comments_url = self._class_attribute(
-            repo,
-            'review_comments_url',
-            URITemplate
-        )
-
-        #: Pull Request Review Comments URL Template. Expand with ``number``
-        self.issue_events_urlt = self._class_attribute(
-            repo,
-            'review_comment_url',
-            URITemplate
-        )
 
 
 class StarredRepository(GitHubCore):
@@ -2320,7 +2304,7 @@ class StarredRepository(GitHubCore):
 
     def _update_attributes(self, starred_repository):
         self.starred_at = self._strptime(starred_repository['starred_at'])
-        self.repository = Repository(starred_repository['repo'], self)
+        self.repository = ShortRepository(starred_repository['repo'], self)
         self.repo = self.repository
 
     def _repr(self):

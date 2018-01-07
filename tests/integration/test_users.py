@@ -153,4 +153,4 @@ class TestUser(IntegrationHelper):
 
         assert len(repos) > 0
         for repository in repos:
-            assert isinstance(repository, github3.repos.Repository)
+            assert isinstance(repository, github3.repos.ShortRepository)
