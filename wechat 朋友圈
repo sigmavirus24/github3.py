@@ -1,0 +1,26 @@
+
+from os import path
+import jieba
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+from scipy.misc import imread
+d = path.dirname(__file__)
+mylist = [s1, s2, s3]
+word_list = [" ".join(jieba.cut(sentence)) for sentence in mylist]
+new_text = ' '.join(word_list)
+imagename = path.join(d, "C://Users//Administrator//Desktop//4.1//背景.jpg")  # 背景图片路径  #C://Users//Administrator//Desktop//4.1//背景.jpg
+coloring = imread(imagename)             # 读取背景图片 
+fontname=path.join(d, "C://Users//Administrator//Desktop//4.1//simhei.ttf")  # 使用的是微软雅黑字体 #C://Users//Administrator//Desktop//4.1//simhei.ttf
+wordcloud = WordCloud( 
+        background_color='white',
+    mask=coloring, 
+    font_path=fontname).generate(new_text)
+
+plt.figure(
+        num=None,
+        figsize=(8,6),dpi=80,
+        facecolor='w',edgecolor='k'
+)
+plt.imshow(wordcloud)
+plt.axis("off")
+plt.show()
