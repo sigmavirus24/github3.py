@@ -162,55 +162,23 @@ class _User(models.GitHubCore):
     class_name = '_User'
 
     def _update_attributes(self, user):
-        #: URL of the avatar at gravatar
         self.avatar_url = user['avatar_url']
-
-        #: Events URL Template. Expands with ``privacy``
         self.events_urlt = URITemplate(user['events_url'])
-
-        #: Followers URL (not a template)
         self.followers_url = user['followers_url']
-
-        #: Following URL Template. Expands with ``other_user``
         self.following_urlt = URITemplate(user['following_url'])
-
-        #: Gists URL Template. Expands with ``gist_id``
         self.gists_urlt = URITemplate(user['gists_url'])
-
-        #: ID of the user's image on Gravatar
         self.gravatar_id = user['gravatar_id']
-
-        # e.g. https://github.com/self._login
-        #: URL of the user/org's profile
         self.html_url = user['html_url']
-
-        #: Unique ID of the account
         self.id = user['id']
-
-        #: User name of the user
         self.login = user['login']
-
-        #: Organizations URL (not a template)
         self.organizations_url = user['organizations_url']
-
-        #: Received Events URL (not a template)
         self.received_events_url = user['received_events_url']
-
-        #: Repostories URL (not a template)
         self.repos_url = user['repos_url']
-
         self.site_admin = user.get('site_admin')
-
-        #: Starred URL Template. Expands with ``owner`` and ``repo``
         self.starred_urlt = URITemplate(user['starred_url'])
-
-        #: Subscriptions URL (not a template)
         self.subscriptions_url = user['subscriptions_url']
-
         self.type = user['type']
-
         self.url = self._api = user['url']
-
         self._uniq = self.id
 
     def __str__(self):
@@ -521,9 +489,111 @@ class ShortUser(_User):
     with different sets of attributes.
 
     .. versionadded:: 1.0.0
+
+
+    .. attribute:: avatar_url
+
+        The URL of the avatar (possibly from Gravatar)
+
+    .. attribute:: events_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        an events URL
+
+    .. attribute:: followers_url
+
+        A string representing the resource to retrieve a User's followers
+
+    .. attribute:: following_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        the URL to check if this user is following ``other_user``
+
+    .. attribute:: gists_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        the URL to retrieve a Gist by its id
+
+    .. attribute:: gravatar_id
+
+        The identifier for the user's gravatar
+
+    .. attribute:: html_url
+
+        The URL of the user's publicly visible profile. For example,
+        ``https://github.com/sigmavirus24``
+
+    .. attribute:: id
+
+        The unique ID of the account
+
+    .. attribute:: login
+
+        The username of the user, e.g., ``sigmavirus24``
+
+    .. attribute:: organizations_url
+
+        A string representing the resource to retrieve the organizations to
+        which a user belongs
+
+    .. attribute:: received_events_url
+
+        A string representing the resource to retrieve the events a user
+        received
+
+    .. attribute:: repos_url
+
+        A string representing the resource to list a user's repositories
+
+    .. attribute:: site_admin
+
+        A boolean attribute indicating whether the user is a member of
+        GitHub's staff
+
+    .. attribute:: starred_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        a URL to retrieve whether the user has starred a repository.
+
+    .. attribute:: subscriptions_url
+
+        A string representing the resource to list a user's subscriptions
+
+    .. attribute:: type
+
+        A string representing the type of User account this. In all cases
+        should be "User"
+
+    .. attribute:: url
+
+        A string of this exact resource retrievable from GitHub's API
     """
 
     class_name = 'ShortUser'
+
+
+class Contributor(_User):
+    """Object for the specialized representation of a contributor.
+
+    When retrieving a repository's contributors, GitHub returns the same
+    information as a :class:`~github3.users.ShortUser` with an additional
+    attribute:
+
+    .. versionadded:: 1.0.0
+
+        This class was added in version 1.0.0
+
+    .. attribute:: contributions_count
+
+        The number of contributions a contributor has made to the repository
+
+    """
+
+    class_name = 'Contributor'
+
+    def _update_attributes(self, contributor):
+        super(Contributor, self)._update_attributes(contributor)
+        self.contributions = contributor['contributions']
 
 
 class User(_User):
@@ -541,53 +611,81 @@ class User(_User):
     authenticated user (e.g., :meth:`~github3.github.GitHub.me`).
 
     .. versionchanged:: 1.0.0
+
+    This object contains all of the attributes available on
+    :class:`~github3.users.ShortUser` as well as the following:
+
+    .. attribute:: bio
+
+        The markdown formatted User's biography
+
+    .. attribute:: blog
+
+        The URL of the user's blog
+
+    .. attribute:: company
+
+        The name or GitHub handle of the user's company
+
+    .. attribute:: created_at
+
+        A parsed :class:`~datetime.datetime` object representing the date the
+        user was created
+
+    .. attribute:: email
+
+        The email address the user has on their public profile page
+
+    .. attribute:: followers_count
+
+        The number of followers of this user
+
+    .. attribute:: following_count
+
+        The number of users this user follows
+
+    .. attribute:: hireable
+
+        Whether or not the user has opted into GitHub jobs advertising
+
+    .. attribute:: location
+
+        The location specified by the user on their public profile
+
+    .. attribute:: name
+
+        The name specified by their user on their public profile
+
+    .. attribute:: public_gists_count
+
+        The number of public gists owned by this user
+
+    .. attribute: public_repos_count
+
+        The number of public repositories owned by this user
+
+    .. attribute:: updated_at
+
+        A parsed :class:`~datetime.datetime` object representing the date
+        the user was last updated
     """
 
     class_name = 'User'
 
     def _update_attributes(self, user):
         super(User, self)._update_attributes(user)
-        #: Markdown formatted biography
         self.bio = user['bio']
-
-        #: URL of the blog
         self.blog = user['blog']
-
-        #: Name of the company
         self.company = user['company']
-
-        #: datetime object representing the date the account was created
         self.created_at = self._strptime(user['created_at'])
-
-        #: E-mail address of the user/org
         self.email = user['email']
-
-        # The number of people following this user
-        #: Number of followers
         self.followers_count = user['followers']
-
-        # The number of people this user follows
-        #: Number of people the user is following
         self.following_count = user['following']
-
-        #: True -- for hire, False -- not for hire
         self.hireable = user['hireable']
-
-        #: Location of the user/org
         self.location = user['location']
-
-        # e.g. first_name last_name
-        #: Real name of the user/org
         self.name = user['name']
-
-        # The number of public_gists
-        #: Number of public gists
         self.public_gists_count = user['public_gists']
-
-        # The number of public_repos
-        #: Number of public repos owned by the user/org
         self.public_repos_count = user['public_repos']
-
         self.updated_at = self._strptime(user['updated_at'])
 
 
@@ -604,29 +702,29 @@ class AuthenticatedUser(User):
 
         The ``total_private_gists`` attribute is no longer returned by
         GitHub's API and so is removed.
+
+    This object has all of the same attribute as the
+    :class:`~github3.users.ShortUser` and :class:`~github3.users.User` objects
+    as well as:
+
+    .. attribute:: disk_usage
+
+        The amount of repository space that has been used by you, the user
+
+    .. attribute:: owned_private_repos_count
+
+        The number of private repositories owned by you, the user
+
+    .. attribute:: plan
+
+        The name of the plan that you, the user, have purchased
     """
 
     class_name = 'AuthenticatedUser'
 
     def _update_attributes(self, user):
         super(AuthenticatedUser, self)._update_attributes(user)
-        #: How much disk consumed by the user
         self.disk_usage = user['disk_usage']
-
-        #: Number of private repos owned by this user
-        self.owned_private_repos = user['owned_private_repos']
-
-        #: Total number of private repos
-        self.total_private_repos = user['total_private_repos']
-
-        #: Which plan this user is on
+        self.owned_private_repos_count = user['owned_private_repos']
+        self.total_private_repos_count = user['total_private_repos']
         self.plan = Plan(user['plan'])
-
-        #: Number of repo contributions. Only appears in ``repo.contributors``
-        contributions = user.get('contributions')
-        # The refresh method uses __init__ to replace the attributes on the
-        # instance with what it receives from the /users/:username endpoint.
-        # What that means is that contributions is no longer returned and as
-        # such is changed because it doesn't exist. This guards against that.
-        if contributions is not None:
-            self.contributions = contributions

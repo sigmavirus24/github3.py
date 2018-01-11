@@ -175,7 +175,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for contributor in repository.contributors():
-                assert isinstance(contributor, github3.users.ShortUser)
+                assert isinstance(contributor, github3.users.Contributor)
                 assert isinstance(contributor.contributions, int)
 
     def test_create_blob(self):

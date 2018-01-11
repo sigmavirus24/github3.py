@@ -403,7 +403,7 @@ class _Repository(GitHubCore):
         params = {}
         if anon:
             params = {'anon': 'true'}
-        return self._iter(int(number), url, users.ShortUser, params, etag)
+        return self._iter(int(number), url, users.Contributor, params, etag)
 
     @requires_auth
     def create_blob(self, content, encoding):
