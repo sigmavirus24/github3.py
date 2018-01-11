@@ -13,25 +13,30 @@ from .events import Event
 
 
 class Key(models.GitHubCore):
-    """The :class:`Key <Key>` object.
+    """The object representing a user's SSH key.
 
     Please see GitHub's `Key Documentation`_ for more information.
 
     .. _Key Documentation:
         http://developer.github.com/v3/users/keys/
+
+    .. versionchanged:: 1.0.0
+
+        Removed ``title`` attribute
+
+    .. attribute:: key
+
+        A string containing the actual text of the SSH Key
+
+    .. attribute:: id
+
+        GitHub's unique ID for this key
     """
 
     def _update_attributes(self, key, session=None):
-        self._api = self._get_attribute(key, 'url')
-
-        #: The text of the actual key
-        self.key = self._get_attribute(key, 'key')
-
-        #: The unique id of the key at GitHub
-        self.id = self._get_attribute(key, 'id')
-
-        #: The title the user gave to the key
-        self.title = self._get_attribute(key, 'title')
+        self._api = key.get('url')
+        self.key = key['key']
+        self.id = key['id']
 
     def _repr(self):
         return '<User Key [{0}]>'.format(self.title)
