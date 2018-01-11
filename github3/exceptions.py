@@ -2,10 +2,40 @@
 """All exceptions for the github3 library."""
 
 
-class GitHubError(Exception):
-    """The base exception class."""
+class GitHubException(Exception):
+    """The base exception class.
+
+    .. versionadded:: 1.0.0
+
+        Necessary to handle pre-response exceptions
+
+    """
+
+    pass
+
+
+class GitHubError(GitHubException):
+    """The base exception class for all response-related exceptions.
+
+    .. versionchanged:: 1.0.0
+
+        This now inherits from :class:`~github3.exceptions.GitHubException`
+
+    .. attribute:: response
+
+        The response object that triggered the exception
+
+    .. attribute:: code
+
+        The response's status code
+
+    .. attribute:: errors
+
+        The list of errors (if present) returned by GitHub's API
+    """
 
     def __init__(self, resp):
+        """Initialize our exception class."""
         super(GitHubError, self).__init__(resp)
         #: Response code that triggered the error
         self.response = resp
@@ -35,9 +65,18 @@ class GitHubError(Exception):
 
 
 class IncompleteResponse(GitHubError):
-    """Exception for a response that doesn't have everything it should."""
+    """Exception for a response that doesn't have everything it should.
+
+    This has the same attributes as :class:`~github3.exceptions.GitHubError`
+    as well as
+
+    .. attribute:: exception
+
+        The original exception causing the IncompleteResponse exception
+    """
 
     def __init__(self, json, exception):
+        """Initialize our IncompleteResponse."""
         self.response = None
         self.code = None
         self.json = json
@@ -50,20 +89,40 @@ class IncompleteResponse(GitHubError):
         ) % (exception,)
 
 
+class NotRefreshable(GitHubException):
+    """Exception to indicate that an object is not refreshable."""
+
+    message_format = ('"{}" is not refreshable because the GitHub API does '
+                      'not provide a URL to retrieve its contents from.')
+
+    def __init__(self, object_name):
+        """Initialize our NotRefreshable exception."""
+        super(NotRefreshable, self).__init__(
+            self.message_format.format(object_name)
+        )
+
+
 class ResponseError(GitHubError):
     """The base exception for errors stemming from GitHub responses."""
+
     pass
 
 
-class TransportError(GitHubError):
-    """Catch-all exception for errors coming from Requests."""
+class TransportError(GitHubException):
+    """Catch-all exception for errors coming from Requests.
+
+    .. versionchanged:: 1.0.0
+
+        Now inherits from :class:`~github3.exceptions.GitHubException`.
+    """
 
     msg_format = 'An error occurred while making a request to GitHub: {0}'
 
     def __init__(self, exception):
-        Exception.__init__(self, exception)
-        self.exception = exception
+        """Initialize TransportError exception."""
         self.msg = self.msg_format.format(str(exception))
+        super(TransportError, self).__init__(self, self.msg, exception)
+        self.exception = exception
 
     def __str__(self):
         return '{0}: {1}'.format(type(self.exception), self.msg)
@@ -77,7 +136,9 @@ class ConnectionError(TransportError):
 
 class UnprocessableResponseBody(ResponseError):
     """Exception class for response objects that cannot be handled."""
+
     def __init__(self, message, body):
+        """Initialize UnprocessableResponseBody."""
         Exception.__init__(self, message)
         self.body = body
         self.msg = message
@@ -91,6 +152,7 @@ class UnprocessableResponseBody(ResponseError):
 
 class BadRequest(ResponseError):
     """Exception class for 400 responses."""
+
     pass
 
 
@@ -102,6 +164,7 @@ class AuthenticationFailed(ResponseError):
     - Need one time password (for two-factor authentication)
     - You are not authorized to access the resource
     """
+
     pass
 
 
@@ -113,21 +176,25 @@ class ForbiddenError(ResponseError):
     - Too many requests (you've exceeded the ratelimit)
     - Too many login failures
     """
+
     pass
 
 
 class NotFoundError(ResponseError):
     """Exception class for 404 responses."""
+
     pass
 
 
 class MethodNotAllowed(ResponseError):
     """Exception class for 405 responses."""
+
     pass
 
 
 class NotAcceptable(ResponseError):
     """Exception class for 406 responses."""
+
     pass
 
 
@@ -138,26 +205,31 @@ class Conflict(ResponseError):
 
     - Head branch was modified (SHA sums do not match)
     """
+
     pass
 
 
 class UnprocessableEntity(ResponseError):
     """Exception class for 422 responses."""
+
     pass
 
 
 class ClientError(ResponseError):
     """Catch-all for 400 responses that aren't specific errors."""
+
     pass
 
 
 class ServerError(ResponseError):
     """Exception class for 5xx responses."""
+
     pass
 
 
 class UnavailableForLegalReasons(ResponseError):
     """Exception class for 451 responses."""
+
     pass
 
 
