@@ -79,20 +79,33 @@ class Plan(models.GitHubCore):
 
     .. _Authenticated User:
         http://developer.github.com/v3/users/#get-the-authenticated-user
+
+    .. attribute:: collaborators_count
+
+        .. versionchanged:: 1.0.0
+
+        The number of collaborators allowed on this plan
+
+    .. attribute:: name
+
+        The name of the plan on GitHub
+
+    .. attribute:: private_repos_count
+
+        .. versionchanged:: 1.0.0
+
+        The number of allowed private repositories
+
+    .. attribute:: space
+
+        The amount of space allotted by this plan
     """
 
     def _update_attributes(self, plan):
-        #: Number of collaborators
-        self.collaborators = self._get_attribute(plan, 'collaborators')
-
-        #: Name of the plan
-        self.name = self._get_attribute(plan, 'name')
-
-        #: Number of private repos
-        self.private_repos = self._get_attribute(plan, 'private_repos')
-
-        #: Space allowed
-        self.space = self._get_attribute(plan, 'space')
+        self.collaborators = plan['collaborators']
+        self.name = plan['name']
+        self.private_repos_count = plan['private_repos']
+        self.space = plan['space']
 
     def _repr(self):
         return '<Plan [{0}]>'.format(self.name)  # (No coverage)
@@ -164,6 +177,7 @@ class _User(models.GitHubCore):
     .. _User section:
         http://developer.github.com/v3/users/
     """
+
     class_name = '_User'
 
     def _update_attributes(self, user):
