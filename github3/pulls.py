@@ -375,21 +375,27 @@ class _PullRequest(models.GitHubCore):
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
-    def merge(self, commit_message=None, sha=None, squash=False):
+    def merge(self, commit_message=None, sha=None, merge_method='merge'):
         """Merge this pull request.
+
+        .. versionchanged:: 1.0.0
+
+            The boolean ``squash`` parameter has been replaced with
+            ``merge_method`` which requires a string.
 
         :param str commit_message:
             (optional), message to be used for the merge commit
         :param str sha:
             (optional), SHA that pull request head must match to merge.
-        :param bool squash:
-            (optional), commit a single commit to the head branch.
+        :param str merge_method: (optional), Change the merge method.
+            Either 'merge', 'squash' or 'rebase'. Default is 'merge'.
         :returns:
             True if successful, False otherwise
         :rtype:
             bool
+        :returns: bool
         """
-        parameters = {'squash': squash}
+        parameters = {'merge_method': merge_method}
         if sha:
             parameters['sha'] = sha
         if commit_message is not None:
