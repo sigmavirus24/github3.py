@@ -31,7 +31,7 @@ class Status(GitHubCore):
 
         #: :class:`User <github3.users.User>` who created the object
         self.creator = self._class_attribute(
-            status, 'creator', users.ShortUser
+            status, 'creator', users.ShortUser, self
         )
 
         #: Short description of the Status

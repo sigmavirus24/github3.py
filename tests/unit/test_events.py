@@ -37,7 +37,7 @@ class TestEvent(UnitHelper):
         json = self.instance.as_dict().copy()
         org = get_org_example_data()
         json['org'] = org
-        event = github3.events.Event(json)
+        event = github3.events.Event(json, self.session)
         assert isinstance(event.org, github3.events.EventOrganization)
 
 

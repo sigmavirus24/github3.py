@@ -142,7 +142,7 @@ class TestProjectColumn(helper.UnitHelper):
     def test_create_card_with_issue(self):
         """Show that a user can create a new project card with an Issue."""
         issue_data = get_issue_example_data()
-        issue = issues.Issue(issue_data)
+        issue = issues.Issue(issue_data, self.session)
 
         self.instance.create_card_with_issue(issue)
         self.post_called_with(

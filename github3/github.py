@@ -57,7 +57,7 @@ class GitHub(GitHubCore):
     """
 
     def __init__(self, username='', password='', token=''):
-        super(GitHub, self).__init__({})
+        super(GitHub, self).__init__({}, self.new_session())
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -1795,7 +1795,7 @@ class GitHubStatus(GitHubCore):
     return the JSON objects returned by the API.
     """
     def __init__(self):
-        super(GitHubStatus, self).__init__({})
+        super(GitHubStatus, self).__init__({}, self.new_session())
         self.session.base_url = 'https://status.github.com'
 
     def _repr(self):

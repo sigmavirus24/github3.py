@@ -32,12 +32,10 @@ class GitHubCore(object):
     have.
     """
 
-    def __init__(self, json, session=None):
+    def __init__(self, json, session):
         if hasattr(session, 'session'):
             # i.e. session is actually a GitHubCore instance
             session = session.session
-        elif session is None:
-            session = GitHubSession()
         self.session = session
 
         # set a sane default
@@ -165,14 +163,14 @@ class GitHubCore(object):
         return repr_string
 
     @classmethod
-    def from_dict(cls, json_dict):
+    def from_dict(cls, json_dict, session):
         """Return an instance of this class formed from ``json_dict``."""
-        return cls(json_dict)
+        return cls(json_dict, session)
 
     @classmethod
-    def from_json(cls, json):
+    def from_json(cls, json, session):
         """Return an instance of this class formed from ``json``."""
-        return cls(loads(json))
+        return cls(loads(json), session)
 
     def __eq__(self, other):
         return self._uniq == other._uniq
@@ -347,6 +345,10 @@ class GitHubCore(object):
             self._json_data = json
             self._update_attributes(json)
         return self
+
+    def new_session(self):
+        """Helper function to generate a new session"""
+        return GitHubSession()
 
 
 class BaseComment(GitHubCore):
