@@ -193,7 +193,7 @@ class Tree(GitData):
         #: list of :class:`Hash <Hash>` objects
         self.tree = self._get_attribute(tree, 'tree', [])
         if self.tree:
-            self.tree = [Hash(t) for t in self.tree]
+            self.tree = [Hash(t, self) for t in self.tree]
 
     def _repr(self):
         return '<Tree [{0}]>'.format(self.sha)

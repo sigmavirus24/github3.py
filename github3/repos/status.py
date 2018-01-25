@@ -74,7 +74,7 @@ class CombinedStatus(GitHubCore):
         #: List of :class:`Status <github3.repos.status.Status>`
         #: objects.
         statuses = self._get_attribute(combined_status, 'statuses', [])
-        self.statuses = [Status(s) for s in statuses]
+        self.statuses = [Status(s, self) for s in statuses]
 
         from . import repo
         #: Repository the combined status belongs too.

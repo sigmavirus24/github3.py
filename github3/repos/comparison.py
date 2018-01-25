@@ -69,7 +69,7 @@ class Comparison(GitHubCore):
         #: objects.
         self.commits = self._get_attribute(compare, 'commits', [])
         if self.commits:
-            self.commits = [RepoCommit(com) for com in self.commits]
+            self.commits = [RepoCommit(com, self) for com in self.commits]
 
         #: List of dicts describing the files modified.
         self.files = self._get_attribute(compare, 'files', [])
