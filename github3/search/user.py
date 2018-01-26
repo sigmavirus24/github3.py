@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from .. import users
-from ..models import GitHubCore
+from ..models import GitHubSearch
 
 
-class UserSearchResult(GitHubCore):
+class UserSearchResult(GitHubSearch):
     def _update_attributes(self, data):
         result = data.copy()
 

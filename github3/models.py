@@ -42,6 +42,7 @@ class GitHubCore(object):
 
         # set a sane default
         self._github_url = 'https://api.github.com'
+        self._ratelimit_resource = 'core'
 
         if json is not None:
             self.etag = json.pop('ETag', None)
@@ -305,7 +306,7 @@ class GitHubCore(object):
         :returns: int
         """
         json = self._json(self._get(self._github_url + '/rate_limit'), 200)
-        core = json.get('resources', {}).get('core', {})
+        core = json.get('resources', {}).get(self._ratelimit_resource, {})
         self._remaining = core.get('remaining', 0)
         return self._remaining
 
@@ -502,3 +503,10 @@ class BaseAccount(GitHubCore):
 
     def _repr(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
+
+
+class GitHubSearch(GitHubCore):
+    """The base object for all search objects."""
+    def __init__(self, json, session=None):
+        super(GitHubSearch, self).__init__(json, session)
+        self._ratelimit_resource = 'search'

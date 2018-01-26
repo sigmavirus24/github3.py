@@ -5,7 +5,7 @@ from .. import models
 from .. import repos
 
 
-class CodeSearchResult(models.GitHubCore):
+class CodeSearchResult(models.GitHubSearch):
 
     def _update_attributes(self, data):
         self._api = self._get_attribute(data, 'url')
