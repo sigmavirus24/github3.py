@@ -138,6 +138,7 @@ class SearchIterator(GitHubIterator):
         self.total_count = 0
         #: Items array returned in the last request
         self.items = []
+        self._ratelimit_resource = 'search'
 
     def _repr(self):
         return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
