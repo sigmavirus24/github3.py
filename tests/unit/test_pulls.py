@@ -78,13 +78,6 @@ class TestPullRequest(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(url_for('merge'))
 
-    def test_is_merged_no_requset(self):
-        """Show that no request is needed if .merged is True."""
-        self.instance.merged = True
-
-        assert self.instance.is_merged()
-        assert self.session.get.called is False
-
     def test_issue(self):
         """Show that a user can retrieve the associated issue of a PR."""
         self.instance.issue()

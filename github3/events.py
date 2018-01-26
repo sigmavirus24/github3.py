@@ -74,6 +74,41 @@ class EventPullRequest(GitHubCore):
     refresh = to_pull
 
 
+class EventReviewComment(GitHubCore):
+    """Representation of review comments in events."""
+
+    def _update_attributes(self, comment):
+        from . import users
+        self._api = comment['url']
+        self.id = comment['id']
+        self.author_association = comment['author_association']
+        self.body = comment['body']
+        self.commit_id = comment['commit_id']
+        self.created_at = self._strptime(comment['created_at'])
+        self.diff_hunk = comment['diff_hunk']
+        self.html_url = comment['html_url']
+        self.links = comment['_links']
+        self.original_commit_id = comment['original_commit_id']
+        self.original_position = comment['original_position']
+        self.path = comment['path']
+        self.position = comment['position']
+        self.pull_request_url = comment['pull_request_url']
+        self.updated_at = self._strptime(comment['updated_at'])
+        self.user = users.ShortUser(comment['user'], self)
+
+    def to_review_comment(self):
+        """Retrieve a full ReviewComment object for this EventReviewComment.
+
+        :rtype:
+            :class:`~github3.pulls.ReviewComment`
+        """
+        from . import pulls
+        comment = self._json(self._get(self._api), 200)
+        return pulls.ReviewComment(comment, self)
+
+    refresh = to_review_comment
+
+
 class EventIssue(GitHubCore):
     """The class that represents the issue information returned in Events."""
 
@@ -210,7 +245,6 @@ def _pullreqev(payload, session):
 
 
 def _pullreqcomm(payload, session):
-    from .pulls import ReviewComment
     # Transform the Pull Request attribute
     pull = payload.get('pull_request')
     if pull:
@@ -219,7 +253,7 @@ def _pullreqcomm(payload, session):
     # Transform the Comment attribute
     comment = payload.get('comment')
     if comment:
-        payload['comment'] = ReviewComment(comment, session)
+        payload['comment'] = EventReviewComment(comment, session)
     return payload
 
 

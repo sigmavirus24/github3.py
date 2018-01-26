@@ -6,6 +6,9 @@ from .helper import create_example_data_helper
 get_example_data = create_example_data_helper('event_example')
 get_org_example_data = create_example_data_helper('org_example')
 get_comment_example_data = create_example_data_helper('comment_example')
+get_review_comment_example_data = create_example_data_helper(
+    'review_comment_example'
+)
 get_pull_request_example_data = create_example_data_helper(
     'pull_request_example'
 )
@@ -100,9 +103,10 @@ class TestPayLoadHandlers(TestCase):
 
     def test_pullreqcomment(self):
         """Show that the event type is a PullRequestReviewCommentEvent."""
-        pull_request = {'comment': get_comment_example_data()}
+        pull_request = {'comment': get_review_comment_example_data()}
         github3.events._pullreqcomm(pull_request, None)
-        assert isinstance(pull_request['comment'], github3.pulls.ReviewComment)
+        assert isinstance(pull_request['comment'],
+                          github3.events.EventReviewComment)
 
     def test_team(self):
         """Show that the event type is a TeamAddEvent."""

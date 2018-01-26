@@ -893,7 +893,7 @@ class ReviewComment(models.GitHubCore):
         self.body_html = comment['body_html']
         self.body_text = comment['body_text']
         self.commit_id = comment['commit_id']
-        self.created_at = comment['created_at']
+        self.created_at = self._strptime(comment['created_at'])
         self.diff_hunk = comment['diff_hunk']
         self.html_url = comment['html_url']
         self.links = comment['_links']
@@ -902,7 +902,7 @@ class ReviewComment(models.GitHubCore):
         self.path = comment['path']
         self.position = comment['position']
         self.pull_request_url = comment['pull_request_url']
-        self.updated_at = comment['updated_at']
+        self.updated_at = self._strptime(comment['updated_at'])
         self.user = users.ShortUser(comment['user'], self)
 
     def _repr(self):

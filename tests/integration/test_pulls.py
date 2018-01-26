@@ -154,11 +154,10 @@ class TestPullRequest(IntegrationHelper):
         cassette_name = self.cassette_name('single')
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
-            assert p.repository == ('sigmavirus24', 'github3.py')
+            assert isinstance(p.repository, github3.repos.ShortRepository)
 
 
 class TestReviewComment(IntegrationHelper):
-
     """Integration tests for the ReviewComment object."""
 
     def test_reply(self):
@@ -174,6 +173,7 @@ class TestReviewComment(IntegrationHelper):
 
 class TestPullFile(IntegrationHelper):
     """Integration tests for the PullFile object."""
+
     def get_pull_request_file(self, owner, repo, pull_number, filename):
         p = self.gh.pull_request(owner, repo, pull_number)
 
