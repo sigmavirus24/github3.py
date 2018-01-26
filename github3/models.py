@@ -31,6 +31,7 @@ class GitHubCore(object):
     basic attributes and methods to other sub-classes that are very useful to
     have.
     """
+    _ratelimit_resource = 'core'
 
     def __init__(self, json, session=None):
         if hasattr(session, 'session'):
@@ -42,7 +43,6 @@ class GitHubCore(object):
 
         # set a sane default
         self._github_url = 'https://api.github.com'
-        self._ratelimit_resource = 'core'
 
         if json is not None:
             self.etag = json.pop('ETag', None)
@@ -507,6 +507,4 @@ class BaseAccount(GitHubCore):
 
 class GitHubSearch(GitHubCore):
     """The base object for all search objects."""
-    def __init__(self, json, session=None):
-        super(GitHubSearch, self).__init__(json, session)
-        self._ratelimit_resource = 'search'
+    _ratelimit_resource = 'search'

@@ -129,6 +129,7 @@ class SearchIterator(GitHubIterator):
     class. For other members and methods, check its parent class.
 
     """
+    _ratelimit_resource = 'search'
 
     def __init__(self, count, url, cls, session, params=None, etag=None,
                  headers=None):
@@ -138,7 +139,6 @@ class SearchIterator(GitHubIterator):
         self.total_count = 0
         #: Items array returned in the last request
         self.items = []
-        self._ratelimit_resource = 'search'
 
     def _repr(self):
         return '<SearchIterator [{0}, {1}?{2}]>'.format(self.count, self.path,
