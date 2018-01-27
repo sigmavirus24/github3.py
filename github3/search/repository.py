@@ -5,7 +5,7 @@ from .. import models
 from .. import repos
 
 
-class RepositorySearchResult(models.GitHubSearch):
+class RepositorySearchResult(models.GitHubCore):
     def _update_attributes(self, data):
         result = data.copy()
 

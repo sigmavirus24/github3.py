@@ -503,8 +503,3 @@ class BaseAccount(GitHubCore):
 
     def _repr(self):
         return '<{s.type} [{s.login}:{s.name}]>'.format(s=self)
-
-
-class GitHubSearch(GitHubCore):
-    """The base object for all search objects."""
-    _ratelimit_resource = 'search'

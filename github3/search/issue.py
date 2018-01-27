@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from ..models import GitHubSearch
+from ..models import GitHubCore
 from ..issues import ShortIssue
 
 
-class IssueSearchResult(GitHubSearch):
+class IssueSearchResult(GitHubCore):
     def _update_attributes(self, data):
         result = data.copy()
 
