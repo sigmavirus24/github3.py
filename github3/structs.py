@@ -129,6 +129,7 @@ class SearchIterator(GitHubIterator):
     class. For other members and methods, check its parent class.
 
     """
+    _ratelimit_resource = 'search'
 
     def __init__(self, count, url, cls, session, params=None, etag=None,
                  headers=None):
