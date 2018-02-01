@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
 import github3
 import mock
