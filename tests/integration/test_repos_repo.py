@@ -986,9 +986,7 @@ class TestRepository(helper.IntegrationHelper):
             assert isinstance(notification, github3.notifications.Thread)
 
     def test_original_license(self):
-        """
-        Test that a repository's license can be retrieved at repository load.
-        """
+        """Test that a repository's license is present initially."""
         cassette_name = self.cassette_name('original_license')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'github3.py')
@@ -1213,7 +1211,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(teams) > 0
         for team in teams:
-            assert isinstance(team, github3.orgs.Team)
+            assert isinstance(team, github3.orgs.ShortTeam)
 
     def test_tree(self):
         """Test the ability to retrieve a tree from a repository."""

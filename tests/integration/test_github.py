@@ -315,7 +315,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('iter_user_teams')
         with self.recorder.use_cassette(cassette_name):
             for t in self.gh.user_teams():
-                assert isinstance(t, github3.orgs.Team)
+                assert isinstance(t, github3.orgs.ShortTeam)
 
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""

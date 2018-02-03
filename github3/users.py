@@ -204,7 +204,14 @@ class _User(models.GitHubCore):
         return self.login
 
     def _repr(self):
-        return '<{s.class_name} [{s.login}:{s.name}]>'.format(s=self)
+        full_name = ''
+        name = getattr(self, 'name', None)
+        if name is not None:
+            full_name = ':{}'.format(name)
+        return '<{s.class_name} [{s.login}{full_name}]>'.format(
+            s=self,
+            full_name=full_name,
+        )
 
     def is_assignee_on(self, username, repository):
         """Check if this user can be assigned to issues on username/repository.

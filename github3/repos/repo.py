@@ -1785,9 +1785,9 @@ class _Repository(GitHubCore):
             endpoint
         :returns: generator of :class:`Team <github3.orgs.Team>`\ s
         """
-        from ..orgs import Team
+        from .. import orgs
         url = self._build_url('teams', base_url=self._api)
-        return self._iter(int(number), url, Team, etag=etag)
+        return self._iter(int(number), url, orgs.ShortTeam, etag=etag)
 
     def tree(self, sha):
         """Get a tree.

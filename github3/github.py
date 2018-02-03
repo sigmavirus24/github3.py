@@ -17,13 +17,14 @@ from .events import Event
 from . import gists
 from .issues import ShortIssue, Issue, issue_params
 from .models import GitHubCore
-from .orgs import Membership, ShortOrganization, Organization, Team
+from .orgs import Membership, ShortOrganization, Organization
 from .projects import Project, ProjectCard, ProjectColumn
 from .pulls import PullRequest
 from .repos import repo
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
 from .structs import SearchIterator
+from . import orgs
 from . import users
 from .notifications import Thread
 from .licenses import License
@@ -828,9 +829,22 @@ class GitHub(GitHubCore):
 
     @requires_auth
     def membership_in(self, organization):
-        """Retrieve the user's membership in the specified organization."""
-        url = self._build_url('user', 'memberships', 'orgs',
-                              str(organization))
+        """Retrieve the user's membership in the specified organization.
+
+        :param organization:
+            the organization or organization login to retrieve the authorized
+            user's membership in
+        :type organization:
+            str
+        :type organization:
+            :class:`~github3.orgs.Organization`
+        :returns:
+            the user's membership
+        :rtype:
+            :class:`~github3.orgs.Membership`
+        """
+        organization_name = getattr(organization, 'login', organization)
+        url = self._build_url('user', 'memberships', 'orgs', organization_name)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(Membership, json)
 
@@ -1708,10 +1722,13 @@ class GitHub(GitHubCore):
         authenticated user belongs. This method requires user or repo scope
         when authenticating via OAuth.
 
-        :returns: generator of :class:`Team <github3.orgs.Team>` objects
+        :returns:
+            generator of teams
+        :rtype:
+            :class:`~github3.orgs.ShortTeam`
         """
         url = self._build_url('user', 'teams')
-        return self._iter(int(number), url, Team, etag=etag)
+        return self._iter(int(number), url, orgs.ShortTeam, etag=etag)
 
     def user_with_id(self, number):
         """Get the user's information with id ``number``.

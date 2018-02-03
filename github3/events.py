@@ -266,10 +266,10 @@ def _release(payload, session):
 
 
 def _team(payload, session):
-    from .orgs import Team
+    from .orgs import ShortTeam
     from .repos import ShortRepository
     if payload.get('team'):
-        payload['team'] = Team(payload['team'], session)
+        payload['team'] = ShortTeam(payload['team'], session)
     if payload.get('repo'):
         payload['repo'] = ShortRepository(payload['repo'], session)
     if payload.get('sender'):
@@ -278,6 +278,7 @@ def _team(payload, session):
 
 
 def identity(x, session):
+    """Return the value."""
     return x
 
 

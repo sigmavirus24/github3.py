@@ -117,5 +117,5 @@ class TestPayLoadHandlers(TestCase):
         }
 
         github3.events._team(team, None)
-        assert isinstance(team['team'], github3.orgs.Team)
+        assert isinstance(team['team'], github3.orgs.ShortTeam)
         assert isinstance(team['repo'], github3.repos.ShortRepository)
