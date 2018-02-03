@@ -65,7 +65,7 @@ class Release(models.GitHubCore):
 
         #: :class:`User <github3.users.ShortUser>` object representing the
         #:  creator of the release
-        self.author = users.ShortUser(release['author'])
+        self.author = users.ShortUser(release['author'], self)
 
         #: URLs to various attributes
         for urltype in ['assets_url', 'html_url', 'tarball_url',

@@ -12,7 +12,7 @@ from . import helper
 
 class MyTestRefreshClass(GitHubCore):
     """Subclass for testing refresh on GitHubCore."""
-    def __init__(self, example_data, session=None):
+    def __init__(self, example_data, session):
         super(MyTestRefreshClass, self).__init__(example_data, session)
         self._api = example_data['url']
         self.last_modified = example_data['last_modified']
@@ -105,7 +105,7 @@ class TestGitHubCore(helper.UnitHelper):
 
     def test_from_json(self):
         """Verify that method returns GitHubObject from json."""
-        github_core = GitHubCore.from_json('{}')
+        github_core = GitHubCore.from_json('{}', self.session)
         assert isinstance(github_core, GitHubCore)
 
     def test_instance_or_null(self):

@@ -36,7 +36,7 @@ class TestUser(helper.UnitHelper):
 
     def test_equality(self):
         """Show that two instances are equal."""
-        user = github3.users.User(get_users_example_data())
+        user = github3.users.User(get_users_example_data(), self.session)
         self.instance == user
 
         user._uniq += 1
@@ -88,7 +88,7 @@ class TestUserKey(helper.UnitHelper):
 
     def test_equality(self):
         """Show that two instances of Key are equal."""
-        key = github3.users.Key(get_user_key_example_data())
+        key = github3.users.Key(get_user_key_example_data(), self.session)
         assert self.instance == key
 
         key._uniq += "cruft"

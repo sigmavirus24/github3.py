@@ -24,8 +24,8 @@ class PullDestination(models.GitHubCore):
         http://developer.github.com/v3/pulls/#get-a-single-pull-request
     """
 
-    def __init__(self, dest, direction):
-        super(PullDestination, self).__init__(dest)
+    def __init__(self, dest, direction, session=None):
+        super(PullDestination, self).__init__(dest, session)
         from .repos.repo import ShortRepository
         #: Direction of the merge with respect to this destination
         self.direction = direction
@@ -36,7 +36,7 @@ class PullDestination(models.GitHubCore):
         #: :class:`User <github3.users.User>` representing the owner
         self.user = None
         if dest.get('user'):
-            self.user = users.ShortUser(dest.get('user'), None)
+            self.user = users.ShortUser(dest.get('user'), self)
         #: SHA of the commit at the head
         self.sha = dest.get('sha')
         self._repo_name = ''
@@ -118,7 +118,7 @@ class _PullRequest(models.GitHubCore):
         self._api = pull['url']
 
         #: Base of the merge
-        self.base = PullDestination(pull['base'], 'Base')
+        self.base = PullDestination(pull['base'], 'Base', self)
 
         #: Body of the pull request message
         self.body = pull['body']
@@ -136,7 +136,7 @@ class _PullRequest(models.GitHubCore):
         self.created_at = self._strptime_attribute(pull, 'created_at')
 
         #: The new head after the pull request
-        self.head = PullDestination(pull['head'], 'Head')
+        self.head = PullDestination(pull['head'], 'Head', self)
 
         #: The unique id of the pull request
         self.id = self._get_attribute(pull, 'id')
@@ -175,7 +175,7 @@ class _PullRequest(models.GitHubCore):
 
         #: :class:`User <github3.users.ShortUser>` object representing the
         #:  creator of the pull request
-        self.user = users.ShortUser(pull['user'])
+        self.user = users.ShortUser(pull['user'], self)
 
         # This is only present if the PR has been assigned.
         #: :class:`User <github3.users.ShortUser>` object representing the

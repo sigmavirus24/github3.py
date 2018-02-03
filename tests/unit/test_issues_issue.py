@@ -225,11 +225,11 @@ class TestIssue(helper.UnitHelper):
     def test_enterprise(self):
         """Show that enterprise data can be instantiated as Issue."""
         json = helper.create_example_data_helper('issue_enterprise')()
-        assert github3.issues.Issue(json)
+        assert github3.issues.Issue(json, self.session)
 
     def test_equality(self):
         """Show that two instances of Issue are equal."""
-        issue = github3.issues.Issue(get_issue_example_data())
+        issue = github3.issues.Issue(get_issue_example_data(), self.session)
         assert self.instance == issue
 
         issue._uniq = 1
@@ -247,7 +247,8 @@ class TestIssue(helper.UnitHelper):
         GitHub sometimes returns `pull` as part of of the `html_url` for Issue
         requests.
         """
-        issue = Issue(helper.create_example_data_helper('issue_137')())
+        issue = Issue(helper.create_example_data_helper('issue_137')(),
+                      self.session)
         self.assertEqual(
             issue.html_url,
             "https://github.com/sigmavirus24/github3.py/pull/1")
@@ -392,7 +393,7 @@ class TestLabel(helper.UnitHelper):
 
     def test_equality(self):
         """Show that two instances of Label are equal."""
-        label = Label(get_issue_label_example_data())
+        label = Label(get_issue_label_example_data(), self.session)
         assert self.instance == label
 
         label._uniq = ('https://https//api.github.com/repos/sigmavirus24/'
@@ -444,7 +445,8 @@ class TestIssueEvent(helper.UnitHelper):
     def test_equality(self):
         """Show that two instances of IssueEvent are equal."""
         issue_event = github3.issues.event.IssueEvent(
-            get_issue_event_example_data()
+            get_issue_event_example_data(),
+            self.session
         )
 
         assert self.instance == issue_event

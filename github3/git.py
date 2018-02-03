@@ -108,7 +108,7 @@ class Reference(GitHubCore):
         self.ref = self._get_attribute(ref, 'ref')
 
         #: :class:`GitObject <GitObject>` the reference points to
-        self.object = self._class_attribute(ref, 'object', GitObject)
+        self.object = self._class_attribute(ref, 'object', GitObject, self)
 
     def _repr(self):
         return '<Reference [{0}]>'.format(self.ref)
@@ -173,7 +173,7 @@ class Tag(GitData):
         self.tagger = self._get_attribute(tag, 'tagger')
 
         #: :class:`GitObject <GitObject>` for the tag
-        self.object = self._class_attribute(tag, 'object', GitObject)
+        self.object = self._class_attribute(tag, 'object', GitObject, self)
 
     def _repr(self):
         return '<Tag [{0}]>'.format(self.tag)
@@ -193,7 +193,7 @@ class Tree(GitData):
         #: list of :class:`Hash <Hash>` objects
         self.tree = self._get_attribute(tree, 'tree', [])
         if self.tree:
-            self.tree = [Hash(t) for t in self.tree]
+            self.tree = [Hash(t, self) for t in self.tree]
 
     def _repr(self):
         return '<Tree [{0}]>'.format(self.sha)

@@ -16,7 +16,7 @@ class TestThread(UnitHelper):
 
     def test_equality(self):
         """Test equality/inequality between two instances."""
-        thread = github3.notifications.Thread(get_example_data())
+        thread = github3.notifications.Thread(get_example_data(), self.session)
         assert self.instance == thread
         thread._uniq = 1
         assert self.instance != thread

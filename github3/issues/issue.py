@@ -34,11 +34,11 @@ class _Issue(models.GitHubCore):
         #: was assigned to.
         self.assignee = issue['assignee']
         if self.assignee:
-            self.assignee = users.ShortUser(self.assignee)
+            self.assignee = users.ShortUser(self.assignee, self)
         self.assignees = issue['assignees']
         if self.assignees:
             self.assignees = [
-                users.ShortUser(assignee) for assignee in self.assignees
+                users.ShortUser(assignee, self) for assignee in self.assignees
             ]
 
         #: Body (description) of the issue.
@@ -107,7 +107,7 @@ class _Issue(models.GitHubCore):
         self.updated_at = self._strptime_attribute(issue, 'updated_at')
 
         #: :class:`User <github3.users.User>` who opened the issue.
-        self.user = users.ShortUser(issue['user'])
+        self.user = users.ShortUser(issue['user'], self)
 
     def _repr(self):
         return '<Issue [{r[0]}/{r[1]} #{n}]>'.format(r=self.repository,
@@ -389,4 +389,4 @@ class Issue(_Issue):
         #: :class:`User <github3.users.User>` who closed the issue.
         self.closed_by = issue['closed_by']
         if self.closed_by:
-            self.closed_by = users.ShortUser(self.closed_by)
+            self.closed_by = users.ShortUser(self.closed_by, self)
