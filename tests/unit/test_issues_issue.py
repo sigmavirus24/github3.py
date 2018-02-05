@@ -119,10 +119,7 @@ class TestIssue(helper.UnitHelper):
     def test_close(self):
         """Verify the request for closing an issue."""
         self.instance.close()
-        try:
-            labels = [str(label) for label in self.instance.original_labels]
-        except UnicodeEncodeError:
-            labels = [label.name for label in self.instance.original_labels]
+        labels = [label.name for label in self.instance.original_labels]
 
         self.patch_called_with(
             url_for(),
@@ -173,7 +170,7 @@ class TestIssue(helper.UnitHelper):
         assert self.session.get.called is False
 
     def test_close_with_unicode_labels(self):
-        """Verify the request for closeing an issue."""
+        """Verify the request for closing an issue."""
         data = {
             'title': 'issue title',
             'body': 'issue body',
