@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
 import github3
 import mock
@@ -31,7 +32,6 @@ get_issue_label_example_data = helper.create_example_data_helper(
 
 
 class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test Issue methods that require Authentication."""
 
     described_class = github3.issues.Issue
@@ -83,7 +83,6 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestIssue(helper.UnitHelper):
-
     """Test Issue methods that make simple requests."""
 
     described_class = github3.issues.Issue
@@ -120,7 +119,8 @@ class TestIssue(helper.UnitHelper):
     def test_close(self):
         """Verify the request for closing an issue."""
         self.instance.close()
-        labels = [str(label) for label in self.instance.original_labels]
+        labels = [label.name for label in self.instance.original_labels]
+
         self.patch_called_with(
             url_for(),
             data={
@@ -168,6 +168,21 @@ class TestIssue(helper.UnitHelper):
         """Verify the request for retrieving an issue comment."""
         self.instance.comment(-1)
         assert self.session.get.called is False
+
+    def test_close_with_unicode_labels(self):
+        """Verify the request for closing an issue."""
+        data = {
+            'title': 'issue title',
+            'body': 'issue body',
+            'assignee': 'sigmavirus24',
+            'state': 'closed',
+            'labels': [u"标签1", u"标签2"]
+        }
+        self.instance.edit(**data)
+        self.patch_called_with(
+            url_for(),
+            data=data
+        )
 
     def test_edit(self):
         """Verify the request for editing an issue."""
@@ -324,7 +339,6 @@ class TestIssue(helper.UnitHelper):
 
 
 class TestIssueIterators(helper.UnitIteratorHelper):
-
     """Test Issue methods that return iterators."""
 
     described_class = github3.issues.Issue
@@ -365,7 +379,6 @@ class TestIssueIterators(helper.UnitIteratorHelper):
 
 
 class TestLabelRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test that ensure certain methods on Label class requires auth."""
 
     described_class = github3.issues.label.Label
@@ -430,7 +443,6 @@ class TestLabel(helper.UnitHelper):
 
 
 class TestIssueEvent(helper.UnitHelper):
-
     """Unit test for IssueEvent."""
 
     described_class = github3.issues.event.IssueEvent
