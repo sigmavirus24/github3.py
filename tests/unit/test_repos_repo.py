@@ -453,6 +453,34 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.post.called is False
 
+    def test_update_ref(self):
+        """Verify the request to update a reference."""
+        ref = 'refs/heads/foo'
+        sha = 'my-fake-sha'
+        self.instance.update_ref(ref, sha)
+
+        self.patch_called_with(
+            url_for('git/' + ref),
+            data={
+                'sha': sha,
+                'force': False,
+            }
+        )
+
+    def test_update_ref_force(self):
+        """Verify the request to force update a reference."""
+        ref = 'refs/heads/foo'
+        sha = 'my-fake-sha'
+        self.instance.update_ref(ref, sha, force=True)
+
+        self.patch_called_with(
+            url_for('git/' + ref),
+            data={
+                'sha': sha,
+                'force': True,
+            }
+        )
+
     def test_create_status(self):
         """Verify the request for creating a status on a commit."""
         data = {
@@ -494,6 +522,35 @@ class TestRepository(helper.UnitHelper):
             tagger={'name': 'Ian Cordasco',
                     'email': 'example@example.com',
                     'date': '2015-11-01T12:16:00Z'},
+        )
+
+        self.post_called_with(
+            url_for('git/tags'),
+            data={
+                'tag': 'tag-name',
+                'message': 'message',
+                'object': 'my-sha',
+                'type': 'commit',
+                'tagger': {
+                    'name': 'Ian Cordasco',
+                    'email': 'example@example.com',
+                    'date': '2015-11-01T12:16:00Z',
+                },
+            },
+        )
+
+    def test_create_tag_that_is_not_lightweight_and_forced(self):
+        """Verify we can create an annotated tag."""
+        self.instance.create_tag(
+            tag='tag-name',
+            message='message',
+            sha='my-sha',
+            obj_type='commit',
+            tagger={'name': 'Ian Cordasco',
+                    'email': 'example@example.com',
+                    'date': '2015-11-01T12:16:00Z'},
+            lightweight=False,
+            update=True
         )
 
         self.post_called_with(
