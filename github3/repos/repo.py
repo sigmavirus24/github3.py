@@ -23,7 +23,7 @@ from ..issues.label import Label
 from ..issues.milestone import Milestone
 from ..licenses import License
 from ..models import GitHubCore
-from ..notifications import Subscription, Thread
+from .. import notifications
 from ..projects import Project
 from ..pulls import ShortPullRequest, PullRequest
 from ..utils import stream_response_to_file, timestamp_parameter
@@ -1088,11 +1088,12 @@ class _Repository(GitHubCore):
 
         This replaces ``Repository#set_subscription``.
 
-        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        :returns: :class:~github3.notifications.RepositorySubscription`
         """
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._put(url, data=dumps({'ignored': True})), 200)
-        return self._instance_or_null(Subscription, json)
+        return self._instance_or_null(notifications.RepositorySubscription,
+                                      json)
 
     @requires_auth
     def imported_issue(self, imported_issue_id):
@@ -1464,7 +1465,7 @@ class _Repository(GitHubCore):
         :type since: datetime or string
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Thread <github3.notifications.Thread>`
+        :returns: generator of :class:`~github3.notifications.Thread`
         """
         url = self._build_url('notifications', base_url=self._api)
         params = {
@@ -1473,7 +1474,9 @@ class _Repository(GitHubCore):
             'since': timestamp_parameter(since)
         }
         self._remove_none(params)
-        return self._iter(int(number), url, Thread, params, etag)
+        return self._iter(
+            int(number), url, notifications.Thread, params, etag
+        )
 
     @requires_auth
     def pages(self):
@@ -1720,12 +1723,13 @@ class _Repository(GitHubCore):
             be received from this repository.
         :param bool ignored: (required), determines if notifications should be
             ignored from this repository.
-        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        :returns: :class:`~github3.notifications.RepositorySubscription`
         """
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._put(url, data=dumps({'subcribed': True})),
                           200)
-        return self._instance_or_null(Subscription, json)
+        return self._instance_or_null(notifications.RepositorySubscription,
+                                      json)
 
     def subscribers(self, number=-1, etag=None):
         r"""Iterate over users subscribed to this repository.
@@ -1743,11 +1747,12 @@ class _Repository(GitHubCore):
     def subscription(self):
         """Return subscription for this Repository.
 
-        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        :returns: :class:`~github3.notifications.RepositorySubscription`
         """
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Subscription, json)
+        return self._instance_or_null(notifications.RepositorySubscription,
+                                      json)
 
     def tag(self, sha):
         """Get an annotated tag.

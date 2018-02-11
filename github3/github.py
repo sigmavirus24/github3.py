@@ -24,9 +24,9 @@ from .repos import repo
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
 from .structs import SearchIterator
+from . import notifications
 from . import orgs
 from . import users
-from .notifications import Thread
 from .licenses import License
 from uritemplate import URITemplate
 
@@ -870,7 +870,7 @@ class GitHub(GitHubCore):
         :param str etag: (optional), ETag from a previous request to the same
             endpoint
         :returns: generator of
-            :class:`Thread <github3.notifications.Thread>`
+            :class:`~github3.notifications.Thread`
         """
         params = None
         if all is True:
@@ -879,7 +879,9 @@ class GitHub(GitHubCore):
             params = {'participating': 'true'}
 
         url = self._build_url('notifications')
-        return self._iter(int(number), url, Thread, params, etag=etag)
+        return self._iter(
+            int(number), url, notifications.Thread, params, etag=etag
+        )
 
     def octocat(self, say=None):
         """Returns an easter egg of the API.

@@ -3,11 +3,38 @@
 Unreleased
 ~~~~~~~~~~
 
+Breaking Changes (since 1.0.0a4)
+````````````````````````````````
+
+- Remove ``Thread.comment``, ``Thread.thread``, ``Thread.urls`` attributes.
+
+- Remove ``Thread#is_unread`` method. Use the ``Thread.unread`` attribute
+  instead.
+
+- ``Subscription`` has been split into two objects: ``ThreadSubscription`` and
+  ``RepositorySubscription`` with the same methods.
+
+- Remove ``is_ignored`` method from our Subscription objects. Use the
+  ``ignored`` attribute instead.
+
+- Remove ``is_subscribed`` method from our Subscription objects. Use the
+  ``subscribed`` attribute instead.
+
+Features Added (since 1.0.0a4)
+``````````````````````````````
+
 - Add ``Organization#all_events``.
-- Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
-- Fix test failtures on windows caused by unclosed file handles.
+
 - Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
+
 - Add ``Repo.statuses`` and a corresponding ``repo.status.CombinedStatus`` to
+
+Deprecations and Other Changes (since 1.0.0a4)
+``````````````````````````````````````````````
+
+- Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
+
+- Fix test failtures on windows caused by unclosed file handles.
   get a combined view of commit statuses for a given ref.
 
 1.0.0a4: 2016-02-19

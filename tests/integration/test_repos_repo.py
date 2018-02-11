@@ -1177,7 +1177,8 @@ class TestRepository(helper.IntegrationHelper):
             subscription = repository.subscription()
             repository.delete_subscription()
 
-        assert isinstance(subscription, github3.notifications.Subscription)
+        assert isinstance(subscription,
+                          github3.notifications.RepositorySubscription)
 
     def test_tag(self):
         """Test the ability to retrieve an annotated tag."""
