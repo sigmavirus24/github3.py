@@ -21,7 +21,7 @@ from ..issues import ShortIssue, Issue, issue_params
 from ..issues.event import IssueEvent
 from ..issues.label import Label
 from ..issues.milestone import Milestone
-from ..licenses import License
+from .. import licenses
 from ..models import GitHubCore
 from .. import notifications
 from ..projects import Project
@@ -1356,11 +1356,11 @@ class _Repository(GitHubCore):
     def license(self):
         """Get the contents of a license for the repo.
 
-        :returns: :class:`License <github3.licenses.License>`
+        :returns: :class:`~github3.licenses.RepsoitoryLicense`
         """
         url = self._build_url('license', base_url=self._api)
-        json = self._json(self._get(url, headers=License.CUSTOM_HEADERS), 200)
-        return self._instance_or_null(License, json)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(licenses.RepositoryLicense, json)
 
     @requires_auth
     def mark_notifications(self, last_read=''):
@@ -2175,8 +2175,8 @@ class Repository(_Repository):
 
     .. attribute:: original_license
 
-        This is the :class:`~github3.license.License` returned as part of the
-        repository. To retrieve the most recent license, see the
+        This is the :class:`~github3.license.ShortLicense` returned as part of
+        the repository. To retrieve the most recent license, see the
         :meth:`~github3.repos.repo.Repository.license` method.
 
     .. attribute:: mirror_url
@@ -2264,7 +2264,9 @@ class Repository(_Repository):
         self.language = repo['language']
         self.original_license = repo['license']
         if self.original_license is not None:
-            self.original_license = License(self.original_license, self)
+            self.original_license = licenses.ShortLicense(
+                self.original_license, self
+            )
         self.mirror_url = repo['mirror_url']
         self.network_count = repo['network_count']
         self.open_issues_count = repo['open_issues_count']

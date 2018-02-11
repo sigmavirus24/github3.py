@@ -24,10 +24,10 @@ from .repos import repo
 from .search import (CodeSearchResult, IssueSearchResult,
                      RepositorySearchResult, UserSearchResult)
 from .structs import SearchIterator
+from . import licenses
 from . import notifications
 from . import orgs
 from . import users
-from .licenses import License
 from uritemplate import URITemplate
 
 
@@ -738,22 +738,27 @@ class GitHub(GitHubCore):
     def license(self, name):
         """Retrieve the license specified by the name.
 
-        :param string name: (required), name of license
-        :returns: :class:`License <github3.licenses.License>`
+        :param string name:
+            (required), name of license
+        :returns:
+            the specified license
+        :rtype:
+            :class:`~github3.licenses.License`
         """
-
         url = self._build_url('licenses', name)
-        json = self._json(self._get(url, headers=License.CUSTOM_HEADERS), 200)
-        return self._instance_or_null(License, json)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(licenses.License, json)
 
     def licenses(self, number=-1, etag=None):
         """Iterate over open source licenses.
 
-        :returns: generator of :class:`License <github3.licenses.License>`
+        :returns:
+            generator of short license objects
+        :rtype:
+            :class:`~github3.licenses.ShortLicense`
         """
         url = self._build_url('licenses')
-        return self._iter(int(number), url, License, etag=etag,
-                          headers=License.CUSTOM_HEADERS)
+        return self._iter(int(number), url, licenses.ShortLicense, etag=etag)
 
     def login(self, username=None, password=None, token=None,
               two_factor_callback=None):
@@ -1205,8 +1210,7 @@ class GitHub(GitHubCore):
         json = None
         if owner and repository:
             url = self._build_url('repos', owner, repository)
-            json = self._json(self._get(url, headers=License.CUSTOM_HEADERS),
-                              200)
+            json = self._json(self._get(url), 200)
         return self._instance_or_null(repo.Repository, json)
 
     def repository_with_id(self, number):

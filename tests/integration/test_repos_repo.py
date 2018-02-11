@@ -919,7 +919,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'github3.py')
             license = repository.license()
-            assert isinstance(license, github3.licenses.License)
+            assert isinstance(license, github3.licenses.RepositoryLicense)
 
     def test_mark_notifications(self):
         """Verify we can mark all notifications on a repository as read."""
@@ -992,7 +992,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('github3py', 'github3.py')
             assert repository is not None
             assert isinstance(repository.original_license,
-                              github3.licenses.License)
+                              github3.licenses.ShortLicense)
 
     def test_pull_request(self):
         """Test that a user can retrieve a pull request from a repo."""
