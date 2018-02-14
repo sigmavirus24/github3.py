@@ -24,7 +24,7 @@ class PullDestination(models.GitHubCore):
 
     Please see GitHub's `Pull Request Documentation`_ for more information.
 
-    .. _PullRequest Documentation:
+    .. _Pull Request Documentation:
         http://developer.github.com/v3/pulls/#get-a-single-pull-request
 
     .. attribute:: ref
@@ -109,7 +109,7 @@ class PullFile(models.GitHubCore):
     Please see GitHub's `Pull Request Files Documentation`_ for more
     information.
 
-    .. _PR Files Documentation:
+    .. _Pull Request Files Documentation:
         http://developer.github.com/v3/pulls/#list-pull-requests-files
 
     .. attribute:: additions_count

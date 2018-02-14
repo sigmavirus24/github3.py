@@ -672,7 +672,7 @@ class _Organization(models.GitHubCore):
     def events(self, number=-1, etag=None):
         """Iterate over public events for this org (deprecated).
 
-        .. deprecated::
+        .. deprecated:: 1.0.0
 
             Use :meth:`public_events` instead.
 
