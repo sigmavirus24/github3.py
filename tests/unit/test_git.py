@@ -10,7 +10,7 @@ reference_url_for = create_url_helper('https://api.github.com/repos/'
                                       'octocat/Hello-World/'
                                       'git/refs/heads/featureA')
 
-get_commit_example_data = create_example_data_helper('commit_example')
+get_commit_example_data = create_example_data_helper('git_commit_example')
 get_git_tag_example_data = create_example_data_helper('git_tag_example')
 get_reference_example_data = create_example_data_helper('reference_example')
 
