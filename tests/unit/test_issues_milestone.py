@@ -50,14 +50,14 @@ class TestMilestone(helper.UnitHelper):
         """Show that creator is None when json attribute is set to None."""
         json = self.instance.as_dict().copy()
         json['creator'] = None
-        milestone = github3.issues.milestone.Milestone(json)
+        milestone = github3.issues.milestone.Milestone(json, self.session)
         assert milestone.creator is None
 
     def test_due_on(self):
         """Show that due on attribute is a datetime object."""
         json = self.instance.as_dict().copy()
         json['due_on'] = '2012-12-31T23:59:59Z'
-        milestone = github3.issues.milestone.Milestone(json)
+        milestone = github3.issues.milestone.Milestone(json, self.session)
         assert isinstance(milestone.due_on, datetime.datetime)
 
     def test_repr(self):

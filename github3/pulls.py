@@ -62,15 +62,11 @@ class PullDestination(models.GitHubCore):
 
     def _update_attributes(self, dest):
         from .repos.repo import ShortRepository
-        #: Full reference string of the object
         self.ref = dest['ref']
-        #: label of the destination
         self.label = dest['label']
-        #: :class:`User <github3.users.User>` representing the owner
         self.user = dest.get('user')
         if self.user:
             self.user = users.ShortUser(self.user, self)
-        #: SHA of the commit at the head
         self.sha = dest['sha']
         self._repo_name = ''
         self._repo_owner = ''
@@ -215,16 +211,14 @@ class _PullRequest(models.GitHubCore):
         self.patch_url = pull['patch_url']
         self.review_comment_urlt = URITemplate(pull['review_comment_url'])
         self.review_comments_url = pull['review_comments_url']
-
         self.repository = None
         if self.base:
             self.repository = self.base.repository
-
         self.state = pull['state']
         self.statuses_url = pull['statuses_url']
         self.title = pull['title']
         self.updated_at = self._strptime(pull['updated_at'])
-        self.user = users.ShortUser(pull['user'])
+        self.user = users.ShortUser(pull['user'], self)
 
     def _repr(self):
         return '<Pull Request [#{0}]>'.format(self.number)

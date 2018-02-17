@@ -314,7 +314,7 @@ class GistFork(GitHubCore):
     def _update_attributes(self, fork):
         self.created_at = self._strptime(fork['created_at'])
         self.id = fork['id']
-        self.owner = users.ShortUser(fork['user'])
+        self.owner = users.ShortUser(fork['user'], self)
         self.updated_at = self._strptime(fork['updated_at'])
         self.url = self._api = fork['url']
 

@@ -85,7 +85,8 @@ class UnitHelper(unittest.TestCase):
             instance = self.described_class(self.example_data,
                                             self.session)
         elif self.example_data and not self.session:
-            instance = self.described_class(self.example_data)
+            session = self.create_session_mock()
+            instance = self.described_class(self.example_data, session)
 
         else:
             instance = self.described_class()

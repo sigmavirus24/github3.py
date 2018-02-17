@@ -23,12 +23,12 @@ class TestTree(UnitHelper):
 
     def test_eq(self):
         """Assert that two trees are equal."""
-        tree = github3.git.Tree(get_example_data())
+        tree = github3.git.Tree(get_example_data(), self.session)
         assert self.instance == tree
 
     def test_ne(self):
         """Assert that two trees are not equal."""
-        tree = github3.git.Tree(get_example_data())
+        tree = github3.git.Tree(get_example_data(), self.session)
         tree._json_data['truncated'] = True
         assert self.instance != tree
 

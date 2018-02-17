@@ -200,7 +200,8 @@ class TestGistHistory(helper.UnitHelper):
     def test_equality(self):
         """Show that two instances of a GistHistory are equal."""
         history = github3.gists.history.GistHistory(
-            gist_history_example_data()
+            gist_history_example_data(),
+            self.session
         )
         assert self.instance == history
         history._uniq = 'foo'
@@ -222,7 +223,8 @@ class TestGistComment(helper.UnitHelper):
     def test_equality(self):
         """Show that two instances of a GistComment are equal."""
         comment = github3.gists.comment.GistComment(
-            gist_comment_example_data()
+            gist_comment_example_data(),
+            self.session
         )
         assert self.instance == comment
         comment._uniq = '1'

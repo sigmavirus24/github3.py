@@ -753,4 +753,4 @@ class AuthenticatedUser(User):
         self.disk_usage = user['disk_usage']
         self.owned_private_repos_count = user['owned_private_repos']
         self.total_private_repos_count = user['total_private_repos']
-        self.plan = Plan(user['plan'])
+        self.plan = Plan(user['plan'], self)

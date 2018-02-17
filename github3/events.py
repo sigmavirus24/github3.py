@@ -154,7 +154,7 @@ class Event(GitHubCore):
         event = copy.deepcopy(event)
 
         #: :class:`User <github3.users.User>` object representing the actor.
-        self.actor = self._class_attribute(event, 'actor', EventUser)
+        self.actor = self._class_attribute(event, 'actor', EventUser, self)
         #: datetime object representing when the event was created.
         self.created_at = self._strptime_attribute(event, 'created_at')
 
@@ -162,7 +162,7 @@ class Event(GitHubCore):
         self.id = self._get_attribute(event, 'id')
 
         #: List all possible types of Events
-        self.org = self._class_attribute(event, 'org', EventOrganization)
+        self.org = self._class_attribute(event, 'org', EventOrganization, self)
 
         #: Event type https://developer.github.com/v3/activity/events/types/
         self.type = self._get_attribute(event, 'type')

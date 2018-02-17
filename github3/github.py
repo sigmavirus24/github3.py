@@ -58,7 +58,7 @@ class GitHub(GitHubCore):
     """
 
     def __init__(self, username='', password='', token=''):
-        super(GitHub, self).__init__({})
+        super(GitHub, self).__init__({}, self.new_session())
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -81,7 +81,7 @@ class GitHub(GitHubCore):
         if addresses:
             url = self._build_url('user', 'emails')
             json = self._json(self._post(url, data=addresses), 201)
-        return [users.Email(email) for email in json] if json else []
+        return [users.Email(email, self) for email in json] if json else []
 
     def all_events(self, number=-1, etag=None):
         """Iterate over public events.
@@ -1818,7 +1818,7 @@ class GitHubStatus(GitHubCore):
     return the JSON objects returned by the API.
     """
     def __init__(self):
-        super(GitHubStatus, self).__init__({})
+        super(GitHubStatus, self).__init__({}, self.new_session())
         self.session.base_url = 'https://status.github.com'
 
     def _repr(self):
