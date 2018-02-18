@@ -31,34 +31,34 @@ class Authorization(GitHubCore):
     """
 
     def _update_attributes(self, auth):
-        self._api = self._get_attribute(auth, 'url')
+        self._api = auth['url']
 
         #: Details about the application (name, url)
-        self.app = self._get_attribute(auth, 'app', {})
+        self.app = auth['app']
 
         #: Returns the Authorization token
-        self.token = self._get_attribute(auth, 'token')
+        self.token = auth['token']
 
         #: App name
-        self.name = self._get_attribute(self.app, 'name')
+        self.name = self.app['name']
 
         #: URL about the note
-        self.note_url = self._get_attribute(auth, 'note_url')
+        self.note_url = auth['note_url']
 
         #: Note about the authorization
-        self.note = self._get_attribute(auth, 'note')
+        self.note = auth['note']
 
         #: List of scopes this applies to
-        self.scopes = self._get_attribute(auth, 'scopes')
+        self.scopes = auth['scopes']
 
         #: Unique id of the authorization
-        self.id = self._get_attribute(auth, 'id')
+        self.id = auth['id']
 
         #: datetime object representing when the authorization was created.
-        self.created_at = self._strptime_attribute(auth, 'created_at')
+        self.created_at = self._strptime(auth['created_at'])
 
         #: datetime object representing when the authorization was updated.
-        self.updated_at = self._strptime_attribute(auth, 'updated_at')
+        self.updated_at = self._strptime(auth['updated_at'])
 
     def _repr(self):
         return '<Authorization [{0}]>'.format(self.name)

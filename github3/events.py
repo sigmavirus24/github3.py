@@ -154,31 +154,36 @@ class Event(GitHubCore):
         event = copy.deepcopy(event)
 
         #: :class:`User <github3.users.User>` object representing the actor.
-        self.actor = self._class_attribute(event, 'actor', EventUser, self)
+        self.actor = EventUser(event['actor'], self)
         #: datetime object representing when the event was created.
-        self.created_at = self._strptime_attribute(event, 'created_at')
+        self.created_at = self._strptime(event['created_at'])
 
         #: Unique id of the event
-        self.id = self._get_attribute(event, 'id')
+        self.id = event['id']
 
-        #: List all possible types of Events
-        self.org = self._class_attribute(event, 'org', EventOrganization, self)
+        #: :class:`EventOrganization <github3.events.EventOrganization>`
+        # object representing the org.
+        # an event only has an org if the event relates to a resource owned
+        # by an org.
+        self.org = event.get('org')
+        if self.org:
+            self.org = EventOrganization(event['org'], self)
 
         #: Event type https://developer.github.com/v3/activity/events/types/
-        self.type = self._get_attribute(event, 'type')
+        self.type = event['type']
         handler = _payload_handlers.get(self.type, identity)
 
         #: Dictionary with the payload. Payload structure is defined by type_.
         #  _type: http://developer.github.com/v3/events/types
-        self.payload = self._class_attribute(event, 'payload', handler, self)
+        self.payload = handler(event['payload'], self)
 
         #: Return ``tuple(owner, repository_name)``
-        self.repo = self._get_attribute(event, 'repo')
+        self.repo = event['repo']
         if self.repo:
             self.repo = tuple(self.repo['name'].split('/'))
 
         #: Indicates whether the Event is public or not.
-        self.public = self._get_attribute(event, 'public')
+        self.public = event['public']
 
     def _repr(self):
         return '<Event [{0}]>'.format(self.type[:-5])

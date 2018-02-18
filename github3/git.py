@@ -24,15 +24,15 @@ class Blob(GitHubCore):
     """
 
     def _update_attributes(self, blob):
-        self._api = self._get_attribute(blob, 'url')
+        self._api = blob['url']
 
         #: Raw content of the blob.
-        self.content = self._get_attribute(blob, 'content')
+        self.content = blob['content']
         if self.content is not None:
             self.content = self.content.encode()
 
         #: Encoding of the raw content.
-        self.encoding = self._get_attribute(blob, 'encoding')
+        self.encoding = blob['encoding']
 
         #: Decoded content of the blob.
         self.decoded = self.content
@@ -40,9 +40,9 @@ class Blob(GitHubCore):
             self.decoded = b64decode(self.content)
 
         #: Size of the blob in bytes
-        self.size = self._get_attribute(blob, 'size')
+        self.size = blob['size']
         #: SHA1 of the blob
-        self.sha = self._get_attribute(blob, 'sha')
+        self.sha = blob['sha']
 
     def _repr(self):
         return '<Blob [{0:.10}]>'.format(self.sha)
@@ -58,8 +58,8 @@ class GitData(GitHubCore):
 
     def _update_attributes(self, data):
         #: SHA of the object
-        self.sha = self._get_attribute(data, 'sha')
-        self._api = self._get_attribute(data, 'url')
+        self.sha = data['sha']
+        self._api = data['url']
 
 
 class Commit(BaseCommit):
@@ -75,21 +75,25 @@ class Commit(BaseCommit):
         super(Commit, self)._update_attributes(commit)
         #: dict containing at least the name, email and date the commit was
         #: created
-        self.author = self._get_attribute(commit, 'author', {})
-        # If GH returns nil/None then make sure author is a dict
-        self._author_name = self._get_attribute(self.author, 'name')
+        self.author = commit['author']
+        # GitHub may not provide a name for the author
+        if self.author.get('name'):
+            self._author_name = self.author['name']
 
         #: dict containing similar information to the author attribute
-        self.committer = self._get_attribute(commit, 'committer', {})
-        # blank the data if GH returns no data
+        # If the committer is not different from the author, we may not get
+        # a committer key
+        if commit.get('committer'):
+            self.committer = commit['committer']
 
-        self._commit_name = self._get_attribute(self.committer, 'name')
+            if self.committer.get('name'):
+                self._commit_name = self.committer['name']
 
-        #: :class:`Tree <Tree>` the commit belongs to.
-        self.tree = self._class_attribute(commit, 'tree', Tree, self)
+        #: :class:`CommitTree <CommitTree>` the commit belongs to.
+        self.tree = CommitTree(commit['tree'], self)
 
     def _repr(self):
-        return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
+        return '<Commit [{0}]>'.format(self.sha)
 
 
 class Reference(GitHubCore):
@@ -102,13 +106,13 @@ class Reference(GitHubCore):
     """
 
     def _update_attributes(self, ref):
-        self._api = self._get_attribute(ref, 'url')
+        self._api = ref['url']
 
         #: The reference path, e.g., refs/heads/sc/featureA
-        self.ref = self._get_attribute(ref, 'ref')
+        self.ref = ref['ref']
 
         #: :class:`GitObject <GitObject>` the reference points to
-        self.object = self._class_attribute(ref, 'object', GitObject, self)
+        self.object = GitObject(ref['object'], self)
 
     def _repr(self):
         return '<Reference [{0}]>'.format(self.ref)
@@ -146,7 +150,7 @@ class GitObject(GitData):
     def _update_attributes(self, obj):
         super(GitObject, self)._update_attributes(obj)
         #: The type of object.
-        self.type = self._get_attribute(obj, 'type')
+        self.type = obj['type']
 
     def _repr(self):
         return '<Git Object [{0}]>'.format(self.sha)
@@ -164,19 +168,41 @@ class Tag(GitData):
         super(Tag, self)._update_attributes(tag)
 
         #: String of the tag
-        self.tag = self._get_attribute(tag, 'tag')
+        self.tag = tag['tag']
 
         #: Commit message for the tag
-        self.message = self._get_attribute(tag, 'message')
+        self.message = tag['message']
 
         #: dict containing the name and email of the person
-        self.tagger = self._get_attribute(tag, 'tagger')
+        self.tagger = tag['tagger']
 
         #: :class:`GitObject <GitObject>` for the tag
-        self.object = self._class_attribute(tag, 'object', GitObject, self)
+        self.object = GitObject(tag['object'], self)
 
     def _repr(self):
         return '<Tag [{0}]>'.format(self.tag)
+
+
+class CommitTree(GitData):
+
+    """The :class:`CommitTree <CommitTree>` object.
+
+    Represents the tree data found in a commit object
+
+    """
+
+    def _update_attributes(self, tree):
+        super(CommitTree, self)._update_attributes(tree)
+
+    def _repr(self):
+        return '<CommitTree [{0}]>'.format(self.sha)
+
+    def to_tree(self):
+        """Retrieve a full Tree object for this CommitTree."""
+        json = self._json(self._get(self._api), 200)
+        return self._instance_or_null(Tree, json)
+
+    refresh = to_tree
 
 
 class Tree(GitData):
@@ -191,7 +217,7 @@ class Tree(GitData):
         super(Tree, self)._update_attributes(tree)
 
         #: list of :class:`Hash <Hash>` objects
-        self.tree = self._get_attribute(tree, 'tree', [])
+        self.tree = tree['tree']
         if self.tree:
             self.tree = [Hash(t, self) for t in self.tree]
 
@@ -224,22 +250,24 @@ class Hash(GitHubCore):
 
     def _update_attributes(self, info):
         #: Path to file
-        self.path = self._get_attribute(info, 'path')
+        self.path = info['path']
 
         #: File mode
-        self.mode = self._get_attribute(info, 'mode')
+        self.mode = info['mode']
 
         #: Type of hash, e.g., blob
-        self.type = self._get_attribute(info, 'type')
+        self.type = info['type']
 
         #: Size of hash
-        self.size = self._get_attribute(info, 'size')
+        # Size is not set if the type is a tree
+        if self.type != 'tree':
+            self.size = info['size']
 
         #: SHA of the hash
-        self.sha = self._get_attribute(info, 'sha')
+        self.sha = info['sha']
 
         #: URL of this object in the GitHub API
-        self.url = self._get_attribute(info, 'url')
+        self.url = info['url']
 
     def _repr(self):
         return '<Hash [{0}]>'.format(self.sha)
