@@ -18,3 +18,4 @@ build/
 .ipynb_checkpoints
 .cache/
 tests/id_rsa
+*.DS_Store
