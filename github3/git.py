@@ -222,7 +222,7 @@ class Reference(models.GitHubCore):
             (required), sha of the reference
         :param bool force:
             (optional), force the update or not
-        :returns
+        :returns:
             True if successful, False otherwise
         :rtype:
             bool

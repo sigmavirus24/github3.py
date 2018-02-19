@@ -41,7 +41,9 @@ class RepoCommit(models.BaseCommit):
         )
 
         #: :class:`Commit <github3.git.Commit>`.
-        self.commit = self._class_attribute(commit, 'commit', git.ShortCommit, self)
+        self.commit = self._class_attribute(
+            commit, 'commit', git.ShortCommit, self,
+        )
 
         self.sha = self._get_attribute(commit, 'sha')
 
