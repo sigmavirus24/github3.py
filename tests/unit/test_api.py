@@ -108,7 +108,7 @@ class TestAPI(unittest.TestCase):
 
     def test_login(self):
         """Show that github3.login proxies to GitHub."""
-        args = ('login', 'password', None, None)
+        args = ('login', 'password', None, None, False)
         with mock.patch.object(github3.GitHub, 'login') as login:
             g = github3.login(*args)
             assert isinstance(g, github3.GitHub)

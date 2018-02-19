@@ -42,6 +42,7 @@ class GitHub(GitHubCore):
         g = login(user, password)
         g = login(token=token)
         g = login(user, token=token)
+        g = login(token=token, isapp=True)
 
     or
 
@@ -51,13 +52,14 @@ class GitHub(GitHubCore):
         g = GitHub(user, password)
         g = GitHub(token=token)
         g = GitHub(user, token=token)
+        g = GitHub(token=token, isapp=True)
 
     This is simple backward compatibility since originally there was no way to
     call the GitHub object with authentication parameters.
     """
 
-    def __init__(self, username='', password='', token=''):
-        super(GitHub, self).__init__({}, self.new_session())
+    def __init__(self, username='', password='', token='', isapp=False):
+        super(GitHub, self).__init__({}, self.new_session(isapp))
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -755,7 +757,7 @@ class GitHub(GitHubCore):
                           headers=License.CUSTOM_HEADERS)
 
     def login(self, username=None, password=None, token=None,
-              two_factor_callback=None):
+              two_factor_callback=None, app=False):
         """Logs the user into GitHub for protected API calls.
 
         :param str username: login name
@@ -771,6 +773,11 @@ class GitHub(GitHubCore):
 
         # The Session method handles None for free.
         self.session.two_factor_auth_callback(two_factor_callback)
+
+        # If running as an App the `Accept` header needs to change.
+        if app:
+            apptype = 'application/vnd.github.machine-man-preview+json'
+            self.session.headers['Accept'] = apptype
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.

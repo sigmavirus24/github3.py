@@ -21,7 +21,7 @@ class GitHubSession(requests.Session):
     auth = None
     __attrs__ = requests.Session.__attrs__ + ['base_url', 'two_factor_auth_cb']
 
-    def __init__(self):
+    def __init__(self, isapp=False):
         super(GitHubSession, self).__init__()
         self.headers.update({
             # Only accept JSON responses
@@ -33,6 +33,10 @@ class GitHubSession(requests.Session):
             # Set our own custom User-Agent string
             'User-Agent': 'github3.py/{0}'.format(__version__),
             })
+        if isapp:
+            apptype = 'application/vnd.github.machine-man-preview+json'
+            self.headers['Accept'] = apptype
+
         self.base_url = 'https://api.github.com'
         self.two_factor_auth_cb = None
         self.request_counter = 0

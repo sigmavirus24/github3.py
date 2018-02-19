@@ -40,7 +40,8 @@ def authorize(username, password, scopes, note='', note_url='', client_id='',
                         client_secret)
 
 
-def login(username=None, password=None, token=None, two_factor_callback=None):
+def login(username=None, password=None, token=None, two_factor_callback=None,
+          app=False):
     """Construct and return an authenticated GitHub session.
 
     .. note::
@@ -61,7 +62,7 @@ def login(username=None, password=None, token=None, two_factor_callback=None):
 
     if (username and password) or token:
         g = GitHub()
-        g.login(username, password, token, two_factor_callback)
+        g.login(username, password, token, two_factor_callback, app)
 
     return g
 

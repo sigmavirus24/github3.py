@@ -347,9 +347,9 @@ class GitHubCore(object):
             self._update_attributes(json)
         return self
 
-    def new_session(self):
+    def new_session(self, isapp=False):
         """Helper function to generate a new session"""
-        return GitHubSession()
+        return GitHubSession(isapp)
 
 
 class BaseComment(GitHubCore):
