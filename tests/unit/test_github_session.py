@@ -30,6 +30,18 @@ class TestGitHubSession:
         assert 'User-Agent' in s.headers
         assert s.headers['User-Agent'].startswith('github3.py/')
 
+    def test_has_appt_headers(self):
+        """Assert the default headers are there upon initialization"""
+        s = session.GitHubSession(isapp=True)
+        assert 'Accept' in s.headers
+        assert s.headers['Accept'] == 'application/vnd.github.machine-man-preview+json'
+        assert 'Accept-Charset' in s.headers
+        assert s.headers['Accept-Charset'] == 'utf-8'
+        assert 'Content-Type' in s.headers
+        assert s.headers['Content-Type'] == 'application/json'
+        assert 'User-Agent' in s.headers
+        assert s.headers['User-Agent'].startswith('github3.py/')
+
     def test_build_url(self):
         """Test that GitHubSessions build basic URLs"""
         s = self.build_session()
