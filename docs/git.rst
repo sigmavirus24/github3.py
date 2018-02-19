@@ -9,7 +9,6 @@ section of the GitHub API.
 
 - :class:`Blob <Blob>`
 - :class:`Commit <Commit>`
-- :class:`GitData <GitData>`
 - :class:`GitObject <GitObject>`
 - :class:`Hash <Hash>`
 - :class:`Reference <Reference>`
@@ -27,12 +26,12 @@ Git Objects
 
 ------
 
-.. autoclass:: Commit
+.. autoclass:: ShortCommit
     :inherited-members:
 
 ------
 
-.. autoclass:: GitData
+.. autoclass:: Commit
     :inherited-members:
 
 ------
@@ -58,4 +57,9 @@ Git Objects
 ------
 
 .. autoclass:: Tree
+    :inherited-members:
+
+------
+
+.. autoclass:: CommitTree
     :inherited-members:
