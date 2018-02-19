@@ -34,7 +34,8 @@ class GitHubSession(requests.Session):
             'User-Agent': 'github3.py/{0}'.format(__version__),
             })
         if isapp:
-            self.headers['Accept'] = 'application/vnd.github.machine-man-preview+json'
+            apptype = 'application/vnd.github.machine-man-preview+json'
+            self.headers['Accept'] = apptype
 
         self.base_url = 'https://api.github.com'
         self.two_factor_auth_cb = None

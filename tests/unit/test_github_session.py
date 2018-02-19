@@ -34,7 +34,8 @@ class TestGitHubSession:
         """Assert the default headers are there upon initialization"""
         s = session.GitHubSession(isapp=True)
         assert 'Accept' in s.headers
-        assert s.headers['Accept'] == 'application/vnd.github.machine-man-preview+json'
+        accepttype = 'application/vnd.github.machine-man-preview+json'
+        assert s.headers['Accept'] == accepttype
         assert 'Accept-Charset' in s.headers
         assert s.headers['Accept-Charset'] == 'utf-8'
         assert 'Content-Type' in s.headers

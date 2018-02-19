@@ -776,7 +776,8 @@ class GitHub(GitHubCore):
 
         # If running as an App the `Accept` header needs to change.
         if app:
-            self.session.headers['Accept'] == 'application/vnd.github.machine-man-preview+json'
+            apptype = 'application/vnd.github.machine-man-preview+json'
+            self.session.headers['Accept'] = apptype
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.

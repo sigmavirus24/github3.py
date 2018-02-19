@@ -40,7 +40,8 @@ def authorize(username, password, scopes, note='', note_url='', client_id='',
                         client_secret)
 
 
-def login(username=None, password=None, token=None, two_factor_callback=None, app=False):
+def login(username=None, password=None, token=None, two_factor_callback=None,
+          app=False):
     """Construct and return an authenticated GitHub session.
 
     .. note::
