@@ -1,20 +1,40 @@
 # -*- coding: utf-8 -*-
-"""
-github3.events
-==============
-
-This module contains the class(es) related to Events
-
-"""
+"""This module contains the classes related to Events."""
 from __future__ import unicode_literals
 
 import copy
 
-from .models import GitHubCore
+from . import models
 
 
-class EventUser(GitHubCore):
-    """The class that represents the user information returned in Events."""
+class EventUser(models.GitHubCore):
+    """The class that represents the user information returned in Events.
+
+    .. note::
+
+        Refreshing this object will return a :class:`~github3.users.User`.
+
+    .. attribute:: avatar_url
+
+        The URL of the avatar image this user chose.
+
+    .. attribute:: display_login
+
+        The login that is displayed as part of the event.
+
+    .. attribute:: gravatar_id
+
+        The unique ID for the user's gravatar, if they're using gravatar to
+        host their avatar.
+
+    .. attribute:: id
+
+        The user's unique ID in GitHub.
+
+    .. attribute:: login
+
+        The user's login (or handle) on GitHub.
+    """
 
     def _update_attributes(self, user):
         self.avatar_url = user['avatar_url']
@@ -25,7 +45,13 @@ class EventUser(GitHubCore):
         self._api = self.url = user['url']
 
     def to_user(self):
-        """Retrieve a full User object for this EventUser."""
+        """Retrieve a full User object for this EventUser.
+
+        :returns:
+            The full information about this user.
+        :rtype:
+            :class:`~github3.users.User`
+        """
         from . import users
         url = self._build_url('users', self.login)
         json = self._json(self._get(url), 200)
@@ -34,8 +60,33 @@ class EventUser(GitHubCore):
     refresh = to_user
 
 
-class EventOrganization(GitHubCore):
-    """The class that represents the org information returned in Events."""
+class EventOrganization(models.GitHubCore):
+    """Representation of the organization information returned in Events.
+
+    .. note::
+
+        Refreshing this object will return a
+        :class:`~github3.orgs.Organization`.
+
+    This object has the following attributes:
+
+    .. attribute:: avatar_url
+
+        The URL to this organization's avatar.
+
+    .. attribute:: gravatar_id
+
+        The unique identifier for this organization on Gravatar, if its
+        avatar is hosted there.
+
+    .. attribute:: id
+
+        This organization's unique identifier on GitHub.
+
+    .. attribute:: login
+
+        The unique login for this organization.
+    """
 
     def _update_attributes(self, org):
         self.avatar_url = org['avatar_url']
@@ -45,7 +96,13 @@ class EventOrganization(GitHubCore):
         self._api = self.url = org['url']
 
     def to_org(self):
-        """Retrieve a full Organization object for this EventOrganization."""
+        """Retrieve a full Organization object for this EventOrganization.
+
+        :returns:
+            The full information about this organization.
+        :rtype:
+            :class:`~github3.orgs.Organization`
+        """
         from . import orgs
         url = self._build_url('orgs', self.login)
         json = self._json(self._get(url), 200)
@@ -54,8 +111,35 @@ class EventOrganization(GitHubCore):
     refresh = to_org
 
 
-class EventPullRequest(GitHubCore):
-    """The class that represents the pr information returned in Events."""
+class EventPullRequest(models.GitHubCore):
+    """Representation of a Pull Request returned in Events.
+
+    .. note::
+
+        Refreshing this object returns a :class:`~github3.pulls.PullRequest`.
+
+    This object has the following attributes:
+
+    .. attribute:: id
+
+        The unique id of this pull request across all of GitHub.
+
+    .. attribute:: number
+
+        The number of this pull request on its repository.
+
+    .. attribute:: state
+
+        The state of this pull request during this event.
+
+    .. attribute:: title
+
+        The title of this pull request during this event.
+
+    .. attribute:: locked
+
+        A boolean attribute describing if this pull request was locked.
+    """
 
     def _update_attributes(self, pull):
         self.id = pull['id']
@@ -66,7 +150,13 @@ class EventPullRequest(GitHubCore):
         self._api = self.url = pull['url']
 
     def to_pull(self):
-        """Retrieve a full PullRequest object for this EventPullRequest."""
+        """Retrieve a full PullRequest object for this EventPullRequest.
+
+        :returns:
+            The full information about this pull request.
+        :rtype:
+            :class:`~github3.pulls.PullRequest`
+        """
         from . import pulls
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
@@ -74,8 +164,79 @@ class EventPullRequest(GitHubCore):
     refresh = to_pull
 
 
-class EventReviewComment(GitHubCore):
-    """Representation of review comments in events."""
+class EventReviewComment(models.GitHubCore):
+    """Representation of review comments in events.
+
+    .. note::
+
+        Refreshing this object will return a new
+        :class`~github3.pulls.ReviewComment`
+
+    This object has the following attributes:
+
+    .. attribute:: id
+
+        The unique id of this comment across all of GitHub.
+
+    .. attribute:: author_association
+
+        The association the author has with this project.
+
+    .. attribute:: body
+
+        The markdown body of this review comment.
+
+    .. attribute:: commit_id
+
+        The identifier of the commit that this comment was left on.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        this comment was created.
+
+    .. attribute:: diff_hunk
+
+        The section (or hunk) of the diff this comment was left on.
+
+    .. attribute:: html_url
+
+        The URL to view this comment in a browser.
+
+    .. attribute:: links
+
+        A dictionary of links to various items about this comment.
+
+    .. attribute:: original_commit_id
+
+        The identifier of original commit this comment was left on.
+
+    .. attribute:: original_position
+
+        The original position within the diff this comment was left.
+
+    .. attribute:: path
+
+        The path to the file this comment was left on.
+
+    .. attribute:: position
+
+        The current position within the diff this comment is placed.
+
+    .. attribute:: pull_request_url
+
+        The URL to retrieve the pull request informtation from the API.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        this comment was updated.
+
+    .. attribute:: user
+
+        A :class:`~github3.users.ShortUser` representing the user who authored
+        this comment.
+    """
 
     def _update_attributes(self, comment):
         from . import users
@@ -99,6 +260,8 @@ class EventReviewComment(GitHubCore):
     def to_review_comment(self):
         """Retrieve a full ReviewComment object for this EventReviewComment.
 
+        :returns:
+            The full information about this review comment
         :rtype:
             :class:`~github3.pulls.ReviewComment`
         """
@@ -109,7 +272,7 @@ class EventReviewComment(GitHubCore):
     refresh = to_review_comment
 
 
-class EventIssue(GitHubCore):
+class EventIssue(models.GitHubCore):
     """The class that represents the issue information returned in Events."""
 
     def _update_attributes(self, issue):
@@ -129,10 +292,10 @@ class EventIssue(GitHubCore):
     refresh = to_issue
 
 
-class Event(GitHubCore):
+class Event(models.GitHubCore):
+    """Represents an event as returned by the API.
 
-    """The :class:`Event <Event>` object. It structures and handles the data
-    returned by via the
+    It structures and handles the data returned by via the
     `Events <https://developer.github.com/v3/activity/events>`_ section
     of the GitHub API.
 
@@ -146,43 +309,69 @@ class Event(GitHubCore):
         e1.id == e2.id
         e1.id != e2.id
 
+    .. attribute:: actor
+
+        A :class:`~github3.events.EventUser` that represents the user whose
+        action generated this event.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` representing when this event was created.
+
+    .. attribute:: id
+
+        The unique identifier for this event.
+
+    .. attribute:: org
+
+        If present, a :class:`~github3.events.EventOrganization` representing
+        the organization on which this event occurred.
+
+    .. attribute:: type
+
+        The type of event this is.
+
+        .. seealso::
+
+            `Event Types Documentation`_
+                GitHub's documentation of different event types
+
+    .. attribute:: payload
+
+        The payload of the event which has all of the details relevant to this
+        event.
+
+    .. attribute:: repo
+
+        The string representation of the repository this event pertains to.
+
+        .. versionchanged:: 1.0.0
+
+            This restores the behaviour of the API. To get a tuple,
+            representation, use ``self.repo.split('/', 1)``
+
+    .. attribute:: public
+
+        A boolean representing whether the event is publicly viewable or not.
+
+    .. _Event Types Documentation:
+        https://developer.github.com/v3/activity/events/types/
     """
 
     def _update_attributes(self, event):
         # If we don't copy this, then we end up altering _json_data which we do
         # not want to do:
         event = copy.deepcopy(event)
-
-        #: :class:`User <github3.users.User>` object representing the actor.
         self.actor = EventUser(event['actor'], self)
-        #: datetime object representing when the event was created.
         self.created_at = self._strptime(event['created_at'])
-
-        #: Unique id of the event
         self.id = event['id']
-
-        #: :class:`EventOrganization <github3.events.EventOrganization>`
-        # object representing the org.
-        # an event only has an org if the event relates to a resource owned
-        # by an org.
         self.org = event.get('org')
         if self.org:
             self.org = EventOrganization(event['org'], self)
-
-        #: Event type https://developer.github.com/v3/activity/events/types/
         self.type = event['type']
         handler = _payload_handlers.get(self.type, identity)
-
-        #: Dictionary with the payload. Payload structure is defined by type_.
-        #  _type: http://developer.github.com/v3/events/types
         self.payload = handler(event['payload'], self)
-
-        #: Return ``tuple(owner, repository_name)``
         self.repo = event['repo']
-        if self.repo:
-            self.repo = tuple(self.repo['name'].split('/'))
-
-        #: Indicates whether the Event is public or not.
         self.public = event['public']
 
     def _repr(self):
