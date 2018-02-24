@@ -2,10 +2,10 @@
 """Module containing the GistFile object."""
 from __future__ import unicode_literals
 
-from ..models import GitHubCore
+from .. import models
 
 
-class _GistFile(GitHubCore):
+class _GistFile(models.GitHubCore):
     """Base for GistFile classes."""
 
     def _update_attributes(self, gistfile):

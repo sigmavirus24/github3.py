@@ -4,16 +4,16 @@ from __future__ import unicode_literals
 
 from json import dumps
 
+from .. import models
 from .. import users
 
-from ..models import GitHubCore
 from ..decorators import requires_auth
 from . import comment
 from . import file as gistfile
 from . import history
 
 
-class _Gist(GitHubCore):
+class _Gist(models.GitHubCore):
     """This object holds all the information returned by Github about a gist.
 
     With it you can comment on or fork the gist (assuming you are
@@ -309,7 +309,7 @@ class ShortGist(_Gist):
     class_name = 'ShortGist'
 
 
-class GistFork(GitHubCore):
+class GistFork(models.GitHubCore):
     """This object represents a forked Gist.
 
     This has a subset of attributes of a
