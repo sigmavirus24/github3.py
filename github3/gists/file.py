@@ -21,8 +21,10 @@ class _GistFile(GitHubCore):
     def content(self):
         """Retrieve contents of file from key 'raw_url'.
 
-        :returns: unaltered, untruncated contents of file.
-        :rtype: bytes
+        :returns:
+            unaltered, untruncated contents of file.
+        :rtype:
+            bytes
         """
         resp = self._get(self.raw_url)
         if self._boolean(resp, 200, 404):
