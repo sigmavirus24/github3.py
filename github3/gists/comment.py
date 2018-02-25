@@ -61,9 +61,9 @@ class GistComment(models.GitHubCore):
         self.body = comment['body']
         self.body_html = comment['body_html']
         self.body_text = comment['body_text']
-        self.created_at = comment['created_at']
+        self.created_at = self._strptime(comment['created_at'])
         self.id = comment['id']
-        self.updated_at = comment['updated_at']
+        self.updated_at = self._strptime(comment['updated_at'])
         self.user = self._class_attribute(
             comment, 'user', users.ShortUser, self,
         )
