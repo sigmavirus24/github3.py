@@ -79,8 +79,7 @@ class TestPayLoadHandlers(TestCase):
         }
         github3.events._issuecomm(comment, None)
         assert isinstance(comment['issue'], github3.events.EventIssue)
-        assert isinstance(comment['comment'],
-                          github3.issues.comment.IssueComment)
+        assert isinstance(comment['comment'], github3.events.EventIssueComment)
 
     def test_issueevent(self):
         """Show that the event type is a IssueEvent."""

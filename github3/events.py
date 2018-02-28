@@ -292,6 +292,77 @@ class EventIssue(models.GitHubCore):
     refresh = to_issue
 
 
+class EventIssueComment(models.GitHubCore):
+    """Representation of a comment left on an issue.
+
+    See also: http://developer.github.com/v3/issues/comments/
+
+    This object has the following attributes:
+
+    .. attribute:: author_association
+
+        The association of the author (:attr:`user`) with the repository
+        this issue belongs to.
+
+    .. attribute:: body
+
+        The markdown formatted original text written by the author.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this comment was created.
+
+    .. attribute:: html_url
+
+        The URL to view this comment in a browser.
+
+    .. attribute:: id
+
+        The unique identifier for this comment.
+
+    .. attribute:: issue_url
+
+        The URL of the parent issue in the API.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this comment was most recently updated.
+
+    .. attribute:: user
+
+        A :class:`~github3.users.ShortUser` representing the author of this
+        comment.
+    """
+
+    def _update_attributes(self, comment):
+        from . import users
+        self._api = comment['url']
+        self.author_association = comment['author_association']
+        self.body = comment['body']
+        self.created_at = self._strptime(comment['created_at'])
+        self.html_url = comment['html_url']
+        self.id = comment['id']
+        self.issue_url = comment['issue_url']
+        self.updated_at = self._strptime(comment['updated_at'])
+        self.user = users.ShortUser(comment['user'], self)
+
+    def to_issue_comment(self):
+        """Retrieve the full IssueComment object for this comment.
+
+        :returns:
+            All the information about an IssueComment.
+        :rtype:
+            :class:`~github3.issues.comment.IssueComment`
+        """
+        from .issues import comment
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(comment.IssueComment, json)
+
+    refresh = to_issue_comment
+
+
 class Event(models.GitHubCore):
     """Represents an event as returned by the API.
 
@@ -411,11 +482,10 @@ def _gist(payload, session):
 
 
 def _issuecomm(payload, session):
-    from .issues.comment import IssueComment
     if payload.get('issue'):
         payload['issue'] = EventIssue(payload['issue'], session)
     if payload.get('comment'):
-        payload['comment'] = IssueComment(payload['comment'], session)
+        payload['comment'] = EventIssueComment(payload['comment'], session)
     return payload
 
 

@@ -7,6 +7,8 @@
   "position": 4,
   "line": 14,
   "commit_id": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+  "author_association": "OWNER",
+  "issue_url": "https://api.github.com/repos/octocat/Hello-World/issues/1",
   "user": {
     "login": "octocat",
     "id": 1,
