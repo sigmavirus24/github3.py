@@ -803,7 +803,7 @@ class TestRepository(helper.IntegrationHelper):
             events = list(repository.issue_events(number=50))
 
         for ev in events:
-            assert isinstance(ev, github3.issues.event.IssueEvent)
+            assert isinstance(ev, github3.issues.event.RepositoryIssueEvent)
 
     def test_issues_sorts_ascendingly(self):
         """Test that issues will be returned in ascending order."""

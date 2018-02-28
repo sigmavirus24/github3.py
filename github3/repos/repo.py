@@ -12,13 +12,13 @@ from json import dumps
 
 from uritemplate import URITemplate
 
+from ..issues import event as ievent
 from .. import users
 
 from ..decorators import requires_auth
 from ..events import Event
 from ..git import Blob, Commit, Reference, Tag, Tree
 from ..issues import ShortIssue, Issue, issue_params
-from ..issues.event import IssueEvent
 from ..issues.label import Label
 from ..issues.milestone import Milestone
 from .. import licenses
@@ -1229,7 +1229,8 @@ class _Repository(GitHubCore):
             :class:`IssueEvent <github3.issues.event.IssueEvent>`\ s
         """
         url = self._build_url('issues', 'events', base_url=self._api)
-        return self._iter(int(number), url, IssueEvent, etag=etag)
+        return self._iter(int(number), url, ievent.RepositoryIssueEvent,
+                          etag=etag)
 
     def issues(self, milestone=None, state=None, assignee=None, mentioned=None,
                labels=None, sort=None, direction=None, since=None, number=-1,

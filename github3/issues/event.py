@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Issue events logic."""
 from __future__ import unicode_literals
 
 from .. import users
@@ -6,71 +7,102 @@ from ..models import GitHubCore
 
 
 class IssueEvent(GitHubCore):
-    """The :class:`IssueEvent <IssueEvent>` object. This specifically deals
-    with events described in the
-    `Issues\>Events <http://developer.github.com/v3/issues/events>`_ section of
-    the GitHub API.
+    """Representation of an event from a specific issue.
 
-    Two event instances can be checked like so::
+    This object will be instantiated from calling
+    :meth:`~github3.issues.issue.Issue.events` which calls
+    https://developer.github.com/v3/issues/events/#list-events-for-an-issue
 
-        e1 == e2
-        e1 != e2
+    See also: http://developer.github.com/v3/issues/events
 
-    And is equivalent to::
+    This object has the following attributes:
 
-        e1.commit_id == e2.commit_id
-        e1.commit_id != e2.commit_id
+    .. attribute:: actor
 
+        A :class:`~github3.users.ShortUser` representing the user who
+        generated this event.
+
+    .. attribute:: commit_id
+
+        The string SHA of a commit that referenced the parent issue. If there
+        was no commit referencing this issue, then this will be ``None``.
+
+    .. attribute:: commit_url
+
+        The URL to retrieve commit information from the API for the commit
+        that references the parent issue. If there was no commit, this will be
+        ``None``.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        this event occurred.
+
+    .. attribute:: event
+
+        The issue-specific action that generated this event. Some examples
+        are:
+
+        - closed
+        - reopened
+        - subscribed
+        - merged
+        - referenced
+        - mentioned
+        - assigned
+
+        See `this list of events`_ for a full listing.
+
+    .. attribute:: id
+
+        The unique identifier for this event.
+
+    .. _this list of events:
+        https://developer.github.com/v3/issues/events/#events-1
     """
+
     def _update_attributes(self, event):
-        # The type of event:
-        #   ('closed', 'reopened', 'subscribed', 'merged', 'referenced',
-        #    'mentioned', 'assigned')
-        #: The type of event, e.g., closed
-        self.event = self._get_attribute(event, 'event')
-        #: SHA of the commit.
-        self.commit_id = self._get_attribute(event, 'commit_id')
-        self._api = self._get_attribute(event, 'url')
-
-        #: :class:`ShortIssue <github3.issues.ShortIssue>` where this comment
-        #:  was made.
-        from .issue import ShortIssue
-        self.issue = self._class_attribute(event, 'issue', ShortIssue, self)
-
-        #: :class:`User <github3.users.ShortUser>` who caused this event.
-        self.actor = self._class_attribute(
-            event, 'actor', users.ShortUser, self,
-        )
-
-        #: Number of comments
-        self.comments = self._get_attribute(event, 'comments')
-
-        #: datetime object representing when the event was created.
-        self.created_at = self._strptime_attribute(event, 'created_at')
-
-        #: Dictionary of links for the pull request
-        self.pull_request = self._get_attribute(event, 'pull_request', {})
-
-        #: Dictionary containing label details
-        self.label = self._get_attribute(event, 'label', {})
-
-        #: The integer ID of the event
+        self._api = event['url']
+        self.actor = users.ShortUser(event['actor'], self)
+        self.commit_id = event['commit_id']
+        self.commit_url = event['commit_url']
+        self.created_at = event['created_at']
+        self.event = event['event']
         self.id = self._get_attribute(event, 'id')
-
-        #: :class:`User <github3.users.User>` that is assigned
-        self.assignee = self._class_attribute(
-            event, 'assignee', users.ShortUser, self,
-        )
-
-        #: Dictionary containing milestone details
-        self.milestone = self._get_attribute(event, 'milestone', {})
-
-        #: Dictionary containing to and from attributes
-        self.rename = self._get_attribute(event, 'rename', {})
-
         self._uniq = self.commit_id
 
     def _repr(self):
         return '<Issue Event [{0} by {1}]>'.format(
             self.event, self.actor
+        )
+
+
+class RepositoryIssueEvent(IssueEvent):
+    """Representation of an issue event on the repository level.
+
+    This object will be instantiated from calling
+    :meth:`~github3.repos.repo.Repository.issue_events` or
+    :meth:`~github3.repos.repo.ShortRepository.issue_events`which call
+    https://developer.github.com/v3/issues/events/#list-events-for-a-repository
+
+    See also: http://developer.github.com/v3/issues/events
+
+    This object has all of the attributes of
+    :class:`~github3.issues.event.IssueEvent` and the following:
+
+    .. attribute:: issue
+
+        A :class:`~github3.issues.issue.ShortIssue` representing the issue
+        where this event originated from.
+
+    """
+
+    def _update_attributes(self, event):
+        super(RepositoryIssueEvent, self)._update_attributes(event)
+        from . import issue
+        self.issue = issue.ShortIssue(event['issue'], self)
+
+    def _repr(self):
+        return '<Repository Issue Event on #{} [{} by {}]>'.format(
+            self.issue.number, self.event, self.actor.login
         )
