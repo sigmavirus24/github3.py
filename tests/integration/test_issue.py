@@ -24,7 +24,7 @@ class TestIssue(IntegrationHelper):
 
         assert len(labels) > 0
         for label in labels:
-            assert isinstance(label, github3.issues.issue.Label)
+            assert isinstance(label, github3.issues.label.Label)
 
     def test_assign(self):
         """Test the ability to assign a user to an issue."""
@@ -47,7 +47,7 @@ class TestIssue(IntegrationHelper):
                                   number=497)
             comment = issue.comment('165547512')
 
-        assert isinstance(comment, github3.issues.issue.IssueComment)
+        assert isinstance(comment, github3.issues.comment.IssueComment)
 
     def test_comments(self):
         """Test the ability to retrieve comments on an issue."""
@@ -87,7 +87,7 @@ class TestIssue(IntegrationHelper):
                 body='Comment from integration test'
             )
 
-        assert isinstance(comment, github3.issues.issue.IssueComment)
+        assert isinstance(comment, github3.issues.comment.IssueComment)
 
     def test_edit(self):
         """Test the ability to edit an issue."""
@@ -215,7 +215,7 @@ class TestIssue(IntegrationHelper):
 
         assert len(labels) > 0
         for label in labels:
-            assert isinstance(label, github3.issues.issue.Label)
+            assert isinstance(label, github3.issues.label.Label)
 
     def test_replace_labels(self):
         """Test the ability to replace labels from an issue."""
@@ -230,7 +230,7 @@ class TestIssue(IntegrationHelper):
 
         assert len(replaced_labels) == len(labels)
         for replaced_label in replaced_labels:
-            assert isinstance(replaced_label, github3.issues.issue.Label)
+            assert isinstance(replaced_label, github3.issues.label.Label)
 
     def test_unlock(self):
         """Test the ability to lock an issue."""

@@ -267,7 +267,6 @@ class TestIssue(helper.UnitHelper):
         self.assertEqual(
             issue.html_url,
             "https://github.com/sigmavirus24/github3.py/pull/1")
-        self.assertEqual(issue.repository, ("sigmavirus24", "github3.py"))
 
     def test_pull_request(self):
         """Verify the request to retrieve an associated Pull Request."""
@@ -283,13 +282,6 @@ class TestIssue(helper.UnitHelper):
         self.instance.pull_request()
 
         assert self.session.get.called is False
-
-    def test_repr(self):
-        """Show that instance string is formattted properly."""
-        assert repr(self.instance) == '<Issue [{r[0]}/{r[1]} #{n}]>'.format(
-            r=self.instance.repository,
-            n=self.instance.number
-        )
 
     def test_remove_all_labels(self):
         """Verify that all labels are removed."""
