@@ -1320,7 +1320,7 @@ class GitHub(GitHubCore):
 
     def search_issues(self, query, sort=None, order=None, per_page=None,
                       text_match=False, number=-1, etag=None):
-        """Find issues by state and keyword
+        """Find issues by state and keyword.
 
         The query can contain any combination of the following supported
         qualifers:
