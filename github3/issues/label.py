@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Module containing the logic for labels."""
 from __future__ import unicode_literals
 
 from json import dumps
@@ -7,18 +8,25 @@ from ..models import GitHubCore
 
 
 class Label(GitHubCore):
-    """The :class:`Label <Label>` object. Succintly represents a label that
-    exists in a repository.
+    """A representation of a label object defined on a repository.
 
     See also: http://developer.github.com/v3/issues/labels/
-    """
-    def _update_attributes(self, label):
-        self._api = self._get_attribute(label, 'url')
-        #: Color of the label, e.g., 626262
-        self.color = self._get_attribute(label, 'color')
-        #: Name of the label, e.g., 'bug'
-        self.name = self._get_attribute(label, 'name')
 
+    This object has the following attributes::
+
+    .. attribute:: color
+
+        The hexadecimeal representation of the background color of this label.
+
+    .. attribute:: name
+
+        The name (display label) for this label.
+    """
+
+    def _update_attributes(self, label):
+        self._api = label['url']
+        self.color = label['color']
+        self.name = label['name']
         self._uniq = self._api
 
     def _repr(self):
@@ -31,7 +39,10 @@ class Label(GitHubCore):
     def delete(self):
         """Delete this label.
 
-        :returns: bool
+        :returns:
+            True if successfully deleted, False otherwise
+        :rtype:
+            bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
@@ -39,9 +50,14 @@ class Label(GitHubCore):
     def update(self, name, color):
         """Update this label.
 
-        :param str name: (required), new name of the label
-        :param str color: (required), color code, e.g., 626262, no leading '#'
-        :returns: bool
+        :param str name:
+            (required), new name of the label
+        :param str color:
+            (required), color code, e.g., 626262, no leading '#'
+        :returns:
+            True if successfully updated, False otherwise
+        :rtype:
+            bool
         """
         json = None
 
