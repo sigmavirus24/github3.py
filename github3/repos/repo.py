@@ -27,6 +27,7 @@ from .. import notifications
 from ..projects import Project
 from ..pulls import ShortPullRequest, PullRequest
 from ..utils import stream_response_to_file, timestamp_parameter
+from . import branch
 from .branch import Branch
 from .comment import RepoComment
 from .commit import RepoCommit
@@ -220,8 +221,8 @@ class _Repository(GitHubCore):
         """
         url = self._build_url('branches', base_url=self._api)
         params = {'protected': '1'} if protected else None
-        return self._iter(int(number), url, Branch, params, etag=etag,
-                          headers=Branch.PREVIEW_HEADERS)
+        return self._iter(int(number), url, branch.ShortBranch, params,
+                          etag=etag, headers=branch.Branch.PREVIEW_HEADERS)
 
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.

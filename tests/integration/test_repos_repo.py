@@ -55,7 +55,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for branch in repository.branches():
-                assert isinstance(branch, github3.repos.branch.Branch)
+                assert isinstance(branch, github3.repos.branch.ShortBranch)
 
     def test_project(self):
         """Test the ability to retrieve a single repository project."""
