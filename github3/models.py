@@ -193,10 +193,8 @@ class GitHubCore(object):
             )
         if not json:
             return None
-        try:
-            return instance_class(json, self)
-        except TypeError:  # instance_class is not a subclass of GitHubCore
-            return instance_class(json)
+
+        return instance_class(json, self)
 
     def _json(self, response, status_code, include_cache_info=True):
         ret = None

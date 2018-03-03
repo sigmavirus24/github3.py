@@ -147,7 +147,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for commit in repository.commits(number=25):
-                assert isinstance(commit, github3.repos.commit.RepoCommit)
+                assert isinstance(commit, github3.repos.commit.ShortCommit)
 
     def test_compare_commits(self):
         """Test the ability to compare two commits."""
@@ -937,7 +937,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'fork_this')
             commit = repository.merge('master', 'new-branch')
-        assert isinstance(commit, github3.repos.commit.RepoCommit)
+        assert isinstance(commit, github3.repos.commit.ShortCommit)
 
     def test_milestone(self):
         """Test the ability to retrieve a milestone on a repository."""

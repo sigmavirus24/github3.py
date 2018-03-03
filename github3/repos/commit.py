@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.repos.commit
-====================
-
-This module contains the RepoCommit class alone
-
-"""
+"""This module contains the RepoCommit classes."""
 from __future__ import unicode_literals
 
 from . import status
@@ -13,8 +7,10 @@ from .. import git, models, users
 from .comment import RepoComment
 
 
-class RepoCommit(models.BaseCommit):
-    """The :class:`RepoCommit <RepoCommit>` object. This represents a commit as
+class _RepoCommit(models.GitHubCore):
+    """The :class:`RepoCommit <RepoCommit>` object.
+
+    This represents a commit as
     viewed by a :class:`Repository`. This is different from a Commit object
     returned from the git data section.
 
@@ -30,53 +26,23 @@ class RepoCommit(models.BaseCommit):
 
     """
 
+    class_name = '_RepoCommit'
+
     def _update_attributes(self, commit):
-        super(RepoCommit, self)._update_attributes(commit)
-
-        self.author = self._class_attribute(
-            commit, 'author', users.ShortUser, self
-        )
-        self.committer = self._class_attribute(
-            commit, 'committer', users.ShortUser, self
-        )
-
-        #: :class:`Commit <github3.git.Commit>`.
-        self.commit = self._class_attribute(
-            commit, 'commit', git.ShortCommit, self,
-        )
-
-        self.sha = self._get_attribute(commit, 'sha')
-
-        #: The number of additions made in the commit.
-        self.additions = 0
-
-        #: The number of deletions made in the commit.
-        self.deletions = 0
-
-        #: Total number of changes in the files.
-        self.total = 0
-        stats = self._get_attribute(commit, 'stats')
-        if stats:
-            self.additions = commit['stats'].get('additions')
-            self.deletions = commit['stats'].get('deletions')
-            self.total = commit['stats'].get('total')
-
-        #: The files that were modified by this commit.
-        self.files = self._get_attribute(commit, 'files', [])
-
-        self._uniq = self.sha
-
-        #: The commit message
-        self.message = getattr(self.commit, 'message', None)
+        self._api = commit['url']
+        #: SHA of this commit.
+        self._uniq = self.sha = commit['sha']
 
     def _repr(self):
-        return '<Repository Commit [{0}]>'.format(self.sha[:7])
+        return '<{0} [{1}]>'.format(self.class_name, self.sha[:7])
 
     def diff(self):
         """Retrieve the diff for this commit.
 
-        :returns: the diff as a bytes object
-        :rtype: bytes
+        :returns:
+            the diff as a bytes object
+        :rtype:
+            bytes
         """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.diff'})
@@ -85,8 +51,10 @@ class RepoCommit(models.BaseCommit):
     def patch(self):
         """Retrieve the patch formatted diff for this commit.
 
-        :returns: the patch as a bytes object
-        :rtype: bytes
+        :returns:
+            the patch as a bytes object
+        :rtype:
+            bytes
         """
         resp = self._get(self._api,
                          headers={'Accept': 'application/vnd.github.patch'})
@@ -95,8 +63,10 @@ class RepoCommit(models.BaseCommit):
     def status(self):
         """Retrieve the combined status for this commit.
 
-        :returns: the combined status for this commit
-        :rtype: :class:`~github3.repos.status.CombinedStatus`
+        :returns:
+            the combined status for this commit
+        :rtype:
+            :class:`~github3.repos.status.CombinedStatus`
         """
         url = self._build_url('status', base_url=self._api)
         json = self._json(self._get(url), 200)
@@ -105,8 +75,10 @@ class RepoCommit(models.BaseCommit):
     def statuses(self):
         """Retrieve the statuses for this commit.
 
-        :returns: the statuses for this commit
-        :rtype: :class:`~github3.repos.status.Status`
+        :returns:
+            the statuses for this commit
+        :rtype:
+            :class:`~github3.repos.status.Status`
         """
         url = self._build_url('statuses', base_url=self._api)
         return self._iter(-1, url, status.Status)
@@ -114,12 +86,65 @@ class RepoCommit(models.BaseCommit):
     def comments(self, number=-1, etag=None):
         """Iterate over comments for this commit.
 
-        :param int number: (optional), number of comments to return. Default:
-            -1 returns all comments
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
+        :param int number:
+            (optional), number of comments to return. Default: -1 returns all
+            comments
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of comments
+        :rtype:
+            :class:~github3.repos.comment.RepoComment`
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
+
+
+class MiniCommit(_RepoCommit):
+    """A commit returned on a ShortBranch."""
+
+    class_name = 'Mini Repository Commit'
+
+
+class ShortCommit(_RepoCommit):
+    """Representation of an incomplete commit in a collection."""
+
+    class_name = 'Short Repository Commit'
+
+    def _update_attributes(self, commit):
+        super(ShortCommit, self)._update_attributes(commit)
+        self.author = commit['author']
+        if self.author:
+            self.author = users.ShortUser(self.author, self)
+        self.comments_url = commit['comments_url']
+        self.commit = git.ShortCommit(commit['commit'], self)
+        self.committer = commit['committer']
+        if self.committer:
+            self.committer = users.ShortUser(self.committer, self)
+        self.html_url = commit['html_url']
+        #: List of parents to this commit.
+        self.parents = commit['parents']
+        #: The commit message
+        self.message = getattr(self.commit, 'message', None)
+
+
+class RepoCommit(_RepoCommit):
+    """Representation of a commit with repository and git data."""
+
+    class_name = 'Repository Commit'
+
+    def _update_attributes(self, commit):
+        super(RepoCommit, self)._update_attributes(commit)
+        #: The number of additions made in the commit.
+        self.additions = 0
+        #: The number of deletions made in the commit.
+        self.deletions = 0
+        #: The files that were modified by this commit.
+        self.files = commit['files']
+        #: Total number of changes in the files.
+        self.total = 0
+        self.stats = commit['stats']
+        if self.stats:
+            self.additions = self.stats['additions']
+            self.deletions = self.stats['deletions']
+            self.total = self.stats['total']

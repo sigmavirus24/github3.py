@@ -8,10 +8,10 @@ from uritemplate import URITemplate
 
 from . import models
 from . import users
+from .repos import commit as rcommit
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
-from .repos.commit import RepoCommit
 from .repos.contents import Contents
 
 
@@ -328,10 +328,10 @@ class _PullRequest(models.GitHubCore):
         :returns:
             generator of repository commit objects
         :rtype:
-            :class:`~github3.repos.commit.RepoCommit`
+            :class:`~github3.repos.commit.ShortCommit`
         """
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, RepoCommit, etag=etag)
+        return self._iter(int(number), url, rcommit.ShortCommit, etag=etag)
 
     def files(self, number=-1, etag=None):
         """Iterate over the files associated with this pull request.

@@ -7,8 +7,6 @@ from json import dumps
 from . import commit
 from .. import models
 
-from .commit import RepoCommit
-
 
 class _Branch(models.GitHubCore):
     """A representation of a branch on a repository.
@@ -25,7 +23,7 @@ class _Branch(models.GitHubCore):
     class_name = 'Repository Branch'
 
     def _update_attributes(self, branch):
-        self.commit = commit.RepoCommit(branch['commit'], self)
+        self.commit = commit.MiniCommit(branch['commit'], self)
         self.name = branch['name']
 
     def _repr(self):
@@ -110,7 +108,7 @@ class ShortBranch(_Branch):
 
     .. attribute:: commit
 
-        A :class:`~github3.repos.commit.RepoCommit` representation of the
+        A :class:`~github3.repos.commit.MiniCommit` representation of the
         newest commit on this branch with the associated repository metadata.
 
     .. attribute:: name
@@ -158,6 +156,7 @@ class Branch(_Branch):
 
     def _update_attributes(self, branch):
         super(Branch, self)._update_attributes(branch)
+        self.commit = commit.ShortCommit(branch['commit'], self)
         #: Returns '_links' attribute.
         self.links = branch['_links']
         #: Provides the branch's protection status.
@@ -166,7 +165,7 @@ class Branch(_Branch):
         self.protection_url = branch['protection_url']
         if self.links and 'self' in self.links:
             self._api = self.links['self']
-        elif isinstance(self.commit, RepoCommit):
+        elif isinstance(self.commit, commit.ShortCommit):
             # Branches obtained via `repo.branches` don't have links.
             base = self.commit.url.split('/commit', 1)[0]
             self._api = self._build_url('branches', self.name, base_url=base)

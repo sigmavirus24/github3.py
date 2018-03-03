@@ -28,9 +28,8 @@ from ..projects import Project
 from ..pulls import ShortPullRequest, PullRequest
 from ..utils import stream_response_to_file, timestamp_parameter
 from . import branch
-from .branch import Branch
+from . import commit
 from .comment import RepoComment
-from .commit import RepoCommit
 from .comparison import Comparison
 from .contents import Contents, validate_commmitter
 from .deployment import Deployment
@@ -203,9 +202,10 @@ class _Repository(GitHubCore):
         json = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            json = self._json(self._get(url, headers=Branch.PREVIEW_HEADERS),
+            json = self._json(self._get(url,
+                                        headers=branch.Branch.PREVIEW_HEADERS),
                               200)
-        return self._instance_or_null(Branch, json)
+        return self._instance_or_null(branch.Branch, json)
 
     def branches(self, number=-1, protected=False, etag=None):
         r"""Iterate over the branches in this repository.
@@ -284,7 +284,7 @@ class _Repository(GitHubCore):
         """
         url = self._build_url('commits', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(RepoCommit, json)
+        return self._instance_or_null(commit.RepoCommit, json)
 
     def commit_activity(self, number=-1, etag=None):
         """Iterate over last year of commit activity by week.
@@ -352,7 +352,7 @@ class _Repository(GitHubCore):
 
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, RepoCommit, params, etag)
+        return self._iter(int(number), url, commit.ShortCommit, params, etag)
 
     def compare_commits(self, base, head):
         """Compare two commits.
@@ -1395,7 +1395,7 @@ class _Repository(GitHubCore):
         if message:
             data['commit_message'] = message
         json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(RepoCommit, json)
+        return self._instance_or_null(commit.ShortCommit, json)
 
     def milestone(self, number):
         """Get the milestone indicated by ``number``.

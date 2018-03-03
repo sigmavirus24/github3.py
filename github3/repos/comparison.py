@@ -9,8 +9,9 @@ GitHub API.
 """
 from __future__ import unicode_literals
 
+from . import commit
+
 from ..models import GitHubCore
-from .commit import RepoCommit
 
 
 class Comparison(GitHubCore):
@@ -50,7 +51,7 @@ class Comparison(GitHubCore):
         #: :class:`RepoCommit <github3.repos.commit.RepoCommit>` object
         #: representing the base of comparison.
         self.base_commit = self._class_attribute(
-            compare, 'base_commit', RepoCommit, None
+            compare, 'base_commit', commit.ShortCommit, None
         )
 
         #: Behind or ahead.
@@ -69,7 +70,9 @@ class Comparison(GitHubCore):
         #: objects.
         self.commits = self._get_attribute(compare, 'commits', [])
         if self.commits:
-            self.commits = [RepoCommit(com, self) for com in self.commits]
+            self.commits = [
+                commit.ShortCommit(com, self) for com in self.commits
+            ]
 
         #: List of dicts describing the files modified.
         self.files = self._get_attribute(compare, 'files', [])

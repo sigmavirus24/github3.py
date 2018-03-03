@@ -7,7 +7,6 @@ from .helper import IntegrationHelper
 
 
 class TestPullRequest(IntegrationHelper):
-
     """PullRequest integration tests."""
 
     def get_pull_request(self, repository='sigmavirus24/github3.py', num=235):
@@ -43,7 +42,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for commit in p.commits():
-                assert isinstance(commit, github3.repos.commit.RepoCommit)
+                assert isinstance(commit, github3.repos.commit.ShortCommit)
 
     def test_create_review_comment(self):
         """Show that a user can create an in-line reveiw comment on a PR."""
@@ -175,6 +174,7 @@ class TestPullFile(IntegrationHelper):
     """Integration tests for the PullFile object."""
 
     def get_pull_request_file(self, owner, repo, pull_number, filename):
+        """Helper method to retrieve a PR file."""
         p = self.gh.pull_request(owner, repo, pull_number)
 
         for pull_file in p.files():
