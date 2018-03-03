@@ -1362,17 +1362,17 @@ class TestRepoComment(helper.IntegrationHelper):
 
         assert deleted
 
-    def test_update(self):
+    def test_edit(self):
         """Test the ability to update a repository comment."""
         self.token_login()
-        cassette_name = self.cassette_name('update')
+        cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('github3py', 'delete_contents')
             comment = repository.create_comment(
                 'Goodbye',
                 '5bcffc5f7dacbbf2706fad0d8dfb74f109bd6a68',
             )
-            updated = comment.update(body='Updated by integration test')
+            updated = comment.edit(body='Updated by integration test')
             comment.delete()
 
         assert updated

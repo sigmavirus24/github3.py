@@ -47,11 +47,11 @@ class TestEvent(UnitHelper):
 class TestPayLoadHandlers(TestCase):
 
     def test_commitcomment(self):
-        """Show that the event type is a RepoComment."""
+        """Show that the event type is a ShortComment."""
         comment = {'comment': get_comment_example_data()}
         comment = github3.events._commitcomment(comment, None)
         assert isinstance(comment['comment'],
-                          github3.repos.comment.RepoComment)
+                          github3.repos.comment.ShortComment)
 
     def test_follow(self):
         """Show that the event type is a FollowEvent."""

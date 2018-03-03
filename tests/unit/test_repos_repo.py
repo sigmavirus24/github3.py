@@ -1855,9 +1855,9 @@ class TestRepoComment(helper.UnitHelper):
         }
         self.instance.update(body=data['body'])
 
-        self.post_called_with(
+        self.patch_called_with(
             comment_url_for(),
-            data=data
+            json=data
         )
 
 

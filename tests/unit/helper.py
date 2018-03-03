@@ -104,17 +104,22 @@ class UnitHelper(unittest.TestCase):
         assert mock_method.called is True
         call_args, call_kwargs = mock_method.call_args
 
+        using_json = False
         # Data passed to assertion
         data = kwargs.pop('data', None)
+        if data is None:
+            using_json = True
+            data = kwargs.pop('json', None)
         # Data passed to patch
-        call_data = call_kwargs.pop('data', None)
+        call_data = call_kwargs.pop('json' if using_json else 'data', None)
         # Data passed by the call to post positionally
         #                                URL, 'json string'
-        if call_data is None:
+        if data and call_data is None:
             call_args, call_data = call_args[:1], call_args[1]
         # If data is a dictionary (or list) and call_data exists
         if not isinstance(data, str) and call_data:
-            call_data = json.loads(call_data)
+            if not using_json:
+                call_data = json.loads(call_data)
 
         assert args == call_args
         assert data == call_data

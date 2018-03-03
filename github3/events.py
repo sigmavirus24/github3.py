@@ -455,9 +455,9 @@ class Event(models.GitHubCore):
 
 
 def _commitcomment(payload, session):
-    from .repos.comment import RepoComment
+    from .repos.comment import ShortComment
     if payload.get('comment'):
-        payload['comment'] = RepoComment(payload['comment'], session)
+        payload['comment'] = ShortComment(payload['comment'], session)
     return payload
 
 

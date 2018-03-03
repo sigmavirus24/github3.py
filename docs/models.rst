@@ -13,18 +13,3 @@ Objects
 
 .. autoclass:: GitHubCore
     :inherited-members:
-
-------
-
-.. autoclass:: BaseAccount
-    :inherited-members:
-
-------
-
-.. autoclass:: BaseComment
-    :inherited-members:
-
-------
-
-.. autoclass:: BaseCommit
-    :inherited-members:
