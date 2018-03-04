@@ -6,7 +6,8 @@ import pytest
 from base64 import b64encode
 from github3 import GitHubError
 from github3.repos.commit import RepoCommit
-from github3.repos.repo import (Comparison, Contents, Hook, RepoComment,
+from github3.repos.contents import Contents
+from github3.repos.repo import (Comparison, Hook, RepoComment,
                                 Repository, ShortRepository)
 from github3.models import GitHubCore
 from github3.projects import Project
@@ -1678,7 +1679,7 @@ class TestContents(helper.UnitHelper):
 
     def test_str(self):
         """Verify that instance string is formatted properly."""
-        assert str(self.instance) == '<Content [{0}]>'.format(
+        assert str(self.instance) == '<Contents [{0}]>'.format(
             self.instance.path
         )
 

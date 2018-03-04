@@ -9,10 +9,10 @@ from uritemplate import URITemplate
 from . import models
 from . import users
 from .repos import commit as rcommit
+from .repos import contents
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
-from .repos.contents import Contents
 
 
 class PullDestination(models.GitHubCore):
@@ -170,10 +170,10 @@ class PullFile(models.GitHubCore):
         :returns:
             An object representing the contents of this file
         :rtype:
-            :class:`Contents <github3.repos.contents.Contents>`
+            :class:`~github3.repos.contents.Contents`
         """
         json = self._json(self._get(self.contents_url), 200)
-        return self._instance_or_null(Contents, json)
+        return self._instance_or_null(contents.Contents, json)
 
 
 class _PullRequest(models.GitHubCore):

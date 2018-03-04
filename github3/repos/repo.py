@@ -29,9 +29,9 @@ from ..pulls import ShortPullRequest, PullRequest
 from ..utils import stream_response_to_file, timestamp_parameter
 from . import branch
 from . import commit
+from . import contents
 from .comment import RepoComment
 from .comparison import Comparison
-from .contents import Contents, validate_commmitter
 from .deployment import Deployment
 from .hook import Hook
 from .issue_import import ImportedIssue
@@ -530,7 +530,7 @@ class _Repository(GitHubCore):
             committer information. If passed, you must specify both a name and
             email.
         :returns: {
-            'content': :class:`Contents <github3.repos.contents.Contents>`:,
+            'content': :class:`~github3.repos.contents.Contents`,
             'commit': :class:`Commit <github3.git.Commit>`}
 
         """
@@ -543,12 +543,14 @@ class _Repository(GitHubCore):
             url = self._build_url('contents', path, base_url=self._api)
             content = b64encode(content).decode('utf-8')
             data = {'message': message, 'content': content, 'branch': branch,
-                    'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author)}
+                    'committer': contents.validate_commmitter(committer),
+                    'author': contents.validate_commmitter(author)}
             self._remove_none(data)
             json = self._json(self._put(url, data=dumps(data)), 201)
             if json and 'content' in json and 'commit' in json:
-                json['content'] = Contents(json['content'], self)
+                json['content'] = contents.Contents(
+                    json['content'], self
+                )
                 json['commit'] = Commit(json['commit'], self)
         return json
 
@@ -952,7 +954,8 @@ class _Repository(GitHubCore):
         """
         url = self._build_url('contents', directory_path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200) or []
-        return return_as((j.get('name'), Contents(j, self)) for j in json)
+        return return_as((j.get('name'), contents.Contents(j, self))
+                         for j in json)
 
     @requires_auth
     def edit(self, name, description=None, homepage=None, private=None,
@@ -1022,7 +1025,7 @@ class _Repository(GitHubCore):
         """
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
-        return self._instance_or_null(Contents, json)
+        return self._instance_or_null(contents.Contents, json)
 
     def forks(self, sort='', number=-1, etag=None):
         """Iterate over forks of this repository.
@@ -1590,7 +1593,7 @@ class _Repository(GitHubCore):
         """
         url = self._build_url('readme', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Contents, json)
+        return self._instance_or_null(contents.Contents, json)
 
     def ref(self, ref):
         """Get a reference pointed to by ``ref``.
