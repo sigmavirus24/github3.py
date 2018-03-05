@@ -166,30 +166,14 @@ class DeploymentStatus(GitHubCore):
 
     def _update_attributes(self, status):
         self._api = status['url']
-
-        #: GitHub's id for this deployment status
-        self.id = status['id']
-
-        #: State of the deployment status
-        self.state = status['state']
-
-        #: Creater of the deployment status
-        self.creator = users.ShortUser(status['creator'], self)
-
-        #: Target URL of the deployment
-        self.target_url = status['target_url']
-
-        #: Date the deployment status was created
         self.created_at = self._strptime(status['created_at'])
-
-        #: Date the deployment status was updated
-        self.updated_at = self._strptime(status['updated_at'])
-
-        #: Description of the deployment
-        self.description = status['description']
-
-        #: URL for the deployment this status is associated with
+        self.creator = users.ShortUser(status['creator'], self)
         self.deployment_url = status['deployment_url']
+        self.description = status['description']
+        self.id = status['id']
+        self.state = status['state']
+        self.target_url = status['target_url']
+        self.updated_at = self._strptime(status['updated_at'])
 
     def _repr(self):
         return '<DeploymentStatus [{0}]>'.format(self.id)
