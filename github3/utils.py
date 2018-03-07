@@ -45,26 +45,6 @@ def timestamp_parameter(timestamp, allow_none=True):
     raise ValueError("Cannot accept type %s for timestamp" % type(timestamp))
 
 
-class UTC(datetime.tzinfo):
-
-    """Yet another UTC reimplementation, to avoid a dependency on pytz or
-    dateutil."""
-
-    ZERO = datetime.timedelta(0)
-
-    def __repr__(self):
-        return 'UTC()'
-
-    def dst(self, dt):
-        return self.ZERO
-
-    def tzname(self, dt):
-        return 'UTC'
-
-    def utcoffset(self, dt):
-        return self.ZERO
-
-
 def stream_response_to_file(response, path=None):
     """Stream a response body to the specified file.
 

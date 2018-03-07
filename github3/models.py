@@ -2,18 +2,16 @@
 """This module provides the basic models used in github3.py."""
 from __future__ import unicode_literals
 
-from datetime import datetime
 from json import dumps, loads
 from logging import getLogger
 
+import dateutil.parser
 import requests
 from requests.compat import is_py2, urlparse
 
 from . import exceptions
 from .session import GitHubSession
-from .utils import UTC
 
-__timeformat__ = '%Y-%m-%dT%H:%M:%SZ'
 __logs__ = getLogger(__package__)
 
 
@@ -145,9 +143,7 @@ class GitHubCore(object):
         :rtype: datetime or None
         """
         if time_str:
-            # Parse UTC string into naive datetime, then add timezone
-            dt = datetime.strptime(time_str, __timeformat__)
-            return dt.replace(tzinfo=UTC())
+            return dateutil.parser.parse(time_str)
         return None
 
     def __repr__(self):
