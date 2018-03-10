@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Release logic for the GitHub API."""
 from __future__ import unicode_literals
 
 import json
@@ -13,13 +14,85 @@ from ..exceptions import error_for
 
 
 class Release(models.GitHubCore):
-
-    """The :class:`Release <Release>` object.
+    """Representation of a GitHub release.
 
     It holds the information GitHub returns about a release from a
     :class:`Repository <github3.repos.repo.Repository>`.
 
     Please see GitHub's `Releases Documentation`_ for more information.
+
+    This object has the following attributes:
+
+    .. attribute:: original_assets
+
+        A list of :class:`~github3.repos.release.Asset` objects representing
+        the assets uploaded for this relesae.
+
+    .. attribute:: assets_url
+
+        The URL to retrieve the assets from the API.
+
+    .. attribute:: author
+
+        A :class:`~github3.users.ShortUser` representing the creator of this
+        release.
+
+    .. attribute:: body
+
+        The description of this release as written by the release creator.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this release was created.
+
+    .. attribute:: draft
+
+        A boolean attribute describing whether this release is a draft.
+
+    .. attribute:: html_url
+
+        The URL to view this release in a browser.
+
+    .. attribute:: id
+
+        The unique identifier of this release.
+
+    .. attribute:: name
+
+        The name given to this release by the :attr:`author`.
+
+    .. attribute:: prerelease
+
+        A boolean attribute indicating whether the release is a pre-release.
+
+    .. attribute:: published_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this release was publisehd.
+
+    .. attribute:: tag_name
+
+        The name of the tag associated with this release.
+
+    .. attribute:: tarball_url
+
+        The URL to retrieve a GitHub generated tarball for this release from
+        the API.
+
+    .. attribute:: target_commitish
+
+        The reference (usually a commit) that is targetted by this release.
+
+    .. attribute:: upload_urlt
+
+        A :class:`~uritemplate.URITemplate` object that expands to form the
+        URL to upload assets to.
+
+    .. attribute:: zipball_url
+
+        The URL to retrieve a GitHub generated zipball for this release from
+        the API.
 
     .. _Releases Documentation:
         https://developer.github.com/v3/repos/releases/
@@ -27,50 +100,24 @@ class Release(models.GitHubCore):
 
     def _update_attributes(self, release):
         self._api = self.url = release['url']
-
-        #: List of :class:`Asset <Asset>` objects for this release
         self.original_assets = [
             Asset(i, self) for i in release['assets']
         ]
-
-        #: Body of the release (the description)
-        self.body = release['body']
-
-        #: Date the release was created
-        self.created_at = self._strptime_attribute(release, 'created_at')
-
-        #: Boolean whether value is True or False
-        self.draft = release['draft']
-
-        #: GitHub id
-        self.id = release['id']
-
-        #: Name given to the release
-        self.name = release['name']
-
-        #: Boolean whether release is a prerelease
-        self.prerelease = release['prerelease']
-
-        #: Date the release was published
-        self.published_at = self._strptime_attribute(release, 'published_at')
-
-        #: Name of the tag
-        self.tag_name = release['tag_name']
-
-        #: "Commit" that this release targets
-        self.target_commitish = release['target_commitish']
-
-        #: URITemplate to upload an asset with
-        self.upload_urlt = URITemplate(release['upload_url'])
-
-        #: :class:`User <github3.users.ShortUser>` object representing the
-        #:  creator of the release
+        self.assets_url = release['assets_url']
         self.author = users.ShortUser(release['author'], self)
-
-        #: URLs to various attributes
-        for urltype in ['assets_url', 'html_url', 'tarball_url',
-                        'zipball_url']:
-            setattr(self, urltype, release[urltype])
+        self.body = release['body']
+        self.created_at = self._strptime(release['created_at'])
+        self.draft = release['draft']
+        self.html_url = release['html_url']
+        self.id = release['id']
+        self.name = release['name']
+        self.prerelease = release['prerelease']
+        self.published_at = self._strptime(release['published_at'])
+        self.tag_name = release['tag_name']
+        self.tarball_url = release['tarball_url']
+        self.target_commitish = release['target_commitish']
+        self.upload_urlt = URITemplate(release['upload_url'])
+        self.zipball_url = release['zipball_url']
 
     def _repr(self):
         return '<Release [{0}]>'.format(self.name)
@@ -78,15 +125,18 @@ class Release(models.GitHubCore):
     def archive(self, format, path=''):
         """Get the tarball or zipball archive for this release.
 
-        :param str format: (required), accepted values: ('tarball',
-            'zipball')
-        :param path: (optional), path where the file should be saved
-            to, default is the filename provided in the headers and will be
-            written in the current directory.
-            it can take a file-like object as well
-        :type path: str, file
-        :returns: bool -- True if successful, False otherwise
-
+        :param str format:
+            (required), accepted values: ('tarball', 'zipball')
+        :param path:
+            (optional), path where the file should be saved to, default is the
+            filename provided in the headers and will be written in the current
+            directory. It can take a file-like object as well
+        :type path:
+            str, file
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         resp = None
         if format in ('tarball', 'zipball'):
@@ -102,8 +152,12 @@ class Release(models.GitHubCore):
     def asset(self, asset_id):
         """Retrieve the asset from this release with ``asset_id``.
 
-        :param int asset_id: ID of the Asset to retrieve
-        :returns: :class:`~github3.repos.release.Asset`
+        :param int asset_id:
+            ID of the Asset to retrieve
+        :returns:
+            the specified asset, if it exists
+        :rtype:
+            :class:`~github3.repos.release.Asset`
         """
         json = None
         if int(asset_id) > 0:
@@ -116,9 +170,14 @@ class Release(models.GitHubCore):
     def assets(self, number=-1, etag=None):
         """Iterate over the assets available for this release.
 
-        :param int number: (optional), Number of assets to return
-        :param str etag: (optional), last ETag header sent
-        :returns: generator of :class:`Asset <Asset>` objects
+        :param int number:
+            (optional), Number of assets to return
+        :param str etag:
+            (optional), last ETag header sent
+        :returns:
+            generator of asset objects
+        :rtype:
+            :class:`~github3.repos.release.Asset`
         """
         url = self._build_url('assets', base_url=self._api)
         return self._iter(number, url, Asset, etag=etag)
@@ -127,9 +186,12 @@ class Release(models.GitHubCore):
     def delete(self):
         """Delete this release.
 
-        Users with push access to the repository can delete a release.
+        Only users with push access to the repository can delete a release.
 
-        :returns: True if successful; False if not successful
+        :returns:
+            True if successful; False if not successful
+        :rtype:
+            bool
         """
         url = self._api
         return self._boolean(
@@ -143,19 +205,27 @@ class Release(models.GitHubCore):
              draft=None, prerelease=None):
         """Edit this release.
 
-        Users with push access to the repository can edit a release.
+        Only users with push access to the repository can edit a release.
 
         If the edit is successful, this object will update itself.
 
-        :param str tag_name: (optional), Name of the tag to use
-        :param str target_commitish: (optional), The "commitish" value that
-            determines where the Git tag is created from. Defaults to the
-            repository's default branch.
-        :param str name: (optional), Name of the release
-        :param str body: (optional), Description of the release
-        :param boolean draft: (optional), True => Release is a draft
-        :param boolean prerelease: (optional), True => Release is a prerelease
-        :returns: True if successful; False if not successful
+        :param str tag_name:
+            (optional), Name of the tag to use
+        :param str target_commitish:
+            (optional), The "commitish" value that determines where the Git tag
+            is created from. Defaults to the repository's default branch.
+        :param str name:
+            (optional), Name of the release
+        :param str body:
+            (optional), Description of the release
+        :param boolean draft:
+            (optional), True => Release is a draft
+        :param boolean prerelease:
+            (optional), True => Release is a prerelease
+        :returns:
+            True if successful; False if not successful
+        :rtype:
+            bool
         """
         url = self._api
         data = {
@@ -182,14 +252,21 @@ class Release(models.GitHubCore):
     def upload_asset(self, content_type, name, asset, label=None):
         """Upload an asset to this release.
 
-        All parameters are required.
+        .. note:: All parameters are required.
 
-        :param str content_type: The content type of the asset. Wikipedia has
-            a list of common media types
-        :param str name: The name of the file
-        :param asset: The file or bytes object to upload.
-        :param label: (optional), An alternate short description of the asset.
-        :returns: :class:`Asset <Asset>`
+        :param str content_type:
+            The content type of the asset. Wikipedia has a list of common media
+            types
+        :param str name:
+            The name of the file
+        :param asset:
+            The file or bytes object to upload.
+        :param label:
+            (optional), An alternate short description of the asset.
+        :returns:
+            the created asset
+        :rtype:
+            :class:`~github3.repos.release.Asset`
         """
         headers = {'Content-Type': content_type}
         params = {'name': name, 'label': label}
@@ -202,42 +279,94 @@ class Release(models.GitHubCore):
 
 
 class Asset(models.GitHubCore):
+    """Representation of an asset in a release.
+
+    .. seealso::
+
+        `List Assets`_, :meth:`~github3.repos.release.Release.assets`
+            Documentation around listing assets of a release
+        `Upload Assets`_, :meth:`~github3.repos.release.Release.upload_asset`
+            Documentation around uploading assets to a release
+        `Get a Single Asset`_, :meth:`~github3.repos.release.Release.asset`
+            Documentation around retrieving an asset
+        `Edit an Asset`_, :meth:`~github3.repos.release.Asset.edit`
+            Documentation around editing an asset
+        `Delete an Asset`_, :meth:`~github3.repos.release.Asset.delete`
+            Documentation around deleting an asset
+
+    This object has the following attributes:
+
+    .. attribute:: browser_download_url
+
+        The user-friendly URL to download this asset via a browser.
+
+    .. attribute:: content_type
+
+        The Content-Type provided by the uploader when this asset was created.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this asset was created.
+
+    .. attribute:: download_count
+
+        The number of times this asset has been downloaded.
+
+    .. attribute:: download_url
+
+        The URL to retrieve this uploaded asset via the API, e.g., tarball,
+        zipball, etc.
+
+    .. attribute:: id
+
+        The unique identifier of this asset.
+
+    .. attribute:: label
+
+        The short description of this asset.
+
+    .. attribute:: name
+
+        The name provided to this asset.
+
+    .. attribute:: size
+
+        The file size of this asset.
+
+    .. attribute:: state
+
+        The state of this asset, e.g., ``'uploaded'``.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this asset was most recently updated.
+
+    .. _List Assets:
+        https://developer.github.com/v3/repos/releases/#list-assets-for-a-release
+    .. _Upload Assets:
+        https://developer.github.com/v3/repos/releases/#upload-a-release-asset
+    .. _Get a Single Asset:
+        https://developer.github.com/v3/repos/releases/#get-a-single-release-asset
+    .. _Edit an Asset:
+        https://developer.github.com/v3/repos/releases/#edit-a-release-asset
+    .. _Delete an Asset:
+        https://developer.github.com/v3/repos/releases/#delete-a-release-asset
+    """
 
     def _update_attributes(self, asset):
         self._api = asset['url']
-
-        #: Content-Type provided when the asset was created
-        self.content_type = asset['content_type']
-
-        #: Date the asset was created
-        self.created_at = asset['created_at']
-
-        #: Number of times the asset was downloaded
-        self.download_count = asset['download_count']
-
-        #: URL to download the asset.
-        #: Request headers must include ``Accept: application/octet-stream``.
-        self.download_url = self._api
-
-        # User friendly download URL
         self.browser_download_url = asset['browser_download_url']
-
-        #: GitHub id of the asset
+        self.content_type = asset['content_type']
+        self.created_at = self._strptime(asset['created_at'])
+        self.download_count = asset['download_count']
+        self.download_url = self._api
         self.id = asset['id']
-
-        #: Short description of the asset
         self.label = asset['label']
-
-        #: Name of the asset
         self.name = asset['name']
-
-        #: Size of the asset
         self.size = asset['size']
-
-        #: State of the asset, e.g., "uploaded"
         self.state = asset['state']
-
-        #: Date the asset was updated
         self.updated_at = self._strptime_attribute(asset, 'updated_at')
 
     def _repr(self):
@@ -246,13 +375,16 @@ class Asset(models.GitHubCore):
     def download(self, path=''):
         """Download the data for this asset.
 
-        :param path: (optional), path where the file should be saved
-            to, default is the filename provided in the headers and will be
-            written in the current directory.
-            it can take a file-like object as well
-        :type path: str, file
-        :returns: name of the file, if successful otherwise ``None``
-        :rtype: str
+        :param path:
+            (optional), path where the file should be saved to, default is the
+            filename provided in the headers and will be written in the current
+            directory. It can take a file-like object as well
+        :type path:
+            str, file
+        :returns:
+            name of the file, if successful otherwise ``None``
+        :rtype:
+            str
         """
         headers = {
             'Accept': 'application/octet-stream'
@@ -278,8 +410,10 @@ class Asset(models.GitHubCore):
     def delete(self):
         """Delete this asset if the user has push access.
 
-        :returns: True if successful; False if not successful
-        :rtype: boolean
+        :returns:
+            True if successful; False if not successful
+        :rtype:
+            bool
         """
         url = self._api
         return self._boolean(
@@ -289,9 +423,14 @@ class Asset(models.GitHubCore):
     def edit(self, name, label=None):
         """Edit this asset.
 
-        :param str name: (required), The file name of the asset
-        :param str label: (optional), An alternate description of the asset
-        :returns: boolean
+        :param str name:
+            (required), The file name of the asset
+        :param str label:
+            (optional), An alternate description of the asset
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         if not name:
             return False
