@@ -1,89 +1,154 @@
 # -*- coding: utf-8 -*-
-"""
-github3.repos.status
-====================
-
-This module contains the Status object for GitHub's commit status API
-
-"""
+"""This module contains the Status object for GitHub's commit status API."""
 from __future__ import unicode_literals
 
+from .. import models
 from .. import users
 
 from ..models import GitHubCore
 
 
-class Status(GitHubCore):
-    """The :class:`Status <Status>` object.
+class _Status(models.GitHubCore):
+    """Representation of a status on a repository."""
 
-    This represents information from the Repo Status API.
-
-    See also: http://developer.github.com/v3/repos/statuses/
-    """
+    class_name = '_Status'
 
     def _update_attributes(self, status):
-        #: A string label to differentiate this status from the status of
-        #: other systems
-        self.context = self._get_attribute(status, 'context')
-
-        #: datetime object representing the creation of the status object
-        self.created_at = self._strptime_attribute(status, 'created_at')
-
-        #: :class:`User <github3.users.User>` who created the object
-        self.creator = self._class_attribute(
-            status, 'creator', users.ShortUser, self
-        )
-
-        #: Short description of the Status
-        self.description = self._get_attribute(status, 'description')
-
-        #: GitHub ID for the status object
-        self.id = self._get_attribute(status, 'id')
-
-        #: State of the status, e.g., 'success', 'pending', 'failed', 'error'
-        self.state = self._get_attribute(status, 'state')
-
-        #: URL to view more information about the status
-        self.target_url = self._get_attribute(status, 'target_url')
-
-        #: datetime object representing the last time the status was updated
-        self.updated_at = self._strptime_attribute(status, 'updated_at')
+        self._api = status['url']
+        self.context = status['context']
+        self.created_at = self._strptime(status['created_at'])
+        self.description = status['description']
+        self.id = status['id']
+        self.state = status['state']
+        self.target_url = status['target_url']
+        self.updated_at = self._strptime(status['updated_at'])
 
     def _repr(self):
-        return '<Status [{s.id}:{s.state}]>'.format(s=self)
+        return '<{s.class_name} [{s.id}:{s.state}]>'.format(s=self)
+
+
+class ShortStatus(_Status):
+    """Representation of a short status on a repository.
+
+    .. versionadded:: 1.0.0
+
+    This is the representation found in a
+    :class:`~github3.repos.status.CombinedStatus` object.
+
+    See also: http://developer.github.com/v3/repos/statuses/
+
+    This object has the following attributes:
+
+    .. attribute:: context
+
+        This is a string that explains the context of this status object.
+        For example, ``'continuous-integration/travis-ci/pr'``.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this status was created.
+
+    .. attribute:: creator
+
+        A :class:`~github3.users.ShortUser` representing the user who created
+        this status.
+
+    .. attribute:: description
+
+        A short description of the status.
+
+    .. attribute:: id
+
+        The unique identifier of this status object.
+
+    .. attribute:: state
+
+        The state of this status, e.g., ``'success'``, ``'pending'``,
+        ``'failure'``.
+
+    .. attribute:: target_url
+
+        The URL to retrieve more information about this status.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this status was most recently updated.
+    """
+
+    class_name = 'ShortStatus'
+
+
+class Status(_Status):
+    """Representation of a full status on a repository.
+
+    See also: http://developer.github.com/v3/repos/statuses/
+
+    This object has the same attributes as a
+    :class:`~github3.repos.status.ShortStatus` as well as the following
+    attributes:
+
+    .. attribute:: creator
+
+        A :class:`~github3.users.ShortUser` representing the user who created
+        this status.
+    """
+
+    class_name = 'Status'
+
+    def _update_attributes(self, status):
+        super(Status, self)._update_attributes(status)
+        self.creator = users.ShortUser(status['creator'], self)
 
 
 class CombinedStatus(GitHubCore):
-    """The :class:`CombinedStatus <CombinedStatus>` object.
-
-    This represents combined information from the Repo Status API.
+    """A representation of the combined statuses in a repository.
 
     See also: http://developer.github.com/v3/repos/statuses/
+
+    This object has the following attributes:
+
+    .. attribute:: commit_url
+
+        The URL of the commit this combined status is present on.
+
+    .. attribute:: repository
+
+        A :class:`~gitub3.repos.repo.ShortRepository` representing the
+        repository on which this combined status exists.
+
+    .. attribute:: sha
+
+        The SHA1 of the commit this status exists on.
+
+    .. attribute:: state
+
+        The state of the combined status, e.g., ``'success'``, ``'pending'``,
+        ``'failure'``.
+
+    .. attribute:: statuses
+
+        The list of :class:`~github3.repos.status.ShortStatus` objects
+        representing the individual statuses that is combined in this object.
+
+    .. attribute:: total_count
+
+        The total number of sub-statuses.
     """
 
     def _update_attributes(self, combined_status):
-        #: State of the combined status, e.g., 'success', 'pending', 'failure'
-        self.state = self._get_attribute(combined_status, 'state')
-
-        #: ref's SHA
-        self.sha = self._get_attribute(combined_status, 'sha')
-
-        #: Total count of sub-statuses
-        self.total_count = self._get_attribute(combined_status, 'total_count')
-
-        #: List of :class:`Status <github3.repos.status.Status>`
-        #: objects.
-        statuses = self._get_attribute(combined_status, 'statuses', [])
-        self.statuses = [Status(s, self) for s in statuses]
-
         from . import repo
-        #: Repository the combined status belongs too.
-        self.repository = self._class_attribute(
-            combined_status, 'repository', repo.ShortRepository, self
+        self._api = combined_status['url']
+        self.commit_url = combined_status['commit_url']
+        self.repository = repo.ShortRepository(
+            combined_status['repository'], self,
         )
-
-        #: commit URL
-        self.commit_url = self._get_attribute(combined_status, 'commit_url')
+        self.sha = self._get_attribute(combined_status, 'sha')
+        self.state = self._get_attribute(combined_status, 'state')
+        statuses = self._get_attribute(combined_status, 'statuses', [])
+        self.statuses = [ShortStatus(s, self) for s in statuses]
+        self.total_count = self._get_attribute(combined_status, 'total_count')
 
     def _repr(self):
         f = '<CombinedStatus [{s.state}:{s.total_count} sub-statuses]>'
