@@ -144,11 +144,11 @@ class CombinedStatus(GitHubCore):
         self.repository = repo.ShortRepository(
             combined_status['repository'], self,
         )
-        self.sha = self._get_attribute(combined_status, 'sha')
-        self.state = self._get_attribute(combined_status, 'state')
-        statuses = self._get_attribute(combined_status, 'statuses', [])
+        self.sha = combined_status['sha']
+        self.state = combined_status['state']
+        statuses = combined_status['statuses']
         self.statuses = [ShortStatus(s, self) for s in statuses]
-        self.total_count = self._get_attribute(combined_status, 'total_count')
+        self.total_count = combined_status['total_count']
 
     def _repr(self):
         f = '<CombinedStatus [{s.state}:{s.total_count} sub-statuses]>'

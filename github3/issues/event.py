@@ -68,7 +68,7 @@ class IssueEvent(GitHubCore):
         self.commit_url = event['commit_url']
         self.created_at = event['created_at']
         self.event = event['event']
-        self.id = self._get_attribute(event, 'id')
+        self.id = event['id']
         self._uniq = self.commit_id
 
     def _repr(self):

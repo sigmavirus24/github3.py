@@ -74,7 +74,7 @@ class PagesBuild(models.GitHubCore):
 
     def _update_attributes(self, build):
         from .. import users
-        self._api = self._get_attribute(build, 'url')
+        self._api = build['url']
         self.commit = build['commit']
         self.created_at = self._strptime(build['created_at'])
         self.duration = build['duration']

@@ -76,7 +76,7 @@ class ContributorStats(models.GitHubCore):
     def _update_attributes(self, stats_object):
         self.author = users.ShortUser(stats_object['author'], self)
         self.total = stats_object['total']
-        self.weeks = self._get_attribute(stats_object, 'weeks', [])
+        self.weeks = stats_object['weeks']
         alt_weeks = self.weeks
         if alt_weeks:
             alt_weeks = [alternate_week(w) for w in self.weeks]
