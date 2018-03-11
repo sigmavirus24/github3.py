@@ -64,9 +64,7 @@ class GistComment(models.GitHubCore):
         self.created_at = self._strptime(comment['created_at'])
         self.id = comment['id']
         self.updated_at = self._strptime(comment['updated_at'])
-        self.user = self._class_attribute(
-            comment, 'user', users.ShortUser, self,
-        )
+        self.user = users.ShortUser(comment['user'], self)
 
     def _repr(self):
         return '<Gist Comment [{0}]>'.format(self.user.login)

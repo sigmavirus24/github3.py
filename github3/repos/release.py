@@ -367,7 +367,7 @@ class Asset(models.GitHubCore):
         self.name = asset['name']
         self.size = asset['size']
         self.state = asset['state']
-        self.updated_at = self._strptime_attribute(asset, 'updated_at')
+        self.updated_at = self._strptime(asset['updated_at'])
 
     def _repr(self):
         return '<Asset [{0}]>'.format(self.name)

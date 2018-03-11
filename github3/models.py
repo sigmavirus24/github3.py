@@ -95,25 +95,6 @@ class GitHubCore(object):
         return result
 
     @classmethod
-    def _class_attribute(cls, data, attribute, cl, *args, **kwargs):
-        """Return the attribute from the json data and instantiate the class.
-
-        :param dict data: dictionary used to put together the model or None
-        :param str attribute: key of the attribute
-        :param class cl: class that will be instantiated
-        :returns: instantiated class or None
-        :rtype: object or None
-        """
-        value = cls._get_attribute(data, attribute)
-        if value:
-            return cl(
-                value,
-                *args,
-                **kwargs
-            )
-        return value
-
-    @classmethod
     def _strptime_attribute(cls, data, attribute):
         """Get a datetime object from a dict, return None if it wan't found.
 
