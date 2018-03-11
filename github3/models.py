@@ -2,17 +2,17 @@
 """This module provides the basic models used in github3.py."""
 from __future__ import unicode_literals
 
-from json import dumps, loads
-from logging import getLogger
+import json as jsonlib
+import logging
 
 import dateutil.parser
 import requests
-from requests.compat import is_py2, urlparse
+import requests.compat
 
 from . import exceptions
-from .session import GitHubSession
+from . import session
 
-__logs__ = getLogger(__package__)
+LOG = logging.getLogger(__package__)
 
 
 class GitHubCore(object):
@@ -22,13 +22,18 @@ class GitHubCore(object):
     basic attributes and methods to other sub-classes that are very useful to
     have.
     """
+
     _ratelimit_resource = 'core'
 
     def __init__(self, json, session):
-        if hasattr(session, 'session'):
-            # i.e. session is actually a GitHubCore instance
-            session = session.session
-        self.session = session
+        """Initialize our basic object.
+
+        Pretty much every object will pass in decoded JSON and a Session.
+        """
+        # Either or 'session' is an instance of a GitHubCore sub-class or it
+        # is a session. In the former case it will have a 'session' attribute.
+        # If it doesn't, we can just default to using the passed in session.
+        self.session = getattr(session, 'session', session)
 
         # set a sane default
         self._github_url = 'https://api.github.com'
@@ -76,7 +81,7 @@ class GitHubCore(object):
         :returns: this object's attributes as a JSON string
         :rtype: str
         """
-        return dumps(self._json_data)
+        return jsonlib.dumps(self._json_data)
 
     @classmethod
     def _get_attribute(cls, data, attribute, fallback=None):
@@ -129,7 +134,7 @@ class GitHubCore(object):
 
     def __repr__(self):
         repr_string = self._repr()
-        if is_py2:
+        if requests.compat.is_py2:
             return repr_string.encode('utf-8')
         return repr_string
 
@@ -141,7 +146,7 @@ class GitHubCore(object):
     @classmethod
     def from_json(cls, json, session):
         """Return an instance of this class formed from ``json``."""
-        return cls(loads(json), session)
+        return cls(jsonlib.loads(json), session)
 
     def __eq__(self, other):
         return self._uniq == other._uniq
@@ -176,9 +181,9 @@ class GitHubCore(object):
     def _json(self, response, status_code, include_cache_info=True):
         ret = None
         if self._boolean(response, status_code, 404) and response.content:
-            __logs__.info('Attempting to get JSON information from a Response '
-                          'with status code %d expecting %d',
-                          response.status_code, status_code)
+            LOG.info('Attempting to get JSON information from a Response '
+                     'with status code %d expecting %d',
+                     response.status_code, status_code)
             ret = response.json()
             headers = response.headers
             if (include_cache_info and
@@ -188,7 +193,7 @@ class GitHubCore(object):
                     'Last-Modified', ''
                 )
                 ret['ETag'] = response.headers.get('ETag', '')
-        __logs__.info('JSON was %sreturned', 'not ' if ret is None else '')
+        LOG.info('JSON was %sreturned', 'not ' if ret is None else '')
         return ret
 
     def _boolean(self, response, true_code, false_code):
@@ -212,29 +217,29 @@ class GitHubCore(object):
             raise exceptions.TransportError(exc)
 
     def _delete(self, url, **kwargs):
-        __logs__.debug('DELETE %s with %s', url, kwargs)
+        LOG.debug('DELETE %s with %s', url, kwargs)
         return self._request('delete', url, **kwargs)
 
     def _get(self, url, **kwargs):
-        __logs__.debug('GET %s with %s', url, kwargs)
+        LOG.debug('GET %s with %s', url, kwargs)
         return self._request('get', url, **kwargs)
 
     def _patch(self, url, **kwargs):
-        __logs__.debug('PATCH %s with %s', url, kwargs)
+        LOG.debug('PATCH %s with %s', url, kwargs)
         return self._request('patch', url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
-            data = dumps(data) if data is not None else data
-        __logs__.debug('POST %s with %s, %s', url, data, kwargs)
+            data = jsonlib.dumps(data) if data is not None else data
+        LOG.debug('POST %s with %s, %s', url, data, kwargs)
         return self._request('post', url, data, **kwargs)
 
     def _put(self, url, **kwargs):
-        __logs__.debug('PUT %s with %s', url, kwargs)
+        LOG.debug('PUT %s with %s', url, kwargs)
         return self._request('put', url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
-        """Builds a new API url from scratch."""
+        """Build a new API url from scratch."""
         return self.session.build_url(*args, **kwargs)
 
     @property
@@ -247,7 +252,7 @@ class GitHubCore(object):
     @_api.setter
     def _api(self, uri):
         if uri:
-            self._uri = urlparse(uri)
+            self._uri = requests.compat.urlparse(uri)
         self.url = uri
 
     def _iter(self, count, url, cls, params=None, etag=None, headers=None):
@@ -316,34 +321,11 @@ class GitHubCore(object):
         return self
 
     def new_session(self):
-        """Helper function to generate a new session"""
-        return GitHubSession()
+        """Generate a new session.
 
-
-class BaseCommit(GitHubCore):
-
-    """This abstracts a lot of the common attributes for commit-like objects.
-
-    The :class:`BaseCommit <BaseCommit>` object serves as the base for
-    the various types of commit objects returned by the API.
-    """
-
-    def _update_attributes(self, commit):
-        self._api = self._get_attribute(commit, 'url')
-
-        #: SHA of this commit.
-        self.sha = self._get_attribute(commit, 'sha')
-
-        #: Commit message
-        self.message = self._get_attribute(commit, 'message')
-
-        #: List of parents to this commit.
-        self.parents = self._get_attribute(commit, 'parents', [])
-
-        #: URL to view the commit on GitHub
-        self.html_url = self._get_attribute(commit, 'html_url')
-        if not self.sha:
-            i = self._api.rfind('/')
-            self.sha = self._api[i + 1:]
-
-        self._uniq = self.sha
+        :returns:
+            A brand new session
+        :rtype:
+            :class:`~github3.session.GitHubSession`
+        """
+        return session.GitHubSession()
