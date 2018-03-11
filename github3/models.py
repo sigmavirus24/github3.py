@@ -84,40 +84,6 @@ class GitHubCore(object):
         return jsonlib.dumps(self._json_data)
 
     @classmethod
-    def _get_attribute(cls, data, attribute, fallback=None):
-        """Return the attribute from the json data.
-
-        :param dict data: dictionary used to put together the model
-        :param str attribute: key of the attribute
-        :param any fallback: return value if original return value is falsy
-        :returns: value paired with key in dict, fallback
-        """
-        if data is None or not isinstance(data, dict):
-            return None
-        result = data.get(attribute)
-        if result is None:
-            return fallback
-        return result
-
-    @classmethod
-    def _strptime_attribute(cls, data, attribute):
-        """Get a datetime object from a dict, return None if it wan't found.
-
-        This is equivalent to calling::
-
-            cls._strptime(data[attribute]) if attribute in data else None
-
-        :param dict data: dictionary used to put together the model
-        :param str attribute: key of the attribute
-        :returns: timezone-aware datetime object
-        :rtype: datetime
-        """
-        result = cls._get_attribute(data, attribute)
-        if result:
-            return cls._strptime(result)
-        return result
-
-    @classmethod
     def _strptime(cls, time_str):
         """Convert an ISO 8601 formatted string to a datetime object.
 

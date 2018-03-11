@@ -5,10 +5,12 @@ import pytest
 
 from base64 import b64encode
 from github3 import GitHubError
+from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
+from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents
-from github3.repos.repo import (Comparison, Hook, RepoComment,
-                                Repository, ShortRepository)
+from github3.repos.hook import Hook
+from github3.repos.repo import Repository, ShortRepository
 from github3.models import GitHubCore
 from github3.projects import Project
 
