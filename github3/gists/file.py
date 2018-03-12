@@ -2,10 +2,10 @@
 """Module containing the GistFile object."""
 from __future__ import unicode_literals
 
-from ..models import GitHubCore
+from .. import models
 
 
-class _GistFile(GitHubCore):
+class _GistFile(models.GitHubCore):
     """Base for GistFile classes."""
 
     def _update_attributes(self, gistfile):
@@ -21,8 +21,10 @@ class _GistFile(GitHubCore):
     def content(self):
         """Retrieve contents of file from key 'raw_url'.
 
-        :returns: unaltered, untruncated contents of file.
-        :rtype: bytes
+        :returns:
+            unaltered, untruncated contents of file.
+        :rtype:
+            bytes
         """
         resp = self._get(self.raw_url)
         if self._boolean(resp, 200, 404):

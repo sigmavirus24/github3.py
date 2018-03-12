@@ -6,6 +6,9 @@ from .helper import create_example_data_helper
 get_example_data = create_example_data_helper('event_example')
 get_org_example_data = create_example_data_helper('org_example')
 get_comment_example_data = create_example_data_helper('comment_example')
+get_review_comment_example_data = create_example_data_helper(
+    'review_comment_example'
+)
 get_pull_request_example_data = create_example_data_helper(
     'pull_request_example'
 )
@@ -44,11 +47,11 @@ class TestEvent(UnitHelper):
 class TestPayLoadHandlers(TestCase):
 
     def test_commitcomment(self):
-        """Show that the event type is a RepoComment."""
+        """Show that the event type is a ShortComment."""
         comment = {'comment': get_comment_example_data()}
         comment = github3.events._commitcomment(comment, None)
         assert isinstance(comment['comment'],
-                          github3.repos.comment.RepoComment)
+                          github3.repos.comment.ShortComment)
 
     def test_follow(self):
         """Show that the event type is a FollowEvent."""
@@ -76,8 +79,7 @@ class TestPayLoadHandlers(TestCase):
         }
         github3.events._issuecomm(comment, None)
         assert isinstance(comment['issue'], github3.events.EventIssue)
-        assert isinstance(comment['comment'],
-                          github3.issues.comment.IssueComment)
+        assert isinstance(comment['comment'], github3.events.EventIssueComment)
 
     def test_issueevent(self):
         """Show that the event type is a IssueEvent."""
@@ -100,9 +102,10 @@ class TestPayLoadHandlers(TestCase):
 
     def test_pullreqcomment(self):
         """Show that the event type is a PullRequestReviewCommentEvent."""
-        pull_request = {'comment': get_comment_example_data()}
+        pull_request = {'comment': get_review_comment_example_data()}
         github3.events._pullreqcomm(pull_request, None)
-        assert isinstance(pull_request['comment'], github3.pulls.ReviewComment)
+        assert isinstance(pull_request['comment'],
+                          github3.events.EventReviewComment)
 
     def test_team(self):
         """Show that the event type is a TeamAddEvent."""
@@ -113,5 +116,5 @@ class TestPayLoadHandlers(TestCase):
         }
 
         github3.events._team(team, None)
-        assert isinstance(team['team'], github3.orgs.Team)
+        assert isinstance(team['team'], github3.orgs.ShortTeam)
         assert isinstance(team['repo'], github3.repos.ShortRepository)

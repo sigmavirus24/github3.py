@@ -1,3 +1,4 @@
+"""Unit tests around the Thread class."""
 import github3
 
 from .helper import (UnitHelper, create_example_data_helper, create_url_helper)
@@ -20,10 +21,6 @@ class TestThread(UnitHelper):
         assert self.instance == thread
         thread._uniq = 1
         assert self.instance != thread
-
-    def test_is_unread(self):
-        """Show that is_unread() equals unread property."""
-        assert self.instance.is_unread() == self.instance.unread
 
     def test_repr(self):
         """Show instance string is formatted correctly."""

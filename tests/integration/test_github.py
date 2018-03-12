@@ -203,14 +203,13 @@ class TestGitHub(IntegrationHelper):
 
     def test_licenses(self):
         """Test the ability to retrieve open source licenses."""
-
         cassette_name = self.cassette_name('licenses')
         with self.recorder.use_cassette(cassette_name):
             licenses = list(self.gh.licenses())
             assert len(licenses) > 0
 
             license = licenses[0]
-            assert isinstance(license, github3.licenses.License)
+            assert isinstance(license, github3.licenses.ShortLicense)
 
     def test_markdown(self):
         """Test the ability to render a markdown document."""
@@ -315,7 +314,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name('iter_user_teams')
         with self.recorder.use_cassette(cassette_name):
             for t in self.gh.user_teams():
-                assert isinstance(t, github3.orgs.Team)
+                assert isinstance(t, github3.orgs.ShortTeam)
 
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""

@@ -50,6 +50,8 @@
       }
     ],
     "url": "https://api.github.com/repos/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+    "html_url": "https://github.com/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+    "comments_url": "https://api.github.com/repos/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d/comments",
     "committer": {
       "avatar_url": "https://avatars.githubusercontent.com/u/1?",
       "events_url": "https://api.github.com/users/octocat/events{/privacy}",
@@ -75,5 +77,6 @@
     "self": "https://api.github.com/repos/octocat/Hello-World/branches/master"
   },
   "protected": true,
+  "protection": {"enabled": true, "required_status_checks": {"enforcement_level": "non_admins", "contexts": ["continuous-integration/travis-ci"]}},
   "protection_url": "https://api.github.com/repos/octocat/Hello-World/branches/master/protection"
 }

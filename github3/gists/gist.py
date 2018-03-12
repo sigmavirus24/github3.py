@@ -4,16 +4,16 @@ from __future__ import unicode_literals
 
 from json import dumps
 
+from .. import models
 from .. import users
 
-from ..models import GitHubCore
 from ..decorators import requires_auth
 from . import comment
 from . import file as gistfile
 from . import history
 
 
-class _Gist(GitHubCore):
+class _Gist(models.GitHubCore):
     """This object holds all the information returned by Github about a gist.
 
     With it you can comment on or fork the gist (assuming you are
@@ -63,9 +63,12 @@ class _Gist(GitHubCore):
     def create_comment(self, body):
         """Create a comment on this gist.
 
-        :param str body: (required), body of the comment
-        :returns: Created comment or None
-        :rtype: :class:`~github3.gists.comment.GistComment`
+        :param str body:
+            (required), body of the comment
+        :returns:
+            Created comment or None
+        :rtype:
+            :class:`~github3.gists.comment.GistComment`
         """
         json = None
         if body:
@@ -77,8 +80,10 @@ class _Gist(GitHubCore):
     def delete(self):
         """Delete this gist.
 
-        :returns: Whether the deletion was successful or not
-        :rtype: bool
+        :returns:
+            Whether the deletion was successful or not
+        :rtype:
+            bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
@@ -86,14 +91,17 @@ class _Gist(GitHubCore):
     def edit(self, description='', files={}):
         """Edit this gist.
 
-        :param str description: (optional), description of the gist
-        :param dict files: (optional), files that make up this gist; the
-            key(s) should be the file name(s) and the values should be another
-            (optional) dictionary with (optional) keys: 'content' and
-            'filename' where the former is the content of the file and the
-            latter is the new name of the file.
-        :returns: Whether the edit was successful or not
-        :rtype: bool
+        :param str description:
+            (optional), description of the gist
+        :param dict files:
+            (optional), files that make up this gist; the key(s) should be the
+            file name(s) and the values should be another (optional) dictionary
+            with (optional) keys: 'content' and 'filename' where the former is
+            the content of the file and the latter is the new name of the file.
+        :returns:
+            Whether the edit was successful or not
+        :rtype:
+            bool
         """
         data = {}
         json = None
@@ -112,8 +120,10 @@ class _Gist(GitHubCore):
     def fork(self):
         """Fork this gist.
 
-        :returns: New gist if successfully forked, ``None`` otherwise
-        :rtype: :class:`~github3.gists.gist.ShortGist`
+        :returns:
+            New gist if successfully forked, ``None`` otherwise
+        :rtype:
+            :class:`~github3.gists.gist.ShortGist`
         """
         url = self._build_url('forks', base_url=self._api)
         json = self._json(self._post(url), 201)
@@ -123,8 +133,10 @@ class _Gist(GitHubCore):
     def is_starred(self):
         """Check to see if this gist is starred by the authenticated user.
 
-        :returns: True if it is starred, False otherwise
-        :rtype: bool
+        :returns:
+            True if it is starred, False otherwise
+        :rtype:
+            bool
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
@@ -132,12 +144,15 @@ class _Gist(GitHubCore):
     def comments(self, number=-1, etag=None):
         """Iterate over comments on this gist.
 
-        :param int number: (optional), number of comments to iterate over.
+        :param int number:
+            (optional), number of comments to iterate over.
             Default: -1 will iterate over all comments on the gist
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of comments
-        :rtype: :class:`~github3.gists.comment.GistComment`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of comments
+        :rtype:
+            :class:`~github3.gists.comment.GistComment`
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, comment.GistComment, etag=etag)
@@ -154,13 +169,16 @@ class _Gist(GitHubCore):
 
             Added param ``etag``.
 
-        :param int number: (optional), number of commits to iterate over.
+        :param int number:
+            (optional), number of commits to iterate over.
             Default: -1 will iterate over all commits associated with this
             gist.
-        :param str etag: (optional), ETag from a previous request to this
-            endpoint.
-        :returns: generator of the gist's history
-        :rtype: :class:`~github3.gists.history.GistHistory`
+        :param str etag:
+            (optional), ETag from a previous request to this endpoint.
+        :returns:
+            generator of the gist's history
+        :rtype:
+            :class:`~github3.gists.history.GistHistory`
         """
         url = self._build_url('commits', base_url=self._api)
         return self._iter(int(number), url, history.GistHistory)
@@ -172,12 +190,15 @@ class _Gist(GitHubCore):
 
             Added params ``number`` and ``etag``.
 
-        :param int number: (optional), number of forks to iterate over.
+        :param int number:
+            (optional), number of forks to iterate over.
             Default: -1 will iterate over all forks of this gist.
-        :param str etag: (optional), ETag from a previous request to this
-            endpoint.
-        :returns: generator of gists
-        :rtype: :class:`~github3.gists.gist.ShortGist`
+        :param str etag:
+            (optional), ETag from a previous request to this endpoint.
+        :returns:
+            generator of gists
+        :rtype:
+            :class:`~github3.gists.gist.ShortGist`
         """
         url = self._build_url('forks', base_url=self._api)
         return self._iter(int(number), url, ShortGist, etag=etag)
@@ -186,8 +207,10 @@ class _Gist(GitHubCore):
     def star(self):
         """Star this gist.
 
-        :returns: True if successful, False otherwise
-        :rtype: bool
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
@@ -196,8 +219,10 @@ class _Gist(GitHubCore):
     def unstar(self):
         """Un-star this gist.
 
-        :returns: True if successful, False otherwise
-        :rtype: bool
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         url = self._build_url('star', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
@@ -284,7 +309,7 @@ class ShortGist(_Gist):
     class_name = 'ShortGist'
 
 
-class GistFork(GitHubCore):
+class GistFork(models.GitHubCore):
     """This object represents a forked Gist.
 
     This has a subset of attributes of a
@@ -324,11 +349,15 @@ class GistFork(GitHubCore):
     def to_gist(self):
         """Retrieve the full Gist representation of this fork.
 
-        :returns: The Gist if retrieving it was successful or ``None``
-        :rtype: :class:`~github3.gists.gist.Gist`
+        :returns:
+            The Gist if retrieving it was successful or ``None``
+        :rtype:
+            :class:`~github3.gists.gist.Gist`
         """
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(Gist, json)
+
+    refresh = to_gist
 
 
 class Gist(_Gist):

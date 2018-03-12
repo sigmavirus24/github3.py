@@ -1,48 +1,86 @@
 # -*- coding: utf-8 -*-
+"""Repository and contributor stats logic."""
 from __future__ import unicode_literals
 
-from datetime import datetime
+import datetime
 
+import dateutil.tz
+
+from .. import models
 from .. import users
-
-from ..models import GitHubCore
 
 
 def alternate_week(week):
+    """Map GitHub 'short' data to usable data.
+
+    .. note:: This is not meant for public consumption
+
+    :param dict week:
+        The week's statistical data from GitHub
+    :returns:
+        Huamnized week statistical data
+    :rtype:
+        dict
+    """
+    start_of_week = datetime.datetime.utcfromtimestamp(int(week['w']))
     return {
-        'start of week': datetime.fromtimestamp(int(week['w'])),
+        'start of week': start_of_week.replace(tzinfo=dateutil.tz.tzutc()),
         'additions': week['a'],
         'deletions': week['d'],
         'commits': week['c'],
     }
 
 
-class ContributorStats(GitHubCore):
+class ContributorStats(models.GitHubCore):
+    """Representation of a user's contributor statistics to a repository.
 
-    """This object provides easy access to information returned by the
-    statistics section of the API.
+    See also http://developer.github.com/v3/repos/statistics/
 
-    See http://developer.github.com/v3/repos/statistics/ for specifics.
+    This object has the following attributes:
+
+    .. attribute:: author
+
+        A :class:`~github3.users.ShortUser` representing the contributor
+        whose stats this object represents.
+
+    .. attribute:: total
+
+        The total number of commits authored by :attr:`author`.
+
+    .. attribute:: weeks
+
+        A list of dictionaries containing weekly statistical data.
+
+    .. attribute:: alternate_weeks
+
+        .. note::
+
+            :mod:`github3` generates this data for a more humane interface
+            to the data in :attr:`weeks`.
+
+        A list of dictionaries that provide an easier to remember set of
+        keys as well as a :class:`~datetime.datetime` object representing the
+        start of the week. The dictionary looks vaguely like:
+
+        .. code-block:: python
+
+            {
+                'start of week': datetime(2013, 5, 5, 5, 0, tzinfo=tzutc())
+                'additions': 100,
+                'deletions': 150,
+                'commits': 5,
+            }
 
     """
 
     def _update_attributes(self, stats_object):
-        #: Contributor in particular that this relates to
-        self.author = self._class_attribute(
-            stats_object, 'author', users.ShortUser, self
-        )
-        #: Total number of commits authored by ``author``.
-        self.total = self._get_attribute(stats_object, 'total')
-        #: List of weekly dictionaries.
-        self.weeks = self._get_attribute(stats_object, 'weeks', [])
-        #: Alternative collection of weekly dictionaries
-        #: This provides a datetime object and easy to remember keys for each
-        #: element in the list.
-        #: 'w' -> 'start of week', 'a' -> 'Number of additions',
-        #: 'd' -> 'Number of deletions', 'c' -> 'Number of commits'
-        self.alt_weeks = self.weeks
-        if self.alt_weeks:
-            self.alt_weeks = [alternate_week(w) for w in self.weeks]
+        self.author = users.ShortUser(stats_object['author'], self)
+        self.total = stats_object['total']
+        self.weeks = stats_object['weeks']
+        alt_weeks = self.weeks
+        if alt_weeks:
+            alt_weeks = [alternate_week(w) for w in self.weeks]
+        self.alternate_weeks = self.alt_weeks = alt_weeks
 
     def _repr(self):
         return '<Contributor Statistics [{0}]>'.format(self.author)

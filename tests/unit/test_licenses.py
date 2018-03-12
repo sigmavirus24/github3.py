@@ -11,6 +11,8 @@ url_for = create_url_helper(
 
 
 class TestLicenses(UnitHelper):
+    """Unit tests around the License class."""
+
     described_class = github3.licenses.License
     example_data = get_example_data()
 
@@ -22,11 +24,7 @@ class TestLicenses(UnitHelper):
             'implementation',
             'html_url',
             'key',
-            'required',
             'name',
-            'permitted',
-            'category',
-            'forbidden',
             'featured',
         ]
         for attr in attributes:

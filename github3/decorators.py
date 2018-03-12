@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-github3.decorators
-==================
-
-This module provides decorators to the rest of the library
-
-"""
+"""This module provides decorators to the rest of the library."""
 
 from functools import wraps
 from requests.models import Response
@@ -20,7 +14,10 @@ except ImportError:  # (No coverage)
 
 
 class RequestsStringIO(StringIO):
+    """Shim compatibility for string IO."""
+
     def read(self, n=-1, *args, **kwargs):
+        """Ignore extra args and kwargs."""
         # StringIO is an old-style class, so can't use super
         return StringIO.read(self, n)
 
@@ -86,6 +83,7 @@ def requires_app_credentials(func):
 
 
 def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
+    """Generate a fake Response from requests."""
     r = Response()
     r.status_code = status_code
     r.encoding = encoding

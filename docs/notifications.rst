@@ -4,8 +4,10 @@
 Notifications
 =============
 
-This part of the documentation covers the :class:`Thread <Thread>` and
-:class:`Subscription <Subscription>` objects.
+This part of the documentation covers the
+:class:`~github3.notifications.Thread`,
+:class:`~github3.notifications.RepositorySubscription`, and
+:class:`~github3.notifications.ThreadSubscription` objects.
 
 Notification Objects
 --------------------
@@ -15,5 +17,10 @@ Notification Objects
 
 ------
 
-.. autoclass:: Subscription
+.. autoclass:: RepositorySubscription
+    :inherited-members:
+
+------
+
+.. autoclass:: ThreadSubscription
     :inherited-members:

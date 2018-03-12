@@ -235,7 +235,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for team in o.teams():
-                assert isinstance(team, github3.orgs.Team)
+                assert isinstance(team, github3.orgs.ShortTeam)
 
     def test_publicize_member(self):
         """Test the ability to publicize a member of the organization."""

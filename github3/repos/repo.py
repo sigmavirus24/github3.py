@@ -7,42 +7,43 @@ returned by GitHub.
 """
 from __future__ import unicode_literals
 
-from base64 import b64encode
-from json import dumps
+import base64
+import json as jsonlib
 
-from uritemplate import URITemplate
+import uritemplate as urit
 
+from .. import events
+from .. import git
+from .. import issues
+from ..issues import event as ievent
+from ..issues import label
+from ..issues import milestone
+from .. import licenses
+from .. import models
+from .. import notifications
+from .. import projects
+from .. import pulls
 from .. import users
+from .. import utils
+
+from . import branch
+from . import comment
+from . import commit
+from . import comparison
+from . import contents
+from . import deployment
+from . import hook
+from . import issue_import
+from . import pages
+from . import release
+from . import stats
+from . import status
+from . import tag
 
 from ..decorators import requires_auth
-from ..events import Event
-from ..git import Blob, Commit, Reference, Tag, Tree
-from ..issues import ShortIssue, Issue, issue_params
-from ..issues.event import IssueEvent
-from ..issues.label import Label
-from ..issues.milestone import Milestone
-from ..licenses import License
-from ..models import GitHubCore
-from ..notifications import Subscription, Thread
-from ..projects import Project
-from ..pulls import ShortPullRequest, PullRequest
-from ..utils import stream_response_to_file, timestamp_parameter
-from .branch import Branch
-from .comment import RepoComment
-from .commit import RepoCommit
-from .comparison import Comparison
-from .contents import Contents, validate_commmitter
-from .deployment import Deployment
-from .hook import Hook
-from .issue_import import ImportedIssue
-from .pages import PagesBuild, PagesInfo
-from .release import Asset, Release
-from .stats import ContributorStats
-from .status import Status
-from .tag import RepoTag
 
 
-class _Repository(GitHubCore):
+class _Repository(models.GitHubCore):
     """This class serves as the base for all other Repository objects.
 
     Sub-classes should need only to override the ``_update_attributes``
@@ -57,50 +58,50 @@ class _Repository(GitHubCore):
 
     def _update_attributes(self, repo):
         self.url = self._api = repo['url']
-        self.archive_urlt = URITemplate(repo['archive_url'])
-        self.assignees_urlt = URITemplate(repo['assignees_url'])
-        self.blobs_urlt = URITemplate(repo['blobs_url'])
-        self.branches_urlt = URITemplate(repo['branches_url'])
-        self.collaborators_urlt = URITemplate(repo['collaborators_url'])
-        self.comments_urlt = URITemplate(repo['comments_url'])
-        self.commits_urlt = URITemplate(repo['commits_url'])
-        self.compare_urlt = URITemplate(repo['compare_url'])
-        self.contents_urlt = URITemplate(repo['contents_url'])
+        self.archive_urlt = urit.URITemplate(repo['archive_url'])
+        self.assignees_urlt = urit.URITemplate(repo['assignees_url'])
+        self.blobs_urlt = urit.URITemplate(repo['blobs_url'])
+        self.branches_urlt = urit.URITemplate(repo['branches_url'])
+        self.collaborators_urlt = urit.URITemplate(repo['collaborators_url'])
+        self.comments_urlt = urit.URITemplate(repo['comments_url'])
+        self.commits_urlt = urit.URITemplate(repo['commits_url'])
+        self.compare_urlt = urit.URITemplate(repo['compare_url'])
+        self.contents_urlt = urit.URITemplate(repo['contents_url'])
         self.contributors_url = repo['contributors_url']
         self.deployments_url = repo['deployments_url']
-        self.description = self._get_attribute(repo, 'description')
+        self.description = repo['description']
         self.downloads_url = repo['downloads_url']
         self.events_url = repo['events_url']
         self.fork = repo['fork']
         self.forks_url = repo['forks_url']
         self.full_name = repo['full_name']
-        self.git_commits_urlt = URITemplate(repo['git_commits_url'])
-        self.git_refs_urlt = URITemplate(repo['git_refs_url'])
-        self.git_tags_urlt = URITemplate(repo['git_tags_url'])
+        self.git_commits_urlt = urit.URITemplate(repo['git_commits_url'])
+        self.git_refs_urlt = urit.URITemplate(repo['git_refs_url'])
+        self.git_tags_urlt = urit.URITemplate(repo['git_tags_url'])
         self.hooks_url = repo['hooks_url']
         self.html_url = repo['html_url']
         self.id = repo['id']
-        self.issue_comment_urlt = URITemplate(repo['issue_comment_url'])
-        self.issue_events_urlt = URITemplate(repo['issue_events_url'])
-        self.issues_urlt = URITemplate(repo['issues_url'])
-        self.keys_urlt = URITemplate(repo['keys_url'])
-        self.labels_urlt = URITemplate(repo['labels_url'])
+        self.issue_comment_urlt = urit.URITemplate(repo['issue_comment_url'])
+        self.issue_events_urlt = urit.URITemplate(repo['issue_events_url'])
+        self.issues_urlt = urit.URITemplate(repo['issues_url'])
+        self.keys_urlt = urit.URITemplate(repo['keys_url'])
+        self.labels_urlt = urit.URITemplate(repo['labels_url'])
         self.languages_url = repo['languages_url']
-        self.merges_url = self._get_attribute(repo, 'merges_url')
-        self.milestones_urlt = URITemplate(repo['milestones_url'])
+        self.merges_url = repo['merges_url']
+        self.milestones_urlt = urit.URITemplate(repo['milestones_url'])
         self.name = repo['name']
-        self.notifications_urlt = URITemplate(repo['notifications_url'])
+        self.notifications_urlt = urit.URITemplate(repo['notifications_url'])
         self.owner = users.ShortUser(repo['owner'], self)
         self.private = repo['private']
-        self.pulls_urlt = URITemplate(repo['pulls_url'])
-        self.releases_urlt = URITemplate(repo['releases_url'])
+        self.pulls_urlt = urit.URITemplate(repo['pulls_url'])
+        self.releases_urlt = urit.URITemplate(repo['releases_url'])
         self.stargazers_url = repo['stargazers_url']
-        self.statuses_urlt = URITemplate(repo['statuses_url'])
+        self.statuses_urlt = urit.URITemplate(repo['statuses_url'])
         self.subscribers_url = repo['subscribers_url']
         self.subscription_url = repo['subscription_url']
         self.tags_url = repo['tags_url']
         self.teams_url = repo['teams_url']
-        self.trees_urlt = URITemplate(repo['trees_url'])
+        self.trees_urlt = urit.URITemplate(repo['trees_url'])
 
     def _repr(self):
         return '<{0} [{1}]>'.format(self.class_name, self)
@@ -114,15 +115,19 @@ class _Repository(GitHubCore):
         if data:
             url = self._build_url('pulls', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(ShortPullRequest, json)
+        return self._instance_or_null(pulls.ShortPullRequest, json)
 
     @requires_auth
     def add_collaborator(self, username):
         """Add ``username`` as a collaborator to a repository.
 
-        :param username: (required), username of the user
-        :type username: str or :class:`User <github3.users.User>`
-        :returns: bool -- True if successful, False otherwise
+        :param username:
+            (required), username of the user
+        :type username:
+            str or :class:`~github3.users.User`
+        :returns:
+            True if successful, False otherwise
+        :rtype:
         """
         if not username:
             return False
@@ -135,16 +140,21 @@ class _Repository(GitHubCore):
 
         See: http://developer.github.com/v3/repos/contents/#get-archive-link
 
-        :param str format: (required), accepted values: ('tarball',
-            'zipball')
-        :param path: (optional), path where the file should be saved
+        :param str format:
+            (required), accepted values: ('tarball', 'zipball')
+        :param path:
+            (optional), path where the file should be saved
             to, default is the filename provided in the headers and will be
             written in the current directory.
             it can take a file-like object as well
-        :type path: str, file
-        :param str ref: (optional)
-        :returns: bool -- True if successful, False otherwise
-
+        :type path:
+            str, file
+        :param str ref:
+            (optional)
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         resp = None
         if format in ('tarball', 'zipball'):
@@ -152,31 +162,39 @@ class _Repository(GitHubCore):
             resp = self._get(url, allow_redirects=True, stream=True)
 
         if resp and self._boolean(resp, 200, 404):
-            stream_response_to_file(resp, path)
+            utils.stream_response_to_file(resp, path)
             return True
         return False
 
     def asset(self, id):
         """Return a single asset.
 
-        :param int id: (required), id of the asset
-        :returns: :class:`Asset <github3.repos.release.Asset>`
+        :param int id:
+            (required), id of the asset
+        :returns:
+            the asset
+        :rtype:
+            :class:`~github3.repos.release.Asset`
         """
         data = None
         if int(id) > 0:
             url = self._build_url('releases', 'assets', str(id),
                                   base_url=self._api)
             data = self._json(self._get(url), 200)
-        return self._instance_or_null(Asset, data)
+        return self._instance_or_null(release.Asset, data)
 
     def assignees(self, number=-1, etag=None):
-        r"""Iterate over all assignees to which an issue may be assigned.
+        """Iterate over all assignees to which an issue may be assigned.
 
-        :param int number: (optional), number of assignees to return. Default:
+        :param int number:
+            (optional), number of assignees to return. Default:
             -1 returns all available assignees
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`~github3.users.User`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of users
+        :rtype:
+            :class:`~github3.users.ShortUser`
         """
         url = self._build_url('assignees', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
@@ -184,124 +202,155 @@ class _Repository(GitHubCore):
     def blob(self, sha):
         """Get the blob indicated by ``sha``.
 
-        :param str sha: (required), sha of the blob
-        :returns: :class:`Blob <github3.git.Blob>` if successful, otherwise
-            None
+        :param str sha:
+            (required), sha of the blob
+        :returns:
+            the git blob
+        :rtype:
+            :class:`~github3.git.Blob`
         """
         url = self._build_url('git', 'blobs', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Blob, json)
+        return self._instance_or_null(git.Blob, json)
 
     def branch(self, name):
         """Get the branch ``name`` of this repository.
 
-        :param str name: (required), branch name
-        :type name: str
-        :returns: :class:`Branch <github3.repos.branch.Branch>`
+        :param str name:
+            (required), branch name
+        :returns:
+            the branch
+        :rtype:
+            :class:`~github3.repos.branch.Branch`
         """
         json = None
         if name:
             url = self._build_url('branches', name, base_url=self._api)
-            json = self._json(self._get(url, headers=Branch.PREVIEW_HEADERS),
+            json = self._json(self._get(url,
+                                        headers=branch.Branch.PREVIEW_HEADERS),
                               200)
-        return self._instance_or_null(Branch, json)
+        return self._instance_or_null(branch.Branch, json)
 
     def branches(self, number=-1, protected=False, etag=None):
-        r"""Iterate over the branches in this repository.
+        """Iterate over the branches in this repository.
 
-        :param int number: (optional), number of branches to return. Default:
-            -1 returns all branches
-        :param bool protected: (optional), True lists only protected branches.
+        :param int number:
+            (optional), number of branches to return. Default: -1 returns all
+            branches
+        :param bool protected:
+            (optional), True lists only protected branches.
             Default: False
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`Branch <github3.repos.branch.Branch>`\ es
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of branches
+        :rtype:
+            :class:`~github3.repos.branch.Branch`
         """
         url = self._build_url('branches', base_url=self._api)
         params = {'protected': '1'} if protected else None
-        return self._iter(int(number), url, Branch, params, etag=etag,
-                          headers=Branch.PREVIEW_HEADERS)
+        return self._iter(int(number), url, branch.ShortBranch, params,
+                          etag=etag, headers=branch.Branch.PREVIEW_HEADERS)
 
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.
 
+        .. versionadded:: 0.7
+
         Returns a weekly aggregate of the number of additions and deletions
         pushed to this repository.
 
-        :param int number: (optional), number of weeks to return. Default: -1
+        .. note::
+
+            All statistics methods may return a 202. On those occasions,
+            you will not receive any objects. You should store your
+            iterator and check the new ``last_status`` attribute. If it
+            is a 202 you should wait before re-requesting.
+
+        :param int number:
+            (optional), number of weeks to return. Default: -1
             returns all weeks
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of lists ``[seconds_from_epoch, additions,
-            deletions]``
-
-        .. note:: All statistics methods may return a 202. On those occasions,
-                  you will not receive any objects. You should store your
-                  iterator and check the new ``last_status`` attribute. If it
-                  is a 202 you should wait before re-requesting.
-
-        .. versionadded:: 0.7
-
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of lists ``[seconds_from_epoch, additions, deletions]``
+        :rtype:
+            list
         """
         url = self._build_url('stats', 'code_frequency', base_url=self._api)
         return self._iter(int(number), url, list, etag=etag)
 
     def collaborators(self, number=-1, etag=None):
-        r"""Iterate over the collaborators of this repository.
+        """Iterate over the collaborators of this repository.
 
-        :param int number: (optional), number of collaborators to return.
+        :param int number:
+            (optional), number of collaborators to return.
             Default: -1 returns all comments
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`~github3.users.ShortUser`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of collaborator users
+        :rtype:
+            :class:`~github3.users.ShortUser`
         """
         url = self._build_url('collaborators', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def comments(self, number=-1, etag=None):
-        r"""Iterate over comments on all commits in the repository.
+        """Iterate over comments on all commits in the repository.
 
-        :param int number: (optional), number of comments to return. Default:
+        :param int number:
+            (optional), number of comments to return. Default:
             -1 returns all comments
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`RepoComment <github3.repos.comment.RepoComment>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of comments on commits
+        :rtype:
+            :class:`~github3.repos.comment.RepoComment`
         """
         url = self._build_url('comments', base_url=self._api)
-        return self._iter(int(number), url, RepoComment, etag=etag)
+        return self._iter(int(number), url, comment.RepoComment, etag=etag)
 
     def commit(self, sha):
         """Get a single (repo) commit.
 
-        See :func:`git_commit` for the Git Data Commit.
+        See :meth:`git_commit` for the Git Data Commit.
 
-        :param str sha: (required), sha of the commit
-        :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>` if
-            successful, otherwise None
+        :param str sha:
+            (required), sha of the commit
+        :returns:
+            the commit
+        :rtype:
+            :class:`~github3.repos.commit.RepoCommit`
         """
         url = self._build_url('commits', sha, base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(RepoCommit, json)
+        return self._instance_or_null(commit.RepoCommit, json)
 
     def commit_activity(self, number=-1, etag=None):
         """Iterate over last year of commit activity by week.
 
-        See: http://developer.github.com/v3/repos/statistics/
-
-        .. note:: All statistics methods may return a 202. On those occasions,
-                  you will not receive any objects. You should store your
-                  iterator and check the new ``last_status`` attribute. If it
-                  is a 202 you should wait before re-requesting.
-
         .. versionadded:: 0.7
 
-        :param int number: (optional), number of weeks to return. Default -1
+        See: http://developer.github.com/v3/repos/statistics/
+
+        .. note::
+
+            All statistics methods may return a 202. On those occasions,
+            you will not receive any objects. You should store your
+            iterator and check the new ``last_status`` attribute. If it
+            is a 202 you should wait before re-requesting.
+
+        :param int number:
+            (optional), number of weeks to return. Default -1
             will return all of the weeks.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of dictionaries
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of dictionaries
+        :rtype:
+            dict
         """
         url = self._build_url('stats', 'commit_activity', base_url=self._api)
         return self._iter(int(number), url, dict, etag=etag)
@@ -309,109 +358,138 @@ class _Repository(GitHubCore):
     def commit_comment(self, comment_id):
         """Get a single commit comment.
 
-        :param int comment_id: (required), id of the comment used by GitHub
-        :returns: :class:`RepoComment <github3.repos.comment.RepoComment>` if
-            successful, otherwise None
+        :param int comment_id:
+            (required), id of the comment used by GitHub
+        :returns:
+            the comment on the commit
+        :rtype:
+            :class:`~github3.repos.comment.RepoComment`
         """
         url = self._build_url('comments', str(comment_id), base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(RepoComment, json)
+        return self._instance_or_null(comment.RepoComment, json)
 
     def commits(self, sha=None, path=None, author=None, number=-1, etag=None,
                 since=None, until=None, per_page=None):
-        r"""Iterate over commits in this repository.
+        """Iterate over commits in this repository.
 
-        :param str sha: (optional), sha or branch to start listing commits
-            from
-        :param str path: (optional), commits containing this path will be
-            listed
-        :param str author: (optional), GitHub login, real name, or email to
+        :param str sha:
+            (optional), sha or branch to start listing commits from
+        :param str path:
+            (optional), commits containing this path will be listed
+        :param str author:
+            (optional), GitHub login, real name, or email to
             filter commits by (using commit author)
-        :param int number: (optional), number of comments to return. Default:
+        :param int number:
+            (optional), number of comments to return. Default:
             -1 returns all comments
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :param since: (optional), Only commits after this date will
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :param since:
+            (optional), Only commits after this date will be returned.
+            This can be a ``datetime`` or an ``ISO8601`` formatted
+            date string.
+        :type since:
+            :class:`~datetime.datetime` or str
+        :param until:
+            (optional), Only commits before this date will
             be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string.
-        :type since: datetime or string
-        :param until: (optional), Only commits before this date will
-            be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
-            date string.
-        :type until: datetime or string
-        :param int per_page: (optional), commits listing page size
-
-        :returns: generator of
-            :class:`RepoCommit <github3.repos.commit.RepoCommit>`\ s
+        :type until:
+            :class:`~datetime.datetime` or str
+        :param int per_page:
+            (optional), commits listing page size
+        :returns:
+            generator of commits
+        :rtype:
+            :class:`~github3.repos.commit.RepoCommit`
         """
         params = {'sha': sha, 'path': path, 'author': author,
-                  'since': timestamp_parameter(since),
-                  'until': timestamp_parameter(until),
+                  'since': utils.timestamp_parameter(since),
+                  'until': utils.timestamp_parameter(until),
                   'per_page': per_page}
 
         self._remove_none(params)
         url = self._build_url('commits', base_url=self._api)
-        return self._iter(int(number), url, RepoCommit, params, etag)
+        return self._iter(int(number), url, commit.ShortCommit, params, etag)
 
     def compare_commits(self, base, head):
         """Compare two commits.
 
-        :param str base: (required), base for the comparison
-        :param str head: (required), compare this against base
-        :returns: :class:`Comparison <github3.repos.comparison.Comparison>` if
-            successful, else None
+        :param str base:
+            (required), base for the comparison
+        :param str head:
+            (required), compare this against base
+        :returns:
+            the comparison of the commits
+        :rtype:
+            :class:`~github3.repos.comparison.Comparison`
         """
         url = self._build_url('compare', base + '...' + head,
                               base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Comparison, json)
+        return self._instance_or_null(comparison.Comparison, json)
 
     def contributor_statistics(self, number=-1, etag=None):
         """Iterate over the contributors list.
 
-        See also: http://developer.github.com/v3/repos/statistics/
-
-        .. note:: All statistics methods may return a 202. On those occasions,
-                  you will not receive any objects. You should store your
-                  iterator and check the new ``last_status`` attribute. If it
-                  is a 202 you should wait before re-requesting.
-
         .. versionadded:: 0.7
 
-        :param int number: (optional), number of weeks to return. Default -1
+        See also: http://developer.github.com/v3/repos/statistics/
+
+        .. note::
+
+            All statistics methods may return a 202. On those occasions,
+            you will not receive any objects. You should store your
+            iterator and check the new ``last_status`` attribute. If it
+            is a 202 you should wait before re-requesting.
+
+        :param int number:
+            (optional), number of weeks to return. Default -1
             will return all of the weeks.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`ContributorStats <github3.repos.stats.ContributorStats>`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of contributor statistics for each contributor
+        :rtype:
+            :class:`~github3.repos.stats.ContributorStats`
         """
         url = self._build_url('stats', 'contributors', base_url=self._api)
-        return self._iter(int(number), url, ContributorStats, etag=etag)
+        return self._iter(int(number), url, stats.ContributorStats, etag=etag)
 
     def contributors(self, anon=False, number=-1, etag=None):
-        r"""Iterate over the contributors to this repository.
+        """Iterate over the contributors to this repository.
 
-        :param bool anon: (optional), True lists anonymous contributors as
-            well
-        :param int number: (optional), number of contributors to return.
+        :param bool anon:
+            (optional), True lists anonymous contributors as well
+        :param int number:
+            (optional), number of contributors to return.
             Default: -1 returns all contributors
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`~github3.users.ShortUser`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of contributor users
+        :rtype:
+            :class:`~github3.users.Contributor`
         """
         url = self._build_url('contributors', base_url=self._api)
         params = {}
         if anon:
             params = {'anon': 'true'}
-        return self._iter(int(number), url, users.ShortUser, params, etag)
+        return self._iter(int(number), url, users.Contributor, params, etag)
 
     @requires_auth
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
-        :param str content: (required), content of the blob
-        :param str encoding: (required), ('base64', 'utf-8')
-        :returns: string of the SHA returned
+        :param str content:
+            (required), content of the blob
+        :param str encoding:
+            (required), ('base64', 'utf-8')
+        :returns:
+            string of the SHA returned
+        :returns:
+            str (on Python 3, unicode on Python 2)
         """
         sha = ''
         if encoding in ('base64', 'utf-8'):
@@ -426,16 +504,20 @@ class _Repository(GitHubCore):
     def create_comment(self, body, sha, path=None, position=None, line=1):
         """Create a comment on a commit.
 
-        :param str body: (required), body of the message
-        :param str sha: (required), commit id
-        :param str path: (optional), relative path of the file to comment
-            on
-        :param str position: (optional), line index in the diff to comment on
-        :param int line: (optional), line number of the file to comment on,
-            default: 1
-        :returns: :class:`RepoComment <github3.repos.comment.RepoComment>` if
-            successful, otherwise None
-
+        :param str body:
+            (required), body of the message
+        :param str sha:
+            (required), commit id
+        :param str path:
+            (optional), relative path of the file to comment on
+        :param str position:
+            (optional), line index in the diff to comment on
+        :param int line:
+            (optional), line number of the file to comment on, default: 1
+        :returns:
+            the created comment
+        :rtype:
+            :class:`~github3.repos.comment.RepoComment`
         """
         json = None
         if body and sha and (line and int(line) > 0):
@@ -445,29 +527,35 @@ class _Repository(GitHubCore):
             url = self._build_url('commits', sha, 'comments',
                                   base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(RepoComment, json)
+        return self._instance_or_null(comment.RepoComment, json)
 
     @requires_auth
     def create_commit(self, message, tree, parents, author=None,
                       committer=None):
         """Create a commit on this repository.
 
-        :param str message: (required), commit message
-        :param str tree: (required), SHA of the tree object this
-            commit points to
-        :param list parents: (required), SHAs of the commits that were parents
+        :param str message:
+            (required), commit message
+        :param str tree:
+            (required), SHA of the tree object this commit points to
+        :param list parents:
+            (required), SHAs of the commits that were parents
             of this commit. If empty, the commit will be written as the root
             commit.  Even if there is only one parent, this should be an
             array.
-        :param dict author: (optional), if omitted, GitHub will
+        :param dict author:
+            (optional), if omitted, GitHub will
             use the authenticated user's credentials and the current
             time. Format: {'name': 'Committer Name', 'email':
             'name@example.com', 'date': 'YYYY-MM-DDTHH:MM:SS+HH:00'}
-        :param dict committer: (optional), if ommitted, GitHub will use the
+        :param dict committer:
+            (optional), if ommitted, GitHub will use the
             author parameters. Should be the same format as the author
             parameter.
-        :returns: :class:`Commit <github3.git.Commit>` if successful, else
-            None
+        :returns:
+            the created commit
+        :rtype:
+            :class:`~github3.git.Commit`
         """
         json = None
         if message and tree and isinstance(parents, list):
@@ -476,26 +564,34 @@ class _Repository(GitHubCore):
                     'author': author, 'committer': committer}
             self._remove_none(data)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Commit, json)
+        return self._instance_or_null(git.Commit, json)
 
     @requires_auth
     def create_deployment(self, ref, required_contexts=None, payload='',
                           auto_merge=False, description='', environment=None):
         """Create a deployment.
 
-        :param str ref: (required), The ref to deploy. This can be a branch,
-            tag, or sha.
-        :param list required_contexts: Optional array of status contexts
+        :param str ref:
+            (required), The ref to deploy. This can be a branch, tag, or sha.
+        :param list required_contexts:
+            Optional array of status contexts
             verified against commit status checks. To bypass checking
             entirely pass an empty array. Default: []
-        :param str payload: Optional JSON payload with extra information about
+        :param str payload:
+            Optional JSON payload with extra information about
             the deployment. Default: ""
-        :param bool auto_merge: Optional parameter to merge the default branch
+        :param bool auto_merge:
+            Optional parameter to merge the default branch
             into the requested deployment branch if necessary. Default: False
-        :param str description: Optional short description. Default: ""
-        :param str environment: Optional name for the target deployment
+        :param str description:
+            Optional short description. Default: ""
+        :param str environment:
+            Optional name for the target deployment
             environment (e.g., production, staging, qa). Default: "production"
-        :returns: :class:`Deployment <github3.repos.deployment.Deployment>`
+        :returns:
+            the created deployment
+        :rtype:
+            :class:`~github3.repos.deployment.Deployment`
         """
         json = None
         if ref:
@@ -508,7 +604,7 @@ class _Repository(GitHubCore):
             self._remove_none(data)
             json = self._json(self._post(url, data=data),
                               201)
-        return self._instance_or_null(Deployment, json)
+        return self._instance_or_null(deployment.Deployment, json)
 
     @requires_auth
     def create_file(self, path, message, content, branch=None,
@@ -517,21 +613,28 @@ class _Repository(GitHubCore):
 
         See also: http://developer.github.com/v3/repos/contents/#create-a-file
 
-        :param str path: (required), path of the file in the repository
-        :param str message: (required), commit message
-        :param bytes content: (required), the actual data in the file
-        :param str branch: (optional), branch to create the commit on.
+        :param str path:
+            (required), path of the file in the repository
+        :param str message:
+            (required), commit message
+        :param bytes content:
+            (required), the actual data in the file
+        :param str branch:
+            (optional), branch to create the commit on.
             Defaults to the default branch of the repository
-        :param dict committer: (optional), if no information is given the
+        :param dict committer:
+            (optional), if no information is given the
             authenticated user's information will be used. You must specify
             both a name and email.
-        :param dict author: (optional), if omitted this will be filled in with
+        :param dict author:
+            (optional), if omitted this will be filled in with
             committer information. If passed, you must specify both a name and
             email.
-        :returns: {
-            'content': :class:`Contents <github3.repos.contents.Contents>`:,
-            'commit': :class:`Commit <github3.git.Commit>`}
-
+        :returns:
+            dictionary of contents and commit for created file
+        :rtype:
+            :class:`~github3.repos.contents.Contents`,
+            :class:`~github3.git.Commit`
         """
         if content and not isinstance(content, bytes):
             raise ValueError(  # (No coverage)
@@ -540,24 +643,29 @@ class _Repository(GitHubCore):
         json = None
         if path and message and content:
             url = self._build_url('contents', path, base_url=self._api)
-            content = b64encode(content).decode('utf-8')
+            content = base64.b64encode(content).decode('utf-8')
             data = {'message': message, 'content': content, 'branch': branch,
-                    'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author)}
+                    'committer': contents.validate_commmitter(committer),
+                    'author': contents.validate_commmitter(author)}
             self._remove_none(data)
-            json = self._json(self._put(url, data=dumps(data)), 201)
+            json = self._json(self._put(url, data=jsonlib.dumps(data)), 201)
             if json and 'content' in json and 'commit' in json:
-                json['content'] = Contents(json['content'], self)
-                json['commit'] = Commit(json['commit'], self)
+                json['content'] = contents.Contents(
+                    json['content'], self
+                )
+                json['commit'] = git.Commit(json['commit'], self)
         return json
 
     @requires_auth
     def create_fork(self, organization=None):
         """Create a fork of this repository.
 
-        :param str organization: (required), login for organization to create
-            the fork under
-        :returns: :class:`Repository <Repository>` if successful, else None
+        :param str organization:
+            (required), login for organization to create the fork under
+        :returns:
+            the fork of this repository
+        :rtype:
+            :class:`~github3.repos.repo.Repository`
         """
         url = self._build_url('forks', base_url=self._api)
         if organization:
@@ -572,14 +680,18 @@ class _Repository(GitHubCore):
     def create_hook(self, name, config, events=['push'], active=True):
         """Create a hook on this repository.
 
-        :param str name: (required), name of the hook
-        :param dict config: (required), key-value pairs which act as settings
-            for this hook
-        :param list events: (optional), events the hook is triggered for
-        :param bool active: (optional), whether the hook is actually
-            triggered
-        :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
-            otherwise None
+        :param str name:
+            (required), name of the hook
+        :param dict config:
+            (required), key-value pairs which act as settings for this hook
+        :param list events:
+            (optional), events the hook is triggered for
+        :param bool active:
+            (optional), whether the hook is actually triggered
+        :returns:
+            the created hook
+        :rtype:
+            :class:`~github3.repos.hook.Hook`
         """
         json = None
         if name and config and isinstance(config, dict):
@@ -587,7 +699,7 @@ class _Repository(GitHubCore):
             data = {'name': name, 'config': config, 'events': events,
                     'active': active}
             json = self._json(self._post(url, data=data), 201)
-        return Hook(json, self) if json else None
+        return hook.Hook(json, self) if json else None
 
     @requires_auth
     def create_issue(self,
@@ -599,22 +711,29 @@ class _Repository(GitHubCore):
                      assignees=None):
         """Create an issue on this repository.
 
-        :param str title: (required), title of the issue
-        :param str body: (optional), body of the issue
-        :param str assignee: (optional), login of the user to assign the
-            issue to
-        :param int milestone: (optional), id number of the milestone to
-            attribute this issue to (e.g. ``m`` is a :class:`Milestone
-            <github3.issues.milestone.Milestone>` object, ``m.number`` is
-            what you pass here.)
-        :param labels: (optional), labels to apply to this
-            issue
-        :type labels: list of strings
-        :param assignees: (optional), login of the users to assign the
-            issue to
-        :type assignees: list of strings
-        :returns: :class:`ShortIssue <github3.issues.ShortIssue>` if
-            successful, otherwise None
+        :param str title:
+            (required), title of the issue
+        :param str body:
+            (optional), body of the issue
+        :param str assignee:
+            (optional), login of the user to assign the issue to
+        :param int milestone:
+            (optional), id number of the milestone to
+            attribute this issue to (e.g. ``m`` is a
+            :class:`~github3.issues.milestone.Milestone` object, ``m.number``
+            is what you pass here.)
+        :param labels:
+            (optional), labels to apply to this issue
+        :type labels:
+            [str]
+        :param assignees:
+            (optional), login of the users to assign the issue to
+        :type assignees:
+            [str]
+        :returns:
+            the created issue
+        :rtype:
+            :class:`~github3.issues.issue.ShortIssue`
         """
         issue = {'title': title, 'body': body, 'assignee': assignee,
                  'milestone': milestone, 'labels': labels,
@@ -626,17 +745,22 @@ class _Repository(GitHubCore):
             url = self._build_url('issues', base_url=self._api)
             json = self._json(self._post(url, data=issue), 201)
 
-        return self._instance_or_null(ShortIssue, json)
+        return self._instance_or_null(issues.ShortIssue, json)
 
     @requires_auth
     def create_key(self, title, key, read_only=False):
         """Create a deploy key.
 
-        :param str title: (required), title of key
-        :param str key: (required), key text
-        :param bool read_only: (optional), restrict key access to read-only,
-            default is False
-        :returns: :class:`~github3.users.Key` if successful, else None
+        :param str title:
+            (required), title of key
+        :param str key:
+            (required), key text
+        :param bool read_only:
+            (optional), restrict key access to read-only, default is False
+        :returns:
+            the created key
+        :rtype:
+            :class:`~github3.users.Key`
         """
         json = None
         if title and key:
@@ -649,31 +773,41 @@ class _Repository(GitHubCore):
     def create_label(self, name, color):
         """Create a label for this repository.
 
-        :param str name: (required), name to give to the label
-        :param str color: (required), value of the color to assign to the
+        :param str name:
+            (required), name to give to the label
+        :param str color:
+            (required), value of the color to assign to the
             label, e.g., '#fafafa' or 'fafafa' (the latter is what is sent)
-        :returns: :class:`Label <github3.issues.label.Label>` if successful,
-            else None
+        :returns:
+            the created label
+        :rtype:
+            :class:`~github3.issues.label.Label`
         """
         json = None
         if name and color:
             data = {'name': name, 'color': color.strip('#')}
             url = self._build_url('labels', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Label, json)
+        return self._instance_or_null(label.Label, json)
 
     @requires_auth
     def create_milestone(self, title, state=None, description=None,
                          due_on=None):
         """Create a milestone for this repository.
 
-        :param str title: (required), title of the milestone
-        :param str state: (optional), state of the milestone, accepted
+        :param str title:
+            (required), title of the milestone
+        :param str state:
+            (optional), state of the milestone, accepted
             values: ('open', 'closed'), default: 'open'
-        :param str description: (optional), description of the milestone
-        :param str due_on: (optional), ISO 8601 formatted due date
-        :returns: :class:`Milestone <github3.issues.milestone.Milestone>` if
-            successful, otherwise None
+        :param str description:
+            (optional), description of the milestone
+        :param str due_on:
+            (optional), ISO 8601 formatted due date
+        :returns:
+            the created milestone
+        :rtype:
+            :class:`~github3.issues.milestone.Milestone`
         """
         url = self._build_url('milestones', base_url=self._api)
         if state not in ('open', 'closed'):
@@ -684,16 +818,20 @@ class _Repository(GitHubCore):
         json = None
         if data:
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Milestone, json)
+        return self._instance_or_null(milestone.Milestone, json)
 
     @requires_auth
     def create_project(self, name, body=None):
         """Create a project for this repository.
 
-        :param str name: (required), name of the project
-        :param str body: (optional), body of the project
-        :returns: :class:`Project <github3.projects.Project>` if
-            successful, otherwise None
+        :param str name:
+            (required), name of the project
+        :param str body:
+            (optional), body of the project
+        :returns:
+            the created project
+        :rtype:
+            :class:`~github3.projects.Project`
         """
         url = self._build_url('projects', base_url=self._api)
         data = {'name': name, 'body': body}
@@ -701,19 +839,25 @@ class _Repository(GitHubCore):
         json = None
         if data:
             json = self._json(self._post(
-                url, data=data, headers=Project.CUSTOM_HEADERS), 201)
-        return self._instance_or_null(Project, json)
+                url, data=data, headers=projects.Project.CUSTOM_HEADERS), 201)
+        return self._instance_or_null(projects.Project, json)
 
     @requires_auth
     def create_pull(self, title, base, head, body=None):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
-        :param str title: (required)
-        :param str base: (required), e.g., 'master'
-        :param str head: (required), e.g., 'username:branch'
-        :param str body: (optional), markdown formatted description
-        :returns: :class:`ShortPullRequest <github3.pulls.ShortPullRequest>`
-            if successful, else None
+        :param str title:
+            (required)
+        :param str base:
+            (required), e.g., 'master'
+        :param str head:
+            (required), e.g., 'username:branch'
+        :param str body:
+            (optional), markdown formatted description
+        :returns:
+            the created pull request
+        :rtype:
+            :class:`~github3.pulls.ShortPullRequest`
         """
         data = {'title': title, 'body': body, 'base': base,
                 'head': head}
@@ -723,11 +867,16 @@ class _Repository(GitHubCore):
     def create_pull_from_issue(self, issue, base, head):
         """Create a pull request from issue #``issue``.
 
-        :param int issue: (required), issue number
-        :param str base: (required), e.g., 'master'
-        :param str head: (required), e.g., 'username:branch'
-        :returns: :class:`ShortPullRequest <github3.pulls.ShortPullRequest>`
-            if successful, else None
+        :param int issue:
+            (required), issue number
+        :param str base:
+            (required), e.g., 'master'
+        :param str head:
+            (required), e.g., 'username:branch'
+        :returns:
+            the created pull request
+        :rtype:
+            :class:`~github3.pulls.ShortPullRequest`
         """
         if int(issue) > 0:
             data = {'issue': issue, 'base': base, 'head': head}
@@ -738,62 +887,82 @@ class _Repository(GitHubCore):
     def create_ref(self, ref, sha):
         """Create a reference in this repository.
 
-        :param str ref: (required), fully qualified name of the reference,
+        :param str ref:
+            (required), fully qualified name of the reference,
             e.g. ``refs/heads/master``. If it doesn't start with ``refs`` and
             contain at least two slashes, GitHub's API will reject it.
-        :param str sha: (required), SHA1 value to set the reference to
-        :returns: :class:`Reference <github3.git.Reference>` if successful
-            else None
+        :param str sha:
+            (required), SHA1 value to set the reference to
+        :returns:
+            the created ref
+        :rtype:
+            :class:`~github3.git.Reference`
         """
         json = None
         if ref and ref.startswith('refs') and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
             url = self._build_url('git', 'refs', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Reference, json)
+        return self._instance_or_null(git.Reference, json)
 
     @requires_auth
     def create_release(self, tag_name, target_commitish=None, name=None,
                        body=None, draft=False, prerelease=False):
         """Create a release for this repository.
 
-        :param str tag_name: (required), name to give to the tag
-        :param str target_commitish: (optional), vague concept of a target,
-            either a SHA or a branch name.
-        :param str name: (optional), name of the release
-        :param str body: (optional), description of the release
-        :param bool draft: (optional), whether this release is a draft or not
-        :param bool prerelease: (optional), whether this is a prerelease or
-            not
-        :returns: :class:`Release <github3.repos.release.Release>`
+        :param str tag_name:
+            (required), name to give to the tag
+        :param str target_commitish:
+            (optional), vague concept of a target, either a SHA or a branch
+            name.
+        :param str name:
+            (optional), name of the release
+        :param str body:
+            (optional), description of the release
+        :param bool draft:
+            (optional), whether this release is a draft or not
+        :param bool prerelease:
+            (optional), whether this is a prerelease or not
+        :returns:
+            the created release
+        :rtype:
+            :class:`~github3.repos.release.Release`
         """
-        data = {'tag_name': str(tag_name),
-                'target_commitish': target_commitish,
-                'name': name,
-                'body': body,
-                'draft': draft,
-                'prerelease': prerelease
-                }
+        data = {
+            'tag_name': str(tag_name),
+            'target_commitish': target_commitish,
+            'name': name,
+            'body': body,
+            'draft': draft,
+            'prerelease': prerelease,
+        }
         self._remove_none(data)
 
         url = self._build_url('releases', base_url=self._api)
         json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Release, json)
+        return self._instance_or_null(release.Release, json)
 
     @requires_auth
     def create_status(self, sha, state, target_url=None, description=None,
                       context='default'):
         """Create a status object on a commit.
 
-        :param str sha: (required), SHA of the commit to create the status on
-        :param str state: (required), state of the test; only the following
+        :param str sha:
+            (required), SHA of the commit to create the status on
+        :param str state:
+            (required), state of the test; only the following
             are accepted: 'pending', 'success', 'error', 'failure'
-        :param str target_url: (optional), URL to associate with this status.
-        :param str description: (optional), short description of the status
-        :param str context: (optional), A string label to differentiate this
+        :param str target_url:
+            (optional), URL to associate with this status.
+        :param str description:
+            (optional), short description of the status
+        :param str context:
+            (optional), A string label to differentiate this
             status from the status of other systems
-        :returns: the status created if successful
-        :rtype: :class:`~github3.repos.status.Status`
+        :returns:
+            the created status
+        :rtype:
+            :class:`~github3.repos.status.Status`
         """
         json = None
         if sha and state:
@@ -802,7 +971,7 @@ class _Repository(GitHubCore):
             url = self._build_url('statuses', sha, base_url=self._api)
             self._remove_none(data)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Status, json)
+        return self._instance_or_null(status.Status, json)
 
     @requires_auth
     def create_tag(self, tag, message, sha, obj_type, tagger,
@@ -820,18 +989,27 @@ class _Repository(GitHubCore):
 
         This behaviour is required by the GitHub API.
 
-        :param str tag: (required), name of the tag
-        :param str message: (required), tag message
-        :param str sha: (required), SHA of the git object this is tagging
-        :param str obj_type: (required), type of object being tagged, e.g.,
-            'commit', 'tree', 'blob'
-        :param dict tagger: (required), containing the name, email of the
+        :param str tag:
+            (required), name of the tag
+        :param str message:
+            (required), tag message
+        :param str sha:
+            (required), SHA of the git object this is tagging
+        :param str obj_type:
+            (required), type of object being tagged, e.g., 'commit', 'tree',
+            'blob'
+        :param dict tagger:
+            (required), containing the name, email of the
             tagger and the date it was tagged
-        :param bool lightweight: (optional), if False, create an annotated
+        :param bool lightweight:
+            (optional), if False, create an annotated
             tag, otherwise create a lightweight tag (a Reference).
-        :returns: If lightweight == False: :class:`Tag <github3.git.Tag>` if
-            successful, else None. If lightweight == True: :class:`Reference
-            <github3.git.Reference>`
+        :returns:
+            if creating a lightweight tag, this will return a
+            :class:`~github3.git.Reference`, otherwise it will return a
+            :class:`~github3.git.Tag`
+        :rtype:
+            :class:`~github3.git.Tag` or :class:`~github3.git.Reference`
         """
         if lightweight and tag and sha:
             return self.create_ref('refs/tags/' + tag, sha)
@@ -844,18 +1022,22 @@ class _Repository(GitHubCore):
             json = self._json(self._post(url, data=data), 201)
             if json:
                 self.create_ref('refs/tags/' + tag, json.get('sha'))
-        return self._instance_or_null(Tag, json)
+        return self._instance_or_null(git.Tag, json)
 
     @requires_auth
     def create_tree(self, tree, base_tree=None):
         """Create a tree on this repository.
 
-        :param list tree: (required), specifies the tree structure.
+        :param list tree:
+            (required), specifies the tree structure.
             Format: [{'path': 'path/file', 'mode':
             'filemode', 'type': 'blob or tree', 'sha': '44bfc6d...'}]
-        :param str base_tree: (optional), SHA1 of the tree you want
-            to update with new data
-        :returns: :class:`Tree <github3.git.Tree>` if successful, else None
+        :param str base_tree:
+            (optional), SHA1 of the tree you want to update with new data
+        :returns:
+            the created tree
+        :rtype:
+            :class:`~github3.git.Tree`
         """
         json = None
         if tree and isinstance(tree, list):
@@ -864,13 +1046,16 @@ class _Repository(GitHubCore):
                 data['base_tree'] = base_tree
             url = self._build_url('git', 'trees', base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(Tree, json)
+        return self._instance_or_null(git.Tree, json)
 
     @requires_auth
     def delete(self):
         """Delete this repository.
 
-        :returns: bool -- True if successful, False otherwise
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
@@ -878,7 +1063,10 @@ class _Repository(GitHubCore):
     def delete_key(self, key_id):
         """Delete the key with the specified id from your deploy keys list.
 
-        :returns: bool -- True if successful, False otherwise
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         if int(key_id) <= 0:
             return False
@@ -889,7 +1077,10 @@ class _Repository(GitHubCore):
     def delete_subscription(self):
         """Delete the user's subscription to this repository.
 
-        :returns: bool
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         url = self._build_url('subscription', base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
@@ -897,27 +1088,34 @@ class _Repository(GitHubCore):
     def deployment(self, id):
         """Retrieve the deployment identified by ``id``.
 
-        :param int id: (required), id for deployments.
-        :returns: :class:`~github3.repos.deployment.Deployment`
+        :param int id:
+            (required), id for deployments.
+        :returns:
+            the deployment
+        :rtype:
+            :class:`~github3.repos.deployment.Deployment`
         """
         json = None
         if int(id) > 0:
             url = self._build_url('deployments', str(id), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Deployment, json)
+        return self._instance_or_null(deployment.Deployment, json)
 
     def deployments(self, number=-1, etag=None):
-        r"""Iterate over deployments for this repository.
+        """Iterate over deployments for this repository.
 
-        :param int number: (optional), number of deployments to return.
+        :param int number:
+            (optional), number of deployments to return.
             Default: -1, returns all available deployments
-        :param str etag: (optional), ETag from a previous request for all
-            deployments
-        :returns: generator of
-            :class:`Deployment <github3.repos.deployment.Deployment>`\ s
+        :param str etag:
+            (optional), ETag from a previous request for all deployments
+        :returns:
+            generator of deployments
+        :rtype:
+            :class:`~github3.repos.deployment.Deployment`
         """
         url = self._build_url('deployments', base_url=self._api)
-        i = self._iter(int(number), url, Deployment, etag=etag)
+        i = self._iter(int(number), url, deployment.Deployment, etag=etag)
         return i
 
     def directory_contents(self, directory_path, ref=None, return_as=list):
@@ -940,18 +1138,23 @@ class _Repository(GitHubCore):
 
             contents = repo.directory_contents('path/to/dir/', return_as=dict)
 
-        :param str path: (required), path to file, e.g.
-            github3/repos/repo.py
-        :param str ref: (optional), the string name of a commit/branch/tag.
+        :param str path:
+            (required), path to file, e.g.  github3/repos/repo.py
+        :param str ref:
+            (optional), the string name of a commit/branch/tag.
             Default: master
-        :param return_as: (optional), how to return the directory's contents.
+        :param return_as:
+            (optional), how to return the directory's contents.
             Default: :class:`list`
-        :returns: list of tuples of the filename and the Contents returned
-        :rtype: list((str, :class:`~github3.repos.contents.Contents`))
+        :returns:
+            list of tuples of the filename and the Contents returned
+        :rtype:
+            [(str, :class:`~github3.repos.contents.Contents`)]
         """
         url = self._build_url('contents', directory_path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200) or []
-        return return_as((j.get('name'), Contents(j, self)) for j in json)
+        return return_as((j.get('name'), contents.Contents(j, self))
+                         for j in json)
 
     @requires_auth
     def edit(self, name, description=None, homepage=None, private=None,
@@ -959,31 +1162,43 @@ class _Repository(GitHubCore):
              default_branch=None, archived=None):
         """Edit this repository.
 
-        :param str name: (required), name of the repository
-        :param str description: (optional), If not ``None``, change the
+        :param str name:
+            (required), name of the repository
+        :param str description:
+            (optional), If not ``None``, change the
             description for this repository. API default: ``None`` - leave
             value unchanged.
-        :param str homepage: (optional), If not ``None``, change the homepage
+        :param str homepage:
+            (optional), If not ``None``, change the homepage
             for this repository. API default: ``None`` - leave value unchanged.
-        :param bool private: (optional), If ``True``, make the repository
+        :param bool private:
+            (optional), If ``True``, make the repository
             private. If ``False``, make the repository public. API default:
             ``None`` - leave value unchanged.
-        :param bool has_issues: (optional), If ``True``, enable issues for
+        :param bool has_issues:
+            (optional), If ``True``, enable issues for
             this repository. If ``False``, disable issues for this repository.
             API default: ``None`` - leave value unchanged.
-        :param bool has_wiki: (optional), If ``True``, enable the wiki for
+        :param bool has_wiki:
+            (optional), If ``True``, enable the wiki for
             this repository. If ``False``, disable the wiki for this
             repository. API default: ``None`` - leave value unchanged.
-        :param bool has_downloads: (optional), If ``True``, enable downloads
+        :param bool has_downloads:
+            (optional), If ``True``, enable downloads
             for this repository. If ``False``, disable downloads for this
             repository. API default: ``None`` - leave value unchanged.
-        :param str default_branch: (optional), If not ``None``, change the
+        :param str default_branch:
+            (optional), If not ``None``, change the
             default branch for this repository. API default: ``None`` - leave
             value unchanged.
-        :param bool archived: (optional), If not ``None``, toggle the archived
+        :param bool archived:
+            (optional), If not ``None``, toggle the archived
             attribute on the repository to control whether it is archived or
             not.
-        :returns: bool -- True if successful, False otherwise
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         edit = {'name': name, 'description': description, 'homepage': homepage,
                 'private': private, 'has_issues': has_issues,
@@ -992,47 +1207,63 @@ class _Repository(GitHubCore):
         self._remove_none(edit)
         json = None
         if edit:
-            json = self._json(self._patch(self._api, data=dumps(edit)), 200)
+            json = self._json(self._patch(
+                self._api,
+                data=jsonlib.dumps(edit)
+            ), 200)
             self._update_attributes(json)
             return True
         return False
 
     def events(self, number=-1, etag=None):
-        r"""Iterate over events on this repository.
+        """Iterate over events on this repository.
 
-        :param int number: (optional), number of events to return. Default: -1
+        :param int number:
+            (optional), number of events to return. Default: -1
             returns all available events
-        :param str etag: (optional), ETag from a previous request to the same
+        :param str etag:
+            (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        :returns:
+            generator of events
+        :rtype:
+            :class:`~github3.events.Event`
         """
         url = self._build_url('events', base_url=self._api)
-        return self._iter(int(number), url, Event, etag=etag)
+        return self._iter(int(number), url, events.Event, etag=etag)
 
     def file_contents(self, path, ref=None):
         """Get the contents of the file pointed to by ``path``.
 
-        :param str path: (required), path to file, e.g.
-            github3/repos/repo.py
-        :param str ref: (optional), the string name of a commit/branch/tag.
+        :param str path:
+            (required), path to file, e.g.  github3/repos/repo.py
+        :param str ref:
+            (optional), the string name of a commit/branch/tag.
             Default: master
-        :returns: the contents of the file requested
-        :rtype: :class:`~github3.repos.contents.Contents`
+        :returns:
+            the contents of the file requested
+        :rtype:
+            :class:`~github3.repos.contents.Contents`
         """
         url = self._build_url('contents', path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200)
-        return self._instance_or_null(Contents, json)
+        return self._instance_or_null(contents.Contents, json)
 
     def forks(self, sort='', number=-1, etag=None):
         """Iterate over forks of this repository.
 
-        :param str sort: (optional), accepted values:
+        :param str sort:
+            (optional), accepted values:
             ('newest', 'oldest', 'watchers'), API default: 'newest'
-        :param int number: (optional), number of forks to return. Default: -1
+        :param int number:
+            (optional), number of forks to return. Default: -1
             returns all forks
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`~github3.repos.repo.ShortRepository`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of forks of this repository
+        :rtype:
+            :class:`~github3.repos.repo.ShortRepository`
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
@@ -1043,42 +1274,52 @@ class _Repository(GitHubCore):
     def git_commit(self, sha):
         """Get a single (git) commit.
 
-        :param str sha: (required), sha of the commit
-        :returns: :class:`Commit <github3.git.Commit>` if successful,
-            otherwise None
+        :param str sha:
+            (required), sha of the commit
+        :returns:
+            the single commit data from git
+        :rtype:
+            :class:`~github3.git.Commit`
         """
         json = {}
         if sha:
             url = self._build_url('git', 'commits', sha, base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Commit, json)
+        return self._instance_or_null(git.Commit, json)
 
     @requires_auth
     def hook(self, hook_id):
         """Get a single hook.
 
-        :param int hook_id: (required), id of the hook
-        :returns: :class:`Hook <github3.repos.hook.Hook>` if successful,
-            otherwise None
+        :param int hook_id:
+            (required), id of the hook
+        :returns:
+            the hook
+        :rtype:
+            :class:`~github3.repos.hook.Hook`
         """
         json = None
         if int(hook_id) > 0:
             url = self._build_url('hooks', str(hook_id), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Hook, json)
+        return self._instance_or_null(hook.Hook, json)
 
     @requires_auth
     def hooks(self, number=-1, etag=None):
-        r"""Iterate over hooks registered on this repository.
+        """Iterate over hooks registered on this repository.
 
-        :param int number: (optional), number of hoks to return. Default: -1
+        :param int number:
+            (optional), number of hoks to return. Default: -1
             returns all hooks
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Hook <github3.repos.hook.Hook>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of hooks
+        :rtype:
+            :class:`~github3.repos.hook.Hook`
         """
         url = self._build_url('hooks', base_url=self._api)
-        return self._iter(int(number), url, Hook, etag=etag)
+        return self._iter(int(number), url, hook.Hook, etag=etag)
 
     @requires_auth
     def ignore(self):
@@ -1088,25 +1329,35 @@ class _Repository(GitHubCore):
 
         This replaces ``Repository#set_subscription``.
 
-        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        :returns:
+            the new repository subscription
+        :rtype:
+            :class:~github3.notifications.RepositorySubscription`
         """
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=dumps({'ignored': True})), 200)
-        return self._instance_or_null(Subscription, json)
+        json = self._json(self._put(url, data=jsonlib.dumps({
+            'ignored': True,
+        })), 200)
+        return self._instance_or_null(notifications.RepositorySubscription,
+                                      json)
 
     @requires_auth
     def imported_issue(self, imported_issue_id):
         """Retrieve imported issue specified by imported issue id.
 
-        :param int imported_issue_id: (required) id of imported issue
-        :returns: :class:`Imported Issue <github3.repos.
-            issue_import.ImportedIssue>`
+        :param int imported_issue_id:
+            (required) id of imported issue
+        :returns:
+            the imported issue
+        :rtype:
+            :class:`~github3.repos.issue_import.ImportedIssue`
         """
         url = self._build_url('import/issues', imported_issue_id,
                               base_url=self._api)
-        data = self._get(url, headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+        data = self._get(
+            url, headers=issue_import.ImportedIssue.IMPORT_CUSTOM_HEADERS)
         json = self._json(data, 200)
-        return self._instance_or_null(ImportedIssue, json)
+        return self._instance_or_null(issue_import.ImportedIssue, json)
 
     @requires_auth
     def imported_issues(self, number=-1, since=None, etag=None):
@@ -1114,27 +1365,33 @@ class _Repository(GitHubCore):
 
         See also: https://gist.github.com/jonmagic/5282384165e0f86ef105
 
-        :param int number: (optional), number of imported issues to return.
+        :param int number:
+            (optional), number of imported issues to return.
             Default: -1 returns all branches
-        :param since: (optional), Only imported issues after this date will
+        :param since:
+            (optional), Only imported issues after this date will
             be returned. This can be a ``datetime`` instance, ISO8601
             formatted date string, or a string formatted like so:
             ``2016-02-04`` i.e. ``%Y-%m-%d``
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`ImportedIssue <github3.repos.
-            issue_import.ImportedIssue>`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of imported issues
+        :rtype:
+            :class:`~github3.repos.issue_import.ImportedIssue`
         """
         data = {
-            'since': timestamp_parameter(since)
+            'since': utils.timestamp_parameter(since)
         }
 
         self._remove_none(data)
         url = self._build_url('import/issues', base_url=self._api)
 
-        return self._iter(int(number), url, ImportedIssue, etag=etag,
-                          params=data,
-                          headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+        return self._iter(
+            int(number), url, issue_import.ImportedIssue, etag=etag,
+            params=data,
+            headers=issue_import.ImportedIssue.IMPORT_CUSTOM_HEADERS,
+        )
 
     @requires_auth
     def import_issue(self, title, body, created_at, assignee=None,
@@ -1143,23 +1400,35 @@ class _Repository(GitHubCore):
 
         See also: https://gist.github.com/jonmagic/5282384165e0f86ef105
 
-        :param string title: (required) Title of issue
-        :param string body: (required) Body of issue
-        :param timestamp created_at: (required) Creation timestamp
-        :param string assignee: (optional) Username to assign issue to
-        :param int milestone: (optional) Milestone ID
-        :param boolean closed: (optional) Status of issue is Closed if True
-        :param list labels: (optional) List of labels containing string names
-        :param list comments: (optional) List of dictionaries which contain
+        :param string title:
+            (required) Title of issue
+        :param string body:
+            (required) Body of issue
+        :param created_at:
+            (required) Creation timestamp
+        :type created_at:
+            :class:`~datetime.datetime` or str
+        :param string assignee:
+            (optional) Username to assign issue to
+        :param int milestone:
+            (optional) Milestone ID
+        :param boolean closed:
+            (optional) Status of issue is Closed if True
+        :param list labels:
+            (optional) List of labels containing string names
+        :param list comments:
+            (optional) List of dictionaries which contain
             created_at and body attributes
-        :returns: :class:`ImportedIssue <github3.repos.
-            issue_import.ImportedIssue>`
+        :returns:
+            the imported issue
+        :rtype:
+            :class:`~github3.repos.issue_import.ImportedIssue`
         """
         issue = {
             'issue': {
                 'title': title,
                 'body': body,
-                'created_at': created_at,
+                'created_at': utils.timestamp_parameter(created_at),
                 'assignee': assignee,
                 'milestone': milestone,
                 'closed': closed,
@@ -1172,18 +1441,23 @@ class _Repository(GitHubCore):
         self._remove_none(issue['issue'])
         url = self._build_url('import/issues', base_url=self._api)
 
-        data = self._post(url, data=issue,
-                          headers=ImportedIssue.IMPORT_CUSTOM_HEADERS)
+        data = self._post(
+            url, data=issue,
+            headers=issue_import.ImportedIssue.IMPORT_CUSTOM_HEADERS,
+        )
 
         json = self._json(data, 202)
-        return self._instance_or_null(ImportedIssue, json)
+        return self._instance_or_null(issue_import.ImportedIssue, json)
 
     def is_assignee(self, username):
         """Check if the user can be assigned an issue on this repository.
 
-        :param username: name of the user to check
-        :type username: str or :class:`User <github3.users.User>`
-        :returns: :class:`bool`
+        :param username:
+            name of the user to check
+        :type username:
+            str or :class:`~github3.users.User`
+        :returns:
+            bool
         """
         if not username:
             return False
@@ -1194,9 +1468,14 @@ class _Repository(GitHubCore):
     def is_collaborator(self, username):
         """Check to see if ``username`` is a collaborator on this repository.
 
-        :param username: (required), login for the user
-        :type username: str or :class:`User <github3.users.User>`
-        :returns: bool -- True if successful, False otherwise
+        :param username:
+            (required), login for the user
+        :type username:
+            str or :class:`~github3.users.User`
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         if not username:
             return False
@@ -1207,73 +1486,94 @@ class _Repository(GitHubCore):
     def issue(self, number):
         """Get the issue specified by ``number``.
 
-        :param int number: (required), number of the issue on this repository
-        :returns: :class:`Issue <github3.issues.Issue>` if successful,
-            otherwise None
+        :param int number:
+            (required), number of the issue on this repository
+        :returns:
+            the issue
+        :rtype:
+            :class:`~github3.issues.issue.Issue`
         """
         json = None
         if int(number) > 0:
             url = self._build_url('issues', str(number), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Issue, json)
+        return self._instance_or_null(issues.Issue, json)
 
     def issue_events(self, number=-1, etag=None):
-        r"""Iterate over issue events on this repository.
+        """Iterate over issue events on this repository.
 
-        :param int number: (optional), number of events to return. Default: -1
+        :param int number:
+            (optional), number of events to return. Default: -1
             returns all available events
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`IssueEvent <github3.issues.event.IssueEvent>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of events on issues
+        :rtype:
+            :class:`~github3.issues.event.IssueEvent`
         """
         url = self._build_url('issues', 'events', base_url=self._api)
-        return self._iter(int(number), url, IssueEvent, etag=etag)
+        return self._iter(int(number), url, ievent.RepositoryIssueEvent,
+                          etag=etag)
 
     def issues(self, milestone=None, state=None, assignee=None, mentioned=None,
                labels=None, sort=None, direction=None, since=None, number=-1,
                etag=None):
-        r"""Iterate over issues on this repo based upon parameters passed.
+        """Iterate over issues on this repo based upon parameters passed.
 
         .. versionchanged:: 0.9.0
 
             The ``state`` parameter now accepts 'all' in addition to 'open'
             and 'closed'.
 
-        :param int milestone: (optional), 'none', or '*'
-        :param str state: (optional), accepted values: ('all', 'open',
-            'closed')
-        :param str assignee: (optional), 'none', '*', or login name
-        :param str mentioned: (optional), user's login name
-        :param str labels: (optional), comma-separated list of labels, e.g.
-            'bug,ui,@high'
-        :param sort: (optional), accepted values:
+        :param int milestone:
+            (optional), 'none', or '*'
+        :param str state:
+            (optional), accepted values: ('all', 'open', 'closed')
+        :param str assignee:
+            (optional), 'none', '*', or login name
+        :param str mentioned:
+            (optional), user's login name
+        :param str labels:
+            (optional), comma-separated list of labels, e.g.  'bug,ui,@high'
+        :param sort:
+            (optional), accepted values:
             ('created', 'updated', 'comments', 'created')
-        :param str direction: (optional), accepted values: ('asc', 'desc')
-        :param since: (optional), Only issues after this date will
+        :param str direction:
+            (optional), accepted values: ('asc', 'desc')
+        :param since:
+            (optional), Only issues after this date will
             be returned. This can be a ``datetime`` or an ``ISO8601`` formatted
             date string, e.g., 2012-05-20T23:10:27Z
-        :type since: datetime or string
-        :param int number: (optional), Number of issues to return.
+        :type since:
+            :class:`~datetime.datetime` or str
+        :param int number:
+            (optional), Number of issues to return.
             By default all issues are returned
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`ShortIssue <github3.issues.ShortIssue>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of issues
+        :rtype:
+            :class:`~github3.issues.ShortIssue`
         """
         url = self._build_url('issues', base_url=self._api)
 
         params = repo_issue_params(milestone, state, assignee, mentioned,
                                    labels, sort, direction, since)
 
-        return self._iter(int(number), url, ShortIssue, params, etag)
+        return self._iter(int(number), url, issues.ShortIssue, params, etag)
 
     @requires_auth
     def key(self, id_num):
         """Get the specified deploy key.
 
-        :param int id_num: (required), id of the key
-        :returns: :class:`~github3.users.Key` if successful, else None
+        :param int id_num:
+            (required), id of the key
+        :returns:
+            the deploy key
+        :rtype:
+            :class:`~github3.users.Key`
         """
         json = None
         if int(id_num) > 0:
@@ -1283,13 +1583,18 @@ class _Repository(GitHubCore):
 
     @requires_auth
     def keys(self, number=-1, etag=None):
-        r"""Iterate over deploy keys on this repository.
+        """Iterate over deploy keys on this repository.
 
-        :param int number: (optional), number of keys to return. Default: -1
+        :param int number:
+            (optional), number of keys to return. Default: -1
             returns all available keys
-        :param str etag: (optional), ETag from a previous request to the same
+        :param str etag:
+            (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`~github3.users.Key`\ s
+        :returns:
+            generator of keys
+        :rtype:
+            :class:`~github3.users.Key`
         """
         url = self._build_url('keys', base_url=self._api)
         return self._iter(int(number), url, users.Key, etag=etag)
@@ -1297,36 +1602,47 @@ class _Repository(GitHubCore):
     def label(self, name):
         """Get the label specified by ``name``.
 
-        :param str name: (required), name of the label
-        :returns: :class:`Label <github3.issues.label.Label>` if successful,
-            else None
+        :param str name:
+            (required), name of the label
+        :returns:
+            the label
+        :rtype:
+            :class:`~github3.issues.label.Label`
         """
         json = None
         if name:
             url = self._build_url('labels', name, base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Label, json)
+        return self._instance_or_null(label.Label, json)
 
     def labels(self, number=-1, etag=None):
-        r"""Iterate over labels on this repository.
+        """Iterate over labels on this repository.
 
-        :param int number: (optional), number of labels to return. Default: -1
+        :param int number:
+            (optional), number of labels to return. Default: -1
             returns all available labels
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Label <github3.issues.label.Label>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of labels
+        :rtype:
+            :class:`~github3.issues.label.Label`
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, Label, etag=etag)
+        return self._iter(int(number), url, label.Label, etag=etag)
 
     def languages(self, number=-1, etag=None):
         """Iterate over the programming languages used in the repository.
 
-        :param int number: (optional), number of languages to return. Default:
+        :param int number:
+            (optional), number of languages to return. Default:
             -1 returns all used languages
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of tuples
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of tuples
+        :rtype:
+            tuple
         """
         url = self._build_url('languages', base_url=self._api)
         return self._iter(int(number), url, tuple, etag=etag)
@@ -1335,94 +1651,123 @@ class _Repository(GitHubCore):
     def latest_pages_build(self):
         """Get the build information for the most recent Pages build.
 
-        :returns: :class:`PagesBuild <github3.repos.pages.PagesBuild>`
+        :returns:
+            the information for the most recent build
+        :rtype:
+            :class:`~github3.repos.pages.PagesBuild`
         """
         url = self._build_url('pages', 'builds', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(PagesBuild, json)
+        return self._instance_or_null(pages.PagesBuild, json)
 
     def latest_release(self):
         """Get the latest release.
 
         Draft releases and prereleases are not returned by this endpoint.
 
-        :returns: :class:`Release <github3.repos.release.Release>`
+        :returns:
+            the release
+        :rtype:
+            :class:`~github3.repos.release.Release`
         """
         url = self._build_url('releases', 'latest', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Release, json)
+        return self._instance_or_null(release.Release, json)
 
     def license(self):
         """Get the contents of a license for the repo.
 
-        :returns: :class:`License <github3.licenses.License>`
+        :returns:
+            the license
+        :rtype:
+            :class:`~github3.licenses.RepositoryLicense`
         """
         url = self._build_url('license', base_url=self._api)
-        json = self._json(self._get(url, headers=License.CUSTOM_HEADERS), 200)
-        return self._instance_or_null(License, json)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(licenses.RepositoryLicense, json)
 
     @requires_auth
     def mark_notifications(self, last_read=''):
         """Mark all notifications in this repository as read.
 
-        :param str last_read: (optional), Describes the last point that
+        :param str last_read:
+            (optional), Describes the last point that
             notifications were checked. Anything updated since this time will
             not be updated. Default: Now. Expected in ISO 8601 format:
             ``YYYY-MM-DDTHH:MM:SSZ``. Example: "2012-10-09T23:39:01Z".
-        :returns: bool
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         url = self._build_url('notifications', base_url=self._api)
         mark = {'read': True}
         if last_read:
             mark['last_read_at'] = last_read
-        return self._boolean(self._put(url, data=dumps(mark)),
+        return self._boolean(self._put(url, data=jsonlib.dumps(mark)),
                              205, 404)
 
     @requires_auth
     def merge(self, base, head, message=''):
         """Perform a merge from ``head`` into ``base``.
 
-        :param str base: (required), where you're merging into
-        :param str head: (required), where you're merging from
-        :param str message: (optional), message to be used for the commit
-        :returns: :class:`RepoCommit <github3.repos.commit.RepoCommit>`
+        :param str base:
+            (required), where you're merging into
+        :param str head:
+            (required), where you're merging from
+        :param str message:
+            (optional), message to be used for the commit
+        :returns:
+            the commit resulting from the merge
+        :rtype:
+            :class:`~github3.repos.commit.RepoCommit`
         """
         url = self._build_url('merges', base_url=self._api)
         data = {'base': base, 'head': head}
         if message:
             data['commit_message'] = message
         json = self._json(self._post(url, data=data), 201)
-        return self._instance_or_null(RepoCommit, json)
+        return self._instance_or_null(commit.ShortCommit, json)
 
     def milestone(self, number):
         """Get the milestone indicated by ``number``.
 
-        :param int number: (required), unique id number of the milestone
-        :returns: :class:`Milestone <github3.issues.milestone.Milestone>`
+        :param int number:
+            (required), unique id number of the milestone
+        :returns:
+            the milestone
+        :rtype:
+            :class:`~github3.issues.milestone.Milestone`
         """
         json = None
         if int(number) > 0:
             url = self._build_url('milestones', str(number),
                                   base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Milestone, json)
+        return self._instance_or_null(milestone.Milestone, json)
 
     def milestones(self, state=None, sort=None, direction=None, number=-1,
                    etag=None):
-        r"""Iterate over the milestones on this repository.
+        """Iterate over the milestones on this repository.
 
-        :param str state: (optional), state of the milestones, accepted
+        :param str state:
+            (optional), state of the milestones, accepted
             values: ('open', 'closed')
-        :param str sort: (optional), how to sort the milestones, accepted
+        :param str sort:
+            (optional), how to sort the milestones, accepted
             values: ('due_date', 'completeness')
-        :param str direction: (optional), direction to sort the milestones,
+        :param str direction:
+            (optional), direction to sort the milestones,
             accepted values: ('asc', 'desc')
-        :param int number: (optional), number of milestones to return.
+        :param int number:
+            (optional), number of milestones to return.
             Default: -1 returns all milestones
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`Milestone <github3.issues.milestone.Milestone>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of milestones
+        :rtype:
+            :class:`~github3.issues.milestone.Milestone`
         """
         url = self._build_url('milestones', base_url=self._api)
         accepted = {'state': ('open', 'closed', 'all'),
@@ -1434,111 +1779,146 @@ class _Repository(GitHubCore):
                 del params[k]
         if not params:
             params = None
-        return self._iter(int(number), url, Milestone, params, etag)
+        return self._iter(int(number), url, milestone.Milestone, params, etag)
 
     def network_events(self, number=-1, etag=None):
         r"""Iterate over events on a network of repositories.
 
-        :param int number: (optional), number of events to return. Default: -1
+        :param int number:
+            (optional), number of events to return. Default: -1
             returns all available events
-        :param str etag: (optional), ETag from a previous request to the same
+        :param str etag:
+            (optional), ETag from a previous request to the same
             endpoint
-        :returns: generator of :class:`Event <github3.events.Event>`\ s
+        :returns:
+            generator of events
+        :rtype:
+            :class:`~github3.events.Event`
         """
         base = self._api.replace('repos', 'networks', 1)
         url = self._build_url('events', base_url=base)
-        return self._iter(int(number), url, Event, etag)
+        return self._iter(int(number), url, events.Event, etag)
 
     @requires_auth
     def notifications(self, all=False, participating=False, since=None,
                       number=-1, etag=None):
-        r"""Iterate over the notifications for this repository.
+        """Iterate over the notifications for this repository.
 
-        :param bool all: (optional), show all notifications, including ones
+        :param bool all:
+            (optional), show all notifications, including ones
             marked as read
-        :param bool participating: (optional), show only the notifications the
+        :param bool participating:
+            (optional), show only the notifications the
             user is participating in directly
-        :param since: (optional), filters out any notifications updated
+        :param since:
+            (optional), filters out any notifications updated
             before the given time. This can be a `datetime` or an `ISO8601`
             formatted date string, e.g., 2012-05-20T23:10:27Z
-        :type since: datetime or string
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Thread <github3.notifications.Thread>`
+        :type since:
+            :class:`~datetime.datetime` or str
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of notification threads
+        :rtype:
+            :class:`~github3.notifications.Thread`
         """
         url = self._build_url('notifications', base_url=self._api)
         params = {
             'all': str(all).lower(),
             'participating': str(participating).lower(),
-            'since': timestamp_parameter(since)
+            'since': utils.timestamp_parameter(since)
         }
         self._remove_none(params)
-        return self._iter(int(number), url, Thread, params, etag)
+        return self._iter(
+            int(number), url, notifications.Thread, params, etag
+        )
 
     @requires_auth
     def pages(self):
         """Get information about this repository's pages site.
 
-        :returns: :class:`PagesInfo <github3.repos.pages.PagesInfo>`
+        :returns:
+            information about this repository's GitHub pages site
+        :rtype:
+            :class:`~github3.repos.pages.PagesInfo`
         """
         url = self._build_url('pages', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(PagesInfo, json)
+        return self._instance_or_null(pages.PagesInfo, json)
 
     @requires_auth
     def pages_builds(self, number=-1, etag=None):
         """Iterate over pages builds of this repository.
 
-        :returns: generator of :class:`PagesBuild
-            <github3.repos.pages.PagesBuild>`
+        :param int number:
+            (optional) the number of builds to return
+        :param str etag:
+            (optional), ETag value from a previous request
+        :returns:
+            generator of builds
+        :rtype:
+            :class:`~github3.repos.pages.PagesBuild`
         """
         url = self._build_url('pages', 'builds', base_url=self._api)
-        return self._iter(int(number), url, PagesBuild, etag=etag)
+        return self._iter(int(number), url, pages.PagesBuild, etag=etag)
 
     def project(self, id, etag=None):
         """Return the organization project with the given ID.
 
-        :param int id: (required), ID number of the project
-        :returns: :class:`Project <github3.projects.Project>` if successful,
-            otherwise None
+        :param int id:
+            (required), ID number of the project
+        :returns:
+            the project
+        :rtype:
+            :class:`~github3.projects.Project`
         """
         url = self._build_url('projects', id, base_url=self._github_url)
-        json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
-        return self._instance_or_null(Project, json)
+        json = self._json(self._get(
+            url, headers=projects.Project.CUSTOM_HEADERS), 200)
+        return self._instance_or_null(projects.Project, json)
 
     def projects(self, number=-1, etag=None):
         """Iterate over projects for this organization.
 
-        :param int number: (optional), number of members to return. Default:
+        :param int number:
+            (optional), number of members to return. Default:
             -1 will return all available.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Project <github3.projects.Project>`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of projects
+        :rtype:
+            :class:`~github3.projects.Project`
         """
         url = self._build_url('projects', base_url=self._api)
         return self._iter(
             int(number),
             url,
-            Project,
+            projects.Project,
             etag=etag,
-            headers=Project.CUSTOM_HEADERS
+            headers=projects.Project.CUSTOM_HEADERS
         )
 
     def pull_request(self, number):
         """Get the pull request indicated by ``number``.
 
-        :param int number: (required), number of the pull request.
-        :returns: :class:`PullRequest <github3.pulls.PullRequest>`
+        :param int number:
+            (required), number of the pull request.
+        :returns:
+            the pull request
+        :rtype:
+            :class:`~github3.pulls.PullRequest`
         """
         json = None
         if int(number) > 0:
             url = self._build_url('pulls', str(number), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(PullRequest, json)
+        return self._instance_or_null(pulls.PullRequest, json)
 
     def pull_requests(self, state=None, head=None, base=None, sort='created',
                       direction='desc', number=-1, etag=None):
-        r"""List pull requests on repository.
+        """List pull requests on repository.
 
         .. versionchanged:: 0.9.0
 
@@ -1549,22 +1929,29 @@ class _Repository(GitHubCore):
 
             - The ``direction`` parameter was added.
 
-        :param str state: (optional), accepted values: ('all', 'open',
-            'closed')
-        :param str head: (optional), filters pulls by head user and branch
+        :param str state:
+            (optional), accepted values: ('all', 'open', 'closed')
+        :param str head:
+            (optional), filters pulls by head user and branch
             name in the format ``user:ref-name``, e.g., ``seveas:debian``
-        :param str base: (optional), filter pulls by base branch name.
+        :param str base:
+            (optional), filter pulls by base branch name.
             Example: ``develop``.
-        :param str sort: (optional), Sort pull requests by ``created``,
+        :param str sort:
+            (optional), Sort pull requests by ``created``,
             ``updated``, ``popularity``, ``long-running``. Default: 'created'
-        :param str direction: (optional), Choose the direction to list pull
+        :param str direction:
+            (optional), Choose the direction to list pull
             requests. Accepted values: ('desc', 'asc'). Default: 'desc'
-        :param int number: (optional), number of pulls to return. Default: -1
+        :param int number:
+            (optional), number of pulls to return. Default: -1
             returns all available pull requests
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`ShortPullRequest <github3.pulls.ShortPullRequest>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of pull requests
+        :rtype:
+            :class:`~github3.pulls.ShortPullRequest`
         """
         url = self._build_url('pulls', base_url=self._api)
         params = {}
@@ -1576,16 +1963,20 @@ class _Repository(GitHubCore):
 
         params.update(head=head, base=base, sort=sort, direction=direction)
         self._remove_none(params)
-        return self._iter(int(number), url, ShortPullRequest, params, etag)
+        return self._iter(int(number), url, pulls.ShortPullRequest, params,
+                          etag)
 
     def readme(self):
         """Get the README for this repository.
 
-        :returns: :class:`Contents <github3.repos.contents.Contents>`
+        :returns:
+            this repository's readme
+        :rtype:
+            :class:`Contents <github3.repos.contents.Contents>`
         """
         url = self._build_url('readme', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Contents, json)
+        return self._instance_or_null(contents.Contents, json)
 
     def ref(self, ref):
         """Get a reference pointed to by ``ref``.
@@ -1595,43 +1986,56 @@ class _Repository(GitHubCore):
         the system should return any reference you provide it in the namespace,
         including notes and stashes (provided they exist on the server).
 
-        :param str ref: (required)
-        :returns: :class:`Reference <github3.git.Reference>`
+        :param str ref:
+            (required)
+        :returns:
+            the reference
+        :rtype:
+            :class:`~github3.git.Reference`
         """
         json = None
         if ref:
             url = self._build_url('git', 'refs', ref, base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Reference, json)
+        return self._instance_or_null(git.Reference, json)
 
     def refs(self, subspace='', number=-1, etag=None):
-        r"""Iterate over references for this repository.
+        """Iterate over references for this repository.
 
-        :param str subspace: (optional), e.g. 'tags', 'stashes', 'notes'
-        :param int number: (optional), number of refs to return. Default: -1
+        :param str subspace:
+            (optional), e.g. 'tags', 'stashes', 'notes'
+        :param int number:
+            (optional), number of refs to return. Default: -1
             returns all available refs
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Reference <github3.git.Reference>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of references
+        :rtype:
+            :class:`~github3.git.Reference`
         """
         if subspace:
             args = ('git', 'refs', subspace)
         else:
             args = ('git', 'refs')
         url = self._build_url(*args, base_url=self._api)
-        return self._iter(int(number), url, Reference, etag=etag)
+        return self._iter(int(number), url, git.Reference, etag=etag)
 
     def release(self, id):
         """Get a single release.
 
-        :param int id: (required), id of release
-        :returns: :class:`Release <github3.repos.release.Release>`
+        :param int id:
+            (required), id of release
+        :returns:
+            the release
+        :rtype:
+            :class:`~github3.repos.release.Release`
         """
         json = None
         if int(id) > 0:
             url = self._build_url('releases', str(id), base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Release, json)
+        return self._instance_or_null(release.Release, json)
 
     def release_from_tag(self, tag_name):
         """Get a release by tag name.
@@ -1639,35 +2043,46 @@ class _Repository(GitHubCore):
         release_from_tag() returns a release with specified tag
         while release() returns a release with specified release id
 
-        :param str tag_name: (required) name of tag
-        :returns: :class:`Release <github3.repos.release.Release>`
+        :param str tag_name:
+            (required) name of tag
+        :returns:
+            the release
+        :rtype:
+            :class:`~github3.repos.release.Release`
         """
         url = self._build_url('releases', 'tags', tag_name,
                               base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Release, json)
+        return self._instance_or_null(release.Release, json)
 
     def releases(self, number=-1, etag=None):
-        r"""Iterate over releases for this repository.
+        """Iterate over releases for this repository.
 
-        :param int number: (optional), number of refs to return. Default: -1
+        :param int number:
+            (optional), number of refs to return. Default: -1
             returns all available refs
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of
-            :class:`Release <github3.repos.release.Release>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of releases
+        :rtype:
+            :class:`~github3.repos.release.Release`
         """
         url = self._build_url('releases', base_url=self._api)
-        iterator = self._iter(int(number), url, Release, etag=etag)
-        return iterator
+        return self._iter(int(number), url, release.Release, etag=etag)
 
     @requires_auth
     def remove_collaborator(self, username):
         """Remove collaborator ``username`` from the repository.
 
-        :param username: (required), login name of the collaborator
-        :type username: str or :class:`User <github3.users.User>`
-        :returns: bool
+        :param username:
+            (required), login name of the collaborator
+        :type username:
+            str or :class:`~github3.users.User`
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         if not username:
             return False
@@ -1677,36 +2092,45 @@ class _Repository(GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     def stargazers(self, number=-1, etag=None):
-        r"""List users who have starred this repository.
+        """List users who have starred this repository.
 
-        :param int number: (optional), number of stargazers to return.
+        :param int number:
+            (optional), number of stargazers to return.
             Default: -1 returns all subscribers available
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`~github3.users.ShortUser`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of users
+        :rtype:
+            :class:`~github3.users.ShortUser`
         """
         url = self._build_url('stargazers', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def statuses(self, sha, number=-1, etag=None):
-        r"""Iterate over the statuses for a specific SHA.
+        """Iterate over the statuses for a specific SHA.
 
         .. warning::
 
             Deprecated in v1.0. Also deprecated upstream
             https://developer.github.com/v3/repos/statuses/
 
-        :param str sha: SHA of the commit to list the statuses of
-        :param int number: (optional), return up to number statuses. Default:
+        :param str sha:
+            SHA of the commit to list the statuses of
+        :param int number:
+            (optional), return up to number statuses. Default:
             -1 returns all available statuses.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Status <github3.repos.status.Status>`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of statuses
+        :rtype:
+            :class:`~github3.repos.status.Status`
         """
         url = ''
         if sha:
             url = self._build_url('statuses', sha, base_url=self._api)
-        return self._iter(int(number), url, Status, etag=etag)
+        return self._iter(int(number), url, status.Status, etag=etag)
 
     @requires_auth
     def subscribe(self):
@@ -1716,25 +2140,36 @@ class _Repository(GitHubCore):
 
         This replaces ``Repository#set_subscription``
 
-        :param bool subscribed: (required), determines if notifications should
+        :param bool subscribed:
+            (required), determines if notifications should
             be received from this repository.
-        :param bool ignored: (required), determines if notifications should be
+        :param bool ignored:
+            (required), determines if notifications should be
             ignored from this repository.
-        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        :returns:
+            the new repository subscription
+        :rtype:
+            :class:`~github3.notifications.RepositorySubscription`
         """
         url = self._build_url('subscription', base_url=self._api)
-        json = self._json(self._put(url, data=dumps({'subcribed': True})),
-                          200)
-        return self._instance_or_null(Subscription, json)
+        json = self._json(self._put(url, data=jsonlib.dumps({
+            'subcribed': True,
+        })), 200)
+        return self._instance_or_null(notifications.RepositorySubscription,
+                                      json)
 
     def subscribers(self, number=-1, etag=None):
-        r"""Iterate over users subscribed to this repository.
+        """Iterate over users subscribed to this repository.
 
-        :param int number: (optional), number of subscribers to return.
+        :param int number:
+            (optional), number of subscribers to return.
             Default: -1 returns all subscribers available
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`~github3.users.ShortUser`
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of users subscribed to this repository
+        :rtype:
+            :class:`~github3.users.ShortUser`
         """
         url = self._build_url('subscribers', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
@@ -1743,68 +2178,90 @@ class _Repository(GitHubCore):
     def subscription(self):
         """Return subscription for this Repository.
 
-        :returns: :class:`Subscription <github3.notifications.Subscription>`
+        :returns:
+            the user's subscription to this repository
+        :rtype:
+            :class:`~github3.notifications.RepositorySubscription`
         """
         url = self._build_url('subscription', base_url=self._api)
         json = self._json(self._get(url), 200)
-        return self._instance_or_null(Subscription, json)
+        return self._instance_or_null(notifications.RepositorySubscription,
+                                      json)
 
     def tag(self, sha):
         """Get an annotated tag.
 
         http://learn.github.com/p/tagging.html
 
-        :param str sha: (required), sha of the object for this tag
-        :returns: :class:`Tag <github3.git.Tag>`
+        :param str sha:
+            (required), sha of the object for this tag
+        :returns:
+            the annotated tag
+        :rtype:
+            :class:`~github3.git.Tag`
         """
         json = None
         if sha:
             url = self._build_url('git', 'tags', sha, base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Tag, json)
+        return self._instance_or_null(git.Tag, json)
 
     def tags(self, number=-1, etag=None):
-        r"""Iterate over tags on this repository.
+        """Iterate over tags on this repository.
 
-        :param int number: (optional), return up to at most number tags.
+        :param int number:
+            (optional), return up to at most number tags.
             Default: -1 returns all available tags.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`RepoTag <github3.repos.tag.RepoTag>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of tags with GitHub repository specific information
+        :rtype:
+            :class:`~github3.repos.tag.RepoTag`
         """
         url = self._build_url('tags', base_url=self._api)
-        return self._iter(int(number), url, RepoTag, etag=etag)
+        return self._iter(int(number), url, tag.RepoTag, etag=etag)
 
     @requires_auth
     def teams(self, number=-1, etag=None):
-        r"""Iterate over teams with access to this repository.
+        """Iterate over teams with access to this repository.
 
-        :param int number: (optional), return up to number Teams. Default: -1
+        :param int number:
+            (optional), return up to number Teams. Default: -1
             returns all Teams.
-        :param str etag: (optional), ETag from a previous request to the same
-            endpoint
-        :returns: generator of :class:`Team <github3.orgs.Team>`\ s
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of teams
+        :rtype:
+            :class:`~github3.orgs.Team`
         """
-        from ..orgs import Team
+        from .. import orgs
         url = self._build_url('teams', base_url=self._api)
-        return self._iter(int(number), url, Team, etag=etag)
+        return self._iter(int(number), url, orgs.ShortTeam, etag=etag)
 
     def tree(self, sha):
         """Get a tree.
 
-        :param str sha: (required), sha of the object for this tree
-        :returns: :class:`Tree <github3.git.Tree>`
+        :param str sha:
+            (required), sha of the object for this tree
+        :returns:
+            the tree
+        :rtype:
+            :class:`~github3.git.Tree`
         """
         json = None
         if sha:
             url = self._build_url('git', 'trees', sha, base_url=self._api)
             json = self._json(self._get(url), 200)
-        return self._instance_or_null(Tree, json)
+        return self._instance_or_null(git.Tree, json)
 
     def weekly_commit_count(self):
         """Retrieve the total commit counts.
 
-        .. note:: All statistics methods may return a 202. If github3.py
+        .. note::
+
+            All statistics methods may return a 202. If github3.py
             receives a 202 in this case, it will return an emtpy dictionary.
             You should give the API a moment to compose the data and then re
             -request it via this method.
@@ -1816,7 +2273,10 @@ class _Repository(GitHubCore):
         includes the owner.) ``d['all'][0]`` will be the oldest week,
         ``d['all'][51]`` will be the most recent.
 
-        :returns: dict
+        :returns:
+            the commit count as a dictionary
+        :rtype:
+            dict
         """
         url = self._build_url('stats', 'participation', base_url=self._api)
         resp = self._get(url)
@@ -2170,8 +2630,8 @@ class Repository(_Repository):
 
     .. attribute:: original_license
 
-        This is the :class:`~github3.license.License` returned as part of the
-        repository. To retrieve the most recent license, see the
+        This is the :class:`~github3.license.ShortLicense` returned as part of
+        the repository. To retrieve the most recent license, see the
         :meth:`~github3.repos.repo.Repository.license` method.
 
     .. attribute:: mirror_url
@@ -2259,7 +2719,9 @@ class Repository(_Repository):
         self.language = repo['language']
         self.original_license = repo['license']
         if self.original_license is not None:
-            self.original_license = License(self.original_license, self)
+            self.original_license = licenses.ShortLicense(
+                self.original_license, self
+            )
         self.mirror_url = repo['mirror_url']
         self.network_count = repo['network_count']
         self.open_issues_count = repo['open_issues_count']
@@ -2274,12 +2736,12 @@ class Repository(_Repository):
         self.ssh_url = repo['ssh_url']
         self.stargazers_count = repo['stargazers_count']
         self.subscribers_count = repo['subscribers_count']
-        self.svn_url = self._get_attribute(repo, 'svn_url')
-        self.updated_at = self._strptime_attribute(repo, 'updated_at')
+        self.svn_url = repo['svn_url']
+        self.updated_at = self._strptime(repo['updated_at'])
         self.watchers_count = self.watchers = repo['watchers_count']
 
 
-class StarredRepository(GitHubCore):
+class StarredRepository(models.GitHubCore):
     """This object represents the data returned about a user's starred repos.
 
     GitHub used to send back the ``starred_at`` attribute on Repositories but
@@ -2327,7 +2789,8 @@ def repo_issue_params(milestone=None,
         params['milestone'] = milestone
     Repository._remove_none(params)
     params.update(
-        issue_params(None, state, labels, sort, direction,
-                     since)
+        issues.issue_params(
+            None, state, labels, sort, direction, since
+        )
     )
     return params

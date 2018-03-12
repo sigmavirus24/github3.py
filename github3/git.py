@@ -1,114 +1,204 @@
 # -*- coding: utf-8 -*-
 """
-github3.git
-===========
-
 This module contains all the classes relating to Git Data.
 
 See also: http://developer.github.com/v3/git/
 """
 from __future__ import unicode_literals
+import base64
+import warnings
 
 from json import dumps
-from base64 import b64decode
-from .models import GitHubCore, BaseCommit
+
+from . import models
 from .decorators import requires_auth
 
 
-class Blob(GitHubCore):
-
-    """The :class:`Blob <Blob>` object.
+class Blob(models.GitHubCore):
+    """This object provides an interface to the API representation of a blob.
 
     See also: http://developer.github.com/v3/git/blobs/
 
+    .. versionchanged:: 1.0.0
+
+       - The :attr:`content` is no longer forcibly coerced to bytes.
+       - The :attr:`decoded` is deprecated in favor of :meth:`decode_content`.
+
+    This object has the following atributes
+
+    .. attribute:: content
+
+        The raw content of the blob. This may be base64 encoded text. Use
+        :meth:`decode_content` to receive the non-encoded text.
+
+    .. attribute:: encoding
+
+        The encoding that GitHub reports for this blob's content.
+
+    .. attribute:: size
+
+        The size of this blob's content in bytes.
+
+    .. attribute:: sha
+
+        The SHA1 of this blob's content.
     """
 
     def _update_attributes(self, blob):
-        self._api = self._get_attribute(blob, 'url')
-
-        #: Raw content of the blob.
-        self.content = self._get_attribute(blob, 'content')
-        if self.content is not None:
-            self.content = self.content.encode()
-
-        #: Encoding of the raw content.
-        self.encoding = self._get_attribute(blob, 'encoding')
-
-        #: Decoded content of the blob.
-        self.decoded = self.content
-        if self.encoding == 'base64':
-            self.decoded = b64decode(self.content)
-
-        #: Size of the blob in bytes
-        self.size = self._get_attribute(blob, 'size')
-        #: SHA1 of the blob
-        self.sha = self._get_attribute(blob, 'sha')
+        self._api = blob['url']
+        self.content = blob['content']
+        self.encoding = blob['encoding']
+        self.size = blob['size']
+        self.sha = blob['sha']
 
     def _repr(self):
         return '<Blob [{0:.10}]>'.format(self.sha)
 
+    @property
+    def decoded(self):
+        """Compatibility shim for the deprecated attribute."""
+        warnings.warn('The decoded attribute is deprecated. Use decode_content'
+                      ' instead.', DeprecationWarning)
+        return self.decode_content()
 
-class GitData(GitHubCore):
+    def decode_content(self):
+        """Return the unencoded content of this blob.
 
-    """The :class:`GitData <GitData>` object. This isn't directly returned to
-    the user (developer) ever. This is used to prevent duplication of some
-    common items among other Git Data objects.
+        If the content is base64 encoded, this will properly decode it.
+        Otherwise, it will return the content as returned by the API.
 
-    """
+        :returns:
+            Decoded content as text
+        :rtype:
+            unicode
+        """
+        if self.encoding == 'base64' and self.content:
+            return base64.b64decode(
+                self.content.encode('utf-8')
+            ).decode('utf-8')
+        return self.content
 
-    def _update_attributes(self, data):
-        #: SHA of the object
-        self.sha = self._get_attribute(data, 'sha')
-        self._api = self._get_attribute(data, 'url')
+
+class _Commit(models.GitHubCore):
+    class_name = '_Commit'
+
+    def _update_attributes(self, commit):
+        self._api = commit['url']
+        self.author = commit['author']
+        if self.author.get('name'):
+            self._author_name = self.author['name']
+        self.committer = commit['committer']
+        if self.committer:
+            self._commit_name = self.committer.get('name')
+        self.message = commit['message']
+        self.tree = CommitTree(commit['tree'], self)
+
+    def _repr(self):
+        return '<{0} [{1}]>'.format(self.class_name, self.sha)
 
 
-class Commit(BaseCommit):
+class Commit(_Commit):
+    """This represents a commit as returned by the git API.
 
-    """The :class:`Commit <Commit>` object. This represents a commit made in a
-    repository.
+    This is distinct from :class:`~github3.repos.commit.RepoCommit`.
+    Primarily this object represents the commit data stored by git and
+    it has no relationship to the repository on GitHub.
 
     See also: http://developer.github.com/v3/git/commits/
 
+    This object has all of the attributes of a
+    :class:`~github3.git.ShortCommit` as well as the following attributes:
+
+    .. attribute:: parents
+
+        The list of commits that are the parents of this commit. This may be
+        empty if this is the initial commit, or it may have several if it is
+        the result of an octopus merge. Each parent is represented as a
+        dictionary with the API URL and SHA1.
+
+    .. attribute:: sha
+
+        The unique SHA1 which identifies this commit.
+
+    .. attribute:: verification
+
+        The GPG verification data about this commit. See
+        https://developer.github.com/v3/git/commits/#commit-signature-verification
+        for more information.
     """
+
+    class_name = 'Commit'
 
     def _update_attributes(self, commit):
         super(Commit, self)._update_attributes(commit)
-        #: dict containing at least the name, email and date the commit was
-        #: created
-        self.author = self._get_attribute(commit, 'author', {})
-        # If GH returns nil/None then make sure author is a dict
-        self._author_name = self._get_attribute(self.author, 'name')
-
-        #: dict containing similar information to the author attribute
-        self.committer = self._get_attribute(commit, 'committer', {})
-        # blank the data if GH returns no data
-
-        self._commit_name = self._get_attribute(self.committer, 'name')
-
-        #: :class:`Tree <Tree>` the commit belongs to.
-        self.tree = self._class_attribute(commit, 'tree', Tree, self)
-
-    def _repr(self):
-        return '<Commit [{0}:{1}]>'.format(self._author_name, self.sha)
+        self.parents = commit['parents']
+        self.sha = commit['sha']
+        if not self.sha:
+            i = self._api.rfind('/')
+            self.sha = self._api[i + 1:]
+        self._uniq = self.sha
+        self.verification = commit['verification']
 
 
-class Reference(GitHubCore):
+class ShortCommit(_Commit):
+    """This represents a commit as returned by the git API.
 
-    """The :class:`Reference <Reference>` object. This represents a reference
-    created on a repository.
+    This is distinct from :class:`~github3.repos.commit.RepoCommit`.
+    Primarily this object represents the commit data stored by git. This
+    shorter representation of a Commit is most often found on a
+    :class:`~github3.repos.commit.RepoCommit` to represent the git data
+    associated with it.
+
+    See also: http://developer.github.com/v3/git/commits/
+
+    This object has the following attributes:
+
+    .. attribute:: author
+
+        This is a dictionary with at least the name and email of the author
+        of this commit as well as the date it was authored.
+
+    .. attribute:: committer
+
+        This is a dictionary with at least the name and email of the committer
+        of this commit as well as the date it was committed.
+
+    .. attribute:: message
+
+        The commit message that describes the changes as written by the author
+        and committer.
+
+    .. attribute:: tree
+
+        The git tree object this commit points to.
+    """
+
+    class_name = 'ShortCommit'
+    refresh_to = Commit
+
+
+class Reference(models.GitHubCore):
+    """Object representing a git reference associated with a repository.
+
+    This represents a reference (or ref) created on a repository via git.
 
     See also: http://developer.github.com/v3/git/refs/
 
+    This object has the following attributes:
+
+    .. attribute:: object
+
+        A :class:`~github3.git.GitObject` that this reference points to.
+
+    .. attribute:: ref
+
+        The string path to the reference, e.g., ``'refs/heads/sc/feature-a'``.
     """
 
     def _update_attributes(self, ref):
-        self._api = self._get_attribute(ref, 'url')
-
-        #: The reference path, e.g., refs/heads/sc/featureA
-        self.ref = self._get_attribute(ref, 'ref')
-
-        #: :class:`GitObject <GitObject>` the reference points to
-        self.object = self._class_attribute(ref, 'object', GitObject, self)
+        self._api = ref['url']
+        self.object = GitObject(ref['object'], self)
+        self.ref = ref['ref']
 
     def _repr(self):
         return '<Reference [{0}]>'.format(self.ref)
@@ -117,8 +207,10 @@ class Reference(GitHubCore):
     def delete(self):
         """Delete this reference.
 
-        :returns: bool
-
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
@@ -126,10 +218,14 @@ class Reference(GitHubCore):
     def update(self, sha, force=False):
         """Update this reference.
 
-        :param str sha: (required), sha of the reference
-        :param bool force: (optional), force the update or not
-        :returns: bool
-
+        :param str sha:
+            (required), sha of the reference
+        :param bool force:
+            (optional), force the update or not
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
         """
         data = {'sha': sha, 'force': force}
         json = self._json(self._patch(self._api, data=dumps(data)), 200)
@@ -139,59 +235,139 @@ class Reference(GitHubCore):
         return False
 
 
-class GitObject(GitData):
+class GitObject(models.GitHubCore):
+    """This object represents an arbitrary 'object' in git.
 
-    """The :class:`GitObject <GitObject>` object."""
+    This object is intended to be versatile and is usually found on one of the
+    following:
+
+    - :class:`~github3.git.Reference`
+    - :class:`~github3.git.Tag`
+
+    This object has the following attributes:
+
+    .. attribute:: sha
+
+        The SHA1 of the object this is representing.
+
+    .. attribute:: type
+
+        The name of the type of object this is representing.
+    """
 
     def _update_attributes(self, obj):
-        super(GitObject, self)._update_attributes(obj)
-        #: The type of object.
-        self.type = self._get_attribute(obj, 'type')
+        self._api = obj['url']
+        self.sha = obj['sha']
+        self.type = obj['type']
 
     def _repr(self):
         return '<Git Object [{0}]>'.format(self.sha)
 
 
-class Tag(GitData):
+class Tag(models.GitHubCore):
+    """This represents an annotated tag.
 
-    """The :class:`Tag <Tag>` object.
+    Tags are a special kind of git reference and annotated tags have more
+    information than lightweight tags.
 
     See also: http://developer.github.com/v3/git/tags/
 
+    This object has the following attributes:
+
+    .. attribute:: message
+
+        This is the message that was written to accompany the creation of the
+        annotated tag.
+
+    .. attribute:: object
+
+        A :class:`~github3.git.GitObject` that represents the underlying git
+        object.
+
+    .. attribute:: sha
+
+        The SHA1 of this tag in the git repository.
+
+    .. attribute:: tag
+
+        The "lightweight" tag (or reference) that backs this annotated tag.
+
+    .. attribute:: tagger
+
+        The person who created this tag.
     """
 
     def _update_attributes(self, tag):
-        super(Tag, self)._update_attributes(tag)
-
-        #: String of the tag
-        self.tag = self._get_attribute(tag, 'tag')
-
-        #: Commit message for the tag
-        self.message = self._get_attribute(tag, 'message')
-
-        #: dict containing the name and email of the person
-        self.tagger = self._get_attribute(tag, 'tagger')
-
-        #: :class:`GitObject <GitObject>` for the tag
-        self.object = self._class_attribute(tag, 'object', GitObject, self)
+        self._api = tag['url']
+        self.message = tag['message']
+        self.object = GitObject(tag['object'], self)
+        self.sha = tag['sha']
+        self.tag = tag['tag']
+        self.tagger = tag['tagger']
 
     def _repr(self):
         return '<Tag [{0}]>'.format(self.tag)
 
 
-class Tree(GitData):
+class CommitTree(models.GitHubCore):
+    """This object represents the abbreviated tree data in a commit.
 
-    """The :class:`Tree <Tree>` object.
+    The API returns different representations of different objects. When
+    representing a :class:`~github3.git.ShortCommit` or
+    :class:`~github3.git.Commit`, the API returns an abbreviated
+    representation of a git tree.
 
-    See also: http://developer.github.com/v3/git/trees/
+    This object has the following attributes:
 
+    .. attribute:: sha
+
+        The SHA1 of this tree in the git repository.
     """
 
     def _update_attributes(self, tree):
-        super(Tree, self)._update_attributes(tree)
+        self._api = tree['url']
+        self.sha = tree['sha']
 
-        #: list of :class:`Hash <Hash>` objects
-        self.tree = self._get_attribute(tree, 'tree', [])
+    def _repr(self):
+        return '<CommitTree [{0}]>'.format(self.sha)
+
+    def to_tree(self):
+        """Retrieve a full Tree object for this CommitTree.
+
+        :returns:
+            The full git data about this tree
+        :rtype:
+            :class:`~github3.git.Tree`
+        """
+        json = self._json(self._get(self._api), 200)
+        return self._instance_or_null(Tree, json)
+
+    refresh = to_tree
+
+
+class Tree(models.GitHubCore):
+    """This represents a tree object from a git repository.
+
+    Trees tend to represent directories and subdirectories.
+
+    See also: http://developer.github.com/v3/git/trees/
+
+    This object has the following attributes:
+
+    .. attribute:: sha
+
+        The SHA1 of this tree in the git repository.
+
+    .. attribute:: tree
+
+        A list that represents the nodes in the tree. If this list has members
+        it will have instances of :class:`~github3.git.Hash`.
+    """
+
+    def _update_attributes(self, tree):
+        self._api = tree['url']
+        self.sha = tree['sha']
+        self.tree = tree['tree']
         if self.tree:
             self.tree = [Hash(t, self) for t in self.tree]
 
@@ -205,41 +381,61 @@ class Tree(GitData):
         return self.as_dict() != other.as_dict()
 
     def recurse(self):
-        """Recurse into the tree.
+        """Recurse into this tree.
 
-        :returns: :class:`Tree <Tree>`
+        :returns:
+            A new tree
+        :rtype:
+            :class:`~github3.git.Tree`
         """
         json = self._json(self._get(self._api, params={'recursive': '1'}),
                           200)
         return self._instance_or_null(Tree, json)
 
 
-class Hash(GitHubCore):
+class Hash(models.GitHubCore):
+    """This is used to represent the elements of a tree.
 
-    """The :class:`Hash <Hash>` object.
+    This provides the path to the object and the type of object it is. For
+    a brief explanation of what these types are and represent, this
+    StackOverflow question answers some of that:
+    https://stackoverflow.com/a/18605496/1953283
 
     See also: http://developer.github.com/v3/git/trees/#create-a-tree
 
+    This object has the following attributes:
+
+    .. attribute:: mode
+
+        The mode of the file, directory, or link.
+
+    .. attribute:: path
+
+        The path to the file, directory, or link.
+
+    .. attribute:: sha
+
+        The SHA1 for this hash.
+
+    .. attribute:: size
+
+        This attribute is only not ``None`` if the :attr:`type` is not a tree.
+
+    .. attribute:: type
+
+        The type of git object this is representing, e.g., tree, blob, etc.
     """
 
     def _update_attributes(self, info):
-        #: Path to file
-        self.path = self._get_attribute(info, 'path')
+        self._api = info['url']
+        self.mode = info['mode']
+        self.path = info['path']
+        self.sha = info['sha']
+        self.size = None
+        self.type = info['type']
 
-        #: File mode
-        self.mode = self._get_attribute(info, 'mode')
-
-        #: Type of hash, e.g., blob
-        self.type = self._get_attribute(info, 'type')
-
-        #: Size of hash
-        self.size = self._get_attribute(info, 'size')
-
-        #: SHA of the hash
-        self.sha = self._get_attribute(info, 'sha')
-
-        #: URL of this object in the GitHub API
-        self.url = self._get_attribute(info, 'url')
+        if self.type != 'tree':
+            self.size = info['size']
 
     def _repr(self):
         return '<Hash [{0}]>'.format(self.sha)

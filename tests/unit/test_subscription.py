@@ -1,3 +1,4 @@
+"""Unit tests around github3's Subscription classes."""
 import github3
 
 from .helper import (UnitHelper, create_url_helper, create_example_data_helper)
@@ -11,7 +12,7 @@ url_for = create_url_helper(
 class TestSubscription(UnitHelper):
     """Subscription unit tests."""
 
-    described_class = github3.notifications.Subscription
+    described_class = github3.notifications._Subscription
     example_data = get_example_data()
 
     def test_repr(self):
@@ -25,14 +26,6 @@ class TestSubscription(UnitHelper):
         self.session.delete.assert_called_once_with(
             url_for()
         )
-
-    def test_is_ignored(self):
-        """Show that subscription is ignored."""
-        self.instance.is_ignored() == self.instance.ignored
-
-    def test_is_subscription(self):
-        """Show that subscription is subscribed."""
-        self.instance.is_subscribed() == self.instance.subscribed
 
     def test_set(self):
         """Show that a user can set a subscription."""

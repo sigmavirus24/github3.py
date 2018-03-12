@@ -1,20 +1,32 @@
 # -*- coding: utf-8 -*-
+"""GitHub Pages related logic."""
 from __future__ import unicode_literals
-from ..models import GitHubCore
+
+from .. import models
 
 
-class PagesInfo(GitHubCore):
+class PagesInfo(models.GitHubCore):
+    """Representation of the information about a GitHub pages website.
+
+    .. attribute:: cname
+
+        The cname in use for the pages site, if one is set.
+
+    .. attribute:: custom_404
+
+        A boolean attribute indicating whether the user configured a custom
+        404 page for this site.
+
+    .. attribute:: status
+
+        The current status of the pages site, e.g., ``built``.
+    """
+
     def _update_attributes(self, info):
-        self._api = self._get_attribute(info, 'url')
-
-        #: Status of the pages site, e.g., built
-        self.status = self._get_attribute(info, 'status')
-
-        #: CName used for the pages site
-        self.cname = self._get_attribute(info, 'cname')
-
-        #: Boolean indicating whether there is a custom 404 for the pages site
-        self.custom_404 = self._get_attribute(info, 'custom_404')
+        self._api = info['url']
+        self.cname = info['cname']
+        self.custom_404 = info['custom_404']
+        self.status = info['status']
 
     def _repr(self):
         info = self.cname or ''
@@ -24,33 +36,52 @@ class PagesInfo(GitHubCore):
         return '<Pages Info [{0}]>'.format(info)
 
 
-class PagesBuild(GitHubCore):
+class PagesBuild(models.GitHubCore):
+    """Representation of a single build of a GitHub pages website.
+
+    .. attribute:: commit
+
+        The SHA of the commit that triggered this build.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this build was created.
+
+    .. attribute:: duration
+
+        The time it spent processing this build.
+
+    .. attribute:: error
+
+        If this build errored, a dictionary containing the error message and
+        details about the error.
+
+    .. attribute:: pusher
+
+        A :class:`~github3.users.ShortUser` representing the user who pushed
+        the commit that triggered this build.
+
+    .. attribute:: status
+
+        The current statues of the build, e.g., ``building``.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this build was last updated.
+    """
+
     def _update_attributes(self, build):
-        self._api = self._get_attribute(build, 'url')
-
-        #: Status of the pages build, e.g., building
-        self.status = self._get_attribute(build, 'status')
-
-        #: Error dictionary containing the error message
-        self.error = self._get_attribute(build, 'error')
-
         from .. import users
-        #: :class:`User <github3.users.User>` representing who pushed the
-        #: commit
-        self.pusher = self._class_attribute(build, 'pusher', users.ShortUser,
-                                            self)
-
-        #: SHA of the commit that triggered the build
-        self.commit = self._get_attribute(build, 'commit')
-
-        #: Time the build took to finish
-        self.duration = self._get_attribute(build, 'duration')
-
-        #: Datetime the build was created
-        self.created_at = self._strptime_attribute(build, 'created_at')
-
-        #: Datetime the build was updated
-        self.updated_at = self._strptime_attribute(build, 'updated_at')
+        self._api = build['url']
+        self.commit = build['commit']
+        self.created_at = self._strptime(build['created_at'])
+        self.duration = build['duration']
+        self.error = build['error']
+        self.pusher = users.ShortUser(build['pusher'], self)
+        self.status = build['status']
+        self.updated_at = self._strptime(build['updated_at'])
 
     def _repr(self):
         return '<Pages Build [{0}/{1}]>'.format(self.commit, self.status)

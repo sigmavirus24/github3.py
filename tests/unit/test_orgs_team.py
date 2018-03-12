@@ -5,7 +5,7 @@ from github3.orgs import Team
 
 from . import helper
 
-url_for = helper.create_url_helper('https://api.github.com/teams/10')
+url_for = helper.create_url_helper('https://api.github.com/teams/1')
 
 get_team_example_data = helper.create_example_data_helper('orgs_team_example')
 
@@ -119,10 +119,7 @@ class TestTeamRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 class TestTeamIterator(helper.UnitIteratorHelper):
     described_class = Team
-
-    example_data = {
-        'url': url_for()
-    }
+    example_data = get_team_example_data()
 
     def test_members(self):
         """Show that one can iterate over all members of a Team."""

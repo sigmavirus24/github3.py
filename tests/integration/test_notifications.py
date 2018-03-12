@@ -4,11 +4,10 @@ from .helper import IntegrationHelper
 
 
 class TestThread(IntegrationHelper):
-
-    """Integration test for methods on Test class"""
+    """Integration test for methods on Test class."""
 
     def test_subscription(self):
-        """Show that a user can retrieve notifications for repository"""
+        """Show that a user can retrieve notifications for repository."""
         self.token_login()
         cassette_name = self.cassette_name("subscription")
         with self.recorder.use_cassette(cassette_name):
@@ -18,15 +17,14 @@ class TestThread(IntegrationHelper):
             thread = threads[0]
             assert isinstance(thread, github3.notifications.Thread)
             assert isinstance(thread.subscription(),
-                              github3.notifications.Subscription)
+                              github3.notifications.ThreadSubscription)
 
 
-class TestSubscription(IntegrationHelper):
-
-    """Integration test for methods on Test class"""
+class TestThreadSubscription(IntegrationHelper):
+    """Integration test for methods on Test class."""
 
     def test_set(self):
-        """Show that user can successful set subscription"""
+        """Show that user can successful set subscription."""
         self.token_login()
         cassette_name = self.cassette_name("set")
         with self.recorder.use_cassette(cassette_name):
@@ -35,4 +33,5 @@ class TestSubscription(IntegrationHelper):
             assert len(threads) > 0
             subscription = threads[0].subscription()
             assert subscription.set(True, False) is None
-            assert isinstance(subscription, github3.notifications.Subscription)
+            assert isinstance(subscription,
+                              github3.notifications.ThreadSubscription)
