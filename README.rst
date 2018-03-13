@@ -16,8 +16,8 @@ Installation
 Dependencies
 ------------
 
-- requests_  by Kenneth Reitz
-- uritemplate_ by Ian Cordasco
+- requests_
+- uritemplate_
 
 .. _requests: https://github.com/kennethreitz/requests
 .. _uritemplate: https://github.com/sigmavirus24/uritemplate
@@ -56,7 +56,7 @@ Examples
 
 See the docs_ for more examples.
 
-.. _docs: https://github3py.readthedocs.io/en/latest/index.html#more-examples
+.. _docs: https://github3.readthedocs.io/en/latest/index.html#more-examples
 
 Testing
 ~~~~~~~
@@ -70,7 +70,7 @@ Install the dependencies from requirements.txt e.g.:
 Author
 ------
 
-Ian Cordasco (sigmavirus24)
+Ian Stapleton Cordasco (sigmavirus24)
 
 Contact Options
 ---------------

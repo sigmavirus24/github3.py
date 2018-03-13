@@ -17,10 +17,10 @@ Let's get information about a user::
     gh = login('sigmavirus24', password='<password>')
 
     sigmavirus24 = gh.me()
-    # <User [sigmavirus24:Ian Cordasco]>
+    # <User [sigmavirus24:Ian Stapleton Cordasco]>
 
     print(sigmavirus24.name)
-    # Ian Cordasco
+    # Ian Stapleton Cordasco
     print(sigmavirus24.login)
     # sigmavirus24
     print(sigmavirus24.followers_count)
@@ -111,7 +111,7 @@ Dependencies
 ~~~~~~~~~~~~
 
 - requests_ by Kenneth Reitz
-- uritemplate_ by Ian Cordasco
+- uritemplate_ by Ian Stapleton Cordasco
 
 .. _requests: https://github.com/kennethreitz/requests
 .. _uritemplate: https://github.com/sigmavirus24/uritemplate

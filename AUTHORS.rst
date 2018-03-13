@@ -1,7 +1,7 @@
 Development Lead
 ----------------
 
-- Ian Cordasco <graffatcolmingov@gmail.com>
+- Ian Stapleton Cordasco <graffatcolmingov@gmail.com>
 
 - Matt Chung (@itsmemattchung)
 
