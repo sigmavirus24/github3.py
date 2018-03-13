@@ -185,6 +185,8 @@ class _PullRequest(models.GitHubCore):
         http://developer.github.com/v3/pulls/
     """
 
+    class_name = '_PullRequest'
+
     def _update_attributes(self, pull):
         self._api = pull['url']
         self.assignee = pull['assignee']
@@ -221,7 +223,7 @@ class _PullRequest(models.GitHubCore):
         self.user = users.ShortUser(pull['user'], self)
 
     def _repr(self):
-        return '<Pull Request [#{0}]>'.format(self.number)
+        return '<{0} [#{1}]>'.format(self.class_name, self.number)
 
     @requires_auth
     def close(self):
@@ -496,6 +498,81 @@ class _PullRequest(models.GitHubCore):
         return False
 
 
+class PullRequest(_PullRequest):
+    """Object for the full representation of a PullRequest.
+
+    GitHub's API returns different amounts of information about prs based
+    upon how that information is retrieved. This object exists to represent
+    the full amount of information returned for a specific pr. For example,
+    you would receive this class when calling
+    :meth:`~github3.github.GitHub.pull_request`. To provide a clear
+    distinction between the types of prs, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionchanged:: 1.0.0
+
+    This object has all of the same attributes as
+    :class:`~github3.pulls.ShortPullRequest` as well as the following:
+
+    .. attribute:: additions_count
+
+        The number of lines of code added in this pull request.
+
+    .. attribute:: deletions_count
+
+        The number of lines of code deleted in this pull request.
+
+    .. attribute:: comments_count
+
+        The number of comments left on this pull request.
+
+    .. attribute:: commits_count
+
+        The number of commits included in this pull request.
+
+    .. attribute:: mergeable
+
+        A boolean attribute indicating whether GitHub deems this pull request
+        is mergeable.
+
+    .. attribute:: mergeable_state
+
+        A string indicating whether this would be a 'clean' or 'dirty' merge.
+
+    .. attribute:: merged
+
+        A boolean attribute indicating whether the pull request has been merged
+        or not.
+
+    .. attribute:: merged_by
+
+        An instance of :class:`~github3.users.ShortUser` to indicate the user
+        who merged this pull request. If this hasn't been merged or if
+        :attr:`mergeable` is still being decided by GitHub this will be
+        ``None``.
+
+    .. attribute:: review_comments_count
+
+        The number of review comments on this pull request.
+    """
+
+    class_name = 'Pull Request'
+
+    def _update_attributes(self, pull):
+        super(PullRequest, self)._update_attributes(pull)
+        self.additions_count = pull['additions']
+        self.deletions_count = pull['deletions']
+        self.comments_count = pull['comments']
+        self.commits_count = pull['commits']
+        self.mergeable = pull['mergeable']
+        self.mergeable_state = pull['mergeable_state']
+        self.merged = pull['merged']
+        self.merged_by = pull['merged_by']
+        if self.merged_by is not None:
+            self.merged_by = users.ShortUser(self.merged_by, self)
+        self.review_comments_count = pull['review_comments']
+
+
 class ShortPullRequest(_PullRequest):
     """Object for the shortened representation of a PullRequest.
 
@@ -646,80 +723,8 @@ class ShortPullRequest(_PullRequest):
         this pull request.
     """
 
-    pass
-
-
-class PullRequest(_PullRequest):
-    """Object for the full representation of a PullRequest.
-
-    GitHub's API returns different amounts of information about prs based
-    upon how that information is retrieved. This object exists to represent
-    the full amount of information returned for a specific pr. For example,
-    you would receive this class when calling
-    :meth:`~github3.github.GitHub.pull_request`. To provide a clear
-    distinction between the types of prs, github3.py uses different classes
-    with different sets of attributes.
-
-    .. versionchanged:: 1.0.0
-
-    This object has all of the same attributes as
-    :class:`~github3.pulls.ShortPullRequest` as well as the following:
-
-    .. attribute:: additions_count
-
-        The number of lines of code added in this pull request.
-
-    .. attribute:: deletions_count
-
-        The number of lines of code deleted in this pull request.
-
-    .. attribute:: comments_count
-
-        The number of comments left on this pull request.
-
-    .. attribute:: commits_count
-
-        The number of commits included in this pull request.
-
-    .. attribute:: mergeable
-
-        A boolean attribute indicating whether GitHub deems this pull request
-        is mergeable.
-
-    .. attribute:: mergeable_state
-
-        A string indicating whether this would be a 'clean' or 'dirty' merge.
-
-    .. attribute:: merged
-
-        A boolean attribute indicating whether the pull request has been merged
-        or not.
-
-    .. attribute:: merged_by
-
-        An instance of :class:`~github3.users.ShortUser` to indicate the user
-        who merged this pull request. If this hasn't been merged or if
-        :attr:`mergeable` is still being decided by GitHub this will be
-        ``None``.
-
-    .. attribute:: review_comments_count
-
-        The number of review comments on this pull request.
-    """
-
-    def _update_attributes(self, pull):
-        super(PullRequest, self)._update_attributes(pull)
-        self.additions_count = pull['additions']
-        self.deletions_count = pull['deletions']
-        self.comments_count = pull['comments']
-        self.commits_count = pull['commits']
-        self.mergeable = pull['mergeable']
-        self.mergeable_state = pull['mergeable_state']
-        self.merged = pull['merged']
-        self.merged_by = pull['merged_by']
-        if self.merged_by is not None:
-            self.merged_by = users.ShortUser(self.merged_by, self)
-        self.review_comments_count = pull['review_comments']
+    class_name = 'Short Pull Request'
+    _refresh_to = PullRequest
 
 
 class PullReview(models.GitHubCore):

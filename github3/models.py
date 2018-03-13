@@ -24,6 +24,7 @@ class GitHubCore(object):
     """
 
     _ratelimit_resource = 'core'
+    _refresh_to = None
 
     def __init__(self, json, session):
         """Initialize our basic object.
@@ -282,8 +283,11 @@ class GitHubCore(object):
         headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)
         if json is not None:
-            self._json_data = json
-            self._update_attributes(json)
+            if self._refresh_to is None:
+                self._json_data = json
+                self._update_attributes(json)
+            else:
+                return self._refresh_to(json, self)
         return self
 
     def new_session(self):

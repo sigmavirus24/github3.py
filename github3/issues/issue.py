@@ -369,6 +369,47 @@ class _Issue(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
 
+class Issue(_Issue):
+    """Object for the full representation of an Issue.
+
+    GitHub's API returns different amounts of information about issues based
+    upon how that information is retrieved. This object exists to represent
+    the full amount of information returned for a specific issue. For example,
+    you would receive this class when calling
+    :meth:`~github3.github.GitHub.issue`. To provide a clear
+    distinction between the types of issues, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionchanged:: 1.0.0
+
+    This object has all of the same attributes as a
+    :class:`~github3.issues.issue.ShortIssue` as well as the following:
+
+    .. attribute:: body_html
+
+        The HTML formatted body of this issue.
+
+    .. attribute:: body_text
+
+        The plain-text formatted body of this issue.
+
+    .. attribute:: closed_by
+
+        If the issue is closed, a :class:`~github3.users.ShortUser`
+        representing the user who closed the issue.
+    """
+
+    class_name = 'Issue'
+
+    def _update_attributes(self, issue):
+        super(Issue, self)._update_attributes(issue)
+        self.body_html = issue['body_html']
+        self.body_text = issue['body_text']
+        self.closed_by = issue['closed_by']
+        if self.closed_by:
+            self.closed_by = users.ShortUser(self.closed_by, self)
+
+
 class ShortIssue(_Issue):
     """Object for the shortened representation of an Issue.
 
@@ -481,43 +522,5 @@ class ShortIssue(_Issue):
         this issue.
     """
 
-    pass
-
-
-class Issue(_Issue):
-    """Object for the full representation of an Issue.
-
-    GitHub's API returns different amounts of information about issues based
-    upon how that information is retrieved. This object exists to represent
-    the full amount of information returned for a specific issue. For example,
-    you would receive this class when calling
-    :meth:`~github3.github.GitHub.issue`. To provide a clear
-    distinction between the types of issues, github3.py uses different classes
-    with different sets of attributes.
-
-    .. versionchanged:: 1.0.0
-
-    This object has all of the same attributes as a
-    :class:`~github3.issues.issue.ShortIssue` as well as the following:
-
-    .. attribute:: body_html
-
-        The HTML formatted body of this issue.
-
-    .. attribute:: body_text
-
-        The plain-text formatted body of this issue.
-
-    .. attribute:: closed_by
-
-        If the issue is closed, a :class:`~github3.users.ShortUser`
-        representing the user who closed the issue.
-    """
-
-    def _update_attributes(self, issue):
-        super(Issue, self)._update_attributes(issue)
-        self.body_html = issue['body_html']
-        self.body_text = issue['body_text']
-        self.closed_by = issue['closed_by']
-        if self.closed_by:
-            self.closed_by = users.ShortUser(self.closed_by, self)
+    class_name = 'ShortIssue'
+    _refresh_to = Issue

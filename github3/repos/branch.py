@@ -93,32 +93,6 @@ class _Branch(models.GitHubCore):
         return True
 
 
-class ShortBranch(_Branch):
-    """The representation of a branch returned in a collection.
-
-    GitHub's API returns different amounts of information about repositories
-    based upon how that information is retrieved. This object exists to
-    represent the limited amount of information returned for a specific
-    branch in a collection. For example, you would receive this class when
-    calling :meth:`~github3.repos.repo.Repository.branches`. To provide a
-    clear distinction between the types of branches, github3.py uses different
-    classes with different sets of attributes.
-
-    This object has the following attributes:
-
-    .. attribute:: commit
-
-        A :class:`~github3.repos.commit.MiniCommit` representation of the
-        newest commit on this branch with the associated repository metadata.
-
-    .. attribute:: name
-
-        The name of this branch.
-    """
-
-    class_name = 'Short Repository Branch'
-
-
 class Branch(_Branch):
     """The representation of a branch returned in a collection.
 
@@ -169,3 +143,30 @@ class Branch(_Branch):
             # Branches obtained via `repo.branches` don't have links.
             base = self.commit.url.split('/commit', 1)[0]
             self._api = self._build_url('branches', self.name, base_url=base)
+
+
+class ShortBranch(_Branch):
+    """The representation of a branch returned in a collection.
+
+    GitHub's API returns different amounts of information about repositories
+    based upon how that information is retrieved. This object exists to
+    represent the limited amount of information returned for a specific
+    branch in a collection. For example, you would receive this class when
+    calling :meth:`~github3.repos.repo.Repository.branches`. To provide a
+    clear distinction between the types of branches, github3.py uses different
+    classes with different sets of attributes.
+
+    This object has the following attributes:
+
+    .. attribute:: commit
+
+        A :class:`~github3.repos.commit.MiniCommit` representation of the
+        newest commit on this branch with the associated repository metadata.
+
+    .. attribute:: name
+
+        The name of this branch.
+    """
+
+    class_name = 'Short Repository Branch'
+    _refresh_to = Branch

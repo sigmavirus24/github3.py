@@ -79,6 +79,29 @@ class _RepoComment(models.GitHubCore):
     update = edit
 
 
+class RepoComment(_RepoComment):
+    """The representation of the full comment on an object in a repository.
+
+    This object has the same attributes as a
+    :class:`~github3.repos.comment.ShortComment` as well as the following:
+
+    .. attribute:: body_html
+
+        The HTML formatted text of this comment.
+
+    .. attribute:: body_text
+
+        The plain-text formatted text of this comment.
+    """
+
+    class_name = 'Repository Comment'
+
+    def _update_attributes(self, comment):
+        super(RepoComment, self)._update_attributes(comment)
+        self.body_text = comment['body_text']
+        self.body_html = comment['body_html']
+
+
 class ShortComment(_RepoComment):
     """The representation of an abridged comment on an object in a repo.
 
@@ -133,26 +156,4 @@ class ShortComment(_RepoComment):
     """
 
     class_name = 'Short Repository Comment'
-
-
-class RepoComment(_RepoComment):
-    """The representation of the full comment on an object in a repository.
-
-    This object has the same attributes as a
-    :class:`~github3.repos.comment.ShortComment` as well as the following:
-
-    .. attribute:: body_html
-
-        The HTML formatted text of this comment.
-
-    .. attribute:: body_text
-
-        The plain-text formatted text of this comment.
-    """
-
-    class_name = 'Repository Comment'
-
-    def _update_attributes(self, comment):
-        super(RepoComment, self)._update_attributes(comment)
-        self.body_text = comment['body_text']
-        self.body_html = comment['body_html']
+    _refresh_to = RepoComment

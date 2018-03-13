@@ -228,87 +228,6 @@ class _Gist(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
 
-class ShortGist(_Gist):
-    """Short representation of a gist.
-
-    GitHub's API returns different amounts of information about gists
-    based upon how that information is retrieved. This object exists to
-    represent the full amount of information returned for a specific
-    gist. For example, you would receive this class when calling
-    :meth:`~github3.github.GitHub.all_gists`. To provide a clear distinction
-    between the types of gists, github3.py uses different classes with
-    different sets of attributes.
-
-    This object only has the following attributes:
-
-    .. attribute:: url
-
-        The GitHub API URL for this repository, e.g.,
-        ``https://api.github.com/gists/6faaaeb956dec3f51a9bd630a3490291``.
-
-    .. attribute:: comments_count
-
-        Number of comments on this gist
-
-    .. attribute:: description
-
-        Description of the gist as written by the creator
-
-    .. attribute:: html_url
-
-        The URL of this gist on GitHub, e.g.,
-        ``https://gist.github.com/sigmavirus24/6faaaeb956dec3f51a9bd630a3490291``
-
-    .. attribute:: id
-
-        The unique identifier for this gist.
-
-    .. attribute:: public
-
-        This is a boolean attribute  describing if the gist is public or
-        private
-
-    .. attribute:: git_pull_url
-
-        The git URL to pull this gist, e.g.,
-        ``git://gist.github.com/sigmavirus24/6faaaeb956dec3f51a9bd630a3490291.git``
-
-    .. attribute:: git_push_url
-
-        The git URL to push to gist, e.g.,
-        ``git@gist.github.com/sigmavirus24/6faaaeb956dec3f51a9bd630a3490291.git``
-
-    .. attribute:: created_at
-
-        This is a datetime object representing when the gist was created.
-
-    .. attribute:: updated_at
-        This is a datetime object representing the last time this gist was
-        most recently updated.
-
-    .. attribute:: owner
-
-        This attribute is a :class:`~github3.users.ShortUser` object
-        representing the creator of the gist.
-
-    .. attribute:: files
-
-        A dictionary mapping the filename to a
-        :class:`~github3.gists.gist.GistFile` object.
-
-        .. versionchanged:: 1.0.0
-
-            Previously this was a list but it has been converted to a
-            dictionary to preserve the structure of the API.
-
-    .. attribute:: comments_url
-
-        The URL to retrieve the list of comments on the Gist via the API.
-    """
-
-    class_name = 'ShortGist'
-
-
 class GistFork(models.GitHubCore):
     """This object represents a forked Gist.
 
@@ -409,3 +328,85 @@ class Gist(_Gist):
         self.forks_url = gist['forks_url']
         self.history = [history.GistHistory(h, self) for h in gist['history']]
         self.truncated = gist['truncated']
+
+
+class ShortGist(_Gist):
+    """Short representation of a gist.
+
+    GitHub's API returns different amounts of information about gists
+    based upon how that information is retrieved. This object exists to
+    represent the full amount of information returned for a specific
+    gist. For example, you would receive this class when calling
+    :meth:`~github3.github.GitHub.all_gists`. To provide a clear distinction
+    between the types of gists, github3.py uses different classes with
+    different sets of attributes.
+
+    This object only has the following attributes:
+
+    .. attribute:: url
+
+        The GitHub API URL for this repository, e.g.,
+        ``https://api.github.com/gists/6faaaeb956dec3f51a9bd630a3490291``.
+
+    .. attribute:: comments_count
+
+        Number of comments on this gist
+
+    .. attribute:: description
+
+        Description of the gist as written by the creator
+
+    .. attribute:: html_url
+
+        The URL of this gist on GitHub, e.g.,
+        ``https://gist.github.com/sigmavirus24/6faaaeb956dec3f51a9bd630a3490291``
+
+    .. attribute:: id
+
+        The unique identifier for this gist.
+
+    .. attribute:: public
+
+        This is a boolean attribute  describing if the gist is public or
+        private
+
+    .. attribute:: git_pull_url
+
+        The git URL to pull this gist, e.g.,
+        ``git://gist.github.com/sigmavirus24/6faaaeb956dec3f51a9bd630a3490291.git``
+
+    .. attribute:: git_push_url
+
+        The git URL to push to gist, e.g.,
+        ``git@gist.github.com/sigmavirus24/6faaaeb956dec3f51a9bd630a3490291.git``
+
+    .. attribute:: created_at
+
+        This is a datetime object representing when the gist was created.
+
+    .. attribute:: updated_at
+        This is a datetime object representing the last time this gist was
+        most recently updated.
+
+    .. attribute:: owner
+
+        This attribute is a :class:`~github3.users.ShortUser` object
+        representing the creator of the gist.
+
+    .. attribute:: files
+
+        A dictionary mapping the filename to a
+        :class:`~github3.gists.gist.GistFile` object.
+
+        .. versionchanged:: 1.0.0
+
+            Previously this was a list but it has been converted to a
+            dictionary to preserve the structure of the API.
+
+    .. attribute:: comments_url
+
+        The URL to retrieve the list of comments on the Gist via the API.
+    """
+
+    class_name = 'ShortGist'
+    _refresh_to = Gist

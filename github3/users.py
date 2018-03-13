@@ -505,99 +505,6 @@ class _User(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 403)
 
 
-class ShortUser(_User):
-    """Object for the shortened representation of a User.
-
-    GitHub's API returns different amounts of information about users based
-    upon how that information is retrieved. Often times, when iterating over
-    several users, GitHub will return less information. To provide a clear
-    distinction between the types of users, github3.py uses different classes
-    with different sets of attributes.
-
-    .. versionadded:: 1.0.0
-
-
-    .. attribute:: avatar_url
-
-        The URL of the avatar (possibly from Gravatar)
-
-    .. attribute:: events_urlt
-
-        A URITemplate object from ``uritemplate`` that can be used to generate
-        an events URL
-
-    .. attribute:: followers_url
-
-        A string representing the resource to retrieve a User's followers
-
-    .. attribute:: following_urlt
-
-        A URITemplate object from ``uritemplate`` that can be used to generate
-        the URL to check if this user is following ``other_user``
-
-    .. attribute:: gists_urlt
-
-        A URITemplate object from ``uritemplate`` that can be used to generate
-        the URL to retrieve a Gist by its id
-
-    .. attribute:: gravatar_id
-
-        The identifier for the user's gravatar
-
-    .. attribute:: html_url
-
-        The URL of the user's publicly visible profile. For example,
-        ``https://github.com/sigmavirus24``
-
-    .. attribute:: id
-
-        The unique ID of the account
-
-    .. attribute:: login
-
-        The username of the user, e.g., ``sigmavirus24``
-
-    .. attribute:: organizations_url
-
-        A string representing the resource to retrieve the organizations to
-        which a user belongs
-
-    .. attribute:: received_events_url
-
-        A string representing the resource to retrieve the events a user
-        received
-
-    .. attribute:: repos_url
-
-        A string representing the resource to list a user's repositories
-
-    .. attribute:: site_admin
-
-        A boolean attribute indicating whether the user is a member of
-        GitHub's staff
-
-    .. attribute:: starred_urlt
-
-        A URITemplate object from ``uritemplate`` that can be used to generate
-        a URL to retrieve whether the user has starred a repository.
-
-    .. attribute:: subscriptions_url
-
-        A string representing the resource to list a user's subscriptions
-
-    .. attribute:: type
-
-        A string representing the type of User account this. In all cases
-        should be "User"
-
-    .. attribute:: url
-
-        A string of this exact resource retrievable from GitHub's API
-    """
-
-    class_name = 'ShortUser'
-
-
 class Contributor(_User):
     """Object for the specialized representation of a contributor.
 
@@ -713,6 +620,100 @@ class User(_User):
         self.public_gists_count = user['public_gists']
         self.public_repos_count = user['public_repos']
         self.updated_at = self._strptime(user['updated_at'])
+
+
+class ShortUser(_User):
+    """Object for the shortened representation of a User.
+
+    GitHub's API returns different amounts of information about users based
+    upon how that information is retrieved. Often times, when iterating over
+    several users, GitHub will return less information. To provide a clear
+    distinction between the types of users, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionadded:: 1.0.0
+
+
+    .. attribute:: avatar_url
+
+        The URL of the avatar (possibly from Gravatar)
+
+    .. attribute:: events_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        an events URL
+
+    .. attribute:: followers_url
+
+        A string representing the resource to retrieve a User's followers
+
+    .. attribute:: following_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        the URL to check if this user is following ``other_user``
+
+    .. attribute:: gists_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        the URL to retrieve a Gist by its id
+
+    .. attribute:: gravatar_id
+
+        The identifier for the user's gravatar
+
+    .. attribute:: html_url
+
+        The URL of the user's publicly visible profile. For example,
+        ``https://github.com/sigmavirus24``
+
+    .. attribute:: id
+
+        The unique ID of the account
+
+    .. attribute:: login
+
+        The username of the user, e.g., ``sigmavirus24``
+
+    .. attribute:: organizations_url
+
+        A string representing the resource to retrieve the organizations to
+        which a user belongs
+
+    .. attribute:: received_events_url
+
+        A string representing the resource to retrieve the events a user
+        received
+
+    .. attribute:: repos_url
+
+        A string representing the resource to list a user's repositories
+
+    .. attribute:: site_admin
+
+        A boolean attribute indicating whether the user is a member of
+        GitHub's staff
+
+    .. attribute:: starred_urlt
+
+        A URITemplate object from ``uritemplate`` that can be used to generate
+        a URL to retrieve whether the user has starred a repository.
+
+    .. attribute:: subscriptions_url
+
+        A string representing the resource to list a user's subscriptions
+
+    .. attribute:: type
+
+        A string representing the type of User account this. In all cases
+        should be "User"
+
+    .. attribute:: url
+
+        A string of this exact resource retrievable from GitHub's API
+    """
+
+    class_name = 'ShortUser'
+    _refresh_to = User
 
 
 class AuthenticatedUser(User):
