@@ -174,7 +174,7 @@ class ShortCommit(_Commit):
     """
 
     class_name = 'ShortCommit'
-    refresh_to = Commit
+    _refresh_to = Commit
 
 
 class Reference(models.GitHubCore):

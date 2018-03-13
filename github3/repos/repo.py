@@ -2290,6 +2290,187 @@ class _Repository(models.GitHubCore):
         return json
 
 
+class Repository(_Repository):
+    """This organizes the full representation of a single Repository.
+
+    The full representation of a Repository is not returned in collections but
+    instead in individual requests, e.g.,
+    :meth:`~github3.github.GitHub.repository`.
+
+    This object has all the same attributes as
+    :class:`~github3.repos.repo.ShortRepository` as well as:
+
+    .. attribute:: archived
+
+        A boolean attribute that describes whether the current repository has
+        been archived or not.
+
+    .. attribute:: clone_url
+
+        This is the URL that can be used to clone the repository via HTTPS,
+        e.g., ``https://github.com/sigmavirus24/github3.py.git``.
+
+    .. attribute:: created_at
+
+        A parsed :class:`~datetime.datetime` object representing the date the
+        repository was created.
+
+    .. attribute:: default_branch
+
+        This is the default branch of the repository as configured by its
+        administrator(s).
+
+    .. attribute:: forks_count
+
+        This is the number of forks of the repository.
+
+    .. attribute:: git_url
+
+        This is the URL that can be used to clone the repository via the Git
+        protocol, e.g., ``git://github.com/sigmavirus24/github3.py``.
+
+    .. attribute:: has_downloads
+
+        This is a boolean attribute that conveys whether or not the repository
+        has downloads.
+
+    .. attribute:: has_issues
+
+        This is a boolean attribute that conveys whether or not the repository
+        has issues.
+
+    .. attribute:: has_pages
+
+        This is a boolean attribute that conveys whether or not the repository
+        has pages.
+
+    .. attribute:: has_wiki
+
+        This is a boolean attribute that conveys whether or not the repository
+        has a wiki.
+
+    .. attribute:: homepage
+
+        This is the administrator set homepage URL for the project. This may
+        not be provided.
+
+    .. attribute:: language
+
+        This is the language GitHub has detected for the repository.
+
+    .. attribute:: original_license
+
+        This is the :class:`~github3.license.ShortLicense` returned as part of
+        the repository. To retrieve the most recent license, see the
+        :meth:`~github3.repos.repo.Repository.license` method.
+
+    .. attribute:: mirror_url
+
+        The URL that GitHub is mirroring the repository from.
+
+    .. attribute:: network_count
+
+        The size of the repository's "network".
+
+    .. attribute:: open_issues_count
+
+        The number of issues currently open on the repository.
+
+    .. attribute:: parent
+
+        A representation of the parent repository as
+        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
+        no parent then this will be ``None``.
+
+    .. attribute:: pushed_at
+
+        A parsed :class:`~datetime.datetime` object representing the date a
+        push was last made to the repository.
+
+    .. attribute:: size
+
+        The size of the repository.
+
+    .. attribute:: source
+
+        A representation of the source repository as
+        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
+        no source then this will be ``None``.
+
+    .. attribute:: ssh_url
+
+        This is the URL that can be used to clone the repository via the SSH
+        protocol, e.g., ``ssh@github.com:sigmavirus24/github3.py.git``.
+
+    .. attribute:: stargazers_count
+
+        The number of people who have starred this repository.
+
+    .. attribute:: subscribers_count
+
+        The number of people watching (or who have subscribed to notifications
+        about) this repository.
+
+    .. attribute:: svn_url
+
+        This is the URL that can be used to clone the repository via SVN,
+        e.g., ``ssh@github.com:sigmavirus24/github3.py.git``.
+
+    .. attribute:: updated_at
+
+        A parsed :class:`~datetime.datetime` object representing the date a
+        the repository was last updated by its administrator(s).
+
+    .. attribute:: watchers_count
+
+        The number of people watching this repository.
+
+
+    See also: http://developer.github.com/v3/repos/
+    """
+
+    class_name = 'Repository'
+
+    def _update_attributes(self, repo):
+        super(Repository, self)._update_attributes(repo)
+        self.archived = repo['archived']
+        self.clone_url = repo['clone_url']
+        self.created_at = self._strptime(repo['created_at'])
+        self.default_branch = repo['default_branch']
+        self.forks_count = repo['forks_count']
+        self.fork_count = self.forks_count
+        self.git_url = repo['git_url']
+        self.has_downloads = repo['has_downloads']
+        self.has_issues = repo['has_issues']
+        self.has_pages = repo['has_pages']
+        self.has_projects = repo['has_projects']
+        self.has_wiki = repo['has_wiki']
+        self.homepage = repo['homepage']
+        self.language = repo['language']
+        self.original_license = repo['license']
+        if self.original_license is not None:
+            self.original_license = licenses.ShortLicense(
+                self.original_license, self
+            )
+        self.mirror_url = repo['mirror_url']
+        self.network_count = repo['network_count']
+        self.open_issues_count = repo['open_issues_count']
+        self.parent = repo.get('parent', None)
+        if self.parent is not None:
+            self.parent = ShortRepository(self.parent, self)
+        self.pushed_at = self._strptime(repo['pushed_at'])
+        self.size = repo['size']
+        self.source = repo.get('source', None)
+        if self.source is not None:
+            self.source = ShortRepository(self.source, self)
+        self.ssh_url = repo['ssh_url']
+        self.stargazers_count = repo['stargazers_count']
+        self.subscribers_count = repo['subscribers_count']
+        self.svn_url = repo['svn_url']
+        self.updated_at = self._strptime(repo['updated_at'])
+        self.watchers_count = self.watchers = repo['watchers_count']
+
+
 class ShortRepository(_Repository):
     """This represents a Repository object returned in collections.
 
@@ -2558,187 +2739,7 @@ class ShortRepository(_Repository):
     """
 
     class_name = 'ShortRepository'
-
-
-class Repository(_Repository):
-    """This organizes the full representation of a single Repository.
-
-    The full representation of a Repository is not returned in collections but
-    instead in individual requests, e.g.,
-    :meth:`~github3.github.GitHub.repository`.
-
-    This object has all the same attributes as
-    :class:`~github3.repos.repo.ShortRepository` as well as:
-
-    .. attribute:: archived
-
-        A boolean attribute that describes whether the current repository has
-        been archived or not.
-
-    .. attribute:: clone_url
-
-        This is the URL that can be used to clone the repository via HTTPS,
-        e.g., ``https://github.com/sigmavirus24/github3.py.git``.
-
-    .. attribute:: created_at
-
-        A parsed :class:`~datetime.datetime` object representing the date the
-        repository was created.
-
-    .. attribute:: default_branch
-
-        This is the default branch of the repository as configured by its
-        administrator(s).
-
-    .. attribute:: forks_count
-
-        This is the number of forks of the repository.
-
-    .. attribute:: git_url
-
-        This is the URL that can be used to clone the repository via the Git
-        protocol, e.g., ``git://github.com/sigmavirus24/github3.py``.
-
-    .. attribute:: has_downloads
-
-        This is a boolean attribute that conveys whether or not the repository
-        has downloads.
-
-    .. attribute:: has_issues
-
-        This is a boolean attribute that conveys whether or not the repository
-        has issues.
-
-    .. attribute:: has_pages
-
-        This is a boolean attribute that conveys whether or not the repository
-        has pages.
-
-    .. attribute:: has_wiki
-
-        This is a boolean attribute that conveys whether or not the repository
-        has a wiki.
-
-    .. attribute:: homepage
-
-        This is the administrator set homepage URL for the project. This may
-        not be provided.
-
-    .. attribute:: language
-
-        This is the language GitHub has detected for the repository.
-
-    .. attribute:: original_license
-
-        This is the :class:`~github3.license.ShortLicense` returned as part of
-        the repository. To retrieve the most recent license, see the
-        :meth:`~github3.repos.repo.Repository.license` method.
-
-    .. attribute:: mirror_url
-
-        The URL that GitHub is mirroring the repository from.
-
-    .. attribute:: network_count
-
-        The size of the repository's "network".
-
-    .. attribute:: open_issues_count
-
-        The number of issues currently open on the repository.
-
-    .. attribute:: parent
-
-        A representation of the parent repository as
-        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
-        no parent then this will be ``None``.
-
-    .. attribute:: pushed_at
-
-        A parsed :class:`~datetime.datetime` object representing the date a
-        push was last made to the repository.
-
-    .. attribute:: size
-
-        The size of the repository.
-
-    .. attribute:: source
-
-        A representation of the source repository as
-        :class:`~github3.repos.repo.ShortRepository`. If this Repository has
-        no source then this will be ``None``.
-
-    .. attribute:: ssh_url
-
-        This is the URL that can be used to clone the repository via the SSH
-        protocol, e.g., ``ssh@github.com:sigmavirus24/github3.py.git``.
-
-    .. attribute:: stargazers_count
-
-        The number of people who have starred this repository.
-
-    .. attribute:: subscribers_count
-
-        The number of people watching (or who have subscribed to notifications
-        about) this repository.
-
-    .. attribute:: svn_url
-
-        This is the URL that can be used to clone the repository via SVN,
-        e.g., ``ssh@github.com:sigmavirus24/github3.py.git``.
-
-    .. attribute:: updated_at
-
-        A parsed :class:`~datetime.datetime` object representing the date a
-        the repository was last updated by its administrator(s).
-
-    .. attribute:: watchers_count
-
-        The number of people watching this repository.
-
-
-    See also: http://developer.github.com/v3/repos/
-    """
-
-    class_name = 'Repository'
-
-    def _update_attributes(self, repo):
-        super(Repository, self)._update_attributes(repo)
-        self.archived = repo['archived']
-        self.clone_url = repo['clone_url']
-        self.created_at = self._strptime(repo['created_at'])
-        self.default_branch = repo['default_branch']
-        self.forks_count = repo['forks_count']
-        self.fork_count = self.forks_count
-        self.git_url = repo['git_url']
-        self.has_downloads = repo['has_downloads']
-        self.has_issues = repo['has_issues']
-        self.has_pages = repo['has_pages']
-        self.has_projects = repo['has_projects']
-        self.has_wiki = repo['has_wiki']
-        self.homepage = repo['homepage']
-        self.language = repo['language']
-        self.original_license = repo['license']
-        if self.original_license is not None:
-            self.original_license = licenses.ShortLicense(
-                self.original_license, self
-            )
-        self.mirror_url = repo['mirror_url']
-        self.network_count = repo['network_count']
-        self.open_issues_count = repo['open_issues_count']
-        self.parent = repo.get('parent', None)
-        if self.parent is not None:
-            self.parent = ShortRepository(self.parent, self)
-        self.pushed_at = self._strptime(repo['pushed_at'])
-        self.size = repo['size']
-        self.source = repo.get('source', None)
-        if self.source is not None:
-            self.source = ShortRepository(self.source, self)
-        self.ssh_url = repo['ssh_url']
-        self.stargazers_count = repo['stargazers_count']
-        self.subscribers_count = repo['subscribers_count']
-        self.svn_url = repo['svn_url']
-        self.updated_at = self._strptime(repo['updated_at'])
-        self.watchers_count = self.watchers = repo['watchers_count']
+    _refresh_to = Repository
 
 
 class StarredRepository(models.GitHubCore):

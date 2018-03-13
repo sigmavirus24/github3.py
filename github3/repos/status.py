@@ -27,6 +27,28 @@ class _Status(models.GitHubCore):
         return '<{s.class_name} [{s.id}:{s.state}]>'.format(s=self)
 
 
+class Status(_Status):
+    """Representation of a full status on a repository.
+
+    See also: http://developer.github.com/v3/repos/statuses/
+
+    This object has the same attributes as a
+    :class:`~github3.repos.status.ShortStatus` as well as the following
+    attributes:
+
+    .. attribute:: creator
+
+        A :class:`~github3.users.ShortUser` representing the user who created
+        this status.
+    """
+
+    class_name = 'Status'
+
+    def _update_attributes(self, status):
+        super(Status, self)._update_attributes(status)
+        self.creator = users.ShortUser(status['creator'], self)
+
+
 class ShortStatus(_Status):
     """Representation of a short status on a repository.
 
@@ -78,28 +100,7 @@ class ShortStatus(_Status):
     """
 
     class_name = 'ShortStatus'
-
-
-class Status(_Status):
-    """Representation of a full status on a repository.
-
-    See also: http://developer.github.com/v3/repos/statuses/
-
-    This object has the same attributes as a
-    :class:`~github3.repos.status.ShortStatus` as well as the following
-    attributes:
-
-    .. attribute:: creator
-
-        A :class:`~github3.users.ShortUser` representing the user who created
-        this status.
-    """
-
-    class_name = 'Status'
-
-    def _update_attributes(self, status):
-        super(Status, self)._update_attributes(status)
-        self.creator = users.ShortUser(status['creator'], self)
+    _refresh_to = Status
 
 
 class CombinedStatus(GitHubCore):

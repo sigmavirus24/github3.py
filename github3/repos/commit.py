@@ -100,34 +100,6 @@ class _RepoCommit(models.GitHubCore):
         return self._iter(int(number), url, RepoComment, etag=etag)
 
 
-class MiniCommit(_RepoCommit):
-    """A commit returned on a ShortBranch."""
-
-    class_name = 'Mini Repository Commit'
-
-
-class ShortCommit(_RepoCommit):
-    """Representation of an incomplete commit in a collection."""
-
-    class_name = 'Short Repository Commit'
-
-    def _update_attributes(self, commit):
-        super(ShortCommit, self)._update_attributes(commit)
-        self.author = commit['author']
-        if self.author:
-            self.author = users.ShortUser(self.author, self)
-        self.comments_url = commit['comments_url']
-        self.commit = git.ShortCommit(commit['commit'], self)
-        self.committer = commit['committer']
-        if self.committer:
-            self.committer = users.ShortUser(self.committer, self)
-        self.html_url = commit['html_url']
-        #: List of parents to this commit.
-        self.parents = commit['parents']
-        #: The commit message
-        self.message = getattr(self.commit, 'message', None)
-
-
 class RepoCommit(_RepoCommit):
     """Representation of a commit with repository and git data."""
 
@@ -148,3 +120,33 @@ class RepoCommit(_RepoCommit):
             self.additions = self.stats['additions']
             self.deletions = self.stats['deletions']
             self.total = self.stats['total']
+
+
+class MiniCommit(_RepoCommit):
+    """A commit returned on a ShortBranch."""
+
+    class_name = 'Mini Repository Commit'
+    _refresh_to = RepoCommit
+
+
+class ShortCommit(_RepoCommit):
+    """Representation of an incomplete commit in a collection."""
+
+    class_name = 'Short Repository Commit'
+    _refresh_to = RepoCommit
+
+    def _update_attributes(self, commit):
+        super(ShortCommit, self)._update_attributes(commit)
+        self.author = commit['author']
+        if self.author:
+            self.author = users.ShortUser(self.author, self)
+        self.comments_url = commit['comments_url']
+        self.commit = git.ShortCommit(commit['commit'], self)
+        self.committer = commit['committer']
+        if self.committer:
+            self.committer = users.ShortUser(self.committer, self)
+        self.html_url = commit['html_url']
+        #: List of parents to this commit.
+        self.parents = commit['parents']
+        #: The commit message
+        self.message = getattr(self.commit, 'message', None)

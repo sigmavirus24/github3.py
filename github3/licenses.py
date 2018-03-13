@@ -26,32 +26,6 @@ class _License(models.GitHubCore):
         return '<{0} [{1}]>'.format(self.class_name, self.name)
 
 
-class ShortLicense(_License):
-    """This object represents a license returned in a collection.
-
-    GitHub's API returns different representations of objects in different
-    contexts. This object reprsents a license that would be returned in a
-    collection, e.g., retrieving all licenses from ``/licenses``.
-
-    This object has the following attributes:
-
-    .. attribute:: key
-
-        The short, API name, for this license.
-
-    .. attribute:: name
-
-        The long form, legal name for this license.
-
-    .. attribute:: spdx_id
-
-        The Software Package Data Exchange (a.k.a, SPDX) identifier for this
-        license.
-    """
-
-    class_name = 'ShortLicense'
-
-
 class License(_License):
     """This object represents a license as returned by the GitHub API.
 
@@ -95,6 +69,8 @@ class License(_License):
         A list of the permissions granted by this license.
     """
 
+    class_name = 'License'
+
     def _update_attributes(self, license):
         super(License, self)._update_attributes(license)
         self.body = license['body']
@@ -108,6 +84,33 @@ class License(_License):
 
     def _repr(self):
         return '<License [{0}]>'.format(self.name)
+
+
+class ShortLicense(_License):
+    """This object represents a license returned in a collection.
+
+    GitHub's API returns different representations of objects in different
+    contexts. This object reprsents a license that would be returned in a
+    collection, e.g., retrieving all licenses from ``/licenses``.
+
+    This object has the following attributes:
+
+    .. attribute:: key
+
+        The short, API name, for this license.
+
+    .. attribute:: name
+
+        The long form, legal name for this license.
+
+    .. attribute:: spdx_id
+
+        The Software Package Data Exchange (a.k.a, SPDX) identifier for this
+        license.
+    """
+
+    class_name = 'ShortLicense'
+    _refresh_to = License
 
 
 class RepositoryLicense(models.GitHubCore):

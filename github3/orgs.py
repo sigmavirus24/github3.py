@@ -262,6 +262,52 @@ class _Team(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
 
+class Team(_Team):
+    """Object representing a team in the GitHub API.
+
+    In addition to the attributes on a :class:`~github3.orgs.ShortTeam` a Team
+    has the following attribute:
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` instance representing the time and date
+        when this team was created.
+
+    .. attribute:: members_count
+
+        The number of members in this team.
+
+    .. attribute:: organization
+
+        A :class:`~github3.orgs.ShortOrganization` representing the
+        organization this team belongs to.
+
+    .. attribute:: repos_count
+
+        The number of repositories this team can access.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` instance representing the time and date
+        when this team was updated.
+
+    Please see GitHub's `Team Documentation`_ for more information.
+
+    .. _Team Documentation:
+        http://developer.github.com/v3/orgs/teams/
+    """
+
+    class_name = 'Team'
+
+    def _update_attributes(self, team):
+        super(Team, self)._update_attributes(team)
+        self.created_at = self._strptime(team['created_at'])
+        self.members_count = team['members_count']
+        self.organization = ShortOrganization(team['organization'], self)
+        self.repos_count = team['repos_count']
+        self.updated_at = self._strptime(team['updated_at'])
+
+
 class ShortTeam(_Team):
     """Object representing a team in the GitHub API.
 
@@ -309,52 +355,7 @@ class ShortTeam(_Team):
     """
 
     class_name = 'ShortTeam'
-
-
-class Team(_Team):
-    """Object representing a team in the GitHub API.
-
-    In addition to the attributes on a :class:`~github3.orgs.ShortTeam` a Team
-    has the following attribute:
-
-    .. attribute:: created_at
-
-        A :class:`~datetime.datetime` instance representing the time and date
-        when this team was created.
-
-    .. attribute:: members_count
-
-        The number of members in this team.
-
-    .. attribute:: organization
-
-        A :class:`~github3.orgs.ShortOrganization` representing the
-        organization this team belongs to.
-
-    .. attribute:: repos_count
-
-        The number of repositories this team can access.
-
-    .. attribute:: updated_at
-
-        A :class:`~datetime.datetime` instance representing the time and date
-        when this team was updated.
-
-    Please see GitHub's `Team Documentation`_ for more information.
-
-    .. _Team Documentation:
-        http://developer.github.com/v3/orgs/teams/
-    """
-
-    class_name = 'Team'
-
-    def _update_attributes(self, team):
-        super(Team, self)._update_attributes(team)
-        self.created_at = self._strptime(team['created_at'])
-        self.members_count = team['members_count']
-        self.organization = ShortOrganization(team['organization'], self)
-        self.repos_count = team['repos_count']
-        self.updated_at = self._strptime(team['updated_at'])
+    _refresh_to = Team
 
 
 class _Organization(models.GitHubCore):
@@ -898,76 +899,6 @@ class _Organization(models.GitHubCore):
         return self._instance_or_null(Team, json)
 
 
-class ShortOrganization(_Organization):
-    """Object for the shortened representation of an Organization.
-
-    GitHub's API returns different amounts of information about orgs based
-    upon how that information is retrieved. Often times, when iterating over
-    several orgs, GitHub will return less information. To provide a clear
-    distinction between the types of orgs, github3.py uses different classes
-    with different sets of attributes.
-
-    .. versionadded:: 1.0.0
-
-    .. attribute:: avatar_url
-
-        The URL of the avatar image for this organization.
-
-    .. attribute:: description
-
-        The user-provided description of this organization.
-
-    .. attribute:: events_url
-
-        The URL to retrieve the events related to this organization.
-
-    .. attribute:: hooks_url
-
-        The URL for the resource to manage organization hooks.
-
-    .. attribute:: id
-
-        The unique identifier for this organization across GitHub.
-
-    .. attribute:: issues_url
-
-        The URL to retrieve the issues across this organization's
-        repositories.
-
-    .. attribute:: login
-
-        The unique username of the organization.
-
-    .. attribute:: members_url
-
-        The URL to retrieve the members of this organization.
-
-    .. attribute:: public_members_urlt
-
-        A :class:`uritemplate.URITemplate` that can be expanded to either list
-        the public members of this organization or verify a user is a public
-        member.
-
-    .. attribute:: repos_url
-
-        The URL to retrieve the repositories in this organization.
-
-    .. attribute:: url
-
-        The URL to retrieve this organization from the GitHub API.
-
-    .. attribute:: type
-
-        .. deprecated:: 1.0.0
-
-            This will be removed in a future release.
-
-        Previously returned by the API to indicate the type of the account.
-    """
-
-    class_name = 'ShortOrganization'
-
-
 class Organization(_Organization):
     """Object for the full representation of a Organization.
 
@@ -1044,6 +975,77 @@ class Organization(_Organization):
         self.email = org.get('email')
         self.location = org.get('location')
         self.name = org.get('name')
+
+
+class ShortOrganization(_Organization):
+    """Object for the shortened representation of an Organization.
+
+    GitHub's API returns different amounts of information about orgs based
+    upon how that information is retrieved. Often times, when iterating over
+    several orgs, GitHub will return less information. To provide a clear
+    distinction between the types of orgs, github3.py uses different classes
+    with different sets of attributes.
+
+    .. versionadded:: 1.0.0
+
+    .. attribute:: avatar_url
+
+        The URL of the avatar image for this organization.
+
+    .. attribute:: description
+
+        The user-provided description of this organization.
+
+    .. attribute:: events_url
+
+        The URL to retrieve the events related to this organization.
+
+    .. attribute:: hooks_url
+
+        The URL for the resource to manage organization hooks.
+
+    .. attribute:: id
+
+        The unique identifier for this organization across GitHub.
+
+    .. attribute:: issues_url
+
+        The URL to retrieve the issues across this organization's
+        repositories.
+
+    .. attribute:: login
+
+        The unique username of the organization.
+
+    .. attribute:: members_url
+
+        The URL to retrieve the members of this organization.
+
+    .. attribute:: public_members_urlt
+
+        A :class:`uritemplate.URITemplate` that can be expanded to either list
+        the public members of this organization or verify a user is a public
+        member.
+
+    .. attribute:: repos_url
+
+        The URL to retrieve the repositories in this organization.
+
+    .. attribute:: url
+
+        The URL to retrieve this organization from the GitHub API.
+
+    .. attribute:: type
+
+        .. deprecated:: 1.0.0
+
+            This will be removed in a future release.
+
+        Previously returned by the API to indicate the type of the account.
+    """
+
+    class_name = 'ShortOrganization'
+    _refresh_to = Organization
 
 
 class Membership(models.GitHubCore):

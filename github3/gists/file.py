@@ -32,6 +32,33 @@ class _GistFile(models.GitHubCore):
         return None
 
 
+class GistFile(_GistFile):
+    """This represents the full file object returned by interacting with gists.
+
+    The object has all of the attributes as returned by the API for a
+    ShortGistFile as well as:
+
+    .. attribute:: truncated
+
+        A boolean attribute that indicates whether :attr:`original_content`
+        contains all of the file's contents.
+
+    .. attribute:: original_content
+
+        The contents of the file (potentially truncated) returned by the API.
+        If the file was truncated use :meth:`content` to retrieve it in its
+        entirety.
+
+    """
+
+    class_name = 'GistFile'
+
+    def _update_attributes(self, gistfile):
+        super(GistFile, self)._update_attributes(gistfile)
+        self.original_content = gistfile['content']
+        self.truncated = gistfile['truncated']
+
+
 class ShortGistFile(_GistFile):
     """This represents the file object returned by interacting with gists.
 
@@ -60,30 +87,4 @@ class ShortGistFile(_GistFile):
     """
 
     class_name = 'ShortGistFile'
-
-
-class GistFile(_GistFile):
-    """This represents the full file object returned by interacting with gists.
-
-    The object has all of the attributes as returned by the API for a
-    ShortGistFile as well as:
-
-    .. attribute:: truncated
-
-        A boolean attribute that indicates whether :attr:`original_content`
-        contains all of the file's contents.
-
-    .. attribute:: original_content
-
-        The contents of the file (potentially truncated) returned by the API.
-        If the file was truncated use :meth:`content` to retrieve it in its
-        entirety.
-
-    """
-
-    class_name = 'GistFile'
-
-    def _update_attributes(self, gistfile):
-        super(GistFile, self)._update_attributes(gistfile)
-        self.original_content = gistfile['content']
-        self.truncated = gistfile['truncated']
+    _refresh_to = GistFile
