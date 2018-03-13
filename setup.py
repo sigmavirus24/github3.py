@@ -73,9 +73,9 @@ setup(
     long_description="\n\n".join([open("README.rst").read(),
                                   open("LATEST_VERSION_NOTES.rst").read()]),
     license='3-clause BSD',
-    author="Ian Cordasco",
+    author="Ian Stapleton Cordasco",
     author_email="graffatcolmingov@gmail.com",
-    url="https://github3py.readthedocs.io",
+    url="https://github3.readthedocs.io",
     packages=packages,
     install_requires=requires,
     classifiers=[
