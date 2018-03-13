@@ -130,8 +130,8 @@ class TestGitHubCore(helper.UnitHelper):
         response = requests.Response()
         response.status_code = 204
 
-        json = self.instance._json(response, 200)
-        assert json is None
+        with pytest.raises(exceptions.UnexpectedResponse):
+            self.instance._json(response, 200)
 
     def test_missingattribute(self):
         """Test AttributeError is raised when attribute is not in JSON."""

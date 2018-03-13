@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on GitHub."""
 import github3
+import pytest
 import uritemplate
 
 from .helper import (GitHubEnterpriseHelper, IntegrationHelper,
@@ -225,10 +226,8 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to retrieve a single gitignore template."""
         cassette_name = self.cassette_name('non_existent_gitignore_template')
         with self.recorder.use_cassette(cassette_name):
-            t = self.gh.gitignore_template('i_donut_exist')
-
-        assert t is not None
-        assert t == ''
+            with pytest.raises(github3.exceptions.NotFoundError):
+                self.gh.gitignore_template('i_donut_exist')
 
     def test_gitignore_templates(self):
         """Test the ability to retrieve a list of gitignore templates."""
