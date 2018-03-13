@@ -121,12 +121,12 @@ class TestOrganization(IntegrationHelper):
 
     def test_all_events(self):
         """Test retrieving organization's complete event stream."""
-        self.auto_login()
+        self.basic_login()
         cassette_name = self.cassette_name('all_events')
         with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization('praw-dev')
+            o = self.get_organization('testgh3py')
 
-            for event in o.all_events(username='bboe'):
+            for event in o.all_events(username='gh3test'):
                 assert isinstance(event, github3.events.Event)
 
     def test_events(self):

@@ -134,6 +134,12 @@ class ConnectionError(TransportError):
     msg_format = 'A connection-level exception occurred: {0}'
 
 
+class UnexpectedResponse(ResponseError):
+    """Exception class for responses that were unexpected."""
+
+    pass
+
+
 class UnprocessableResponseBody(ResponseError):
     """Exception class for response objects that cannot be handled."""
 

@@ -87,6 +87,7 @@ class TestRepository(helper.IntegrationHelper):
 
     def test_protected_branches(self):
         """Test the ability to retrieve protected branches in a repository."""
+        self.token_login()
         cassette_name = self.cassette_name('branches_protected')
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')

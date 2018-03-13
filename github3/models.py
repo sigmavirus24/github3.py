@@ -144,21 +144,31 @@ class GitHubCore(object):
 
         return instance_class(json, self)
 
-    def _json(self, response, status_code, include_cache_info=True):
+    def _json(self, response, expected_status_code, include_cache_info=True):
         ret = None
-        if self._boolean(response, status_code, 404) and response.content:
-            LOG.info('Attempting to get JSON information from a Response '
-                     'with status code %d expecting %d',
-                     response.status_code, status_code)
+        if response is None:
+            return None
+
+        actual_status_code = response.status_code
+        if actual_status_code != expected_status_code:
+            if actual_status_code >= 400:
+                raise exceptions.error_for(response)
+            LOG.warning('Expected status_code %d but got %d',
+                        expected_status_code,
+                        actual_status_code)
+        try:
             ret = response.json()
-            headers = response.headers
-            if (include_cache_info and
-                    (headers.get('Last-Modified') or headers.get('ETag')) and
-                    isinstance(ret, dict)):
-                ret['Last-Modified'] = response.headers.get(
-                    'Last-Modified', ''
-                )
-                ret['ETag'] = response.headers.get('ETag', '')
+        except ValueError:
+            raise exceptions.UnexpectedResponse(response)
+
+        headers = response.headers
+        if (include_cache_info and
+                (headers.get('Last-Modified') or headers.get('ETag')) and
+                isinstance(ret, dict)):
+            ret['Last-Modified'] = response.headers.get(
+                'Last-Modified', ''
+            )
+            ret['ETag'] = response.headers.get('ETag', '')
         LOG.info('JSON was %sreturned', 'not ' if ret is None else '')
         return ret
 
