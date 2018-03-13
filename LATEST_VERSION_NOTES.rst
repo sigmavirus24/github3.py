@@ -1,10 +1,63 @@
 .. vim: set tw=100
 
-Unreleased
-~~~~~~~~~~
+1.0.0: 2018-03-13
+~~~~~~~~~~~~~~~~~
 
-Breaking Changes (since 1.0.0a4)
-````````````````````````````````
+1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
+It is suggested you read the following release notes *very* carefully.
+
+Unfortunately, it's plausible that some things have slipped through the cracks
+in these release notes.
+
+Breaking Changes
+````````````````
+
+- Methods that iterate over collections return a separate class than methods
+  that retrieve a single instance. These objects have separate representations
+  when retrieving the data from GitHub's API. They include:
+
+  * Team now can be represented by ShortTeam or Team
+
+  * Organization now can be represented by ShortOrganization or Organization
+
+  * Issue now can be represented by ShortIssue or Issue
+
+  * PullRequest now can be represented by ShortPullRequest or PullRequest
+
+  * Commit now can be represented by ShortCommit, or Commit
+
+  * Gist now can be represented by ShortGist, GistFork, or Gist
+
+  * GistFile now can be represented by ShortGistFile or GistFile
+
+  * Repository objects:
+
+    - Branch now can be represented by ShortBranch or Branch
+
+    - RepoComment now can be represented by ShortComment or ShortRepoComment
+
+    - Repository now can be represented by ShortRepository or Repository
+
+    - RepoCommit now can be represented by MiniCommit, ShortCommit, or
+      RepoCommit
+
+    - Status now can be represented by ShortStatus or Status
+
+  * User now can be represented by ShortUser, Contributor, User, or
+    AuthenticatedUser
+
+  * License now can be represented by ShortLicense or License
+
+- Refreshing a short representation of an object will result in a new object
+  of a new class returned. For example:
+
+  .. code-block:: python
+
+      import github3
+      users = [(u, u.refresh()) for u in github3.all_users(10)]
+      for short_user, user in users:
+          assert isinstance(short_user, github3.users.ShortUser)
+          assert isinstance(user, github3.users.User)
 
 - Remove ``Thread.comment``, ``Thread.thread``, ``Thread.urls`` attributes.
 
@@ -20,44 +73,6 @@ Breaking Changes (since 1.0.0a4)
 - Remove ``is_subscribed`` method from our Subscription objects. Use the
   ``subscribed`` attribute instead.
 
-Features Added (since 1.0.0a4)
-``````````````````````````````
-
-- Add ``Organization#all_events``.
-
-- Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
-
-- Add ``Repo.statuses`` and a corresponding ``repo.status.CombinedStatus`` to
-
-Deprecations and Other Changes (since 1.0.0a4)
-``````````````````````````````````````````````
-
-- Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
-
-- Fix test failtures on windows caused by unclosed file handles.
-  get a combined view of commit statuses for a given ref.
-
-1.0.0a4: 2016-02-19
-~~~~~~~~~~~~~~~~~~~
-
-Features Added (since 1.0.0a3)
-``````````````````````````````
-
-- Add support for the Issue locking API currently in Preview Mode
-
-Bugs Fixed (since 1.0.0a3)
-``````````````````````````
-
-- Fix the dependencies and requirements. In 1.0.0a3 we moved to using the
-  ``setup.cfg`` file to define optional dependencies for wheels. By doing
-  so we accidentally left out our actual hard dependencies.
-
-1.0.0a3: 2016-02-11
-~~~~~~~~~~~~~~~~~~~
-
-Breaking Changes (since 1.0.0a2)
-````````````````````````````````
-
 - Move ``Users#add_email_addresses`` to ``GitHub#add_email_addresses``.
 
 - Move ``Users#delete_email_addresses`` to ``GitHub#delete_email_addresses``.
@@ -65,87 +80,6 @@ Breaking Changes (since 1.0.0a2)
 - Remove ``Users#add_email_address`` and ``Users#delete_email_address``.
 
 - Remove ``Repository#update_label``.
-
-Features Added (since 1.0.0a2)
-``````````````````````````````
-
-- Support filtering organization members by whether they have 2FA enabled.
-
-- Support filtering organization and team members by role.
-
-- Add ``GitHub#all_organizations``.
-
-- Add ``PullRequest#create_comment``.
-
-- Add ``Repository#release_by_tag_name`` to retrieve a Release from a
-  Repository by its associated tag name.
-
-- Add ``Repository#latest_release`` to retrieve the latest Release for a
-  Repository.
-
-- Add ``GitHub#license`` to retrieve a ``github3.license.License`` by the
-  license name.
-
-- Add ``GitHub#licenses`` to iterate over all the licenses returned by
-  GitHub's Licenses API.
-
-- Add protection information to ``github3.repos.branch.Branch``.
-
-- Add ``Branch#protect`` and ``Branch#unprotect`` to support updating a
-  Branch's protection status.
-
-- Vastly improved GitHub Enterprise support:
-
-  - Add ``User#rename`` to rename a user in a GitHub Enterprise installation.
-
-  - Add ``GitHub#create_user`` to create a user.
-
-  - Add ``User#impersonate`` to create an impersonation token by an admin for
-    a particular user.
-
-  - Add ``User#revoke_impersonation`` to revoke all impersonation tokens for a
-    user.
-
-  - Add ``User#promote`` to promote a particular user to a site administrator.
-
-  - Add ``User#demote`` to demote a site administrator to a simple user.
-
-  - Add ``User#suspend`` to suspend a user's account.
-
-  - Add ``User#unsuspend`` to reinstate a user's account.
-
-- Add ``original_content`` attribute to a ``GistFile``
-
-- Add ``GistFile#content`` to retrieve the contents of a file in a gist from
-  the API.
-
-- Add support for the alpha `bulk issue import API`_
-
-.. _bulk issue import API:
-    https://gist.github.com/jonmagic/5282384165e0f86ef105
-
-Bugs Fixed (since 1.0.0a2)
-``````````````````````````
-
-- The ``context`` parameter to ``Repository#create_status`` now properly
-  defaults to ``"default"``.
-
-- Fix AttributeError when ``IssueEvent`` has assignee.
-
-- Correctly set the ``message`` attribute on ``RepoCommit`` instances.
-
-- Include ``browser_download_url`` on ``Asset`` instances.
-
-- (Packaging related) Fix ``setup.py`` to use proper values for certain
-  parameters.
-
-- Fix ``ValueError`` for ``Repository#create_file``.
-
-1.0.0a2: 2015-07-14
-~~~~~~~~~~~~~~~~~~~
-
-Breaking Changes (since 1.0.0a1)
-````````````````````````````````
 
 - When you download a release asset, instead of returning ``True`` or
   ``False``, it will return the name of the file in which it saved the asset.
@@ -157,50 +91,6 @@ Breaking Changes (since 1.0.0a1)
   instances of ``github3.repos.contents.Contents``.
 
 - Replace ``Repository#comments_on_commit`` with ``RepoCommit#comments``.
-
-Features Added (since 1.0.0a1)
-``````````````````````````````
-
-- You can now download a file in a pull request to a file on disk.
-
-- You can retrieve the contents of the file in a pull request as bytes.
-
-- Add ``id`` attribute to ``github3.repos.milestone.Milestone``.
-
-- Add support for sort, direction, and since parameters to the ``comments``
-  method on ``github3.issues.Issue``.
-
-- Add branch argument to update and delete methods on
-  ``github3.repos.contents.Contents``.
-
-- Add ``permissions`` attribute to ``github3.repos.repo.Repository`` object to
-  retrieve the permissions for a specific repository.
-
-- Allow a deployment to be retrieved by its id.
-
-- Add the ``delete`` method to the ``github3.repos.release.Asset`` class.
-
-Bugs Fixed (since 1.0.0a1)
-``````````````````````````
-
-- Pull request files can now be downloaded even when the repository is
-  private.
-
-- Fix exception when merging a pull request with an empty commit message.
-
-- Add missing Issue events.
-
-- Coerce review comment positions to integers.
-
-
-1.0.0a1: 2014-12-07
-~~~~~~~~~~~~~~~~~~~
-
-1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
-It is suggested you read the following release notes *very* carefully.
-
-Breaking Changes
-````````````````
 
 - ``Organization#add_member`` has been changed. The second parameter has been
   changed to ``team_id`` and now expects an integer.
@@ -558,3 +448,126 @@ New Features
 
       i = github3.issue('sigmavirus24', 'github3.py', 301)
       pr = i.pull_request()
+
+- Add support for the Issue locking API currently in Preview Mode
+
+- Add ``Organization#all_events``.
+
+- Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
+
+- Add ``Repo.statuses`` and a corresponding ``repo.status.CombinedStatus`` to
+
+- Support filtering organization members by whether they have 2FA enabled.
+
+- Support filtering organization and team members by role.
+
+- Add ``GitHub#all_organizations``.
+
+- Add ``PullRequest#create_comment``.
+
+- Add ``Repository#release_by_tag_name`` to retrieve a Release from a
+  Repository by its associated tag name.
+
+- Add ``Repository#latest_release`` to retrieve the latest Release for a
+  Repository.
+
+- Add ``GitHub#license`` to retrieve a ``github3.license.License`` by the
+  license name.
+
+- Add ``GitHub#licenses`` to iterate over all the licenses returned by
+  GitHub's Licenses API.
+
+- Add protection information to ``github3.repos.branch.Branch``.
+
+- Add ``Branch#protect`` and ``Branch#unprotect`` to support updating a
+  Branch's protection status.
+
+- Vastly improved GitHub Enterprise support:
+
+  - Add ``User#rename`` to rename a user in a GitHub Enterprise installation.
+
+  - Add ``GitHub#create_user`` to create a user.
+
+  - Add ``User#impersonate`` to create an impersonation token by an admin for
+    a particular user.
+
+  - Add ``User#revoke_impersonation`` to revoke all impersonation tokens for a
+    user.
+
+  - Add ``User#promote`` to promote a particular user to a site administrator.
+
+  - Add ``User#demote`` to demote a site administrator to a simple user.
+
+  - Add ``User#suspend`` to suspend a user's account.
+
+  - Add ``User#unsuspend`` to reinstate a user's account.
+
+- Add ``original_content`` attribute to a ``GistFile``
+
+- Add ``GistFile#content`` to retrieve the contents of a file in a gist from
+  the API.
+
+- Add support for the alpha `bulk issue import API`_
+
+- You can now download a file in a pull request to a file on disk.
+
+- You can retrieve the contents of the file in a pull request as bytes.
+
+- Add ``id`` attribute to ``github3.repos.milestone.Milestone``.
+
+- Add support for sort, direction, and since parameters to the ``comments``
+  method on ``github3.issues.Issue``.
+
+- Add branch argument to update and delete methods on
+  ``github3.repos.contents.Contents``.
+
+- Add ``permissions`` attribute to ``github3.repos.repo.Repository`` object to
+  retrieve the permissions for a specific repository.
+
+- Allow a deployment to be retrieved by its id.
+
+- Add the ``delete`` method to the ``github3.repos.release.Asset`` class.
+
+.. _bulk issue import API:
+    https://gist.github.com/jonmagic/5282384165e0f86ef105
+
+Bugs Fixed
+``````````
+
+- Fix the dependencies and requirements. In 1.0.0a3 we moved to using the
+  ``setup.cfg`` file to define optional dependencies for wheels. By doing
+  so we accidentally left out our actual hard dependencies.
+
+- The ``context`` parameter to ``Repository#create_status`` now properly
+  defaults to ``"default"``.
+
+- Fix AttributeError when ``IssueEvent`` has assignee.
+
+- Correctly set the ``message`` attribute on ``RepoCommit`` instances.
+
+- Include ``browser_download_url`` on ``Asset`` instances.
+
+- (Packaging related) Fix ``setup.py`` to use proper values for certain
+  parameters.
+
+- Fix ``ValueError`` for ``Repository#create_file``.
+
+- Pull request files can now be downloaded even when the repository is
+  private.
+
+- Fix exception when merging a pull request with an empty commit message.
+
+- Add missing Issue events.
+
+- Coerce review comment positions to integers.
+
+Deprecations and Other Changes
+``````````````````````````````
+
+- Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
+
+- Fix test failtures on windows caused by unclosed file handles.
+  get a combined view of commit statuses for a given ref.
+
+- The ``refresh`` method will eventually stop updating the instance in place
+  and instead only return new instances of objects.
