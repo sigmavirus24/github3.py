@@ -1,5 +1,13 @@
 .. vim: set tw=100
 
+1.0.1: 2018-03-14
+~~~~~~~~~~~~~~~~~
+
+Bugs Fixed
+``````````
+
+- Fix missing python-dateutil requirement when installing from a wheel.
+
 1.0.0: 2018-03-13
 ~~~~~~~~~~~~~~~~~
 
