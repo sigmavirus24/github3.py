@@ -27,6 +27,8 @@ matrix:
       env: TOXENV=py37
     - python: pypy
       env: TOXENV=pypy
+    - python: 3.6
+      env: TOXENV=teststubs
     - env: TOXENV=py27-flake8
     - env: TOXENV=py34-flake8
     - env: TOXENV=docstrings

@@ -78,6 +78,9 @@ setup(
     url="https://github3.readthedocs.io",
     packages=packages,
     install_requires=requires,
+    package_data={
+        "github3": ["py.typed"],
+    },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved',

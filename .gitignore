@@ -19,3 +19,4 @@ build/
 .cache/
 tests/id_rsa
 *.DS_Store
+.mypy_cache
