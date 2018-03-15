@@ -1,13 +1,15 @@
-class _User:
-    ...
+from . import models
 
-
-class ShortUser(_User):
+class _User(models.GitHubCore):
     ...
 
 
 class User(_User):
     ...
+
+
+class ShortUser(_User):
+    _refresh_to = User
 
 
 class Contributor(_User):
@@ -18,5 +20,9 @@ class AuthenticatedUser(User):
     ...
 
 
-class Email:
+class Email(models.GitHubCore):
+    ...
+
+
+class Key(models.GitHubCore):
     ...

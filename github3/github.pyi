@@ -1,25 +1,29 @@
 """This module contains the type stubs for github3.github."""
-from typing import Dict, List, Union, Optional
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+)
 
 from . import auths
 from . import events
-from .gists import gist
-from .issues import issue
+from . import models
 from . import orgs
-from .repos import repo
 from . import structs
 from . import users
+from .gists import gist
+from .issues import issue
+from .repos import repo
 
-AuthorizationsIterator = structs.GitHubIterator[auths.Authorization]
-EventsIterator = structs.GitHubIterator[events.Event]
-OrganizationsIterator = structs.GitHubIterator[orgs.ShortOrganization]
-RepositoriesIterator = structs.GitHubIterator[repo.ShortRepository]
-UsersIterator = structs.GitHubIterator[users.ShortUser]
+T = TypeVar('T', bound='GitHub')
 
 
-class GitHub:
+class GitHub(models.GitHubCore):
     def __init__(
-        self,
+        self: T,
         username: str='',
         password: str='',
         token: str='',
@@ -27,60 +31,60 @@ class GitHub:
         ...
 
     def add_email_addresses(
-        self,
+        self: T,
         addresses: List[str]=[],
     ) -> List[users.Email]:
         ...
 
     def all_events(
-        self,
+        self: T,
         number: int=-1,
         etag: Optional[str]=None,
-    ) -> EventsIterator:
+    ) -> structs.GitHubIterator[events.Event]:
         ...
 
     def all_organizations(
-        self,
+        self: T,
         number: int=-1,
         since: Optional[int]=None,
         etag: Optional[str]=None,
         per_page: Optional[int]=None,
-    ) -> OrganizationsIterator:
+    ) -> structs.GitHubIterator[orgs.ShortOrganization]:
         ...
 
     def all_repositories(
-        self,
+        self: T,
         number: int=-1,
         since: Optional[int]=None,
         etag: Optional[str]=None,
         per_page: Optional[int]=None,
-    ) -> RepositoriesIterator:
+    ) -> structs.GitHubIterator[repo.ShortRepository]:
         ...
 
     def all_users(
-        self,
+        self: T,
         number: int=-1,
         etag: Optional[str]=None,
         per_page: Optional[int]=None,
         since: Optional[int]=None,
-    ) -> UsersIterator:
+    ) -> structs.GitHubIterator[users.ShortUser]:
         ...
 
     def authorization(
-        self,
+        self: T,
         id_num: Union[int, str],
-    ) -> AuthorizationsIterator:
+    ) -> auths.Authorization:
         ...
 
     def authorizations(
-        self,
+        self: T,
         number: int=-1,
         etag: Optional[str]=None,
-    ) -> AuthorizationsIterator:
+    ) -> structs.GitHubIterator[auths.Authorization]:
         ...
 
     def authorize(
-        self,
+        self: T,
         username: str,
         password: str,
         scopes: Optional[List[str]]=None,
@@ -92,13 +96,13 @@ class GitHub:
         ...
 
     def check_authorization(
-        self,
+        self: T,
         access_token: str,
     ) -> bool:
         ...
 
     def create_gist(
-        self,
+        self: T,
         description: str,
         files: Dict[str, Dict[str, str]],
         public: bool=True,
@@ -106,7 +110,7 @@ class GitHub:
         ...
 
     def create_issue(
-        self,
+        self: T,
         owner: str,
         repository: str,
         title: str,
@@ -116,4 +120,58 @@ class GitHub:
         labels: List[str]=[],
         assignees: Optional[List[str]]=None,
     ) -> issue.ShortIssue:
+        ...
+
+    def create_key(
+        self: T,
+        title: str,
+        key: str,
+        read_only: bool=False,
+    ) -> users.Key:
+        ...
+
+    def create_repository(
+        self: T,
+        name: str,
+        description: str='',
+        homepage: str='',
+        private: bool=False,
+        has_issues: bool=True,
+        has_wiki: bool=True,
+        auto_init: bool=False,
+        gitignore_template: str='',
+    ) -> repo.Repository:
+        ...
+
+    def delete_email_addresses(
+        self: T,
+        addresses: List[str],
+    ) -> bool:
+        ...
+
+    def emails(
+        self: T,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[users.Email]:
+        ...
+
+    def emojis(self: T) -> Dict[str, str]:
+        ...
+
+    def feeds(self: T) -> Dict[str, Any]:
+        ...
+
+    def follow(
+        self: T,
+        username: str
+    ) -> bool:
+        ...
+
+    def followed_by(
+        self: T,
+        username: str,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[users.ShortUser]:
         ...
