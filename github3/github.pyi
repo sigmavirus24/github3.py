@@ -9,6 +9,7 @@ from typing import (
 )
 
 from . import auths
+from . import decorators
 from . import events
 from . import models
 from . import orgs
@@ -30,6 +31,7 @@ class GitHub(models.GitHubCore):
     ) -> None:
         ...
 
+    @decorators.requires_auth
     def add_email_addresses(
         self: T,
         addresses: List[str]=[],
@@ -70,6 +72,7 @@ class GitHub(models.GitHubCore):
     ) -> structs.GitHubIterator[users.ShortUser]:
         ...
 
+    @decorators.requires_basic_auth
     def authorization(
         self: T,
         id_num: Union[int, str],
@@ -109,6 +112,7 @@ class GitHub(models.GitHubCore):
     ) -> gist.Gist:
         ...
 
+    @decorators.requires_auth
     def create_issue(
         self: T,
         owner: str,
@@ -122,6 +126,7 @@ class GitHub(models.GitHubCore):
     ) -> issue.ShortIssue:
         ...
 
+    @decorators.requires_auth
     def create_key(
         self: T,
         title: str,
@@ -130,6 +135,7 @@ class GitHub(models.GitHubCore):
     ) -> users.Key:
         ...
 
+    @decorators.requires_auth
     def create_repository(
         self: T,
         name: str,
@@ -143,12 +149,14 @@ class GitHub(models.GitHubCore):
     ) -> repo.Repository:
         ...
 
+    @decorators.requires_auth
     def delete_email_addresses(
         self: T,
         addresses: List[str],
     ) -> bool:
         ...
 
+    @decorators.requires_auth
     def emails(
         self: T,
         number: int=-1,
@@ -162,6 +170,7 @@ class GitHub(models.GitHubCore):
     def feeds(self: T) -> Dict[str, Any]:
         ...
 
+    @decorators.requires_auth
     def follow(
         self: T,
         username: str
@@ -174,4 +183,50 @@ class GitHub(models.GitHubCore):
         number: int=-1,
         etag: Optional[str]=None,
     ) -> structs.GitHubIterator[users.ShortUser]:
+        ...
+
+    @decorators.requires_auth
+    def followers(
+        self: T,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[users.ShortUser]:
+        ...
+
+    def followers_of(
+        self: T,
+        username: str,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[users.ShortUser]:
+        ...
+
+    @decorators.requires_auth
+    def following(
+        self: T,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[users.ShortUser]:
+        ...
+
+    def gist(
+        self: T,
+        id_num: int,
+    ) -> gist.Gist:
+        ...
+
+    @decorators.requires_auth
+    def gists(
+        self: T,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[gist.ShortGist]:
+        ...
+
+    def gists_by(
+        self: T,
+        username: str,
+        number: int=-1,
+        etag: Optional[str]=None,
+    ) -> structs.GitHubIterator[gist.ShortGist]:
         ...

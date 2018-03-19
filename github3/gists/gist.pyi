@@ -1,4 +1,7 @@
-class _Gist:
+from .. import models
+
+
+class _Gist(models.GitHubCore):
     ...
 
 
