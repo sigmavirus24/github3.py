@@ -17,6 +17,21 @@ def requires_2fa(response):
     return False
 
 
+class TokenAuth(requests.auth.AuthBase):
+    def __init__(self, token):
+        self.token = token
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __eq__(self, other):
+        return self.token == getattr(other, 'token', None)
+
+    def __call__(self, request):
+        request.headers['Authorization'] = 'token {}'.format(self.token)
+        return request
+
+
 class GitHubSession(requests.Session):
     auth = None
     __attrs__ = requests.Session.__attrs__ + ['base_url', 'two_factor_auth_cb']
@@ -47,9 +62,6 @@ class GitHubSession(requests.Session):
             return
 
         self.auth = (username, password)
-
-        # Disable token authentication
-        self.headers.pop('Authorization', None)
 
     def build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""
@@ -122,11 +134,7 @@ class GitHubSession(requests.Session):
         if not token:
             return
 
-        self.headers.update({
-            'Authorization': 'token {0}'.format(token)
-            })
-        # Unset username/password so we stop sending them
-        self.auth = None
+        self.auth = TokenAuth(token)
 
     @contextmanager
     def temporary_basic_auth(self, *auth):
