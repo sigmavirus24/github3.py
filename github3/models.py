@@ -154,9 +154,15 @@ class GitHubCore(object):
         if actual_status_code != expected_status_code:
             if actual_status_code >= 400:
                 raise exceptions.error_for(response)
+
+            if actual_status_code == 304:
+                # Received a response from someone passing in `etag=`
+                return None
+
             LOG.warning('Expected status_code %d but got %d',
                         expected_status_code,
                         actual_status_code)
+
         try:
             ret = response.json()
         except ValueError:
