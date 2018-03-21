@@ -154,12 +154,17 @@ class UnitHelper(unittest.TestCase):
     def setUp(self):
         """Use to set up attributes on self before each test."""
         self.session = self.create_session_mock()
-        self.instance = self.create_instance_of_described_class()
         # Proxy the build_url method to the class so it can build the URL and
         # we can assert things about the call that will be attempted to the
         # internet
+        self.old_build_url = self.described_class._build_url
         self.described_class._build_url = build_url
+        self.instance = self.create_instance_of_described_class()
         self.after_setup()
+
+    def tearDown(self):
+        """Reset attributes on items under test."""
+        self.described_class._build_url = self.old_build_url
 
     def after_setup(self):
         """No-op method to avoid people having to override setUp."""

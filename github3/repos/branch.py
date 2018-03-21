@@ -25,12 +25,14 @@ class _Branch(models.GitHubCore):
     def _update_attributes(self, branch):
         self.commit = commit.MiniCommit(branch['commit'], self)
         self.name = branch['name']
+        base = self.commit.url.split('/commit', 1)[0]
+        self._api = self._build_url('branches', self.name, base_url=base)
 
     def _repr(self):
         return '<{0} [{1}]>'.format(self.class_name, self.name)
 
     def latest_sha(self, differs_from=''):
-        """Check if SHA-1 is the same as remote branch.
+        """Check if SHA-1 is the same as the remote branch.
 
         See: https://git.io/vaqIw
 
@@ -139,10 +141,6 @@ class Branch(_Branch):
         self.protection_url = branch['protection_url']
         if self.links and 'self' in self.links:
             self._api = self.links['self']
-        elif isinstance(self.commit, commit.ShortCommit):
-            # Branches obtained via `repo.branches` don't have links.
-            base = self.commit.url.split('/commit', 1)[0]
-            self._api = self._build_url('branches', self.name, base_url=base)
 
 
 class ShortBranch(_Branch):
