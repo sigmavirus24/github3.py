@@ -279,10 +279,17 @@ class GitHub(models.GitHubCore):
             return self._boolean(resp, 200, 404)
         return False
 
+    @requires_auth
     def create_gist(self, description, files, public=True):
         """Create a new gist.
 
-        If no login was provided, it will be anonymous.
+        .. versionchanged:: 1.1.0
+
+            Per `GitHub's recent announcement`_ authentication is now required
+            for creating gists.
+
+        .. _GitHub's recent announcement:
+            https://blog.github.com/2018-02-18-deprecation-notice-removing-anonymous-gist-creation/
 
         :param str description:
             (required), description of gist
