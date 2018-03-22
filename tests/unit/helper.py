@@ -44,14 +44,32 @@ def build_url(self, *args, **kwargs):
     return github3.session.GitHubSession().build_url(*args, **kwargs)
 
 
-class UnitHelper(unittest.TestCase):
+def enterprise_build_url_builder(enterprise_url):
+    """Build a URL builder function."""
+    def enterprise_build_url(self, *args, **kwargs):
+        """A function to proxy to the actual GitHubSession#build_url method."""
+        # We want to assert what is happening with the actual calls to the
+        # Internet. We can proxy this.
+        return github3.session.GitHubSession().build_url(
+            *args,
+            base_url=enterprise_url,
+            **kwargs
+        )
+    return enterprise_build_url
 
+
+class UnitHelper(unittest.TestCase):
     """Base class for unittests."""
 
     # Sub-classes must assign the class to this during definition
     described_class = None
     # Sub-classes must also assign a dictionary to this during definition
     example_data = {}
+    enterprise_url = None
+
+    @staticmethod
+    def get_build_url_proxy():
+        return build_url
 
     def create_mocked_session(self):
         """Use mock to auto-spec a GitHubSession and return an instance."""
@@ -89,7 +107,10 @@ class UnitHelper(unittest.TestCase):
             instance = self.described_class(self.example_data, session)
 
         else:
-            instance = self.described_class()
+            if self.enterprise_url is None:
+                instance = self.described_class()
+            else:
+                instance = self.described_class(self.enterprise_url)
             instance.session = self.session
 
         return instance
@@ -154,12 +175,17 @@ class UnitHelper(unittest.TestCase):
     def setUp(self):
         """Use to set up attributes on self before each test."""
         self.session = self.create_session_mock()
-        self.instance = self.create_instance_of_described_class()
         # Proxy the build_url method to the class so it can build the URL and
         # we can assert things about the call that will be attempted to the
         # internet
-        self.described_class._build_url = build_url
+        self.old_build_url = self.described_class._build_url
+        self.described_class._build_url = self.get_build_url_proxy()
+        self.instance = self.create_instance_of_described_class()
         self.after_setup()
+
+    def tearDown(self):
+        """Reset attributes on items under test."""
+        self.described_class._build_url = self.old_build_url
 
     def after_setup(self):
         """No-op method to avoid people having to override setUp."""
@@ -234,42 +260,17 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
 
 
 class UnitGitHubObjectHelper(UnitHelper):
-
     """Base class for GitHubObject unit tests."""
+    # TODO(sigmavirus24): delete me
 
-    def setUp(self):
-        self.session = None
-        self.instance = self.create_instance_of_described_class()
-        # Proxy the build_url method to the class so it can build the URL and
-        # we can assert things about the call that will be attempted to the
-        # internet
-        self.described_class._build_url = build_url
-        self.after_setup()
-        pass
+    pass
 
 
 @pytest.mark.usefixtures('enterprise_url')
 class UnitGitHubEnterpriseHelper(UnitHelper):
 
-    def build_url(self, *args, **kwargs):
-        """A function to proxy to the actual GitHubSession#build_url method."""
-        # We want to assert what is happening with the actual calls to the
-        # Internet. We can proxy this.
-        return github3.session.GitHubSession().build_url(
-            *args,
-            base_url=self.enterprise_url,
-            **kwargs
-        )
-
-    def setUp(self):
-        self.session = self.create_session_mock()
-        self.instance = github3.GitHubEnterprise(self.enterprise_url)
-        self.instance.session = self.session
-        # Proxy the build_url method to the class so it can build the URL and
-        # we can assert things about the call that will be attempted to the
-        # internet
-        self.instance._build_url = self.build_url
-        self.after_setup()
+    def get_build_url_proxy(self):
+        return enterprise_build_url_builder(self.enterprise_url)
 
 
 is_py3 = (3, 0) <= sys.version_info < (4, 0)
