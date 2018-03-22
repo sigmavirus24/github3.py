@@ -85,9 +85,12 @@ class TestGitHubSession:
         """
         s = self.build_session()
         s.token_auth('token goes here')
-        assert 'Authorization' in s.headers
+        req = requests.Request('GET', 'https://api.github.com/')
+        pr = s.prepare_request(req)
+        assert 'token token goes here' == pr.headers['Authorization']
         s.basic_auth('username', 'password')
-        assert 'Authorization' not in s.headers
+        pr = s.prepare_request(req)
+        assert 'token token goes here' != pr.headers['Authorization']
 
     @mock.patch.object(requests.Session, 'request')
     def test_handle_two_factor_auth(self, request_mock):
@@ -136,7 +139,9 @@ class TestGitHubSession:
         """Test that token auth will work with a valid token"""
         s = self.build_session()
         s.token_auth('token goes here')
-        assert s.headers['Authorization'] == 'token token goes here'
+        req = requests.Request('GET', 'https://api.github.com/')
+        pr = s.prepare_request(req)
+        assert pr.headers['Authorization'] == 'token token goes here'
 
     def test_token_auth_disables_basic_auth(self):
         """Test that using token auth removes the value of the auth attribute.
@@ -146,15 +151,49 @@ class TestGitHubSession:
         s = self.build_session()
         s.auth = ('foo', 'bar')
         s.token_auth('token goes here')
-        assert s.auth is None
+        assert s.auth != ('foo', 'bar')
+        assert isinstance(s.auth, session.TokenAuth)
 
     def test_token_auth_does_not_use_falsey_values(self):
         """Test that token auth will not authenticate with falsey values"""
         bad_tokens = [None, '']
+        req = requests.Request('GET', 'https://api.github.com/')
         for token in bad_tokens:
             s = self.build_session()
             s.token_auth(token)
-            assert 'Authorization' not in s.headers
+            pr = s.prepare_request(req)
+            assert 'Authorization' not in pr.headers
+
+    def test_token_auth_with_netrc_works(self, tmpdir):
+        """
+        Test that token auth will be used instead of netrc.
+
+        With no auth specified, requests will use any matching auths
+        in .netrc/_netrc files
+        """
+        token = "my-valid-token"
+        s = self.build_session()
+        s.token_auth(token)
+
+        netrc_contents = (
+            "machine api.github.com\n"
+            "login sigmavirus24\n"
+            "password invalid_token_for_test_verification\n"
+        )
+        # cover testing netrc behaviour on different OSs
+        dotnetrc = tmpdir.join(".netrc")
+        dotnetrc.write(netrc_contents)
+        dashnetrc = tmpdir.join("_netrc")
+        dashnetrc.write(netrc_contents)
+
+        with mock.patch.dict('os.environ', {'HOME': str(tmpdir)}):
+            # prepare_request triggers reading of .netrc files
+            pr = s.prepare_request(
+                requests.Request(
+                    'GET', 'https://api.github.com/users/sigmavirus24')
+            )
+            auth_header = pr.headers['Authorization']
+            assert auth_header == 'token {0}'.format(token)
 
     def test_two_factor_auth_callback_handles_None(self):
         s = self.build_session()
@@ -214,13 +253,15 @@ class TestGitHubSession:
         """Verify that no_auth removes existing authentication."""
         s = self.build_session()
         s.basic_auth('user', 'password')
-        s.headers['Authorization'] = 'token foobarbogus'
+        req = requests.Request('GET', 'https://api.github.com/')
 
         with s.no_auth():
-            assert 'Authentication' not in s.headers
+            pr = s.prepare_request(req)
+            assert 'Authorization' not in pr.headers
             assert s.auth is None
 
-        assert s.headers['Authorization'] == 'token foobarbogus'
+        pr = s.prepare_request(req)
+        assert 'Authorization' in pr.headers
         assert s.auth == ('user', 'password')
 
     def test_retrieve_client_credentials_when_set(self):
