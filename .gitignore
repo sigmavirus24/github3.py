@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 docs/_build
+docs/build
 bin/
 include/
 lib/

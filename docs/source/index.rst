@@ -1,23 +1,22 @@
-github3.py
-==========
+============
+ github3.py
+============
 
 Release v\ |version|.
 
 github3.py is wrapper for the `GitHub API`_ written in python. The design of
 github3.py is centered around having a logical organization of the methods
-needed to interact with the API. Let me demonstrate this with a code example.
+needed to interact with the API. As an example, let's get information about a
+user:
 
-Example
--------
-
-Let's get information about a user::
+.. code-block:: python
 
     from github3 import login
 
     gh = login('sigmavirus24', password='<password>')
 
     sigmavirus24 = gh.me()
-    # <User [sigmavirus24:Ian Stapleton Cordasco]>
+    # <AuthenticatedUser [sigmavirus24:Ian Stapleton Cordasco]>
 
     print(sigmavirus24.name)
     # Ian Stapleton Cordasco
@@ -38,8 +37,7 @@ Let's get information about a user::
 
     followers = [str(f) for f in gh.followers('kennethreitz')]
 
-More Examples
-~~~~~~~~~~~~~
+There are several examples of different aspects of using github3.py
 
 .. toctree::
     :maxdepth: 2
@@ -50,85 +48,34 @@ More Examples
     examples/git
     examples/github
     examples/issue
-    examples/iterators.rst
+    examples/iterators
     examples/logging
     examples/octocat
-
-
-.. links
-
-.. _GitHub API: http://developer.github.com
-
-
-Modules
--------
-
-.. toctree::
-    :maxdepth: 1
-
-    api
-    auths
-    events
-    gists
-    git
-    github
-    issues
-    models
-    notifications
-    orgs
-    pulls
-    repos
-    search_structs
-    structs
-    users
-
-Internals
-~~~~~~~~~
-
-For objects you're not likely to see in practice. This is useful if you ever
-feel the need to contribute to the project.
-
-.. toctree::
-    :maxdepth: 1
-
-    models
-    decorators
 
 
 Installation
 ------------
 
-.. code-block:: sh
+.. code-block:: console
 
     $ pip install github3.py
-    # OR:
-    $ git clone git://github.com/sigmavirus24/github3.py.git github3.py
-    $ cd github3.py
-    $ python setup.py install
 
 
-Dependencies
-~~~~~~~~~~~~
+API Reference Documentation
+---------------------------
 
-- requests_ by Kenneth Reitz
-- uritemplate_ by Ian Stapleton Cordasco
+.. toctree::
+    :maxdepth: 1
 
-.. _requests: https://github.com/kennethreitz/requests
-.. _uritemplate: https://github.com/sigmavirus24/uritemplate
+    api-reference/index
 
 
 Contributing
 ------------
 
-I'm maintaining two public copies of the project. The first can be found on
-GitHub_ and the second on BitBucket_. I would prefer pull requests to take
-place on GitHub, but feel free to do them via BitBucket. Please make sure to
-add yourself to the list of contributors in AUTHORS.rst, especially if you're
-going to be working on the list below.
-
-.. links
-.. _GitHub: https://github.com/sigmavirus24/github3.py
-.. _BitBucket: https://bitbucket.org/icordasc/github3.py/src
+All developlment happens on GitHub_. Please remember to add yourself to the
+list of contributors in AUTHORS.rst, especially if you're going to be
+working on the list below.
 
 Contributor Friendly Work
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,55 +92,67 @@ Examples
     Have a clever example that takes advantage of github3.py? Feel free to
     share it.
 
+Otherwise, feel free to example the list of issues where we would like help_
+and feel free to take one.
+
 Running the Unittests
 ~~~~~~~~~~~~~~~~~~~~~
 
-The tests are generally run using tox. Tox can be installed lke so::
+The tests are generally run using tox. Tox can be installed lke so
+
+.. code-block:: console
 
     pip install tox
 
 We test against PyPy and the following versions of Python:
 
-- 2.6
 - 2.7
-- 3.2
-- 3.3
+
 - 3.4
+
+- 3.5
+
+- 3.6
 
 If you simply run ``tox`` it will run tests against all of these versions of
 python and run ``flake8`` against the codebase as well. If you want to run
-against one specific version, you can do::
+against one specific version, you can do
 
-    tox -e py34
+.. code-block:: console
 
-And if you want to run tests against a specific file, you can do::
+    tox -e py36
 
-    tox -e py34 -- tests/uni/test_github.py
+And if you want to run tests against a specific file, you can do
+
+.. code-block:: console
+
+    tox -e py36 -- tests/unit/test_github.py
 
 To run the tests, ``tox`` uses ``py.test`` so you can pass any options or
 parameters to ``py.test`` after specifying ``--``. For example, you can get
-more verbose output by doing::
+more verbose output by doing
 
-    tox -e py34 -- -vv
+.. code-block:: console
+
+    tox -e py36 -- -vv
 
 .. toctree::
 
-    testing
+    contributing/testing
 
 
 Contact
 -------
 
-- Twitter: @\ sigmavirus24_
+- Twitter: `@sigmavirus24`_
 - Private email: graffatcolmingov [at] gmail
-- Mailing list: github3.py [at] librelist.com
 
-.. _sigmavirus24: https://twitter.com/sigmavirus24
+.. _@sigmavirus24: https://twitter.com/sigmavirus24
 
 Latest Version's Changes
 ------------------------
 
-.. include:: ../LATEST_VERSION_NOTES.rst
+.. include:: ../../LATEST_VERSION_NOTES.rst
 
 The full history of the project is available as well.
 
@@ -253,3 +212,13 @@ Testimonials
 
     <script async src="//platform.twitter.com/widgets.js"
     charset="utf-8"></script>
+
+
+.. links
+
+.. _GitHub API:
+    http://developer.github.com
+.. _GitHub:
+    https://github.com/sigmavirus24/github3.py
+.. _help:
+    https://github.com/sigmavirus24/github3.py/labels/help%20wanted
