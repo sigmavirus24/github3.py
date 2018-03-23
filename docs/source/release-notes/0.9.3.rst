@@ -1,0 +1,11 @@
+0.9.3: 2014-11-04
+-----------------
+
+- Backport of ``PullRequest#create_review_comment`` by Adrian Moisey
+
+- Backport of ``PullRequest#review_comments`` by Adrian Moisey
+
+- Backport of a fix that allows authenticated users to download Release
+  Assets. Original bug reported by Eugene Fidelin in issue #288.
+
+- Documentation typo fix by Marc Abramowitz

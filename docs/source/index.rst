@@ -1,6 +1,6 @@
-============
- github3.py
-============
+===================================================
+ github3.py: A Library for Using GitHub's REST API
+===================================================
 
 Release v\ |version|.
 
@@ -54,15 +54,24 @@ There are several examples of different aspects of using github3.py
 
 
 Installation
-------------
+============
 
 .. code-block:: console
 
     $ pip install github3.py
 
 
+User Guide
+==========
+
+.. toctree::
+    :maxdepth: 1
+
+    narrative/index
+
+
 API Reference Documentation
----------------------------
+===========================
 
 .. toctree::
     :maxdepth: 1
@@ -71,14 +80,14 @@ API Reference Documentation
 
 
 Contributing
-------------
+============
 
 All developlment happens on GitHub_. Please remember to add yourself to the
 list of contributors in AUTHORS.rst, especially if you're going to be
 working on the list below.
 
 Contributor Friendly Work
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 In order of importance:
 
@@ -96,7 +105,7 @@ Otherwise, feel free to example the list of issues where we would like help_
 and feel free to take one.
 
 Running the Unittests
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 The tests are generally run using tox. Tox can be installed lke so
 
@@ -142,26 +151,23 @@ more verbose output by doing
 
 
 Contact
--------
+=======
 
 - Twitter: `@sigmavirus24`_
 - Private email: graffatcolmingov [at] gmail
 
 .. _@sigmavirus24: https://twitter.com/sigmavirus24
 
-Latest Version's Changes
-------------------------
-
-.. include:: ../../LATEST_VERSION_NOTES.rst
-
-The full history of the project is available as well.
+Version History
+===============
 
 .. toctree::
+    :maxdepth: 1
 
-    project_changelog
+    release-notes/index
 
 Testimonials
-------------
+============
 
 .. raw:: html
 

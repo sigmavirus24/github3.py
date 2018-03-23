@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-
-import sys
+"""Packaging logic."""
 import os
 import re
+import sys
+import warnings
 
-from setuptools import setup
-from setuptools.command.test import test as TestCommand
+import setuptools
+import setuptools.command.test
 
 kwargs = {}
 requires = []
@@ -53,25 +54,27 @@ if not __version__:
     raise RuntimeError('Cannot find version information')
 
 
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
+class PyTest(setuptools.command.test.test):  # noqa: D101
+    def finalize_options(self):  # noqa: D102
+        setuptools.command.test.test.finalize_options(self)
         self.test_args = []
         self.test_suite = True
 
-    def run_tests(self):
+    def run_tests(self):  # noqa: D102
         # import here, cause outside the eggs aren't loaded
         import pytest
+        warnings.warn("pyton setup.py test support is deprecated.",
+                      DeprecationWarning)
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
-setup(
+
+setuptools.setup(
     name="github3.py",
     version=__version__,
     description=("Python wrapper for the GitHub API"
                  "(http://developer.github.com/v3)"),
-    long_description="\n\n".join([open("README.rst").read(),
-                                  open("LATEST_VERSION_NOTES.rst").read()]),
+    long_description=open("README.rst").read(),
     license='3-clause BSD',
     author="Ian Stapleton Cordasco",
     author_email="graffatcolmingov@gmail.com",
