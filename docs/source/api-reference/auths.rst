@@ -1,11 +1,9 @@
-.. module:: github3
-.. module:: github3.auths
-
-Authorization
-=============
+============================
+ Authorizations API Classes
+============================
 
 This part of the documentation covers the
-:class:`Authorization <Authorization>` object.
+:class:`~github3.auths.Authorization` object.
 
-.. autoclass:: Authorization
+.. autoclass:: github3.auths.Authorization
     :inherited-members:
