@@ -1,39 +1,36 @@
-.. _githubex:
+===============
+ GitHub Object
+===============
 
-GitHub
-======
+The GitHub objects is the point at which most usage of github3.py works.
 
-.. module:: github3
-.. module:: github3.github
 
-This part of the documentation covers the :class:`GitHub <GitHub>` object. A
-large portion of what you will likely want to do can be found in this class. If
-you're looking for anonymous functions, you're most likely looking for the
-:ref:`API <api>`.
+GitHub.com Object
+=================
+
+.. autoclass:: github3.github.GitHub
+    :inherited-members:
+
 
 Examples
 --------
 
-Examples utilizing this object can be found :ref:`here <github_examples>`.
-
-GitHub Object
--------------
-
-.. autoclass:: GitHub
-    :inherited-members:
+There are some examples of how to get started with this object
+:ref:`here <github_examples>`.
 
 
 GitHubEnterprise Object
------------------------
+=======================
 
-This has all of the same attributes as the :class:`GitHub <GitHub>` object so 
-for brevity's sake, I'm not listing all of it's inherited members.
+This has all of the same attributes as the :class:`~github3.github.GitHub`
+object so for brevity's sake, I'm not listing all of it's inherited members.
 
-.. autoclass:: GitHubEnterprise
+.. autoclass:: github3.github.GitHubEnterprise
     :members:
 
-GitHubStatus Object
--------------------
 
-.. autoclass:: GitHubStatus
+GitHubStatus Object
+===================
+
+.. autoclass:: github3.github.GitHubStatus
     :members:

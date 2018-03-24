@@ -5,8 +5,9 @@
 This part of the documentation covers the objects that represent data returned
 by the Events API.
 
-Event Objects
-=============
+
+The Event Object
+================
 
 .. autoclass:: github3.events.Event
     :inherited-members:
@@ -34,6 +35,10 @@ an object for the payload in this instance. For one, creating a class for each
 payload type would be insanity. I did it once, but it isn't worth the effort.
 Having individual handlers as we have now which modify the payload to use our
 objects when available is more sensible.
+
+
+Event Related Objects
+=====================
 
 The following objects are returned as part of an
 :class:`~github3.events.Event`. These objects all have methods to convert them

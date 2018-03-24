@@ -79,6 +79,15 @@ API Reference Documentation
     api-reference/index
 
 
+Version History
+===============
+
+.. toctree::
+    :maxdepth: 1
+
+    release-notes/index
+
+
 Contributing
 ============
 
@@ -158,13 +167,6 @@ Contact
 
 .. _@sigmavirus24: https://twitter.com/sigmavirus24
 
-Version History
-===============
-
-.. toctree::
-    :maxdepth: 1
-
-    release-notes/index
 
 Testimonials
 ============

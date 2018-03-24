@@ -1,65 +1,49 @@
-.. module:: github3
-.. module:: github3.git
-
-Git
-===
+=================
+ Git API Classes
+=================
 
 This part of the documentation covers the module associated with the `Git Data`_
 section of the GitHub API.
 
-- :class:`Blob <Blob>`
-- :class:`Commit <Commit>`
-- :class:`GitObject <GitObject>`
-- :class:`Hash <Hash>`
-- :class:`Reference <Reference>`
-- :class:`Tag <Tag>`
-- :class:`Tree <Tree>`
+Like much of the GitHub API, many objects have different representations.
+
+
+Blob Object(s)
+==============
+
+.. autoclass:: github3.git.Blob
+
+
+Commit Object(s)
+================
+
+.. autoclass:: github3.git.Commit
+
+.. autoclass:: github3.git.ShortCommit
+
+
+Tree Object(s)
+==============
+
+.. autoclass:: github3.git.CommitTree
+
+.. autoclass:: github3.git.Hash
+
+.. autoclass:: github3.git.Tree
+
+
+Git Object, Reference, and Tag Object(s)
+========================================
+
+Yes, we know, ``GitObject`` is a funky name.
+
+.. autoclass:: github3.git.GitObject
+
+.. autoclass:: github3.git.Reference
+
+.. autoclass:: github3.git.Tag
+
 
 .. links
-.. _Git Data: http://developer.github.com/v3/git
-
-Git Objects
------------
-
-.. autoclass:: Blob
-    :inherited-members:
-
-------
-
-.. autoclass:: ShortCommit
-    :inherited-members:
-
-------
-
-.. autoclass:: Commit
-    :inherited-members:
-
-------
-
-.. autoclass:: GitObject
-    :inherited-members:
-
-------
-
-.. autoclass:: Hash
-    :inherited-members:
-
-------
-
-.. autoclass:: Reference
-    :inherited-members:
-
-------
-
-.. autoclass:: Tag
-    :inherited-members:
-
-------
-
-.. autoclass:: Tree
-    :inherited-members:
-
-------
-
-.. autoclass:: CommitTree
-    :inherited-members:
+.. _Git Data:
+    https://developer.github.com/v3/git/
