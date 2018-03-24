@@ -2360,6 +2360,14 @@ class Repository(_Repository):
 
     .. attribute:: original_license
 
+        .. note::
+
+            When used with a Github Enterprise instance <= 2.12.7, this
+            attribute will not be returned. To handle these situations
+            sensitively, the attribute will be set to ``None``.
+            Repositories may still have a license associated with them
+            in these cases.
+
         This is the :class:`~github3.license.ShortLicense` returned as part of
         the repository. To retrieve the most recent license, see the
         :meth:`~github3.repos.repo.Repository.license` method.
@@ -2447,7 +2455,7 @@ class Repository(_Repository):
         self.has_wiki = repo['has_wiki']
         self.homepage = repo['homepage']
         self.language = repo['language']
-        self.original_license = repo['license']
+        self.original_license = repo.get('license', None)
         if self.original_license is not None:
             self.original_license = licenses.ShortLicense(
                 self.original_license, self
