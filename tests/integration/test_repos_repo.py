@@ -46,7 +46,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             branch = repository.branch('develop')
             assert isinstance(branch, github3.repos.branch.Branch)
-            assert 'enabled' in branch.protection
+            assert 'enabled' in branch.original_protection
 
     def test_branches(self):
         """Test the ability to retrieve the branches in a repository."""
