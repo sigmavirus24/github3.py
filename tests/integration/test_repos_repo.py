@@ -92,7 +92,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
-            assert all(b.protection['enabled'] is True
+            assert all(b.original_protection['enabled'] is True
                        for b in repository.branches(protected=True))
 
     def test_code_frequency(self):

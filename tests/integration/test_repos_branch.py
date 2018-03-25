@@ -25,22 +25,22 @@ class TestBranch(IntegrationHelper):
 
             # Initial change
             branch.protect('off', [])
-            assert branch.protection is None
+            assert branch.original_protection is None
 
             # Change status_checks
             branch.protect(None, ['a'])
             required['contexts'] = ['a']
-            assert branch.protection == expected
+            assert branch.original_protection == expected
 
             # Change enforcement
             branch.protect('everyone')
             required['enforcement_level'] = 'everyone'
-            assert branch.protection == expected
+            assert branch.original_protection == expected
 
             # Clear status_checks
             branch.protect(None, [])
             required['contexts'] = []
-            assert branch.protection == expected
+            assert branch.original_protection == expected
 
     @pytest.mark.xfail
     def test_unprotect(self):
@@ -55,7 +55,7 @@ class TestBranch(IntegrationHelper):
             repository = self.gh.repository('github3py', 'github3.py')
             branch = next(repository.branches(protected=True))
             branch.unprotect()
-            assert branch.protection == expected
+            assert branch.original_protection == expected
 
     def test_latest_sha(self):
         cassette_name = self.cassette_name('latest_sha')
