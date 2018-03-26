@@ -2455,7 +2455,7 @@ class Repository(_Repository):
         self.has_wiki = repo['has_wiki']
         self.homepage = repo['homepage']
         self.language = repo['language']
-        self.original_license = repo.get('license', None)
+        self.original_license = repo.get('license')
         if self.original_license is not None:
             self.original_license = licenses.ShortLicense(
                 self.original_license, self
@@ -2463,12 +2463,12 @@ class Repository(_Repository):
         self.mirror_url = repo['mirror_url']
         self.network_count = repo['network_count']
         self.open_issues_count = repo['open_issues_count']
-        self.parent = repo.get('parent', None)
+        self.parent = repo.get('parent')
         if self.parent is not None:
             self.parent = ShortRepository(self.parent, self)
         self.pushed_at = self._strptime(repo['pushed_at'])
         self.size = repo['size']
-        self.source = repo.get('source', None)
+        self.source = repo.get('source')
         if self.source is not None:
             self.source = ShortRepository(self.source, self)
         self.ssh_url = repo['ssh_url']
