@@ -744,6 +744,14 @@ class AuthenticatedUser(User):
 
     .. attribute:: plan
 
+        .. note::
+
+            When used with a Github Enterprise instance <= 2.12.7, this
+            attribute will not be returned. To handle these situations
+            sensitively, the attribute will be set to ``None``.
+            Repositories may still have a license associated with them
+            in these cases.
+
         The name of the plan that you, the user, have purchased
     """
 
@@ -754,4 +762,6 @@ class AuthenticatedUser(User):
         self.disk_usage = user['disk_usage']
         self.owned_private_repos_count = user['owned_private_repos']
         self.total_private_repos_count = user['total_private_repos']
-        self.plan = Plan(user['plan'], self)
+        self.plan = user.get('plan')
+        if self.plan is not None:
+            self.plan = Plan(self.plan, self)
