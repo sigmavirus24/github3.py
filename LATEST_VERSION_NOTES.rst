@@ -1,5 +1,17 @@
 .. vim: set tw=100
 
+1.0.2: 2018-03-28
+~~~~~~~~~~~~~~~~~
+
+Bugs Fixed
+``````````
+
+- Handle 304s from users passing etag
+- Generate _api object for ShortBranch objects
+- Require auth for creating gists
+- Ensure only desired auth scheme is used with requests
+- Handle older GitHub Enterprise responses for repository objects
+
 1.0.1: 2018-03-14
 ~~~~~~~~~~~~~~~~~
 
