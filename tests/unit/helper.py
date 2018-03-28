@@ -168,6 +168,12 @@ class UnitHelper(unittest.TestCase):
         assert data == call_data
         assert kwargs == call_kwargs
 
+    def get_called(self, *args, **kwargs):
+        assert self.session.get.called is True
+        call_args, call_kwargs = self.session.get.call_args
+        assert args == call_args
+        assert kwargs == call_kwargs
+
     def put_called_with(self, *args, **kwargs):
         """Use to assert put was called with JSON."""
         self.method_called_with('put', args, kwargs)
