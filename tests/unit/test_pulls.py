@@ -286,3 +286,21 @@ class TestPullFile(helper.UnitHelper):
         self.session.get.assert_called_once_with(
             self.example_data['contents_url']
         )
+
+
+class TestPullFilePatch(helper.UnitHelper):
+    """Unit tests for the PullFile class with empty patch."""
+
+    described_class = pulls.PullFile
+    get_pull_file_patch_example_data = helper.create_example_data_helper(
+        'pull_file_patch_example'
+    )
+    example_data = get_pull_file_patch_example_data()
+
+    def test_contents(self):
+        """Verify the request made to fetch a pull request file contents."""
+        self.instance.contents()
+
+        self.session.get.assert_called_once_with(
+            self.example_data['contents_url']
+        )
