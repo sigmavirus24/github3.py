@@ -1,48 +1,50 @@
-.. module:: github3
+====================
+ Issues API Objects
+====================
 
-Issue
-=====
+The following objects represent data returned by the `Issues API`_
 
-This part of the documentation covers the module which handles :class:`Issue
-<github3.issues.issue.Issue>`\ s and their related objects:
 
-- :class:`IssueComment <github3.issues.comment.IssueComment>`
-- :class:`IssueEvent <github3.issues.event.IssueEvent>`
-- :class:`Milestone <github3.issues.milestone.Milestone>`
-- :class:`Label <github3.issues.label.Label>`.
+Issues
+------
 
-Issue Objects
--------------
-
-.. module:: github3.issues.issue
+.. autoclass:: github3.issues.issue.ShortIssue
+    :inherited-members:
 
 .. autoclass:: github3.issues.issue.Issue
     :inherited-members:
 
-------
 
-.. module:: github3.issues.comment
+Issue Comments
+--------------
 
 .. autoclass:: github3.issues.comment.IssueComment
     :inherited-members:
 
-------
 
-.. module:: github3.issues.event
+Issue Events
+------------
 
 .. autoclass:: github3.issues.event.IssueEvent
     :inherited-members:
 
-------
+.. autoclass:: github3.issues.event.RepositoryIssueEvent
 
-.. module:: github3.issues.milestone
+
+Issue Labels
+------------
+
+.. autoclass:: github3.issues.label.Label
+    :inherited-members:
+
+
+Milestone Objects
+-----------------
 
 .. autoclass:: github3.issues.milestone.Milestone
     :inherited-members:
 
-------
 
-.. module:: github3.issues.label
-
-.. autoclass:: github3.issues.label.Label
-    :inherited-members:
+.. links
+.. _Issues API:
+    https://developer.github.com/v3/issues/
