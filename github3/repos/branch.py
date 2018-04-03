@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from json import dumps
 
 from . import commit
+from .. import decorators
 from .. import models
 
 
@@ -53,6 +54,26 @@ class _Branch(models.GitHubCore):
             return resp.content
         return None
 
+    @decorators.requires_auth
+    def protection(self):
+        """Retrieve the protections enabled for this branch.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+
+        :returns:
+            The protections enabled for this branch.
+        :rtype:
+            :class:`~github3.repos.branch.BranchProtection`
+        """
+        url = self._build_url('protection', base_url=self._api)
+        headers_map = BranchProtection.PREVIEW_HEADERS_MAP
+        headers = headers_map['required_approving_review_count']
+        resp = self._get(url, headers=headers)
+        json = self._json(resp, 200)
+        return BranchProtection(json, self)
+
+    @decorators.requires_auth
     def protect(self, enforcement=None, status_checks=None):
         """Enable force push protection and configure status check enforcement.
 
@@ -86,6 +107,7 @@ class _Branch(models.GitHubCore):
         self._update_attributes(json)
         return True
 
+    @decorators.requires_auth
     def unprotect(self):
         """Disable force push protection on this branch."""
         edit = {'protection': {'enabled': False}}
@@ -118,7 +140,13 @@ class Branch(_Branch):
         A boolean attribute that describes whether this branch is protected or
         not.
 
-    .. attribute:: protection
+    .. attribute:: original_protection
+
+        .. versionchanged:: 1.1.0
+
+            To support a richer branch protection API, this is the new name
+            for the information formerly stored under the attribute
+            ``protection``.
 
         A dictionary with details about the protection configuration of this
         branch.
@@ -137,7 +165,7 @@ class Branch(_Branch):
         self.links = branch['_links']
         #: Provides the branch's protection status.
         self.protected = branch['protected']
-        self.protection = branch['protection']
+        self.original_protection = branch['protection']
         self.protection_url = branch['protection_url']
         if self.links and 'self' in self.links:
             self._api = self.links['self']
@@ -168,3 +196,353 @@ class ShortBranch(_Branch):
 
     class_name = 'Short Repository Branch'
     _refresh_to = Branch
+
+
+class BranchProtection(models.GitHubCore):
+    """The representation of a branch's protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+    This object has the following attributes:
+
+    .. attribute:: enforce_admins
+
+        A :class:`~github3.repos.branch.ProtectionEnforceAdmins` instance
+        representing whether required status checks are required for admins.
+
+    .. attribute:: restrictions
+
+        A :class:`~github3.repos.branch.ProtectionRestrictions` representing
+        who can push to this branch. Team and user restrictions are only
+        available for organization-owned repositories.
+
+    .. attribute:: required_pull_request_reviews
+
+        A :class:`~github3.repos.branch.ProtectionRequiredPullRequestReviews`
+        representing the protection provided by requiring pull request
+        reviews.
+
+    .. attribute:: required_status_checks
+
+        A :class:`~github3.repos.branch.ProtectionRequiredStatusChecks`
+        representing the protection provided by requiring status checks.
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    PREVIEW_HEADERS_MAP = {
+        'required_approving_review_count': {
+            'Accept': 'application/vnd.github.luke-cage-preview+json',
+        },
+        'requires_signed_commits': {
+            'Accept': 'application/vnd.github.zzzax-preview+json',
+        },
+        'nested_teams': {
+            'Accept': 'application/vnd.github.hellcat-preview+json',
+        },
+    }
+
+    def _update_attributes(self, protection):
+        self._api = protection['url']
+
+        def _set_conditional_attr(name, cls):
+            value = protection.get(name)
+            setattr(self, name, value)
+            if getattr(self, name):
+                setattr(self, name, cls(value, self))
+
+        _set_conditional_attr('enforce_admins', ProtectionEnforceAdmins)
+        _set_conditional_attr('restrictions', ProtectionRestrictions)
+        _set_conditional_attr('required_pull_request_reviews',
+                              ProtectionRequiredPullRequestReviews)
+        _set_conditional_attr('required_status_checks',
+                              ProtectionRequiredStatusChecks)
+
+
+class ProtectionEnforceAdmins(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+    This object has the following attributes:
+
+    .. attribute:: enabled
+
+        A boolean attribute indicating whether the ``enforce_admins``
+        protection is enabled or disabled.
+
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    def _update_attributes(self, protection):
+        self._api = protection['url']
+        self.enabled = protection['enabled']
+
+
+class ProtectionRestrictions(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+        `Branch restriction documentation`_
+            GitHub's description of branch restriction
+
+    This object has the following attributes:
+
+    .. attribute:: original_teams
+
+        List of :class:`~github3.orgs.ShortTeam` objects representing
+        the teams allowed to push to the protected branch.
+
+    .. attribute:: original_users
+
+        List of :class:`~github3.users.ShortUser` objects representing
+        the users allowed to push to the protected branch.
+
+    .. attribute:: teams_url
+
+        The URL to retrieve the list of teams allowed to push to the
+        protected branch.
+
+    .. attribute:: users_url
+
+        The URL to retrieve the list of users allowed to push to the
+        protected branch.
+
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    .. _Branch restriction documentation:
+        https://help.github.com/articles/about-branch-restrictions
+    """
+
+    def _update_attributes(self, protection):
+        from .. import orgs, users
+        self._api = protection['url']
+        self.users_url = protection['users_url']
+        self.teams_url = protection['teams_url']
+        self.original_users = protection['users']
+        if self.original_users:
+            self.original_users = [
+                users.ShortUser(user, self)
+                for user in self.original_users
+            ]
+
+        self.original_teams = protection['teams']
+        if self.original_teams:
+            self.original_teams = [
+                orgs.ShortTeam(team, self)
+                for team in self.original_teams
+            ]
+
+    def teams(self, number=-1):
+        """Retrieve an up-to-date listing of teams.
+
+        :returns:
+            An iterator of teams
+        :rtype:
+            :class:`~github3.orgs.ShortTeam`
+        """
+        from .. import orgs
+        return self._iter(int(number), self.teams_url, orgs.ShortTeam)
+
+    def users(self, number=-1):
+        """Retrieve an up-to-date listing of users.
+
+        :returns:
+            An iterator of users
+        :rtype:
+            :class:`~github3.users.ShortUser`
+        """
+        from .. import users
+        return self._iter(int(number), self.users_url, users.ShortUser)
+
+
+class ProtectionRequiredPullRequestReviews(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    def _update_attributes(self, protection):
+        self._api = protection['url']
+        self.dismiss_stale_reviews = protection['dismiss_stale_reviews']
+        # Use a temporary value to stay under line-length restrictions
+        value = protection['require_code_owner_reviews']
+        self.require_code_owner_reviews = value
+        # Use a temporary value to stay under line-length restrictions
+        value = protection['required_approving_review_count']
+        self.required_approving_review_count = value
+        self.dismissal_restrictions = ProtectionRestrictions(
+            protection['dismissal_restrictions'],
+            self,
+        )
+
+
+class ProtectionRequiredStatusChecks(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+        `Required Status Checks documentation`_
+            GitHub's description of required status checks
+
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    .. _Required Status Checks documentation:
+        https://help.github.com/articles/about-required-status-checks
+    """
+
+    def _update_attributes(self, protection):
+        self._api = protection['url']
+        self.strict = protection['strict']
+        self.original_contexts = protection['contexts']
+        self.contexts_url = protection['contexts_url']
+
+    @decorators.requires_auth
+    def add_contexts(self, contexts):
+        """Add contexts to the existing list of required contexts.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#add-required-status-checks-contexts-of-protected-branch
+
+        :param list contexts:
+            The list of contexts to append to the existing list.
+        :returns:
+            The updated list of contexts.
+        :rtype:
+            list
+        """
+        resp = self._post(self.contexts_url, json=contexts)
+        json = self._json(resp, 200)
+        return json
+
+    @decorators.requires_auth
+    def contexts(self):
+        """Retrieve the list of contexts required as status checks.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#list-required-status-checks-contexts-of-protected-branch
+
+        :returns:
+            A list of context names which are required status checks.
+        :rtype:
+            list
+        """
+        resp = self._get(self.contexts_url)
+        json = self._json(resp, 200)
+        return json
+
+    @decorators.requires_auth
+    def remove_contexts(self, contexts):
+        """Remove the specified contexts from the list of required contexts.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#remove-required-status-checks-contexts-of-protected-branch
+
+        :param list contexts:
+            The context names to remove
+        :returns:
+            The updated list of contexts required as status checks.
+        :rtype:
+            list
+        """
+        resp = self._delete(self.contexts_url, json=contexts)
+        json = self._json(resp, 200)
+        return json
+
+    @decorators.requires_auth
+    def replace_contexts(self, contexts):
+        """Replace the existing contexts required as status checks.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#replace-required-status-checks-contexts-of-protected-branch
+
+        :param list contexts:
+            The names of the contexts to be required as status checks
+        :returns:
+            The updated list of contexts required as status checks.
+        :rtype:
+            list
+        """
+        resp = self._put(self.contexts_url, json=contexts)
+        json = self._json(resp, 200)
+        return json
+
+    @decorators.requires_auth
+    def update(self, strict=None, contexts=None):
+        """Update required status checks for the branch.
+
+        This requires admin or owner permissions to the repository and
+        branch protection to be enabled.
+
+        .. seealso::
+
+            `API docs`_
+                Descrption of how to update the required status checks.
+
+        :param bool strict:
+            Whether this should be strict protection or not.
+        :param list contexts:
+            A list of context names that should be required.
+        :returns:
+            A new instance of this class with the updated information
+        :rtype:
+            :class:`~github3.repos.branch.ProtectionRequiredStatusChecks`
+
+
+        .. links
+        .. _API docs:
+            https://developer.github.com/v3/repos/branches/#update-required-status-checks-of-protected-branch
+        """
+        update_data = {}
+        if strict is not None:
+            update_data['strict'] = strict
+        if contexts is not None:
+            update_data['contexts'] = contexts
+        if update_data:
+            resp = self._patch(self.url, json=update_data)
+            json = self._json(resp, 200)
+            return ProtectionRequiredStatusChecks(json, self)
+
+    @decorators.requires_auth
+    def delete(self):
+        """Remove required status checks from this branch.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#remove-required-status-checks-of-protected-branch
+
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        resp = self._delete(self.url)
+        return self._boolean(resp, 204, 404)

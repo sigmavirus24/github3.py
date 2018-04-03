@@ -19,12 +19,18 @@ key_url_for = helper.create_url_helper(
 get_authenticated_user_example_data = helper.create_example_data_helper(
     'authenticated_user_example'
 )
+get_authenticated_user_2_12_example_data = helper.create_example_data_helper(
+    'authenticated_user_2_12_example'
+)
 get_users_example_data = helper.create_example_data_helper('users_example')
 get_user_key_example_data = helper.create_example_data_helper(
     'user_key_example'
 )
 
 example_data = get_users_example_data()
+authenticated_user_2_12_example_data = (
+    get_authenticated_user_2_12_example_data()
+)
 
 
 class TestUser(helper.UnitHelper):
@@ -272,3 +278,15 @@ class TestPlan(helper.UnitGitHubObjectHelper):
     def test_is_free(self):
         """Show that user can check if the plan is free."""
         assert self.instance.is_free() is False
+
+
+class TestAuthenticatedUserCompatibility_2_12(helper.UnitHelper):
+
+    """Test methods on AuthenticatedUser from Github Enterprise 2.12."""
+
+    described_class = github3.users.AuthenticatedUser
+    example_data = authenticated_user_2_12_example_data
+
+    def test_user(self):
+        """Test the ability to retrieve an AuthenticatedUser"""
+        assert str(self.instance) == 'octocat'

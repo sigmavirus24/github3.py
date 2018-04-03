@@ -46,7 +46,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             branch = repository.branch('develop')
             assert isinstance(branch, github3.repos.branch.Branch)
-            assert 'enabled' in branch.protection
+            assert 'enabled' in branch.original_protection
 
     def test_branches(self):
         """Test the ability to retrieve the branches in a repository."""
@@ -92,7 +92,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
-            assert all(b.protection['enabled'] is True
+            assert all(isinstance(b, github3.repos.branch.ShortBranch)
                        for b in repository.branches(protected=True))
 
     def test_code_frequency(self):

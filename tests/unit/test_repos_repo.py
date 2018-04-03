@@ -39,6 +39,9 @@ url_for = helper.create_url_helper(
 get_repo_example_data = helper.create_example_data_helper(
     'repo_example'
 )
+get_repo_2_12_example_data = helper.create_example_data_helper(
+    'repo_2_12_example'
+)
 get_comment_example_data = helper.create_example_data_helper(
     'comment_example'
 )
@@ -64,6 +67,7 @@ content_example_data = get_content_example_data()
 create_file_contents_example_data = create_file_contents_example_data()
 hook_example_data = get_hook_example_data()
 repo_example_data = get_repo_example_data()
+repo_2_12_example_data = get_repo_2_12_example_data()
 
 
 class TestRepository(helper.UnitHelper):
@@ -1950,3 +1954,17 @@ class TestComparison(helper.UnitHelper):
     def test_str(self):
         """Show that instance string is formatted correctly."""
         assert str(self.instance).startswith('<Comparison')
+
+
+class TestRepositoryCompatibility_2_12(helper.UnitIteratorHelper):
+
+    """Unit tests for Repository from Github Enterprise 2.12"""
+
+    described_class = Repository
+    example_data = repo_2_12_example_data
+
+    def test_repository(self):
+        """
+        Test the ability to retrieve a Repository with older releases
+        """
+        assert isinstance(self.instance, Repository)
