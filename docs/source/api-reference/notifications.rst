@@ -1,13 +1,10 @@
-.. module:: github3
-.. module:: github3.notifications
+===============
+ Notifications
+===============
 
-Notifications
-=============
+This part of the documentation covers the notifications module which contains
+all of the classes used to represent notification objects in github3.py.
 
-This part of the documentation covers the
-:class:`~github3.notifications.Thread`,
-:class:`~github3.notifications.RepositorySubscription`, and
-:class:`~github3.notifications.ThreadSubscription` objects.
 
 Notification Objects
 --------------------
@@ -15,12 +12,8 @@ Notification Objects
 .. autoclass:: Thread
     :inherited-members:
 
-------
-
-.. autoclass:: RepositorySubscription
+.. autoclass:: ThreadSubscription
     :inherited-members:
 
-------
-
-.. autoclass:: ThreadSubscription
+.. autoclass:: RepositorySubscription
     :inherited-members:

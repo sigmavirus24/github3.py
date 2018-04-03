@@ -176,7 +176,7 @@ class _Subscription(models.GitHubCore):
         return '<{0} [{1}]>'.format(self.class_name, self.subscribed)
 
     def delete(self):
-        """Delete the user's subscription to this thread.
+        """Delete this subscription.
 
         :returns:
             True if successful, False otherwise
