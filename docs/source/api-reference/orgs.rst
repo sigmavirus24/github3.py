@@ -1,21 +1,29 @@
-.. module:: github3
-.. module:: github3.orgs
+=========================================
+ Organizations and their Related Objects
+=========================================
 
-Organization
-============
+This section of the documentation covers the objects that represent data
+returned by the API for organizations.
 
-This section of the documentation covers:
 
-- :class:`Organization <Organization>`\ s 
-- :class:`Team <Team>`\ s
+Team Objects
+------------
+
+.. autoclass:: github3.orgs.ShortTeam
+    :inherited-members:
+
+.. autoclass:: github3.orgs.Team
+    :inherited-members:
+
+.. autoclass:: github3.orgs.Membership
+    :inherited-members:
+
 
 Organization Objects
 --------------------
 
-.. autoclass:: Organization
+.. autoclass:: github3.orgs.ShortOrganization
     :inherited-members:
 
-------
-
-.. autoclass:: Team
+.. autoclass:: github3.orgs.Organization
     :inherited-members:
