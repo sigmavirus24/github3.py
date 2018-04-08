@@ -746,13 +746,11 @@ class AuthenticatedUser(User):
 class Collaborator(_User):
     """Object for the representation of a collaborator.
 
+    .. versionadded:: 1.1.0
+
     When retrieving a repository's contributors, GitHub returns the same
     information as a :class:`~github3.users.ShortUser` with an additional
     attribute:
-
-    .. versionadded:: 1.0.3
-
-        This class was added in version 1.0.3
 
     .. attribute:: permissions
 
@@ -771,23 +769,19 @@ class Collaborator(_User):
 class Contributor(_User):
     """Object for the specialized representation of a contributor.
 
+    .. versionadded:: 1.0.0
+
+    .. versionchanged:: 1.1.0
+
+        This class now refreshes to a :class:`~github3.users.User`.
+
+        The attribute ``contributions`` was renamed to ``contributions_count``,
+        the documentation already declared it as ``contributions_count``, it
+        was the implementation now reflects this as well.
+
     When retrieving a repository's contributors, GitHub returns the same
     information as a :class:`~github3.users.ShortUser` with an additional
     attribute:
-
-    .. versionadded:: 1.0.0
-
-        This class was added in version 1.0.0
-
-    .. versionadded:: 1.0.3
-
-        Refresh was implemented in version 1.0.3.
-
-    .. versionchanged:: 1.0.3
-
-        The attribute `contributions` was renamed to `contributions_count`,
-        the documentation already declared it as `contributions_count`, it was
-        the implementation now reflects this as well.
 
     .. attribute:: contributions_count
 
