@@ -783,6 +783,12 @@ class Contributor(_User):
 
         Refresh was implemented in version 1.0.3.
 
+    .. versionchanged:: 1.0.3
+
+        The attribute `contributions` was renamed to `contributions_count`,
+        the documentation already declared it as `contributions_count`, it was
+        the implementation now reflects this as well.
+
     .. attribute:: contributions_count
 
         The number of contributions a contributor has made to the repository
@@ -794,4 +800,4 @@ class Contributor(_User):
 
     def _update_attributes(self, contributor):
         super(Contributor, self)._update_attributes(contributor)
-        self.contributions = contributor['contributions']
+        self.contributions_count = contributor['contributions']
