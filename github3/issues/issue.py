@@ -197,8 +197,13 @@ class _Issue(models.GitHubCore):
         :param str state:
             accepted values: ('open', 'closed')
         :param int milestone:
-            the NUMBER (not title) of the milestone to assign this to [1]_, or
-            0 to remove the milestone
+            the number (not title) of the milestone to assign this to,
+            or 0 to remove the milestone
+
+            .. note::
+
+                This is not the milestone's globally unique identifier, it's
+                value in :attr:`~github3.issues.milestone.Milestone.number`.
         :param list labels:
             list of labels to apply this to
         :param assignees:
@@ -209,9 +214,6 @@ class _Issue(models.GitHubCore):
             True if successful, False otherwise
         :rtype:
             bool
-
-        .. [1] Milestone numbering starts at 1, i.e. the first milestone you
-               create is 1, the second is 2, etc.
         """
         json = None
         data = {'title': title, 'body': body, 'assignee': assignee,

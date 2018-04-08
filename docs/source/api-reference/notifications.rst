@@ -9,11 +9,11 @@ all of the classes used to represent notification objects in github3.py.
 Notification Objects
 --------------------
 
-.. autoclass:: Thread
+.. autoclass:: github3.notifications.Thread
     :inherited-members:
 
-.. autoclass:: ThreadSubscription
+.. autoclass:: github3.notifications.ThreadSubscription
     :inherited-members:
 
-.. autoclass:: RepositorySubscription
+.. autoclass:: github3.notifications.RepositorySubscription
     :inherited-members:

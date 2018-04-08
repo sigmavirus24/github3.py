@@ -11,5 +11,5 @@ future developers of this library.
     These classes are only to be used internally in development of this
     library.
 
-.. autoclass:: GitHubCore
+.. autoclass:: github3.models.GitHubCore
     :inherited-members:

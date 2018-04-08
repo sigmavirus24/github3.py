@@ -1,33 +1,38 @@
-.. module:: github3
-.. module:: github3.pulls
+============================================
+ Pull Requests and their Associated Objects
+============================================
 
-Pull Request
-============
-
-This section of the documentation covers:
-
-- :class:`PullRequest <PullRequest>`
-- :class:`ReviewComment <ReviewComment>`
-- :class:`PullDestination <PullDestination>`
-- :class:`PullFile <PullFile>`
+This section of the documentation covers the representations of various
+objects related to the `Pull Requests API`_.
 
 Pull Request Objects
 --------------------
 
-.. autoclass:: PullRequest
+.. autoclass:: github3.pulls.ShortPullRequest
     :inherited-members:
 
-------
-
-.. autoclass:: ReviewComment
+.. autoclass:: github3.pulls.PullRequest
     :inherited-members:
 
-------
-
-.. autoclass:: PullDestination
+.. autoclass:: github3.pulls.PullDestination
     :inherited-members:
 
-------
+.. autoclass:: github3.pulls.Head
 
-.. autoclass:: PullFile
+.. autoclass:: github3.pulls.Base
+
+.. autoclass:: github3.pulls.PullFile
     :inherited-members:
+
+
+Review Objects
+--------------
+
+.. autoclass:: github3.pulls.ReviewComment
+    :inherited-members:
+
+
+.. ---
+.. links
+.. _Pull Requests API:
+    https://developer.github.com/v3/pulls/
