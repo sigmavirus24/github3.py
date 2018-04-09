@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
 import github3
+import datetime
 import mock
 
 from github3.issues.label import Label
@@ -25,6 +26,9 @@ get_issue_example_data = helper.create_example_data_helper(
 
 get_issue_event_example_data = helper.create_example_data_helper(
     'issue_event_example'
+)
+get_issue_assigned_event_example_data = helper.create_example_data_helper(
+    'issue_assigned_event_example'
 )
 get_issue_label_example_data = helper.create_example_data_helper(
     'issue_label_example'
@@ -445,6 +449,21 @@ class TestIssueEvent(helper.UnitHelper):
         assert repr(self.instance) == '<Issue Event [{0} by {1}]>'.format(
             'closed', 'octocat'
         )
+
+    def test_created_at(self):
+        """Show that the instance has a correct created_at datetime."""
+        expected = datetime.datetime(
+            2011, 4, 14, 16, 0, 49, tzinfo=datetime.timezone.utc)
+        assert self.instance.created_at == expected
+
+    def test_assignee(self):
+        """Show that assignees are correctly parsed ShortUser objects"""
+        assigned_event = github3.issues.event.IssueEvent(
+            get_issue_assigned_event_example_data(),
+            self.session
+        )
+        assert assigned_event.assignee.login == 'sigmavirus24'
+        assert assigned_event.assigner.login == 'sigmavirus24'
 
     def test_equality(self):
         """Show that two instances of IssueEvent are equal."""
