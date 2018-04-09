@@ -28,7 +28,7 @@ matrix:
     - python: pypy
       env: TOXENV=pypy
     - env: TOXENV=py27-flake8
-    - env: TOXENV=py34-flake8
+    - env: TOXENV=py36-flake8
     - env: TOXENV=docstrings
     - env: TOXENV=notebooks
     - env: TOXENV=readme
