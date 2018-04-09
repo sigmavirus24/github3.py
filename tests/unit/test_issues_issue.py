@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
 import github3
-import datetime
+import dateutil.parser
 import mock
 
 from github3.issues.label import Label
@@ -452,8 +452,7 @@ class TestIssueEvent(helper.UnitHelper):
 
     def test_created_at(self):
         """Show that the instance has a correct created_at datetime."""
-        expected = datetime.datetime(
-            2011, 4, 14, 16, 0, 49, tzinfo=datetime.timezone.utc)
+        expected = dateutil.parser.parse('2011-04-14T16:00:49Z')
         assert self.instance.created_at == expected
 
     def test_assignee(self):
