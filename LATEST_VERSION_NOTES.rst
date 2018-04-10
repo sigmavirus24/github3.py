@@ -1,5 +1,31 @@
 .. vim: set tw=100
 
+1.1.0: 2018-04-09
+~~~~~~~~~~~~~~~~~
+
+This is a small release with some enhancments.
+
+Features Added
+``````````````
+
+- Repository collaborators now returns a ``users.Collaborator`` object, instead of
+  a ``users.ShortUser`` object. This is to support collaborator affiliations. A
+  refresh call of this object (and ``users.Contributor``) will result in a full
+  ``users.User`` object.
+
+- The call to iterate collaborators of a repository
+  (``Repsitory#collaborators``) can now take an ``affiliation`` filter with options of
+  ``outside``, ``direct``, and ``all``. The default is ``all``, which preserves the previous
+  behavior of this method.
+
+Bugs Fixed
+``````````
+
+- Parse certain attributes on ``IssueEvent`` into objects (again, this was a
+  regression in 1.0)
+- Handle older GitHub Enterprise responses for authenticated user objects
+- Handle large file pull request responses not including a ``patch`` attribute
+
 1.0.2: 2018-03-28
 ~~~~~~~~~~~~~~~~~
 
@@ -213,10 +239,10 @@ Old name                                      New name
 
 - ``github3.login`` has been simplified and split into two functions:
 
-  - ``github3.login`` serves the majority use case and only provides an 
+  - ``github3.login`` serves the majority use case and only provides an
     authenticated ``GitHub`` object.
 
-  - ``github3.enterprise_login`` allows GitHub Enterprise users to log into 
+  - ``github3.enterprise_login`` allows GitHub Enterprise users to log into
     their service.
 
 - ``GitHub#iter_followers`` was split into two functions:
@@ -237,10 +263,10 @@ Old name                                      New name
 
 - ``GitHub#iter_gists`` was split into three functions:
 
-  - ``GitHub#public_gists`` which iterates over all of the public gists on 
+  - ``GitHub#public_gists`` which iterates over all of the public gists on
     GitHub
 
-  - ``GitHub#gists_for`` which iterates over all the public gists of a 
+  - ``GitHub#gists_for`` which iterates over all the public gists of a
     specific user
 
   - ``GitHub#gists`` which iterates over the authenticated users gists
@@ -258,7 +284,7 @@ Old name                                      New name
   - ``GitHub#subscriptions_for`` which iterates over an arbitrary user's
     subscriptions
 
-  - ``GitHub#subscriptions`` which iterates over the authenticated user's 
+  - ``GitHub#subscriptions`` which iterates over the authenticated user's
     subscriptions
 
 - ``GitHub#iter_starred`` was split into two functions:
@@ -292,10 +318,10 @@ Old name                                      New name
 
 - ``Repository#set_subscription`` was split into two simpler functions
 
-  - ``Repository#subscribe`` subscribes the authenticated user to the 
+  - ``Repository#subscribe`` subscribes the authenticated user to the
     repository's notifications
 
-  - ``Repository#ignore`` ignores notifications from the repository for the 
+  - ``Repository#ignore`` ignores notifications from the repository for the
     authenticated user
 
 - ``Repository#contents`` was split into two simpler functions
