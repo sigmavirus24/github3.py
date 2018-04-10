@@ -470,7 +470,12 @@ class TestIssueEvent(helper.UnitHelper):
             get_issue_event_example_data(),
             self.session
         )
+        assigned_event = github3.issues.event.IssueEvent(
+            get_issue_assigned_event_example_data(),
+            self.session
+        )
 
+        assert self.instance._uniq is not None
+        assert assigned_event._uniq is not None
         assert self.instance == issue_event
-        issue_event._uniq = 'foo'
-        assert self.instance != issue_event
+        assert self.instance != assigned_event
