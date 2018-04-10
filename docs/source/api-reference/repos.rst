@@ -1,165 +1,139 @@
-.. module:: github3
+========================
+ Repository API Objects
+========================
 
-Repository
-==========
+This section of the documentation covers the representations of various
+objects related to the `Repositories API`_.
 
-This part of the documentation covers:
-
-- :class:`Repository <github3.repos.repo.Repository>`
-- :class:`StarredRepository <github3.repos.repo.StarredRepository>`
-- :class:`Asset <github3.repos.release.Asset>`
-- :class:`Branch <github3.repos.branch.Branch>`
-- :class:`Contents <github3.repos.contents.Contents>`
-- :class:`Deployment <github3.repos.deployment.Deployment>`
-- :class:`DeploymentStatus <github3.repos.deployment.DeploymentStatus>`
-- :class:`Hook <github3.repos.hook.Hook>`
-- :class:`ImportedIssue <github3.repos.issue_import.ImportedIssue>`
-- :class:`PagesInfo <github3.repos.pages.PagesInfo>`
-- :class:`PagesBuild <github3.repos.pages.PagesBuild>`
-- :class:`Release <github3.repos.release.Release>`
-- :class:`RepoTag <github3.repos.tag.RepoTag>`
-- :class:`RepoComment <github3.repos.comment.RepoComment>`
-- :class:`RepoCommit <github3.repos.commit.RepoCommit>`
-- :class:`Comparison <github3.repos.comparison.Comparison>`
-- :class:`Status <github3.repos.status.Status>`
-- :class:`CombinedStatus <github3.repos.status.CombinedStatus>`
-- :class:`ContributorStats <github3.repos.stats.ContributorStats>`
-
-None of these objects should be instantiated directly by the user (developer).
-These are here for reference only.
-
-**When listing repositories in any context, GitHub refuses to return a number 
-of attributes, e.g., source and parent. If you require these, call the refresh 
-method on the repository object to make a second call to the API and retrieve 
-those attributes.**
-
-More information for about this class can be found in the official
-`documentation <http://developer.github.com/v3/repos>`_ and in various other
-sections of the GitHub documentation.
 
 Repository Objects
 ------------------
 
-.. module:: github3.repos.repo
-
 .. autoclass:: github3.repos.repo.Repository
     :inherited-members:
 
----------
+.. autoclass:: github3.repos.repo.ShortRepository
+    :inherited-members:
 
 .. autoclass:: github3.repos.repo.StarredRepository
     :inherited-members:
 
----------
-
-.. module:: github3.repos.branch
-
-.. autoclass:: github3.repos.branch.Branch
-    :members:
-
----------
-
-.. module:: github3.repos.contents
-
 .. autoclass:: github3.repos.contents.Contents
     :members:
-
----------
-
-.. module:: github3.repos.deployment
-
-.. autoclass:: github3.repos.deployment.Deployment
-    :members:
-
----------
-
-.. autoclass:: github3.repos.deployment.DeploymentStatus
-    :members:
-
----------
-
-.. module:: github3.repos.release
-
-.. autoclass:: github3.repos.release.Release
-    :members:
-
----------
-
-.. autoclass:: github3.repos.release.Asset
-    :members:
-
----------
-
-.. module:: github3.repos.hook
 
 .. autoclass:: github3.repos.hook.Hook
     :members:
 
----------
-
-.. module:: github3.repos.imported_issue
-
 .. autoclass:: github3.repos.issue_import.ImportedIssue
-     :members:
-
----------
-
-.. module:: github3.repos.pages
-
-.. autoclass:: github3.repos.pages.PagesInfo
     :members:
 
----------
 
-.. autoclass:: github3.repos.pages.PagesBuild
-    :members:
-
----------
-
-.. module:: github3.repos.tag
+Git-related Objects
+-------------------
 
 .. autoclass:: github3.repos.tag.RepoTag
     :members:
 
----------
+Branches
+~~~~~~~~
 
-.. module:: github3.repos.comment
+.. autoclass:: github3.repos.branch.Branch
+    :members:
 
-More information about this class can be found in the official documentation
-about `comments <http://developer.github.com/v3/repos/comments/>`_.
+.. autoclass:: github3.repos.branch.ShortBranch
+    :members:
 
-.. autoclass:: github3.repos.comment.RepoComment
-    :inherited-members:
+.. autoclass:: github3.repos.branch.BranchProtection
+    :members:
 
----------
+.. autoclass:: github3.repos.branch.ProtectionEnforceAdmins
+    :members:
 
-.. module:: github3.repos.commit
+.. autoclass:: github3.repos.branch.ProtectionRestrictions
+    :members:
+
+.. autoclass:: github3.repos.branch.ProtectionRequiredPullRequestReviews
+    :members:
+
+.. autoclass:: github3.repos.branch.ProtectionRequiredStatusChecks
+    :members:
+
+Commits
+~~~~~~~
+
+.. autoclass:: github3.repos.commit.MiniCommit
+    :members:
+
+.. autoclass:: github3.repos.commit.ShortCommit
+    :members:
 
 .. autoclass:: github3.repos.commit.RepoCommit
     :members:
 
----------
-
-.. module:: github3.repos.comparison
-
 .. autoclass:: github3.repos.comparison.Comparison
     :members:
 
----------
 
-.. module:: github3.repos.status
+Release Objects
+---------------
 
-.. autoclass:: github3.repos.status.Status
+.. autoclass:: github3.repos.release.Asset
     :members:
 
----------
+.. autoclass:: github3.repos.release.Release
+    :members:
+
+
+Pages Objects
+-------------
+
+.. autoclass:: github3.repos.pages.PagesInfo
+    :members:
+
+.. autoclass:: github3.repos.pages.PagesBuild
+    :members:
+
+
+Comment Objects
+---------------
+
+More information about these classes can be found in the official documentation
+about `comments <http://developer.github.com/v3/repos/comments/>`_.
+
+.. autoclass:: github3.repos.comment.ShortRepoComment
+    :members:
+
+.. autoclass:: github3.repos.comment.RepoComment
+    :members:
+
+
+Deployment and Status Objects
+-----------------------------
+
+.. autoclass:: github3.repos.deployment.Deployment
+    :members:
+
+.. autoclass:: github3.repos.deployment.DeploymentStatus
+    :members:
+
+.. autoclass:: github3.repos.status.ShortStatus
+    :members:
 
 .. autoclass:: github3.repos.status.CombinedStatus
     :members:
 
----------
+.. autoclass:: github3.repos.status.Status
+    :members:
 
-.. module:: github3.repos.stats
+
+Contributor Statistics Objects
+------------------------------
 
 .. autoclass:: github3.repos.stats.ContributorStats
     :members:
+
+
+.. ---
+.. links
+.. _Repositories API:
+    https://developer.github.com/v3/repos/
