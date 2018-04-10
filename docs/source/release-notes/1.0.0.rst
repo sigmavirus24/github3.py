@@ -193,10 +193,10 @@ Old name                                      New name
 
 - ``github3.login`` has been simplified and split into two functions:
 
-  - ``github3.login`` serves the majority use case and only provides an 
+  - ``github3.login`` serves the majority use case and only provides an
     authenticated ``GitHub`` object.
 
-  - ``github3.enterprise_login`` allows GitHub Enterprise users to log into 
+  - ``github3.enterprise_login`` allows GitHub Enterprise users to log into
     their service.
 
 - ``GitHub#iter_followers`` was split into two functions:
@@ -217,10 +217,10 @@ Old name                                      New name
 
 - ``GitHub#iter_gists`` was split into three functions:
 
-  - ``GitHub#public_gists`` which iterates over all of the public gists on 
+  - ``GitHub#public_gists`` which iterates over all of the public gists on
     GitHub
 
-  - ``GitHub#gists_for`` which iterates over all the public gists of a 
+  - ``GitHub#gists_for`` which iterates over all the public gists of a
     specific user
 
   - ``GitHub#gists`` which iterates over the authenticated users gists
@@ -238,7 +238,7 @@ Old name                                      New name
   - ``GitHub#subscriptions_for`` which iterates over an arbitrary user's
     subscriptions
 
-  - ``GitHub#subscriptions`` which iterates over the authenticated user's 
+  - ``GitHub#subscriptions`` which iterates over the authenticated user's
     subscriptions
 
 - ``GitHub#iter_starred`` was split into two functions:
@@ -272,10 +272,10 @@ Old name                                      New name
 
 - ``Repository#set_subscription`` was split into two simpler functions
 
-  - ``Repository#subscribe`` subscribes the authenticated user to the 
+  - ``Repository#subscribe`` subscribes the authenticated user to the
     repository's notifications
 
-  - ``Repository#ignore`` ignores notifications from the repository for the 
+  - ``Repository#ignore`` ignores notifications from the repository for the
     authenticated user
 
 - ``Repository#contents`` was split into two simpler functions

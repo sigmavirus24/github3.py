@@ -280,21 +280,35 @@ class _Repository(models.GitHubCore):
         url = self._build_url('stats', 'code_frequency', base_url=self._api)
         return self._iter(int(number), url, list, etag=etag)
 
-    def collaborators(self, number=-1, etag=None):
+    def collaborators(self, affiliation='all', number=-1, etag=None):
         """Iterate over the collaborators of this repository.
 
+        :param str affiliation:
+            (optional), affiliation of the collaborator to the repository.
+            Default: "all" returns contributors with all affiliations
         :param int number:
             (optional), number of collaborators to return.
             Default: -1 returns all comments
         :param str etag:
             (optional), ETag from a previous request to the same endpoint
         :returns:
-            generator of collaborator users
+            generator of collaborators
         :rtype:
-            :class:`~github3.users.ShortUser`
+            :class:`~github3.users.Collaborator`
         """
         url = self._build_url('collaborators', base_url=self._api)
-        return self._iter(int(number), url, users.ShortUser, etag=etag)
+        affiliations = {'outside', 'direct', 'all'}
+        if affiliation not in affiliations:
+            raise ValueError(
+                (
+                    "Invalid affiliation value {!r} parameter passed, must "
+                    "be 'outside', 'direct', or 'all' (defaults to 'all')."
+                ).format(affiliation)
+            )
+        params = {'affiliation': affiliation}
+        return self._iter(
+            int(number), url, users.Collaborator, params, etag=etag
+        )
 
     def comments(self, number=-1, etag=None):
         """Iterate over comments on all commits in the repository.

@@ -66,7 +66,27 @@ class IssueEvent(GitHubCore):
         self.actor = users.ShortUser(event['actor'], self)
         self.commit_id = event['commit_id']
         self.commit_url = event['commit_url']
-        self.created_at = event['created_at']
+        self.created_at = self._strptime(event['created_at'])
+        # Only for 'assigned' and 'unassigned' events.
+        self.assignee = event.get('assignee')
+        if self.assignee:
+            self.assignee = users.ShortUser(self.assignee, self)
+        self.assigner = event.get('assigner')
+        if self.assigner:
+            self.assigner = users.ShortUser(self.assigner, self)
+
+        # Only for 'review_requested' and 'review_request_removed' events.
+        self.review_requester = event.get('review_requester')
+        if self.review_requester:
+            self.review_requester = (
+                users.ShortUser(self.review_requester, self))
+        self.requested_reviewers = event.get('requested_reviewers')
+        if self.requested_reviewers:
+            self.requested_reviewers = [
+                users.ShortUser(reviewer, self)
+                for reviewer in self.requested_reviewers
+            ]
+
         self.event = event['event']
         self.id = event['id']
         self._uniq = self.commit_id

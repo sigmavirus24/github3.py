@@ -113,7 +113,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             assert repository is not None
             for collaborator in repository.collaborators():
-                assert isinstance(collaborator, github3.users.ShortUser)
+                assert isinstance(collaborator, github3.users.Collaborator)
 
     def test_comments(self):
         """Test the ability to retrieve comments on a repository."""
