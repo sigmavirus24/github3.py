@@ -1,29 +1,16 @@
-.. module:: github3
-.. module:: github3.structs
+============================
+ Custom Iterator Structures
+============================
 
-Structures
-==========
+Many of the methods in github3.py that return iterators of another object are
+actually returning one of the iterators below. These iterators effectively
+allow users to ignore GitHub's API pagination of large sets of data. In all
+senses, they behave like a normal Python iterator. Their difference is that
+they have extra logic around making API requests and coercing the JSON into
+predefined objects.
 
-Developed for github3.py
-------------------------
-
-As of right now, there exists only one class in this section, and it is of 
-only limited importance to users of github3.py. The :class:`GitHubIterator` 
-class is used to return the results of calls to almost all of the calls to 
-``iter_`` methods on objects. When conditional refreshing was added to 
-objects, there was a noticable gap in having conditional calls to those 
-``iter_`` methods.  GitHub provides the proper headers on those calls, but 
-there was no easy way to add that to what github3.py returned so it could be 
-used properly. This was the best compromise - an object the behaves like an 
-iterator regardless but can also be ``refresh``\ ed to get results since the 
-last request conditionally.
-
-Objects
--------
-
-.. autoclass:: GitHubIterator
+.. autoclass:: github3.structs.GitHubIterator
     :inherited-members:
 
-
-.. autoclass:: SearchIterator
+.. autoclass:: github3.structs.SearchIterator
     :inherited-members:
