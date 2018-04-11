@@ -89,7 +89,7 @@ class IssueEvent(GitHubCore):
 
         self.event = event['event']
         self.id = event['id']
-        self._uniq = self.commit_id
+        self._uniq = self._api
 
     def _repr(self):
         return '<Issue Event [{0} by {1}]>'.format(
