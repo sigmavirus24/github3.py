@@ -42,6 +42,14 @@ Anonymous Functions
 
 .. autofunction:: github3.authorize
 
+Deprecated Functions
+~~~~~~~~~~~~~~~~~~~~
+
+.. warning::
+
+    Due to GitHub's anonymous ratelimits, it's strongly advised that you don't
+    use these functions.
+
 .. autofunction:: github3.create_gist
 
 .. autofunction:: github3.gist
