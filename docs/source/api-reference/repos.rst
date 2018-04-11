@@ -100,7 +100,7 @@ Comment Objects
 More information about these classes can be found in the official documentation
 about `comments <http://developer.github.com/v3/repos/comments/>`_.
 
-.. autoclass:: github3.repos.comment.ShortRepoComment
+.. autoclass:: github3.repos.comment.ShortComment
     :members:
 
 .. autoclass:: github3.repos.comment.RepoComment
