@@ -1,34 +1,44 @@
-.. module:: github3
-.. module:: github3.users
+====================================
+ Users and their Associated Objects
+====================================
 
-User
-====
+This section of the documentation covers the representations of various
+objects related to the `Users API`_.
 
-This part of the documentation covers:
 
-- :class:`User <User>`
-- :class:`Key <Key>`
-- :class:`Plan <Plan>`
-
-None of these objects should ever be instantiated by the user (developer).
-
-**When listing users, GitHub only sends a handful of the object's attributes.  
-To retrieve all of the object's attributes, you must call the refresh() 
-method. This unfortunately requires another call to the API, so use it 
-sparingly if you have a low limit**
-
-User Modules
+User Objects
 ------------
 
-.. autoclass:: User
+.. autoclass:: github3.users.ShortUser
     :inherited-members:
 
-------
-
-.. autoclass:: Key
+.. autoclass:: github3.users.User
     :inherited-members:
 
-------
-
-.. autoclass:: Plan
+.. autoclass:: github3.users.AuthenticatedUser
     :inherited-members:
+
+.. autoclass:: github3.users.Collaborator
+    :inherited-members:
+
+.. autoclass:: github3.users.Contributor
+    :inherited-members:
+
+
+AuthenticatedUser Peripherals
+-----------------------------
+
+.. autoclass:: github3.users.Key
+    :inherited-members:
+
+.. autoclass:: github3.users.Plan
+    :inherited-members:
+
+.. autoclass:: github3.users.Email
+    :inherited-members:
+
+
+.. ---
+.. links
+.. _Users API:
+    https://developer.github.com/v3/users/
