@@ -3,7 +3,7 @@
 ===============
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 3
 
     api
     auths
@@ -16,7 +16,7 @@
     orgs
     pulls
     repos
-    search_structs
+    search
     structs
     users
 

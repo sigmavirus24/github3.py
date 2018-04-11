@@ -65,7 +65,7 @@ User Guide
 ==========
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     narrative/index
 
@@ -74,7 +74,7 @@ API Reference Documentation
 ===========================
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     api-reference/index
 
@@ -83,7 +83,7 @@ Version History
 ===============
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     release-notes/index
 
