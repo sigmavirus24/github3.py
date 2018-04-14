@@ -1,0 +1,25 @@
+1.1.0: 2018-04-09
+-----------------
+
+This is a small release with some enhancments.
+
+Features Added
+``````````````
+
+- Repository collaborators now returns a ``users.Collaborator`` object, instead of
+  a ``users.ShortUser`` object. This is to support collaborator affiliations. A
+  refresh call of this object (and ``users.Contributor``) will result in a full
+  ``users.User`` object.
+
+- The call to iterate collaborators of a repository
+  (``Repsitory#collaborators``) can now take an ``affiliation`` filter with options of
+  ``outside``, ``direct``, and ``all``. The default is ``all``, which preserves the previous
+  behavior of this method.
+
+Bugs Fixed
+``````````
+
+- Parse certain attributes on ``IssueEvent`` into objects (again, this was a
+  regression in 1.0)
+- Handle older GitHub Enterprise responses for authenticated user objects
+- Handle large file pull request responses not including a ``patch`` attribute

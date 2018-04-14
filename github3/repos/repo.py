@@ -2636,7 +2636,7 @@ class ShortRepository(_Repository):
         The HTML URL of this repository, e.g.,
         ``https://github.com/sigmavirus24/github3.py``.
 
-    .. attibute:: id
+    .. attribute:: id
 
         The unique GitHub assigned numerical id of this repository.
 

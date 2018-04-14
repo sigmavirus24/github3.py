@@ -1,0 +1,573 @@
+.. vim: set tw=100
+
+1.0.0: 2018-03-13
+-----------------
+
+1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
+It is suggested you read the following release notes *very* carefully.
+
+Unfortunately, it's plausible that some things have slipped through the cracks
+in these release notes.
+
+Breaking Changes
+````````````````
+
+- Methods that iterate over collections return a separate class than methods
+  that retrieve a single instance. These objects have separate representations
+  when retrieving the data from GitHub's API. They include:
+
+  * Team now can be represented by ShortTeam or Team
+
+  * Organization now can be represented by ShortOrganization or Organization
+
+  * Issue now can be represented by ShortIssue or Issue
+
+  * PullRequest now can be represented by ShortPullRequest or PullRequest
+
+  * Commit now can be represented by ShortCommit, or Commit
+
+  * Gist now can be represented by ShortGist, GistFork, or Gist
+
+  * GistFile now can be represented by ShortGistFile or GistFile
+
+  * Repository objects:
+
+    - Branch now can be represented by ShortBranch or Branch
+
+    - RepoComment now can be represented by ShortComment or ShortRepoComment
+
+    - Repository now can be represented by ShortRepository or Repository
+
+    - RepoCommit now can be represented by MiniCommit, ShortCommit, or
+      RepoCommit
+
+    - Status now can be represented by ShortStatus or Status
+
+  * User now can be represented by ShortUser, Contributor, User, or
+    AuthenticatedUser
+
+  * License now can be represented by ShortLicense or License
+
+- Refreshing a short representation of an object will result in a new object
+  of a new class returned. For example:
+
+  .. code-block:: python
+
+      import github3
+      users = [(u, u.refresh()) for u in github3.all_users(10)]
+      for short_user, user in users:
+          assert isinstance(short_user, github3.users.ShortUser)
+          assert isinstance(user, github3.users.User)
+
+- Remove ``Thread.comment``, ``Thread.thread``, ``Thread.urls`` attributes.
+
+- Remove ``Thread#is_unread`` method. Use the ``Thread.unread`` attribute
+  instead.
+
+- ``Subscription`` has been split into two objects: ``ThreadSubscription`` and
+  ``RepositorySubscription`` with the same methods.
+
+- Remove ``is_ignored`` method from our Subscription objects. Use the
+  ``ignored`` attribute instead.
+
+- Remove ``is_subscribed`` method from our Subscription objects. Use the
+  ``subscribed`` attribute instead.
+
+- Move ``Users#add_email_addresses`` to ``GitHub#add_email_addresses``.
+
+- Move ``Users#delete_email_addresses`` to ``GitHub#delete_email_addresses``.
+
+- Remove ``Users#add_email_address`` and ``Users#delete_email_address``.
+
+- Remove ``Repository#update_label``.
+
+- When you download a release asset, instead of returning ``True`` or
+  ``False``, it will return the name of the file in which it saved the asset.
+
+- The ``download`` method on ``github3.pulls.PullFile`` instances has been
+  removed.
+
+- The ``contents`` method on ``github3.pulls.PullFile`` instances now return
+  instances of ``github3.repos.contents.Contents``.
+
+- Replace ``Repository#comments_on_commit`` with ``RepoCommit#comments``.
+
+- ``Organization#add_member`` has been changed. The second parameter has been
+  changed to ``team_id`` and now expects an integer.
+
+- ``Organization#add_repository`` has been changed. The second parameter has been
+  changed to ``team_id`` and now expects an integer.
+
+- All methods and functions starting with ``iter_`` have been renamed.
+
+==========================================    ==============================================
+Old name                                      New name
+==========================================    ==============================================
+``github3.iter_all_repos``                    ``github3.all_repositories``
+``github3.iter_all_users``                    ``github3.all_users``
+``github3.iter_events``                       ``github3.all_events``
+``github3.iter_followers``                    ``github3.followers_of``
+``github3.iter_following``                    ``github3.followed_by``
+``github3.iter_repo_issues``                  ``github3.issues_on``
+``github3.iter_orgs``                         ``github3.organizations_with``
+``github3.iter_user_repos``                   ``github3.repositories_by``
+``github3.iter_starred``                      ``github3.starred_by``
+``github3.iter_subscriptions``                ``github3.subscriptions_for``
+``Deployment#iter_statuses``                  ``Deployment#statuses``
+``Gist#iter_comments``                        ``Gist#comments``
+``Gist#iter_commits``                         ``Gist#commits``
+``Gist#iter_files``                           ``Gist#files``
+``Gist#iter_forks``                           ``Gist#forks``
+``GitHub#iter_all_repos``                     ``GitHub#all_repositories``
+``GitHub#iter_all_users``                     ``GitHub#all_users``
+``GitHub#iter_authorizations``                ``GitHub#authorizations``
+``GitHub#iter_emails``                        ``GitHub#emails``
+``GitHub#iter_events``                        ``GitHub#events``
+``GitHub#iter_followers``                     ``GitHub#{followers,followers_of}``
+``GitHub#iter_following``                     ``GitHub#{following,followed_by}``
+``GitHub#iter_gists``                         ``GitHub#{gists,gists_by,public_gists}``
+``GitHub#iter_notifications``                 ``GitHub#notifications``
+``GitHub#iter_org_issues``                    ``GitHub#organization_issues``
+``GitHub#iter_issues``                        ``GitHub#issues``
+``GitHub#iter_user_issues``                   ``GitHub#user_issues``
+``GitHub#iter_repo_issues``                   ``GitHub#issues_on``
+``GitHub#iter_keys``                          ``GitHub#keys``
+``GitHub#iter_orgs``                          ``GitHub#{organizations,organizations_with}``
+``GitHub#iter_repos``                         ``GitHub#reposistories``
+``GitHub#iter_user_repos``                    ``GitHub#repositories_by``
+``GitHub#iter_user_teams``                    ``GitHub#user_teams``
+``Issue#iter_comments``                       ``Issue#comments``
+``Issue#iter_events``                         ``Issue#events``
+``Issue#iter_labels``                         ``Issue#labels``
+``Milestone#iter_labels``                     ``Milestone#labels``
+``Organization#iter_members``                 ``Organization#members``
+``Organization#iter_public_members``          ``Organization#public_members``
+``Organization#iter_repos``                   ``Organization#repositories``
+``Organization#iter_teams``                   ``Organization#teams``
+``PullRequest#iter_comments``                 ``PullRequest#review_comments``
+``PullRequest#iter_commits``                  ``PullRequest#commits``
+``PullRequest#iter_files``                    ``PullRequest#files``
+``PullRequest#iter_issue_comments``           ``PullRequest#issue_comments``
+``Team#iter_members``                         ``Team#members``
+``Team#iter_repos``                           ``Team#repositories``
+``Repository#iter_assignees``                 ``Repository#assignees``
+``Repository#iter_branches``                  ``Repository#branches``
+``Repository#iter_code_frequency``            ``Repository#code_frequency``
+``Repository#iter_collaborators``             ``Repository#collaborators``
+``Repository#iter_comments``                  ``Repository#comments``
+``Repository#iter_comments_on_commit``        ``RepoCommit#comments``
+``Repository#iter_commit_activity``           ``Repository#commit_activity``
+``Repository#iter_commits``                   ``Repository#commits``
+``Repository#iter_contributor_statistics``    ``Repository#contributor_statistics``
+``Repository#iter_contributors``              ``Repository#contributors``
+``Repository#iter_forks``                     ``Repository#forks``
+``Repository#iter_hooks``                     ``Repository#hooks``
+``Repository#iter_issues``                    ``Repository#issues``
+``Repository#iter_issue_events``              ``Repository#issue_events``
+``Repository#iter_keys``                      ``Repository#keys``
+``Repository#iter_labels``                    ``Repository#labels``
+``Repository#iter_languages``                 ``Repository#languages``
+``Repository#iter_milestones``                ``Repository#milestones``
+``Repository#iter_network_events``            ``Repository#network_events``
+``Repository#iter_notifications``             ``Repository#notifications``
+``Repository#iter_pages_builds``              ``Repository#pages_builds``
+``Repository#iter_pulls``                     ``Repository#pull_requests``
+``Repository#iter_refs``                      ``Repository#refs``
+``Repository#iter_releases``                  ``Repository#releases``
+``Repository#iter_stargazers``                ``Repository#stargazers``
+``Repository#iter_subscribers``               ``Repository#subscribers``
+``Repository#iter_statuses``                  ``Repository#statuses``
+``Repository#iter_tags``                      ``Repository#tags``
+``Repository#iter_teams``                     ``Repository#teams``
+``Repository#iter_teams``                     ``Repository#teams``
+``User#iter_events``                          ``User#events``
+``User#iter_followers``                       ``User#followers``
+``User#iter_following``                       ``User#following``
+``User#iter_keys``                            ``User#keys``
+``User#iter_org_events``                      ``User#organization_events``
+``User#iter_received_events``                 ``User#received_events``
+``User#iter_orgs``                            ``User#organizations``
+``User#iter_starred``                         ``User#starred_repositories``
+``User#iter_subscriptions``                   ``User#subscriptions``
+==========================================    ==============================================
+
+- ``github3.login`` has been simplified and split into two functions:
+
+  - ``github3.login`` serves the majority use case and only provides an
+    authenticated ``GitHub`` object.
+
+  - ``github3.enterprise_login`` allows GitHub Enterprise users to log into
+    their service.
+
+- ``GitHub#iter_followers`` was split into two functions:
+
+  - ``GitHub#followers_of`` which iterates over all of the followers of a user
+    whose username you provide
+
+  - ``GitHub#followers`` which iterates over all of the followers of the
+    authenticated user
+
+- ``GitHub#iter_following`` was split into two functions:
+
+  - ``GitHub#followed_by`` which iterates over all of the users followed by
+    the username you provide
+
+  - ``GitHub#following`` which iterates over all of the users followed by the
+    authenticated user
+
+- ``GitHub#iter_gists`` was split into three functions:
+
+  - ``GitHub#public_gists`` which iterates over all of the public gists on
+    GitHub
+
+  - ``GitHub#gists_for`` which iterates over all the public gists of a
+    specific user
+
+  - ``GitHub#gists`` which iterates over the authenticated users gists
+
+- ``GitHub#iter_orgs`` was split into two functions:
+
+  - ``GitHub#organizations`` which iterates over the authenticated user's
+    organization memberships
+
+  - ``GitHub#organizations_with`` which iterates over the given user's
+    organization memberships
+
+- ``GitHub#iter_subscriptions`` was split into two functions:
+
+  - ``GitHub#subscriptions_for`` which iterates over an arbitrary user's
+    subscriptions
+
+  - ``GitHub#subscriptions`` which iterates over the authenticated user's
+    subscriptions
+
+- ``GitHub#iter_starred`` was split into two functions:
+
+  - ``GitHub#starred_by`` which iterates over an arbitrary user's stars
+
+  - ``GitHub#starred`` which iterates over the authenticated user's stars
+
+- ``GitHub#user`` was split into two functions:
+
+  - ``GitHub#user`` which retrieves an arbitrary user's information
+
+  - ``GitHub#me`` which retrieves the authenticated user's information
+
+- ``GitHub#update_user`` has been renamed to ``GitHub#update_me`` and only
+  uses 1 API call now. It was renamed to reflect the addition of
+  ``GitHub#me``.
+
+- The legacy watching API has been removed:
+
+  - ``GitHub#subscribe``
+
+  - ``GitHub#unsubscribe``
+
+  - ``GitHub#is_subscribed``
+
+- ``GitHub#create_repo`` was renamed to ``GitHub#create_repository``
+
+- ``GitHub#delete_key`` was removed. To delete a key retrieve it with
+  ``GitHub#key`` and then call ``Key#delete``.
+
+- ``Repository#set_subscription`` was split into two simpler functions
+
+  - ``Repository#subscribe`` subscribes the authenticated user to the
+    repository's notifications
+
+  - ``Repository#ignore`` ignores notifications from the repository for the
+    authenticated user
+
+- ``Repository#contents`` was split into two simpler functions
+
+  - ``Repository#file_contents`` returns the contents of a file object
+
+  - ``Repository#directory_contents`` returns the contents of files in a
+    directory.
+
+- ``Organization#add_repo`` and ``Team#add_repo`` have been renamed to
+  ``Organization#add_repository`` and ``Team#add_repository`` respectively.
+
+- ``Organization#create_repo`` has been renamed to
+  ``Organization#create_repository``. It no longer accepts ``has_downloads``.
+  It now accepts ``license_template``.
+
+- ``Organization#remove_repo`` has been renamed to
+  ``Organization#remove_repository``. It now accepts ``team_id`` instead of
+  ``team``.
+
+- ``github3.ratelimit_remaining`` was removed
+
+- ``GitHub`` instances can no longer be used as context managers
+
+- The pull request API has changed.
+
+  - The ``links`` attribute now contains the raw ``_links`` attribute from the
+    API.
+
+  - The ``merge_commit_sha`` attribute has been removed since it was deprecated
+    in the GitHub API.
+
+  - To present a more consistent universal API, certain attributes have been
+    renamed.
+
+===============================     ==========================
+Old name                            New attribute name
+===============================     ==========================
+``PullFile.additions``              ``additions_count``
+``PullFile.deletions``              ``deletions_count``
+``PullFile.changes``                ``changes_count``
+``PullRequest.additions``           ``additions_count``
+``PullRequest.comments``            ``comments_count``
+``PullRequest.commits``             ``commits_count``
+``PullRequest.deletions``           ``deletions_count``
+``PullRequest.review_comments``     ``review_comments_count``
+===============================     ==========================
+
+- The Gist API has changed.
+
+  - The ``forks`` and ``files`` attributes that used to keep count of the
+    number of ``forks`` and ``files`` have been **removed**.
+
+  - The ``comments`` attribute which provided the number of comments on a
+    gist, has been **renamed** to ``comments_count``.
+
+  - The ``is_public`` method has been removed since it just returned the
+    ``Gist.public`` attribute.
+
+- Most instances of ``login`` as a parameter have been changed to ``username``
+  for clarity and consistency. This affects the following methods:
+
+  - ``github3.authorize``
+  - ``github3.repositories_by``
+  - ``github3.user``
+  - ``GitHub``
+  - ``GitHub#authorize``
+  - ``GitHub#follow``
+  - ``GitHub#is_following``
+  - ``GitHub#is_starred``
+  - ``GitHub#issue``
+  - ``GitHub#followers_of``
+  - ``GitHub#followed_by``
+  - ``GitHub#gists_by``
+  - ``GitHub#issues_on``
+  - ``GitHub#organizations_with``
+  - ``GitHub#starred_by``
+  - ``GitHub#subscriptions_for``
+  - ``GitHub#user``
+  - ``GitHubEnterprise``
+  - ``Issue#assign``
+  - ``Organization#add_member``
+  - ``Organization#is_member``
+  - ``Organization#is_public_member``
+  - ``Organization#remove_member``
+  - ``Repository#add_collaborator``
+  - ``Repository#is_assignee``
+  - ``Repository#is_collaborator``
+  - ``Repository#remove_collaborator``
+  - ``Team#add_member``
+  - ``Team#is_member``
+  - ``User#is_assignee_on``
+  - ``User#is_following``
+
+- ``Repository.stargazers`` is now ``Repository.stargazers_count`` (conforming
+  with the attribute name returned by the API).
+
+
+- The ``Issue`` API has changed in order to provide a more consistent attribute
+  API. ``Issue.comments`` is now ``Issue.comments_count`` and returns the
+  number of comments on an issue.
+
+- The ``Issue.labels`` attribute has also been renamed. It is now available from
+  ``Issue.original_labels``. This will provide the user with the list of
+  ``Label`` objects that was returned by the API. To retrieve an updated list
+  of labels, the user can now use ``Issue#labels``, e.g.
+
+  ::
+
+      i = github3.issue('sigmavirus24', 'github3.py', 30)
+      labels = list(i.labels())
+
+- The ``Organization`` and ``User`` APIs have changed to become more
+  consistent with the rest of the library and GitHub API. The following
+  attribute names have been changed
+
+===============================     ==========================
+Old name                            New attribute name
+===============================     ==========================
+``Organization.followers``          ``followers_count``
+``Organization.following``          ``following_count``
+``Organization.public_repos``       ``public_repos_count``
+``User.followers``                  ``followers_count``
+``User.following``                  ``following_count``
+``User.public_repos``               ``public_repos_count``
+===============================     ==========================
+
+- The ``Release.assets`` attribute has been renamed to
+  ``Release.original_assets``. To retrieve up-to-date assets, use the
+  ``Release#assets`` method.
+
+- The ``Authorization`` API has changed. The ``update`` method has been split
+  into three methods: ``add_scopes``, ``remove_scopes``, ``replace_scopes``.
+  This highlights the fact that ``Authorization#update`` used to require more
+  than one request.
+
+- ``Event#is_public`` has been removed. Simply check the event's ``public``
+  attribute instead.
+
+- ``Repository#delete_file`` and ``Repository#update_file`` have been removed.
+  Simply delete or update a file using the Contents API.
+
+- ``Content#delete`` now returns a dictionary that matches the JSON returned
+  by the API. It contains the Contents and the Commit associated with the
+  deletion.
+
+- ``Content#update`` now returns a dictionary that matches the JSON returned
+  by the API. It contains the Contents and the Commit associated with the
+  deletion.
+
+- ``Issue.pull_request`` has been renamed to ``Issue.pull_request_urls``
+
+New Features
+````````````
+
+- Most objects now have a ``session`` attribute. This is a subclass of a
+  ``Session`` object from ``requests``. This can now be used in conjunction
+  with a third-party caching mechanism. The suggested caching library is
+  ``cachecontrol``.
+
+- All object's ``url`` attribute are now available.
+
+- You can now retrieve a repository by its id with
+  ``GitHub#repository_with_id``.
+
+- You can call the ``pull_request`` method on an ``Issue`` now to retrieve the
+  associated pull request::
+
+      import github3
+
+      i = github3.issue('sigmavirus24', 'github3.py', 301)
+      pr = i.pull_request()
+
+- Add support for the Issue locking API currently in Preview Mode
+
+- Add ``Organization#all_events``.
+
+- Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
+
+- Add ``Repo.statuses`` and a corresponding ``repo.status.CombinedStatus`` to
+
+- Support filtering organization members by whether they have 2FA enabled.
+
+- Support filtering organization and team members by role.
+
+- Add ``GitHub#all_organizations``.
+
+- Add ``PullRequest#create_comment``.
+
+- Add ``Repository#release_by_tag_name`` to retrieve a Release from a
+  Repository by its associated tag name.
+
+- Add ``Repository#latest_release`` to retrieve the latest Release for a
+  Repository.
+
+- Add ``GitHub#license`` to retrieve a ``github3.license.License`` by the
+  license name.
+
+- Add ``GitHub#licenses`` to iterate over all the licenses returned by
+  GitHub's Licenses API.
+
+- Add protection information to ``github3.repos.branch.Branch``.
+
+- Add ``Branch#protect`` and ``Branch#unprotect`` to support updating a
+  Branch's protection status.
+
+- Vastly improved GitHub Enterprise support:
+
+  - Add ``User#rename`` to rename a user in a GitHub Enterprise installation.
+
+  - Add ``GitHub#create_user`` to create a user.
+
+  - Add ``User#impersonate`` to create an impersonation token by an admin for
+    a particular user.
+
+  - Add ``User#revoke_impersonation`` to revoke all impersonation tokens for a
+    user.
+
+  - Add ``User#promote`` to promote a particular user to a site administrator.
+
+  - Add ``User#demote`` to demote a site administrator to a simple user.
+
+  - Add ``User#suspend`` to suspend a user's account.
+
+  - Add ``User#unsuspend`` to reinstate a user's account.
+
+- Add ``original_content`` attribute to a ``GistFile``
+
+- Add ``GistFile#content`` to retrieve the contents of a file in a gist from
+  the API.
+
+- Add support for the alpha `bulk issue import API`_
+
+- You can now download a file in a pull request to a file on disk.
+
+- You can retrieve the contents of the file in a pull request as bytes.
+
+- Add ``id`` attribute to ``github3.repos.milestone.Milestone``.
+
+- Add support for sort, direction, and since parameters to the ``comments``
+  method on ``github3.issues.Issue``.
+
+- Add branch argument to update and delete methods on
+  ``github3.repos.contents.Contents``.
+
+- Add ``permissions`` attribute to ``github3.repos.repo.Repository`` object to
+  retrieve the permissions for a specific repository.
+
+- Allow a deployment to be retrieved by its id.
+
+- Add the ``delete`` method to the ``github3.repos.release.Asset`` class.
+
+.. _bulk issue import API:
+    https://gist.github.com/jonmagic/5282384165e0f86ef105
+
+Bugs Fixed
+``````````
+
+- Fix the dependencies and requirements. In 1.0.0a3 we moved to using the
+  ``setup.cfg`` file to define optional dependencies for wheels. By doing
+  so we accidentally left out our actual hard dependencies.
+
+- The ``context`` parameter to ``Repository#create_status`` now properly
+  defaults to ``"default"``.
+
+- Fix AttributeError when ``IssueEvent`` has assignee.
+
+- Correctly set the ``message`` attribute on ``RepoCommit`` instances.
+
+- Include ``browser_download_url`` on ``Asset`` instances.
+
+- (Packaging related) Fix ``setup.py`` to use proper values for certain
+  parameters.
+
+- Fix ``ValueError`` for ``Repository#create_file``.
+
+- Pull request files can now be downloaded even when the repository is
+  private.
+
+- Fix exception when merging a pull request with an empty commit message.
+
+- Add missing Issue events.
+
+- Coerce review comment positions to integers.
+
+Deprecations and Other Changes
+``````````````````````````````
+
+- Deprecate ``Organization#events`` in favor of ``Organization#public_events``.
+
+- Fix test failtures on windows caused by unclosed file handles.
+  get a combined view of commit statuses for a given ref.
+
+- The ``refresh`` method will eventually stop updating the instance in place
+  and instead only return new instances of objects.

@@ -102,7 +102,7 @@ class RepositoryIssueEvent(IssueEvent):
 
     This object will be instantiated from calling
     :meth:`~github3.repos.repo.Repository.issue_events` or
-    :meth:`~github3.repos.repo.ShortRepository.issue_events`which call
+    :meth:`~github3.repos.repo.ShortRepository.issue_events` which call
     https://developer.github.com/v3/issues/events/#list-events-for-a-repository
 
     See also: http://developer.github.com/v3/issues/events

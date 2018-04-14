@@ -1,0 +1,4 @@
+0.5.2: 2013-03-02
+-----------------
+
+- Stop trying to decode the byte strings returned by ``b64decode``. Fixes #72
