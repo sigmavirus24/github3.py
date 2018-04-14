@@ -46,7 +46,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'github3.py'
-copyright = u'2012 - Ian Cordasco'
+copyright = u'2012-2018 - Ian Stapleton Cordasco'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
