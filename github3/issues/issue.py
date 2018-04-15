@@ -293,7 +293,9 @@ class _Issue(models.GitHubCore):
         """
         from .. import pulls
         json = None
-        pull_request_url = self.pull_request_urls.get('url')
+        pull_request_url = None
+        if self.pull_request_urls is not None:
+            pull_request_url = self.pull_request_urls.get('url')
         if pull_request_url:
             json = self._json(self._get(pull_request_url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
