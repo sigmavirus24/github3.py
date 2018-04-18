@@ -66,7 +66,7 @@ class GitHub(models.GitHubCore):
 
     def _repr(self):
         if self.session.auth:
-            return '<GitHub [{0[0]}]>'.format(self.session.auth)
+            return '<GitHub [{!r}]>'.format(self.session.auth)
         return '<Anonymous GitHub at 0x{0:x}>'.format(id(self))
 
     @requires_auth
