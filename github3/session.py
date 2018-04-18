@@ -11,15 +11,28 @@ __logs__ = getLogger(__package__)
 
 
 def requires_2fa(response):
+    """Determine whether a response requires us to prompt the user for 2FA."""
     if (response.status_code == 401 and 'X-GitHub-OTP' in response.headers and
             'required' in response.headers['X-GitHub-OTP']):
         return True
     return False
 
 
+class BasicAuth(requests.auth.HTTPBasicAuth):
+    """Sub-class requests's class so we have a nice repr."""
+
+    def __repr__(self):
+        """Use the username as the representation."""
+        return 'basic {}'.format(self.username)
+
+
 class TokenAuth(requests.auth.AuthBase):
     def __init__(self, token):
         self.token = token
+
+    def __repr__(self):
+        """Return a nice view of the token in use."""
+        return 'token {}...'.format(self.token[:4])
 
     def __ne__(self, other):
         return not self == other
@@ -61,7 +74,7 @@ class GitHubSession(requests.Session):
         if not (username and password):
             return
 
-        self.auth = (username, password)
+        self.auth = BasicAuth(username, password)
 
     def build_url(self, *args, **kwargs):
         """Builds a new API url from scratch."""

@@ -69,13 +69,13 @@ class TestGitHubSession:
             # Make sure we have a clean session to test with
             s = self.build_session()
             s.basic_auth(*auth)
-            assert s.auth != auth
+            assert s.auth != session.BasicAuth(*auth)
 
     def test_basic_login(self):
         """Test that basic auth will work with a valid combination"""
         s = self.build_session()
         s.basic_auth('username', 'password')
-        assert s.auth == ('username', 'password')
+        assert s.auth == session.BasicAuth('username', 'password')
 
     def test_basic_login_disables_token_auth(self):
         """Test that basic auth will remove the Authorization header.
@@ -238,16 +238,16 @@ class TestGitHubSession:
         s = self.build_session()
         s.basic_auth('foo', 'bar')
         with s.temporary_basic_auth('temp', 'pass'):
-            assert s.auth != ('foo', 'bar')
+            assert s.auth != session.BasicAuth('foo', 'bar')
 
-        assert s.auth == ('foo', 'bar')
+        assert s.auth == session.BasicAuth('foo', 'bar')
 
     def test_temporary_basic_auth_replaces_auth(self):
         """Test that temporary_basic_auth sets the proper credentials."""
         s = self.build_session()
         s.basic_auth('foo', 'bar')
         with s.temporary_basic_auth('temp', 'pass'):
-            assert s.auth == ('temp', 'pass')
+            assert s.auth == session.BasicAuth('temp', 'pass')
 
     def test_no_auth(self):
         """Verify that no_auth removes existing authentication."""
@@ -262,7 +262,7 @@ class TestGitHubSession:
 
         pr = s.prepare_request(req)
         assert 'Authorization' in pr.headers
-        assert s.auth == ('user', 'password')
+        assert s.auth == session.BasicAuth('user', 'password')
 
     def test_retrieve_client_credentials_when_set(self):
         """Test that retrieve_client_credentials will return the credentials.
