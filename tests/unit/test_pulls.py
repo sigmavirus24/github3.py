@@ -9,6 +9,9 @@ from github3 import pulls
 get_pr_example_data = helper.create_example_data_helper(
     'pull_request_example'
 )
+get_pullreview_example_data = helper.create_example_data_helper(
+    'pull_review_example'
+)
 
 
 url_for = helper.create_url_helper(
@@ -59,6 +62,20 @@ class TestPullRequest(helper.UnitHelper):
                 'commit_id': 'sha',
                 'path': 'path',
                 'position': 6
+            }
+        )
+
+    def test_create_review(self):
+        """Verify the request to create a review on a PR."""
+        self.instance.create_review('body', 'sha', 'APPROVED')
+
+        self.post_called_with(
+            url_for('reviews'),
+            data={
+                'body': 'body',
+                'commit_id': 'sha',
+                'event': 'APPROVED',
+                'comments': [],
             }
         )
 
@@ -147,6 +164,25 @@ class TestPullRequest(helper.UnitHelper):
                 'e5bd3914e2e596debea16f433f57875b5b90bcd6')
         assert not self.instance.merged
         assert self.instance.mergeable
+
+
+class TestPullReview(helper.UnitHelper):
+    """PullReview unit tests."""
+
+    described_class = pulls.PullReview
+    example_data = get_pullreview_example_data()
+
+    def test_submit(self):
+        """Verify the request to submit a review"""
+        self.instance.submit('body', 'APPROVED')
+
+        self.post_called_with(
+            url_for('reviews/{0}/events'.format(self.instance.id)),
+            data={
+                'body': 'body',
+                'event': 'APPROVED',
+            }
+        )
 
 
 class TestPullRequestRequiresAuthentication(
