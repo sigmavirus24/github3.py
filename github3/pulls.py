@@ -287,9 +287,15 @@ class _PullRequest(models.GitHubCore):
         return self._instance_or_null(ReviewComment, json)
 
     @requires_auth
-    def create_review(self, body, commit_id=None, event=None,
-                      comments=None):
+    def create_review(self, body, commit_id=None, event=None, comments=None):
         """Create a review comment on this pull request.
+
+        .. warning::
+
+            If you do not specify ``event``, GitHub will default it
+            to ``PENDING`` which means that your review will need to
+            be submitted after creation. (See also
+            :meth:`~github3.pulls.PullReview.submit`.)
 
         :param str body:
             The comment text itself, required when using COMMENT or
@@ -300,7 +306,7 @@ class _PullRequest(models.GitHubCore):
             The review action you want to perform. Actions include
             APPROVE, REQUEST_CHANGES or COMMENT. By leaving this blank
             you set the action to PENDING and will need to submit the
-            review. Leaving blank will result in a 422 error response
+            review. Leaving blank may result in a 422 error response
             which will need to be handled.
         :param list comments:
             Array of draft review comment objects. Please see Github's
@@ -310,8 +316,7 @@ class _PullRequest(models.GitHubCore):
             `body`.
 
             .. _Create a pull request review documentation:
-                https://developer.github.com/v3/pulls/reviews/\
-                #create-a-pull-request-review
+                https://developer.github.com/v3/pulls/reviews/#create-a-pull-request-review
 
         :returns:
             The created review.
