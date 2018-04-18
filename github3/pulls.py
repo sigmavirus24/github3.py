@@ -286,6 +286,54 @@ class _PullRequest(models.GitHubCore):
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(ReviewComment, json)
 
+    @requires_auth
+    def create_review(self, body, commit_id=None, event=None, comments=None):
+        """Create a review comment on this pull request.
+
+        .. warning::
+
+            If you do not specify ``event``, GitHub will default it
+            to ``PENDING`` which means that your review will need to
+            be submitted after creation. (See also
+            :meth:`~github3.pulls.PullReview.submit`.)
+
+        :param str body:
+            The comment text itself, required when using COMMENT or
+            REQUEST_CHANGES.
+        :param str commit_id:
+            The SHA of the commit to comment on
+        :param str event:
+            The review action you want to perform. Actions include
+            APPROVE, REQUEST_CHANGES or COMMENT. By leaving this blank
+            you set the action to PENDING and will need to submit the
+            review. Leaving blank may result in a 422 error response
+            which will need to be handled.
+        :param list comments:
+            Array of draft review comment objects. Please see Github's
+            `Create a pull request review documentation`_ for details
+            on review comment objects. At the time of writing these
+            were a dictionary with 3 keys: `path`, `position` and
+            `body`.
+
+            .. _Create a pull request review documentation:
+                https://developer.github.com/v3/pulls/reviews/#create-a-pull-request-review
+
+        :returns:
+            The created review.
+        :rtype:
+            :class:`~github3.pulls.PullReview`
+        """
+        if comments is None:
+            comments = []
+        url = self._build_url('reviews', base_url=self._api)
+        data = {'body': body, 'comments': comments}
+        if commit_id is not None:
+            data['commit_id'] = commit_id
+        if event is not None:
+            data['event'] = event
+        json = self._json(self._post(url, data=data), 200)
+        return self._instance_or_null(PullReview, json)
+
     def diff(self):
         """Return the diff.
 
@@ -807,11 +855,39 @@ class PullReview(models.GitHubCore):
         self.html_url = review['html_url']
         self.user = users.ShortUser(review['user'], self)
         self.state = review['state']
-        self.submitted_at = review['submitted_at']
+        self.submitted_at = self._strptime(review.get('submitted_at'))
         self.pull_request_url = review['pull_request_url']
 
     def _repr(self):
         return '<Pull Request Review [{0}]>'.format(self.id)
+
+    @requires_auth
+    def submit(self, body, event=None):
+        """Submit a pull request review.
+
+        :param str body:
+            The body text of the pull request review.
+        :param str event:
+            The review action you want to perform. Actions include
+            APPROVE, REQUEST_CHANGES or COMMENT. By leaving this blank
+            you set the action to PENDING and will need to submit the
+            review. Leaving blank will result in a 422 error response
+            which will need to be handled.
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url('reviews', self.id, 'events',
+                              base_url=self.pull_request_url)
+        data = {'body': body}
+        if event is not None:
+            data['event'] = event
+        json = self._json(self._post(url, data=data), 200)
+        if json:
+            self._update_attributes(json)
+            return True
+        return False
 
 
 class ReviewComment(models.GitHubCore):

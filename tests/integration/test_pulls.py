@@ -58,6 +58,18 @@ class TestPullRequest(IntegrationHelper):
             )
         assert isinstance(comment, github3.pulls.ReviewComment)
 
+    def test_create_review(self):
+        """Verify the request to create a pending review on a PR."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_review')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=819)
+            comment = p.create_review(
+                body='Testing create review',
+                event='COMMENT',
+            )
+        assert isinstance(comment, github3.pulls.PullReview)
+
     def test_diff(self):
         """Show that one can retrieve a bytestring diff of a PR."""
         cassette_name = self.cassette_name('diff')
@@ -154,6 +166,24 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             assert isinstance(p.repository, github3.repos.ShortRepository)
+
+
+class TestPullReview(IntegrationHelper):
+    """Integration tests for the PullReview object."""
+
+    def test_submit(self):
+        self.token_login()
+        cassette_name = self.cassette_name('submit')
+        with self.recorder.use_cassette(cassette_name):
+            pr = self.gh.pull_request("sigmavirus24", "github3.py", 819)
+            p = pr.create_review(
+                body='Testing submit review',
+            )
+            p.submit(
+                body='Testing submit review',
+                event='COMMENT',
+            )
+        assert p.submitted_at is not None
 
 
 class TestReviewComment(IntegrationHelper):
