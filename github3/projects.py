@@ -82,8 +82,7 @@ class Project(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectColumn`
         """
-        url = self._build_url(
-            'projects', 'columns', str(id), base_url=self._github_url)
+        url = self._build_url('projects', 'columns', str(id))
         json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(ProjectColumn, json)
 
@@ -102,8 +101,7 @@ class Project(models.GitHubCore):
         """
         # TODO(sigmaviurs24): Determine if we need to construct from scratch
         # or if we can use `self._api` with 'columns' to build the URL
-        url = self._build_url(
-            'projects', str(self.id), 'columns', base_url=self._github_url)
+        url = self._build_url('projects', str(self.id), 'columns')
         return self._iter(
             int(number),
             url,
@@ -217,8 +215,7 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectCard`
         """
-        url = self._build_url(
-            'projects/columns/cards', str(id), base_url=self._github_url)
+        url = self._build_url('projects', 'columns', 'cards', str(id))
         json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(ProjectCard, json)
 
@@ -235,12 +232,7 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             :class:`~github3.project.ProjectCard`
         """
-        url = self._build_url(
-            'projects/columns',
-            str(self.id),
-            'cards',
-            base_url=self._github_url
-        )
+        url = self._build_url('projects', 'columns', str(self.id), 'cards')
         return self._iter(
             int(number),
             url,
@@ -265,12 +257,7 @@ class ProjectColumn(models.GitHubCore):
         if not content_id or not content_type:
             return None
 
-        url = self._build_url(
-            'projects/columns',
-            str(self.id),
-            'cards',
-            base_url=self._github_url
-        )
+        url = self._build_url('projects', 'columns', str(self.id), 'cards')
         json = None
         data = {'content_id': content_id, 'content_type': content_type}
         json = self._json(self._post(
@@ -306,12 +293,7 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectCard`
         """
-        url = self._build_url(
-            'projects/columns',
-            str(self.id),
-            'cards',
-            base_url=self._github_url
-        )
+        url = self._build_url('projects', 'columns', str(self.id), 'cards')
         json = None
         if note:
             json = self._json(self._post(
@@ -327,8 +309,7 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url(
-            'projects/columns', self.id, base_url=self._github_url)
+        url = self._build_url('projects', 'columns', str(self.id))
         return self._boolean(self._delete(
             url, headers=Project.CUSTOM_HEADERS), 204, 404)
 
@@ -348,12 +329,7 @@ class ProjectColumn(models.GitHubCore):
         if not position:
             return False
 
-        url = self._build_url(
-            'projects/columns',
-            self.id,
-            'moves',
-            base_url=self._github_url
-        )
+        url = self._build_url('projects', 'columns', str(self.id), 'moves')
         data = {'position': position}
         return self._boolean(self._post(
             url, data=data, headers=Project.CUSTOM_HEADERS), 201, 404)
@@ -374,8 +350,7 @@ class ProjectColumn(models.GitHubCore):
         self._remove_none(data)
 
         if data:
-            url = self._build_url(
-                'projects/columns', self.id, base_url=self._github_url)
+            url = self._build_url('projects', 'columns', str(self.id))
             json = self._json(self._patch(
                 url, data=dumps(data), headers=Project.CUSTOM_HEADERS), 200)
 
@@ -448,8 +423,7 @@ class ProjectCard(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url(
-            'projects/columns/cards', self.id, base_url=self._github_url)
+        url = self._build_url('projects', 'columns', 'cards', str(self.id))
         return self._boolean(self._delete(
             url, headers=Project.CUSTOM_HEADERS), 204, 404)
 
@@ -471,12 +445,8 @@ class ProjectCard(models.GitHubCore):
         if not position or not column_id:
             return False
 
-        url = self._build_url(
-            'projects/columns/cards',
-            self.id,
-            'moves',
-            base_url=self._github_url
-        )
+        url = self._build_url('projects', 'columns', 'cards', str(self.id),
+                              'moves')
         data = {'position': position, 'column_id': column_id}
         return self._boolean(self._post(
             url, data=data, headers=Project.CUSTOM_HEADERS), 201, 404)
@@ -499,8 +469,7 @@ class ProjectCard(models.GitHubCore):
         self._remove_none(data)
 
         if data:
-            url = self._build_url(
-                'projects/columns/cards', self.id, base_url=self._github_url)
+            url = self._build_url('projects', 'columns', 'cards', str(self.id))
             json = self._json(self._patch(
                 url, data=dumps(data), headers=Project.CUSTOM_HEADERS), 200)
 
