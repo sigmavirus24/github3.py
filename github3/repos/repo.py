@@ -13,6 +13,7 @@ import json as jsonlib
 import uritemplate as urit
 
 from .. import events
+from .. import exceptions
 from .. import git
 from .. import issues
 from ..issues import event as ievent
@@ -1164,9 +1165,18 @@ class _Repository(models.GitHubCore):
             list of tuples of the filename and the Contents returned
         :rtype:
             [(str, :class:`~github3.repos.contents.Contents`)]
+        :raises github3.exceptions.UnprocessableResponseBody:
+            When the requested directory is not actually a directory
         """
         url = self._build_url('contents', directory_path, base_url=self._api)
         json = self._json(self._get(url, params={'ref': ref}), 200) or []
+        if not (isinstance(json, list) and
+                all(isinstance(j, dict) for j in json)):
+            raise exceptions.UnprocessableResponseBody(
+                'The contents returned do not appear to be a directory. '
+                'You may have requested a non-directory.',
+                json
+            )
         return return_as((j.get('name'), contents.Contents(j, self))
                          for j in json)
 

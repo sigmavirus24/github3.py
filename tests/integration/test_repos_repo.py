@@ -574,6 +574,14 @@ class TestRepository(helper.IntegrationHelper):
             assert content.name == filename
             assert isinstance(content, github3.repos.contents.Contents)
 
+    def test_directory_contents_for_a_file(self):
+        """Verify we raise a sensical exception for a directory's contents."""
+        cassette_name = self.cassette_name('not_really_directory_contents')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            with pytest.raises(github3.exceptions.UnprocessableResponseBody):
+                repository.directory_contents('README.rst')
+
     def test_edit(self):
         """Test the ability to edit a repository."""
         self.token_login()
