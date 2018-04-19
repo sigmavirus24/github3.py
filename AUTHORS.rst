@@ -158,3 +158,5 @@ Contributors
 - Walid Ziouche (@01walid)
 
 - Katie Bell (@katharosada)
+
+- Jeff Quast (@jquast)

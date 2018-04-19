@@ -1204,7 +1204,8 @@ class _Repository(models.GitHubCore):
     @requires_auth
     def edit(self, name, description=None, homepage=None, private=None,
              has_issues=None, has_wiki=None, has_downloads=None,
-             default_branch=None, archived=None):
+             default_branch=None, archived=None, allow_merge_commit=None,
+             allow_squash_merge=None, allow_rebase_merge=None):
         """Edit this repository.
 
         :param str name:
@@ -1240,15 +1241,39 @@ class _Repository(models.GitHubCore):
             (optional), If not ``None``, toggle the archived
             attribute on the repository to control whether it is archived or
             not.
+        :param bool allow_rebase_merge:
+            (optional), If not ``None``, change whether the merge strategy
+            that allows adding all commits from the head branch onto the base
+            branch individually is enabled for this repository.  API default:
+            ``None`` - leave value unchanged.
+        :param bool allow_squash_merge:
+            (optional), If not ``None``, change whether combining all commits
+            from the head branch into a single commit in the base branch is
+            allowed. API default: ``None`` - leave value unchanged.
+        :param bool allow_merge_commit:
+            (optional), If not ``None``, change whether adding all commits
+            from the head branch to the base branch with a merge commit is
+            allowed. API default: ``None`` - leave value unchanged.
         :returns:
             True if successful, False otherwise
         :rtype:
             bool
         """
-        edit = {'name': name, 'description': description, 'homepage': homepage,
-                'private': private, 'has_issues': has_issues,
-                'has_wiki': has_wiki, 'has_downloads': has_downloads,
-                'default_branch': default_branch, 'archived': archived}
+        edit = {
+            'name': name,
+            'description': description,
+            'homepage': homepage,
+            'private': private,
+            'has_issues': has_issues,
+            'has_wiki': has_wiki,
+            'has_downloads': has_downloads,
+            'default_branch': default_branch,
+            'archived': archived,
+            'default_branch': default_branch,
+            'allow_merge_commit': allow_merge_commit,
+            'allow_squash_merge': allow_squash_merge,
+            'allow_rebase_merge': allow_rebase_merge,
+        }
         self._remove_none(edit)
         json = None
         if edit:
@@ -2345,6 +2370,32 @@ class Repository(_Repository):
     This object has all the same attributes as
     :class:`~github3.repos.repo.ShortRepository` as well as:
 
+    .. attribute:: allow_merge_commit
+
+        .. note::
+
+            This attribute is not guaranteed to be present.
+
+        Whether the repository allows creating a merge commit when merging
+        when a pull request.
+
+    .. attribute:: allow_rebase_merge
+
+        .. note::
+
+            This attribute is not guaranteed to be present.
+
+        Whether the repository allows rebasing when merging a pull request.
+
+    .. attribute:: allow_squash_merge
+
+        .. note::
+
+            This attribute is not guaranteed to be present.
+
+        Whether the repository allows squashing commits when merging a pull
+        request.
+
     .. attribute:: archived
 
         A boolean attribute that describes whether the current repository has
@@ -2486,6 +2537,9 @@ class Repository(_Repository):
 
     def _update_attributes(self, repo):
         super(Repository, self)._update_attributes(repo)
+        self.allow_merge_commit = repo.get('allow_merge_commit')
+        self.allow_rebase_merge = repo.get('allow_rebase_merge')
+        self.allow_squash_merge = repo.get('allow_squash_merge')
         self.archived = repo['archived']
         self.clone_url = repo['clone_url']
         self.created_at = self._strptime(repo['created_at'])
