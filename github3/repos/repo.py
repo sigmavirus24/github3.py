@@ -516,20 +516,21 @@ class _Repository(models.GitHubCore):
         return sha
 
     @requires_auth
-    def create_branch(self, name, sha=None):
-        """Create a branch. Returns False if branch doesn't exist
-        or not authorized.
+    def create_branch_ref(self, name, sha=None):
+        """Create a branch git reference.
 
-        :param str branch: (required), the branch to create.
-        :param str|commit sha: (optional), the commit to base
-                the branch from, otherwise the HEAD commit on
-                master will be fetched from the API.
+        This is a shortcut for calling
+        :meth:`github3.repos.repo.Repository.create_ref`.
 
-        :returns: bool -- True if successful, False otherwise
+        :param str branch:
+            (required), the branch to create
+        :param str sha:
+            the commit to base the branch from
+        :returns:
+            a reference object representing the branch
+        :rtype:
+            :class:`~github3.git.Reference`
         """
-        if sha is None:
-            sha = self.commit("HEAD").sha
-
         ref = "refs/heads/%s" % name
         return self.create_ref(ref, sha)
 
@@ -931,9 +932,8 @@ class _Repository(models.GitHubCore):
         :rtype:
             :class:`~github3.git.Reference`
         """
-        if isinstance(sha, Commit):
-            sha = sha.sha
-        
+        sha = getattr(sha, 'sha', sha)
+
         json = None
         if ref and ref.startswith('refs') and ref.count('/') >= 2 and sha:
             data = {'ref': ref, 'sha': sha}
@@ -1096,17 +1096,6 @@ class _Repository(models.GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def delete_branch(self, name):
-        """Delete a branch. Returns False if branch doesn't exist
-        or not authorized.
-
-        :param str branch: (required), the branch to delete.
-
-        :returns: bool -- True if successful, False otherwise
-        """
-        return self.delete_ref("heads/%s" % name)
-
-    @requires_auth
     def delete_key(self, key_id):
         """Delete the key with the specified id from your deploy keys list.
 
@@ -1118,18 +1107,6 @@ class _Repository(models.GitHubCore):
         if int(key_id) <= 0:
             return False
         url = self._build_url('keys', str(key_id), base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
-
-    @requires_auth
-    def delete_ref(self, ref):
-        """Delete a reference. Returns False if ref doesn't exist
-        or not authorized for the action.
-
-        :param str ref: (required), the reference to delete.
-
-        :returns: bool -- True if successful, False otherwise
-        """
-        url = self._build_url('git/refs', ref, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth

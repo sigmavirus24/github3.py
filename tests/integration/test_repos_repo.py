@@ -465,6 +465,34 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(pull_request, github3.pulls.ShortPullRequest)
 
+    def test_create_ref(self):
+        """Verify the ability to create a reference on a repository."""
+        self.auto_login()
+        cassette_name = self.cassette_name('create_ref')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'fork_this')
+            master = repository.commit('master')
+            ref = repository.create_ref(
+                'refs/tags/test-tag-{}'.format(master.sha[:6]),
+                master,
+            )
+            assert isinstance(ref, github3.git.Reference)
+            ref.delete()
+
+    def test_create_branch_ref(self):
+        """Verify the ability to create a branch on a repository."""
+        self.auto_login()
+        cassette_name = self.cassette_name('create_branch_ref')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('github3py', 'fork_this')
+            master = repository.commit('master')
+            ref = repository.create_branch_ref(
+                'test-branch-{}'.format(master.sha[:6]),
+                master,
+            )
+            assert isinstance(ref, github3.git.Reference)
+            ref.delete()
+
     def test_create_release(self):
         """Test the ability to create a release on a repository."""
         self.token_login()

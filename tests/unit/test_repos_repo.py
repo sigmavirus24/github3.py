@@ -437,6 +437,18 @@ class TestRepository(helper.UnitHelper):
             },
         )
 
+    def test_create_branch_ref(self):
+        """Verify the request to create a branch."""
+        self.instance.create_branch_ref('branch-name', 'my-fake-sha')
+
+        self.post_called_with(
+            url_for('git/refs'),
+            data={
+                'ref': 'refs/heads/branch-name',
+                'sha': 'my-fake-sha',
+            },
+        )
+
     def test_create_ref_requires_a_reference_with_two_slashes(self):
         """Test that we check the validity of a reference."""
         self.instance.create_ref('refs/heads', 'my-fake-sha')
