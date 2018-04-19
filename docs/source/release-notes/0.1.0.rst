@@ -10,7 +10,7 @@
 
 - Handle sending json with ``%`` symbols better, courtesy of Kristian Glass
 
-- Correctly handle non-GitHub committers and authors courtesy of Paul Swartz 
+- Correctly handle non-GitHub committers and authors courtesy of Paul Swartz
   (@paulswartz)
 
 - Correctly display method signatures in documentation courtesy of (@seveas)
@@ -31,7 +31,7 @@
 
   - Now also includes the Statuses API
 
-  - Also covers the auto_init parameters to the Repository creation 
+  - Also covers the auto_init parameters to the Repository creation
     methodology
 
   - Limited implementation of iterators in the place of list functions.

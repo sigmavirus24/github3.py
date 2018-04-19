@@ -38,9 +38,9 @@ object ``g``. That might look like this::
 So anywhere you see ``g`` used, you can safely assume that it is an instance
 where a user has authenticated already.
 
-For the cases where we do not need an authenticated user, or where we are trying
-to demonstrate the differences between the two, I will use ``anon``. ``anon``
-could be instantiated like so::
+For the cases where we do not need an authenticated user, or where we are
+trying to demonstrate the differences between the two, I will use ``anon``.
+``anon`` could be instantiated like so::
 
     anon = GitHub()
 

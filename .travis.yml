@@ -34,7 +34,7 @@ matrix:
     - env: TOXENV=docstrings
     - env: TOXENV=notebooks
     - env: TOXENV=readme
-    - env: TOXENV=docs
+    - env: TOXENV=doclint,docs
   fast_finish: true
   allow_failures:
   - env: TOXENV=docstrings

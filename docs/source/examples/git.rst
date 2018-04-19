@@ -1,14 +1,14 @@
 Git Code Examples
 =================
 
-The GitHub API does not just provide an API to interact with GitHub's 
-features. A whole section of the API provides a RESTful API to git operations 
+The GitHub API does not just provide an API to interact with GitHub's
+features. A whole section of the API provides a RESTful API to git operations
 that one might normally perform at the command-line or via your git client.
 
 Creating a Blob Object
 ----------------------
 
-One of the really cool (and under used, it seems) parts of the GitHub API 
+One of the really cool (and under used, it seems) parts of the GitHub API
 involves the ability to create blob objects.
 
 .. code-block:: python
@@ -30,7 +30,7 @@ involves the ability to create blob objects.
 Creating a Tag Object
 ---------------------
 
-GitHub provides tar files for download via tag objects. You can create one via 
+GitHub provides tar files for download via tag objects. You can create one via
 ``git tag`` or you can use the API.
 
 .. code-block:: python

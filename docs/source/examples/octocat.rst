@@ -8,7 +8,7 @@ What you should see
 
 ::
 
-    
+
     Hey Octocat!
 
                MMM.           .MMM

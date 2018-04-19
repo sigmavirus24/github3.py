@@ -2,8 +2,8 @@
  Git API Classes
 =================
 
-This part of the documentation covers the module associated with the `Git Data`_
-section of the GitHub API.
+This part of the documentation covers the module associated with the
+`Git Data`_ section of the GitHub API.
 
 Like much of the GitHub API, many objects have different representations.
 

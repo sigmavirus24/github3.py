@@ -3,34 +3,34 @@
 Using Tokens for Your Projects
 ------------------------------
 
-Let's say you're designing an application that uses github3.py. If your 
+Let's say you're designing an application that uses github3.py. If your
 intention is to have users authenticate, you have a few options.
 
-1. Ask the user to enter their credentials each time they start the 
-   application. (Or save the username somewhere, and just ask for the 
+1. Ask the user to enter their credentials each time they start the
+   application. (Or save the username somewhere, and just ask for the
    password.)
-2. Ask the user to supply their credentials once and store them somewhere for 
+2. Ask the user to supply their credentials once and store them somewhere for
    later use. (**VERY VERY BAD**)
-3. Ask the user to supply their credentials once, get an authorization token 
+3. Ask the user to supply their credentials once, get an authorization token
    and store that for later use.
 
-The first isn't a bad method at all, it just unfortunately may lead to unhappy 
-users, this should always be an option though. The second (as I already noted) 
-is a bad idea. Even if you obfuscate the username and password, they can still 
-be discovered and no level of obfuscation is clever enough. (May I also take 
-this moment to remind people that base64 is **not** encryption.) The last is 
-probably the least objectionable of the evils. The token has scopes so there 
+The first isn't a bad method at all, it just unfortunately may lead to unhappy
+users, this should always be an option though. The second (as I already noted)
+is a bad idea. Even if you obfuscate the username and password, they can still
+be discovered and no level of obfuscation is clever enough. (May I also take
+this moment to remind people that base64 is **not** encryption.) The last is
+probably the least objectionable of the evils. The token has scopes so there
 is only so much someone can do with it and it works well with github3.py.
 
 Requesting a token
 ~~~~~~~~~~~~~~~~~~
 
-If you're not doing a web application, you are more than welcome to use 
-github3.py (otherwise work with redirects_). Let's say your application needs 
-access to public and private repositories, and the users but not to gists.  
-Your scopes_ should be ``['user', 'repo']``. I'm also assuming your 
-application will not be deleting any repositories. The only things left to do 
-are collect the username and password and give a good description for your 
+If you're not doing a web application, you are more than welcome to use
+github3.py (otherwise work with redirects_). Let's say your application needs
+access to public and private repositories, and the users but not to gists.
+Your scopes_ should be ``['user', 'repo']``. I'm also assuming your
+application will not be deleting any repositories. The only things left to do
+are collect the username and password and give a good description for your
 application.
 
 ::
@@ -54,8 +54,8 @@ application.
         fd.write(auth.token + '\n')
         fd.write(auth.id)
 
-In the future, you can then read that token in without having to bother your 
-user. If at some later point in the lifetime of your application you need more 
+In the future, you can then read that token in without having to bother your
+user. If at some later point in the lifetime of your application you need more
 privileges, you simply do the following:
 
 ::
