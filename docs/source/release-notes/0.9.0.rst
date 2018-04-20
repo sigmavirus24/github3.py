@@ -24,14 +24,14 @@
 
 - Add ``assets`` attribute to ``Release`` object.
 
-- Fix wrong argument to ``Organization#create_team`` (``permissions`` versus 
+- Fix wrong argument to ``Organization#create_team`` (``permissions`` versus
   ``permission``)
 
 - Fix Issue Search Result's representation and initialization
 
 - Fix Repository Search Result's initialization
 
-- Allow users to pass a two-factor authentication callback to 
+- Allow users to pass a two-factor authentication callback to
   ``GitHub#authorize``.
 
 .. _single authorization:

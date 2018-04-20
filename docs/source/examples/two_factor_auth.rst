@@ -1,12 +1,12 @@
 Using Two Factor Authentication with github3.py
 ===============================================
 
-GitHub recently added support for Two Factor Authentication to ``github.com`` 
-and shortly thereafter added support for it on ``api.github.com``. In version 
+GitHub recently added support for Two Factor Authentication to ``github.com``
+and shortly thereafter added support for it on ``api.github.com``. In version
 0.8, github3.py also added support for it and you can use it right now.
 
-To use Two Factor Authentication, you must define your own function that will 
-return your one time authentication code. You then provide that function when 
+To use Two Factor Authentication, you must define your own function that will
+return your one time authentication code. You then provide that function when
 logging in with github3.py.
 
 For example:
@@ -33,5 +33,5 @@ For example:
     g = github3.login('sigmavirus24', 'my_password',
                       two_factor_callback=my_two_factor_function)
 
-Then each time the API tells github3.py it requires a Two Factor Authentication 
+Then each time the API tells github3.py it requires a Two Factor Authentication
 code, github3.py will call ``my_two_factor_function`` which prompt you for it.

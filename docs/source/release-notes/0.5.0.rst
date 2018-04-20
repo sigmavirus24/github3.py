@@ -33,58 +33,58 @@
 
       i = github3.iter_all_repos(10, etag=i.etag)
 
-  And the second call will only give you the new repositories since the last 
+  And the second call will only give you the new repositories since the last
   request. This mimics behavior in `pengwynn/octokit`_
 
 - Add support for `sortable stars`_.
 
-- In github3.users.User, ``iter_keys`` now allows you to iterate over **any** 
-  user's keys. No name is returned for each key. This is the equivalent of 
+- In github3.users.User, ``iter_keys`` now allows you to iterate over **any**
+  user's keys. No name is returned for each key. This is the equivalent of
   visiting: github.com/:user.keys
 
-- In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use 
+- In github3.repos.Repository, ``pubsubhubbub`` has been removed. Use
   github3.github.Github.pubsubhubbub instead
 
 - In github3.api, ``iter_repo_issues``'s signature has been corrected.
 
 - Remove ``list_{labels, comments, events}`` methods from github3.issues.Issue
 
-- Remove ``list_{comments, commits, files}`` methods from 
+- Remove ``list_{comments, commits, files}`` methods from
   github3.pulls.PullRequest
 
 - In github3.gists.Gist:
 
-  - the ``user`` attribute was changed by GitHub and is now the ``owner`` 
+  - the ``user`` attribute was changed by GitHub and is now the ``owner``
     attribute
 
-  - the ``public`` attribute and the ``is_public`` method return the same 
+  - the ``public`` attribute and the ``is_public`` method return the same
     information. The method will be removed in the next version.
 
   - the ``is_starred`` method now requires authentication
 
-  - the default ``refresh`` method is no longer over-ridden. In a change made 
-    in before, a generic ``refresh`` method was added to most objects. This 
-    was overridden in the Gist object and would cause otherwise unexpected 
+  - the default ``refresh`` method is no longer over-ridden. In a change made
+    in before, a generic ``refresh`` method was added to most objects. This
+    was overridden in the Gist object and would cause otherwise unexpected
     results.
 
-- ``github3.events.Event.is_public()`` and ``github3.events.Event.public`` now 
-  return the same information. In the next version, the former will be 
+- ``github3.events.Event.is_public()`` and ``github3.events.Event.public`` now
+  return the same information. In the next version, the former will be
   removed.
 
 - In github3.issues.Issue
 
-  - ``add_labels`` now returns the list of Labels on the issue instead of a 
+  - ``add_labels`` now returns the list of Labels on the issue instead of a
     boolean.
 
   - ``remove_label`` now retuns a boolean.
 
-  - ``remove_all_labels`` and ``replace_labels`` now return lists. The former 
-    should return an empty list on a successful call. The latter should 
+  - ``remove_all_labels`` and ``replace_labels`` now return lists. The former
+    should return an empty list on a successful call. The latter should
     return a list of ``github3.issue.Label`` objects.
 
-- Now we won't get spurious GitHubErrors on 404s, only on other expected 
-  errors whilst accessing the json in a response. All methods that return an 
-  object can now *actually* return None if it gets a 404 instead of just 
+- Now we won't get spurious GitHubErrors on 404s, only on other expected
+  errors whilst accessing the json in a response. All methods that return an
+  object can now *actually* return None if it gets a 404 instead of just
   raising an exception. (Inspired by #49)
 
 - GitHubStatus API now works.

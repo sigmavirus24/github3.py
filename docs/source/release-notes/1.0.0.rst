@@ -4,7 +4,7 @@
 -----------------
 
 1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
-It is suggested you read the following release notes *very* carefully.
+It is suggested you read the following release notes carefully.
 
 Unfortunately, it's plausible that some things have slipped through the cracks
 in these release notes.
@@ -95,8 +95,8 @@ Breaking Changes
 - ``Organization#add_member`` has been changed. The second parameter has been
   changed to ``team_id`` and now expects an integer.
 
-- ``Organization#add_repository`` has been changed. The second parameter has been
-  changed to ``team_id`` and now expects an integer.
+- ``Organization#add_repository`` has been changed. The second parameter has
+  been changed to ``team_id`` and now expects an integer.
 
 - All methods and functions starting with ``iter_`` have been renamed.
 
@@ -378,8 +378,8 @@ Old name                            New attribute name
   API. ``Issue.comments`` is now ``Issue.comments_count`` and returns the
   number of comments on an issue.
 
-- The ``Issue.labels`` attribute has also been renamed. It is now available from
-  ``Issue.original_labels``. This will provide the user with the list of
+- The ``Issue.labels`` attribute has also been renamed. It is now available
+  from ``Issue.original_labels``. This will provide the user with the list of
   ``Label`` objects that was returned by the API. To retrieve an updated list
   of labels, the user can now use ``Issue#labels``, e.g.
 

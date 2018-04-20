@@ -8,15 +8,15 @@ What you should see
 
 ::
 
-    
-    Hey Octocat!
+
+    Hey Octocat
 
                MMM.           .MMM
                MMMMMMMMMMMMMMMMMMM
-               MMMMMMMMMMMMMMMMMMM      __________
-              MMMMMMMMMMMMMMMMMMMMM    |          |
-             MMMMMMMMMMMMMMMMMMMMMMM   | Hey Ian! |
-            MMMMMMMMMMMMMMMMMMMMMMMM   |_   ______|
+               MMMMMMMMMMMMMMMMMMM      _________
+              MMMMMMMMMMMMMMMMMMMMM    |         |
+             MMMMMMMMMMMMMMMMMMMMMMM   | Hey Ian |
+            MMMMMMMMMMMMMMMMMMMMMMMM   |_   _____|
             MMMM::- -:::::::- -::MMMM    |/
              MM~:~   ~:::::~   ~:~MM
         .. MMMMM::. .:::+:::. .::MMMMM ..

@@ -17,7 +17,7 @@
 
   - is_mergeable() and mergeable are now the same
 
-  - repository now returns a tuple of the login and name of the repository it 
+  - repository now returns a tuple of the login and name of the repository it
     belongs to
 
 - In github3.notifications.Thread
@@ -52,12 +52,12 @@
 
     import github3
 
-    r = github3.repository('sigmavirus24', 'github3.py')
+    repo = github3.repository('sigmavirus24', 'github3.py')
 
-    template = """Some kind of template where you mention this repository 
+    template = """Some kind of template where you mention this repository
     {0}"""
 
-    print(template.format(r))
+    print(template.format(repo))
     # Some kind of template where you mention this repository
     # sigmavirus24/github3.py
 
