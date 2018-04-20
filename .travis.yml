@@ -35,6 +35,7 @@ matrix:
     - env: TOXENV=notebooks
     - env: TOXENV=readme
     - env: TOXENV=doclint,docs
+    - env: TOXENV=commitlint
   fast_finish: true
   allow_failures:
   - env: TOXENV=docstrings
