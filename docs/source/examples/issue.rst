@@ -3,8 +3,8 @@ Issue Code Examples
 
 Examples using ``Issue``\ s
 
-Administrating Issues
----------------------
+Administering Issues
+--------------------
 
 Let's assume you have your username and password stored in ``user`` and ``pw``
 respectively, you have your repository name stored in ``repo``, and the number

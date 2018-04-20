@@ -16,7 +16,7 @@ Module Contents
 
 To interact with the GitHub API you can either authenticate to access protected
 functionality or you can interact with it anonymously. Authenticating provides
-more functionality to the the user (developer).
+more functionality to the user (developer).
 
 To authenticate, you may use :func:`github3.login`.
 

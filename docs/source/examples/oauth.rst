@@ -10,7 +10,7 @@ intention is to have users authenticate, you have a few options.
    application. (Or save the username somewhere, and just ask for the
    password.)
 2. Ask the user to supply their credentials once and store them somewhere for
-   later use. (**VERY VERY BAD**)
+   later use.
 3. Ask the user to supply their credentials once, get an authorization token
    and store that for later use.
 
@@ -74,8 +74,6 @@ privileges, you simply do the following:
     # if you want to be really paranoid, you can then test:
     # token == auth.token
     # in case the update changes the token
-
-Hopefully this helps someone.
 
 .. _redirects: http://developer.github.com/v3/oauth/#redirect-urls
 .. _scopes: http://developer.github.com/v3/oauth/#scopes

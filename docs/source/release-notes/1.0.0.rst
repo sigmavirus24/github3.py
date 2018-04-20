@@ -4,7 +4,7 @@
 -----------------
 
 1.0.0 is a huge release. It includes a great deal of changes to ``github3.py``.
-It is suggested you read the following release notes *very* carefully.
+It is suggested you read the following release notes carefully.
 
 Unfortunately, it's plausible that some things have slipped through the cracks
 in these release notes.

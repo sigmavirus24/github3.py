@@ -1,7 +1,7 @@
 import github3
 
-print("Hey Octocat!")
-print(github3.octocat("Hey Ian!"))
+print("Hey Octocat")
+print(github3.octocat("Hey Ian"))
 print("What do you think about github3.py?")
 print(github3.octocat("github3.py rocks!"))
 print("Thanks Octocat, that means a lot coming from you.")
