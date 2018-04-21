@@ -14,23 +14,17 @@ For example:
 .. code::
 
     import github3
-
-    try:
-        # Python 2
-        prompt = raw_input
-    except NameError:
-        # Python 3
-        prompt = input
+    from getpass import getpass
 
     def my_two_factor_function():
         code = ''
         while not code:
             # The user could accidentally press Enter before being ready,
             # let's protect them from doing that.
-            code = prompt('Enter 2FA code: ')
+            code = getpass('Enter 2FA code: ')
         return code
 
-    g = github3.login('sigmavirus24', 'my_password',
+    g = github3.login('sigmavirus24', '' or getpass(),
                       two_factor_callback=my_two_factor_function)
 
 Then each time the API tells github3.py it requires a Two Factor Authentication
