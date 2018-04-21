@@ -19,6 +19,8 @@ is provided by this library is called ``github3``. To use it you can run:
 where necessary.
 
 
+.. _logging-in:
+
 Logging into GitHub using github3.py
 ------------------------------------
 
