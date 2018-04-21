@@ -2,7 +2,7 @@
 """Implementation of a branch on a repository."""
 from __future__ import unicode_literals
 
-from json import dumps
+import json as jsonlib
 
 from . import commit
 from .. import decorators
@@ -95,28 +95,43 @@ class _Branch(models.GitHubCore):
             bool
         """
         previous_values = None
-        if self.protection:
-            previous_values = self.protection['required_status_checks']
+        previous_protection = getattr(self, 'original_protection', {})
+        if previous_protection:
+            previous_values = previous_protection.get('required_status_checks',
+                                                      {})
         if enforcement is None and previous_values:
             enforcement = previous_values['enforcement_level']
         if status_checks is None and previous_values:
             status_checks = previous_values['contexts']
 
-        edit = {'protection': {'enabled': True, 'required_status_checks': {
-            'enforcement_level': enforcement, 'contexts': status_checks}}}
-        json = self._json(self._patch(self._api, data=dumps(edit),
-                                      headers=self.PREVIEW_HEADERS), 200)
-        self._update_attributes(json)
-        return True
+        edit = {
+            'protection': {
+                'enabled': True,
+                'required_status_checks': {
+                    'enforcement_level': enforcement,
+                    'contexts': status_checks,
+                },
+            },
+        }
+        resp = self._patch(self._api, data=jsonlib.dumps(edit),
+                           headers=self.PREVIEW_HEADERS)
+        json = self._json(resp, 200)
+        if self._boolean(resp, 200, 404):
+            self._update_attributes(json)
+            return True
+        return False
 
     @decorators.requires_auth
     def unprotect(self):
         """Disable force push protection on this branch."""
         edit = {'protection': {'enabled': False}}
-        json = self._json(self._patch(self._api, data=dumps(edit),
-                                      headers=self.PREVIEW_HEADERS), 200)
-        self._update_attributes(json)
-        return True
+        resp = self._patch(self._api, data=jsonlib.dumps(edit),
+                           headers=self.PREVIEW_HEADERS)
+        json = self._json(resp, 200)
+        if self._boolean(resp, 200, 404):
+            self._update_attributes(json)
+            return True
+        return False
 
 
 class Branch(_Branch):
