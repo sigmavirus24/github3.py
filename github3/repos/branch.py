@@ -41,6 +41,8 @@ class _Branch(models.GitHubCore):
             (optional), sha to compare against
         :returns:
             string of the SHA or None
+        :rtype:
+            unicode on python 2, str on python 3
         """
         # If-None-Match returns 200 instead of 304 value does not have quotes
         headers = {
@@ -51,7 +53,7 @@ class _Branch(models.GitHubCore):
         url = self._build_url('commits', self.name, base_url=base)
         resp = self._get(url, headers=headers)
         if self._boolean(resp, 200, 304):
-            return resp.content
+            return resp.text
         return None
 
     @decorators.requires_auth

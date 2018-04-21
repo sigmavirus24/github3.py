@@ -81,4 +81,4 @@ class TestBranch(IntegrationHelper):
             sha = '541468cdfde6cffe55f0cc801186cdffed154a6a'
             latest_sha = branch.latest_sha(differs_from=sha)
 
-        assert latest_sha
+        assert not isinstance(latest_sha, bytes)
