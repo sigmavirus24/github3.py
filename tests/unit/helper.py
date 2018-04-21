@@ -108,10 +108,10 @@ class UnitHelper(unittest.TestCase):
 
         else:
             if self.enterprise_url is None:
-                instance = self.described_class()
+                instance = self.described_class(session=self.session)
             else:
-                instance = self.described_class(self.enterprise_url)
-            instance.session = self.session
+                instance = self.described_class(self.enterprise_url,
+                                                session=self.session)
 
         return instance
 
