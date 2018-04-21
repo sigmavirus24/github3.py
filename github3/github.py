@@ -56,9 +56,9 @@ class GitHub(models.GitHubCore):
     call the GitHub object with authentication parameters.
     """
 
-    def __init__(self, username='', password='', token=''):
+    def __init__(self, username='', password='', token='', session=None):
         """Create a new GitHub instance to talk to the API."""
-        super(GitHub, self).__init__({}, self.new_session())
+        super(GitHub, self).__init__({}, session or self.new_session())
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -2173,9 +2173,11 @@ class GitHubEnterprise(GitHub):
     override the validation by passing `verify=False`.
     """
 
-    def __init__(self, url, username='', password='', token='', verify=True):
+    def __init__(self, url, username='', password='', token='', verify=True,
+                 session=None):
         """Create a client for a GitHub Enterprise instance."""
-        super(GitHubEnterprise, self).__init__(username, password, token)
+        super(GitHubEnterprise, self).__init__(username, password, token,
+                                               session=session)
         self.session.base_url = url.rstrip('/') + '/api/v3'
         self.session.verify = verify
         self.url = url
@@ -2233,9 +2235,9 @@ class GitHubStatus(models.GitHubCore):
     This will only ever return the JSON objects returned by the API.
     """
 
-    def __init__(self):
+    def __init__(self, session=None):
         """Create a status API client."""
-        super(GitHubStatus, self).__init__({}, self.new_session())
+        super(GitHubStatus, self).__init__({}, session or self.new_session())
         self.session.base_url = 'https://status.github.com'
 
     def _repr(self):
