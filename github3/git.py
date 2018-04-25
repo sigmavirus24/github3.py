@@ -427,7 +427,7 @@ class Hash(models.GitHubCore):
     """
 
     def _update_attributes(self, info):
-        self._api = info['url']
+        self._api = info.get('url')
         self.mode = info['mode']
         self.path = info['path']
         self.sha = info['sha']
@@ -435,7 +435,7 @@ class Hash(models.GitHubCore):
         self.type = info['type']
 
         if self.type != 'tree':
-            self.size = info['size']
+            self.size = info.get('size')
 
     def _repr(self):
         return '<Hash [{0}]>'.format(self.sha)
