@@ -208,7 +208,7 @@ class TestProtectionRequiredStatusChecks(helper.UnitHelper):
 
     def test_contexts(self):
         self.instance.contexts()
-        self.get_called(protection_required_status_checks_contexts_url_for())
+        self.get_called_with(protection_required_status_checks_contexts_url_for())
 
     def test_replace_contexts(self):
         self.instance.replace_contexts(self._json_data)

@@ -168,7 +168,7 @@ class UnitHelper(unittest.TestCase):
         assert data == call_data
         assert kwargs == call_kwargs
 
-    def get_called(self, *args, **kwargs):
+    def get_called_with(self, *args, **kwargs):
         assert self.session.get.called is True
         call_args, call_kwargs = self.session.get.call_args
         assert args == call_args
