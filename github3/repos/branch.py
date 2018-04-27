@@ -84,9 +84,12 @@ class _Branch(models.GitHubCore):
                 required_pull_request_reviews=None, restrictions=None):
         """Enable force push protection and configure status check enforcement.
 
-        See http://git.io/v4Gvu
+        Note: this is a shorthand method for `branch.protection().update()`
 
-        :param str enforcenforce_adminsement:
+        See
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+
+        :param str enforce_admins:
             (optional), Specifies the enforce_admins level of the status checks.
             Must be one of 'off', 'non_admins', or 'everyone'. Use `None` or
             omit to use the already associated value.
@@ -104,18 +107,25 @@ class _Branch(models.GitHubCore):
         :returns:
             Returns branch protection instance
         :rtype:
-            BranchProtection
+            :class:`~github3.repos.branch.BranchProtection`
         """
-        return self.protection()\
-            .update(enforce_admins=enforce_admins,
-                    required_status_checks=required_status_checks,
-                    required_pull_request_reviews=required_pull_request_reviews,
-                    restrictions=restrictions)
+        p = self.protection()
+        p.u = p.update
+        v = p.u(enforce_admins=enforce_admins,
+                required_status_checks=required_status_checks,
+                required_pull_request_reviews=required_pull_request_reviews,
+                restrictions=restrictions)
+        return v
 
 
     @decorators.requires_auth
     def unprotect(self):
-        """Disable protection on this branch."""
+        """Disable protection on this branch.
+        :returns:
+            If branch protection has been removed
+        :rtype:
+            bool
+        """
         return self.protection().delete()
 
 
@@ -266,7 +276,7 @@ class BranchProtection(models.GitHubCore):
                               ProtectionRequiredStatusChecks)
 
     @decorators.requires_auth
-    def update(self, enforce_admins=None, required_pull_request_reviews=None,
+    def update(self, enforce_admins=None, required_status_checks=None,
                required_pull_request_reviews=None, restrictions=None):
         """Enable force push protection and configure status check enforcement.
 
@@ -276,11 +286,11 @@ class BranchProtection(models.GitHubCore):
             (optional), Specifies the enforcement level of the status checks.
             Must be one of 'off', 'non_admins', or 'everyone'. Use `None` or
             omit to use the already associated value.
-        :param list status_checks:
+        :param list required_status_checks:
             (optional), A list of strings naming status checks that must pass
             before merging. Use `None` or omit to use the already associated
             value.
-        :param obj pr_reviews:
+        :param obj required_pull_request_reviews:
             (optional), Object representing the configuration of Request Pull
             Request Reviews settings. Use `None` or omit to use the already
             associated value.
@@ -290,7 +300,7 @@ class BranchProtection(models.GitHubCore):
         :returns:
             Updated branch protection
         :rtype:
-            BranchProtection
+            :class:`~github3.repos.branch.BranchProtection`
         """
         edit = {
             'enabled': True,
@@ -317,6 +327,10 @@ class BranchProtection(models.GitHubCore):
 
     @decorators.requires_auth
     def delete(self):
+        """
+        Removes branch protection
+        :return bool:
+        """
         resp = self._delete(self._api)
         return self._boolean(resp, 204, 404)
 
@@ -590,7 +604,7 @@ class ProtectionRequiredPullRequestReviews(models.GitHubCore):
     .. _Branch protection API documentation:
         https://developer.github.com/v3/repos/branches/#get-branch-protection
     .. _Branch Required Pull Request Reviews
-        https://git.io/vxS3A
+        https://developer.github.com/v3/repos/branches/#get-pull-request-review-enforcement-of-protected-branch
     """
 
     def _update_attributes(self, protection):
@@ -670,7 +684,7 @@ class ProtectionRequiredPullRequestReviews(models.GitHubCore):
     @decorators.requires_auth
     def delete(self):
         """Removes the Required Pull Request Reviews
-        :return:
+        :returns:
             Whether the operation finished successfully or not
         :rtype:
             bool
@@ -816,7 +830,7 @@ class ProtectionRequiredStatusChecks(models.GitHubCore):
 
         .. links
         .. _API docs:
-            https://git.io/vxrJB
+            https://developer.github.com/v3/repos/branches/#update-required-status-checks-of-protected-branch
         """
         update_data = {}
         if strict is not None:
