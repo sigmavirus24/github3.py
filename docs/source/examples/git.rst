@@ -13,8 +13,8 @@ involves the ability to create blob objects.
 
 .. code-block:: python
 
-    from github3 import login
-    g = login(username, password)
+    from github3 import GitHub
+    g = GitHub(username, password)
     repo = g.repository('sigmavirus24', 'Todo.txt-python')
     sha = repo.create_blob('Testing blob creation', 'utf-8')
     sha
@@ -35,8 +35,8 @@ GitHub provides tar files for download via tag objects. You can create one via
 
 .. code-block:: python
 
-    from github3 import login
-    g = login(username, password)
+    from github3 import GitHub
+    g = GitHub(username, password)
     repo = g.repository('sigmavirus24', 'github3.py')
     tag = repo.tag('cdba84b4fede2c69cb1ee246b33f49f19475abfa')
     tag

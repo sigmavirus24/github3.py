@@ -18,16 +18,16 @@ To interact with the GitHub API you can either authenticate to access protected
 functionality or you can interact with it anonymously. Authenticating provides
 more functionality to the user (developer).
 
-To authenticate, you may use :func:`github3.login`.
+To authenticate, you may use :class:`~github3.github.GitHub`.
 
-.. autofunction:: github3.login
+.. autoclass:: github3.github.GitHub
 
 With the :class:`~github3.github.GitHub` object that is returned you have
 access to more functionality. See that object's documentation for more
 information.
 
 To use the API anonymously, you can also create a new
-:class:`~github3.github.GitHub` object, e.g.,
+:class:`~github3.github.GitHub` object without parameters, e.g.,
 
 .. code-block:: python
 

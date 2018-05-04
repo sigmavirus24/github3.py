@@ -9,11 +9,11 @@ Assumptions
 -----------
 
 I'll just make some basic assumptions for the examples on this page. First,
-let's assume that all you ever import from github3.py is ``login`` and
-``GitHub`` and that you have already received your :class:`GitHub <GitHub>`
+let's assume that all you ever import from github3.py is ``GitHub`` and
+that you have already received your :class:`GitHub <GitHub>`
 object ``g``. That might look like this::
 
-    from github3 import login, GitHub
+    from github3 import GitHub
     from getpass import getpass, getuser
     import sys
     try:
@@ -33,7 +33,7 @@ object ``g``. That might look like this::
         print("Cowardly refusing to login without a username and password.")
         sys.exit(1)
 
-    g = login(user, password)
+    g = GitHub(user, password)
 
 So anywhere you see ``g`` used, you can safely assume that it is an instance
 where a user has authenticated already.
