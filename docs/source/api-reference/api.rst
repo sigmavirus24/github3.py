@@ -21,6 +21,7 @@ more functionality to the user (developer).
 To authenticate, you may use :class:`~github3.github.GitHub`.
 
 .. autoclass:: github3.github.GitHub
+   :noindex:
 
 With the :class:`~github3.github.GitHub` object that is returned you have
 access to more functionality. See that object's documentation for more
