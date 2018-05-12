@@ -27,6 +27,7 @@ class Label(GitHubCore):
         self._api = label['url']
         self.color = label['color']
         self.name = label['name']
+        self.description = label.get('description')
         self._uniq = self._api
 
     def _repr(self):

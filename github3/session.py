@@ -110,6 +110,10 @@ class GitHubSession(requests.Session):
         raise NotImplementedError('These features are not implemented yet')
 
     def request(self, *args, **kwargs):
+        if 'headers' in kwargs:
+            headers = kwargs.pop('headers')
+            self.headers.update(headers)
+
         response = super(GitHubSession, self).request(*args, **kwargs)
         self.request_counter += 1
         if requires_2fa(response) and self.two_factor_auth_cb:

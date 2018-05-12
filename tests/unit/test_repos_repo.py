@@ -298,7 +298,8 @@ class TestRepository(helper.UnitHelper):
         self.instance.create_label(**data)
         self.post_called_with(
             url_for('labels'),
-            data=data
+            data=data,
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'}
         )
 
     def test_create_label_required_name(self):
@@ -327,6 +328,20 @@ class TestRepository(helper.UnitHelper):
         }
         self.instance.create_label(**data)
         assert self.session.post.called is False
+
+    def test_create_label_optional_description(self):
+        """Should accept an optional description for the label."""
+        data = {
+            'name': 'foo',
+            'color': 'fafafa',
+            'description': 'A nice description'
+        }
+        self.instance.create_label(**data)
+        self.post_called_with(
+            url_for('labels'),
+            data=data,
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'}
+        )
 
     def test_create_milestone(self):
         """Verify the request for creating a milestone."""
@@ -798,7 +813,8 @@ class TestRepository(helper.UnitHelper):
         """Verify the request for retrieving a label on a repository."""
         self.instance.label('bug')
         self.session.get.assert_called_once_with(
-            url_for('labels/bug')
+            url_for('labels/bug'),
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'}
         )
 
     def test_label_required_name(self):
