@@ -1,5 +1,4 @@
 #!/bin/sh
-
 output="$(find docs/source -name '*.rst' | xargs proselint)"
 exit_code=$?
 
