@@ -11,3 +11,4 @@ concepts in the library.
     :maxdepth: 2
 
     getting-started
+    repositories
