@@ -1,5 +1,5 @@
 .. image::
-    https://raw.github.com/sigmavirus24/github3.py/develop/images/gh3-logo.png
+    https://raw.github.com/sigmavirus24/github3.py/develop/docs/img/gh3-logo.png
 
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
