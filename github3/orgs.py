@@ -626,6 +626,29 @@ class _Organization(models.GitHubCore):
             return True
         return False
 
+    @requires_auth
+    def invite(self, username, role=None):
+        """Invite the user to join this organization.
+
+        :param str username:
+            (required), user to invite to join this organization.
+        :param str role:
+            (optional) role from members_roles
+        :returns:
+            dictionary resembling
+
+            .. code-block:: python
+
+                {'state': 'pending', 'url': 'https://api.github.com/orgs/...'}
+        :rtype:
+            dict
+        """
+        data = {}
+        if role in self.members_roles:
+            data['role'] = role
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._json(self._put(url, data=dumps(data)), 200)
+
     def is_member(self, username):
         """Check if the user named ``username`` is a member.
 
@@ -709,6 +732,18 @@ class _Organization(models.GitHubCore):
         url = self._build_url('events', base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
+    @requires_auth
+    def invitations(self, number=-1, etag=None):
+        r"""Iterate over outstanding invitations to this organization.
+
+        :returns: generator of
+        """
+        headers = {'Accept': 'application/vnd.github.korra-preview', }
+        params = {}
+        url = self._build_url('invitations', base_url=self._api)
+        return self._iter(int(number), url, dict, params=params, etag=etag,
+                          headers=headers)
+
     def members(self, filter=None, role=None, number=-1, etag=None):
         """Iterate over members of this organization.
 
@@ -742,6 +777,23 @@ class _Organization(models.GitHubCore):
         url = self._build_url('members', base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, params=params,
                           etag=etag, headers=headers)
+
+    @requires_auth
+    def membership(self, username):
+        """Obtain the membership status of ``username``.
+
+        Implements
+        https://developer.github.com/v3/orgs/members/#get-organization-membership
+
+        :param str username:
+            (required), username name of the user
+        :returns:
+            dictonary of the membership information
+        :rtype:
+            dict
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._json(self._get(url), 200, 404)
 
     def public_members(self, number=-1, etag=None):
         """Iterate over public members of this organization.
@@ -794,6 +846,18 @@ class _Organization(models.GitHubCore):
             etag=etag,
             headers=Project.CUSTOM_HEADERS
         )
+
+    @requires_auth
+    def remove_membership(self, username):
+        """Remove ``username`` from this organization.
+
+        Unlike ``remove_member``, this will cancel a pending invitation.
+
+        :param str username: (required), username of the member to remove
+        :returns: bool
+        """
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
 
     def repositories(self, type='', number=-1, etag=None):
         """Iterate over repos for this organization.

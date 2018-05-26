@@ -160,3 +160,5 @@ Contributors
 - Katie Bell (@katharosada)
 
 - Jeff Quast (@jquast)
+
+- Hal Wine (@hwine)
