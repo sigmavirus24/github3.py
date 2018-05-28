@@ -294,21 +294,24 @@ class TestOrganization(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization('mozillatw', auth_needed=True)
             for invite in o.invitations():
-                assert isinstance(invite, dict)
+                assert isinstance(invite, github3.orgs.Invitation)
 
     def test_invite(self):
         """Show that a user can invite a new member."""
         cassette_name = self.cassette_name('invite')
         with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization('Thunderbird-client', auth_needed=True)
-            assert o.invite('AFineOldWine', role='member')
+            o = self.get_organization(auth_needed=True)
+            team = self.get_team(o)
+            # 2354350 is gh3test
+            assert o.invite([team.id], invitee_id=2354350,
+                            role='direct_member')
 
     def test_membership(self):
         """Show that a user can obtain the membership status."""
         cassette_name = self.cassette_name('membership')
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization('Thunderbird-client', auth_needed=True)
-            assert o.membership('AFineOldWine')
+            assert o.membership_for('AFineOldWine')
 
     def test_remove_membership(self):
         """Show that a user can remove a member or invite."""

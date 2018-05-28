@@ -20,7 +20,8 @@ class _Team(models.GitHubCore):
 
     class_name = '_Team'
     # Roles available to members on a team.
-    members_roles = frozenset(['member', 'maintainer', 'all'])
+    member_roles = frozenset(['member', 'maintainer'])
+    filterable_member_roles = member_roles.union(['all'])
 
     def _update_attributes(self, team):
         self._api = team['url']
@@ -38,6 +39,10 @@ class _Team(models.GitHubCore):
     def add_member(self, username):
         """Add ``username`` to this team.
 
+        .. deprecated:: 1.0.0
+
+            Use :meth:`add_or_update_membership` instead.
+
         :param str username:
             the username of the user you would like to add to this team.
         :returns:
@@ -52,6 +57,37 @@ class _Team(models.GitHubCore):
             DeprecationWarning)
         url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def add_or_update_membership(self, username, role='member'):
+        """Add or update the user's membership in this team.
+
+        This returns a dictionary like so::
+
+            {
+                'state': 'pending',
+                'url': 'https://api.github.com/teams/...',
+                'role': 'member',
+            }
+
+        :param str username:
+            (required), login of user whose membership is being modified
+        :param str role:
+            (optional), the role the user should have once their membership
+            has been modified. Options: 'member', 'maintainer'. Default:
+            'member'
+        :returns:
+            dictionary of the invitation response
+        :rtype:
+            dict
+        """
+        if role not in self.member_roles:
+            raise ValueError("'role' must be one of {}".format(', '.join(
+                sorted(self.member_roles)
+            )))
+        data = {'role': role}
+        url = self._build_url('memberships', username, base_url=self._api)
+        return self._json(self._put(url, json=data), 200)
 
     @requires_auth
     def add_repository(self, repository, permission=''):
@@ -125,6 +161,10 @@ class _Team(models.GitHubCore):
     def invite(self, username):
         """Invite the user to join this team.
 
+        .. deprecated:: 1.2.0
+
+            Use :meth:`add_or_update_membership` instead.
+
         This returns a dictionary like so::
 
             {'state': 'pending', 'url': 'https://api.github.com/teams/...'}
@@ -136,8 +176,11 @@ class _Team(models.GitHubCore):
         :rtype:
             dict
         """
-        url = self._build_url('memberships', username, base_url=self._api)
-        return self._json(self._put(url), 200)
+        warnings.warn(
+            'This method is deprecated. Please use '
+            '``add_or_update_membership`` instead.',
+            DeprecationWarning)
+        return self.add_or_update_membership(username)
 
     @requires_auth
     def is_member(self, username):
@@ -150,6 +193,10 @@ class _Team(models.GitHubCore):
         :rtype:
             bool
         """
+        warnings.warn(
+            'This method is deprecated. Please use '
+            '``membership_for`` instead.',
+            DeprecationWarning)
         url = self._build_url('members', username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
@@ -173,7 +220,7 @@ class _Team(models.GitHubCore):
         """
         headers = {}
         params = {}
-        if role in self.members_roles:
+        if role in self.filterable_member_roles:
             params['role'] = role
             headers['Accept'] = 'application/vnd.github.ironman-preview+json'
         url = self._build_url('members', base_url=self._api)
@@ -217,6 +264,10 @@ class _Team(models.GitHubCore):
     @requires_auth
     def remove_member(self, username):
         """Remove ``username`` from this team.
+
+        .. deprecated:: 1.0.0
+
+            Use :meth:`revoke_membership` instead.
 
         :param str username:
             (required), username of the member to remove
@@ -374,7 +425,12 @@ class _Organization(models.GitHubCore):
     members_filters = frozenset(['2fa_disabled', 'all'])
 
     # Roles available to members in an organization.
-    members_roles = frozenset(['all', 'admin', 'member'])
+    member_roles = frozenset(['admin', 'member'])
+    filterable_member_roles = member_roles.union(['all'])
+
+    # Roles for invitations, see also:
+    # https://developer.github.com/v3/orgs/members/#create-organization-invitation
+    invitation_roles = frozenset(['admin', 'direct_member', 'billing_manager'])
 
     def _update_attributes(self, org):
         self.avatar_url = org['avatar_url']
@@ -445,6 +501,31 @@ class _Organization(models.GitHubCore):
 
         url = self._build_url('teams', str(team_id), 'members', str(username))
         return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def add_or_update_membership(self, username, role='member'):
+        """Add a member or update their role.
+
+        :param str username:
+            (required), user to add or update.
+        :param str role:
+            (optional), role to give to the user. Options are ``member``,
+            ``admin``. Defaults to ``member``.
+        :returns:
+            the created or updated membership
+        :rtype:
+            :class:`~github3.orgs.Membership`
+        :raises:
+            ValueError if role is not a valid choice
+        """
+        if role not in self.member_roles:
+            raise ValueError("'role' must be one of {}".format(', '.join(
+                sorted(self.member_roles)
+            )))
+        data = {'role': role}
+        url = self._build_url('memberships', str(username), base_url=self._api)
+        json = self._json(self._put(url, json=data), 200)
+        return self._instance_or_null(Membership, json)
 
     @requires_auth
     def add_repository(self, repository, team_id):  # FIXME(jlk): add perms
@@ -627,27 +708,48 @@ class _Organization(models.GitHubCore):
         return False
 
     @requires_auth
-    def invite(self, username, role=None):
+    def invite(self, team_ids, invitee_id=None, email=None,
+               role='direct_member'):
         """Invite the user to join this organization.
 
-        :param str username:
-            (required), user to invite to join this organization.
+        :param list[int] team_ids:
+            (required), list of team identifiers to invite the user to
+        :param int invitee_id:
+            (required if email is not specified), the identifier for the user
+            being invited
+        :param str email:
+            (required if invitee_id is not specified), the email address of
+            the user being invited
         :param str role:
-            (optional) role from members_roles
+            (optional) role to provide to the invited user. Must be one of
         :returns:
-            dictionary resembling
-
-            .. code-block:: python
-
-                {'state': 'pending', 'url': 'https://api.github.com/orgs/...'}
+            the created invitation
         :rtype:
-            dict
+            :class:`~github3.orgs.Invitation`
         """
-        data = {}
-        if role in self.members_roles:
-            data['role'] = role
-        url = self._build_url('memberships', username, base_url=self._api)
-        return self._json(self._put(url, data=dumps(data)), 200)
+        if ((invitee_id is None and email is None) or
+                (invitee_id is not None and email is not None)):
+            raise ValueError(
+                "One of either 'invitee_id' or 'email' must be specified"
+            )
+        if not team_ids:
+            raise ValueError(
+                "'team_ids' must be a non-empty list of integers"
+            )
+        data = {'team_ids': team_ids}
+        if invitee_id is not None:
+            data['invitee_id'] = invitee_id
+        else:
+            data['email'] = email
+        if role not in self.invitation_roles:
+            raise ValueError("'role' must be one of {}".format(', '.join(
+                sorted(self.invitation_roles)
+            )))
+        headers = {'Accept': 'application/vnd.github.dazzler-preview.json'}
+        data['role'] = role
+        url = self._build_url('invitations', base_url=self._api)
+        json = self._json(self._post(url, data=data, headers=headers), 200)
+        return self._instance_or_null(Invitation, json)
 
     def is_member(self, username):
         """Check if the user named ``username`` is a member.
@@ -734,14 +836,16 @@ class _Organization(models.GitHubCore):
 
     @requires_auth
     def invitations(self, number=-1, etag=None):
-        r"""Iterate over outstanding invitations to this organization.
+        """Iterate over outstanding invitations to this organization.
 
-        :returns: generator of
+        :returns:
+            generator of invitation objects
+        :rtype:
+            :class:`~github3.orgs.Invitation`
         """
-        headers = {'Accept': 'application/vnd.github.korra-preview', }
-        params = {}
+        headers = {'Accept': 'application/vnd.github.korra-preview'}
         url = self._build_url('invitations', base_url=self._api)
-        return self._iter(int(number), url, dict, params=params, etag=etag,
+        return self._iter(int(number), url, Invitation, etag=etag,
                           headers=headers)
 
     def members(self, filter=None, role=None, number=-1, etag=None):
@@ -769,7 +873,7 @@ class _Organization(models.GitHubCore):
         params = {}
         if filter in self.members_filters:
             params['filter'] = filter
-        if role in self.members_roles:
+        if role in self.filterable_member_roles:
             params['role'] = role
             # TODO(sigmavirus24): Determine if the preview header is still
             # necessary
@@ -779,7 +883,7 @@ class _Organization(models.GitHubCore):
                           etag=etag, headers=headers)
 
     @requires_auth
-    def membership(self, username):
+    def membership_for(self, username):
         """Obtain the membership status of ``username``.
 
         Implements
@@ -788,12 +892,13 @@ class _Organization(models.GitHubCore):
         :param str username:
             (required), username name of the user
         :returns:
-            dictonary of the membership information
+            the membership information
         :rtype:
-            dict
+            :class:`~github3.orgs.Membership`
         """
         url = self._build_url('memberships', username, base_url=self._api)
-        return self._json(self._get(url), 200, 404)
+        json = self._json(self._get(url), 200, 404)
+        return self._instance_or_null(Membership, json)
 
     def public_members(self, number=-1, etag=None):
         """Iterate over public members of this organization.
@@ -915,6 +1020,11 @@ class _Organization(models.GitHubCore):
     @requires_auth
     def remove_member(self, username):
         """Remove the user named ``username`` from this organization.
+
+        .. note::
+
+            Only a user may publicize their own membership. See also:
+            https://developer.github.com/v3/orgs/members/#publicize-a-users-membership
 
         :param str username:
             name of the user to remove from the org
@@ -1110,6 +1220,71 @@ class ShortOrganization(_Organization):
 
     class_name = 'ShortOrganization'
     _refresh_to = Organization
+
+
+class Invitation(models.GitHubCore):
+    """Object representing an invitation to an organization.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` instance representing the time and date
+        when this invitation was created.
+
+    .. attribute:: email
+
+        The email address of the user invited to the organization.
+
+    .. attribute:: id
+
+        The unique identifier for this invitation.
+
+    .. attribute:: invitation_team_url
+
+        The API URL to retrieve the :class:`~github3.orgs.ShortTeam` objects
+        associated with this invitation.
+
+    .. attribute:: inviter
+
+        A :class:`~github3.users.ShortUser` representing the user who invited
+        the user identified by ``login``.
+
+    .. attribute:: login
+
+        The username of the user invited to the organization.
+
+    .. attribute:: team_count
+
+        The number of teams involved in this invitation.
+    """
+
+    def _update_attributes(self, json):
+        self.created_at = self._strptime(json['created_at'])
+        self.email = json['email']
+        self.id = json['id']
+        self.inviter = users.ShortUser(json['inviter'], self)
+        self.login = json['login']
+        # NOTE(sigmavirus24): GitHub docs claim these should be present but
+        # in testing it is not.
+        self.invitation_team_url = json.get('invitation_team_url')
+        self.team_count = json.get('team_count')
+
+    def _repr(self):
+        return '<Invitation {} for [{}] from [{}]>'.format(
+            self.id, self.login, self.inviter.login
+        )
+
+    @requires_auth
+    def teams(self):
+        """Retrieve the list of teams associated with this invite.
+
+        :returns:
+            generator of teams associated with this invitation
+        :rtype:
+            :class:`~github3.orgs.ShortTeam`
+        """
+        return self._iter(-1, self.invitation_team_url, ShortTeam, headers={
+            'Accept': 'application/vnd.github.dazzler-preview.json',
+        })
 
 
 class Membership(models.GitHubCore):

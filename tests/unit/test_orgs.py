@@ -1,3 +1,4 @@
+"""Organization unit tests."""
 import mock
 import pytest
 
@@ -15,6 +16,8 @@ example_data = get_org_example_data()
 
 
 class TestOrganization(helper.UnitHelper):
+    """Class-based unit tests for organizations."""
+
     described_class = Organization
     example_data = get_org_example_data()
 
@@ -179,35 +182,43 @@ class TestOrganization(helper.UnitHelper):
         assert self.session.get.called is False
 
     def test_invite(self):
-        """Show that a user can be invited to an org"""
-        self.instance.invite('user')
+        """Show that a user can be invited to an org."""
+        self.instance.invite([1, 2, 3], invitee_id=1)
+        headers = {'Accept': 'application/vnd.github.dazzler-preview.json'}
 
-        self.session.put.assert_called_once_with(
-            'https://api.github.com/orgs/github/memberships/user',
-            data='{}'
+        self.post_called_with(
+            'https://api.github.com/orgs/github/invitations',
+            data={
+                'team_ids': [1, 2, 3],
+                'invitee_id': 1,
+                'role': 'direct_member',
+            },
+            headers=headers,
         )
 
     def test_invite_requires_valid_role(self):
-        """Show that a user can be invited to an org"""
-        self.instance.invite('user', role='Freddy')
-
-        self.session.put.assert_called_once_with(
-            'https://api.github.com/orgs/github/memberships/user',
-            data='{}'
-        )
+        """Validate our validation of roles."""
+        with pytest.raises(ValueError):
+            self.instance.invite([1, 2], email='user', role='Freddy')
 
     def test_invite_passes_optional_role(self):
-        """Show that a user can be invited to an org"""
-        self.instance.invite('user', role='admin')
+        """Exercise alternative parameters to create an invitation."""
+        self.instance.invite([1, 2], email='user', role='admin')
+        headers = {'Accept': 'application/vnd.github.dazzler-preview.json'}
 
-        self.session.put.assert_called_once_with(
-            'https://api.github.com/orgs/github/memberships/user',
-            data='{"role": "admin"}'
+        self.post_called_with(
+            'https://api.github.com/orgs/github/invitations',
+            data={
+                'role': 'admin',
+                'email': 'user',
+                'team_ids': [1, 2],
+            },
+            headers=headers,
         )
 
-    def test_membership(self):
-        """Show that a user's invitation status can be queried"""
-        self.instance.membership('user')
+    def test_membership_for(self):
+        """Show that a user's invitation status can be queried."""
+        self.instance.membership_for('user')
 
         self.session.get.assert_called_once_with(
             'https://api.github.com/orgs/github/memberships/user'
@@ -223,6 +234,8 @@ class TestOrganization(helper.UnitHelper):
 
 
 class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+    """Unit tests that ensure certain methods require authentication."""
+
     described_class = Organization
     example_data = get_org_example_data()
 
@@ -282,40 +295,34 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
             self.instance.team(10)
 
     def test_invitations(self):
-        """
-            Show that getting outstanding invitations requires authentication.
-        """
+        """Verify retrieving invitations requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.invitations()
 
     def test_invite(self):
-        """
-            Show that inviting a member requires authentication.
-        """
+        """Show that inviting a member requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.invite()
 
-    def test_membership(self):
-        """
-            Show that inviting a member requires authentication.
-        """
+    def test_membership_for(self):
+        """Show that inviting a member requires authentication."""
         with pytest.raises(GitHubError):
-            self.instance.membership()
+            self.instance.membership_for()
 
     def test_remove_membership(self):
-        """
-            Show that inviting a member requires authentication.
-        """
+        """Show that inviting a member requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.remove_membership()
 
 
 class TestOrganizationIterator(helper.UnitIteratorHelper):
-    described_class = Organization
+    """Test Organization methods that return iterators."""
 
+    described_class = Organization
     example_data = example_data.copy()
 
     def test_all_events(self):
+        """Verify the request made from all_events."""
         i = self.instance.all_events(username='dummy')
         self.get_next(i)
 
