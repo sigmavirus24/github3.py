@@ -21,12 +21,21 @@ class Label(GitHubCore):
     .. attribute:: name
 
         The name (display label) for this label.
+
+    .. attribute:: desciption
+
+        The description for this label.
     """
+
+    SYMMETRA_PREVIEW_HEADERS = {
+        'Accept': 'application/vnd.github.symmetra-preview+json'
+    }
 
     def _update_attributes(self, label):
         self._api = label['url']
         self.color = label['color']
         self.name = label['name']
+        self.description = label['description']
         self._uniq = self._api
 
     def _repr(self):
@@ -47,13 +56,15 @@ class Label(GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def update(self, name, color):
+    def update(self, name, color, description=None):
         """Update this label.
 
         :param str name:
             (required), new name of the label
         :param str color:
             (required), color code, e.g., 626262, no leading '#'
+        :param str description:
+            (optional), new description of the label
         :returns:
             True if successfully updated, False otherwise
         :rtype:
@@ -64,8 +75,12 @@ class Label(GitHubCore):
         if name and color:
             if color[0] == '#':
                 color = color[1:]
-            json = self._json(self._patch(self._api, data=dumps({
-                'name': name, 'color': color})), 200)
+            data = {'name': name, 'color': color}
+            if description is not None:
+                data['description'] = description
+            resp = self._patch(self._api, data=dumps(data),
+                               headers=self.SYMMETRA_PREVIEW_HEADERS)
+            json = self._json(resp, 200)
 
         if json:
             self._update_attributes(json)
