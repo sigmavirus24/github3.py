@@ -42,7 +42,7 @@ user:
     gh.create_repository(name='A Repo')
     
     # grab the repo
-    repos = list(g.repositories())
+    repos = list(gh.repositories())
     my_repo = [x for x in repos if x.name == 'A Repo'][0] # grab match
     
     # create a label
@@ -52,7 +52,7 @@ user:
     my_repo.create_milestone("7.0.1", due_on='2018-08-21T23:59:59Z')
     
     # create a project and add columns to project
-    my_repo.create_proj('Project 1')
+    my_repo.create_project('Project 1')
     projects = list(my_repo.projects())
     my_proj = [x for x in projects if x.name == "Project 1"][0]
     my_proj.create_column('To Do')
