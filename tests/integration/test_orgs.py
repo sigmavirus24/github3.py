@@ -101,9 +101,14 @@ class TestOrganization(IntegrationHelper):
         self.auto_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
-            o = self.get_organization()
+            o = self.get_organization(name='foo-org')
 
             assert o.edit(location='Madison, WI') is True
+            assert o.edit(description='How people build software.') is True
+            assert o.edit(has_organization_projects=False) is True
+            assert o.edit(has_repository_projects=False) is True
+            assert o.edit(default_repository_permission='write') is True
+            assert o.edit(members_can_create_repositories=False) is True
 
     def test_is_member(self):
         """Test the ability to check if a User is a member of the org."""
