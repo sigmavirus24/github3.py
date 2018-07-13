@@ -1155,6 +1155,17 @@ class TestRepository(helper.IntegrationHelper):
 
         assert removed_collaborator is True
 
+    def test_replace_topics(self):
+        """Test the ability to replace the topics of a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name('replace_topics')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('jacquerie', 'flask-shell-bpython')
+            topics = repository.replace_topics(['flask', 'bpython', 'python'])
+
+        assert isinstance(topics, github3.repos.topics.Topics)
+        assert len(topics.names) == 3
+
     def test_stargazers(self):
         """Test the ability to retrieve the stargazers on a repository."""
         cassette_name = self.cassette_name('stargazers')
@@ -1250,6 +1261,16 @@ class TestRepository(helper.IntegrationHelper):
         assert len(teams) > 0
         for team in teams:
             assert isinstance(team, github3.orgs.ShortTeam)
+
+    def test_topics(self):
+        """Test the ability to retrieve topics from a repository."""
+        cassette_name = self.cassette_name('topics')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('jacquerie', 'flask-shell-bpython')
+            topics = repository.topics()
+
+        assert isinstance(topics, github3.repos.topics.Topics)
+        assert len(topics.names) == 3
 
     def test_tree(self):
         """Test the ability to retrieve a tree from a repository."""

@@ -40,6 +40,7 @@ from . import release
 from . import stats
 from . import status
 from . import tag
+from . import topics
 
 from ..decorators import requires_auth
 
@@ -50,6 +51,10 @@ class _Repository(models.GitHubCore):
     Sub-classes should need only to override the ``_update_attributes``
     method to ensure that all attributes are present on the object.
     """
+
+    PREVIEW_HEADERS = {
+        'Accept': 'application/vnd.github.mercy-preview+json'
+    }
 
     STAR_HEADERS = {
         'Accept': 'application/vnd.github.v3.star+json'
@@ -2161,6 +2166,31 @@ class _Repository(models.GitHubCore):
                               base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
+    @requires_auth
+    def replace_topics(self, new_topics):
+        """Replace the repository topics with ``new_topics``.
+
+        :param topics:
+            (required), new topics of the repository
+        :type topics:
+            list
+        :returns:
+            new topics of the repository
+        :rtype:
+            :class:`~github3.repos.topics.Topics`
+        """
+        url = self._build_url('topics', base_url=self._api)
+        data = {'names': new_topics}
+        json = self._json(
+            self._put(
+                url,
+                data=jsonlib.dumps(data),
+                headers=self.PREVIEW_HEADERS
+            ),
+            200
+        )
+        return self._instance_or_null(topics.Topics, json)
+
     def stargazers(self, number=-1, etag=None):
         """List users who have starred this repository.
 
@@ -2309,6 +2339,18 @@ class _Repository(models.GitHubCore):
         from .. import orgs
         url = self._build_url('teams', base_url=self._api)
         return self._iter(int(number), url, orgs.ShortTeam, etag=etag)
+
+    def topics(self):
+        """Get the topics of this repository.
+
+        :returns:
+            this repository's topics
+        :rtype:
+            :class:`~github3.repos.topics.Topics`
+        """
+        url = self._build_url('topics', base_url=self._api)
+        json = self._json(self._get(url, headers=self.PREVIEW_HEADERS), 200)
+        return self._instance_or_null(topics.Topics, json)
 
     def tree(self, sha):
         """Get a tree.
