@@ -2352,11 +2352,13 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url, headers=self.PREVIEW_HEADERS), 200)
         return self._instance_or_null(topics.Topics, json)
 
-    def tree(self, sha):
+    def tree(self, sha, recursive=False):
         """Get a tree.
 
         :param str sha:
             (required), sha of the object for this tree
+        :param bool recursive:
+            (optional), whether to fetch the tree recursively
         :returns:
             the tree
         :rtype:
@@ -2365,7 +2367,8 @@ class _Repository(models.GitHubCore):
         json = None
         if sha:
             url = self._build_url('git', 'trees', sha, base_url=self._api)
-            json = self._json(self._get(url), 200)
+            params = {'recursive': 1} if recursive else None
+            json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(git.Tree, json)
 
     def weekly_commit_count(self):
