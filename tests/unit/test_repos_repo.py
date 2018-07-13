@@ -972,6 +972,16 @@ class TestRepository(helper.UnitHelper):
 
         assert self.session.delete.called is False
 
+    def test_replace_topics(self):
+        """Verify the request for replacing the topics."""
+        self.instance.replace_topics(['flask', 'bpython', 'python'])
+
+        self.session.put.assert_called_once_with(
+            url_for('topics'),
+            data='{"names": ["flask", "bpython", "python"]}',
+            headers=self.instance.PREVIEW_HEADERS
+        )
+
     def test_source(self):
         """Verify that the source of the repository can be retrieved."""
         source = self.instance.source
@@ -999,6 +1009,15 @@ class TestRepository(helper.UnitHelper):
         self.instance.tag('')
 
         assert self.session.get.called is False
+
+    def test_topics(self):
+        """Verify the request for retrieving the topics."""
+        self.instance.topics()
+
+        self.session.get.assert_called_once_with(
+            url_for('topics'),
+            headers=self.instance.PREVIEW_HEADERS
+        )
 
     def test_tree(self):
         """Verify the request for retrieving a tree."""
@@ -1663,6 +1682,10 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def test_remove_collaborator(self):
         """Show that a user must be authenticated to remove a collaborator."""
         self.assert_requires_auth(self.instance.remove_collaborator)
+
+    def test_replace_topics(self):
+        """Show that a user must be authenticated to replace the topics."""
+        self.assert_requires_auth(self.instance.replace_topics)
 
     def test_subscription(self):
         """
