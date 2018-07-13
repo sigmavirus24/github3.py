@@ -277,6 +277,12 @@ class TestGitHub(helper.UnitHelper):
         self.instance.key(-1)
         self.session.get.called is False
 
+    def test_license(self):
+        """Verify the request to retrieve a license."""
+        self.instance.license('MIT')
+
+        self.session.get.assert_called_once_with(url_for('licenses/MIT'))
+
     def test_login(self):
         """Verify the request for user logging in."""
         self.instance.login('user', 'password')
@@ -988,6 +994,17 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('user/keys'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_licenses(self):
+        """Verify the request to retrieve all licenses."""
+        i = self.instance.licenses()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('licenses'),
             params={'per_page': 100},
             headers={}
         )
