@@ -1329,7 +1329,7 @@ class _Repository(models.GitHubCore):
 
         :param str sort:
             (optional), accepted values:
-            ('newest', 'oldest', 'watchers'), API default: 'newest'
+            ('newest', 'oldest', 'stargazers'), API default: 'newest'
         :param int number:
             (optional), number of forks to return. Default: -1
             returns all forks
@@ -1342,7 +1342,7 @@ class _Repository(models.GitHubCore):
         """
         url = self._build_url('forks', base_url=self._api)
         params = {}
-        if sort in ('newest', 'oldest', 'watchers'):
+        if sort in ('newest', 'oldest', 'stargazers'):
             params = {'sort': sort}
         return self._iter(int(number), url, ShortRepository, params, etag)
 
