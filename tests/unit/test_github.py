@@ -1107,6 +1107,18 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
             headers={}
         )
 
+    def test_public_gists_since(self):
+        """Show that public gists can be filtered by date."""
+        since = '2018-07-13T00:00:00Z'
+        i = self.instance.public_gists(since=since)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('gists/public'),
+            params={'per_page': 100, 'since': since},
+            headers={}
+        )
+
     def test_respositories(self):
         """
         Show that an authenticated user can iterate over their repositories.

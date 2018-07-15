@@ -21,6 +21,7 @@ from .repos import repo
 from . import search
 from . import structs
 from . import users
+from . import utils
 
 from .decorators import (requires_auth, requires_basic_auth,
                          requires_app_credentials)
@@ -1267,7 +1268,7 @@ class GitHub(models.GitHubCore):
                 url, headers=projects.Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(projects.ProjectColumn, json)
 
-    def public_gists(self, number=-1, etag=None):
+    def public_gists(self, number=-1, etag=None, since=None):
         """Retrieve all public gists and iterate over them.
 
         .. versionadded:: 1.0
@@ -1277,13 +1278,24 @@ class GitHub(models.GitHubCore):
             returns all available gists
         :param str etag:
             (optional), ETag from a previous request to the same endpoint
+        :param since:
+            (optional), filters out any gists updated before the
+            given time. This can be a `datetime` or an `ISO8601`
+            formatted date string, e.g., 2012-05-20T23:10:27Z
+        :type since:
+            :class:`~datetime.datetime` or str
         :returns:
             generator of short gists
         :rtype:
             :class:`~github3.gists.gist.ShortGist`
         """
+        params = None
         url = self._build_url('gists', 'public')
-        return self._iter(int(number), url, gists.ShortGist, etag=etag)
+        if since is not None:
+            params = {'since': utils.timestamp_parameter(since)}
+        return self._iter(int(number), url, gists.ShortGist,
+                          params=params,
+                          etag=etag)
 
     @requires_auth
     def organization_memberships(self, state=None, number=-1, etag=None):

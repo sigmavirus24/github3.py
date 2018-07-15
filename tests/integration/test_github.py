@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on GitHub."""
+from datetime import datetime
+
 import github3
 import pytest
 import uritemplate
@@ -402,6 +404,15 @@ class TestGitHub(IntegrationHelper):
             r = self.gh.project_column(957217)
 
         assert isinstance(r, github3.projects.ProjectColumn)
+
+    def test_public_gists(self):
+        """Test the ability to iterate over the public gists."""
+        since = datetime(2018, 7, 13)
+        cassette_name = self.cassette_name('public_gists')
+        with self.recorder.use_cassette(cassette_name):
+            for r in self.gh.public_gists(since=since, number=25):
+                assert isinstance(r, github3.gists.ShortGist)
+                assert r.updated_at.replace(tzinfo=None) >= since
 
     def test_pubsubhubbub(self):
         """Test the ability to create a pubsubhubbub hook."""
