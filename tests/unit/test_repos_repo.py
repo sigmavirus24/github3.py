@@ -632,7 +632,8 @@ class TestRepository(helper.UnitHelper):
             'default_branch': 'develop',
             'allow_rebase_merge': True,
             'allow_squash_merge': True,
-            'allow_merge_commit': False
+            'allow_merge_commit': False,
+            'has_projects': False
         }
 
         with mock.patch.object(Repository, '_update_attributes') as up_attr:

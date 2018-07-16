@@ -1210,7 +1210,8 @@ class _Repository(models.GitHubCore):
     def edit(self, name, description=None, homepage=None, private=None,
              has_issues=None, has_wiki=None, has_downloads=None,
              default_branch=None, archived=None, allow_merge_commit=None,
-             allow_squash_merge=None, allow_rebase_merge=None):
+             allow_squash_merge=None, allow_rebase_merge=None,
+             has_projects=None):
         """Edit this repository.
 
         :param str name:
@@ -1259,6 +1260,10 @@ class _Repository(models.GitHubCore):
             (optional), If not ``None``, change whether adding all commits
             from the head branch to the base branch with a merge commit is
             allowed. API default: ``None`` - leave value unchanged.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository.
+            If ``False``, disable projects projects for this repository.
+            API default: ``None`` - leave value unchanged.
         :returns:
             True if successful, False otherwise
         :rtype:
@@ -1278,6 +1283,7 @@ class _Repository(models.GitHubCore):
             'allow_merge_commit': allow_merge_commit,
             'allow_squash_merge': allow_squash_merge,
             'allow_rebase_merge': allow_rebase_merge,
+            'has_projects': has_projects,
         }
         self._remove_none(edit)
         json = None

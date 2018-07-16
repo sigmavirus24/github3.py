@@ -630,6 +630,15 @@ class TestRepository(helper.IntegrationHelper):
             assert repository.archived is True
             repository.delete()
 
+    def test_edit_has_projects(self):
+        self.token_login()
+        cassette_name = self.cassette_name('edit_has_projects')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('jacquerie', 'flask-shell-bpython')
+            assert repository.has_projects is True
+            repository.edit('flask-shell-bpython', has_projects=False)
+            assert repository.has_projects is False
+
     def test_events(self):
         """Test that a user can iterate over the events from a repository."""
         cassette_name = self.cassette_name('events')
