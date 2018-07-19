@@ -1,8 +1,9 @@
 """Unit tests for methods implemented on Branch Protection."""
+
 import github3
 from github3.repos.branch import BranchProtection
+
 from . import helper
-from json import dumps
 
 protection_example_data = helper.create_example_data_helper(
     'branch_protection_example'
@@ -11,25 +12,6 @@ protection_url_for = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/'
     'branches/master/protection'
 )
-
-
-# class TestBranchProtection(helper.UnitRequiresAuthenticationHelper):
-#     """Branch protection unit test"""
-#
-#     described_class = github3.repos.branch.BranchProtection
-#     example_data = protection_example_data()
-#
-#     def test_protect(self):
-#         """Verify PUT method works"""
-#         self.instance.enforce_admins = True
-#         self.instance.restrictions = ['continuous-integration/travis-ci']
-#         self.instance.update()
-#         self.put_called_with(url_for())
-#
-#     def test_unprotect(self):
-#         """Verify DELETE method works"""
-#         self.instance.delete()
-#         self.delete_called_with(url_for())
 
 
 enforce_admins_url_for = helper.create_url_helper(
@@ -41,15 +23,19 @@ enforce_admins_example_data = helper.create_example_data_helper(
 
 
 class TestProtectionEnforceAdmins(helper.UnitHelper):
+    """Unit tests around the ProtectionRequiredPullRequestReviews class."""
+
     described_class = github3.repos.branch.ProtectionEnforceAdmins
     example_data = enforce_admins_example_data()
 
     def test_enable(self):
+        """Verify the request to enable admin enforcement."""
         self.instance.enable()
         self.post_called_with(enforce_admins_url_for(),
                               headers=BranchProtection.PREVIEW_HEADERS_MAP)
 
     def test_disable(self):
+        """Verify the request to disable admin enforcement."""
         self.instance.disable()
         self.delete_called_with(enforce_admins_url_for(),
                                 headers=BranchProtection.PREVIEW_HEADERS_MAP)
@@ -66,22 +52,13 @@ protection_required_pull_request_reviews_data = \
 
 
 class TestProtectionRequiredPullRequestReviews(helper.UnitHelper):
+    """Unit tests around the ProtectionRequiredPullRequestReviews class."""
+
     described_class = github3.repos.branch.ProtectionRequiredPullRequestReviews
     example_data = protection_required_pull_request_reviews_data()
 
-    def test_set_required_code_owner_reviews(self):
-        self.instance.set_required_code_owner_reviews(False)
-        assert self.instance.require_code_owner_reviews is False
-
-    def test_set_dismiss_stale_reviews(self):
-        self.instance.set_dismiss_stale_reviews(False)
-        assert self.instance.dismiss_stale_reviews is False
-
-    def test_set_required_approving_review_count(self):
-        self.instance.set_required_approving_review_count(10)
-        assert self.instance.required_approving_review_count == 10
-
     def test_update(self):
+        """Verify the request to update required PR review protections."""
         teams = [
             team.slug
             for team in self.instance.dismissal_restrictions.original_teams
@@ -133,49 +110,68 @@ protection_restrictions_example_data = helper.create_example_data_helper(
 
 
 class TestProtectionRestrictions(helper.UnitHelper):
+    """Unit tests around the ProtectionRestrictions class."""
+
     described_class = github3.repos.branch.ProtectionRestrictions
     example_data = protection_restrictions_example_data()
 
     def test_add_teams(self):
+        """Verify the request to add new teams."""
         self.instance.add_teams(['justice-league'])
-        self.post_called_with(protection_restrictions_teams_url_for(),
-                              data=['justice-league'],
-                              headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        self.post_called_with(
+            protection_restrictions_teams_url_for(),
+            data=['justice-league'],
+            headers=BranchProtection.PREVIEW_HEADERS_MAP['nested_teams'],
+        )
 
     def test_remove_teams(self):
+        """Verify the request to remove teams."""
         self.instance.remove_teams(['justice-league'])
-        self.delete_called_with(protection_restrictions_teams_url_for(),
-                                json=dumps(['justice-league']),
-                                headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        self.delete_called_with(
+            protection_restrictions_teams_url_for(),
+            json=['justice-league'],
+            headers=BranchProtection.PREVIEW_HEADERS_MAP['nested_teams'],
+        )
 
     def test_add_users(self):
+        """Verify the request to add new users."""
         self.instance.add_users(['sigmavirus24'])
-        self.post_called_with(protection_restrictions_users_url_for(),
-                              data=['sigmavirus24'],
-                              headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        self.post_called_with(
+            protection_restrictions_users_url_for(),
+            data=['sigmavirus24'],
+        )
 
     def test_remove_users(self):
+        """Verify the request to remove users."""
         self.instance.remove_users(['sigmavirus24'])
-        self.delete_called_with(protection_restrictions_users_url_for(),
-                                json=dumps(['sigmavirus24']),
-                                headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        self.delete_called_with(
+            protection_restrictions_users_url_for(),
+            json=['sigmavirus24'],
+        )
 
     def test_delete(self):
+        """Verify the request to delete all restrictions."""
         self.instance.delete()
-        self.delete_called_with(protection_restrictions_url_for(),
-                                headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        self.delete_called_with(
+            protection_restrictions_url_for(),
+        )
 
-    def test_set_teams(self):
-        self.instance.set_teams(['justice-league'])
-        self.put_called_with(protection_restrictions_teams_url_for(),
-                             json=dumps(['justice-league']),
-                             headers=BranchProtection.PREVIEW_HEADERS_MAP)
+    def test_replace_teams(self):
+        """Verify the request to replace teams."""
+        self.instance.replace_teams(['justice-league'])
+        self.put_called_with(
+            protection_restrictions_teams_url_for(),
+            json=['justice-league'],
+            headers=BranchProtection.PREVIEW_HEADERS_MAP['nested_teams'],
+        )
 
-    def test_set_users(self):
-        self.instance.set_users(['sigmavirus24'])
-        self.put_called_with(protection_restrictions_users_url_for(),
-                             json=dumps(['sigmavirus24']),
-                             headers=BranchProtection.PREVIEW_HEADERS_MAP)
+    def test_replace_users(self):
+        """Verify the request to replace users."""
+        self.instance.replace_users(['sigmavirus24'])
+        self.put_called_with(
+            protection_restrictions_users_url_for(),
+            json=['sigmavirus24'],
+        )
 
 
 protection_required_status_checks_url_for = helper.create_url_helper(
@@ -195,11 +191,13 @@ protection_required_status_checks_example_data = \
 
 
 class TestProtectionRequiredStatusChecks(helper.UnitHelper):
+    """Unit tests around the ProtectionRequiredStatusChecks class."""
+
     described_class = github3.repos.branch.ProtectionRequiredStatusChecks
     example_data = protection_required_status_checks_example_data()
-    _json_data = dumps(['continuous-integration/jenkins'])
 
     def test_add_contexts(self):
+        """Verify the request to add contexts to required status checks."""
         self.instance.add_contexts(['continuous-integration/jenkins'])
         self.post_called_with(
             protection_required_status_checks_contexts_url_for(),
@@ -207,24 +205,30 @@ class TestProtectionRequiredStatusChecks(helper.UnitHelper):
         )
 
     def test_contexts(self):
+        """Verify the request to retrieve contexts."""
         self.instance.contexts()
-        self.get_called_with(protection_required_status_checks_contexts_url_for())
+        self.session.get.assert_called_once_with(
+            protection_required_status_checks_contexts_url_for(),
+        )
 
     def test_replace_contexts(self):
-        self.instance.replace_contexts(self._json_data)
+        """Verify the request ro replace required status check contexts."""
+        self.instance.replace_contexts(['continuous-integration/jenkins'])
         self.put_called_with(
             protection_required_status_checks_contexts_url_for(),
-            json=self._json_data
+            json=['continuous-integration/jenkins']
         )
 
     def test_delete_contexts(self):
-        self.instance.delete_contexts(self._json_data)
+        """Verify the request to remove contexts."""
+        self.instance.delete_contexts(['continuous-integration/jenkins'])
         self.delete_called_with(
             protection_required_status_checks_contexts_url_for(),
-            json=self._json_data
+            json=['continuous-integration/jenkins']
         )
 
     def test_update(self):
+        """Verify the request to update the required status checks."""
         self.instance.update(True, ['continuous-integration/jenkins'])
         update_data = {
             'strict': True,
@@ -234,6 +238,7 @@ class TestProtectionRequiredStatusChecks(helper.UnitHelper):
                                json=update_data)
 
     def test_update_not_strict(self):
+        """Verify another variant of the update request."""
         self.instance.update(False, ['continuous-integration/jenkins'])
         update_data = {
             'strict': False,
@@ -243,7 +248,8 @@ class TestProtectionRequiredStatusChecks(helper.UnitHelper):
                                json=update_data)
 
     def test_update_no_strict(self):
-        self.instance.update(None, ['continuous-integration/jenkins'])
+        """Verify updating contexts only sends contexts."""
+        self.instance.update(contexts=['continuous-integration/jenkins'])
         update_data = {
             'contexts': ['continuous-integration/jenkins']
         }
@@ -251,5 +257,6 @@ class TestProtectionRequiredStatusChecks(helper.UnitHelper):
                                json=update_data)
 
     def test_delete(self):
+        """Verify the request to delete required status checks."""
         self.instance.delete()
         self.delete_called_with(protection_required_status_checks_url_for())
