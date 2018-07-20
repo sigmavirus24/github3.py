@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 from json import dumps
 
+from . import label
 from .. import users
 
 from ..decorators import requires_auth
-from .label import Label
 from ..models import GitHubCore
 
 
@@ -117,10 +117,10 @@ class Milestone(GitHubCore):
         :returns:
             generator of labels
         :rtype:
-            :class:`~github3.issues.label.Label`
+            :class:`~github3.issues.label.ShortLabel`
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, Label, etag=etag)
+        return self._iter(int(number), url, label.ShortLabel, etag=etag)
 
     @requires_auth
     def update(self, title=None, state=None, description=None, due_on=None):

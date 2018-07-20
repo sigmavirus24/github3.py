@@ -33,4 +33,4 @@ class TestMilestone(IntegrationHelper):
             milestone = issue.milestone
             assert milestone is not None
             for label in milestone.labels():
-                assert isinstance(label, github3.issues.label.Label)
+                assert isinstance(label, github3.issues.label.ShortLabel)

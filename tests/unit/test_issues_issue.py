@@ -428,13 +428,28 @@ class TestLabel(helper.UnitHelper):
         """Test the request for updating a label."""
         data = {
             'name': 'newname',
-            'color': 'afafaf'
+            'color': 'afafaf',
+            'description': 'newdescription',
         }
 
         self.instance.update(**data)
         self.patch_called_with(
             label_url_for(),
-            data=data
+            data=data,
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'},
+        )
+
+    def test_update_without_description(self):
+        data = {
+            'name': 'newname',
+            'color': 'afafaf',
+        }
+
+        self.instance.update(**data)
+        self.patch_called_with(
+            label_url_for(),
+            data=data,
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'},
         )
 
 

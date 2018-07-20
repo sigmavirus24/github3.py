@@ -809,7 +809,7 @@ class _Repository(models.GitHubCore):
         return self._instance_or_null(users.Key, json)
 
     @requires_auth
-    def create_label(self, name, color):
+    def create_label(self, name, color, description=None):
         """Create a label for this repository.
 
         :param str name:
@@ -817,6 +817,8 @@ class _Repository(models.GitHubCore):
         :param str color:
             (required), value of the color to assign to the
             label, e.g., '#fafafa' or 'fafafa' (the latter is what is sent)
+        :param str description:
+            (optional), description to give to the label
         :returns:
             the created label
         :rtype:
@@ -825,8 +827,12 @@ class _Repository(models.GitHubCore):
         json = None
         if name and color:
             data = {'name': name, 'color': color.strip('#')}
+            if description is not None:
+                data['description'] = description
             url = self._build_url('labels', base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            resp = self._post(url, data=data,
+                              headers=label.Label.SYMMETRA_PREVIEW_HEADERS)
+            json = self._json(resp, 201)
         return self._instance_or_null(label.Label, json)
 
     @requires_auth
@@ -1693,7 +1699,8 @@ class _Repository(models.GitHubCore):
         json = None
         if name:
             url = self._build_url('labels', name, base_url=self._api)
-            json = self._json(self._get(url), 200)
+            resp = self._get(url, headers=label.Label.SYMMETRA_PREVIEW_HEADERS)
+            json = self._json(resp, 200)
         return self._instance_or_null(label.Label, json)
 
     def labels(self, number=-1, etag=None):
@@ -1710,7 +1717,8 @@ class _Repository(models.GitHubCore):
             :class:`~github3.issues.label.Label`
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, label.Label, etag=etag)
+        return self._iter(int(number), url, label.Label, etag=etag,
+                          headers=label.Label.SYMMETRA_PREVIEW_HEADERS)
 
     def languages(self, number=-1, etag=None):
         """Iterate over the programming languages used in the repository.

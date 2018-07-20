@@ -298,7 +298,8 @@ class TestRepository(helper.UnitHelper):
         self.instance.create_label(**data)
         self.post_called_with(
             url_for('labels'),
-            data=data
+            data=data,
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'},
         )
 
     def test_create_label_required_name(self):
@@ -799,7 +800,8 @@ class TestRepository(helper.UnitHelper):
         """Verify the request for retrieving a label on a repository."""
         self.instance.label('bug')
         self.session.get.assert_called_once_with(
-            url_for('labels/bug')
+            url_for('labels/bug'),
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'},
         )
 
     def test_label_required_name(self):
@@ -1326,7 +1328,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('keys'),
             params={'per_page': 100},
-            headers={}
+            headers={},
         )
 
     def test_labels(self):
@@ -1337,7 +1339,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for('labels'),
             params={'per_page': 100},
-            headers={}
+            headers={'Accept': 'application/vnd.github.symmetra-preview+json'},
         )
 
     def test_languages(self):
