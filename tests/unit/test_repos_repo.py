@@ -1025,7 +1025,8 @@ class TestRepository(helper.UnitHelper):
         self.instance.tree('fake-sha')
 
         self.session.get.assert_called_once_with(
-            url_for('git/trees/fake-sha')
+            url_for('git/trees/fake-sha'),
+            params=None
         )
 
     def test_tree_required_sha(self):
@@ -1033,6 +1034,15 @@ class TestRepository(helper.UnitHelper):
         self.instance.tree('')
 
         assert self.session.get.called is False
+
+    def test_tree_optional_recursive(self):
+        """Verify the request for recursively retrieving a tree."""
+        self.instance.tree('fake-sha', recursive=True)
+
+        self.session.get.assert_called_once_with(
+            url_for('git/trees/fake-sha'),
+            params={'recursive': 1}
+        )
 
     def test_str(self):
         """Verify instance string is formatted correctly."""

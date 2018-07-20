@@ -1289,6 +1289,18 @@ class TestRepository(helper.IntegrationHelper):
             tree = repository.tree('52a3f30e05cf434285e775979f01f1a8355049a7')
 
         assert isinstance(tree, github3.git.Tree)
+        assert len(tree.tree) == 18
+
+    def test_tree_recursive(self):
+        """Test the ability to retrieve a tree recursively."""
+        cassette_name = self.cassette_name('tree_recursive')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('sigmavirus24', 'github3.py')
+            tree = repository.tree(
+                '52a3f30e05cf434285e775979f01f1a8355049a7', recursive=True)
+
+        assert isinstance(tree, github3.git.Tree)
+        assert len(tree.tree) == 275
 
     def test_weekly_commit_count(self):
         """
