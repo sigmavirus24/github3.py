@@ -7,26 +7,7 @@ from ..decorators import requires_auth
 from ..models import GitHubCore
 
 
-class Label(GitHubCore):
-    """A representation of a label object defined on a repository.
-
-    See also: http://developer.github.com/v3/issues/labels/
-
-    This object has the following attributes::
-
-    .. attribute:: color
-
-        The hexadecimeal representation of the background color of this label.
-
-    .. attribute:: name
-
-        The name (display label) for this label.
-
-    .. attribute:: desciption
-
-        The description for this label.
-    """
-
+class _Label(GitHubCore):
     SYMMETRA_PREVIEW_HEADERS = {
         'Accept': 'application/vnd.github.symmetra-preview+json'
     }
@@ -35,11 +16,10 @@ class Label(GitHubCore):
         self._api = label['url']
         self.color = label['color']
         self.name = label['name']
-        self.description = label['description']
         self._uniq = self._api
 
     def _repr(self):
-        return '<Label [{0}]>'.format(self)
+        return '<{0.class_name} [{0.name}]>'.format(self)
 
     def __str__(self):
         return self.name
@@ -87,3 +67,49 @@ class Label(GitHubCore):
             return True
 
         return False
+
+
+class ShortLabel(_Label):
+    """A representation of a label object defined on a repository.
+
+    See also: http://developer.github.com/v3/issues/labels/
+
+    This object has the following attributes::
+
+    .. attribute:: color
+
+        The hexadecimeal representation of the background color of this label.
+
+    .. attribute:: name
+
+        The name (display label) for this label.
+    """
+
+    class_name = 'ShortLabel'
+
+
+class Label(_Label):
+    """A representation of a label object defined on a repository.
+
+    See also: http://developer.github.com/v3/issues/labels/
+
+    This object has the following attributes::
+
+    .. attribute:: color
+
+        The hexadecimeal representation of the background color of this label.
+
+    .. attribute:: desciption
+
+        The description for this label.
+
+    .. attribute:: name
+
+        The name (display label) for this label.
+    """
+
+    class_name = 'Label'
+
+    def _update_attributes(self, label):
+        super(Label, self)._update_attributes(label)
+        self.description = label['description']

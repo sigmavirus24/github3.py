@@ -935,6 +935,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository('sigmavirus24', 'github3.py')
             label = repository.label('bug')
         assert isinstance(label, github3.issues.label.Label)
+        assert label.description is not None
 
     def test_labels(self):
         """Test that a user can retrieve a repository's labels."""

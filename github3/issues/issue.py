@@ -54,7 +54,7 @@ class _Issue(models.GitHubCore):
         self.original_labels = issue['labels']
         if self.original_labels:
             self.original_labels = [
-                label.Label(lbl, self) for lbl in self.original_labels
+                label.ShortLabel(lbl, self) for lbl in self.original_labels
             ]
         self.pull_request_urls = issue.get('pull_request')
         self.state = issue['state']
@@ -76,11 +76,11 @@ class _Issue(models.GitHubCore):
         :returns:
             list of labels
         :rtype:
-            :class:`~github3.issues.label.Label`
+            :class:`~github3.issues.label.ShortLabel`
         """
         url = self._build_url('labels', base_url=self._api)
         json = self._json(self._post(url, data=args), 200)
-        return [label.Label(lbl, self) for lbl in json] if json else []
+        return [label.ShortLabel(lbl, self) for lbl in json] if json else []
 
     @requires_auth
     def assign(self, username):
@@ -266,10 +266,10 @@ class _Issue(models.GitHubCore):
         :returns:
             generator of labels on this issue
         :rtype:
-            :class:`~github3.issues.label.Label`
+            :class:`~github3.issues.label.ShortLabel`
         """
         url = self._build_url('labels', base_url=self._api)
-        return self._iter(int(number), url, label.Label, etag=etag)
+        return self._iter(int(number), url, label.ShortLabel, etag=etag)
 
     @requires_auth
     def lock(self):
@@ -309,11 +309,11 @@ class _Issue(models.GitHubCore):
         :returns:
             list of removed labels
         :rtype:
-            :class:`~github3.issues.label.Label`
+            :class:`~github3.issues.label.ShortLabel`
         """
         url = self._build_url('labels', name, base_url=self._api)
         json = self._json(self._delete(url), 200, 404)
-        labels = [label.Label(lbl, self) for lbl in json] if json else []
+        labels = [label.ShortLabel(lbl, self) for lbl in json] if json else []
         return labels
 
     @requires_auth
@@ -337,11 +337,11 @@ class _Issue(models.GitHubCore):
         :returns:
             list of labels
         :rtype:
-            :class:`~github3.issues.label.Label`
+            :class:`~github3.issues.label.ShortLabel`
         """
         url = self._build_url('labels', base_url=self._api)
         json = self._json(self._put(url, data=dumps(labels)), 200)
-        return [label.Label(lbl, self) for lbl in json] if json else []
+        return [label.ShortLabel(lbl, self) for lbl in json] if json else []
 
     @requires_auth
     def reopen(self):
@@ -499,8 +499,8 @@ class ShortIssue(_Issue):
     .. attribute:: original_labels
 
         If any are assigned to this issue, the list of
-        :class:`~github3.issues.label.Label` objects representing the labels
-        returned by the API for this issue.
+        :class:`~github3.issues.label.ShortLabel` objects representing the
+        labels returned by the API for this issue.
 
     .. attribute:: pull_request_urls
 
