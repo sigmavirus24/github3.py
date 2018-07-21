@@ -42,7 +42,7 @@ requires.extend([
 ])
 
 __version__ = ''
-with open('github3/__about__.py', 'r') as fd:
+with open('src/github3/__about__.py', 'r') as fd:
     reg = re.compile(r'__version__ = [\'"]([^\'"]*)[\'"]')
     for line in fd:
         m = reg.match(line)
@@ -80,6 +80,7 @@ setuptools.setup(
     author_email="graffatcolmingov@gmail.com",
     url="https://github3.readthedocs.io",
     packages=packages,
+    package_dir={"": "src"},
     install_requires=requires,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
