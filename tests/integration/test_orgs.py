@@ -104,6 +104,11 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             assert o.edit(location='Madison, WI') is True
+            assert o.edit(description='How people build software.') is True
+            assert o.edit(has_organization_projects=False) is True
+            assert o.edit(has_repository_projects=False) is True
+            assert o.edit(default_repository_permission='write') is True
+            assert o.edit(members_can_create_repositories=False) is True
 
     def test_is_member(self):
         """Test the ability to check if a User is a member of the org."""

@@ -676,7 +676,9 @@ class _Organization(models.GitHubCore):
 
     @requires_auth
     def edit(self, billing_email=None, company=None, email=None, location=None,
-             name=None):
+             name=None, description=None, has_organization_projects=None,
+             has_repository_projects=None, default_repository_permission=None,
+             members_can_create_repositories=None):
         """Edit this organization.
 
         :param str billing_email:
@@ -689,14 +691,49 @@ class _Organization(models.GitHubCore):
             (optional)
         :param str name:
             (optional)
+        :param str description:
+            (optional) The description of the company.
+        :param bool has_organization_projects:
+            (optional) Toggles whether organization projects are enabled for
+            the organization.
+        :param bool has_repository_projects:
+            (optional) Toggles whether repository projects are enabled for
+            repositories that belong to the organization.
+        :param string default_repository_permission:
+            (optional) Default permission level members have for organization
+            repositories:
+
+            - ``read`` -- (default) can pull, but not push to or administer
+                this repository.
+            - ``write`` -- can pull and push, but not administer this
+                repository.
+            - ``admin`` -- can pull, push, and administer this repository.
+            - ``none`` -- no permissions granted by default.
+        :param bool members_can_create_repositories:
+            (optional) Toggles ability of non-admin organization members to
+            create repositories:
+
+            - ``True`` -- (default) all organization members can create
+                repositories.
+            - ``False`` -- only admin members can create repositories.
         :returns:
             True if successful, False otherwise
         :rtype:
             bool
         """
         json = None
-        data = {'billing_email': billing_email, 'company': company,
-                'email': email, 'location': location, 'name': name}
+        data = {
+            'billing_email': billing_email,
+            'company': company,
+            'email': email,
+            'location': location,
+            'name': name,
+            'description': description,
+            'has_organization_projects': has_organization_projects,
+            'has_repository_projects': has_repository_projects,
+            'default_repository_permission': default_repository_permission,
+            'members_can_create_repositories': members_can_create_repositories,
+        }
         self._remove_none(data)
 
         if data:

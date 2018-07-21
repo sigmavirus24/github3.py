@@ -162,3 +162,5 @@ Contributors
 - Jeff Quast (@jquast)
 
 - Hal Wine (@hwine)
+
+- Jacopo Notarstefano (@jacquerie)
