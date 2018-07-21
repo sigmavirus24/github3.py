@@ -101,7 +101,7 @@ class TestOrganization(IntegrationHelper):
         self.auto_login()
         cassette_name = self.cassette_name('edit')
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
-            o = self.get_organization(name='foo-org')
+            o = self.get_organization()
 
             assert o.edit(location='Madison, WI') is True
             assert o.edit(description='How people build software.') is True
