@@ -60,14 +60,14 @@ privileges, you simply do the following:
 
 ::
 
-    from github3 import login
+    from github3 import GitHub
 
     token = id = ''
     with open(CREDENTIALS_FILE, 'r') as fd:
         token = fd.readline().strip()  # Can't hurt to be paranoid
         id = fd.readline().strip()
 
-    gh = login(token=token)
+    gh = GitHub(token=token)
     auth = gh.authorization(id)
     auth.update(add_scopes=['repo:status', 'gist'], rm_scopes=['user'])
 

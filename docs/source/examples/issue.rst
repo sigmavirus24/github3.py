@@ -12,9 +12,9 @@ of the issue you're concerned with in ``num``.
 
 ::
 
-    from github3 import login
+    from github3 import GitHub
 
-    gh = login(user, pw)
+    gh = GitHub(user, pw)
     issue = gh.issue(user, repo, num)
     if issue.is_closed():
         issue.reopen()
@@ -60,7 +60,7 @@ timestamp(s) for comment(s) too.
 ::
 
    import github3
-   gh = github3.login(token=token)
+   gh = github3.GitHub(token=token)
    issue = {
       'title': 'Documentation issue',
       'body': 'Missing links in index.html',

@@ -38,7 +38,7 @@ and password. You can then do:
 
     import github3
 
-    github = github3.login(username=username, password=password)
+    github = github3.GitHub(username=username, password=password)
 
 Second, you can `generate an access token`_ and use that. Let's presume you
 have a variable bound as ``token`` that contains your access token.
@@ -47,23 +47,23 @@ have a variable bound as ``token`` that contains your access token.
 
     import github3
 
-    github = github3.login(token=token)
+    github = github3.GitHub(token=token)
 
 Third, if you're using a GitHub Enterprise installation you can use similar
-methods above, but you'll need to use :func:`~github3.api.enterprise_login`,
+methods above, but you'll need to use :class:`~github3.github.GitHubEnterprise`,
 e.g.,
 
 .. code-block:: python
 
     import github3
 
-    githubent = github3.enterprise_login(
+    githubent = github3.GitHubEnterprise(
         url='https://github.myenterprise.example.com',
         username=username,
         password=password,
     )
 
-    githubent = github3.enterprise_login(
+    githubent = github3.GitHubEnterprise(
         url='https://github.myenterprise.example.com',
         token=token,
     )
@@ -94,7 +94,7 @@ An example mechanism is as follows:
         return code
 
 
-    github = github3.login(username, password,
+    github = github3.GitHub(username, password,
                            two_factor_callback=second_factor_retrieval)
 
 

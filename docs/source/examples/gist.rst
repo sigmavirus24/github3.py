@@ -11,9 +11,9 @@ Listing gists after authenticating
 
 ::
 
-    from github3 import login
+    from github3 import GitHub
 
-    gh = login(username, password)
+    gh = GitHub(username, password)
     gists = [g for g in gh.iter_gists()]
 
 Creating a gist after authenticating
@@ -21,9 +21,9 @@ Creating a gist after authenticating
 
 ::
 
-    from github3 import login
+    from github3 import GitHub
 
-    gh = login(username, password)
+    gh = GitHub(username, password)
     files = {
         'spam.txt' : {
             'content': 'What... is the air-speed velocity of an unladen swallow?'

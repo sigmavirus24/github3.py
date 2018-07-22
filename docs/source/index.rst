@@ -11,9 +11,9 @@ user:
 
 .. code-block:: python
 
-    from github3 import login
+    from github3 import GitHub
 
-    gh = login('sigmavirus24', password='<password>')
+    gh = GitHub('sigmavirus24', password='<password>')
 
     sigmavirus24 = gh.me()
     # <AuthenticatedUser [sigmavirus24:Ian Stapleton Cordasco]>

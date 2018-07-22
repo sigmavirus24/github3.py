@@ -30,8 +30,8 @@ For example:
             code = prompt('Enter 2FA code: ')
         return code
 
-    g = github3.login('sigmavirus24', 'my_password',
-                      two_factor_callback=my_two_factor_function)
+    g = github3.GitHub('sigmavirus24', 'my_password',
+                       two_factor_callback=my_two_factor_function)
 
 Then each time the API tells github3.py it requires a Two Factor Authentication
 code, github3.py will call ``my_two_factor_function`` which prompt you for it.

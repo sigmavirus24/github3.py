@@ -11,7 +11,7 @@ looks like this:
 
     import github3
 
-    g = github3.login(USERNAME, PASSWORD)
+    g = github3.GitHub(USERNAME, PASSWORD)
 
     for u in g.iter_all_users():
         add_user_to_database(u)
