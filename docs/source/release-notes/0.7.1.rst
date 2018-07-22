@@ -1,0 +1,15 @@
+0.7.1: 2013-09-30
+-----------------
+
+- Add dependency on uritemplate.py_ to add URITemplates to different classes.
+  See the documentation for attributes which are templates.
+
+- Fixed issue trying to parse ``html_url`` on Pull Requests courtesy of
+  @rogerhu.
+
+- Remove ``expecter`` as a test dependency courtesy of @esacteksab.
+
+- Fixed issue #141 trying to find an Event that doesn't exist.
+
+.. _uritemplate.py:
+    https://github.com/sigmavirus24/uritemplate

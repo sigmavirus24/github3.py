@@ -1,0 +1,16 @@
+1.2.0: unreleased
+-----------------
+
+This is a small release with some enhancments.
+
+Features Added
+``````````````
+
+- Organization Invitations Preview API is now supported. This includes an
+  additional ``Invitation`` object. This is the result of hard work by Hal
+  Wine.
+
+- A ``ShortLabel`` class was added to represent the shorter (description-less)
+  representation of labels returned by the API.
+
+- The branch protections API is now completely represented in github3.py.

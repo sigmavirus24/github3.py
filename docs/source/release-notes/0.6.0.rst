@@ -1,0 +1,39 @@
+0.6.0: 2013-04-05
+-----------------
+
+- Add ``sort`` and ``order`` parameters to ``github3.GitHub.search_users`` and
+  ``github3.GitHub.search_repos``.
+
+- Add ``iter_commits`` to ``github3.gists.Gist`` as a means of re-requesting
+  just the history from GitHub and iterating over it.
+
+- Add minimal logging (e.g., ``logging.getLogger('github3')``)
+
+- Re-organize the library a bit. (Split up repos.py, issues.py, gists.py and a
+  few others into sub-modules for my sanity.)
+
+- Calling ``refresh(True)`` on a ``github3.structs.GitHubIterator`` actually
+  works as expected now.
+
+- API ``iter_`` methods now accept the ``etag`` argument as the
+  ``GitHub.iter_`` methods do.
+
+- Make ``github3.octocat`` and ``github3.github.GitHub.octocat`` both support
+  sending messages to make the Octocat say things. (Think cowsay)
+
+- Remove vendored dependency of PySO8601.
+
+- Split ``GitHub.iter_repos`` into ``GitHub.iter_user_repos`` and
+  ``GitHub.iter_repos``. As a consequence ``github3.iter_repos`` is now
+  ``github3.iter_user_repos``
+
+- ``IssueComment.update`` was corrected to match GitHub's documentation
+
+- ``github3.login`` now accepts an optional ``url`` parameter for users of the
+  ``GitHubEnterprise`` API, courtesy of Kristian Glass (@doismellburning)
+
+- Several classes now allow their instances to be compared with ``==`` and
+  ``!=``. In most cases this will check the unique id provided by GitHub. In
+  others, it will check SHAs and any other guaranteed immutable and unique
+  attribute. The class doc-strings all have information about this and details
+  about how equivalence is determined.

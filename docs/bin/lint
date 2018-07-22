@@ -1,0 +1,8 @@
+#!/bin/sh
+output="$(find docs/source -name '*.rst' | xargs proselint)"
+exit_code=$?
+
+if echo "$output" | grep -qve 'typography' ; then
+    echo $output
+    exit $exit_code
+fi

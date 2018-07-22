@@ -1,0 +1,81 @@
+0.3.0: 2013-01-01
+-----------------
+
+- In github3.repos.Repository
+
+  - is_fork() and fork return the same thing
+
+  - is_private() and private return the same thing as well
+
+  - has_downloads, has_issues, has_wiki are now straight attributes
+
+- In github3.repos.Hook
+
+  - is_active() and active return the same value
+
+- In github3.pulls.PullRequest
+
+  - is_mergeable() and mergeable are now the same
+
+  - repository now returns a tuple of the login and name of the repository it
+    belongs to
+
+- In github3.notifications.Thread
+
+  - is_unread() and unread are now the same
+
+- In github3.gists
+
+  - GistFile.filename and GistFile.name return the same information
+
+  - Gist.history now lists the history of the gist
+
+  - GistHistory is an object representing one commit or version of the history
+
+  - You can retrieve gists at a specific version with GistHistory.get_gist()
+
+- github3.orgs.Organization.iter_repos now accepts all types_
+
+- list_* methods on Organization objects that were missed are now deleted
+
+- Some objects now have ``__str__`` methods. You can now do things like:
+
+  .. code-block:: python
+
+    import github3
+    u = github3.user('sigmavirus24')
+    r = github3.repository(u, 'github3.py')
+
+  And
+
+  .. code-block:: python
+
+    import github3
+
+    repo = github3.repository('sigmavirus24', 'github3.py')
+
+    template = """Some kind of template where you mention this repository
+    {0}"""
+
+    print(template.format(repo))
+    # Some kind of template where you mention this repository
+    # sigmavirus24/github3.py
+
+  Current list of objects with this feature:
+
+  - github3.users.User (uses the login name)
+
+  - github3.users.Key (uses the key text)
+
+  - github3.users.Repository (uses the login/name pair)
+
+  - github3.users.RepoTag (uses the tag name)
+
+  - github3.users.Contents (uses the decoded content)
+
+- 60% test coverage with mock
+
+- Upgrade to requests 1.0.x
+
+.. _types:
+    http://developer.github.com/v3/repos/#list-organization-repositories

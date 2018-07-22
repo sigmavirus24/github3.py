@@ -2,16 +2,18 @@ import copy
 import betamax
 import github3
 import os
+import pytest
 import unittest
 
 
+@pytest.mark.usefixtures('betamax_simple_body')
 class IntegrationHelper(unittest.TestCase):
     def setUp(self):
         self.user = os.environ.get('GH_USER', 'foo')
         self.password = os.environ.get('GH_PASSWORD', 'bar')
         self.token = os.environ.get('GH_AUTH', 'x' * 20)
         self.gh = self.get_client()
-        self.session = self.gh._session
+        self.session = self.gh.session
         self.recorder = betamax.Betamax(self.session)
 
     def get_client(self):
@@ -22,6 +24,14 @@ class IntegrationHelper(unittest.TestCase):
 
     def basic_login(self):
         self.gh.login(self.user, self.password)
+
+    def auto_login(self):
+        """Log in appropriately based on discovered credentials"""
+
+        if self.token:
+            self.token_login()
+        else:
+            self.basic_login()
 
     def cassette_name(self, method, cls=None):
         class_name = cls or self.described_class
@@ -52,3 +62,16 @@ class CustomHeadersMatcher(betamax.BaseMatcher):
 
 
 betamax.Betamax.register_request_matcher(CustomHeadersMatcher)
+
+
+@pytest.mark.usefixtures('enterprise_url')
+class GitHubEnterpriseHelper(IntegrationHelper):
+
+    def get_client(self):
+        return github3.GitHubEnterprise(self.enterprise_url)
+
+
+class GitHubStatusHelper(IntegrationHelper):
+
+    def get_client(self):
+        return github3.GitHubStatus()

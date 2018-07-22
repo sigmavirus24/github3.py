@@ -1,5 +1,5 @@
 .. image::
-    https://raw.github.com/sigmavirus24/github3.py/develop/images/gh3-logo.png
+    https://raw.github.com/sigmavirus24/github3.py/develop/docs/img/gh3-logo.png
 
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
@@ -16,11 +16,11 @@ Installation
 Dependencies
 ------------
 
-- requests_  by Kenneth Reitz
-- uritemplate.py_ by Ian Cordasco
+- requests_
+- uritemplate_
 
 .. _requests: https://github.com/kennethreitz/requests
-.. _uritemplate.py: https://github.com/sigmavirus24/uritemplate
+.. _uritemplate: https://github.com/sigmavirus24/uritemplate
 
 Contributing
 ------------
@@ -42,7 +42,7 @@ this in a virtual enviroment. These need to be installed for the tests to run.
 
 .. _betamax: https://github.com/sigmavirus24/betamax
 .. _coverage: http://nedbatchelder.com/code/coverage/
-.. _mock: http://mock.readthedocs.org/en/latest/
+.. _mock: https://mock.readthedocs.io/en/latest/
 
 License
 -------
@@ -56,7 +56,7 @@ Examples
 
 See the docs_ for more examples.
 
-.. _docs: http://github3py.readthedocs.org/en/latest/index.html#more-examples
+.. _docs: https://github3.readthedocs.io/en/latest/index.html#more-examples
 
 Testing
 ~~~~~~~
@@ -70,7 +70,7 @@ Install the dependencies from requirements.txt e.g.:
 Author
 ------
 
-Ian Cordasco (sigmavirus24)
+Ian Stapleton Cordasco (sigmavirus24)
 
 Contact Options
 ---------------

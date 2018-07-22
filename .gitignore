@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 docs/_build
+docs/build
 bin/
 include/
 lib/
@@ -15,3 +16,10 @@ venv*/
 build/
 *.egg
 .env
+.ipynb_checkpoints
+.cache/
+tests/id_rsa
+*.DS_Store
+.mypy_cache/
+.pytest_cache/
+t.py

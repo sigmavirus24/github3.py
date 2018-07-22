@@ -1,3 +1,8 @@
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
 import pytest
 
 import requests
@@ -64,13 +69,13 @@ class TestGitHubSession:
             # Make sure we have a clean session to test with
             s = self.build_session()
             s.basic_auth(*auth)
-            assert s.auth != auth
+            assert s.auth != session.BasicAuth(*auth)
 
     def test_basic_login(self):
         """Test that basic auth will work with a valid combination"""
         s = self.build_session()
         s.basic_auth('username', 'password')
-        assert s.auth == ('username', 'password')
+        assert s.auth == session.BasicAuth('username', 'password')
 
     def test_basic_login_disables_token_auth(self):
         """Test that basic auth will remove the Authorization header.
@@ -80,9 +85,12 @@ class TestGitHubSession:
         """
         s = self.build_session()
         s.token_auth('token goes here')
-        assert 'Authorization' in s.headers
+        req = requests.Request('GET', 'https://api.github.com/')
+        pr = s.prepare_request(req)
+        assert 'token token goes here' == pr.headers['Authorization']
         s.basic_auth('username', 'password')
-        assert 'Authorization' not in s.headers
+        pr = s.prepare_request(req)
+        assert 'token token goes here' != pr.headers['Authorization']
 
     @mock.patch.object(requests.Session, 'request')
     def test_handle_two_factor_auth(self, request_mock):
@@ -131,7 +139,9 @@ class TestGitHubSession:
         """Test that token auth will work with a valid token"""
         s = self.build_session()
         s.token_auth('token goes here')
-        assert s.headers['Authorization'] == 'token token goes here'
+        req = requests.Request('GET', 'https://api.github.com/')
+        pr = s.prepare_request(req)
+        assert pr.headers['Authorization'] == 'token token goes here'
 
     def test_token_auth_disables_basic_auth(self):
         """Test that using token auth removes the value of the auth attribute.
@@ -141,15 +151,49 @@ class TestGitHubSession:
         s = self.build_session()
         s.auth = ('foo', 'bar')
         s.token_auth('token goes here')
-        assert s.auth is None
+        assert s.auth != ('foo', 'bar')
+        assert isinstance(s.auth, session.TokenAuth)
 
     def test_token_auth_does_not_use_falsey_values(self):
         """Test that token auth will not authenticate with falsey values"""
         bad_tokens = [None, '']
+        req = requests.Request('GET', 'https://api.github.com/')
         for token in bad_tokens:
             s = self.build_session()
             s.token_auth(token)
-            assert 'Authorization' not in s.headers
+            pr = s.prepare_request(req)
+            assert 'Authorization' not in pr.headers
+
+    def test_token_auth_with_netrc_works(self, tmpdir):
+        """
+        Test that token auth will be used instead of netrc.
+
+        With no auth specified, requests will use any matching auths
+        in .netrc/_netrc files
+        """
+        token = "my-valid-token"
+        s = self.build_session()
+        s.token_auth(token)
+
+        netrc_contents = (
+            "machine api.github.com\n"
+            "login sigmavirus24\n"
+            "password invalid_token_for_test_verification\n"
+        )
+        # cover testing netrc behaviour on different OSs
+        dotnetrc = tmpdir.join(".netrc")
+        dotnetrc.write(netrc_contents)
+        dashnetrc = tmpdir.join("_netrc")
+        dashnetrc.write(netrc_contents)
+
+        with mock.patch.dict('os.environ', {'HOME': str(tmpdir)}):
+            # prepare_request triggers reading of .netrc files
+            pr = s.prepare_request(
+                requests.Request(
+                    'GET', 'https://api.github.com/users/sigmavirus24')
+            )
+            auth_header = pr.headers['Authorization']
+            assert auth_header == 'token {0}'.format(token)
 
     def test_two_factor_auth_callback_handles_None(self):
         s = self.build_session()
@@ -167,7 +211,11 @@ class TestGitHubSession:
         s = self.build_session()
         assert s.two_factor_auth_cb is None
         # You have to have a sense of humor ;)
-        not_so_anonymous = lambda *args: 'foo'
+
+        def _not_so_anonymous(*args):
+            return 'foo'
+
+        not_so_anonymous = _not_so_anonymous
         s.two_factor_auth_callback(not_so_anonymous)
         assert s.two_factor_auth_cb is not_so_anonymous
 
@@ -190,29 +238,31 @@ class TestGitHubSession:
         s = self.build_session()
         s.basic_auth('foo', 'bar')
         with s.temporary_basic_auth('temp', 'pass'):
-            assert s.auth != ('foo', 'bar')
+            assert s.auth != session.BasicAuth('foo', 'bar')
 
-        assert s.auth == ('foo', 'bar')
+        assert s.auth == session.BasicAuth('foo', 'bar')
 
     def test_temporary_basic_auth_replaces_auth(self):
         """Test that temporary_basic_auth sets the proper credentials."""
         s = self.build_session()
         s.basic_auth('foo', 'bar')
         with s.temporary_basic_auth('temp', 'pass'):
-            assert s.auth == ('temp', 'pass')
+            assert s.auth == session.BasicAuth('temp', 'pass')
 
     def test_no_auth(self):
         """Verify that no_auth removes existing authentication."""
         s = self.build_session()
         s.basic_auth('user', 'password')
-        s.headers['Authorization'] = 'token foobarbogus'
+        req = requests.Request('GET', 'https://api.github.com/')
 
         with s.no_auth():
-            assert 'Authentication' not in s.headers
+            pr = s.prepare_request(req)
+            assert 'Authorization' not in pr.headers
             assert s.auth is None
 
-        assert s.headers['Authorization'] == 'token foobarbogus'
-        assert s.auth == ('user', 'password')
+        pr = s.prepare_request(req)
+        assert 'Authorization' in pr.headers
+        assert s.auth == session.BasicAuth('user', 'password')
 
     def test_retrieve_client_credentials_when_set(self):
         """Test that retrieve_client_credentials will return the credentials.
@@ -231,3 +281,14 @@ class TestGitHubSession:
         """
         s = self.build_session()
         assert s.retrieve_client_credentials() == (None, None)
+
+    def test_pickling(self):
+        s = self.build_session('https://api.github.com')
+        dumped = pickle.dumps(s, pickle.HIGHEST_PROTOCOL)
+        loaded = pickle.loads(dumped)
+
+        assert hasattr(loaded, 'base_url')
+        assert hasattr(loaded, 'two_factor_auth_cb')
+
+        assert loaded.base_url == s.base_url
+        assert loaded.two_factor_auth_cb == s.two_factor_auth_cb

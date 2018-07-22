@@ -1,0 +1,29 @@
+0.7.0: 2013-05-19
+-----------------
+
+- Fix ``Issue.close``, ``Issue.reopen``, and ``Issue.assign``. (Issue #106)
+
+- Add ``check_authorization`` to the ``GitHub class`` to cover the `new part
+  of the API <http://developer.github.com/v3/oauth/#check-an-authorization>`_.
+
+- Add ``create_file``, ``update_file``, ``delete_file``,
+  ``iter_contributor_statistics``, ``iter_commit_activity``,
+  ``iter_code_frequency`` and ``weekly_commit_count`` to the ``Repository``
+  object.
+
+- Add ``update`` and ``delete`` methods to the ``Contents`` object.
+
+- Add ``is_following`` to the ``User`` object.
+
+- Add ``head``, ``base`` parameters to ``Repository.iter_pulls``.
+
+- The signature of ``Hook.edit`` has changed since that endpoint has changed
+  as well. See:
+  github/developer.github.com@b95f291a47954154a6a8cd7c2296cdda9b610164
+
+- ``github3.GitHub`` can now be used as a context manager, e.g.,
+
+  .. code-block:: python
+
+       with github.GitHub() as gh:
+           u = gh.user('sigmavirus24')

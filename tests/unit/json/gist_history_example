@@ -1,0 +1,28 @@
+{
+    "change_status": {
+        "additions": 1,
+        "deletions": 7,
+        "total": 8
+    },
+    "committed_at": "2012-10-02T00:04:49Z",
+    "url": "https://api.github.com/gists/3813862/8d6121ba316f3d07371183e526b5287474d81bcc",
+    "user": {
+        "avatar_url": "https://secure.gravatar.com/avatar/c148356d89f925e692178bee1d93acf7?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
+        "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}",
+        "followers_url": "https://api.github.com/users/sigmavirus24/followers",
+        "following_url": "https://api.github.com/users/sigmavirus24/following{/other_user}",
+        "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}",
+        "gravatar_id": "c148356d89f925e692178bee1d93acf7",
+        "html_url": "https://github.com/sigmavirus24",
+        "id": 240830,
+        "login": "sigmavirus24",
+        "organizations_url": "https://api.github.com/users/sigmavirus24/orgs",
+        "received_events_url": "https://api.github.com/users/sigmavirus24/received_events",
+        "repos_url": "https://api.github.com/users/sigmavirus24/repos",
+        "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions",
+        "type": "User",
+        "url": "https://api.github.com/users/sigmavirus24"
+    },
+    "version": "8d6121ba316f3d07371183e526b5287474d81bcc"
+}

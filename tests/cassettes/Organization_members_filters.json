@@ -1,0 +1,118 @@
+{
+    "http_interactions": [
+        {
+            "recorded_at": "2014-07-21T02:20:59",
+            "request": {
+                "body": {
+                    "encoding": "utf-8",
+                    "string": ""
+                },
+                "headers": {
+                    "Accept": "application/vnd.github.v3.full+json",
+                    "Accept-Charset": "utf-8",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Authorization": "Basic <BASIC_AUTH>",
+                    "Content-Type": "application/json",
+                    "User-Agent": "github3.py/1.0.0"
+                },
+                "method": "GET",
+                "uri": "https://api.github.com/orgs/github3py"
+            },
+            "response": {
+                "body": {
+                    "base64_string": "H4sIAAAAAAAAA52SPW/CMBCG/0rlOSROIFB5adcOVRekSl2iS3CMVce2bAdEEf+9ZxJKSie6Jed77+N570iUEVITRoQM276e2wNJiNwQlq8ei7xcJqR3Cp+3IVjPsgysTIfUtDFdZpzw2VTquDW+ukOTnRXYlO+4DvdJBwlqO97V3N0nHjXHbPg4YRnb10o21X+q/ZZOi8IOArhbJOegH1H2nrvG6IAAzlT7bKT/hENp6PjVn/RsECZZ0IdJWBoM12gmYbpXKkFfGwjSRGtfYSO90cnD+0vk3IFER4escezBA1b+IBDSB08YTUhrlDJ7hDv5kxrb4Ns2dOpmscltTM+icRwC31QQcJ6C5sWMlrNitaYLVpRsvvzAwXq7+ZWzmNHVrKDrfMkoZfMi5oSDjTDenAAtv4YFMWoCqMo6iVR5NS6D85m9xp5/45fIdUsE9Fn1HgRWz+kiElYKauMgmHH1WiqFi1cjPyJcCm2bQrRMpZ3UqTC7ZxHpRhPjOSlA/MeLg63jHKPeQoNd5nRVUJzxdrrT6Rvyb5wJlAMAAA==",
+                    "encoding": "utf-8",
+                    "string": ""
+                },
+                "headers": {
+                    "access-control-allow-credentials": "true",
+                    "access-control-allow-origin": "*",
+                    "access-control-expose-headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+                    "cache-control": "private, max-age=60, s-maxage=60",
+                    "content-encoding": "gzip",
+                    "content-security-policy": "default-src 'none'",
+                    "content-type": "application/json; charset=utf-8",
+                    "date": "Mon, 21 Jul 2014 02:20:58 GMT",
+                    "etag": "\"7a807b488b5268f40ea462dc5a957426\"",
+                    "last-modified": "Sun, 20 Jul 2014 16:00:32 GMT",
+                    "server": "GitHub.com",
+                    "status": "200 OK",
+                    "strict-transport-security": "max-age=31536000; includeSubdomains",
+                    "transfer-encoding": "chunked",
+                    "vary": "Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding",
+                    "x-content-type-options": "nosniff",
+                    "x-frame-options": "deny",
+                    "x-github-media-type": "github.v3; param=full; format=json",
+                    "x-github-request-id": "48A0C4D3:55C1:7111A9:53CC790A",
+                    "x-ratelimit-limit": "5000",
+                    "x-ratelimit-remaining": "4948",
+                    "x-ratelimit-reset": "1405911623",
+                    "x-served-by": "a8d8e492d6966f0c23dee2eed64c678a",
+                    "x-xss-protection": "1; mode=block"
+                },
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "url": "https://api.github.com/orgs/github3py"
+            }
+        },
+        {
+            "recorded_at": "2014-07-21T02:20:59",
+            "request": {
+                "body": {
+                    "encoding": "utf-8",
+                    "string": ""
+                },
+                "headers": {
+                    "Accept": "application/vnd.github.v3.full+json",
+                    "Accept-Charset": "utf-8",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Authorization": "Basic <BASIC_AUTH>",
+                    "Content-Type": "application/json",
+                    "User-Agent": "github3.py/1.0.0"
+                },
+                "method": "GET",
+                "uri": "https://api.github.com/orgs/github3py/members?per_page=100&filter=2fa_disabled"
+            },
+            "response": {
+                "body": {
+                    "base64_string": "H4sIAAAAAAAAA62TXW+CMBSG/wvXxspHFbzZr9jVsphSDtgMKWkLxhH/+07FbJYtxjKvIKTPe14OPG9DUMtKNME2AM24gQ/N8mARiCLYrtOMZuEiYD0zTO06VeOpvTGt3hIyPtTLSph9l3caFJeNgcYsuTyQjozwC0ZV6hpgM4MVUAijgvKkTDOAJKbRpkxXrKAJBZrHCEwGteI6ZEzGSZo4XffmUE/aja0ugHO0lHUtj5gwfZv7Q8g3h/XGe9FUszKQG4g0e8CF4quc7YKENr6FLsxA7GUnCpui8RspKDxLXSmsdGywzUAUtPIS1+WaK9EaIRvfcg6LWVJVrBGfbE4WshojbC3fGhcGWejxt/SFR2ggrRI94ye7EgUcRI8rnhU4oTHPnFpAI17xN7ALFwZ2rDhYF0tWazgvftzUojqwXqhORwmetSZFySqNVzPtHOHfdvIwSWO6LtKszCIK6ywKN2kOEBZZzHi5wdkP2Dlpe9/PyWEvQ2/Z+Y7+kfIfS524f3nqJD3PVDf21nP8vN6uOmm+tjqwv68O/hxjJ40c4x9w9v0LOH8telEHAAA=",
+                    "encoding": "utf-8",
+                    "string": ""
+                },
+                "headers": {
+                    "access-control-allow-credentials": "true",
+                    "access-control-allow-origin": "*",
+                    "access-control-expose-headers": "ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+                    "cache-control": "private, max-age=60, s-maxage=60",
+                    "content-encoding": "gzip",
+                    "content-security-policy": "default-src 'none'",
+                    "content-type": "application/json; charset=utf-8",
+                    "date": "Mon, 21 Jul 2014 02:20:58 GMT",
+                    "etag": "\"b9889daf1e146f0dc5ac6d7f9852a69a\"",
+                    "server": "GitHub.com",
+                    "status": "200 OK",
+                    "strict-transport-security": "max-age=31536000; includeSubdomains",
+                    "transfer-encoding": "chunked",
+                    "vary": "Accept, Authorization, Cookie, X-GitHub-OTP, Accept-Encoding",
+                    "x-content-type-options": "nosniff",
+                    "x-frame-options": "deny",
+                    "x-github-media-type": "github.v3; param=full; format=json",
+                    "x-github-request-id": "48A0C4D3:55C1:7111DD:53CC790A",
+                    "x-ratelimit-limit": "5000",
+                    "x-ratelimit-remaining": "4947",
+                    "x-ratelimit-reset": "1405911623",
+                    "x-served-by": "88d924ed861736d2749ce1a55766cb53",
+                    "x-xss-protection": "1; mode=block"
+                },
+                "status": {
+                    "code": 200,
+                    "message": "OK"
+                },
+                "url": "https://api.github.com/orgs/github3py/members?per_page=100"
+            }
+        }
+    ],
+    "recorded_with": "betamax/{version}"
+}

@@ -61,7 +61,7 @@ Guidelines for Contributing to github3.py
 .. _easy: https://github.com/sigmavirus24/github3.py/issues?labels=Easy&page=1&state=open
 .. _Pair with Ian: https://github.com/sigmavirus24/github3.py/issues?labels=Pair+with+Ian&page=1&state=open
 .. _AUTHORS.rst: ./AUTHORS.rst
-.. _cordial: http://kennethreitz.com/be-cordial-or-be-on-your-way.html
+.. _cordial: http://www.kennethreitz.org/essays/be-cordial-or-be-on-your-way
 .. _pep-0008: http://www.python.org/dev/peps/pep-0008/
 .. _docstrings: http://www.python.org/dev/peps/pep-0257/
 .. _flake8: http://pypi.python.org/pypi/flake8

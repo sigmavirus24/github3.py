@@ -1,0 +1,23 @@
+0.2.0: 2012-11-21
+-----------------
+
+- MAJOR API CHANGES:
+
+  - ``GitHub.iter_subscribed`` --> ``GitHub.iter_subscriptions``
+
+  - Broken ``list_*`` functions in github3.api have been renamed to the correct
+    ``iter_*`` methods on ``GitHub``.
+
+  - Removed ``list_*`` functions from ``Repository``, ``Gist``,
+    ``Organization``, and ``User`` objects
+
+- Added zen of GitHub method.
+
+- More tests
+
+- Changed the way ``Repository.edit`` works courtesy of Kristian Glass
+  (@doismellburning)
+
+- Changed ``Repository.contents`` behaviour when acting on a 404.
+
+- 50% test coverage via mock tests

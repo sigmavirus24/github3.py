@@ -1,12 +1,16 @@
 Development Lead
 ----------------
 
-- Ian Cordasco <graffatcolmingov@gmail.com>
+- Ian Stapleton Cordasco <graffatcolmingov@gmail.com>
+
+- Matt Chung (@itsmemattchung)
 
 Maintainer(s)
 `````````````
 
 - Barry Morrison (@esacteksab)
+
+- Matt Chung (@itsmemattchung)
 
 Requests
 ````````
@@ -80,3 +84,83 @@ Contributors
 - Marc Abramowitz (@msabramo)
 
 - Adrian Moisey (@adrianmoisey)
+
+- Bryce Boe (@bboe)
+
+- Ryan Weald (@rweald)
+
+- Lars Holm Nielsen (@larshankat)
+
+- Ryan Pitts (@ryanpitts)
+
+- Jürgen Hermann (@jhermann)
+
+- Antoine Giraudmaillet (@antoine-g)
+
+- Paulus Schoutsen (@balloob)
+
+- Nolan Bruabker (@nrb)
+
+- Marcin Wielgoszewski (@mwielgoszewski)
+
+- Omri Harel (@omriharel)
+
+- Noel Lee (@noellee)
+
+- Sourav Singh(@souravsingh)
+
+- Matt Chung (@itsmemattchung)
+
+- Martin Ek (@ekmartin)
+
+- Chris Thompson (@notyetsecure)
+
+- Bastien Gandouet (@b4stien)
+
+- Usman Ehtesham Gul (@ueg1990)
+
+- Derek Gustafson (@degustaf)
+
+- Christophe Lecointe (@christophelec)
+
+- Abhijeet Kasurde (@akasurde)
+
+- Matthew Krueger (@mlkrueger1987)
+
+- Dejan Svetec (@dsvetec)
+
+- Billy Keyes (@bluekeyes)
+
+- Evan Borgstrom (@borgstrom)
+
+- Jordan Moldow (@jmoldow)
+
+- Goodwillcoding (@goodwillcoding)
+
+- Andreas Backx (@AndreasBackx)
+
+- Alexander Koshelev <daevaorn@gmail.com>
+
+- Gabi Davar (@mindw)
+
+- Björn Kautler (@Vampire)
+
+- David Prothero (@dprothero)
+
+- Jesse Keating (@omgjlk)
+
+- @rco-ableton
+
+- Mark Troyer (@discogestalt)
+
+- Becca James (@beccasjames)
+
+- Walid Ziouche (@01walid)
+
+- Katie Bell (@katharosada)
+
+- Jeff Quast (@jquast)
+
+- Hal Wine (@hwine)
+
+- Jacopo Notarstefano (@jacquerie)

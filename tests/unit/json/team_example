@@ -1,0 +1,20 @@
+{
+  "id": 1,
+  "url": "https://api.github.com/teams/1",
+  "name": "Justice League",
+  "slug": "justice-league",
+  "description": "A great team.",
+  "privacy": "closed",
+  "permission": "admin",
+  "members_url": "https://api.github.com/teams/1/members{/member}",
+  "repositories_url": "https://api.github.com/teams/1/repos",
+  "members_count": 3,
+  "repos_count": 10,
+  "organization": {
+    "login": "github",
+    "id": 1,
+    "url": "https://api.github.com/orgs/github",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "description": "A great organization"
+  }
+}

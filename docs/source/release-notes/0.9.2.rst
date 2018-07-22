@@ -1,0 +1,15 @@
+0.9.2: 2014-10-05
+-----------------
+
+- Updates for `new team management`_ API changes
+
+  - Add ``Team#invite``, ``Team#membership_for``, and
+    ``Team#revoke_membership``
+
+  - Deprecate ``Team#add_member``, ``Team#remove_member``, and
+    ``Organization#add_member``.
+
+  - Update payload handler for ``TeamAddEvent``.
+
+.. _new team management:
+    https://developer.github.com/changes/2014-09-23-one-more-week-before-the-add-team-member-api-breaking-change/

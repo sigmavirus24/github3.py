@@ -1,0 +1,45 @@
+0.8.0: 2014-01-03
+-----------------
+
+- **Breaking Change** Remove legacy search API
+
+  I realize this should have been scheduled for 1.0 but I was a bit eager to
+  remove this.
+
+- Use Betamax to start recording integration tests
+
+- Add support for Releases API
+
+- Add support for Feeds API
+
+- Add support for Two-Factor Authentication via the API
+
+- Add support for New Search API
+
+  - Add ``github3.search_code``, ``github3.search_issues``,
+    ``github3.search_repositories``, ``github3.search_users``
+
+  - Add ``GitHub#search_code``, ``GitHub#search_issues``,
+    ``GitHub#search_repositories``, ``GitHub#search_users``
+
+- Switch to requests >= 2.0
+
+- Totally remove all references to the Downloads API
+
+- Fix bug in ``Repository#update_file`` where ``branch`` was not being sent to
+  the API. Thanks @tpetr!
+
+- Add ``GitHub#rate_limit`` to return all of the information from the
+  ``/rate_limit`` endpoint.
+
+- Catch missing attributes -- ``diff_hunk``, ``original_commit_id`` -- on
+  ``ReviewComment``.
+
+- Add support for the Emojis endpoint
+
+- Note deprecation of a few object attributes
+
+- Add support for the ``ReleaseEvent``
+
+- Add ``GitHub#iter_user_teams`` to return all of the teams the authenticated
+  user belongs to

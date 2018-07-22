@@ -1,0 +1,81 @@
+{
+  "url": "https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a",
+  "forks_url": "https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a/forks",
+  "commits_url": "https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a/commits",
+  "id": "e20f1e6c9ca010cabc523a7356217f5a",
+  "git_pull_url": "https://gist.github.com/e20f1e6c9ca010cabc523a7356217f5a.git",
+  "git_push_url": "https://gist.github.com/e20f1e6c9ca010cabc523a7356217f5a.git",
+  "html_url": "https://gist.github.com/e20f1e6c9ca010cabc523a7356217f5a",
+  "files": {
+    ".gertty.yaml": {
+      "filename": ".gertty.yaml",
+      "type": "text/x-yaml",
+      "language": "YAML",
+      "raw_url": "https://gist.githubusercontent.com/sigmavirus24/e20f1e6c9ca010cabc523a7356217f5a/raw/0e8bfa0d58f40c153ec1c8762ad48b8f5bc4be72/.gertty.yaml",
+      "size": 1022,
+      "truncated": false,
+      "content": "palettes:\n  - name: solarized\n    comment: ['dark blue', '']\n    comment-name: ['white,bold', '']\n    context-button: ['white,bold', '']\n    filename: ['light gray', '']\n    focused-filename: ['light magenta', '']\n    focused: ['black', 'light gray']\n    focused-added-line: ['light gray', 'dark green']\n    focused-added-word: ['white', 'dark gray']\n    focused-context-button: ['dark magenta,bold', '']\n    focused-removed-line: ['light gray', 'dark red']\n    focused-line-number: ['dark gray', 'light gray']\n    focused-link: ['light gray', 'dark blue']\n    focused-unsubscribed-project: ['light magenta,bold', 'white']\n    focused-reviewed-change: ['white,bold', 'dark magenta']\n    focused-starred-change: ['white,bold', 'dark blue']\n    footer: ['brown', '']\n    line-number: ['light gray', '']\n    reviewed-change: ['dark magenta', '']\n    starred-change: ['dark green', '']\n    test-SUCCESS: ['dark green', '']\n    test-FAILURE: ['light red', '']\n    unsubscribed-project: ['light magenta', '']\n\npalette: solarized"
+    }
+  },
+  "public": true,
+  "created_at": "2016-12-15T16:52:48Z",
+  "updated_at": "2016-12-15T16:52:48Z",
+  "description": "Solarized palette for gertty",
+  "comments": 0,
+  "user": null,
+  "comments_url": "https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a/comments",
+  "owner": {
+    "login": "sigmavirus24",
+    "id": 240830,
+    "avatar_url": "https://avatars3.githubusercontent.com/u/240830?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/sigmavirus24",
+    "html_url": "https://github.com/sigmavirus24",
+    "followers_url": "https://api.github.com/users/sigmavirus24/followers",
+    "following_url": "https://api.github.com/users/sigmavirus24/following{/other_user}",
+    "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions",
+    "organizations_url": "https://api.github.com/users/sigmavirus24/orgs",
+    "repos_url": "https://api.github.com/users/sigmavirus24/repos",
+    "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/sigmavirus24/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "forks": [
+
+  ],
+  "history": [
+    {
+      "user": {
+        "login": "sigmavirus24",
+        "id": 240830,
+        "avatar_url": "https://avatars3.githubusercontent.com/u/240830?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/sigmavirus24",
+        "html_url": "https://github.com/sigmavirus24",
+        "followers_url": "https://api.github.com/users/sigmavirus24/followers",
+        "following_url": "https://api.github.com/users/sigmavirus24/following{/other_user}",
+        "gists_url": "https://api.github.com/users/sigmavirus24/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/sigmavirus24/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/sigmavirus24/subscriptions",
+        "organizations_url": "https://api.github.com/users/sigmavirus24/orgs",
+        "repos_url": "https://api.github.com/users/sigmavirus24/repos",
+        "events_url": "https://api.github.com/users/sigmavirus24/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/sigmavirus24/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "version": "52c245f17cac4be831ac7c7bd441e94bb7992bd2",
+      "committed_at": "2016-12-15T16:52:48Z",
+      "change_status": {
+        "total": 26,
+        "additions": 26,
+        "deletions": 0
+      },
+      "url": "https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a/52c245f17cac4be831ac7c7bd441e94bb7992bd2"
+    }
+  ],
+  "truncated": false
+}

@@ -5,7 +5,7 @@ from .helper import IntegrationHelper
 
 class TestAPI(IntegrationHelper):
     def get_client(self):
-        return github3.gh
+        return github3.api.gh
 
     def test_emojis(self):
         """Test the ability to use the /emojis endpoint"""
@@ -40,7 +40,7 @@ class TestAPI(IntegrationHelper):
         cassette_name = self.cassette_name('search_issues',
                                            cls='GitHub')
         with self.recorder.use_cassette(cassette_name):
-            issues = self.gh.search_issues('github3 labels:bugs')
+            issues = self.gh.search_issues('github3 label:Bug')
             assert isinstance(next(issues),
                               github3.search.IssueSearchResult)
 

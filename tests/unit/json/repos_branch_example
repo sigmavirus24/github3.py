@@ -1,0 +1,83 @@
+{
+  "name": "master",
+  "commit": {
+    "sha": "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+    "commit": {
+      "url": "https://api.github.com/repos/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+      "author": {
+        "name": "The Octocat",
+        "date": "2012-03-06T15:06:50-08:00",
+        "email": "octocat@nowhere.com"
+      },
+      "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+      "message": "Merge pull request #6 from Spaceghost/patch-1\n\nNew line at end of file.",
+      "tree": {
+        "sha": "b4eecafa9be2f2006ce1b709d6857b07069b4608",
+        "url": "https://api.github.com/repos/octocat/Hello-World/git/trees/b4eecafa9be2f2006ce1b709d6857b07069b4608"
+      },
+      "committer": {
+        "name": "The Octocat",
+        "date": "2012-03-06T15:06:50-08:00",
+        "email": "octocat@nowhere.com"
+      }
+    },
+    "author": {
+      "avatar_url": "https://avatars.githubusercontent.com/u/1?",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "gravatar_id": "60164d729bafa8c81e373fc2d00efb9c",
+      "html_url": "https://github.com/octocat",
+      "id": 1,
+      "login": "octocat",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "site_admin": false,
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "type": "User",
+      "url": "https://api.github.com/users/octocat"
+    },
+    "parents": [
+      {
+        "sha": "553c2077f0edc3d5dc5d17262f6aa498e69d6f8e",
+        "url": "https://api.github.com/repos/octocat/Hello-World/commits/553c2077f0edc3d5dc5d17262f6aa498e69d6f8e"
+      },
+      {
+        "sha": "762941318ee16e59dabbacb1b4049eec22f0d303",
+        "url": "https://api.github.com/repos/octocat/Hello-World/commits/762941318ee16e59dabbacb1b4049eec22f0d303"
+      }
+    ],
+    "url": "https://api.github.com/repos/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+    "html_url": "https://github.com/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d",
+    "comments_url": "https://api.github.com/repos/octocat/Hello-World/commits/7fd1a60b01f91b314f59955a4e4d4e80d8edf11d/comments",
+    "committer": {
+      "avatar_url": "https://avatars.githubusercontent.com/u/1?",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "gravatar_id": "60164d729bafa8c81e373fc2d00efb9c",
+      "html_url": "https://github.com/octocat",
+      "id": 1,
+      "login": "octocat",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "site_admin": false,
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "type": "User",
+      "url": "https://api.github.com/users/octocat"
+    }
+  },
+  "_links": {
+    "html": "https://github.com/octocat/Hello-World/tree/master",
+    "self": "https://api.github.com/repos/octocat/Hello-World/branches/master"
+  },
+  "protected": true,
+  "protection": {"enabled": true, "required_status_checks": {"enforcement_level": "non_admins", "contexts": ["continuous-integration/travis-ci"]}},
+  "protection_url": "https://api.github.com/repos/octocat/Hello-World/branches/master/protection"
+}
