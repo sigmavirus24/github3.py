@@ -25,3 +25,29 @@ class TestBranch(helper.UnitHelper):
             url_for(),
             headers=headers
         )
+
+    def test_protect(self):
+        """Verify the request to patch protection with protect"""
+        headers ={
+            'Accept': 'application/vnd.github.loki-preview+json'
+        }
+
+
+        self.instance.protect()
+        self.session.patch.assert_called_once_with(
+            url_for(),
+            headers=headers
+        )
+
+    def test_unprotect(self):
+        """Verify the request to patch protection with unprotect"""
+        headers ={
+            'Accept': 'application/vnd.github.loki-preview+json'
+        }
+    
+
+        self.instance.unprotect()
+        self.session.patch.assert_called_once_with(
+            url_for(),
+            headers=headers
+        )
