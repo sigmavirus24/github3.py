@@ -963,7 +963,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.Project`
         """
-        url = self._build_url('projects', id, base_url=self._github_url)
+        url = self._build_url('projects', id)
         json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(Project, json)
 

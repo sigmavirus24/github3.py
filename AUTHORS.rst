@@ -168,3 +168,5 @@ Contributors
 - Taylor Edmiston (@tedmiston)
 
 - Jenny Li (@imjennyli)
+
+- Chandan Singh (@cs-shadow)
