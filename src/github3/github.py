@@ -71,6 +71,28 @@ class GitHub(models.GitHubCore):
         return '<Anonymous GitHub at 0x{0:x}>'.format(id(self))
 
     @requires_auth
+    def activate_membership(self, organization):
+        """Activate the membership to an organization.
+
+        :param organization:
+            the organization or organization login for which to activate the
+            membership
+        :type organization:
+            str
+        :type organization:
+            :class:`~github3.orgs.Organization`
+        :returns:
+            the activated membership
+        :rtype:
+            :class:`~github3.orgs.Membership`
+        """
+        organization_name = getattr(organization, 'login', organization)
+        url = self._build_url('user', 'memberships', 'orgs', organization_name)
+        data = {'state': 'active'}
+        _json = self._json(self._patch(url, data=json.dumps(data)), 200)
+        return self._instance_or_null(orgs.Membership, _json)
+
+    @requires_auth
     def add_email_addresses(self, addresses=[]):
         """Add the addresses to the authenticated user's account.
 
