@@ -58,6 +58,15 @@ class TestPullRequest(IntegrationHelper):
             )
         assert isinstance(comment, github3.pulls.ReviewComment)
 
+    def test_create_review_requests(self):
+        """Show that a user can create review requests on a PR."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_review_requests')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=873)
+            pull_request = p.create_review_requests(reviewers=['sigmavirus24'])
+        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
+
     def test_create_review(self):
         """Verify the request to create a pending review on a PR."""
         self.token_login()
@@ -69,6 +78,14 @@ class TestPullRequest(IntegrationHelper):
                 event='COMMENT',
             )
         assert isinstance(comment, github3.pulls.PullReview)
+
+    def test_delete_review_requests(self):
+        """Show that a user can delete review requests on a PR."""
+        self.token_login()
+        cassette_name = self.cassette_name('delete_review_requests')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=873)
+            assert p.delete_review_requests(reviewers=['sigmavirus24']) is True
 
     def test_diff(self):
         """Show that one can retrieve a bytestring diff of a PR."""
@@ -147,6 +164,14 @@ class TestPullRequest(IntegrationHelper):
             p = self.get_pull_request()
             for comment in p.review_comments():
                 assert isinstance(comment, github3.pulls.ReviewComment)
+
+    def test_review_requests(self):
+        """Show that one can retrieve the review requests of a PR."""
+        cassette_name = self.cassette_name('review_requests')
+        with self.recorder.use_cassette(cassette_name):
+            p = self.get_pull_request(num=873)
+            review_requests = p.review_requests()
+        assert isinstance(review_requests, github3.pulls.ReviewRequests)
 
     def test_update(self):
         """Show that one can update an open Pull Request."""

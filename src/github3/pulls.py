@@ -194,6 +194,7 @@ class _PullRequest(models.GitHubCore):
     class_name = '_PullRequest'
 
     def _update_attributes(self, pull):
+        from . import orgs
         self._api = pull['url']
         self.assignee = pull['assignee']
         if self.assignee is not None:
@@ -217,6 +218,12 @@ class _PullRequest(models.GitHubCore):
         self.merged_at = self._strptime(pull['merged_at'])
         self.number = pull['number']
         self.patch_url = pull['patch_url']
+        requested_reviewers = pull.get('requested_reviewers', [])
+        self.requested_reviewers = [
+            users.ShortUser(r, self) for r in requested_reviewers]
+        requested_teams = pull.get('requested_teams', [])
+        self.requested_teams = [
+            orgs.ShortTeam(t, self) for t in requested_teams]
         self.review_comment_urlt = URITemplate(pull['review_comment_url'])
         self.review_comments_url = pull['review_comments_url']
         self.repository = None
@@ -287,6 +294,29 @@ class _PullRequest(models.GitHubCore):
         return self._instance_or_null(ReviewComment, json)
 
     @requires_auth
+    def create_review_requests(self, reviewers=None, team_reviewers=None):
+        """Ask for reviews on this pull request.
+
+        :param list reviewers:
+            The users to which request a review
+        :param list team_reviewers:
+            The teams to which request a review
+        :returns:
+            The pull request on which the reviews were requested
+        :rtype:
+            :class:`~github3.pulls.ShortPullRequest`
+        """
+        url = self._build_url('requested_reviewers', base_url=self._api)
+        data = {}
+        if reviewers is not None:
+            data['reviewers'] = [getattr(r, 'login', r) for r in reviewers]
+        if team_reviewers is not None:
+            data['team_reviewers'] = [
+                getattr(t, 'slug', t) for t in team_reviewers]
+        json = self._json(self._post(url, data=data), 201)
+        return self._instance_or_null(ShortPullRequest, json)
+
+    @requires_auth
     def create_review(self, body, commit_id=None, event=None, comments=None):
         """Create a review comment on this pull request.
 
@@ -333,6 +363,28 @@ class _PullRequest(models.GitHubCore):
             data['event'] = event
         json = self._json(self._post(url, data=data), 200)
         return self._instance_or_null(PullReview, json)
+
+    @requires_auth
+    def delete_review_requests(self, reviewers=None, team_reviewers=None):
+        """Cancel review requests on this pull request.
+
+        :param list reviewers:
+            The users whose review is no longer requested
+        :param list team_reviewers:
+            The teams whose review is no longer requested
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url('requested_reviewers', base_url=self._api)
+        data = {}
+        if reviewers is not None:
+            data['reviewers'] = [getattr(r, 'login', r) for r in reviewers]
+        if team_reviewers is not None:
+            data['team_reviewers'] = [
+                getattr(t, 'slug', t) for t in team_reviewers]
+        return self._boolean(self._delete(url, data=dumps(data)), 200, 404)
 
     def diff(self):
         """Return the diff.
@@ -494,6 +546,18 @@ class _PullRequest(models.GitHubCore):
         """
         url = self._build_url('comments', base_url=self._api)
         return self._iter(int(number), url, ReviewComment, etag=etag)
+
+    def review_requests(self):
+        """Retrieve the review requests associated with this pull request.
+
+        :returns:
+            review requests associated with this pull request
+        :rtype:
+            :class:`~github3.pulls.ReviewRequests`
+        """
+        url = self._build_url('requested_reviewers', base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(ReviewRequests, json)
 
     def reviews(self, number=-1, etag=None):
         """Iterate over the reviews associated with this pull request.
@@ -747,6 +811,16 @@ class ShortPullRequest(_PullRequest):
 
         A :class:`~github3.repos.repo.ShortRepository` from the :attr:`base`
         instance.
+
+    .. attribute:: requested_reviewers
+
+        A list of :class:`~github3.users.ShortUser` from which a review was
+        requested.
+
+    .. attribute:: requested_teams
+
+       A list of :class:`~github3.orgs.ShortTeam` from which a review was
+       requested.
 
     .. attribute:: review_comment_urlt
 
@@ -1037,3 +1111,29 @@ class ReviewComment(models.GitHubCore):
             'body': body, 'in_reply_to': in_reply_to
         }), 201)
         return self._instance_or_null(ReviewComment, json)
+
+
+class ReviewRequests(models.GitHubCore):
+    """Object representing review requests in the GitHub API.
+
+    .. attribute:: teams
+
+        The list of teams that were requested a review
+
+    .. attribute:: users
+
+        The list of users that were requested a review
+
+    Please see GitHub's `Review Request Documentation`_ for more information.
+
+    .. _Review Request Documentation:
+       https://developer.github.com/v3/pulls/review_requests/
+    """
+    def _update_attributes(self, requests):
+        from . import orgs
+        self.teams = [orgs.ShortTeam(t, self) for t in requests['teams']]
+        self.users = [users.ShortUser(u, self) for u in requests['users']]
+
+    def _repr(self):
+        return '<Review Requests [users: {0}, teams: {1}]>'.format(
+            len(self.users), len(self.teams))

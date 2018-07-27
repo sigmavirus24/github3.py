@@ -65,6 +65,15 @@ class TestPullRequest(helper.UnitHelper):
             }
         )
 
+    def test_create_review_requests(self):
+        """Verify the request to ask for reviews on a PR."""
+        self.instance.create_review_requests(reviewers=['sigmavirus24'])
+
+        self.session.post.assert_called_once_with(
+            url_for('requested_reviewers'),
+            '{"reviewers": ["sigmavirus24"]}'
+        )
+
     def test_create_review(self):
         """Verify the request to create a review on a PR."""
         self.instance.create_review('body', 'sha', 'APPROVED')
@@ -77,6 +86,15 @@ class TestPullRequest(helper.UnitHelper):
                 'event': 'APPROVED',
                 'comments': [],
             }
+        )
+
+    def test_delete_review_requests(self):
+        """Verify the request to cancel review requests on a PR."""
+        self.instance.delete_review_requests(reviewers=['sigmavirus24'])
+
+        self.session.delete.assert_called_once_with(
+            url_for('requested_reviewers'),
+            data='{"reviewers": ["sigmavirus24"]}'
         )
 
     def test_diff(self):
@@ -143,6 +161,14 @@ class TestPullRequest(helper.UnitHelper):
             }
         )
 
+    def test_review_requests(self):
+        """Verify the request to fetch the review requests from a PR."""
+        self.instance.review_requests()
+
+        self.session.get.assert_called_once_with(
+            url_for('requested_reviewers')
+        )
+
     def test_update(self):
         """Show that a user can update a Pull Request."""
         self.instance.update('my new title',
@@ -201,6 +227,14 @@ class TestPullRequestRequiresAuthentication(
         """Show that you must be authenticated to close a Pull Request."""
         with pytest.raises(GitHubError):
             self.instance.create_review_comment('', '', '', 1)
+
+    def test_create_review_requests(self):
+        """Show that you must be authenticated to ask for reviews."""
+        self.assert_requires_auth(self.instance.create_review_requests)
+
+    def test_delete_review_requests(self):
+        """Show that you must be authenticated to cancel review requests."""
+        self.assert_requires_auth(self.instance.delete_review_requests)
 
     def test_merge(self):
         """Show that you must be authenticated to merge a Pull Request."""
