@@ -1,6 +1,6 @@
 0.8.1: 2014-01-26
 -----------------
 
-- Add documentation for using Two Factor Authentication
+- Add documentation for using Two-factor Authentication
 
 - Fix oversight where ``github3.login`` could not be used for 2FA

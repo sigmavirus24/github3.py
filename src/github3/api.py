@@ -72,7 +72,7 @@ def login(username=None, password=None, token=None, two_factor_callback=None):
     :param str password: password for the login
     :param str token: OAuth token
     :param func two_factor_callback: (optional), function you implement to
-        provide the Two Factor Authentication code to GitHub when necessary
+        provide the Two-factor Authentication code to GitHub when necessary
     :returns: :class:`GitHub <github3.github.GitHub>`
 
     """
@@ -100,7 +100,7 @@ def enterprise_login(username=None, password=None, token=None, url=None,
     :param str token: OAuth token
     :param str url: URL of a GitHub Enterprise instance
     :param func two_factor_callback: (optional), function you implement to
-        provide the Two Factor Authentication code to GitHub when necessary
+        provide the Two-factor Authentication code to GitHub when necessary
     :returns: :class:`GitHubEnterprise <github3.github.GitHubEnterprise>`
 
     """

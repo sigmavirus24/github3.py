@@ -953,7 +953,7 @@ class GitHub(models.GitHubCore):
         :param str token:
             OAuth token
         :param func two_factor_callback:
-            (optional), function you implement to provide the Two Factor
+            (optional), function you implement to provide the Two-factor
             Authentication code to GitHub when necessary
         """
         if username and password:
