@@ -1,7 +1,7 @@
 1.1.0: 2018-04-09
 -----------------
 
-This is a small release with some enhancments.
+This is a small release with some enhancements.
 
 Features Added
 ``````````````
@@ -12,7 +12,7 @@ Features Added
   result in a full ``users.User`` object.
 
 - The call to iterate collaborators of a repository
-  (``Repsitory#collaborators``) can now take an ``affiliation`` filter with
+  (``Repository#collaborators``) can now take an ``affiliation`` filter with
   options of ``outside``, ``direct``, and ``all``. The default is ``all``,
   which preserves the previous behavior of this method.
 

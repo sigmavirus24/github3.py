@@ -24,9 +24,9 @@ where necessary.
 Logging into GitHub using github3.py
 ------------------------------------
 
-Once you've ipmorted the module, you can get started using the API. It's
+Once you've imported the module, you can get started using the API. It's
 recommended that you authenticate with GitHub to avoid running into `their
-ratelimits`_. To do so you have a few options.
+rate limits`_. To do so you have a few options.
 
 First, you can use your username and password. We advise you not to type your
 password into your shell or python console directly as others can view that
@@ -76,7 +76,7 @@ GitHub has long supported the use of a second-factor authentication (a.k.a,
 2FA) mechanism for logging in. This provides some extra security, especially
 around administrative actions on the website. If you choose to login with
 simply your username and password and you have to provide github3.py with a
-mechanism for obtaining your token and providing it to Github.
+mechanism for obtaining your token and providing it to GitHub.
 
 An example mechanism is as follows:
 
@@ -104,7 +104,7 @@ almost certainly want to obtain an access token.
 
 
 .. links
-.. _their ratelimits:
+.. _their rate limits:
     https://developer.github.com/v3/#rate-limiting
 .. _generate an access token:
     https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/

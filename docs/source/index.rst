@@ -116,7 +116,7 @@ and feel free to take one.
 Running the Unittests
 ---------------------
 
-The tests are generally run using tox. Tox can be installed lke so
+The tests are generally run using tox. Tox can be installed like so
 
 .. code-block:: console
 

@@ -34,7 +34,7 @@ Testing
 
 You can run either ``pip install -r dev-requirements.txt`` to install the 
 following before testing or simply ``make test-deps``. It is suggested you do 
-this in a virtual enviroment. These need to be installed for the tests to run.
+this in a virtual environment. These need to be installed for the tests to run.
 
 - betamax_
 - coverage_ by Ned Batchelder
@@ -75,9 +75,9 @@ Ian Stapleton Cordasco (sigmavirus24)
 Contact Options
 ---------------
 
-- Feel free to use the `github3.py`_ tag on StackOverflow for any questions 
+- Feel free to use the `github3.py`_ tag on Stack Overflow for any questions 
   you may have
-- If you dislike StackOverflow it is preferred that you send an email to 
+- If you dislike Stack Overflow it is preferred that you send an email to 
   github3.py@librelist.com
 - You may also contact (via email) the author directly with 
   questions/suggestions/comments or if you wish to include sensitive data.

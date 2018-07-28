@@ -59,7 +59,7 @@ What you should see
 
     Thanks Octocat, that means a lot coming from you.
     FIN.
-    Epilog:
+    Epilogue:
         The preceding conversation was entirely fictional. If you didn't realize
         that, you need to get out more. And yes, I did just have a
         conversation with an API. Cool, no? (Sad too, I guess.)

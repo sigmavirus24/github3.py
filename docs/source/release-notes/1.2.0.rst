@@ -1,7 +1,7 @@
 1.2.0: unreleased
 -----------------
 
-This is a small release with some enhancments.
+This is a small release with some enhancements.
 
 Features Added
 ``````````````

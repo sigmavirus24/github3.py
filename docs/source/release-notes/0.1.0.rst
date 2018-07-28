@@ -8,7 +8,7 @@
 
 - Handle 500 errors better, courtesy of Kristian Glass (@doismellburning)
 
-- Handle sending json with ``%`` symbols better, courtesy of Kristian Glass
+- Handle sending JSON with ``%`` symbols better, courtesy of Kristian Glass
 
 - Correctly handle non-GitHub committers and authors courtesy of Paul Swartz
   (@paulswartz)
