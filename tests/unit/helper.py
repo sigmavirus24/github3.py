@@ -259,13 +259,6 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
             func(*args, **kwargs)
 
 
-class UnitGitHubObjectHelper(UnitHelper):
-    """Base class for GitHubObject unit tests."""
-    # TODO(sigmavirus24): delete me
-
-    pass
-
-
 @pytest.mark.usefixtures('enterprise_url')
 class UnitGitHubEnterpriseHelper(UnitHelper):
 
