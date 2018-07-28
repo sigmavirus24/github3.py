@@ -250,7 +250,7 @@ cassette file to the repository, like so:
 Recording Cassettes that Require Authentication/Authorization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you need to write a test that requires an Authorization (i.e., oAuth token)
+If you need to write a test that requires an Authorization (i.e., OAuth token)
 or Authentication (i.e., username and password), all you need to do is set
 environment variables when running `py.test`, e.g.,
 

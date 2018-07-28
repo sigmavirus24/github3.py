@@ -91,7 +91,7 @@ Version History
 Contributing
 ============
 
-All developlment happens on GitHub_. Please remember to add yourself to the
+All development happens on GitHub_. Please remember to add yourself to the
 list of contributors in AUTHORS.rst, especially if you're going to be
 working on the list below.
 
@@ -116,7 +116,7 @@ and feel free to take one.
 Running the Unittests
 ---------------------
 
-The tests are generally run using tox. Tox can be installed lke so
+The tests are generally run using tox. Tox can be installed like so
 
 .. code-block:: console
 

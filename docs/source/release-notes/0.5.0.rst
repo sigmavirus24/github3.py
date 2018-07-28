@@ -15,9 +15,9 @@
 
       # some time later
 
-      u.refresh()  # Will ALWAYS send a GET request and lower your ratelimit
+      u.refresh()  # Will ALWAYS send a GET request and lower your rate limit
       u.refresh(True)  # Will send the GET with a header such that if nothing
-                       # has changed, it will not count against your ratelimit
+                       # has changed, it will not count against your rate limit
                        # otherwise you'll get the updated user object.
 
 - Add support for conditional iterables. What this means is that you can do:
@@ -76,7 +76,7 @@
   - ``add_labels`` now returns the list of Labels on the issue instead of a
     boolean.
 
-  - ``remove_label`` now retuns a boolean.
+  - ``remove_label`` now returns a boolean.
 
   - ``remove_all_labels`` and ``replace_labels`` now return lists. The former
     should return an empty list on a successful call. The latter should

@@ -164,3 +164,5 @@ Contributors
 - Hal Wine (@hwine)
 
 - Jacopo Notarstefano (@jacquerie)
+
+- Taylor Edmiston (@tedmiston)

@@ -47,7 +47,7 @@ Deprecated Functions
 
 .. warning::
 
-    Due to GitHub's anonymous ratelimits, it's strongly advised that you don't
+    Due to GitHub's anonymous rate limits, it's strongly advised that you don't
     use these functions.
 
 .. autofunction:: github3.create_gist

@@ -40,7 +40,7 @@ comment message. Then run the script and watch as the issue opens in your
 browser focusing on the comment **you** just created.
 
 The following shows how you could use github3.py to fetch and display your
-issues in your own style and in your webbrowser.
+issues in your own style and in your web browser.
 
 .. literalinclude:: source/browser.py
     :language: python

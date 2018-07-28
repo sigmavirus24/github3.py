@@ -18,6 +18,6 @@
 - Changed the way ``Repository.edit`` works courtesy of Kristian Glass
   (@doismellburning)
 
-- Changed ``Repository.contents`` behaviour when acting on a 404.
+- Changed ``Repository.contents`` behavior when acting on a 404.
 
 - 50% test coverage via mock tests

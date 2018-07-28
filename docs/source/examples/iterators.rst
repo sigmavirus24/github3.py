@@ -66,6 +66,6 @@ The Second Approach
 
 ------
 
-If there are no new users, these approaches won't impact your ratelimit at
+If there are no new users, these approaches won't impact your rate limit at
 all. This mimics the ability to conditionally refresh data on almost all other
 objects in github3.py.
