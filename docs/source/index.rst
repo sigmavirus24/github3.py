@@ -91,7 +91,7 @@ Version History
 Contributing
 ============
 
-All developlment happens on GitHub_. Please remember to add yourself to the
+All development happens on GitHub_. Please remember to add yourself to the
 list of contributors in AUTHORS.rst, especially if you're going to be
 working on the list below.
 
