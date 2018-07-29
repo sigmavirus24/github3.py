@@ -263,7 +263,7 @@ class TestUsersRequiresAuth(helper.UnitRequiresAuthenticationHelper):
             self.instance.organization_events('foo')
 
 
-class TestPlan(helper.UnitGitHubObjectHelper):
+class TestPlan(helper.UnitHelper):
 
     """Test for methods on Plan class."""
 
