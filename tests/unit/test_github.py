@@ -19,6 +19,13 @@ class TestGitHub(helper.UnitHelper):
     described_class = GitHub
     example_data = None
 
+    def test_activate_membership(self):
+        self.instance.activate_membership('github3py')
+        self.session.patch.assert_called_once_with(
+            url_for('user/memberships/orgs/github3py'),
+            data='{"state": "active"}'
+        )
+
     def test_add_email_addresses(self):
         """Verify request to add email addresses for a user."""
         self.instance.add_email_addresses(['example1@example.com',
@@ -1284,6 +1291,10 @@ class TestGitHubRequiresAuthentication(
 
     described_class = GitHub
     example_data = None
+
+    def test_activate_membership(self):
+        """Verify that activating a membership requires authentication."""
+        self.assert_requires_auth(self.instance.activate_membership)
 
     def test_add_email_addresses(self):
         """Verify a user must be authenticated to add email addresses."""
