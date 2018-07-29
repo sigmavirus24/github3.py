@@ -27,6 +27,15 @@ class TestGitHub(IntegrationHelper):
 
     match_on = ['method', 'uri', 'gh3-headers']
 
+    def test_activate_membership(self):
+        """Validate the ability to activate membership."""
+        self.basic_login()
+        cassette_name = self.cassette_name('activate_membership')
+        with self.recorder.use_cassette(cassette_name):
+            membership = self.gh.activate_membership('sv24-archive')
+
+        assert isinstance(membership, github3.orgs.Membership)
+
     def test_authorize(self):
         """Test the ability to create an authorization."""
         from ..conftest import credentials
