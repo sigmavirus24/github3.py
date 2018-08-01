@@ -1298,6 +1298,17 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
             }
         )
 
+    def test_invitations(self):
+        """Verify the request for retrieving invitations."""
+        i = self.instance.invitations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('invitations'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_issue_events(self):
         """Test the ability to iterate over a repository's issue events."""
         i = self.instance.issue_events()
@@ -1617,6 +1628,10 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that editing a repository requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.edit(name='Hello')
+
+    def test_invitations(self):
+        """Show that iterating over the invitations requires authentication."""
+        self.assert_requires_auth(self.instance.invitations)
 
     def test_is_collaborator(self):
         """
