@@ -523,6 +523,27 @@ class TestGitHub(IntegrationHelper):
         assert isinstance(code_result, github3.search.CodeSearchResult)
         assert len(code_result.text_matches) > 0
 
+    def test_search_commits(self):
+        """Test the ability to search for commits."""
+        cassette_name = self.cassette_name('search_commits')
+        with self.recorder.use_cassette(cassette_name):
+            result_iterator = self.gh.search_commits(
+                'css repo:octocat/Spoon-Knife')
+            commit_result = next(result_iterator)
+
+        assert isinstance(commit_result, github3.search.CommitSearchResult)
+
+    def test_search_commits_with_text_match(self):
+        """Test the ability to search for commits  with text matches."""
+        cassette_name = self.cassette_name('search_commits_with_text_match')
+        with self.recorder.use_cassette(cassette_name):
+            result_iterator = self.gh.search_commits(
+                'css repo:octocat/Spoon-Knife', text_match=True)
+            commit_result = next(result_iterator)
+
+        assert isinstance(commit_result, github3.search.CommitSearchResult)
+        assert len(commit_result.text_matches) > 0
+
     def test_search_users(self):
         """Test the ability to use the user search endpoint."""
         cassette_name = self.cassette_name('search_users')
