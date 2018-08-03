@@ -2,6 +2,7 @@
 """Module containing the Issue logic."""
 from __future__ import unicode_literals
 
+import warnings
 from json import dumps
 
 from uritemplate import URITemplate
@@ -107,6 +108,10 @@ class _Issue(models.GitHubCore):
     def assign(self, username):
         """Assign user ``username`` to this issue.
 
+        .. deprecated:: 1.2.0
+
+            Use :meth:`github3.issues.issue.Issue.add_assignees` instead.
+
         This is a short cut for :meth:`~github3.issues.issue.Issue.edit`.
 
         :param str username:
@@ -116,6 +121,9 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
+        warnings.warn(
+            'This method is deprecated. Please use ``add_assignees`` '
+            'instead.', DeprecationWarning, stacklevel=2)
         if not username:
             return False
         number = self.milestone.number if self.milestone else None
