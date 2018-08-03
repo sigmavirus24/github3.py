@@ -11,6 +11,18 @@ class TestIssue(IntegrationHelper):
 
     """Integration tests for methods on the Issue class."""
 
+    def test_add_assignees(self):
+        """Test the ability to add assignees to an issue."""
+        self.auto_login()
+        cassette_name = self.cassette_name('add_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='sigmavirus24',
+                                  repository='github3.py',
+                                  number=711)
+            assigned = issue.add_assignees(['jacquerie'])
+
+        assert assigned is True
+
     def test_add_labels(self):
         """Test the ability to add a label to an issue."""
         self.auto_login()

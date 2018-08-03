@@ -44,6 +44,10 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def after_setup(self):
         self.session.has_auth.return_value = False
 
+    def test_add_assignees(self):
+        """Verify that adding assignees requires authentication."""
+        self.assert_requires_auth(self.instance.add_assignees)
+
     def test_add_labels(self):
         """Verify that adding a label requires authentication."""
         self.assert_requires_auth(self.instance.add_labels, 'enhancement')
@@ -91,6 +95,15 @@ class TestIssue(helper.UnitHelper):
 
     described_class = github3.issues.Issue
     example_data = get_issue_example_data()
+
+    def test_add_assignees(self):
+        """Verify the request for adding assignees to an issue."""
+        self.instance.add_assignees(['jacquerie'])
+
+        self.session.patch.assert_called_with(
+            url_for(),
+            data='{"assignees": ["jacquerie"]}'
+        )
 
     def test_add_labels(self):
         """Verify the request for adding a label."""
