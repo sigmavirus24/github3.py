@@ -77,6 +77,10 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that removing all labels requires authentication."""
         self.assert_requires_auth(self.instance.remove_all_labels)
 
+    def test_remove_assignees(self):
+        """Verify that removing assignees requires authentication."""
+        self.assert_requires_auth(self.instance.remove_assignees)
+
     def test_remove_label(self):
         """Verify that removing a label requires authentication."""
         self.assert_requires_auth(self.instance.remove_label, 'enhancement')
@@ -306,6 +310,15 @@ class TestIssue(helper.UnitHelper):
             replace_labels.return_value = []
             assert self.instance.remove_all_labels() == []
             replace_labels.assert_called_once_with([])
+
+    def test_remove_assignees(self):
+        """Verify the request for removing assignees from an issue."""
+        self.instance.remove_assignees(['octocat'])
+
+        self.session.patch.assert_called_once_with(
+            url_for(),
+            data='{"assignees": []}'
+        )
 
     def test_remove_label(self):
         """Verify the request for removing a label from an issue."""

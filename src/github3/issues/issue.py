@@ -330,6 +330,27 @@ class _Issue(models.GitHubCore):
         return self._instance_or_null(pulls.PullRequest, json)
 
     @requires_auth
+    def remove_assignees(self, users):
+        """Unassign ``users`` from this issue.
+
+        This is a shortcut for :meth:`~github3.issues.issue.Issue.edit`.
+
+        :param users:
+            users or usernames to unassign this issue from
+        :type users:
+            list of :class:`~github3.users.User`
+        :type users:
+            list of str
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        usernames = {getattr(user, 'login', user) for user in users}
+        assignees = list({a.login for a in self.assignees} - usernames)
+        return self.edit(assignees=assignees)
+
+    @requires_auth
     def remove_label(self, name):
         """Remove label ``name`` from this issue.
 

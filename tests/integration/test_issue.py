@@ -215,6 +215,18 @@ class TestIssue(IntegrationHelper):
 
         assert reopened is True
 
+    def test_remove_assignees(self):
+        """Test the ability to remove assignees from an issue."""
+        self.auto_login()
+        cassette_name = self.cassette_name('remove_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='sigmavirus24',
+                                  repository='github3.py',
+                                  number=711)
+            unassigned = issue.remove_assignees(['jacquerie'])
+
+        assert unassigned is True
+
     def test_remove_label(self):
         """Test the ability to remove a label from an issue."""
         self.auto_login()
