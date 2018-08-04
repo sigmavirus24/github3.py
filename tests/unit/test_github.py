@@ -1295,6 +1295,85 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
         )
 
 
+class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
+
+    """Test GitHub methods that return search iterators."""
+
+    described_class = GitHub
+    example_data = None
+
+    def test_search_code(self):
+        """Verify the request to search for code."""
+        i = self.instance.search_code(
+            'addClass in:file language:js repo:jquery/jquery')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('search/code'),
+            params={'per_page': 100,
+                    'q': 'addClass in:file language:js repo:jquery/jquery'},
+            headers={}
+        )
+
+    def test_search_commits(self):
+        """Verify the request to search for commits."""
+        i = self.instance.search_commits(
+            'css repo:octocat/Spoon-Knife')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('search/commits'),
+            params={'per_page': 100,
+                    'q': 'css repo:octocat/Spoon-Knife'},
+            headers={'Accept': 'application/vnd.github.cloak-preview'}
+        )
+
+    def test_search_issues(self):
+        """Verify the request to search for issues."""
+        i = self.instance.search_issues(
+            'windows label:bug language:python state:open',
+            sort='created', order='asc')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('search/issues'),
+            params={'order': 'asc',
+                    'per_page': 100,
+                    'q': 'windows label:bug language:python state:open',
+                    'sort': 'created'},
+            headers={}
+        )
+
+    def test_search_repositories(self):
+        """Verify the request to search for repositories."""
+        i = self.instance.search_repositories(
+            'tetris language:assembly',
+            sort='stars', order='asc')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('search/repositories'),
+            params={'order': 'asc',
+                    'per_page': 100,
+                    'q': 'tetris language:assembly',
+                    'sort': 'stars'},
+            headers={}
+        )
+
+    def test_search_users(self):
+        """Verify the request to search for users."""
+        i = self.instance.search_users(
+            'tom repos:>42 followers:>1000')
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('search/users'),
+            params={'per_page': 100,
+                    'q': 'tom repos:>42 followers:>1000'},
+            headers={}
+        )
+
+
 class TestGitHubRequiresAuthentication(
         helper.UnitRequiresAuthenticationHelper):
 
