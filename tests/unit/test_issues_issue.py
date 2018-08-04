@@ -44,6 +44,10 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def after_setup(self):
         self.session.has_auth.return_value = False
 
+    def test_add_assignees(self):
+        """Verify that adding assignees requires authentication."""
+        self.assert_requires_auth(self.instance.add_assignees)
+
     def test_add_labels(self):
         """Verify that adding a label requires authentication."""
         self.assert_requires_auth(self.instance.add_labels, 'enhancement')
@@ -73,6 +77,10 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that removing all labels requires authentication."""
         self.assert_requires_auth(self.instance.remove_all_labels)
 
+    def test_remove_assignees(self):
+        """Verify that removing assignees requires authentication."""
+        self.assert_requires_auth(self.instance.remove_assignees)
+
     def test_remove_label(self):
         """Verify that removing a label requires authentication."""
         self.assert_requires_auth(self.instance.remove_label, 'enhancement')
@@ -91,6 +99,15 @@ class TestIssue(helper.UnitHelper):
 
     described_class = github3.issues.Issue
     example_data = get_issue_example_data()
+
+    def test_add_assignees(self):
+        """Verify the request for adding assignees to an issue."""
+        self.instance.add_assignees(['jacquerie'])
+
+        self.session.patch.assert_called_with(
+            url_for(),
+            data='{"assignees": ["jacquerie"]}'
+        )
 
     def test_add_labels(self):
         """Verify the request for adding a label."""
@@ -293,6 +310,15 @@ class TestIssue(helper.UnitHelper):
             replace_labels.return_value = []
             assert self.instance.remove_all_labels() == []
             replace_labels.assert_called_once_with([])
+
+    def test_remove_assignees(self):
+        """Verify the request for removing assignees from an issue."""
+        self.instance.remove_assignees(['octocat'])
+
+        self.session.patch.assert_called_once_with(
+            url_for(),
+            data='{"assignees": []}'
+        )
 
     def test_remove_label(self):
         """Verify the request for removing a label from an issue."""

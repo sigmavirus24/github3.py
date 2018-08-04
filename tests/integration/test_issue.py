@@ -11,6 +11,18 @@ class TestIssue(IntegrationHelper):
 
     """Integration tests for methods on the Issue class."""
 
+    def test_add_assignees(self):
+        """Test the ability to add assignees to an issue."""
+        self.auto_login()
+        cassette_name = self.cassette_name('add_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='sigmavirus24',
+                                  repository='github3.py',
+                                  number=711)
+            assigned = issue.add_assignees(['jacquerie'])
+
+        assert assigned is True
+
     def test_add_labels(self):
         """Test the ability to add a label to an issue."""
         self.auto_login()
@@ -202,6 +214,18 @@ class TestIssue(IntegrationHelper):
             reopened = issue.reopen()
 
         assert reopened is True
+
+    def test_remove_assignees(self):
+        """Test the ability to remove assignees from an issue."""
+        self.auto_login()
+        cassette_name = self.cassette_name('remove_assignees')
+        with self.recorder.use_cassette(cassette_name):
+            issue = self.gh.issue(username='sigmavirus24',
+                                  repository='github3.py',
+                                  number=711)
+            unassigned = issue.remove_assignees(['jacquerie'])
+
+        assert unassigned is True
 
     def test_remove_label(self):
         """Test the ability to remove a label from an issue."""

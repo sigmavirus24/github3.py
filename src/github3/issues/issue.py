@@ -2,6 +2,7 @@
 """Module containing the Issue logic."""
 from __future__ import unicode_literals
 
+import warnings
 from json import dumps
 
 from uritemplate import URITemplate
@@ -68,6 +69,27 @@ class _Issue(models.GitHubCore):
         )
 
     @requires_auth
+    def add_assignees(self, users):
+        """Assign ``users`` to this issue.
+
+        This is a shortcut for :meth:`~github3.issues.issue.Issue.edit`.
+
+        :param users:
+            users or usernames to assign this issue to
+        :type users:
+            list of :class:`~github3.users.User`
+        :type users:
+            list of str
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        usernames = {getattr(user, 'login', user) for user in users}
+        assignees = list({a.login for a in self.assignees} | usernames)
+        return self.edit(assignees=assignees)
+
+    @requires_auth
     def add_labels(self, *args):
         """Add labels to this issue.
 
@@ -86,6 +108,10 @@ class _Issue(models.GitHubCore):
     def assign(self, username):
         """Assign user ``username`` to this issue.
 
+        .. deprecated:: 1.2.0
+
+            Use :meth:`github3.issues.issue.Issue.add_assignees` instead.
+
         This is a short cut for :meth:`~github3.issues.issue.Issue.edit`.
 
         :param str username:
@@ -95,6 +121,9 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
+        warnings.warn(
+            'This method is deprecated. Please use ``add_assignees`` '
+            'instead.', DeprecationWarning, stacklevel=2)
         if not username:
             return False
         number = self.milestone.number if self.milestone else None
@@ -299,6 +328,27 @@ class _Issue(models.GitHubCore):
         if pull_request_url:
             json = self._json(self._get(pull_request_url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
+
+    @requires_auth
+    def remove_assignees(self, users):
+        """Unassign ``users`` from this issue.
+
+        This is a shortcut for :meth:`~github3.issues.issue.Issue.edit`.
+
+        :param users:
+            users or usernames to unassign this issue from
+        :type users:
+            list of :class:`~github3.users.User`
+        :type users:
+            list of str
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        usernames = {getattr(user, 'login', user) for user in users}
+        assignees = list({a.login for a in self.assignees} - usernames)
+        return self.edit(assignees=assignees)
 
     @requires_auth
     def remove_label(self, name):
