@@ -9,6 +9,31 @@ import uritemplate
 from .helper import (GitHubEnterpriseHelper, IntegrationHelper,
                      GitHubStatusHelper)
 
+GPG_KEY = (
+    # Generated for this alone then deleted
+    '-----BEGIN PGP PUBLIC KEY BLOCK-----\n'
+    '\n'
+    'mI0EW3Gx5AEEAKkl8uAp56B9WlVMRl3ibQN99x/7JAkCWHVU1NjfAa4/AOmhG2Bl\n'
+    'FmSCfQ6CBVgOGpdaMtzyq0YxYgvhnhzwwaEZ6mrwz2in1Mo8iOVkXv2eK3ov24PU\n'
+    'aLoYxiGMtNT8nKQjJLLWrEjrJOnNNGkSUHM8eAVlz3TonZALp0lOsIg/ABEBAAG0\n'
+    'aUphY29wbyBOb3RhcnN0ZWZhbm8gKENyZWF0ZWQgZm9yIGEgdGVzdCBmb3IgZ2l0\n'
+    'aHViMy5weSBhbmQgdGhlbiBkZWxldGVkLikgPGphY29wby5ub3RhcnN0ZWZhbm9A\n'
+    'Z21haWwuY29tPojOBBMBCgA4FiEEux/Ns2l9RasyufUE8C5SQOx2rKgFAltxseQC\n'
+    'GwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQ8C5SQOx2rKhwEgQApsTrwmfh\n'
+    'PgwzX4zPtVvwKq+MYU6idhS2hwouHYPzgsVNOt5P6vW2V9jF9NQrK1gVXMSn1S16\n'
+    '6iE/X8R5rkRYbAXlvFnww4xaVCWSrXBhBGDbOCQ4fSuTNEWXREhwHAHnP4nDR+mh\n'
+    'mba6f9pMZBZalz8/0jYf2Q2ds5PEhzCQk6K4jQRbcbHkAQQAt9A5ebOFcxFyfxmt\n'
+    'OeEkmQArt31U1yATLQQto9AmpQnPk1OHjEsv+4MWaydTnuWKG1sxZb9BQRq8T8ho\n'
+    'jFcYXg3CAdz2Pi6dA+I6dSKgknVY2qTFURSegFcKOiVJd48oEScMyjnRcn+gDM3Y\n'
+    'S3shYhDt1ff6cStm344+HWFyBPcAEQEAAYi2BBgBCgAgFiEEux/Ns2l9RasyufUE\n'
+    '8C5SQOx2rKgFAltxseQCGwwACgkQ8C5SQOx2rKhlfgP/dhFe09wMtVE6qXpQAXWU\n'
+    'T34sJD7GTcyYCleGtAgbtFD+7j9rk7VTG4hGZlDvW6FMdEQBE18Hd+0UhO1TA0c1\n'
+    'XTLKl8sNmIg+Ph3yiED8Nn+ByNk7KqX3SeCNvAFkTZI3yeTAynUmQin68ZqrwMjp\n'
+    'IMGmjyjdODb4qOpFvBPAlM8=\n'
+    '=2MWr\n'
+    '-----END PGP PUBLIC KEY BLOCK-----'
+)
+
 SSH_KEY = (
     # Generated for this alone then deleted
     'ssh-rsa '
@@ -71,6 +96,15 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(g, github3.gists.Gist)
         assert g.public is True
+
+    def test_create_gpg_key(self):
+        """Test the ability of a GitHub instance to create a new GPG key."""
+        self.token_login()
+        cassette_name = self.cassette_name('create_gpg_key')
+        with self.recorder.use_cassette(cassette_name):
+            gpg_key = self.gh.create_gpg_key(GPG_KEY)
+            assert isinstance(gpg_key, github3.users.GPGKey)
+            assert gpg_key.delete() is True
 
     def test_create_issue(self):
         """Test the ability of a GitHub instance to create a new issue."""
@@ -196,6 +230,32 @@ class TestGitHub(IntegrationHelper):
 
         assert t is not None
         assert t != ''
+
+    def test_gpg_key(self):
+        """Test the ability to retrieve a user's GPG key."""
+        self.token_login()
+        cassette_name = self.cassette_name('gpg_key')
+        with self.recorder.use_cassette(cassette_name):
+            created_gpg_key = self.gh.create_gpg_key(GPG_KEY)
+            assert isinstance(created_gpg_key, github3.users.GPGKey)
+            retrieved_gpg_key = self.gh.gpg_key(created_gpg_key.id)
+            assert isinstance(retrieved_gpg_key, github3.users.GPGKey)
+            assert created_gpg_key == retrieved_gpg_key
+            assert created_gpg_key.delete() is True
+
+    def test_gpg_keys(self):
+        """Test the ability to retrieve all user's GPG keys."""
+        self.token_login()
+        cassette_name = self.cassette_name('gpg_keys')
+        with self.recorder.use_cassette(cassette_name):
+            created_gpg_key = self.gh.create_gpg_key(GPG_KEY)
+            assert isinstance(created_gpg_key, github3.users.GPGKey)
+            retrieved_gpg_keys = list(self.gh.gpg_keys())
+            assert len(retrieved_gpg_keys) > 0
+            for retrieved_gpg_key in retrieved_gpg_keys:
+                assert isinstance(retrieved_gpg_key, github3.users.GPGKey)
+            assert created_gpg_key in retrieved_gpg_keys
+            assert created_gpg_key.delete() is True
 
     def test_key(self):
         """Test the ability to retrieve a user's key."""

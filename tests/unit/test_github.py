@@ -105,6 +105,15 @@ class TestGitHub(helper.UnitHelper):
             }
         )
 
+    def test_create_gpg_key(self):
+        """Test the request to create a GPG key."""
+        self.instance.create_gpg_key('GPG key text')
+
+        self.session.post.assert_called_once_with(
+            url_for('user/gpg_keys'),
+            '{"armored_public_key": "GPG key text"}'
+        )
+
     def test_create_key(self):
         """Test the request to create a key."""
         self.instance.create_key('key_name', 'key text', read_only=False)
@@ -217,6 +226,12 @@ class TestGitHub(helper.UnitHelper):
         self.session.get.assert_called_once_with(
             url_for('gitignore/templates')
         )
+
+    def test_gpg_key(self):
+        """Verify the request to retrieve a GPG key."""
+        self.instance.gpg_key(3)
+
+        self.session.get.assert_called_once_with(url_for('user/gpg_keys/3'))
 
     def test_is_following(self):
         """Test the request to check if the user is following a user."""
@@ -964,6 +979,17 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
             headers={}
         )
 
+    def test_gpg_keys(self):
+        """Verify the request to iterate over the GPG keys."""
+        i = self.instance.gpg_keys()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/gpg_keys'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_issues(self):
         """Show that an authenticated user can iterate over their issues."""
         i = self.instance.issues()
@@ -1397,6 +1423,10 @@ class TestGitHubRequiresAuthentication(
     def test_authorizations(self):
         """Show that one needs to authenticate to use #authorizations."""
         self.assert_requires_auth(self.instance.authorizations)
+
+    def test_create_gpg_key(self):
+        """Show that GitHub#create_gpg_key requires auth."""
+        self.assert_requires_auth(self.instance.create_gpg_key)
 
     def test_create_issue(self):
         """Show that GitHub#create_issue requires auth."""

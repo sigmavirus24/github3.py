@@ -336,6 +336,24 @@ class GitHub(models.GitHubCore):
         return self._instance_or_null(gists.Gist, json)
 
     @requires_auth
+    def create_gpg_key(self, armored_public_key):
+        """Create a new GPG key.
+
+        .. versionadded:: 1.2.0
+
+        :param str armored_public_key:
+            (required), your GPG key, generated in ASCII-armored format
+        :returns:
+            the created GPG key if successful, otherwise ``None``
+        :rtype:
+            :class:`~github3.users.GPGKey`
+        """
+        url = self._build_url('user', 'gpg_keys')
+        data = {'armored_public_key': armored_public_key}
+        json = self._json(self._post(url, data=data), 201)
+        return self._instance_or_null(users.GPGKey, json)
+
+    @requires_auth
     def create_issue(self, owner, repository, title, body=None, assignee=None,
                      milestone=None, labels=[], assignees=None):
         """Create an issue on the repository.
@@ -739,6 +757,39 @@ class GitHub(models.GitHubCore):
         """
         url = self._build_url('gitignore', 'templates')
         return self._json(self._get(url), 200) or []
+
+    @requires_auth
+    def gpg_key(self, id_num):
+        """Retrieve the GPG key of the authenticated user specified by id_num.
+
+        .. versionadded:: 1.2.0
+
+        :returns:
+            the GPG key specified by id_num
+        :rtype:
+            :class:`~github3.users.GPGKey`
+        """
+        url = self._build_url('user', 'gpg_keys', id_num)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(users.GPGKey, json)
+
+    @requires_auth
+    def gpg_keys(self, number=-1, etag=None):
+        """Iterate over the GPG keys of the authenticated user.
+
+        .. versionadded:: 1.2.0
+
+        :param int number: (optional), number of GPG keys to return. Default:
+            -1 returns all available GPG keys
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns:
+            generator of the GPG keys belonging to the authenticated user
+        :rtype:
+            :class:`~github3.users.GPGKey`
+        """
+        url = self._build_url('user', 'gpg_keys')
+        return self._iter(int(number), url, users.GPGKey, etag=etag)
 
     @requires_auth
     def is_following(self, username):

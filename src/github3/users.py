@@ -12,6 +12,103 @@ from .decorators import requires_auth
 from .events import Event
 
 
+class GPGKey(models.GitHubCore):
+    """The object representing a user's GPG key.
+
+    .. versionadded:: 1.2.0
+
+    Please see GitHub's `GPG Key Documentation` for more information.
+
+    .. _GPG Key Documentation:
+        https://developer.github.com/v3/users/gpg_keys/
+
+    .. attribute:: can_certify
+
+        Whether this GPG key can be used to sign a key.
+
+    .. attribute:: can_encrypt_comms
+
+        Whether this GPG key can be used to encrypt communications.
+
+    .. attribute:: can_encrypt_storage
+
+        Whether this GPG key can be used to encrypt storage.
+
+    .. attribute:: can_sign
+
+        Whether this GPG key can be used to sign some data.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` representing the date and time when
+        this GPG key was created.
+
+    .. attribute:: emails
+
+        A list of :class:`~github3.users.ShortEmail` attached to this GPG
+        key.
+
+    .. attribute:: expires_at
+
+        A :class:`~datetime.datetime` representing the date and time when
+        this GPG key will expire.
+
+    .. attribute:: id
+
+        The unique identifier of this GPG key.
+
+    .. attribute:: key_id
+
+        A hexadecimal string that identifies this GPG key.
+
+    .. attribute:: primary_key_id
+
+        The unique identifier of the primary key of this GPG key.
+
+    .. attribute:: public_key
+
+        The public key contained in this GPG key. This is not a GPG formatted
+        key, and is not suitable to be used directly in programs like GPG.
+
+    .. attribute:: subkeys
+
+        A list of :class:`~github3.users.GPGKey` of the subkeys of this GPG
+        key.
+    """
+
+    def _update_attributes(self, key):
+        self.can_certify = key['can_certify']
+        self.can_encrypt_comms = key['can_encrypt_comms']
+        self.can_encrypt_storage = key['can_encrypt_storage']
+        self.can_sign = key['can_sign']
+        self.created_at = self._strptime(key['created_at'])
+        self.emails = [ShortEmail(email, self) for email in key['emails']]
+        self.expires_at = self._strptime(key['expires_at'])
+        self.id = key['id']
+        self.key_id = key['key_id']
+        self.primary_key_id = key['primary_key_id']
+        self.public_key = key['public_key']
+        self.subkeys = [GPGKey(subkey, self) for subkey in key['subkeys']]
+
+    def _repr(self):
+        return '<GPG Key [{0}]>'.format(self.key_id)
+
+    def __str__(self):
+        return self.key_id
+
+    @requires_auth
+    def delete(self):
+        """Delete this GPG key.
+
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url('user', 'gpg_keys', self.id)
+        return self._boolean(self._delete(url), 204, 404)
+
+
 class Key(models.GitHubCore):
     """The object representing a user's SSH key.
 
@@ -121,15 +218,26 @@ class Plan(models.GitHubCore):
         return self.name == 'free'  # (No coverage)
 
 
-class Email(models.GitHubCore):
-    """The object used to represent an AuthenticatedUser's email.
+class _Email(models.GitHubCore):
+    """Base email object."""
 
-    Please see GitHub's `Emails documentation`_ for more information.
+    class_name = '_Email'
 
-    .. _Emails documentation:
-        https://developer.github.com/v3/users/emails/
+    def _update_attributes(self, email):
+        self.email = email['email']
+        self.verified = email['verified']
 
-    The attributes represented on this object include:
+    def _repr(self):
+        return '<{0} [{1}]>'.format(self.class_name, self.email)
+
+    def __str__(self):
+        return self.email
+
+
+class ShortEmail(_Email):
+    """The object used to represent an email attached to a GPG key.
+
+    This object has the following attributes:
 
     .. attribute:: email
 
@@ -139,16 +247,35 @@ class Email(models.GitHubCore):
 
         A boolean value representing whether the address has been verified or
         not
+    """
+
+    class_name = 'ShortEmail'
+
+
+class Email(_Email):
+    """The object used to represent an AuthenticatedUser's email.
+
+    Please see GitHub's `Emails documentation`_ for more information.
+
+    .. _Emails documentation:
+        https://developer.github.com/v3/users/emails/
+
+    This object has all of the attributes of :class:`ShortEmail` as well as
+    the following attributes:
 
     .. attribute:: primary
 
         A boolean value representing whether the address is the primary
         address for the user or not
+
+    .. attribute:: visibility
+
+        A string value representing whether an authenticated user can view the
+        email address. Use ``public`` to allow it, ``private`` to disallow it.
     """
 
     def _update_attributes(self, email):
-        self.email = email['email']
-        self.verified = email['verified']
+        super(Email, self)._update_attributes(email)
         self.primary = email['primary']
         self.visibility = email['visibility']
 
@@ -275,6 +402,20 @@ class _User(models.GitHubCore):
         """
         url = self._build_url('following', base_url=self._api)
         return self._iter(int(number), url, ShortUser, etag=etag)
+
+    def gpg_keys(self, number=-1, etag=None):
+        """Iterate over the GPG keys of this user.
+
+        .. versionadded:: 1.2.0
+
+        :param int number: (optional), number of GPG keys to return. Default:
+            -1 returns all available GPG keys
+        :param str etag: (optional), ETag from a previous request to the same
+            endpoint
+        :returns: generator of :class:`GPGKey <GPGKey>`\ s
+        """
+        url = self._build_url('gpg_keys', base_url=self._api)
+        return self._iter(int(number), url, GPGKey, etag=etag)
 
     def keys(self, number=-1, etag=None):
         r"""Iterate over the public keys of this user.
