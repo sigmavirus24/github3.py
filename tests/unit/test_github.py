@@ -1126,6 +1126,17 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
             headers={}
         )
 
+    def test_repository_invitations(self):
+        """Verify the request to iterate over the repository invitations."""
+        i = self.instance.repository_invitations()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('user/repository_invitations'),
+            params={'per_page': 100},
+            headers={}
+        )
+
     def test_respositories(self):
         """
         Show that an authenticated user can iterate over their repositories.
@@ -1385,6 +1396,10 @@ class TestGitHubRequiresAuthentication(
     def test_repositories(self):
         """Show that one needs to authenticate to use #repositories."""
         self.assert_requires_auth(self.instance.repositories)
+
+    def test_repository_invitations(self):
+        """Show that getting the repo invitations requires authentication."""
+        self.assert_requires_auth(self.instance.repository_invitations)
 
     def test_star(self):
         """Show that starring a repository requires authentication."""
