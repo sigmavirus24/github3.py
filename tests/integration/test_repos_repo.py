@@ -718,6 +718,18 @@ class TestRepository(helper.IntegrationHelper):
             subscription = repository.ignore()
             assert subscription.ignored is True
 
+    def test_invitations(self):
+        """Test that a user can iterate over the invitations to a repo."""
+        self.token_login()
+        cassette_name = self.cassette_name('invitations')
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository('jacquerie', 'flask-shell-bpython')
+            invitations = list(repository.invitations())
+
+        assert len(invitations) > 0
+        for invitation in invitations:
+            assert isinstance(invitation, github3.repos.invitation.Invitation)
+
     def test_is_assignee(self):
         """
         Test the ability to check if a user can be assigned issues on a

@@ -34,6 +34,7 @@ from . import comparison
 from . import contents
 from . import deployment
 from . import hook
+from . import invitation
 from . import issue_import
 from . import pages
 from . import release
@@ -1535,6 +1536,23 @@ class _Repository(models.GitHubCore):
 
         json = self._json(data, 202)
         return self._instance_or_null(issue_import.ImportedIssue, json)
+
+    @requires_auth
+    def invitations(self, number=-1, etag=None):
+        """Iterate over the invitations to this repository.
+
+        :param int number:
+            (optional), number of invitations to return. Default: -1 returns
+            all available invitations
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of repository invitation objects
+        :rtype:
+            :class:`~github3.repos.invitation.Invitation`
+        """
+        url = self._build_url('invitations', base_url=self._api)
+        return self._iter(int(number), url, invitation.Invitation, etag=etag)
 
     def is_assignee(self, username):
         """Check if the user can be assigned an issue on this repository.

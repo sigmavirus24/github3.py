@@ -462,6 +462,17 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(r, github3.repos.repo.Repository)
 
+    def test_repository_invitations(self):
+        """Test the ability to retrieve the repository invitation."""
+        self.token_login()
+        cassette_name = self.cassette_name('repository_invitations')
+        with self.recorder.use_cassette(cassette_name):
+            invitations = list(self.gh.repository_invitations())
+
+        assert len(invitations) > 0
+        for invitation in invitations:
+            assert isinstance(invitation, github3.repos.invitation.Invitation)
+
     def test_repository_with_id(self):
         """Test the ability to retrieve a repository by its id."""
         cassette_name = self.cassette_name('repository_with_id')

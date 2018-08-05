@@ -10,6 +10,7 @@ import uritemplate
 from . import auths
 from . import events
 from . import gists
+from .repos import invitation
 from . import issues
 from . import licenses
 from . import models
@@ -1523,6 +1524,23 @@ class GitHub(models.GitHubCore):
             url = self._build_url('repos', owner, repository)
             json = self._json(self._get(url), 200)
         return self._instance_or_null(repo.Repository, json)
+
+    @requires_auth
+    def repository_invitations(self, number=-1, etag=None):
+        """Iterate over the repository invitations for the current user.
+
+        :param int number:
+            (optional), number of invitations to return. Default: -1 returns
+            all available invitations
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of repository invitation objects
+        :rtype:
+            :class:`~github3.repos.invitation.Invitation`
+        """
+        url = self._build_url('user', 'repository_invitations')
+        return self._iter(int(number), url, invitation.Invitation, etag=etag)
 
     def repository_with_id(self, number):
         """Retrieve the repository with the globally unique id.
