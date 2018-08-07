@@ -241,6 +241,24 @@ class UnitIteratorHelper(UnitHelper):
         self.get_json_mock.stop()
 
 
+class UnitSearchIteratorHelper(UnitIteratorHelper):
+
+    """Base class for search iterator based unit tests."""
+
+    def patch_get_json(self):
+        """Patch a SearchIterator's _get_json method."""
+        self.get_json_mock = mock.patch.object(
+            github3.structs.SearchIterator, '_get_json'
+        )
+        self.patched_get_json = self.get_json_mock.start()
+        self.patched_get_json.return_value = []
+
+    def setUp(self):
+        """Use UnitIteratorHelper's setUp and patch _get_json."""
+        super(UnitSearchIteratorHelper, self).setUp()
+        self.patch_get_json()
+
+
 class UnitRequiresAuthenticationHelper(UnitHelper):
 
     """Helper for unit tests that demonstrate authentication is required."""

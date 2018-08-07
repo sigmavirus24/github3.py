@@ -1669,6 +1669,87 @@ class GitHub(models.GitHubCore):
             number, url, search.CodeSearchResult, self, params, etag, headers
         )
 
+    def search_commits(self, query, sort=None, order=None, per_page=None,
+                       text_match=False, number=-1, etag=None):
+        """Find commits via the commits search API.
+
+        The query can contain any combination of the following supported
+        qualifiers:
+
+        - ``author`` Matches commits authored by the given username.
+          Example: ``author:defunkt``.
+        - ``committer`` Matches commits committed by the given username.
+          Example: ``committer:defunkt``.
+        - ``author-name`` Matches commits authored by a user with the given
+          name. Example: ``author-name:wanstrath``.
+        - ``committer-name`` Matches commits committed by a user with the given
+          name. Example: ``committer-name:wanstrath``.
+        - ``author-email`` Matches commits authored by a user with the given
+          email. Example: ``author-email:chris@github.com``.
+        - ``committer-email`` Matches commits committed by a user with the
+          given email. Example: ``committer-email:chris@github.com``.
+        - ``author-date`` Matches commits authored within the specified date
+          range. Example: ``author-date:<2016-01-01``.
+        - ``committer-date`` Matches commits committed within the specified
+          date range. Example: ``committer-date:>2016-01-01``.
+        - ``merge`` Matches merge commits when set to to ``true``, excludes
+          them when set to ``false``.
+        - ``hash`` Matches commits with the specified hash. Example:
+          ``hash:124a9a0ee1d8f1e15e833aff432fbb3b02632105``.
+        - ``parent`` Matches commits whose parent has the specified hash.
+          Example: ``parent:124a9a0ee1d8f1e15e833aff432fbb3b02632105``.
+        - ``tree`` Matches commits with the specified tree hash. Example:
+          ``tree:99ca967``.
+        - ``is`` Matches public repositories when set to ``public``, private
+          repositories when set to ``private``.
+        - ``user`` or ``org`` or ``repo`` Limits the search to a specific user,
+          organization, or repository.
+
+        For more information about these qualifiers, see: https://git.io/vb7XQ
+
+        :param str query:
+            (required), a valid query as described above, e.g.,
+            ``css repo:octocat/Spoon-Knife``
+        :param str sort:
+            (optional), how the results should be sorted;
+            options: ``author-date``, ``committer-date``;
+            default: best match
+        :param str order:
+            (optional), the direction of the sorted results,
+            options: ``asc``, ``desc``; default: ``desc``
+        :param int per_page:
+            (optional)
+        :param int number:
+            (optional), number of commits to return.
+            Default: -1, returns all available commits
+        :param str etag:
+            (optional), previous ETag header value
+        :return:
+            generator of commit search results
+        :rtype:
+            :class:`~github3.search.commits.CommitSearchResult`
+        """
+        params = {'q': query}
+        headers = {'Accept': 'application/vnd.github.cloak-preview'}
+
+        if sort in ('author-date', 'committer-date'):
+            params['sort'] = sort
+
+        if sort and order in ('asc', 'desc'):
+            params['order'] = order
+
+        if text_match:
+            headers['Accept'] = ', '.join([
+                headers['Accept'],
+                'application/vnd.github.v3.full.text-match+json'
+            ])
+
+        url = self._build_url('search', 'commits')
+        return structs.SearchIterator(
+            number, url, search.CommitSearchResult,
+            self, params, etag, headers
+        )
+
     def search_issues(self, query, sort=None, order=None, per_page=None,
                       text_match=False, number=-1, etag=None):
         """Find issues by state and keyword.
