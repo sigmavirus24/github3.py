@@ -23,14 +23,22 @@ matrix:
       env: TOXENV=py35
     - python: 3.6
       env: TOXENV=py36
-    - python: nightly
+    - python: 3.7
       env: TOXENV=py37
+      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
+      sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
+    - python: nightly
+      env: TOXENV=py38
+      dist: xenial    # required for Python 3.8 (travis-ci/travis-ci#9069)
+      sudo: required  # required for Python 3.8 (travis-ci/travis-ci#9069)
     - python: pypy
       env: TOXENV=pypy
     - python: 2.7
       env: TOXENV=py27-flake8
-    - python: 3.6
-      env: TOXENV=py36-flake8
+    - python: 3.7
+      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
+      sudo: required  # required for Python 3.7 (travis-ci/travis-ci#9069)
+      env: TOXENV=py37-flake8
     - env: TOXENV=docstrings
     - env: TOXENV=notebooks
     - env: TOXENV=readme
