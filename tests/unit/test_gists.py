@@ -5,6 +5,9 @@ import github3
 from . import helper
 
 gist_example_data = helper.create_example_data_helper('gist_example')
+gist_example_issue_883 = helper.create_example_data_helper(
+    'gist_example_issue_883'
+)
 gist_example_short_data = helper.create_example_data_helper(
     'gist_example_short'
 )
@@ -100,6 +103,18 @@ class TestGist(helper.UnitHelper):
     def test_to_str(self):
         """Show that a str(gist) is the same as the gist's id."""
         assert str(self.instance) == str(self.instance.id)
+
+
+class TestGistIssue883(helper.UnitHelper):
+
+    """Unit tests for the Gist object about issue 883."""
+
+    described_class = github3.gists.Gist
+    example_data = gist_example_issue_883()
+
+    def test_owner_is_not_required(self):
+        """Show that a gist does not always have an owner."""
+        assert 'owner' not in self.instance.as_dict()
 
 
 class TestGistRequiresAuth(helper.UnitRequiresAuthenticationHelper):

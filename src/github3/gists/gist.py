@@ -48,7 +48,9 @@ class _Gist(models.GitHubCore):
         self.git_push_url = gist['git_push_url']
         self.html_url = gist['html_url']
         self.id = gist['id']
-        self.owner = users.ShortUser(gist['owner'], self)
+        self.owner = gist.get('owner')
+        if self.owner is not None:
+            self.owner = users.ShortUser(self.owner, self)
         self.public = gist['public']
         self.updated_at = self._strptime(gist['updated_at'])
         self.url = self._api = gist['url']
