@@ -36,6 +36,36 @@ user:
     print(kennethreitz.followers_count)
 
     followers = [str(f) for f in gh.followers('kennethreitz')]
+    
+    # create a repository
+    gh.create_repository(name='Repo_Name')
+    
+    # grab the repo
+    repos = list(gh.repositories())
+    my_repo = gh.repository(gh.me(), 'Repo_Name') # grab match
+    
+    # create a label
+    my_repo.create_label(name='Ugly', color='d73a4a')
+    
+    # create an issue
+    my_repo.create_issue(title='Problem with Blah Blah')
+    
+    # create a milestone
+    my_repo.create_milestone("7.0.1", due_on='2018-08-21T23:59:59Z')
+    
+    # create a project and add columns to project
+    my_repo.create_project('Project 1')
+    projects = list(my_repo.projects())
+    my_proj = [x for x in projects if x.name == "Project 1"][0]
+    my_proj.create_column('To Do')
+    
+    # move project card with corresponding issue into specific column
+    issues = list(my_repo.issues())
+    issue_1 = issues[0]
+    columns = list(my_proj.columns())
+    column_1 = columns[0]
+    column_1.create_card_with_issue(issue_1)
+
 
 There are several examples of different aspects of using github3.py
 
