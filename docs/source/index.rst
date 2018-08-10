@@ -46,10 +46,6 @@ user:
     
     my_milestone = my_repo.create_milestone(title='7.0.1', due_on='2018-08-21T23:59:59Z')
     
-    my_proj = my_repo.create_project('Project 1')
-    my_col = my_proj.create_column('To Do') 
-    my_col.create_card_with_issue(my_issue)
-    # added project card to column
 
 There are several examples of different aspects of using github3.py
 
