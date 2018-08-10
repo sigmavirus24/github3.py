@@ -37,6 +37,16 @@ user:
 
     followers = [str(f) for f in gh.followers('kennethreitz')]
 
+    # play with repository objects
+    my_repo = gh.create_repository(name='Repo_Name')
+    
+    my_label = my_repo.create_label(name='Ugly', color='d73a4a')
+    
+    my_issue = my_repo.create_issue(title='Problem with Blah Blah')
+    
+    my_milestone = my_repo.create_milestone(title='7.0.1', due_on='2018-08-21T23:59:59Z')
+    
+
 There are several examples of different aspects of using github3.py
 
 .. toctree::
