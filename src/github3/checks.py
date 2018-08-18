@@ -68,7 +68,7 @@ class CheckSuite(models.GitHubCore):
         from . import pulls
         from .repos import ShortRepository
         self._api = suite['url']
-        #self.base = Base(pull['base'], self)
+        # self.base = Base(pull['base'], self)
         self.status = suite['status']
         self.conclusion = suite['conclusion']
         self.head_branch = suite['head_branch']
@@ -150,8 +150,8 @@ class CheckRun(models.GitHubCore):
 
     .. attribute:: pull_requests
 
-        A list of representations of the pull requests the check run belongs to as
-        :class:`~github3.pulls.ShortPullRequest` (this may be empty).
+        A list of representations of the pull requests the check run belongs to
+        as :class:`~github3.pulls.ShortPullRequest` (this may be empty).
 
     .. attribute:: id
 
