@@ -42,6 +42,8 @@ class _RepoCommit(models.GitHubCore):
     def check_runs(self):
         """Retrieve the check runs for this commit.
 
+        .. versionadded:: 1.2.0
+
         :returns:
             the check runs for this commit
         :rtype:
@@ -53,6 +55,8 @@ class _RepoCommit(models.GitHubCore):
     @requires_auth
     def check_suites(self):
         """Retrieve the check suites for this commit.
+
+        .. versionadded:: 1.2.0
 
         :returns:
             the check suites for this commit

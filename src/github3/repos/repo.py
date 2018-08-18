@@ -268,6 +268,8 @@ class _Repository(models.GitHubCore):
     def check_run(self, id):
         """Return a single check run.
 
+        .. versionadded:: 1.2.0
+
         :param int id:
             (required), id of the check run
         :returns:
@@ -285,6 +287,8 @@ class _Repository(models.GitHubCore):
     @requires_auth
     def check_suite(self, id):
         """Return a single check suite.
+
+        .. versionadded:: 1.2.0
 
         :param int id:
             (required), id of the check suite
@@ -561,6 +565,8 @@ class _Repository(models.GitHubCore):
                          actions=None):
         """Create a check run object on a commit
 
+        .. versionadded:: 1.2.0
+
         :param str name:
             (required), The name of the check
         :param str head_sha:
@@ -609,6 +615,8 @@ class _Repository(models.GitHubCore):
     @requires_auth
     def create_check_suite(self, head_sha):
         """Create a check suite object on a commit
+
+        .. versionadded:: 1.2.0
 
         :param str head_sha:
             The sha of the head commit.
