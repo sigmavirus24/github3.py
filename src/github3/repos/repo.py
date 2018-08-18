@@ -12,6 +12,7 @@ import json as jsonlib
 
 import uritemplate as urit
 
+from .. import checks
 from .. import events
 from .. import exceptions
 from .. import git
@@ -259,6 +260,42 @@ class _Repository(models.GitHubCore):
         return self._iter(int(number), url, branch.ShortBranch, params,
                           etag=etag, headers=branch.Branch.PREVIEW_HEADERS)
 
+    @requires_auth
+    def check_run(self, id):
+        """Return a single check run.
+
+        :param int id:
+            (required), id of the check run
+        :returns:
+            the check run
+        :rtype:
+            :class:`~github3.checks.CheckRun`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url('check-runs', str(id),
+                                  base_url=self._api)
+            data = self._json(self._get(url), 200)
+        return self._instance_or_null(checks.CheckRun, data)
+
+    @requires_auth
+    def check_suite(self, id):
+        """Return a single check suite.
+
+        :param int id:
+            (required), id of the check suite
+        :returns:
+            the check suite
+        :rtype:
+            :class:`~github3.checks.CheckSuite`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url('check-suites', str(id),
+                                  base_url=self._api)
+            data = self._json(self._get(url), 200)
+        return self._instance_or_null(checks.CheckSuite, data)
+
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.
 
@@ -498,6 +535,77 @@ class _Repository(models.GitHubCore):
         if anon:
             params = {'anon': 'true'}
         return self._iter(int(number), url, users.Contributor, params, etag)
+
+    @requires_auth
+    def create_check_run(self, name, head_sha, details_url=None,
+                         external_id=None, started_at=None, status=None,
+                         conclusion=None, completed_at=None, output=None,
+                         actions=None):
+        """Create a check run object on a commit
+
+        :param str name:
+            (required), The name of the check
+        :param str head_sha:
+            (required), The SHA of the commit
+        :param str details_url:
+            (optional), The URL of the integrator's site that has the full
+            details of the check
+        :param str external_id:
+            (optional), A reference for the run on the integrator's system
+        :param str started_at:
+            (optional), ISO 8601 time format: YYYY-MM-DDTHH:MM:SSZ
+        :param str status:
+            (optional), ('queued', 'in_progress', 'completed')
+        :param str conclusion:
+            (optional), Required if you provide 'completed_at', or a
+            'status' of 'completed'. The final conclusion of the check.
+            ('success', 'failure', 'neutral', 'cancelled', 'timed_out',
+            'action_required')
+        :param str completed_at:
+            (optional), Required if you provide 'conclusion'. ISO 8601 time
+            format: YYYY-MM-DDTHH:MM:SSZ
+        :param dict output:
+            (optional), key-value pairs representing the output. Format:
+            {'title': 'string', 'summary', 'text, can be markdown', 'text':
+            'text, can be markdown', 'annotations': [{}], 'images': [{}]}
+        :param array actions:
+            (optiona), array of action objects. Object format is:
+            {'label': 'text', 'description', 'text', 'identifier', 'text'}
+        :returns:
+            the created check run
+        :rtype:
+            :class:`~github3.checks.CheckRun`
+        """
+        json = None
+        # TODO: Cleanse output dict, actions array
+        if name and head_sha:
+            data = {'name': name, 'details_url': details_url, 'external_id':
+                    external_id, 'started_at': started_at, 'status': status,
+                    'conclusion': conclusion, 'completed_at': completed_at,
+                    'output': output, 'actions': actions}
+            self._remove_none(data)
+            url = self._build_url('check-runs', base_url=self._api)
+            json = self._json(self._post(url, data=data), 201)
+        return self._instance_or_null(checks.CheckRun, json)
+
+    @requires_auth
+    def create_check_suite(self, head_sha):
+        """Create a check suite object on a commit
+
+        :param str head_sha:
+            The sha of the head commit.
+        :returns:
+            the created check suite
+        :rtype:
+            :class:`~github3.checks.CheckSuite`
+        """
+        json = None
+        if head_sha:
+            data = {'head_sha': head_sha}
+            self._remove_none(data)
+            url = self._build_url('check-suites', base_url=self._api)
+            json = self._json(self._post(url, data=data), 201)
+        return self._instance_or_null(checks.CheckSuite, json)
 
     @requires_auth
     def create_blob(self, content, encoding):
