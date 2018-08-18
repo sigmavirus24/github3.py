@@ -59,6 +59,7 @@ __all__ = (
     'GitHubError',
     'GitHubStatus',
     'authorize',
+    'checks',
     'login',
     'enterprise_login',
     'emojis',
