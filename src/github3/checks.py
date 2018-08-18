@@ -95,7 +95,6 @@ class CheckSuite(models.GitHubCore):
         :rtype:
             bool
         """
-
         url = self._build_url('rerequest', base_url=self._api)
         return self._boolean(self._post(
             url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404)
@@ -253,7 +252,6 @@ class CheckRun(models.GitHubCore):
         :rtype:
             bool
         """
-
         # TODO: Clean output dict, actions array. Need a deep recursive clean
         data = {'name': name, 'details_url': details_url, 'external_id':
                 external_id, 'started_at': started_at, 'status': status,
@@ -278,7 +276,6 @@ class CheckRun(models.GitHubCore):
         :rtype:
             bool
         """
-
         url = self._build_url('rerequest', base_url=self._api)
         return self._boolean(self._post(
             url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404)
