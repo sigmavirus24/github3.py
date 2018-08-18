@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 from json import dumps
 
 from . import models
-from . import pulls
 from .decorators import requires_auth
 
 
@@ -66,6 +65,7 @@ class CheckSuite(models.GitHubCore):
 
     def _update_attributes(self, suite):
         # Import here, because a toplevel import causes an import loop
+        from . import pulls
         from .repos import ShortRepository
         self._api = suite['url']
         #self.base = Base(pull['base'], self)
@@ -189,6 +189,8 @@ class CheckRun(models.GitHubCore):
     }
 
     def _update_attributes(self, run):
+        # Import here, because a toplevel import causes an import loop
+        from . import pulls
         self._api = run['url']
         self.html_url = run['html_url']
         self.status = run['status']
