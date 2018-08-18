@@ -12,6 +12,8 @@ from .decorators import requires_auth
 class CheckSuite(models.GitHubCore):
     """The :class:`CheckSuite <CheckSuite>` object.
 
+    .. versionadded:: 1.2.0
+
     Please see GitHub's `CheckSuite Documentation`_ for more information.
 
     .. attribute:: status
@@ -113,6 +115,8 @@ class CheckSuite(models.GitHubCore):
 
 class CheckRun(models.GitHubCore):
     """The :class:`CheckRun <CheckRun>` object.
+
+    .. versionadded:: 1.2.0
 
     Please see GitHub's `CheckRun Documentation`_ for more information.
 
