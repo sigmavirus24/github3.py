@@ -6,7 +6,6 @@ from json import dumps
 
 from . import models
 from . import pulls
-from .repos import ShortRepository
 from .decorators import requires_auth
 
 
@@ -64,6 +63,8 @@ class CheckSuite(models.GitHubCore):
     }
 
     def _update_attributes(self, suite):
+        # Import here, because a toplevel import causes an import loop
+        from .repos import ShortRepository
         self._api = suite['url']
         #self.base = Base(pull['base'], self)
         self.status = suite['status']
