@@ -11,6 +11,9 @@ github_url_for = helper.create_url_helper(
     'https://api.github.com'
 )
 
+gpg_key_url_for = helper.create_url_helper(
+    'https://api.github.com/user/gpg_keys'
+)
 
 key_url_for = helper.create_url_helper(
     'https://api.github.com/user/keys'
@@ -23,6 +26,9 @@ get_authenticated_user_2_12_example_data = helper.create_example_data_helper(
     'authenticated_user_2_12_example'
 )
 get_users_example_data = helper.create_example_data_helper('users_example')
+get_user_gpg_key_example_data = helper.create_example_data_helper(
+    'user_gpg_key_example'
+)
 get_user_key_example_data = helper.create_example_data_helper(
     'user_key_example'
 )
@@ -65,6 +71,34 @@ class TestUser(helper.UnitHelper):
         self.instance.is_following('sigmavirus24')
         self.session.get.assert_called_once_with(
             url_for('/following/sigmavirus24')
+        )
+
+
+class TestUserGPGKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
+
+    """Unit tests that demonstrate which GPGKey methods require auth."""
+
+    described_class = github3.users.GPGKey
+    example_data = get_user_gpg_key_example_data()
+
+    def test_delete(self):
+        """Test that deleting a GPG key requires authentication."""
+        self.assert_requires_auth(self.instance.delete)
+
+
+class TestUserGPGKey(helper.UnitHelper):
+
+    """Unit tests for the GPGKey object."""
+
+    described_class = github3.users.GPGKey
+    example_data = get_user_gpg_key_example_data()
+
+    def test_delete(self):
+        """Verify the request to delete a GPG key."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(
+            gpg_key_url_for('3')
         )
 
 
@@ -159,6 +193,17 @@ class TestUserIterators(helper.UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for('following'),
+            params={'per_page': 100},
+            headers={}
+        )
+
+    def test_gpg_keys(self):
+        """Test the request to retrieve a user's GPG keys."""
+        i = self.instance.gpg_keys()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for('gpg_keys'),
             params={'per_page': 100},
             headers={}
         )
