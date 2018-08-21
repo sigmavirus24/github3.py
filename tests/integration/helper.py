@@ -1,17 +1,33 @@
 import copy
-import betamax
-import github3
+import datetime
 import os
-import pytest
 import unittest
+
+import betamax
+import dateutil.tz
+import pytest
+
+from betamax.cassette import cassette
+
+import github3
 
 
 @pytest.mark.usefixtures('betamax_simple_body')
 class IntegrationHelper(unittest.TestCase):
+    """Base test clas for integration tests."""
+
     def setUp(self):
+        """Retrieve all of our environmen test variables."""
         self.user = os.environ.get('GH_USER', 'foo')
         self.password = os.environ.get('GH_PASSWORD', 'bar')
         self.token = os.environ.get('GH_AUTH', 'x' * 20)
+        self.app_id = int(os.environ.get('GH_APP_ID', '0'))
+        self.private_key_bytes = os.environ.get(
+            'GH_APP_PRIVATE_KEY', u''
+        ).encode('utf8')
+        self.app_installation_id = int(
+            os.environ.get('GH_APP_INSTALLATION_ID', '0')
+        )
         self.gh = self.get_client()
         self.session = self.gh.session
         self.recorder = betamax.Betamax(self.session)
@@ -24,6 +40,44 @@ class IntegrationHelper(unittest.TestCase):
 
     def basic_login(self):
         self.gh.login(self.user, self.password)
+
+    def app_bearer_login(self):
+        """Login as a Github App."""
+        if self.private_key_bytes and self.app_id:
+            self.gh.login_as_app(self.private_key_bytes, self.app_id)
+        else:
+            token = 'x' * 20
+            self.gh.session.app_bearer_token_auth(token, 600)
+
+    def app_installation_login(self):
+        """Login as the specific installation of a GitHub App."""
+        if (self.current_cassette.is_recording() and
+                self.private_key_bytes and
+                self.app_id and
+                self.installation_id):
+            self.gh.login_as_app_installation(
+                self.private_key_bytes, app_id=self.app_id,
+                installation_id=self.app_installation_id,
+                expire_in=30,
+            )
+            token = self.gh.session.auth
+        else:
+            token = 'v1.{}'.format('x' * 10)
+            now = datetime.datetime.now(tz=dateutil.tz.UTC)
+            expires_at_dt = now + datetime.timedelta(seconds=60*60)
+            expires_at = expires_at_dt.isoformat()
+            self.gh.session.app_installation_token_auth({
+                'token': token,
+                'expires_at': expires_at,
+            })
+        self.current_cassette.placeholders.append(
+            cassette.Placeholder('<INSTALLATION_TOKEN>', token)
+        )
+
+    @property
+    def current_cassette(self):
+        """Short-cut to the recorder's current cassette."""
+        return self.recorder.current_cassette
 
     def auto_login(self):
         """Log in appropriately based on discovered credentials"""

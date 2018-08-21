@@ -6,6 +6,7 @@
     :maxdepth: 3
 
     api
+    apps
     auths
     events
     gists

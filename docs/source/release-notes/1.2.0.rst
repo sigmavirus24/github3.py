@@ -6,6 +6,38 @@ This is a small release with some enhancements.
 Features Added
 ``````````````
 
+- Partial GitHub Apps support. We added the following:
+
+  - ``GitHub.login_as_app`` to login using JWT as an Application
+
+  - ``GitHub.login_as_app_installation`` to login using a token obtained from
+    an App's JWT
+
+  - ``GitHub.app`` to retrieve an application by its "slug"
+
+  - ``GitHub.app_installation`` to retrieve a specific installation by its ID
+
+  - ``GitHub.app_installations`` to retrieve all of an App's installations
+
+  - ``GitHub.app_installation_for_organization`` to retrieve an organization's
+    installation of an App
+
+  - ``GitHub.app_installation_for_repository`` to retrieve an installation for
+    a specific repository
+
+  - ``GitHub.app_installation_for_user`` to retrieve an installation for a
+    specific user
+
+  - ``GitHub.authenticated_app`` to retrieve the metadata for a specific App
+
+  - Not supported as of this release:
+
+    - `Installations API`_
+
+    - `List installations for user`_
+
+    - `User-to-server OAuth access token`_
+
 - Organization Invitations Preview API is now supported. This includes an
   additional ``Invitation`` object. This is the result of hard work by Hal
   Wine.
@@ -14,3 +46,14 @@ Features Added
   representation of labels returned by the API.
 
 - The branch protections API is now completely represented in github3.py.
+
+
+.. links
+.. _Installations API:
+    https://developer.github.com/v3/apps/installations/
+
+.. _List installations for user:
+    https://developer.github.com/v3/apps/#list-installations-for-user
+
+.. _User-to-server OAuth access token:
+    https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/#identifying-users-on-your-site
