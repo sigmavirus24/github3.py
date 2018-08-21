@@ -82,6 +82,42 @@ def requires_app_credentials(func):
     return auth_wrapper
 
 
+def requires_app_bearer_auth(func):
+    """Require the use of application authentication.
+
+    .. versionadded:: 1.2.0
+    """
+    @wraps(func)
+    def auth_wrapper(self, *args, **kwargs):
+        from . import session
+        if isinstance(self.session.auth, session.AppBearerTokenAuth):
+            return func(self, *args, **kwargs)
+        else:
+            from . import exceptions
+            raise exceptions.MissingAppBearerAuthentication(
+                "This method requires GitHub App authentication."
+            )
+    return auth_wrapper
+
+
+def requires_app_installation_auth(func):
+    """Require the use of App's installation authentication.
+
+    .. versionadded:: 1.2.0
+    """
+    @wraps(func)
+    def auth_wrapper(self, *args, **kwargs):
+        from . import session
+        if isinstance(self.session.auth, session.AppInstallationTokenAuth):
+            return func(self, *args, **kwargs)
+        else:
+            from . import exceptions
+            raise exceptions.MissingAppInstallationAuthentication(
+                "This method requires GitHub App authentication."
+            )
+    return auth_wrapper
+
+
 def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
     """Generate a fake Response from requests."""
     r = Response()

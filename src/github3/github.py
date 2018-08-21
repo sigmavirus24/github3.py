@@ -7,7 +7,9 @@ import re
 
 import uritemplate
 
+from . import apps
 from . import auths
+from . import decorators
 from . import events
 from . import gists
 from .repos import invitation
@@ -198,6 +200,188 @@ class GitHub(models.GitHubCore):
         url = self._build_url('users')
         return self._iter(int(number), url, users.ShortUser, etag=etag,
                           params={'per_page': per_page, 'since': since})
+
+    def app(self, app_slug):
+        """Retrieve information about a specific app using its "slug".
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Get a single GitHub App`_
+                API Documentation
+
+        :param app_slug:
+            The identifier for the specific slug, e.g.,
+            ``test-github3-py-apps``.
+        :returns:
+            The app if and only if it is public.
+        :rtype:
+            :class:`~github3.apps.App`
+
+        .. _Get a single GitHub App:
+            https://developer.github.com/v3/apps/#get-a-single-github-app
+        """
+        headers = apps.APP_PREVIEW_HEADERS
+        url = self._build_url('apps', str(app_slug))
+        json = self._json(self._get(url, headers=headers), 200)
+        return self._instance_or_null(apps.App, json)
+
+    @decorators.requires_app_bearer_auth
+    def app_installation(self, installation_id):
+        """Retrieve a specific App installation by its ID.
+
+        .. versionadded: 1.2.0
+
+        .. seealso::
+
+            `Get a single installation`_
+                API Documentation
+
+        :param int installation_id:
+            The ID of the specific installation.
+        :returns:
+            The installation.
+        :rtype:
+            :class:`~github3.apps.Installation`
+
+        .. _Get a single installation:
+            https://developer.github.com/v3/apps/#get-a-single-installation
+        """
+        url = self._build_url('app', 'installations', str(installation_id))
+        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
+                          200)
+        return self._instance_or_null(apps.Installation, json)
+
+    @decorators.requires_app_bearer_auth
+    def app_installations(self, number=-1):
+        """Retrieve the list of installations for the authenticated app.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Find installations`_
+                API Documentation
+
+        :returns:
+            The installations of the authenticated App.
+        :rtype:
+            :class:`~github3.apps.Installation`
+
+        .. _Find installations:
+            https://developer.github.com/v3/apps/#find-installations
+        """
+        url = self._build_url('app', 'installations')
+        return self._iter(int(number), url, apps.Installation,
+                          headers=apps.APP_PREVIEW_HEADERS)
+
+    @decorators.requires_app_bearer_auth
+    def app_installation_for_organization(self, organization):
+        """Retrieve an App installation for a specific organization.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Find organization installation`_
+                API Documentation
+
+        :param str organization:
+            The name of the organization.
+        :returns:
+            The installation
+        :rtype:
+            :class:`~github3.apps.Installation`
+
+        .. _Find organization installation:
+            https://developer.github.com/v3/apps/#find-organization-installation
+        """
+        url = self._build_url('orgs', organization, 'installation')
+        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
+                          200)
+        return self._instance_or_null(apps.Installation, json)
+
+    @decorators.requires_app_bearer_auth
+    def app_installation_for_repository(self, owner, repository):
+        """Retrieve an App installation for a specific repository.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Find repository installation`_
+                API Documentation
+
+        :param str owner:
+            The name of the owner.
+        :param str repostory:
+            The name of the repository.
+        :returns:
+            The installation
+        :rtype:
+            :class:`~github3.apps.Installation`
+
+        .. _Find repository installation:
+            https://developer.github.com/v3/apps/#find-repository-installation
+        """
+        owner = getattr(owner, 'login', str(owner))
+        repository = getattr(repository, 'name', repository)
+        url = self._build_url('repos', owner, repository, 'installation')
+        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
+                          200)
+        return self._instance_or_null(apps.Installation, json)
+
+    @decorators.requires_app_bearer_auth
+    def app_installation_for_user(self, user):
+        """Retrieve an App installation for a specific repository.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Find user installation`_
+                API Documentation
+
+        :param str user:
+            The name of the user.
+        :returns:
+            The installation
+        :rtype:
+            :class:`~github3.apps.Installation`
+
+        .. _Find user installation:
+            https://developer.github.com/v3/apps/#find-user-installation
+        """
+        user = getattr(user, 'login', str(user))
+        url = self._build_url('users', user, 'installation')
+        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
+                          200)
+        return self._instance_or_null(apps.Installation, json)
+
+    @decorators.requires_app_bearer_auth
+    def authenticated_app(self):
+        """Retrieve information about the current app.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Get the authenticated GitHub App`_
+                API Documentation
+
+        :returns:
+            Metadata about the application
+        :rtype:
+            :class:`~github3.apps.App`
+
+        .. _Get the authenticated GitHub App:
+            https://developer.github.com/v3/apps/#get-the-authenticated-github-app
+        """
+        headers = apps.APP_PREVIEW_HEADERS
+        json = self._json(self._get(self._build_url('app'), headers=headers),
+                          200)
+        return self._instance_or_null(apps.App, json)
 
     @requires_basic_auth
     def authorization(self, id_num):
@@ -1037,6 +1221,77 @@ class GitHub(models.GitHubCore):
 
         # The Session method handles None for free.
         self.session.two_factor_auth_callback(two_factor_callback)
+
+    def login_as_app(self, private_key_pem, app_id,
+                     expire_in=apps.DEFAULT_JWT_TOKEN_EXPIRATION):
+        """Login as a GitHub Application.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Authenticating as an App`_
+                GitHub's documentation of authenticating as an application.
+
+        :param bytes private_key_pem:
+            The bytes of the private key for this GitHub Application.
+        :param int app_id:
+            The integer identifier for this GitHub Application.
+        :param int expire_in:
+            The length in seconds for this token to be valid for.
+            Default: 600 seconds (10 minutes)
+
+        .. _Authenticating as an App:
+            https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
+        """
+        token = apps.create_token(private_key_pem, app_id, expire_in)
+        self.session.app_bearer_token_auth(token, expire_in)
+
+    def login_as_app_installation(self, private_key_pem, app_id,
+                                  installation_id):
+        """Login using your GitHub App's installation credentials.
+
+        .. versionadded:: 1.2.0
+
+        .. seealso::
+
+            `Authenticating as an Installation`_
+                GitHub's documentation of authenticating as an installation.
+            `Create a new installation token`_
+                API Documentation
+
+        .. note::
+
+            This method makes an API call to retrieve the token.
+
+        .. warning::
+
+            This method expires after 1 hour.
+
+        :param bytes private_key_pem:
+            The bytes of the private key for this GitHub Application.
+        :param int app_id:
+            The integer identifier for this GitHub Application.
+        :param int installation_id:
+            The integer identifier of your App's installation.
+
+        .. _Authenticating as an Installation:
+            https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-an-installation
+        .. _Create a new installation token:
+            https://developer.github.com/v3/apps/#create-a-new-installation-token
+        """
+        # NOTE(sigmavirus24): This JWT token does not need to last very long.
+        # Instead of allowing it to stick around for 10 minutes, let's limit
+        # it to 30 seconds.
+        headers = apps.create_jwt_headers(private_key_pem, app_id,
+                                          expire_in=30)
+        url = self._build_url('app', 'installations', str(installation_id),
+                              'access_tokens')
+        with self.session.no_auth():
+            response = self.session.post(url, headers=headers)
+            json = self._json(response, 201)
+
+        self.session.app_installation_token_auth(json)
 
     def markdown(self, text, mode='', context='', raw=False):
         """Render an arbitrary markdown document.

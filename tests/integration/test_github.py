@@ -47,7 +47,6 @@ SSH_KEY = (
 
 
 class TestGitHub(IntegrationHelper):
-
     """GitHub integration tests."""
 
     match_on = ['method', 'uri', 'gh3-headers']
@@ -60,6 +59,15 @@ class TestGitHub(IntegrationHelper):
             membership = self.gh.activate_membership('sv24-archive')
 
         assert isinstance(membership, github3.orgs.Membership)
+
+    def test_authenticated_app(self):
+        """Validate an app can retrieve its own metadata."""
+        cassette_name = self.cassette_name('authenticated_app')
+        with self.recorder.use_cassette(cassette_name):
+            self.app_bearer_login()
+            app = self.gh.authenticated_app()
+
+        assert isinstance(app, github3.apps.App)
 
     def test_authorize(self):
         """Test the ability to create an authorization."""

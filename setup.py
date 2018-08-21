@@ -21,7 +21,7 @@ packages = [
 SNI_requirements = [
     'pyOpenSSL',
     'ndg-httpsclient',
-    'pyasn1'
+    'pyasn1',
 ]
 
 kwargs['tests_require'] = ['betamax>=0.8.0', 'pytest>2.3.5',
@@ -39,6 +39,7 @@ requires.extend([
     "requests >= 2.18",
     "uritemplate >= 3.0.0",
     "python-dateutil >= 2.6.0",
+    "jwcrypto >= 0.5.0",
 ])
 
 __version__ = ''

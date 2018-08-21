@@ -14,6 +14,60 @@ class GitHubException(Exception):
     pass
 
 
+class GeneratedTokenExpired(GitHubException):
+    """This exception is used to prevent an expired token from being used.
+
+    .. versionadded:: 1.2.0
+    """
+
+    pass
+
+
+class AppInstallationTokenExpired(GeneratedTokenExpired):
+    """This exception is used to prevent an expired token from being used.
+
+    .. versionadded:: 1.2.0
+    """
+
+    pass
+
+
+class AppTokenExpired(GeneratedTokenExpired):
+    """This exception is used to prevent an expired token from being used.
+
+    .. versionadded:: 1.2.0
+    """
+
+    pass
+
+
+class MissingAppAuthentication(GitHubException):
+    """Raised when user tries to call a method that requires app auth.
+
+    .. versionadded:: 1.2.0
+    """
+
+    pass
+
+
+class MissingAppBearerAuthentication(MissingAppAuthentication):
+    """Raised when user tries to call a method that requires app auth.
+
+    .. versionadded:: 1.2.0
+    """
+
+    pass
+
+
+class MissingAppInstallationAuthentication(MissingAppAuthentication):
+    """Raised when user tries to call a method that requires app installation.
+
+    .. versionadded:: 1.2.0
+    """
+
+    pass
+
+
 class GitHubError(GitHubException):
     """The base exception class for all response-related exceptions.
 
