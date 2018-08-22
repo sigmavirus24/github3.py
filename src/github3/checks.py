@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from json import dumps
 
 from . import models
-from .decorators import requires_auth
+from . import decorators
 
 
 class CheckSuite(models.GitHubCore):
@@ -65,8 +65,7 @@ class CheckSuite(models.GitHubCore):
 
     def _update_attributes(self, suite):
         # Import here, because a toplevel import causes an import loop
-        from . import pulls
-        from .repos import ShortRepository
+        from . import pulls, repos
         self._api = suite['url']
         # self.base = Base(pull['base'], self)
         self.status = suite['status']
@@ -79,13 +78,13 @@ class CheckSuite(models.GitHubCore):
         self.pull_requests = [
             pulls.ShortPullRequest(p, self) for p in pull_requests
         ]
-        self.repository = ShortRepository(suite['repository'], self)
+        self.repository = repos.ShortRepository(suite['repository'], self)
         self.id = suite['id']
 
     def _repr(self):
         return '<{s.class_name} [{s.id}:{s.status}]>'.format(s=self)
 
-    @requires_auth
+    @decorators.requires_auth
     def rerequest(self):
         """Rerequest the check suite.
 
@@ -98,7 +97,7 @@ class CheckSuite(models.GitHubCore):
         return self._boolean(self._post(
             url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def check_runs(self):
         """Retrieve the check runs for this suite.
 
@@ -212,7 +211,7 @@ class CheckRun(models.GitHubCore):
     def _repr(self):
         return '<{s.class_name} [{s.name}:{s.status}]>'.format(s=self)
 
-    @requires_auth
+    @decorators.requires_auth
     def update(self, name=None, details_url=None, external_id=None,
                started_at=None, status=None, conclusion=None,
                completed_at=None, output=None, actions=None):
@@ -266,7 +265,7 @@ class CheckRun(models.GitHubCore):
             return True
         return False
 
-    @requires_auth
+    @decorators.requires_auth
     def rerequest(self):
         """Rerequest the check suite.
 
