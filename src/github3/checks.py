@@ -83,8 +83,7 @@ class CheckSuite(models.GitHubCore):
         self.id = suite['id']
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.class_name, self.id)
-        # FIXME(omgjlk): This could be more descriptive perhaps
+        return '<{s.class_name} [{s.id}:{s.status}]>'.format(s=self)
 
     @requires_auth
     def rerequest(self):
