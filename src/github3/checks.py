@@ -11,7 +11,7 @@ from . import decorators
 class CheckSuite(models.GitHubCore):
     """The :class:`CheckSuite <CheckSuite>` object.
 
-    .. versionadded:: 1.2.0
+    .. versionadded:: 1.3.0
 
     Please see GitHub's `CheckSuite Documentation`_ for more information.
 
@@ -84,7 +84,7 @@ class CheckSuite(models.GitHubCore):
     def _repr(self):
         return '<{s.class_name} [{s.id}:{s.status}]>'.format(s=self)
 
-    @decorators.requires_auth
+    @decorators.requires_app_installation_auth
     def rerequest(self):
         """Rerequest the check suite.
 
@@ -97,7 +97,7 @@ class CheckSuite(models.GitHubCore):
         return self._boolean(self._post(
             url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404)
 
-    @decorators.requires_auth
+    @decorators.requires_app_installation_auth
     def check_runs(self):
         """Retrieve the check runs for this suite.
 
@@ -211,7 +211,7 @@ class CheckRun(models.GitHubCore):
     def _repr(self):
         return '<{s.class_name} [{s.name}:{s.status}]>'.format(s=self)
 
-    @decorators.requires_auth
+    @decorators.requires_app_installation_auth
     def update(self, name=None, details_url=None, external_id=None,
                started_at=None, status=None, conclusion=None,
                completed_at=None, output=None, actions=None):
@@ -265,7 +265,7 @@ class CheckRun(models.GitHubCore):
             return True
         return False
 
-    @decorators.requires_auth
+    @decorators.requires_app_installation_auth
     def rerequest(self):
         """Rerequest the check suite.
 
