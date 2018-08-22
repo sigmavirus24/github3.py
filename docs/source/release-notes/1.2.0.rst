@@ -1,7 +1,7 @@
-1.2.0: unreleased
+1.2.0: 2018-08-22
 -----------------
 
-This is a small release with some enhancements.
+This is a larger release with some enhancements and bug fixes.
 
 Features Added
 ``````````````
@@ -46,6 +46,45 @@ Features Added
   representation of labels returned by the API.
 
 - The branch protections API is now completely represented in github3.py.
+
+- We now support the GPG Keys API.
+
+- We now support the Commit Search API.
+
+- We now support Repository Invitations.
+
+- We now have assign and unassign methods that support assigning and
+  unassigning multiple users at once.
+
+- We now support review requests on Pull Requests.
+
+- We now support the ability for a user to activate their membership in an
+  Organization.
+
+- We now support recurisvely traverse a tree via the API.
+
+- We now support enabling or disabling projects on a Repository.
+
+- We now support editing and reading Repository topics.
+
+- We now support Repository Pull Request merge settings.
+
+
+Bugs Fixed
+``````````
+
+- No longer require a Gist to have an owner.
+
+- ``Branch.latest_sha()`` now returns text (unicode) as documented.
+
+
+Special Thanks
+``````````````
+
+A great deal of the exception feature work done above was performed by the
+newest team member of the github3.py project: Jacopo Notarstefano (a.k.a,
+``@jacquerie`` on GitHub). This project has had new life breathed into it
+thanks to Jacopo.
 
 
 .. links
