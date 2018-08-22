@@ -13,6 +13,7 @@ import json as jsonlib
 import uritemplate as urit
 
 from .. import checks
+from .. import decorators
 from .. import events
 from .. import exceptions
 from .. import git
@@ -43,8 +44,6 @@ from . import stats
 from . import status
 from . import tag
 from . import topics
-
-from ..decorators import requires_auth
 
 
 class _Repository(models.GitHubCore):
@@ -121,7 +120,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(pulls.ShortPullRequest, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def add_collaborator(self, username):
         """Add ``username`` as a collaborator to a repository.
 
@@ -264,11 +263,11 @@ class _Repository(models.GitHubCore):
             headers=branch.Branch.PREVIEW_HEADERS,
         )
 
-    @requires_auth
+    @decorators.requires_app_installation_auth
     def check_run(self, id):
         """Return a single check run.
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.3.0
 
         :param int id:
             (required), id of the check run
@@ -284,11 +283,11 @@ class _Repository(models.GitHubCore):
             data = self._json(self._get(url), 200)
         return self._instance_or_null(checks.CheckRun, data)
 
-    @requires_auth
+    @decorators.requires_app_installation_auth
     def check_suite(self, id):
         """Return a single check suite.
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.3.0
 
         :param int id:
             (required), id of the check suite
@@ -558,14 +557,14 @@ class _Repository(models.GitHubCore):
             params = {"anon": "true"}
         return self._iter(int(number), url, users.Contributor, params, etag)
 
-    @requires_auth
+    @decorators.requires_app_installation_auth
     def create_check_run(self, name, head_sha, details_url=None,
                          external_id=None, started_at=None, status=None,
                          conclusion=None, completed_at=None, output=None,
                          actions=None):
         """Create a check run object on a commit
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.3.0
 
         :param str name:
             (required), The name of the check
@@ -612,11 +611,11 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(checks.CheckRun, json)
 
-    @requires_auth
+    @decorators.requires_app_installation_auth
     def create_check_suite(self, head_sha):
         """Create a check suite object on a commit
 
-        .. versionadded:: 1.2.0
+        .. versionadded:: 1.3.0
 
         :param str head_sha:
             The sha of the head commit.
@@ -633,7 +632,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(checks.CheckSuite, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
@@ -655,7 +654,7 @@ class _Repository(models.GitHubCore):
                 sha = json.get("sha")
         return sha
 
-    @requires_auth
+    @decorators.requires_auth
     def create_branch_ref(self, name, sha=None):
         """Create a branch git reference.
 
@@ -674,7 +673,7 @@ class _Repository(models.GitHubCore):
         ref = "refs/heads/%s" % name
         return self.create_ref(ref, sha)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_comment(self, body, sha, path=None, position=None, line=1):
         """Create a comment on a commit.
 
@@ -708,7 +707,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(comment.RepoComment, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_commit(
         self, message, tree, parents, author=None, committer=None
     ):
@@ -751,7 +750,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(git.Commit, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_deployment(
         self,
         ref,
@@ -802,7 +801,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(deployment.Deployment, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_file(
         self, path, message, content, branch=None, committer=None, author=None
     ):
@@ -856,7 +855,7 @@ class _Repository(models.GitHubCore):
                 json["commit"] = git.Commit(json["commit"], self)
         return json
 
-    @requires_auth
+    @decorators.requires_auth
     def create_fork(self, organization=None):
         """Create a fork of this repository.
 
@@ -876,7 +875,7 @@ class _Repository(models.GitHubCore):
         json = self._json(resp, 202)
         return self._instance_or_null(Repository, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_hook(self, name, config, events=["push"], active=True):
         """Create a hook on this repository.
 
@@ -905,7 +904,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return hook.Hook(json, self) if json else None
 
-    @requires_auth
+    @decorators.requires_auth
     def create_issue(
         self,
         title,
@@ -958,7 +957,7 @@ class _Repository(models.GitHubCore):
 
         return self._instance_or_null(issues.ShortIssue, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_key(self, title, key, read_only=False):
         """Create a deploy key.
 
@@ -980,7 +979,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(users.Key, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_label(self, name, color, description=None):
         """Create a label for this repository.
 
@@ -1008,7 +1007,7 @@ class _Repository(models.GitHubCore):
             json = self._json(resp, 201)
         return self._instance_or_null(label.Label, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_milestone(
         self, title, state=None, description=None, due_on=None
     ):
@@ -1043,7 +1042,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(milestone.Milestone, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_project(self, name, body=None):
         """Create a project for this repository.
 
@@ -1069,7 +1068,7 @@ class _Repository(models.GitHubCore):
             )
         return self._instance_or_null(projects.Project, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_pull(self, title, base, head, body=None):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
@@ -1089,7 +1088,7 @@ class _Repository(models.GitHubCore):
         data = {"title": title, "body": body, "base": base, "head": head}
         return self._create_pull(data)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_pull_from_issue(self, issue, base, head):
         """Create a pull request from issue #``issue``.
 
@@ -1109,7 +1108,7 @@ class _Repository(models.GitHubCore):
             return self._create_pull(data)
         return None
 
-    @requires_auth
+    @decorators.requires_auth
     def create_ref(self, ref, sha):
         """Create a reference in this repository.
 
@@ -1133,7 +1132,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(git.Reference, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_release(
         self,
         tag_name,
@@ -1177,7 +1176,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(release.Release, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_status(
         self, sha, state, target_url=None, description=None, context="default"
     ):
@@ -1213,7 +1212,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(status.Status, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_tag(
         self, tag, message, sha, obj_type, tagger, lightweight=False
     ):
@@ -1270,7 +1269,7 @@ class _Repository(models.GitHubCore):
                 self.create_ref("refs/tags/" + tag, json.get("sha"))
         return self._instance_or_null(git.Tag, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_tree(self, tree, base_tree=None):
         """Create a tree on this repository.
 
@@ -1294,7 +1293,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(git.Tree, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def delete(self):
         """Delete this repository.
 
@@ -1305,7 +1304,7 @@ class _Repository(models.GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def delete_key(self, key_id):
         """Delete the key with the specified id from your deploy keys list.
 
@@ -1319,7 +1318,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("keys", str(key_id), base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def delete_subscription(self):
         """Delete the user's subscription to this repository.
 
@@ -1413,7 +1412,7 @@ class _Repository(models.GitHubCore):
             (j.get("name"), contents.Contents(j, self)) for j in json
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def edit(
         self,
         name,
@@ -1585,7 +1584,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(git.Commit, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def hook(self, hook_id):
         """Get a single hook.
 
@@ -1602,7 +1601,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(hook.Hook, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def hooks(self, number=-1, etag=None):
         """Iterate over hooks registered on this repository.
 
@@ -1619,7 +1618,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("hooks", base_url=self._api)
         return self._iter(int(number), url, hook.Hook, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def ignore(self):
         """Ignore notifications from this repository for the user.
 
@@ -1640,7 +1639,7 @@ class _Repository(models.GitHubCore):
             notifications.RepositorySubscription, json
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def imported_issue(self, imported_issue_id):
         """Retrieve imported issue specified by imported issue id.
 
@@ -1660,7 +1659,7 @@ class _Repository(models.GitHubCore):
         json = self._json(data, 200)
         return self._instance_or_null(issue_import.ImportedIssue, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def imported_issues(self, number=-1, since=None, etag=None):
         """Retrieve the collection of imported issues via the API.
 
@@ -1695,7 +1694,7 @@ class _Repository(models.GitHubCore):
             headers=issue_import.ImportedIssue.IMPORT_CUSTOM_HEADERS,
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def import_issue(
         self,
         title,
@@ -1761,7 +1760,7 @@ class _Repository(models.GitHubCore):
         json = self._json(data, 202)
         return self._instance_or_null(issue_import.ImportedIssue, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def invitations(self, number=-1, etag=None):
         """Iterate over the invitations to this repository.
 
@@ -1793,7 +1792,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("assignees", str(username), base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def is_collaborator(self, username):
         """Check to see if ``username`` is a collaborator on this repository.
 
@@ -1913,7 +1912,7 @@ class _Repository(models.GitHubCore):
 
         return self._iter(int(number), url, issues.ShortIssue, params, etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def key(self, id_num):
         """Get the specified deploy key.
 
@@ -1930,7 +1929,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return users.Key(json, self) if json else None
 
-    @requires_auth
+    @decorators.requires_auth
     def keys(self, number=-1, etag=None):
         """Iterate over deploy keys on this repository.
 
@@ -2005,7 +2004,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("languages", base_url=self._api)
         return self._iter(int(number), url, tuple, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def latest_pages_build(self):
         """Get the build information for the most recent Pages build.
 
@@ -2044,7 +2043,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(licenses.RepositoryLicense, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def mark_notifications(self, last_read=""):
         """Mark all notifications in this repository as read.
 
@@ -2066,7 +2065,7 @@ class _Repository(models.GitHubCore):
             self._put(url, data=jsonlib.dumps(mark)), 205, 404
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def merge(self, base, head, message=""):
         """Perform a merge from ``head`` into ``base``.
 
@@ -2162,7 +2161,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("events", base_url=base)
         return self._iter(int(number), url, events.Event, etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def notifications(
         self, all=False, participating=False, since=None, number=-1, etag=None
     ):
@@ -2198,7 +2197,7 @@ class _Repository(models.GitHubCore):
             int(number), url, notifications.Thread, params, etag
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def pages(self):
         """Get information about this repository's pages site.
 
@@ -2211,7 +2210,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(pages.PagesInfo, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def pages_builds(self, number=-1, etag=None):
         """Iterate over pages builds of this repository.
 
@@ -2446,7 +2445,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("releases", base_url=self._api)
         return self._iter(int(number), url, release.Release, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def remove_collaborator(self, username):
         """Remove collaborator ``username`` from the repository.
 
@@ -2467,7 +2466,7 @@ class _Repository(models.GitHubCore):
         )
         return self._boolean(self._delete(url), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def replace_topics(self, new_topics):
         """Replace the repository topics with ``new_topics``.
 
@@ -2531,7 +2530,7 @@ class _Repository(models.GitHubCore):
             url = self._build_url("statuses", sha, base_url=self._api)
         return self._iter(int(number), url, status.Status, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def subscribe(self):
         """Subscribe the user to this repository's notifications.
 
@@ -2567,7 +2566,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("subscribers", base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def subscription(self):
         """Return subscription for this Repository.
 
@@ -2616,7 +2615,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("tags", base_url=self._api)
         return self._iter(int(number), url, tag.RepoTag, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def teams(self, number=-1, etag=None):
         """Iterate over teams with access to this repository.
 
@@ -2666,7 +2665,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(git.Tree, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def unignore(self):
         """Unignore notifications from this repository for the user.
 
@@ -2687,7 +2686,7 @@ class _Repository(models.GitHubCore):
             notifications.RepositorySubscription, json
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def unsubscribe(self):
         """Unsubscribe the user to this repository's notifications.
 
