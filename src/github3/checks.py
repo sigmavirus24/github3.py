@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 
 from json import dumps
 
-from . import models
+from . import apps
 from . import decorators
+from . import models
 
 
 class CheckSuite(models.GitHubCore):
@@ -174,7 +175,7 @@ class CheckRun(models.GitHubCore):
     .. attribute:: app
 
         A :class:`~github3.apps.App` representing the App
-        this run belongs to. (TODO: Implement this)
+        this run belongs to.
 
     .. CheckRun Documentation:
         http://developer.github.com/v3/checks/runs/
@@ -202,8 +203,7 @@ class CheckRun(models.GitHubCore):
         ]
         self.id = run['id']
         self.external_id = run['external_id']
-        # self.app = app.App(run['app'], self)
-        self.app = run['app']  # TODO: turn into an object
+        self.app = apps.App(run['app'], self)
         self.check_suite = run['check_suite']['id']
         # self.output = CheckRunOutput(run['output'], self)
         self.output = run['output']  # TODO: turn into an object
