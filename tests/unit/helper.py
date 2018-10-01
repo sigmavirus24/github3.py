@@ -259,6 +259,17 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
         self.patch_get_json()
 
 
+class UnitAppInstallHelper(UnitHelper):
+    """Helper for unittests that require app installation."""
+
+    def after_setup(self):
+        """Set session app installation"""
+        MockedAuth = mock.create_autospec(
+            github3.session.AppInstallationTokenAuth
+        )
+        self.session.auth = MockedAuth
+
+
 class UnitRequiresAuthenticationHelper(UnitHelper):
 
     """Helper for unit tests that demonstrate authentication is required."""
