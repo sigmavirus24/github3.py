@@ -241,6 +241,17 @@ class UnitIteratorHelper(UnitHelper):
         self.get_json_mock.stop()
 
 
+class UnitIteratorAppInstHelper(UnitIteratorHelper):
+    """Helper for iterable unittests that require app installation."""
+
+    def after_setup(self):
+        """Set session app installation"""
+        MockedAuth = mock.create_autospec(
+            github3.session.AppInstallationTokenAuth
+        )
+        self.session.auth = MockedAuth
+
+
 class UnitSearchIteratorHelper(UnitIteratorHelper):
 
     """Base class for search iterator based unit tests."""
