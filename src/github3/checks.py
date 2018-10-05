@@ -147,7 +147,8 @@ class CheckSuite(models.GitHubCore):
 
     .. attribute:: head_sha
 
-        The sha of the commit at the head of the branch checked
+        The sha of the commit at the head of the branch the check was run
+        against (the source of the pull request)
 
     .. attribute:: head_branch
 
@@ -155,7 +156,7 @@ class CheckSuite(models.GitHubCore):
 
     .. attribute:: before
 
-        The sha of the target branch before the change
+        The sha of the pull request target branch at the time of the checks
 
     .. attribute:: after
 
@@ -166,10 +167,14 @@ class CheckSuite(models.GitHubCore):
         A representation of the repository the suite belongs to as
         :class:`~github3.repos.repo.ShortRepository`.
 
-    .. attribute:: pull_requests
+    .. attribute:: origional_pull_requests
 
         A list of representations of the pull requests the suite belongs to as
-        :class:`~github3.checks.CheckPullRequest`. This may be empty.
+        :class:`~github3.checks.CheckPullRequest`.
+
+        .. note::
+
+            This may be empty.
 
     .. attribute:: id
 
@@ -200,7 +205,7 @@ class CheckSuite(models.GitHubCore):
         self.before = suite['before']
         self.after = suite['after']
         prs = suite.get('pull_requests', [])
-        self.pull_requests = [
+        self.origional_pull_requests = [
             CheckPullRequest(p, self) for p in prs
         ]
         self.repository = repos.ShortRepository(suite['repository'], self)
@@ -272,10 +277,15 @@ class CheckRun(models.GitHubCore):
         when this check run completed. If this run is not completed it will
         be ``None``.
 
-    .. attribute:: pull_requests
+    .. attribute:: origional_pull_requests
 
         A list of representations of the pull requests the run belongs to as
-        :class:`~github3.checks.CheckPullRequest`. This may be empty.
+        :class:`~github3.checks.CheckPullRequest`.
+
+        .. note::
+
+            This may be empty.
+
 
     .. attribute:: id
 
@@ -322,7 +332,7 @@ class CheckRun(models.GitHubCore):
         self.head_sha = run['head_sha']
         self.name = run['name']
         prs = run.get('pull_requests', [])
-        self.pull_requests = [
+        self.origional_pull_requests = [
             CheckPullRequest(p, self) for p in prs
         ]
         self.id = run['id']
