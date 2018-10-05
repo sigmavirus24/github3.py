@@ -54,7 +54,7 @@ class TestCheckRun(UnitAppInstallHelper):
         )
 
         assert isinstance(
-            self.instance.pull_requests[0],
+            self.instance.origional_pull_requests[0],
             github3.checks.CheckPullRequest
         )
 
