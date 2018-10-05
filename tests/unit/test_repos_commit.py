@@ -57,7 +57,7 @@ class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
         self.session.get.assert_called_once_with(
             url_for('check-runs'),
             params={'per_page': 100},
-            headers={}
+            headers=github3.checks.CheckRun.CUSTOM_HEADERS
         )
 
     def test_check_suits(self):
@@ -68,7 +68,7 @@ class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
         self.session.get.assert_called_once_with(
             url_for('check-suites'),
             params={'per_page': 100},
-            headers={}
+            headers=github3.checks.CheckSuite.CUSTOM_HEADERS
         )
 
 
