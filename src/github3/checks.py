@@ -4,9 +4,129 @@ from __future__ import unicode_literals
 
 from json import dumps
 
-from . import apps
 from . import decorators
 from . import models
+
+
+class CheckPullRequest(models.GitHubCore):
+    """Representation of a Pull Request returned in Checks APIs.
+
+    .. versionadded:: 1.3.0
+
+    .. note::
+
+        Refreshing this object returns a :class:`~github3.pulls.PullRequest`.
+
+    This object has the following attributes:
+
+    .. attribute:: id
+
+        The unique id of this pull request across all of GitHub.
+
+    .. attribute:: number
+
+        The number of this pull request on its repository.
+
+    .. attribute:: head
+
+        A dict of minimal head information retrieved from the Check data
+        representing the source of the pull request
+
+    .. attribute:: base
+
+        A dict of minimal base information retrieved from the Check data
+        representing the pull request destination.
+    """
+
+    def _update_attributes(self, pull):
+        self.id = pull['id']
+        self.number = pull['number']
+        self.base = pull['base']
+        self.head = pull['head']
+        self._api = self.url = pull['url']
+
+    def _repr(self):
+        return '<CheckPullRequest [#{0}]>'.format(self.number)
+
+    def to_pull(self):
+        """Retrieve a full PullRequest object for this CheckPullRequest.
+
+        :returns:
+            The full information about this pull request.
+        :rtype:
+            :class:`~github3.pulls.PullRequest`
+        """
+        from . import pulls
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(pulls.PullRequest, json)
+
+    refresh = to_pull
+
+
+class CheckApp(models.GitHubCore):
+    """Representation of an App returned in Checks APIs.
+
+    .. versionadded:: 1.3.0
+
+    .. note::
+
+        Refreshing this object returns a :class:`~github3.apps.App`.
+
+    This object has the following attributes:
+
+    .. attribute:: description
+
+        The description of the App provided by the owner.
+
+    .. attribute:: external_url
+
+        The URL provided for the App by the owner.
+
+    .. attribute:: html_url
+
+        The HTML URL provided for the App by the owner.
+
+    .. attribute:: id
+
+        The unique identifier for the App. This is useful in cases where you
+        may want to authenticate either as an App or as a specific
+        installation of an App.
+
+    .. attribute:: name
+
+        The display name of the App that the user sees.
+
+    .. attribute:: owner
+
+        A dict of minimal user information retrieved from the Check data
+        representing the app owner
+    """
+
+    def _update_attributes(self, app):
+        self.description = app['description']
+        self.external_url = app['external_url']
+        self.html_url = app['html_url']
+        self.id = app['id']
+        self.name = app['name']
+        self.owner = app['owner']
+
+    def _repr(self):
+        return '<App ["{}" by {}]>'.format(self.name,
+                                           str(self.owner['login']))
+
+    def to_app(self):
+        """Retrieve a full App object for this CheckApp.
+
+        :returns:
+            The full information about this App.
+        :rtype:
+            :class:`~github3.apps.App`
+        """
+        from . import apps
+        json = self._json(self._get(self.url), 200)
+        return self._instance_or_null(apps.App, json)
+
+    refresh = to_app
 
 
 class CheckSuite(models.GitHubCore):
@@ -49,11 +169,16 @@ class CheckSuite(models.GitHubCore):
     .. attribute:: pull_requests
 
         A list of representations of the pull requests the suite belongs to as
-        :class:`~github3.pulls.ShortPullRequest`. This may be empty.
+        :class:`~github3.checks.CheckPullRequest`. This may be empty.
 
     .. attribute:: id
 
         The unique GitHub assigned numerical id of this check suite.
+
+    .. attribute:: app
+
+        A :class:`~github3.checks.CheckApp` representing the App
+        this suite belongs to.
 
     .. CheckSuite Documentation:
         http://developer.github.com/v3/checks/suites/
@@ -66,21 +191,21 @@ class CheckSuite(models.GitHubCore):
 
     def _update_attributes(self, suite):
         # Import here, because a toplevel import causes an import loop
-        from . import pulls, repos
+        from . import repos
         self._api = suite['url']
-        # self.base = Base(pull['base'], self)
         self.status = suite['status']
         self.conclusion = suite['conclusion']
         self.head_branch = suite['head_branch']
         self.head_sha = suite['head_sha']
         self.before = suite['before']
         self.after = suite['after']
-        pull_requests = suite.get('pull_requests', [])
+        prs = suite.get('pull_requests', [])
         self.pull_requests = [
-            pulls.ShortPullRequest(p, self) for p in pull_requests
+            CheckPullRequest(p, self) for p in prs
         ]
         self.repository = repos.ShortRepository(suite['repository'], self)
         self.id = suite['id']
+        self.app = CheckApp(suite['app'], self)
 
     def _repr(self):
         return '<{s.class_name} [{s.id}:{s.status}]>'.format(s=self)
@@ -108,13 +233,14 @@ class CheckSuite(models.GitHubCore):
             :class:`~github3.checks.CheckRun`
         """
         url = self._build_url('check-runs', base_url=self._api)
-        return self._iter(-1, url, CheckRun)
+        return self._iter(-1, url, CheckRun,
+                          headers=CheckSuite.CUSTOM_HEADERS)
 
 
 class CheckRun(models.GitHubCore):
     """The :class:`CheckRun <CheckRun>` object.
 
-    .. versionadded:: 1.2.0
+    .. versionadded:: 1.3.0
 
     Please see GitHub's `CheckRun Documentation`_ for more information.
 
@@ -148,8 +274,8 @@ class CheckRun(models.GitHubCore):
 
     .. attribute:: pull_requests
 
-        A list of representations of the pull requests the check run belongs to
-        as :class:`~github3.pulls.ShortPullRequest` (this may be empty).
+        A list of representations of the pull requests the run belongs to as
+        :class:`~github3.checks.CheckPullRequest`. This may be empty.
 
     .. attribute:: id
 
@@ -174,7 +300,7 @@ class CheckRun(models.GitHubCore):
 
     .. attribute:: app
 
-        A :class:`~github3.apps.App` representing the App
+        A :class:`~github3.checks.CheckApp` representing the App
         this run belongs to.
 
     .. CheckRun Documentation:
@@ -187,23 +313,21 @@ class CheckRun(models.GitHubCore):
     }
 
     def _update_attributes(self, run):
-        # Import here, because a toplevel import causes an import loop
-        from . import pulls
         self._api = run['url']
         self.html_url = run['html_url']
         self.status = run['status']
         self.conclusion = run['conclusion']
-        self.started_at = self._strptime(run['created_at'])
+        self.started_at = self._strptime(run['started_at'])
         self.completed_at = self._strptime(run['completed_at'])
         self.head_sha = run['head_sha']
         self.name = run['name']
-        pull_requests = run.get('pull_requests', [])
+        prs = run.get('pull_requests', [])
         self.pull_requests = [
-            pulls.ShortPullRequest(p, self) for p in pull_requests
+            CheckPullRequest(p, self) for p in prs
         ]
         self.id = run['id']
         self.external_id = run['external_id']
-        self.app = apps.App(run['app'], self)
+        self.app = CheckApp(run['app'], self)
         self.check_suite = run['check_suite']['id']
         # self.output = CheckRunOutput(run['output'], self)
         self.output = run['output']  # TODO: turn into an object
@@ -259,7 +383,10 @@ class CheckRun(models.GitHubCore):
         json = None
 
         if data:
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+            json = self._json(self._patch(
+                self._api, data=dumps(data),
+                headers=CheckSuite.CUSTOM_HEADERS), 200
+            )
         if json:
             self._update_attributes(json)
             return True
