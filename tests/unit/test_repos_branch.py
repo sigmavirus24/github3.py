@@ -3,11 +3,12 @@ import github3
 from . import helper
 
 get_example_data = helper.create_example_data_helper('repos_branch_example')
-url_for_branches = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/branches/master'
-)
 url_for_commits = helper.create_url_helper(
     'https://api.github.com/repos/octocat/Hello-World/commits/master'
+)
+url_for_protection = helper.create_url_helper(
+    'https://api.github.com/repos/octocat/Hello-World/'
+    'branches/master/protection'
 )
 
 
@@ -32,71 +33,71 @@ class TestBranch(helper.UnitHelper):
     def test_protect(self):
         """Verify the request to protect a branch."""
         headers = {
-            'Accept': 'application/vnd.github.loki-preview+json'
+            'Accept': 'application/vnd.github.luke-cage-preview+json'
         }
         json = {
-            'protection': {
-                'enabled': True,
-                'required_status_checks': {
-                    'enforcement_level': 'non_admins',
-                    'contexts': [
-                        'continuous-integration/travis-ci'
+            'required_status_checks': {
+                'contexts': [
+                    'continuous-integration/travis-ci'
+                ],
+                'strict': True
+            },
+            'enforce_admins': True,
+            'required_pull_request_reviews': {
+                'dismissal_restrictions': {
+                    'users': [
+                        'octocat'
+                    ],
+                    'teams': [
+                        'justice-league'
                     ]
-                }
+                },
+                'dismiss_stale_reviews': True,
+                'require_code_owner_reviews': True,
+                'required_approving_review_count': 2
+            },
+            'restrictions': {
+                'users': [
+                    'octocat'
+                ],
+                'teams': [
+                    'justice-league'
+                ]
             }
         }
 
-        self.instance.protect()
-        self.session.patch.assert_called_once_with(
-            url_for_branches(),
-            headers=headers,
-            json=json
+        self.instance.protect(
+            enforce_admins=True,
+            required_status_checks={
+                'contexts': [
+                    'continuous-integration/travis-ci'
+                ],
+                'strict': True
+            },
+            required_pull_request_reviews={
+                'dismissal_restrictions': {
+                    'users': [
+                        'octocat'
+                    ],
+                    'teams': [
+                        'justice-league'
+                    ]
+                },
+                'dismiss_stale_reviews': True,
+                'require_code_owner_reviews': True,
+                'required_approving_review_count': 2
+            },
+            restrictions={
+                'users': [
+                    'octocat'
+                ],
+                'teams': [
+                    'justice-league'
+                ]
+            }
         )
-
-    def test_protect_enforcement(self):
-        """Verify the request to protect a branch changing enforcement."""
-        headers = {
-            'Accept': 'application/vnd.github.loki-preview+json'
-        }
-        json = {
-            'protection': {
-                'enabled': True,
-                'required_status_checks': {
-                    'enforcement_level': 'off',
-                    'contexts': [
-                        'continuous-integration/travis-ci'
-                    ]
-                }
-            }
-        }
-
-        self.instance.protect(enforcement='off')
-        self.session.patch.assert_called_once_with(
-            url_for_branches(),
-            headers=headers,
-            json=json
-        )
-
-    def test_protect_status_checks(self):
-        """Verify the request to protect a branch changing status checks."""
-        headers = {
-            'Accept': 'application/vnd.github.loki-preview+json'
-        }
-        json = {
-            'protection': {
-                'enabled': True,
-                'required_status_checks': {
-                    'enforcement_level': 'non_admins',
-                    'contexts': [
-                        'another/status-check'
-                    ]
-                }
-            }
-        }
-
-        self.instance.protect(status_checks=['another/status-check'])
-        self.session.patch.assert_called_once_with(
-            url_for_branches(),
+        self.session.put.assert_called_once_with(
+            url_for_protection(),
             headers=headers,
             json=json
         )
@@ -104,19 +105,13 @@ class TestBranch(helper.UnitHelper):
     def test_unprotect(self):
         """Verify the request to unprotect a branch."""
         headers = {
-            'Accept': 'application/vnd.github.loki-preview+json'
-        }
-        json = {
-            'protection': {
-                'enabled': False
-            }
+            'Accept': 'application/vnd.github.luke-cage-preview+json'
         }
 
         self.instance.unprotect()
-        self.session.patch.assert_called_once_with(
-            url_for_branches(),
-            headers=headers,
-            json=json
+        self.session.delete.assert_called_once_with(
+            url_for_protection(),
+            headers=headers
         )
 
 

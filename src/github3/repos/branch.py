@@ -74,62 +74,56 @@ class _Branch(models.GitHubCore):
         return BranchProtection(json, self)
 
     @decorators.requires_auth
-    def protect(self, enforcement=None, status_checks=None):
-        """Enable force push protection and configure status check enforcement.
+    def protect(self, enforce_admins, required_pull_request_reviews,
+                required_status_checks, restrictions):
+        """Enable force push protection.
 
-        See: http://git.io/v4Gvu
+        See:
+        https://developer.github.com/v3/repos/branches/#update-branch-protection
 
-        :param str enforcement:
-            (optional), Specifies the enforcement level of the status checks.
-            Must be one of 'off', 'non_admins', or 'everyone'. Use `None` or
-            omit to use the already associated value.
-        :param list status_checks:
-            (optional), An list of strings naming status checks that must pass
-            before merging. Use `None` or omit to use the already associated
-            value.
+        :param bool enforce_admins:
+            TODO
+        :param dict required_pull_request_reviews:
+            TODO
+        :param dict required_status_checks:
+            TODO
+        :param dict restrictions:
+            TODO
+        :returns:
+            The protections enabled for this branch.
+        :rtype:
+            :class:`~github3.repos.branch.BranchProtection`
+        """
+        edit = {
+            'enforce_admins': enforce_admins,
+            'required_pull_request_reviews': required_pull_request_reviews,
+            'required_status_checks': required_status_checks,
+            'restrictions': restrictions
+        }
+
+        url = self._build_url('protection', base_url=self._api)
+        preview_key = 'required_approving_review_count'
+        headers = BranchProtection.PREVIEW_HEADERS_MAP[preview_key]
+        resp = self._put(url, json=edit, headers=headers)
+        json = self._json(resp, 200)
+        return BranchProtection(json, self) if json else None
+
+    @decorators.requires_auth
+    def unprotect(self):
+        """Disable force push protection on this branch.
+
+        See:
+        https://developer.github.com/v3/repos/branches/#remove-branch-protection
+
         :returns:
             True if successful, False otherwise
         :rtype:
             bool
         """
-        previous_values = None
-        previous_protection = getattr(self, 'original_protection', {})
-        if previous_protection:
-            previous_values = previous_protection.get('required_status_checks',
-                                                      {})
-        if enforcement is None and previous_values:
-            enforcement = previous_values['enforcement_level']
-        if status_checks is None and previous_values:
-            status_checks = previous_values['contexts']
-
-        edit = {
-            'protection': {
-                'enabled': True,
-                'required_status_checks': {
-                    'enforcement_level': enforcement,
-                    'contexts': status_checks,
-                },
-            },
-        }
-        resp = self._patch(self._api, json=edit,
-                           headers=self.PREVIEW_HEADERS)
-        json = self._json(resp, 200)
-        if self._boolean(resp, 200, 404):
-            self._update_attributes(json)
-            return True
-        return False
-
-    @decorators.requires_auth
-    def unprotect(self):
-        """Disable force push protection on this branch."""
-        edit = {'protection': {'enabled': False}}
-        resp = self._patch(self._api, json=edit,
-                           headers=self.PREVIEW_HEADERS)
-        json = self._json(resp, 200)
-        if self._boolean(resp, 200, 404):
-            self._update_attributes(json)
-            return True
-        return False
+        url = self._build_url('protection', base_url=self._api)
+        preview_key = 'required_approving_review_count'
+        headers = BranchProtection.PREVIEW_HEADERS_MAP[preview_key]
+        return self._boolean(self._delete(url, headers=headers), 204, 404)
 
 
 class Branch(_Branch):
