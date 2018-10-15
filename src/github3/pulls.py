@@ -2,6 +2,7 @@
 """This module contains all the classes relating to pull requests."""
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from json import dumps
 
 from uritemplate import URITemplate
@@ -10,6 +11,7 @@ from . import models
 from . import users
 from .repos import commit as rcommit
 from .repos import contents
+from .repos import status
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
@@ -574,6 +576,31 @@ class _PullRequest(models.GitHubCore):
         """
         url = self._build_url('reviews', base_url=self._api)
         return self._iter(int(number), url, PullReview, etag=etag)
+
+    def statuses(self, number=-1, etag=None, most_recent=True):
+        """Iterate over the statuses associated with this pull request.
+
+        :param int number:
+            (optional), number of statuses to return. Default: -1 returns all
+            available statuses.
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :param str etag:
+            (optional), defaults to True, If true only returns the most recent
+            status of each context type else returns all statuses
+        :returns:
+            generator of statuses for this pull request
+        :rtype:
+            :class:`~github3.repos.Status`
+        """
+        statuses = self._iter(number, self.statuses_url, status.Status,  etag=etag)
+        if not most_recent:
+            return statuses
+        else:
+            statuses_by_context = OrderedDict()
+            for status in statuses:
+                statuses_by_context[status.context] = status
+        return statuses_by_context.values()
 
     @requires_auth
     def update(self, title=None, body=None, state=None, base=None,
