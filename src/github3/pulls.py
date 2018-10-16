@@ -589,7 +589,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.Status`
         """
-        return self._iter(number, self.statuses_url, status.Status,  etag=etag)
+        return self._iter(int(number), self.statuses_url, status.Status,  etag=etag)
 
     @requires_auth
     def update(self, title=None, body=None, state=None, base=None,
