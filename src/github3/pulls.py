@@ -2,7 +2,6 @@
 """This module contains all the classes relating to pull requests."""
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 from json import dumps
 
 from uritemplate import URITemplate
@@ -577,7 +576,7 @@ class _PullRequest(models.GitHubCore):
         url = self._build_url('reviews', base_url=self._api)
         return self._iter(int(number), url, PullReview, etag=etag)
 
-    def statuses(self, number=-1, etag=None, most_recent=True):
+    def statuses(self, number=-1, etag=None):
         """Iterate over the statuses associated with this pull request.
 
         :param int number:
@@ -585,22 +584,12 @@ class _PullRequest(models.GitHubCore):
             available statuses.
         :param str etag:
             (optional), ETag from a previous request to the same endpoint
-        :param str etag:
-            (optional), defaults to True, If true only returns the most recent
-            status of each context type else returns all statuses
         :returns:
             generator of statuses for this pull request
         :rtype:
             :class:`~github3.repos.Status`
         """
-        statuses = self._iter(number, self.statuses_url, status.Status,  etag=etag)
-        if not most_recent:
-            return statuses
-        else:
-            statuses_by_context = OrderedDict()
-            for status in statuses:
-                statuses_by_context[status.context] = status
-        return statuses_by_context.values()
+        return self._iter(number, self.statuses_url, status.Status,  etag=etag)
 
     @requires_auth
     def update(self, title=None, body=None, state=None, base=None,
