@@ -10,6 +10,7 @@ from . import models
 from . import users
 from .repos import commit as rcommit
 from .repos import contents
+from .repos import status
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
@@ -574,6 +575,15 @@ class _PullRequest(models.GitHubCore):
         """
         url = self._build_url('reviews', base_url=self._api)
         return self._iter(int(number), url, PullReview, etag=etag)
+
+    def combined_status(self):
+        """ Retrieve the combined status for this Pull Request
+        :rtype:
+            :class:`~github3.repos.CombinedStatus`
+        """
+        combined_status_url = self.statuses_url.replace('/statuses/', '/status/')
+        json = self._json(self._get(combined_status_url), 200)
+        return self._instance_or_null(status.CombinedStatus, json)
 
     @requires_auth
     def update(self, title=None, body=None, state=None, base=None,
