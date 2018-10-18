@@ -577,7 +577,7 @@ class _PullRequest(models.GitHubCore):
         return self._iter(int(number), url, PullReview, etag=etag)
 
     def combined_status(self):
-        """ Retrieve the combined status for this Pull Request
+        """ Retrieve the combined status for the Head of this Pull Request
         :rtype:
             :class:`~github3.repos.CombinedStatus`
         """
