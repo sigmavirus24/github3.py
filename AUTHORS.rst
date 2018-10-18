@@ -166,3 +166,5 @@ Contributors
 - Jacopo Notarstefano (@jacquerie)
 
 - Taylor Edmiston (@tedmiston)
+
+- Jenny Li (@imjennyli)
