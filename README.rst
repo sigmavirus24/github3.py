@@ -27,7 +27,7 @@ Contributing
 
 Please read the `CONTRIBUTING`_ document.
 
-.. _CONTRIBUTING: https://github.com/sigmavirus24/github3.py/blob/develop/CONTRIBUTING.rst
+.. _CONTRIBUTING: https://github.com/sigmavirus24/github3.py/blob/master/CONTRIBUTING.rst
 
 Testing
 ~~~~~~~
