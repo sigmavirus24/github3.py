@@ -581,8 +581,10 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.CombinedStatus`
         """
-        combined_status_url = self.statuses_url.replace('/statuses/', '/status/')
-        json = self._json(self._get(combined_status_url), 200)
+        url = self._build_url(
+            'status', self.head.sha, base_url=self.repository._api
+        )
+        json = self._json(self._get(url), 200)
         return self._instance_or_null(status.CombinedStatus, json)
 
     @requires_auth
