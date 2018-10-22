@@ -577,7 +577,8 @@ class _PullRequest(models.GitHubCore):
         return self._iter(int(number), url, PullReview, etag=etag)
 
     def statuses(self, number=-1, etag=None):
-        """Iterate over the statuses associated with this pull request.
+        """Iterate over the statuses associated with head of this pull
+         request.
 
         :param int number:
             (optional), number of statuses to return. Default: -1 returns all
@@ -589,7 +590,15 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.Status`
         """
-        return self._iter(int(number), self.statuses_url, status.Status,  etag=etag)
+        if self.repository is None:
+            return []
+
+        # rebuild statuses_url as sigmavirus24 says sometimes github's
+        # returned urls are bad
+        url = self._build_url(
+            'statuses', self.head.sha, base_url=self.repository._api
+        )
+        return self._iter(int(number), url, status.Status,  etag=etag)
 
     @requires_auth
     def update(self, title=None, body=None, state=None, base=None,
