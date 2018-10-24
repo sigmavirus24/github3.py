@@ -31,7 +31,7 @@ from .decorators import (requires_auth, requires_basic_auth,
 
 
 _pubsub_re = re.compile(
-    'https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+'
+    r'https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+'
 )
 
 
