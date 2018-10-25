@@ -404,7 +404,7 @@ class _User(models.GitHubCore):
         return self._iter(int(number), url, ShortUser, etag=etag)
 
     def gpg_keys(self, number=-1, etag=None):
-        """Iterate over the GPG keys of this user.
+        r"""Iterate over the GPG keys of this user.
 
         .. versionadded:: 1.2.0
 

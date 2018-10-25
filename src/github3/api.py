@@ -309,7 +309,7 @@ def gists_by(username, number=-1, etag=None):
 def issues_on(owner, repository, milestone=None, state=None, assignee=None,
               mentioned=None, labels=None, sort=None, direction=None,
               since=None, number=-1, etag=None):
-    """Iterate over issues on owner/repository.
+    r"""Iterate over issues on owner/repository.
 
     .. deprecated:: 1.2.0
 
