@@ -116,7 +116,7 @@ Creating a new repository
 
     r = None
     if repo.get('name'):
-        r = g.create_repo(repo.pop('name'), **repo)
+        r = g.create_repository(repo.pop('name'), **repo)
 
     if r:
         print("Created {0} successfully.".format(r.name))
