@@ -259,7 +259,7 @@ class GitHubCore(object):
 
         :returns: int
         """
-        json = self._json(self._get(self._github_url + '/rate_limit'), 200)
+        json = self._json(self._get(self._build_url('rate_limit')), 200)
         core = json.get('resources', {}).get(self._ratelimit_resource, {})
         self._remaining = core.get('remaining', 0)
         return self._remaining
