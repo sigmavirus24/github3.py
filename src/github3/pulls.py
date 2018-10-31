@@ -477,8 +477,14 @@ class _PullRequest(models.GitHubCore):
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
-    def merge(self, commit_message=None, sha=None, merge_method='merge'):
+    def merge(self, commit_message=None, sha=None, merge_method='merge',
+              commit_title=None):
         """Merge this pull request.
+
+        .. versionchanged:: 1.3.0
+
+            The ``commit_title`` parameter has been added to allow users to
+            set the merge commit title.
 
         .. versionchanged:: 1.0.0
 
@@ -487,6 +493,8 @@ class _PullRequest(models.GitHubCore):
 
         :param str commit_message:
             (optional), message to be used for the merge commit
+        :param str commit_title:
+            (optional), message to be used for the merge commit title
         :param str sha:
             (optional), SHA that pull request head must match to merge.
         :param str merge_method: (optional), Change the merge method.
@@ -502,6 +510,8 @@ class _PullRequest(models.GitHubCore):
             parameters['sha'] = sha
         if commit_message is not None:
             parameters['commit_message'] = commit_message
+        if commit_title is not None:
+            parameters['commit_title'] = commit_title
         url = self._build_url('merge', base_url=self._api)
         json = self._json(self._put(url, data=dumps(parameters)), 200)
         if not json:
