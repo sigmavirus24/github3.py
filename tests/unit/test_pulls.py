@@ -139,6 +139,15 @@ class TestPullRequest(helper.UnitHelper):
             data={"merge_method": "squash", "commit_message": "commit message"}
         )
 
+    def test_merge_with_custom_title(self):
+        """Show that user can merge a Pull Request with custom commit title"""
+        self.instance.merge(commit_title='commit title')
+
+        self.put_called_with(
+            url_for('merge'),
+            data={"merge_method": "merge", "commit_title": "commit title"}
+        )
+
     def test_patch(self):
         """Show that a user can fetch the patch from a Pull Request."""
         self.instance.patch()
