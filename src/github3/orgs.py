@@ -18,22 +18,22 @@ from .repos import Repository, ShortRepository
 class _Team(models.GitHubCore):
     """Base class for Team representations."""
 
-    class_name = '_Team'
+    class_name = "_Team"
     # Roles available to members on a team.
-    member_roles = frozenset(['member', 'maintainer'])
-    filterable_member_roles = member_roles.union(['all'])
+    member_roles = frozenset(["member", "maintainer"])
+    filterable_member_roles = member_roles.union(["all"])
 
     def _update_attributes(self, team):
-        self._api = team['url']
-        self.id = team['id']
-        self.members_urlt = URITemplate(team['members_url'])
-        self.name = team['name']
-        self.permission = team['permission']
-        self.repositories_url = team['repositories_url']
-        self.slug = team['slug']
+        self._api = team["url"]
+        self.id = team["id"]
+        self.members_urlt = URITemplate(team["members_url"])
+        self.name = team["name"]
+        self.permission = team["permission"]
+        self.repositories_url = team["repositories_url"]
+        self.slug = team["slug"]
 
     def _repr(self):
-        return '<{s.class_name} [{s.name}]>'.format(s=self)
+        return "<{s.class_name} [{s.name}]>".format(s=self)
 
     @requires_auth
     def add_member(self, username):
@@ -51,15 +51,16 @@ class _Team(models.GitHubCore):
             bool
         """
         warnings.warn(
-            'This is no longer supported by the GitHub API, see '
-            'https://developer.github.com/changes/2014-09-23-one-more-week'
-            '-before-the-add-team-member-api-breaking-change/',
-            DeprecationWarning)
-        url = self._build_url('members', username, base_url=self._api)
+            "This is no longer supported by the GitHub API, see "
+            "https://developer.github.com/changes/2014-09-23-one-more-week"
+            "-before-the-add-team-member-api-breaking-change/",
+            DeprecationWarning,
+        )
+        url = self._build_url("members", username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_or_update_membership(self, username, role='member'):
+    def add_or_update_membership(self, username, role="member"):
         """Add or update the user's membership in this team.
 
         This returns a dictionary like so::
@@ -82,15 +83,17 @@ class _Team(models.GitHubCore):
             dict
         """
         if role not in self.member_roles:
-            raise ValueError("'role' must be one of {}".format(', '.join(
-                sorted(self.member_roles)
-            )))
-        data = {'role': role}
-        url = self._build_url('memberships', username, base_url=self._api)
+            raise ValueError(
+                "'role' must be one of {}".format(
+                    ", ".join(sorted(self.member_roles))
+                )
+            )
+        data = {"role": role}
+        url = self._build_url("memberships", username, base_url=self._api)
         return self._json(self._put(url, json=data), 200)
 
     @requires_auth
-    def add_repository(self, repository, permission=''):
+    def add_repository(self, repository, permission=""):
         """Add ``repository`` to this team.
 
         If a permission is not provided, the team's default permission
@@ -107,8 +110,8 @@ class _Team(models.GitHubCore):
         """
         data = {}
         if permission:
-            data = {'permission': permission}
-        url = self._build_url('repos', repository, base_url=self._api)
+            data = {"permission": permission}
+        url = self._build_url("repos", repository, base_url=self._api)
         return self._boolean(self._put(url, data=dumps(data)), 204, 404)
 
     @requires_auth
@@ -123,7 +126,7 @@ class _Team(models.GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def edit(self, name, permission=''):
+    def edit(self, name, permission=""):
         """Edit this team.
 
         :param str name:
@@ -136,7 +139,7 @@ class _Team(models.GitHubCore):
             bool
         """
         if name:
-            data = {'name': name, 'permission': permission}
+            data = {"name": name, "permission": permission}
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
             if json:
                 self._update_attributes(json)
@@ -154,7 +157,7 @@ class _Team(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('repos', repository, base_url=self._api)
+        url = self._build_url("repos", repository, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
@@ -177,9 +180,10 @@ class _Team(models.GitHubCore):
             dict
         """
         warnings.warn(
-            'This method is deprecated. Please use '
-            '``add_or_update_membership`` instead.',
-            DeprecationWarning)
+            "This method is deprecated. Please use "
+            "``add_or_update_membership`` instead.",
+            DeprecationWarning,
+        )
         return self.add_or_update_membership(username)
 
     @requires_auth
@@ -194,10 +198,11 @@ class _Team(models.GitHubCore):
             bool
         """
         warnings.warn(
-            'This method is deprecated. Please use '
-            '``membership_for`` instead.',
-            DeprecationWarning)
-        url = self._build_url('members', username, base_url=self._api)
+            "This method is deprecated. Please use "
+            "``membership_for`` instead.",
+            DeprecationWarning,
+        )
+        url = self._build_url("members", username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
@@ -221,11 +226,17 @@ class _Team(models.GitHubCore):
         headers = {}
         params = {}
         if role in self.filterable_member_roles:
-            params['role'] = role
-            headers['Accept'] = 'application/vnd.github.ironman-preview+json'
-        url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, users.ShortUser, params=params,
-                          etag=etag, headers=headers)
+            params["role"] = role
+            headers["Accept"] = "application/vnd.github.ironman-preview+json"
+        url = self._build_url("members", base_url=self._api)
+        return self._iter(
+            int(number),
+            url,
+            users.ShortUser,
+            params=params,
+            etag=etag,
+            headers=headers,
+        )
 
     @requires_auth
     def repositories(self, number=-1, etag=None):
@@ -241,10 +252,11 @@ class _Team(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.ShortRepository`
         """
-        headers = {'Accept': 'application/vnd.github.ironman-preview+json'}
-        url = self._build_url('repos', base_url=self._api)
-        return self._iter(int(number), url, ShortRepository, etag=etag,
-                          headers=headers)
+        headers = {"Accept": "application/vnd.github.ironman-preview+json"}
+        url = self._build_url("repos", base_url=self._api)
+        return self._iter(
+            int(number), url, ShortRepository, etag=etag, headers=headers
+        )
 
     @requires_auth
     def membership_for(self, username):
@@ -257,7 +269,7 @@ class _Team(models.GitHubCore):
         :rtype:
             dict
         """
-        url = self._build_url('memberships', username, base_url=self._api)
+        url = self._build_url("memberships", username, base_url=self._api)
         json = self._json(self._get(url), 200)
         return json or {}
 
@@ -277,11 +289,12 @@ class _Team(models.GitHubCore):
             bool
         """
         warnings.warn(
-            'This is no longer supported by the GitHub API, see '
-            'https://developer.github.com/changes/2014-09-23-one-more-week'
-            '-before-the-add-team-member-api-breaking-change/',
-            DeprecationWarning)
-        url = self._build_url('members', username, base_url=self._api)
+            "This is no longer supported by the GitHub API, see "
+            "https://developer.github.com/changes/2014-09-23-one-more-week"
+            "-before-the-add-team-member-api-breaking-change/",
+            DeprecationWarning,
+        )
+        url = self._build_url("members", username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
@@ -295,7 +308,7 @@ class _Team(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('memberships', username, base_url=self._api)
+        url = self._build_url("memberships", username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
@@ -309,7 +322,7 @@ class _Team(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('repos', repository, base_url=self._api)
+        url = self._build_url("repos", repository, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
 
@@ -348,15 +361,15 @@ class Team(_Team):
         http://developer.github.com/v3/orgs/teams/
     """
 
-    class_name = 'Team'
+    class_name = "Team"
 
     def _update_attributes(self, team):
         super(Team, self)._update_attributes(team)
-        self.created_at = self._strptime(team['created_at'])
-        self.members_count = team['members_count']
-        self.organization = ShortOrganization(team['organization'], self)
-        self.repos_count = team['repos_count']
-        self.updated_at = self._strptime(team['updated_at'])
+        self.created_at = self._strptime(team["created_at"])
+        self.members_count = team["members_count"]
+        self.organization = ShortOrganization(team["organization"], self)
+        self.repos_count = team["repos_count"]
+        self.updated_at = self._strptime(team["updated_at"])
 
 
 class ShortTeam(_Team):
@@ -405,7 +418,7 @@ class ShortTeam(_Team):
         http://developer.github.com/v3/orgs/teams/
     """
 
-    class_name = 'ShortTeam'
+    class_name = "ShortTeam"
     _refresh_to = Team
 
 
@@ -418,42 +431,43 @@ class _Organization(models.GitHubCore):
         http://developer.github.com/v3/orgs/
     """
 
-    class_name = '_Organization'
+    class_name = "_Organization"
 
     # Filters available when listing members. Note: ``"2fa_disabled"``
     # is only available for organization owners.
-    members_filters = frozenset(['2fa_disabled', 'all'])
+    members_filters = frozenset(["2fa_disabled", "all"])
 
     # Roles available to members in an organization.
-    member_roles = frozenset(['admin', 'member'])
-    filterable_member_roles = member_roles.union(['all'])
+    member_roles = frozenset(["admin", "member"])
+    filterable_member_roles = member_roles.union(["all"])
 
     # Roles for invitations, see also:
     # https://developer.github.com/v3/orgs/members/#create-organization-invitation
-    invitation_roles = frozenset(['admin', 'direct_member', 'billing_manager'])
+    invitation_roles = frozenset(
+        ["admin", "direct_member", "billing_manager"]
+    )
 
     def _update_attributes(self, org):
-        self.avatar_url = org['avatar_url']
-        self.description = org['description']
-        self.events_url = org['events_url']
-        self.hooks_url = org['hooks_url']
-        self.id = org['id']
-        self.issues_url = org['issues_url']
-        self.login = org['login']
-        self.members_url = org['members_url']
-        self.public_members_urlt = URITemplate(org['public_members_url'])
-        self.repos_url = org['repos_url']
-        self.url = self._api = org['url']
-        self.type = 'Organization'
+        self.avatar_url = org["avatar_url"]
+        self.description = org["description"]
+        self.events_url = org["events_url"]
+        self.hooks_url = org["hooks_url"]
+        self.id = org["id"]
+        self.issues_url = org["issues_url"]
+        self.login = org["login"]
+        self.members_url = org["members_url"]
+        self.public_members_urlt = URITemplate(org["public_members_url"])
+        self.repos_url = org["repos_url"]
+        self.url = self._api = org["url"]
+        self.type = "Organization"
 
     def _repr(self):
-        display_name = ''
-        name = getattr(self, 'name', None)
+        display_name = ""
+        name = getattr(self, "name", None)
         if name is not None:
-            display_name = ':{}'.format(name)
-        return '<{s.class_name} [{s.login}{display}]>'.format(
-            s=self,
-            display=display_name,
+            display_name = ":{}".format(name)
+        return "<{s.class_name} [{s.login}{display}]>".format(
+            s=self, display=display_name
         )
 
     @requires_auth
@@ -491,19 +505,20 @@ class _Organization(models.GitHubCore):
             bool
         """
         warnings.warn(
-            'This is no longer supported by the GitHub API, see '
-            'https://developer.github.com/changes/2014-09-23-one-more-week'
-            '-before-the-add-team-member-api-breaking-change/',
-            DeprecationWarning)
+            "This is no longer supported by the GitHub API, see "
+            "https://developer.github.com/changes/2014-09-23-one-more-week"
+            "-before-the-add-team-member-api-breaking-change/",
+            DeprecationWarning,
+        )
 
         if int(team_id) < 0:
             return False
 
-        url = self._build_url('teams', str(team_id), 'members', str(username))
+        url = self._build_url("teams", str(team_id), "members", str(username))
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def add_or_update_membership(self, username, role='member'):
+    def add_or_update_membership(self, username, role="member"):
         """Add a member or update their role.
 
         :param str username:
@@ -519,11 +534,15 @@ class _Organization(models.GitHubCore):
             ValueError if role is not a valid choice
         """
         if role not in self.member_roles:
-            raise ValueError("'role' must be one of {}".format(', '.join(
-                sorted(self.member_roles)
-            )))
-        data = {'role': role}
-        url = self._build_url('memberships', str(username), base_url=self._api)
+            raise ValueError(
+                "'role' must be one of {}".format(
+                    ", ".join(sorted(self.member_roles))
+                )
+            )
+        data = {"role": role}
+        url = self._build_url(
+            "memberships", str(username), base_url=self._api
+        )
         json = self._json(self._put(url, json=data), 200)
         return self._instance_or_null(Membership, json)
 
@@ -549,11 +568,11 @@ class _Organization(models.GitHubCore):
         if int(team_id) < 0:
             return False
 
-        url = self._build_url('teams', str(team_id), 'repos', str(repository))
+        url = self._build_url("teams", str(team_id), "repos", str(repository))
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def create_project(self, name, body=''):
+    def create_project(self, name, body=""):
         """Create a project for this organization.
 
         If the client is authenticated and a member of the organization, this
@@ -568,17 +587,27 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.Project`
         """
-        url = self._build_url('projects', base_url=self._api)
-        data = {'name': name, 'body': body}
-        json = self._json(self._post(
-            url, data, headers=Project.CUSTOM_HEADERS), 201)
+        url = self._build_url("projects", base_url=self._api)
+        data = {"name": name, "body": body}
+        json = self._json(
+            self._post(url, data, headers=Project.CUSTOM_HEADERS), 201
+        )
         return self._instance_or_null(Project, json)
 
     @requires_auth
-    def create_repository(self, name, description='', homepage='',
-                          private=False, has_issues=True, has_wiki=True,
-                          team_id=0, auto_init=False, gitignore_template='',
-                          license_template=''):
+    def create_repository(
+        self,
+        name,
+        description="",
+        homepage="",
+        private=False,
+        has_issues=True,
+        has_wiki=True,
+        team_id=0,
+        auto_init=False,
+        gitignore_template="",
+        license_template="",
+    ):
         """Create a repository for this organization.
 
         If the client is authenticated and a member of the organization, this
@@ -619,14 +648,20 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.Repository`
         """
-        url = self._build_url('repos', base_url=self._api)
-        data = {'name': name, 'description': description,
-                'homepage': homepage, 'private': private,
-                'has_issues': has_issues, 'has_wiki': has_wiki,
-                'license_template': license_template, 'auto_init': auto_init,
-                'gitignore_template': gitignore_template}
+        url = self._build_url("repos", base_url=self._api)
+        data = {
+            "name": name,
+            "description": description,
+            "homepage": homepage,
+            "private": private,
+            "has_issues": has_issues,
+            "has_wiki": has_wiki,
+            "license_template": license_template,
+            "auto_init": auto_init,
+            "gitignore_template": gitignore_template,
+        }
         if int(team_id) > 0:
-            data.update({'team_id': team_id})
+            data.update({"team_id": team_id})
         json = self._json(self._post(url, data), 201)
         return self._instance_or_null(Repository, json)
 
@@ -641,11 +676,11 @@ class _Organization(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('public_members', username, base_url=self._api)
+        url = self._build_url("public_members", username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def create_team(self, name, repo_names=[], permission='pull'):
+    def create_team(self, name, repo_names=[], permission="pull"):
         """Create a new team and return it.
 
         This only works if the authenticated user owns this organization.
@@ -668,17 +703,29 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Team`
         """
-        data = {'name': name, 'repo_names': repo_names,
-                'permission': permission}
-        url = self._build_url('teams', base_url=self._api)
+        data = {
+            "name": name,
+            "repo_names": repo_names,
+            "permission": permission,
+        }
+        url = self._build_url("teams", base_url=self._api)
         json = self._json(self._post(url, data), 201)
         return self._instance_or_null(Team, json)
 
     @requires_auth
-    def edit(self, billing_email=None, company=None, email=None, location=None,
-             name=None, description=None, has_organization_projects=None,
-             has_repository_projects=None, default_repository_permission=None,
-             members_can_create_repositories=None):
+    def edit(
+        self,
+        billing_email=None,
+        company=None,
+        email=None,
+        location=None,
+        name=None,
+        description=None,
+        has_organization_projects=None,
+        has_repository_projects=None,
+        default_repository_permission=None,
+        members_can_create_repositories=None,
+    ):
         """Edit this organization.
 
         :param str billing_email:
@@ -723,16 +770,16 @@ class _Organization(models.GitHubCore):
         """
         json = None
         data = {
-            'billing_email': billing_email,
-            'company': company,
-            'email': email,
-            'location': location,
-            'name': name,
-            'description': description,
-            'has_organization_projects': has_organization_projects,
-            'has_repository_projects': has_repository_projects,
-            'default_repository_permission': default_repository_permission,
-            'members_can_create_repositories': members_can_create_repositories,
+            "billing_email": billing_email,
+            "company": company,
+            "email": email,
+            "location": location,
+            "name": name,
+            "description": description,
+            "has_organization_projects": has_organization_projects,
+            "has_repository_projects": has_repository_projects,
+            "default_repository_permission": default_repository_permission,
+            "members_can_create_repositories": members_can_create_repositories,
         }
         self._remove_none(data)
 
@@ -745,8 +792,9 @@ class _Organization(models.GitHubCore):
         return False
 
     @requires_auth
-    def invite(self, team_ids, invitee_id=None, email=None,
-               role='direct_member'):
+    def invite(
+        self, team_ids, invitee_id=None, email=None, role="direct_member"
+    ):
         """Invite the user to join this organization.
 
         :param list[int] team_ids:
@@ -764,8 +812,9 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Invitation`
         """
-        if ((invitee_id is None and email is None) or
-                (invitee_id is not None and email is not None)):
+        if (invitee_id is None and email is None) or (
+            invitee_id is not None and email is not None
+        ):
             raise ValueError(
                 "One of either 'invitee_id' or 'email' must be specified"
             )
@@ -773,18 +822,20 @@ class _Organization(models.GitHubCore):
             raise ValueError(
                 "'team_ids' must be a non-empty list of integers"
             )
-        data = {'team_ids': team_ids}
+        data = {"team_ids": team_ids}
         if invitee_id is not None:
-            data['invitee_id'] = invitee_id
+            data["invitee_id"] = invitee_id
         else:
-            data['email'] = email
+            data["email"] = email
         if role not in self.invitation_roles:
-            raise ValueError("'role' must be one of {}".format(', '.join(
-                sorted(self.invitation_roles)
-            )))
-        headers = {'Accept': 'application/vnd.github.dazzler-preview.json'}
-        data['role'] = role
-        url = self._build_url('invitations', base_url=self._api)
+            raise ValueError(
+                "'role' must be one of {}".format(
+                    ", ".join(sorted(self.invitation_roles))
+                )
+            )
+        headers = {"Accept": "application/vnd.github.dazzler-preview.json"}
+        data["role"] = role
+        url = self._build_url("invitations", base_url=self._api)
         json = self._json(self._post(url, data=data, headers=headers), 200)
         return self._instance_or_null(Invitation, json)
 
@@ -798,7 +849,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('members', username, base_url=self._api)
+        url = self._build_url("members", username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def is_public_member(self, username):
@@ -811,7 +862,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('public_members', username, base_url=self._api)
+        url = self._build_url("public_members", username, base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def all_events(self, username, number=-1, etag=None):
@@ -829,7 +880,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.events.Event`
         """
-        url = self._build_url('users', username, 'events', 'orgs', self.login)
+        url = self._build_url("users", username, "events", "orgs", self.login)
         return self._iter(int(number), url, Event, etag=etag)
 
     def events(self, number=-1, etag=None):
@@ -850,8 +901,9 @@ class _Organization(models.GitHubCore):
             :class:`~github3.events.Event`
         """
         warnings.warn(
-            'This method is deprecated. Please use ``public_events`` instead.',
-            DeprecationWarning)
+            "This method is deprecated. Please use ``public_events`` instead.",
+            DeprecationWarning,
+        )
         return self.public_events(number, etag=etag)
 
     def public_events(self, number=-1, etag=None):
@@ -868,7 +920,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.events.Event`
         """
-        url = self._build_url('events', base_url=self._api)
+        url = self._build_url("events", base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
     @requires_auth
@@ -880,10 +932,11 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Invitation`
         """
-        headers = {'Accept': 'application/vnd.github.korra-preview'}
-        url = self._build_url('invitations', base_url=self._api)
-        return self._iter(int(number), url, Invitation, etag=etag,
-                          headers=headers)
+        headers = {"Accept": "application/vnd.github.korra-preview"}
+        url = self._build_url("invitations", base_url=self._api)
+        return self._iter(
+            int(number), url, Invitation, etag=etag, headers=headers
+        )
 
     def members(self, filter=None, role=None, number=-1, etag=None):
         """Iterate over members of this organization.
@@ -909,15 +962,21 @@ class _Organization(models.GitHubCore):
         headers = {}
         params = {}
         if filter in self.members_filters:
-            params['filter'] = filter
+            params["filter"] = filter
         if role in self.filterable_member_roles:
-            params['role'] = role
+            params["role"] = role
             # TODO(sigmavirus24): Determine if the preview header is still
             # necessary
-            headers['Accept'] = 'application/vnd.github.ironman-preview+json'
-        url = self._build_url('members', base_url=self._api)
-        return self._iter(int(number), url, users.ShortUser, params=params,
-                          etag=etag, headers=headers)
+            headers["Accept"] = "application/vnd.github.ironman-preview+json"
+        url = self._build_url("members", base_url=self._api)
+        return self._iter(
+            int(number),
+            url,
+            users.ShortUser,
+            params=params,
+            etag=etag,
+            headers=headers,
+        )
 
     @requires_auth
     def membership_for(self, username):
@@ -933,7 +992,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Membership`
         """
-        url = self._build_url('memberships', username, base_url=self._api)
+        url = self._build_url("memberships", username, base_url=self._api)
         json = self._json(self._get(url), 200, 404)
         return self._instance_or_null(Membership, json)
 
@@ -950,7 +1009,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.users.ShortUser`
         """
-        url = self._build_url('public_members', base_url=self._api)
+        url = self._build_url("public_members", base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def project(self, id, etag=None):
@@ -963,7 +1022,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.Project`
         """
-        url = self._build_url('projects', id)
+        url = self._build_url("projects", id)
         json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(Project, json)
 
@@ -980,13 +1039,13 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.Project`
         """
-        url = self._build_url('projects', base_url=self._api)
+        url = self._build_url("projects", base_url=self._api)
         return self._iter(
             int(number),
             url,
             Project,
             etag=etag,
-            headers=Project.CUSTOM_HEADERS
+            headers=Project.CUSTOM_HEADERS,
         )
 
     @requires_auth
@@ -998,10 +1057,10 @@ class _Organization(models.GitHubCore):
         :param str username: (required), username of the member to remove
         :returns: bool
         """
-        url = self._build_url('memberships', username, base_url=self._api)
+        url = self._build_url("memberships", username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    def repositories(self, type='', number=-1, etag=None):
+    def repositories(self, type="", number=-1, etag=None):
         """Iterate over repos for this organization.
 
         :param str type:
@@ -1017,10 +1076,10 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.Repository`
         """
-        url = self._build_url('repos', base_url=self._api)
+        url = self._build_url("repos", base_url=self._api)
         params = {}
-        if type in ('all', 'public', 'member', 'private', 'forks', 'sources'):
-            params['type'] = type
+        if type in ("all", "public", "member", "private", "forks", "sources"):
+            params["type"] = type
         return self._iter(int(number), url, ShortRepository, params, etag)
 
     @requires_auth
@@ -1037,7 +1096,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.ShortTeam`
         """
-        url = self._build_url('teams', base_url=self._api)
+        url = self._build_url("teams", base_url=self._api)
         return self._iter(int(number), url, ShortTeam, etag=etag)
 
     @requires_auth
@@ -1051,7 +1110,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('public_members', username, base_url=self._api)
+        url = self._build_url("public_members", username, base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
@@ -1070,7 +1129,7 @@ class _Organization(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('members', username, base_url=self._api)
+        url = self._build_url("members", username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
@@ -1087,8 +1146,9 @@ class _Organization(models.GitHubCore):
             bool
         """
         if int(team_id) > 0:
-            url = self._build_url('teams', str(team_id), 'repos',
-                                  str(repository))
+            url = self._build_url(
+                "teams", str(team_id), "repos", str(repository)
+            )
             return self._boolean(self._delete(url), 204, 404)
         return False
 
@@ -1105,7 +1165,7 @@ class _Organization(models.GitHubCore):
         """
         json = None
         if int(team_id) > 0:
-            url = self._build_url('teams', str(team_id))
+            url = self._build_url("teams", str(team_id))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Team, json)
 
@@ -1170,22 +1230,22 @@ class Organization(_Organization):
         The number of public repositories owned by thi sorganization.
     """
 
-    class_name = 'Organization'
+    class_name = "Organization"
 
     def _update_attributes(self, org):
         super(Organization, self)._update_attributes(org)
-        self.created_at = self._strptime(org['created_at'])
-        self.followers_count = org['followers']
-        self.following_count = org['following']
-        self.html_url = org['html_url']
-        self.public_repos_count = org['public_repos']
+        self.created_at = self._strptime(org["created_at"])
+        self.followers_count = org["followers"]
+        self.following_count = org["following"]
+        self.html_url = org["html_url"]
+        self.public_repos_count = org["public_repos"]
         # GitHub just doesn't return these 4 attributes sometimes. Compare
         # /orgs/github3py to /orgs/testgh3py
-        self.blog = org.get('blog')
-        self.company = org.get('company')
-        self.email = org.get('email')
-        self.location = org.get('location')
-        self.name = org.get('name')
+        self.blog = org.get("blog")
+        self.company = org.get("company")
+        self.email = org.get("email")
+        self.location = org.get("location")
+        self.name = org.get("name")
 
 
 class ShortOrganization(_Organization):
@@ -1255,7 +1315,7 @@ class ShortOrganization(_Organization):
         Previously returned by the API to indicate the type of the account.
     """
 
-    class_name = 'ShortOrganization'
+    class_name = "ShortOrganization"
     _refresh_to = Organization
 
 
@@ -1295,18 +1355,18 @@ class Invitation(models.GitHubCore):
     """
 
     def _update_attributes(self, json):
-        self.created_at = self._strptime(json['created_at'])
-        self.email = json['email']
-        self.id = json['id']
-        self.inviter = users.ShortUser(json['inviter'], self)
-        self.login = json['login']
+        self.created_at = self._strptime(json["created_at"])
+        self.email = json["email"]
+        self.id = json["id"]
+        self.inviter = users.ShortUser(json["inviter"], self)
+        self.login = json["login"]
         # NOTE(sigmavirus24): GitHub docs claim these should be present but
         # in testing it is not.
-        self.invitation_team_url = json.get('invitation_team_url')
-        self.team_count = json.get('team_count')
+        self.invitation_team_url = json.get("invitation_team_url")
+        self.team_count = json.get("team_count")
 
     def _repr(self):
-        return '<Invitation {} for [{}] from [{}]>'.format(
+        return "<Invitation {} for [{}] from [{}]>".format(
             self.id, self.login, self.inviter.login
         )
 
@@ -1319,9 +1379,12 @@ class Invitation(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.ShortTeam`
         """
-        return self._iter(-1, self.invitation_team_url, ShortTeam, headers={
-            'Accept': 'application/vnd.github.dazzler-preview.json',
-        })
+        return self._iter(
+            -1,
+            self.invitation_team_url,
+            ShortTeam,
+            headers={"Accept": "application/vnd.github.dazzler-preview.json"},
+        )
 
 
 class Membership(models.GitHubCore):
@@ -1359,22 +1422,24 @@ class Membership(models.GitHubCore):
     """
 
     def _repr(self):
-        return '<Membership [{0}]>'.format(self.organization)
+        return "<Membership [{0}]>".format(self.organization)
 
     def _update_attributes(self, membership):
-        self._api = membership['url']
-        self.organization = ShortOrganization(membership['organization'], self)
-        self.organization_url = membership['organization_url']
-        self.role = membership['role']
-        self.state = membership['state']
-        self.user = users.ShortUser(membership['user'], self)
+        self._api = membership["url"]
+        self.organization = ShortOrganization(
+            membership["organization"], self
+        )
+        self.organization_url = membership["organization_url"]
+        self.role = membership["role"]
+        self.state = membership["state"]
+        self.user = users.ShortUser(membership["user"], self)
 
         self.active = self.state
         if self.active:
-            self.active = self.state.lower() == 'active'
+            self.active = self.state.lower() == "active"
         self.pending = self.state
         if self.pending:
-            self.pending = self.state.lower() == 'pending'
+            self.pending = self.state.lower() == "pending"
 
     @requires_auth
     def edit(self, state):
@@ -1389,8 +1454,8 @@ class Membership(models.GitHubCore):
             bool
         """
         json = None
-        if state and state.lower() == 'active':
-            data = dumps({'state': state.lower()})
+        if state and state.lower() == "active":
+            data = dumps({"state": state.lower()})
             json = self._json(self._patch(self._api, data=data), 200)
         if json is not None:
             self._update_attributes(json)

@@ -14,7 +14,7 @@ class Topics(models.GitHubCore):
     """
 
     def _update_attributes(self, topics):
-        self.names = topics['names']
+        self.names = topics["names"]
 
     def _repr(self):
-        return '<Topics [{0}]>'.format(', '.join(self.names))
+        return "<Topics [{0}]>".format(", ".join(self.names))

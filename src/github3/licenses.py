@@ -14,16 +14,16 @@ from . import models
 class _License(models.GitHubCore):
     """Base license object."""
 
-    class_name = '_License'
+    class_name = "_License"
 
     def _update_attributes(self, license):
-        self._api = license['url']
-        self.key = license['key']
-        self.name = license['name']
-        self.spdx_id = license['spdx_id']
+        self._api = license["url"]
+        self.key = license["key"]
+        self.name = license["name"]
+        self.spdx_id = license["spdx_id"]
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.class_name, self.name)
+        return "<{0} [{1}]>".format(self.class_name, self.name)
 
 
 class License(_License):
@@ -69,21 +69,21 @@ class License(_License):
         A list of the permissions granted by this license.
     """
 
-    class_name = 'License'
+    class_name = "License"
 
     def _update_attributes(self, license):
         super(License, self)._update_attributes(license)
-        self.body = license['body']
-        self.conditions = license['conditions']
-        self.description = license['description']
-        self.featured = license['featured']
-        self.html_url = license['html_url']
-        self.implementation = license['implementation']
-        self.limitations = license['limitations']
-        self.permissions = license['permissions']
+        self.body = license["body"]
+        self.conditions = license["conditions"]
+        self.description = license["description"]
+        self.featured = license["featured"]
+        self.html_url = license["html_url"]
+        self.implementation = license["implementation"]
+        self.limitations = license["limitations"]
+        self.permissions = license["permissions"]
 
     def _repr(self):
-        return '<License [{0}]>'.format(self.name)
+        return "<License [{0}]>".format(self.name)
 
 
 class ShortLicense(_License):
@@ -109,7 +109,7 @@ class ShortLicense(_License):
         license.
     """
 
-    class_name = 'ShortLicense'
+    class_name = "ShortLicense"
     _refresh_to = License
 
 
@@ -176,22 +176,22 @@ class RepositoryLicense(models.GitHubCore):
     """
 
     def _update_attributes(self, license):
-        self._api = license['url']
-        self.name = license['name']
-        self.path = license['path']
-        self.sha = license['sha']
-        self.size = license['size']
-        self.html_url = license['html_url']
-        self.git_url = license['git_url']
-        self.download_url = license['download_url']
-        self.type = license['type']
-        self.content = license['content']
-        self.encoding = license['encoding']
-        self.links = license['_links']
-        self.license = ShortLicense(license['license'], self)
+        self._api = license["url"]
+        self.name = license["name"]
+        self.path = license["path"]
+        self.sha = license["sha"]
+        self.size = license["size"]
+        self.html_url = license["html_url"]
+        self.git_url = license["git_url"]
+        self.download_url = license["download_url"]
+        self.type = license["type"]
+        self.content = license["content"]
+        self.encoding = license["encoding"]
+        self.links = license["_links"]
+        self.license = ShortLicense(license["license"], self)
 
     def _repr(self):
-        return '<RepositoryLicense [{0}]>'.format(self.name)
+        return "<RepositoryLicense [{0}]>".format(self.name)
 
     def decode_content(self):
         """Decode the :attr:`content` attribute.
@@ -204,8 +204,8 @@ class RepositoryLicense(models.GitHubCore):
         :rtype:
             text (unicode on Python 2, str on Python 3)
         """
-        if self.encoding == 'base64':
-            return base64.b64decode(
-                self.content.encode('utf-8')
-            ).decode('utf-8')
+        if self.encoding == "base64":
+            return base64.b64decode(self.content.encode("utf-8")).decode(
+                "utf-8"
+            )
         return self.content

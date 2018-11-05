@@ -11,8 +11,4 @@ from .repo import Repository
 from .repo import ShortRepository
 from .repo import StarredRepository
 
-__all__ = (
-    'Repository',
-    'ShortRepository',
-    'StarredRepository',
-)
+__all__ = ("Repository", "ShortRepository", "StarredRepository")

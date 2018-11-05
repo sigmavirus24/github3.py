@@ -36,12 +36,17 @@ def timestamp_parameter(timestamp, allow_none=True):
         raise ValueError("Timestamp value cannot be None")
 
     if isinstance(timestamp, datetime.datetime):
-        return timestamp.isoformat() + 'Z'
+        return timestamp.isoformat() + "Z"
 
     if isinstance(timestamp, compat.basestring):
         if not ISO_8601.match(timestamp):
-            raise ValueError(("Invalid timestamp: %s is not a valid ISO-8601"
-                              " formatted date") % timestamp)
+            raise ValueError(
+                (
+                    "Invalid timestamp: %s is not a valid ISO-8601"
+                    " formatted date"
+                )
+                % timestamp
+            )
         return timestamp
 
     raise ValueError("Cannot accept type %s for timestamp" % type(timestamp))
@@ -63,18 +68,18 @@ def stream_response_to_file(response, path=None):
     fd = None
     filename = None
     if path:
-        if isinstance(getattr(path, 'write', None), collections.Callable):
+        if isinstance(getattr(path, "write", None), collections.Callable):
             pre_opened = True
             fd = path
-            filename = getattr(fd, 'name', None)
+            filename = getattr(fd, "name", None)
         else:
-            fd = open(path, 'wb')
+            fd = open(path, "wb")
             filename = path
     else:
-        header = response.headers['content-disposition']
-        i = header.find('filename=') + len('filename=')
+        header = response.headers["content-disposition"]
+        i = header.find("filename=") + len("filename=")
         filename = header[i:]
-        fd = open(filename, 'wb')
+        fd = open(filename, "wb")
 
     for chunk in response.iter_content(chunk_size=512):
         fd.write(chunk)

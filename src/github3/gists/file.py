@@ -9,14 +9,14 @@ class _GistFile(models.GitHubCore):
     """Base for GistFile classes."""
 
     def _update_attributes(self, gistfile):
-        self.raw_url = gistfile['raw_url']
-        self.filename = gistfile['filename']
-        self.language = gistfile['language']
-        self.size = gistfile['size']
-        self.type = gistfile['type']
+        self.raw_url = gistfile["raw_url"]
+        self.filename = gistfile["filename"]
+        self.language = gistfile["language"]
+        self.size = gistfile["size"]
+        self.type = gistfile["type"]
 
     def _repr(self):
-        return '<{s.class_name} [{s.filename}]>'.format(s=self)
+        return "<{s.class_name} [{s.filename}]>".format(s=self)
 
     def content(self):
         """Retrieve contents of file from key 'raw_url'.
@@ -51,12 +51,12 @@ class GistFile(_GistFile):
 
     """
 
-    class_name = 'GistFile'
+    class_name = "GistFile"
 
     def _update_attributes(self, gistfile):
         super(GistFile, self)._update_attributes(gistfile)
-        self.original_content = gistfile['content']
-        self.truncated = gistfile['truncated']
+        self.original_content = gistfile["content"]
+        self.truncated = gistfile["truncated"]
 
 
 class ShortGistFile(_GistFile):
@@ -86,5 +86,5 @@ class ShortGistFile(_GistFile):
         The file size in bytes.
     """
 
-    class_name = 'ShortGistFile'
+    class_name = "ShortGistFile"
     _refresh_to = GistFile

@@ -26,9 +26,9 @@ class UserSearchResult(GitHubCore):
 
     def _update_attributes(self, data):
         result = data.copy()
-        self.score = result.pop('score')
-        self.text_matches = result.pop('text_matches', [])
+        self.score = result.pop("score")
+        self.text_matches = result.pop("text_matches", [])
         self.user = users.ShortUser(result, self)
 
     def _repr(self):
-        return '<UserSearchResult [{0}]>'.format(self.user)
+        return "<UserSearchResult [{0}]>".format(self.user)

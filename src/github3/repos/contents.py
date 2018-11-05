@@ -84,26 +84,26 @@ class Contents(models.GitHubCore):
     """
 
     def _update_attributes(self, content):
-        self._api = content['url']
-        self.content = content.get('content')
-        self.encoding = content.get('encoding')
+        self._api = content["url"]
+        self.content = content.get("content")
+        self.encoding = content.get("encoding")
         self.decoded = self.content
-        if self.encoding == 'base64' and self.content:
+        if self.encoding == "base64" and self.content:
             self.decoded = b64decode(self.content.encode())
-        self.download_url = content['download_url']
-        self.git_url = content['git_url']
-        self.html_url = content['html_url']
-        self.links = content['_links']
-        self.name = content['name']
-        self.path = content['path']
-        self._uniq = self.sha = content['sha']
-        self.size = content['size']
-        self.submodule_git_url = content.get('submodule_git_url')
-        self.target = content.get('target')
-        self.type = content['type']
+        self.download_url = content["download_url"]
+        self.git_url = content["git_url"]
+        self.html_url = content["html_url"]
+        self.links = content["_links"]
+        self.name = content["name"]
+        self.path = content["path"]
+        self._uniq = self.sha = content["sha"]
+        self.size = content["size"]
+        self.submodule_git_url = content.get("submodule_git_url")
+        self.target = content.get("target")
+        self.type = content["type"]
 
     def _repr(self):
-        return '<Contents [{0}]>'.format(self.path)
+        return "<Contents [{0}]>".format(self.path)
 
     def __eq__(self, other):
         return self.decoded == other
@@ -134,21 +134,27 @@ class Contents(models.GitHubCore):
         """
         json = {}
         if message:
-            data = {'message': message, 'sha': self.sha, 'branch': branch,
-                    'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author)}
+            data = {
+                "message": message,
+                "sha": self.sha,
+                "branch": branch,
+                "committer": validate_commmitter(committer),
+                "author": validate_commmitter(author),
+            }
             self._remove_none(data)
             json = self._json(self._delete(self._api, data=dumps(data)), 200)
-            if json and 'commit' in json:
-                json['commit'] = Commit(json['commit'], self)
-            if json and 'content' in json:
-                json['content'] = self._instance_or_null(Contents,
-                                                         json['content'])
+            if json and "commit" in json:
+                json["commit"] = Commit(json["commit"], self)
+            if json and "content" in json:
+                json["content"] = self._instance_or_null(
+                    Contents, json["content"]
+                )
         return json
 
     @requires_auth
-    def update(self, message, content, branch=None, committer=None,
-               author=None):
+    def update(
+        self, message, content, branch=None, committer=None, author=None
+    ):
         """Update this file.
 
         :param str message:
@@ -173,22 +179,27 @@ class Contents(models.GitHubCore):
         """
         if content and not isinstance(content, bytes):
             raise ValueError(  # (No coverage)
-                'content must be a bytes object')  # (No coverage)
+                "content must be a bytes object"
+            )  # (No coverage)
 
         json = None
         if message and content:
-            content = b64encode(content).decode('utf-8')
-            data = {'message': message, 'content': content, 'branch': branch,
-                    'sha': self.sha,
-                    'committer': validate_commmitter(committer),
-                    'author': validate_commmitter(author)}
+            content = b64encode(content).decode("utf-8")
+            data = {
+                "message": message,
+                "content": content,
+                "branch": branch,
+                "sha": self.sha,
+                "committer": validate_commmitter(committer),
+                "author": validate_commmitter(author),
+            }
             self._remove_none(data)
             json = self._json(self._put(self._api, data=dumps(data)), 200)
-            if json and 'content' in json:
-                self._update_attributes(json['content'])
-                json['content'] = self
-            if json and 'commit' in json:
-                json['commit'] = Commit(json['commit'], self)
+            if json and "content" in json:
+                self._update_attributes(json["content"])
+                json["content"] = self
+            if json and "commit" in json:
+                json["commit"] = Commit(json["commit"], self)
         return json
 
 
@@ -198,6 +209,6 @@ def validate_commmitter(d):
     When sending data to GitHub, we need to ensure we're sending the name and
     email for committer and author data.
     """
-    if d and d.get('name') and d.get('email'):
+    if d and d.get("name") and d.get("email"):
         return d
     return None

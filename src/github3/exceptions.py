@@ -98,19 +98,20 @@ class GitHubError(GitHubException):
         try:
             error = resp.json()
             #: Message associated with the error
-            self.msg = error.get('message')
+            self.msg = error.get("message")
             #: List of errors provided by GitHub
-            if error.get('errors'):
-                self.errors = error.get('errors')
+            if error.get("errors"):
+                self.errors = error.get("errors")
         except Exception:  # Amazon S3 error
-            self.msg = resp.content or '[No message]'
+            self.msg = resp.content or "[No message]"
 
     def __repr__(self):
-        return '<{0} [{1}]>'.format(self.__class__.__name__,
-                                    self.msg or self.code)
+        return "<{0} [{1}]>".format(
+            self.__class__.__name__, self.msg or self.code
+        )
 
     def __str__(self):
-        return '{0} {1}'.format(self.code, self.msg)
+        return "{0} {1}".format(self.code, self.msg)
 
     @property
     def message(self):
@@ -146,8 +147,10 @@ class IncompleteResponse(GitHubError):
 class NotRefreshable(GitHubException):
     """Exception to indicate that an object is not refreshable."""
 
-    message_format = ('"{}" is not refreshable because the GitHub API does '
-                      'not provide a URL to retrieve its contents from.')
+    message_format = (
+        '"{}" is not refreshable because the GitHub API does '
+        "not provide a URL to retrieve its contents from."
+    )
 
     def __init__(self, object_name):
         """Initialize our NotRefreshable exception."""
@@ -170,7 +173,7 @@ class TransportError(GitHubException):
         Now inherits from :class:`~github3.exceptions.GitHubException`.
     """
 
-    msg_format = 'An error occurred while making a request to GitHub: {0}'
+    msg_format = "An error occurred while making a request to GitHub: {0}"
 
     def __init__(self, exception):
         """Initialize TransportError exception."""
@@ -179,13 +182,13 @@ class TransportError(GitHubException):
         self.exception = exception
 
     def __str__(self):
-        return '{0}: {1}'.format(type(self.exception), self.msg)
+        return "{0}: {1}".format(type(self.exception), self.msg)
 
 
 class ConnectionError(TransportError):
     """Exception for errors in connecting to or reading data from GitHub."""
 
-    msg_format = 'A connection-level exception occurred: {0}'
+    msg_format = "A connection-level exception occurred: {0}"
 
 
 class UnexpectedResponse(ResponseError):
@@ -204,7 +207,7 @@ class UnprocessableResponseBody(ResponseError):
         self.msg = message
 
     def __repr__(self):
-        return '<{0} [{1}]>'.format('UnprocessableResponseBody', self.body)
+        return "<{0} [{1}]>".format("UnprocessableResponseBody", self.body)
 
     def __str__(self):
         return self.message

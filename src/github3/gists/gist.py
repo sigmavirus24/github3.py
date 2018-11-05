@@ -34,32 +34,34 @@ class _Gist(models.GitHubCore):
 
     """
 
-    class_name = '_Gist'
+    class_name = "_Gist"
     _file_class = gistfile.ShortGistFile
 
     def _update_attributes(self, gist):
-        self.comments_count = gist['comments']
-        self.comments_url = gist['comments_url']
-        self.created_at = self._strptime(gist['created_at'])
-        self.description = gist['description']
-        self.files = {filename: self._file_class(gfile, self)
-                      for filename, gfile in gist['files'].items()}
-        self.git_pull_url = gist['git_pull_url']
-        self.git_push_url = gist['git_push_url']
-        self.html_url = gist['html_url']
-        self.id = gist['id']
-        self.owner = gist.get('owner')
+        self.comments_count = gist["comments"]
+        self.comments_url = gist["comments_url"]
+        self.created_at = self._strptime(gist["created_at"])
+        self.description = gist["description"]
+        self.files = {
+            filename: self._file_class(gfile, self)
+            for filename, gfile in gist["files"].items()
+        }
+        self.git_pull_url = gist["git_pull_url"]
+        self.git_push_url = gist["git_push_url"]
+        self.html_url = gist["html_url"]
+        self.id = gist["id"]
+        self.owner = gist.get("owner")
         if self.owner is not None:
             self.owner = users.ShortUser(self.owner, self)
-        self.public = gist['public']
-        self.updated_at = self._strptime(gist['updated_at'])
-        self.url = self._api = gist['url']
+        self.public = gist["public"]
+        self.updated_at = self._strptime(gist["updated_at"])
+        self.url = self._api = gist["url"]
 
     def __str__(self):
         return self.id
 
     def _repr(self):
-        return '<{s.class_name} [{s.id}]>'.format(s=self)
+        return "<{s.class_name} [{s.id}]>".format(s=self)
 
     @requires_auth
     def create_comment(self, body):
@@ -74,8 +76,8 @@ class _Gist(models.GitHubCore):
         """
         json = None
         if body:
-            url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, data={'body': body}), 201)
+            url = self._build_url("comments", base_url=self._api)
+            json = self._json(self._post(url, data={"body": body}), 201)
         return self._instance_or_null(comment.GistComment, json)
 
     @requires_auth
@@ -90,7 +92,7 @@ class _Gist(models.GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def edit(self, description='', files={}):
+    def edit(self, description="", files={}):
         """Edit this gist.
 
         :param str description:
@@ -108,9 +110,9 @@ class _Gist(models.GitHubCore):
         data = {}
         json = None
         if description:
-            data['description'] = description
+            data["description"] = description
         if files:
-            data['files'] = files
+            data["files"] = files
         if data:
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
@@ -127,7 +129,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.gist.ShortGist`
         """
-        url = self._build_url('forks', base_url=self._api)
+        url = self._build_url("forks", base_url=self._api)
         json = self._json(self._post(url), 201)
         return self._instance_or_null(ShortGist, json)
 
@@ -140,7 +142,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('star', base_url=self._api)
+        url = self._build_url("star", base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def comments(self, number=-1, etag=None):
@@ -156,7 +158,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.comment.GistComment`
         """
-        url = self._build_url('comments', base_url=self._api)
+        url = self._build_url("comments", base_url=self._api)
         return self._iter(int(number), url, comment.GistComment, etag=etag)
 
     def commits(self, number=-1, etag=None):
@@ -182,7 +184,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.history.GistHistory`
         """
-        url = self._build_url('commits', base_url=self._api)
+        url = self._build_url("commits", base_url=self._api)
         return self._iter(int(number), url, history.GistHistory)
 
     def forks(self, number=-1, etag=None):
@@ -202,7 +204,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.gist.ShortGist`
         """
-        url = self._build_url('forks', base_url=self._api)
+        url = self._build_url("forks", base_url=self._api)
         return self._iter(int(number), url, ShortGist, etag=etag)
 
     @requires_auth
@@ -214,7 +216,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('star', base_url=self._api)
+        url = self._build_url("star", base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
@@ -226,7 +228,7 @@ class _Gist(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('star', base_url=self._api)
+        url = self._build_url("star", base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
 
@@ -258,14 +260,14 @@ class GistFork(models.GitHubCore):
     """
 
     def _update_attributes(self, fork):
-        self.created_at = self._strptime(fork['created_at'])
-        self.id = fork['id']
-        self.owner = users.ShortUser(fork['user'], self)
-        self.updated_at = self._strptime(fork['updated_at'])
-        self.url = self._api = fork['url']
+        self.created_at = self._strptime(fork["created_at"])
+        self.id = fork["id"]
+        self.owner = users.ShortUser(fork["user"], self)
+        self.updated_at = self._strptime(fork["updated_at"])
+        self.url = self._api = fork["url"]
 
     def _repr(self):
-        return '<GistFork [{0}]>'.format(self.id)
+        return "<GistFork [{0}]>".format(self.id)
 
     def to_gist(self):
         """Retrieve the full Gist representation of this fork.
@@ -320,16 +322,16 @@ class Gist(_Gist):
         Gist has been truncated or not.
     """
 
-    class_name = 'Gist'
+    class_name = "Gist"
     _file_class = gistfile.GistFile
 
     def _update_attributes(self, gist):
         super(Gist, self)._update_attributes(gist)
-        self.commits_url = gist['commits_url']
-        self.original_forks = [GistFork(fork, self) for fork in gist['forks']]
-        self.forks_url = gist['forks_url']
-        self.history = [history.GistHistory(h, self) for h in gist['history']]
-        self.truncated = gist['truncated']
+        self.commits_url = gist["commits_url"]
+        self.original_forks = [GistFork(fork, self) for fork in gist["forks"]]
+        self.forks_url = gist["forks_url"]
+        self.history = [history.GistHistory(h, self) for h in gist["history"]]
+        self.truncated = gist["truncated"]
 
 
 class ShortGist(_Gist):
@@ -410,5 +412,5 @@ class ShortGist(_Gist):
         The URL to retrieve the list of comments on the Gist via the API.
     """
 
-    class_name = 'ShortGist'
+    class_name = "ShortGist"
     _refresh_to = Gist

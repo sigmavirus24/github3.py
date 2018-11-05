@@ -37,12 +37,12 @@ class EventUser(models.GitHubCore):
     """
 
     def _update_attributes(self, user):
-        self.avatar_url = user['avatar_url']
-        self.display_login = user.get('display_login')
-        self.gravatar_id = user['id']
-        self.id = user['id']
-        self.login = user['login']
-        self._api = self.url = user['url']
+        self.avatar_url = user["avatar_url"]
+        self.display_login = user.get("display_login")
+        self.gravatar_id = user["id"]
+        self.id = user["id"]
+        self.login = user["login"]
+        self._api = self.url = user["url"]
 
     def to_user(self):
         """Retrieve a full User object for this EventUser.
@@ -53,7 +53,8 @@ class EventUser(models.GitHubCore):
             :class:`~github3.users.User`
         """
         from . import users
-        url = self._build_url('users', self.login)
+
+        url = self._build_url("users", self.login)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(users.User, json)
 
@@ -89,11 +90,11 @@ class EventOrganization(models.GitHubCore):
     """
 
     def _update_attributes(self, org):
-        self.avatar_url = org['avatar_url']
-        self.gravatar_id = org['id']
-        self.id = org['id']
-        self.login = org['login']
-        self._api = self.url = org['url']
+        self.avatar_url = org["avatar_url"]
+        self.gravatar_id = org["id"]
+        self.id = org["id"]
+        self.login = org["login"]
+        self._api = self.url = org["url"]
 
     def to_org(self):
         """Retrieve a full Organization object for this EventOrganization.
@@ -104,7 +105,8 @@ class EventOrganization(models.GitHubCore):
             :class:`~github3.orgs.Organization`
         """
         from . import orgs
-        url = self._build_url('orgs', self.login)
+
+        url = self._build_url("orgs", self.login)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(orgs.Organization, json)
 
@@ -142,12 +144,12 @@ class EventPullRequest(models.GitHubCore):
     """
 
     def _update_attributes(self, pull):
-        self.id = pull['id']
-        self.number = pull['number']
-        self.state = pull['state']
-        self.title = pull['title']
-        self.locked = pull['locked']
-        self._api = self.url = pull['url']
+        self.id = pull["id"]
+        self.number = pull["number"]
+        self.state = pull["state"]
+        self.title = pull["title"]
+        self.locked = pull["locked"]
+        self._api = self.url = pull["url"]
 
     def to_pull(self):
         """Retrieve a full PullRequest object for this EventPullRequest.
@@ -158,6 +160,7 @@ class EventPullRequest(models.GitHubCore):
             :class:`~github3.pulls.PullRequest`
         """
         from . import pulls
+
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
 
@@ -240,22 +243,23 @@ class EventReviewComment(models.GitHubCore):
 
     def _update_attributes(self, comment):
         from . import users
-        self._api = comment['url']
-        self.id = comment['id']
-        self.author_association = comment['author_association']
-        self.body = comment['body']
-        self.commit_id = comment['commit_id']
-        self.created_at = self._strptime(comment['created_at'])
-        self.diff_hunk = comment['diff_hunk']
-        self.html_url = comment['html_url']
-        self.links = comment['_links']
-        self.original_commit_id = comment['original_commit_id']
-        self.original_position = comment['original_position']
-        self.path = comment['path']
-        self.position = comment['position']
-        self.pull_request_url = comment['pull_request_url']
-        self.updated_at = self._strptime(comment['updated_at'])
-        self.user = users.ShortUser(comment['user'], self)
+
+        self._api = comment["url"]
+        self.id = comment["id"]
+        self.author_association = comment["author_association"]
+        self.body = comment["body"]
+        self.commit_id = comment["commit_id"]
+        self.created_at = self._strptime(comment["created_at"])
+        self.diff_hunk = comment["diff_hunk"]
+        self.html_url = comment["html_url"]
+        self.links = comment["_links"]
+        self.original_commit_id = comment["original_commit_id"]
+        self.original_position = comment["original_position"]
+        self.path = comment["path"]
+        self.position = comment["position"]
+        self.pull_request_url = comment["pull_request_url"]
+        self.updated_at = self._strptime(comment["updated_at"])
+        self.user = users.ShortUser(comment["user"], self)
 
     def to_review_comment(self):
         """Retrieve a full ReviewComment object for this EventReviewComment.
@@ -266,6 +270,7 @@ class EventReviewComment(models.GitHubCore):
             :class:`~github3.pulls.ReviewComment`
         """
         from . import pulls
+
         comment = self._json(self._get(self._api), 200)
         return pulls.ReviewComment(comment, self)
 
@@ -276,16 +281,17 @@ class EventIssue(models.GitHubCore):
     """The class that represents the issue information returned in Events."""
 
     def _update_attributes(self, issue):
-        self.id = issue['id']
-        self.number = issue['number']
-        self.state = issue['state']
-        self.title = issue['title']
-        self.locked = issue['locked']
-        self._api = self.url = issue['url']
+        self.id = issue["id"]
+        self.number = issue["number"]
+        self.state = issue["state"]
+        self.title = issue["title"]
+        self.locked = issue["locked"]
+        self._api = self.url = issue["url"]
 
     def to_issue(self):
         """Retrieve a full Issue object for this EventIssue."""
         from . import issues
+
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(issues.Issue, json)
 
@@ -338,15 +344,16 @@ class EventIssueComment(models.GitHubCore):
 
     def _update_attributes(self, comment):
         from . import users
-        self._api = comment['url']
-        self.author_association = comment['author_association']
-        self.body = comment['body']
-        self.created_at = self._strptime(comment['created_at'])
-        self.html_url = comment['html_url']
-        self.id = comment['id']
-        self.issue_url = comment['issue_url']
-        self.updated_at = self._strptime(comment['updated_at'])
-        self.user = users.ShortUser(comment['user'], self)
+
+        self._api = comment["url"]
+        self.author_association = comment["author_association"]
+        self.body = comment["body"]
+        self.created_at = self._strptime(comment["created_at"])
+        self.html_url = comment["html_url"]
+        self.id = comment["id"]
+        self.issue_url = comment["issue_url"]
+        self.updated_at = self._strptime(comment["updated_at"])
+        self.user = users.ShortUser(comment["user"], self)
 
     def to_issue_comment(self):
         """Retrieve the full IssueComment object for this comment.
@@ -357,6 +364,7 @@ class EventIssueComment(models.GitHubCore):
             :class:`~github3.issues.comment.IssueComment`
         """
         from .issues import comment
+
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(comment.IssueComment, json)
 
@@ -433,20 +441,20 @@ class Event(models.GitHubCore):
         # If we don't copy this, then we end up altering _json_data which we do
         # not want to do:
         event = copy.deepcopy(event)
-        self.actor = EventUser(event['actor'], self)
-        self.created_at = self._strptime(event['created_at'])
-        self.id = event['id']
-        self.org = event.get('org')
+        self.actor = EventUser(event["actor"], self)
+        self.created_at = self._strptime(event["created_at"])
+        self.id = event["id"]
+        self.org = event.get("org")
         if self.org:
-            self.org = EventOrganization(event['org'], self)
-        self.type = event['type']
+            self.org = EventOrganization(event["org"], self)
+        self.type = event["type"]
         handler = _payload_handlers.get(self.type, identity)
-        self.payload = handler(event['payload'], self)
-        self.repo = event['repo']
-        self.public = event['public']
+        self.payload = handler(event["payload"], self)
+        self.repo = event["repo"]
+        self.public = event["public"]
 
     def _repr(self):
-        return '<Event [{0}]>'.format(self.type[:-5])
+        return "<Event [{0}]>".format(self.type[:-5])
 
     @staticmethod
     def list_types():
@@ -456,88 +464,94 @@ class Event(models.GitHubCore):
 
 def _commitcomment(payload, session):
     from .repos.comment import ShortComment
-    if payload.get('comment'):
-        payload['comment'] = ShortComment(payload['comment'], session)
+
+    if payload.get("comment"):
+        payload["comment"] = ShortComment(payload["comment"], session)
     return payload
 
 
 def _follow(payload, session):
-    if payload.get('target'):
-        payload['target'] = EventUser(payload['target'], session)
+    if payload.get("target"):
+        payload["target"] = EventUser(payload["target"], session)
     return payload
 
 
 def _forkev(payload, session):
     from .repos import ShortRepository
-    if payload.get('forkee'):
-        payload['forkee'] = ShortRepository(payload['forkee'], session)
+
+    if payload.get("forkee"):
+        payload["forkee"] = ShortRepository(payload["forkee"], session)
     return payload
 
 
 def _gist(payload, session):
     from .gists import Gist
-    if payload.get('gist'):
-        payload['gist'] = Gist(payload['gist'], session)
+
+    if payload.get("gist"):
+        payload["gist"] = Gist(payload["gist"], session)
     return payload
 
 
 def _issuecomm(payload, session):
-    if payload.get('issue'):
-        payload['issue'] = EventIssue(payload['issue'], session)
-    if payload.get('comment'):
-        payload['comment'] = EventIssueComment(payload['comment'], session)
+    if payload.get("issue"):
+        payload["issue"] = EventIssue(payload["issue"], session)
+    if payload.get("comment"):
+        payload["comment"] = EventIssueComment(payload["comment"], session)
     return payload
 
 
 def _issueevent(payload, session):
-    if payload.get('issue'):
-        payload['issue'] = EventIssue(payload['issue'], session)
+    if payload.get("issue"):
+        payload["issue"] = EventIssue(payload["issue"], session)
     return payload
 
 
 def _member(payload, session):
-    if payload.get('member'):
-        payload['member'] = EventUser(payload['member'], session)
+    if payload.get("member"):
+        payload["member"] = EventUser(payload["member"], session)
     return payload
 
 
 def _pullreqev(payload, session):
-    if payload.get('pull_request'):
-        payload['pull_request'] = EventPullRequest(payload['pull_request'],
-                                                   session)
+    if payload.get("pull_request"):
+        payload["pull_request"] = EventPullRequest(
+            payload["pull_request"], session
+        )
     return payload
 
 
 def _pullreqcomm(payload, session):
     # Transform the Pull Request attribute
-    pull = payload.get('pull_request')
+    pull = payload.get("pull_request")
     if pull:
-        payload['pull_request'] = EventPullRequest(pull, session)
+        payload["pull_request"] = EventPullRequest(pull, session)
 
     # Transform the Comment attribute
-    comment = payload.get('comment')
+    comment = payload.get("comment")
     if comment:
-        payload['comment'] = EventReviewComment(comment, session)
+        payload["comment"] = EventReviewComment(comment, session)
     return payload
 
 
 def _release(payload, session):
     from .repos.release import Release
-    release = payload.get('release')
+
+    release = payload.get("release")
     if release:
-        payload['release'] = Release(release, session)
+        payload["release"] = Release(release, session)
     return payload
 
 
 def _team(payload, session):
     from .orgs import ShortTeam
     from .repos import ShortRepository
-    if payload.get('team'):
-        payload['team'] = ShortTeam(payload['team'], session)
-    if payload.get('repo'):
-        payload['repo'] = ShortRepository(payload['repo'], session)
-    if payload.get('sender'):
-        payload['sender'] = EventUser(payload['sender'], session)
+
+    if payload.get("team"):
+        payload["team"] = ShortTeam(payload["team"], session)
+    if payload.get("repo"):
+        payload["repo"] = ShortRepository(payload["repo"], session)
+    if payload.get("sender"):
+        payload["sender"] = EventUser(payload["sender"], session)
     return payload
 
 
@@ -547,23 +561,23 @@ def identity(x, session):
 
 
 _payload_handlers = {
-    'CommitCommentEvent': _commitcomment,
-    'CreateEvent': identity,
-    'DeleteEvent': identity,
-    'FollowEvent': _follow,
-    'ForkEvent': _forkev,
-    'ForkApplyEvent': identity,
-    'GistEvent': _gist,
-    'GollumEvent': identity,
-    'IssueCommentEvent': _issuecomm,
-    'IssuesEvent': _issueevent,
-    'MemberEvent': _member,
-    'PublicEvent': identity,
-    'PullRequestEvent': _pullreqev,
-    'PullRequestReviewCommentEvent': _pullreqcomm,
-    'PushEvent': identity,
-    'ReleaseEvent': _release,
-    'StatusEvent': identity,
-    'TeamAddEvent': _team,
-    'WatchEvent': identity,
+    "CommitCommentEvent": _commitcomment,
+    "CreateEvent": identity,
+    "DeleteEvent": identity,
+    "FollowEvent": _follow,
+    "ForkEvent": _forkev,
+    "ForkApplyEvent": identity,
+    "GistEvent": _gist,
+    "GollumEvent": identity,
+    "IssueCommentEvent": _issuecomm,
+    "IssuesEvent": _issueevent,
+    "MemberEvent": _member,
+    "PublicEvent": identity,
+    "PullRequestEvent": _pullreqev,
+    "PullRequestReviewCommentEvent": _pullreqcomm,
+    "PushEvent": identity,
+    "ReleaseEvent": _release,
+    "StatusEvent": identity,
+    "TeamAddEvent": _team,
+    "WatchEvent": identity,
 }

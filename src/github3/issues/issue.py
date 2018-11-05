@@ -26,46 +26,46 @@ class _Issue(models.GitHubCore):
         http://developer.github.com/v3/issues
     """
 
-    class_name = '_Issue'
+    class_name = "_Issue"
 
     def _update_attributes(self, issue):
-        self._api = issue['url']
-        self.assignee = issue['assignee']
+        self._api = issue["url"]
+        self.assignee = issue["assignee"]
         if self.assignee:
             self.assignee = users.ShortUser(self.assignee, self)
-        self.assignees = issue['assignees']
+        self.assignees = issue["assignees"]
         if self.assignees:
             self.assignees = [
                 users.ShortUser(assignee, self) for assignee in self.assignees
             ]
-        self.body = issue['body']
-        self.closed_at = self._strptime(issue['closed_at'])
-        self.comments_count = issue['comments']
-        self.comments_url = issue['comments_url']
-        self.created_at = self._strptime(issue['created_at'])
-        self.events_url = issue['events_url']
-        self.html_url = issue['html_url']
-        self.id = issue['id']
-        self.labels_urlt = URITemplate(issue['labels_url'])
-        self.locked = issue['locked']
-        self.milestone = issue['milestone']
+        self.body = issue["body"]
+        self.closed_at = self._strptime(issue["closed_at"])
+        self.comments_count = issue["comments"]
+        self.comments_url = issue["comments_url"]
+        self.created_at = self._strptime(issue["created_at"])
+        self.events_url = issue["events_url"]
+        self.html_url = issue["html_url"]
+        self.id = issue["id"]
+        self.labels_urlt = URITemplate(issue["labels_url"])
+        self.locked = issue["locked"]
+        self.milestone = issue["milestone"]
         if self.milestone:
             self.milestone = milestone.Milestone(self.milestone, self)
-        self.number = issue['number']
-        self.original_labels = issue['labels']
+        self.number = issue["number"]
+        self.original_labels = issue["labels"]
         if self.original_labels:
             self.original_labels = [
                 label.ShortLabel(lbl, self) for lbl in self.original_labels
             ]
-        self.pull_request_urls = issue.get('pull_request')
-        self.state = issue['state']
-        self.title = issue['title']
-        self.updated_at = self._strptime(issue['updated_at'])
-        self.user = users.ShortUser(issue['user'], self)
+        self.pull_request_urls = issue.get("pull_request")
+        self.state = issue["state"]
+        self.title = issue["title"]
+        self.updated_at = self._strptime(issue["updated_at"])
+        self.user = users.ShortUser(issue["user"], self)
 
     def _repr(self):
-        return '<{class_name} [#{n}]>'.format(
-            n=self.number, class_name=self.class_name,
+        return "<{class_name} [#{n}]>".format(
+            n=self.number, class_name=self.class_name
         )
 
     @requires_auth
@@ -85,7 +85,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        usernames = {getattr(user, 'login', user) for user in users}
+        usernames = {getattr(user, "login", user) for user in users}
         assignees = list({a.login for a in self.assignees} | usernames)
         return self.edit(assignees=assignees)
 
@@ -100,7 +100,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.label.ShortLabel`
         """
-        url = self._build_url('labels', base_url=self._api)
+        url = self._build_url("labels", base_url=self._api)
         json = self._json(self._post(url, data=args), 200)
         return [label.ShortLabel(lbl, self) for lbl in json] if json else []
 
@@ -122,14 +122,18 @@ class _Issue(models.GitHubCore):
             bool
         """
         warnings.warn(
-            'This method is deprecated. Please use ``add_assignees`` '
-            'instead.', DeprecationWarning, stacklevel=2)
+            "This method is deprecated. Please use ``add_assignees`` "
+            "instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         if not username:
             return False
         number = self.milestone.number if self.milestone else None
         labels = [str(lbl) for lbl in self.original_labels]
-        return self.edit(self.title, self.body, username, self.state, number,
-                         labels)
+        return self.edit(
+            self.title, self.body, username, self.state, number, labels
+        )
 
     @requires_auth
     def close(self):
@@ -140,12 +144,13 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        assignee = self.assignee.login if self.assignee else ''
+        assignee = self.assignee.login if self.assignee else ""
         number = self.milestone.number if self.milestone else None
         labels = [lbl.name for lbl in self.original_labels]
 
-        return self.edit(self.title, self.body, assignee, 'closed',
-                         number, labels)
+        return self.edit(
+            self.title, self.body, assignee, "closed", number, labels
+        )
 
     def comment(self, id_num):
         """Get a single comment by its id.
@@ -163,13 +168,12 @@ class _Issue(models.GitHubCore):
         """
         json = None
         if int(id_num) > 0:  # Might as well check that it's positive
-            base_url, _ = self.url.rsplit('/', 1)
-            url = self._build_url('comments', str(id_num),
-                                  base_url=base_url)
+            base_url, _ = self.url.rsplit("/", 1)
+            url = self._build_url("comments", str(id_num), base_url=base_url)
             json = self._json(self._get(url), 200)
         return self._instance_or_null(comment.IssueComment, json)
 
-    def comments(self, number=-1, sort='', direction='', since=None):
+    def comments(self, number=-1, sort="", direction="", since=None):
         """Iterate over the comments on this issue.
 
         :param int number:
@@ -190,7 +194,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.comment.IssueComment`
         """
-        url = self._build_url('comments', base_url=self._api)
+        url = self._build_url("comments", base_url=self._api)
         params = comment.issue_comment_params(sort, direction, since)
         return self._iter(int(number), url, comment.IssueComment, params)
 
@@ -207,14 +211,21 @@ class _Issue(models.GitHubCore):
         """
         json = None
         if body:
-            url = self._build_url('comments', base_url=self._api)
-            json = self._json(self._post(url, data={'body': body}),
-                              201)
+            url = self._build_url("comments", base_url=self._api)
+            json = self._json(self._post(url, data={"body": body}), 201)
         return self._instance_or_null(comment.IssueComment, json)
 
     @requires_auth
-    def edit(self, title=None, body=None, assignee=None, state=None,
-             milestone=None, labels=None, assignees=None):
+    def edit(
+        self,
+        title=None,
+        body=None,
+        assignee=None,
+        state=None,
+        milestone=None,
+        labels=None,
+        assignees=None,
+    ):
         """Edit this issue.
 
         :param str title:
@@ -245,13 +256,19 @@ class _Issue(models.GitHubCore):
             bool
         """
         json = None
-        data = {'title': title, 'body': body, 'assignee': assignee,
-                'state': state, 'milestone': milestone, 'labels': labels,
-                'assignees': assignees}
+        data = {
+            "title": title,
+            "body": body,
+            "assignee": assignee,
+            "state": state,
+            "milestone": milestone,
+            "labels": labels,
+            "assignees": assignees,
+        }
         self._remove_none(data)
         if data:
-            if 'milestone' in data and data['milestone'] == 0:
-                data['milestone'] = None
+            if "milestone" in data and data["milestone"] == 0:
+                data["milestone"] = None
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_attributes(json)
@@ -269,7 +286,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.event.IssueEvent`
         """
-        url = self._build_url('events', base_url=self._api)
+        url = self._build_url("events", base_url=self._api)
         return self._iter(int(number), url, event.IssueEvent)
 
     def is_closed(self):
@@ -280,7 +297,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        if self.closed_at or (self.state == 'closed'):
+        if self.closed_at or (self.state == "closed"):
             return True
         return False
 
@@ -297,7 +314,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.label.ShortLabel`
         """
-        url = self._build_url('labels', base_url=self._api)
+        url = self._build_url("labels", base_url=self._api)
         return self._iter(int(number), url, label.ShortLabel, etag=etag)
 
     @requires_auth
@@ -309,7 +326,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('lock', base_url=self._api)
+        url = self._build_url("lock", base_url=self._api)
         return self._boolean(self._put(url), 204, 404)
 
     def pull_request(self):
@@ -321,10 +338,11 @@ class _Issue(models.GitHubCore):
             :class:`~github3.pulls.PullRequest`
         """
         from .. import pulls
+
         json = None
         pull_request_url = None
         if self.pull_request_urls is not None:
-            pull_request_url = self.pull_request_urls.get('url')
+            pull_request_url = self.pull_request_urls.get("url")
         if pull_request_url:
             json = self._json(self._get(pull_request_url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
@@ -346,7 +364,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        usernames = {getattr(user, 'login', user) for user in users}
+        usernames = {getattr(user, "login", user) for user in users}
         assignees = list({a.login for a in self.assignees} - usernames)
         return self.edit(assignees=assignees)
 
@@ -361,7 +379,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.label.ShortLabel`
         """
-        url = self._build_url('labels', name, base_url=self._api)
+        url = self._build_url("labels", name, base_url=self._api)
         json = self._json(self._delete(url), 200, 404)
         labels = [label.ShortLabel(lbl, self) for lbl in json] if json else []
         return labels
@@ -389,7 +407,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.label.ShortLabel`
         """
-        url = self._build_url('labels', base_url=self._api)
+        url = self._build_url("labels", base_url=self._api)
         json = self._json(self._put(url, data=dumps(labels)), 200)
         return [label.ShortLabel(lbl, self) for lbl in json] if json else []
 
@@ -404,11 +422,12 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        assignee = self.assignee.login if self.assignee else ''
+        assignee = self.assignee.login if self.assignee else ""
         number = self.milestone.number if self.milestone else None
         labels = [str(lbl) for lbl in self.original_labels]
-        return self.edit(self.title, self.body, assignee, 'open',
-                         number, labels)
+        return self.edit(
+            self.title, self.body, assignee, "open", number, labels
+        )
 
     @requires_auth
     def unlock(self):
@@ -419,7 +438,7 @@ class _Issue(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('lock', base_url=self._api)
+        url = self._build_url("lock", base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
 
@@ -453,13 +472,13 @@ class Issue(_Issue):
         representing the user who closed the issue.
     """
 
-    class_name = 'Issue'
+    class_name = "Issue"
 
     def _update_attributes(self, issue):
         super(Issue, self)._update_attributes(issue)
-        self.body_html = issue['body_html']
-        self.body_text = issue['body_text']
-        self.closed_by = issue['closed_by']
+        self.body_html = issue["body_html"]
+        self.body_text = issue["body_text"]
+        self.closed_by = issue["closed_by"]
         if self.closed_by:
             self.closed_by = users.ShortUser(self.closed_by, self)
 
@@ -576,5 +595,5 @@ class ShortIssue(_Issue):
         this issue.
     """
 
-    class_name = 'ShortIssue'
+    class_name = "ShortIssue"
     _refresh_to = Issue

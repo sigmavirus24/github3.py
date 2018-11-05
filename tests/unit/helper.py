@@ -13,11 +13,11 @@ import unittest
 
 def create_url_helper(base_url):
     """A function to generate ``url_for`` helpers."""
-    base_url = base_url.rstrip('/')
+    base_url = base_url.rstrip("/")
 
-    def url_for(path=''):
+    def url_for(path=""):
         if path:
-            path = '/' + path.strip('/')
+            path = "/" + path.strip("/")
         return base_url + path
 
     return url_for
@@ -46,15 +46,15 @@ def build_url(self, *args, **kwargs):
 
 def enterprise_build_url_builder(enterprise_url):
     """Build a URL builder function."""
+
     def enterprise_build_url(self, *args, **kwargs):
         """A function to proxy to the actual GitHubSession#build_url method."""
         # We want to assert what is happening with the actual calls to the
         # Internet. We can proxy this.
         return github3.session.GitHubSession().build_url(
-            *args,
-            base_url=enterprise_url,
-            **kwargs
+            *args, base_url=enterprise_url, **kwargs
         )
+
     return enterprise_build_url
 
 
@@ -79,7 +79,7 @@ class UnitHelper(unittest.TestCase):
     def create_session_mock(self, *args):
         """Create a mocked session and add headers and auth attributes."""
         session = self.create_mocked_session()
-        base_attrs = ['headers', 'auth']
+        base_attrs = ["headers", "auth"]
         attrs = dict(
             (key, mock.Mock()) for key in set(args).union(base_attrs)
         )
@@ -100,8 +100,7 @@ class UnitHelper(unittest.TestCase):
         class.
         """
         if self.example_data and self.session:
-            instance = self.described_class(self.example_data,
-                                            self.session)
+            instance = self.described_class(self.example_data, self.session)
         elif self.example_data and not self.session:
             session = self.create_session_mock()
             instance = self.described_class(self.example_data, session)
@@ -110,14 +109,15 @@ class UnitHelper(unittest.TestCase):
             if self.enterprise_url is None:
                 instance = self.described_class(session=self.session)
             else:
-                instance = self.described_class(self.enterprise_url,
-                                                session=self.session)
+                instance = self.described_class(
+                    self.enterprise_url, session=self.session
+                )
 
         return instance
 
     def delete_called_with(self, *args, **kwargs):
         """Use to assert delete was called with JSON."""
-        self.method_called_with('delete', args, kwargs)
+        self.method_called_with("delete", args, kwargs)
 
     def method_called_with(self, method_name, args, kwargs):
         """Assert that a method was called on a session with JSON."""
@@ -127,12 +127,12 @@ class UnitHelper(unittest.TestCase):
 
         using_json = False
         # Data passed to assertion
-        data = kwargs.pop('data', None)
+        data = kwargs.pop("data", None)
         if data is None:
             using_json = True
-            data = kwargs.pop('json', None)
+            data = kwargs.pop("json", None)
         # Data passed to patch
-        call_data = call_kwargs.pop('json' if using_json else 'data', None)
+        call_data = call_kwargs.pop("json" if using_json else "data", None)
         # Data passed by the call to post positionally
         #                                URL, 'json string'
         if data and call_data is None:
@@ -148,7 +148,7 @@ class UnitHelper(unittest.TestCase):
 
     def patch_called_with(self, *args, **kwargs):
         """Use to assert patch was called with JSON."""
-        self.method_called_with('patch', args, kwargs)
+        self.method_called_with("patch", args, kwargs)
 
     def post_called_with(self, *args, **kwargs):
         """Use to assert post was called with JSON."""
@@ -156,7 +156,7 @@ class UnitHelper(unittest.TestCase):
         call_args, call_kwargs = self.session.post.call_args
 
         # Data passed to assertion
-        data = kwargs.pop('data', None)
+        data = kwargs.pop("data", None)
         # Data passed by the call to post positionally
         #                                URL, 'json string'
         call_args, call_data = call_args[:1], call_args[1]
@@ -170,7 +170,7 @@ class UnitHelper(unittest.TestCase):
 
     def put_called_with(self, *args, **kwargs):
         """Use to assert put was called with JSON."""
-        self.method_called_with('put', args, kwargs)
+        self.method_called_with("put", args, kwargs)
 
     def setUp(self):
         """Use to set up attributes on self before each test."""
@@ -225,7 +225,7 @@ class UnitIteratorHelper(UnitHelper):
     def patch_get_json(self):
         """Patch a GitHubIterator's _get_json method."""
         self.get_json_mock = mock.patch.object(
-            github3.structs.GitHubIterator, '_get_json'
+            github3.structs.GitHubIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
         self.patched_get_json.return_value = []
@@ -248,7 +248,7 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
     def patch_get_json(self):
         """Patch a SearchIterator's _get_json method."""
         self.get_json_mock = mock.patch.object(
-            github3.structs.SearchIterator, '_get_json'
+            github3.structs.SearchIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
         self.patched_get_json.return_value = []
@@ -277,9 +277,8 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
             func(*args, **kwargs)
 
 
-@pytest.mark.usefixtures('enterprise_url')
+@pytest.mark.usefixtures("enterprise_url")
 class UnitGitHubEnterpriseHelper(UnitHelper):
-
     def get_build_url_proxy(self):
         return enterprise_build_url_builder(self.enterprise_url)
 
@@ -289,7 +288,7 @@ is_py3 = (3, 0) <= sys.version_info < (4, 0)
 
 class NullObject(object):
     def __init__(self, initializer=None):
-        self.__dict__['initializer'] = initializer
+        self.__dict__["initializer"] = initializer
 
     def __int__(self):
         return 0
@@ -300,15 +299,15 @@ class NullObject(object):
     __nonzero__ = __bool__
 
     def __str__(self):
-        return ''
+        return ""
 
     def __unicode__(self):
-        return '' if is_py3 else ''.decode()
+        return "" if is_py3 else "".decode()
 
     def __repr__(self):
-        return '<NullObject({0})>'.format(
-            repr(self.__getattribute__('initializer'))
-            )
+        return "<NullObject({0})>".format(
+            repr(self.__getattribute__("initializer"))
+        )
 
     def __getitem__(self, index):
         return self

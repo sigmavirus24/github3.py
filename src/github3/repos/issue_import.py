@@ -38,14 +38,14 @@ class ImportedIssue(models.GitHubCore):
     """
 
     IMPORT_CUSTOM_HEADERS = {
-        'Accept': 'application/vnd.github.golden-comet-preview+json'
+        "Accept": "application/vnd.github.golden-comet-preview+json"
     }
 
     def _update_attributes(self, issue):
-        self._api = issue['url']
-        self.created_at = self._strptime(issue['created_at'])
-        self.id = issue['id']
-        self.import_issues_url = issue['import_issues_url']
-        self.repository_url = issue['repository_url']
-        self.status = issue['status']
-        self.updated_at = self._strptime(issue['updated_at'])
+        self._api = issue["url"]
+        self.created_at = self._strptime(issue["created_at"])
+        self.id = issue["id"]
+        self.import_issues_url = issue["import_issues_url"]
+        self.repository_url = issue["repository_url"]
+        self.status = issue["status"]
+        self.updated_at = self._strptime(issue["updated_at"])

@@ -32,9 +32,9 @@ class IssueSearchResult(GitHubCore):
 
     def _update_attributes(self, data):
         result = data.copy()
-        self.score = result.pop('score')
-        self.text_matches = result.pop('text_matches', [])
+        self.score = result.pop("score")
+        self.text_matches = result.pop("text_matches", [])
         self.issue = ShortIssue(result, self)
 
     def _repr(self):
-        return '<IssueSearchResult [{0}]>'.format(self.issue)
+        return "<IssueSearchResult [{0}]>".format(self.issue)

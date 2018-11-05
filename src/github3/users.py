@@ -77,21 +77,21 @@ class GPGKey(models.GitHubCore):
     """
 
     def _update_attributes(self, key):
-        self.can_certify = key['can_certify']
-        self.can_encrypt_comms = key['can_encrypt_comms']
-        self.can_encrypt_storage = key['can_encrypt_storage']
-        self.can_sign = key['can_sign']
-        self.created_at = self._strptime(key['created_at'])
-        self.emails = [ShortEmail(email, self) for email in key['emails']]
-        self.expires_at = self._strptime(key['expires_at'])
-        self.id = key['id']
-        self.key_id = key['key_id']
-        self.primary_key_id = key['primary_key_id']
-        self.public_key = key['public_key']
-        self.subkeys = [GPGKey(subkey, self) for subkey in key['subkeys']]
+        self.can_certify = key["can_certify"]
+        self.can_encrypt_comms = key["can_encrypt_comms"]
+        self.can_encrypt_storage = key["can_encrypt_storage"]
+        self.can_sign = key["can_sign"]
+        self.created_at = self._strptime(key["created_at"])
+        self.emails = [ShortEmail(email, self) for email in key["emails"]]
+        self.expires_at = self._strptime(key["expires_at"])
+        self.id = key["id"]
+        self.key_id = key["key_id"]
+        self.primary_key_id = key["primary_key_id"]
+        self.public_key = key["public_key"]
+        self.subkeys = [GPGKey(subkey, self) for subkey in key["subkeys"]]
 
     def _repr(self):
-        return '<GPG Key [{0}]>'.format(self.key_id)
+        return "<GPG Key [{0}]>".format(self.key_id)
 
     def __str__(self):
         return self.key_id
@@ -105,7 +105,7 @@ class GPGKey(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('user', 'gpg_keys', self.id)
+        url = self._build_url("user", "gpg_keys", self.id)
         return self._boolean(self._delete(url), 204, 404)
 
 
@@ -131,12 +131,12 @@ class Key(models.GitHubCore):
     """
 
     def _update_attributes(self, key, session=None):
-        self._api = key.get('url')
-        self.key = key['key']
-        self.id = key['id']
+        self._api = key.get("url")
+        self.key = key["key"]
+        self.id = key["id"]
 
     def _repr(self):
-        return '<User Key [{0}]>'.format(self.title)
+        return "<User Key [{0}]>".format(self.title)
 
     def __str__(self):
         return self.key
@@ -161,7 +161,7 @@ class Key(models.GitHubCore):
         """
         json = None
         if title and key:
-            data = {'title': title, 'key': key}
+            data = {"title": title, "key": key}
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_attributes(json)
@@ -199,13 +199,13 @@ class Plan(models.GitHubCore):
     """
 
     def _update_attributes(self, plan):
-        self.collaborators = plan['collaborators']
-        self.name = plan['name']
-        self.private_repos_count = plan['private_repos']
-        self.space = plan['space']
+        self.collaborators = plan["collaborators"]
+        self.name = plan["name"]
+        self.private_repos_count = plan["private_repos"]
+        self.space = plan["space"]
 
     def _repr(self):
-        return '<Plan [{0}]>'.format(self.name)  # (No coverage)
+        return "<Plan [{0}]>".format(self.name)  # (No coverage)
 
     def __str__(self):
         return self.name
@@ -215,20 +215,20 @@ class Plan(models.GitHubCore):
 
         :returns: bool
         """
-        return self.name == 'free'  # (No coverage)
+        return self.name == "free"  # (No coverage)
 
 
 class _Email(models.GitHubCore):
     """Base email object."""
 
-    class_name = '_Email'
+    class_name = "_Email"
 
     def _update_attributes(self, email):
-        self.email = email['email']
-        self.verified = email['verified']
+        self.email = email["email"]
+        self.verified = email["verified"]
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.class_name, self.email)
+        return "<{0} [{1}]>".format(self.class_name, self.email)
 
     def __str__(self):
         return self.email
@@ -249,7 +249,7 @@ class ShortEmail(_Email):
         not
     """
 
-    class_name = 'ShortEmail'
+    class_name = "ShortEmail"
 
 
 class Email(_Email):
@@ -276,11 +276,11 @@ class Email(_Email):
 
     def _update_attributes(self, email):
         super(Email, self)._update_attributes(email)
-        self.primary = email['primary']
-        self.visibility = email['visibility']
+        self.primary = email["primary"]
+        self.visibility = email["visibility"]
 
     def _repr(self):
-        return '<Email [{0}]>'.format(self.email)
+        return "<Email [{0}]>".format(self.email)
 
     def __str__(self):
         return self.email
@@ -305,39 +305,38 @@ class _User(models.GitHubCore):
         http://developer.github.com/v3/users/
     """
 
-    class_name = '_User'
+    class_name = "_User"
 
     def _update_attributes(self, user):
-        self.avatar_url = user['avatar_url']
-        self.events_urlt = URITemplate(user['events_url'])
-        self.followers_url = user['followers_url']
-        self.following_urlt = URITemplate(user['following_url'])
-        self.gists_urlt = URITemplate(user['gists_url'])
-        self.gravatar_id = user['gravatar_id']
-        self.html_url = user['html_url']
-        self.id = user['id']
-        self.login = user['login']
-        self.organizations_url = user['organizations_url']
-        self.received_events_url = user['received_events_url']
-        self.repos_url = user['repos_url']
-        self.site_admin = user.get('site_admin')
-        self.starred_urlt = URITemplate(user['starred_url'])
-        self.subscriptions_url = user['subscriptions_url']
-        self.type = user['type']
-        self.url = self._api = user['url']
+        self.avatar_url = user["avatar_url"]
+        self.events_urlt = URITemplate(user["events_url"])
+        self.followers_url = user["followers_url"]
+        self.following_urlt = URITemplate(user["following_url"])
+        self.gists_urlt = URITemplate(user["gists_url"])
+        self.gravatar_id = user["gravatar_id"]
+        self.html_url = user["html_url"]
+        self.id = user["id"]
+        self.login = user["login"]
+        self.organizations_url = user["organizations_url"]
+        self.received_events_url = user["received_events_url"]
+        self.repos_url = user["repos_url"]
+        self.site_admin = user.get("site_admin")
+        self.starred_urlt = URITemplate(user["starred_url"])
+        self.subscriptions_url = user["subscriptions_url"]
+        self.type = user["type"]
+        self.url = self._api = user["url"]
         self._uniq = self.id
 
     def __str__(self):
         return self.login
 
     def _repr(self):
-        full_name = ''
-        name = getattr(self, 'name', None)
+        full_name = ""
+        name = getattr(self, "name", None)
         if name is not None:
-            full_name = ':{}'.format(name)
-        return '<{s.class_name} [{s.login}{full_name}]>'.format(
-            s=self,
-            full_name=full_name,
+            full_name = ":{}".format(name)
+        return "<{s.class_name} [{s.login}{full_name}]>".format(
+            s=self, full_name=full_name
         )
 
     def is_assignee_on(self, username, repository):
@@ -348,8 +347,9 @@ class _User(models.GitHubCore):
         :returns: True if the use can be assigned, False otherwise
         :rtype: :class:`bool`
         """
-        url = self._build_url('repos', username, repository, 'assignees',
-                              self.login)
+        url = self._build_url(
+            "repos", username, repository, "assignees", self.login
+        )
         return self._boolean(self._get(url), 204, 404)
 
     def is_following(self, username):
@@ -373,9 +373,9 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
-        path = ['events']
+        path = ["events"]
         if public:
-            path.append('public')
+            path.append("public")
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
@@ -388,7 +388,7 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`User <User>`\ s
         """
-        url = self._build_url('followers', base_url=self._api)
+        url = self._build_url("followers", base_url=self._api)
         return self._iter(int(number), url, ShortUser, etag=etag)
 
     def following(self, number=-1, etag=None):
@@ -400,7 +400,7 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`User <User>`\ s
         """
-        url = self._build_url('following', base_url=self._api)
+        url = self._build_url("following", base_url=self._api)
         return self._iter(int(number), url, ShortUser, etag=etag)
 
     def gpg_keys(self, number=-1, etag=None):
@@ -414,7 +414,7 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`GPGKey <GPGKey>`\ s
         """
-        url = self._build_url('gpg_keys', base_url=self._api)
+        url = self._build_url("gpg_keys", base_url=self._api)
         return self._iter(int(number), url, GPGKey, etag=etag)
 
     def keys(self, number=-1, etag=None):
@@ -428,7 +428,7 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`Key <Key>`\ s
         """
-        url = self._build_url('keys', base_url=self._api)
+        url = self._build_url("keys", base_url=self._api)
         return self._iter(int(number), url, Key, etag=etag)
 
     @requires_auth
@@ -444,9 +444,9 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
-        url = ''
+        url = ""
         if org:
-            url = self._build_url('events', 'orgs', org, base_url=self._api)
+            url = self._build_url("events", "orgs", org, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
     def received_events(self, public=False, number=-1, etag=None):
@@ -463,9 +463,9 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`Event <github3.events.Event>`\ s
         """
-        path = ['received_events']
+        path = ["received_events"]
         if public:
-            path.append('public')
+            path.append("public")
         url = self._build_url(*path, base_url=self._api)
         return self._iter(int(number), url, Event, etag=etag)
 
@@ -481,11 +481,13 @@ class _User(models.GitHubCore):
         """
         # Import here, because a toplevel import causes an import loop
         from .orgs import ShortOrganization
-        url = self._build_url('orgs', base_url=self._api)
+
+        url = self._build_url("orgs", base_url=self._api)
         return self._iter(int(number), url, ShortOrganization, etag=etag)
 
-    def starred_repositories(self, sort=None, direction=None, number=-1,
-                             etag=None):
+    def starred_repositories(
+        self, sort=None, direction=None, number=-1, etag=None
+    ):
         """Iterate over repositories starred by this user.
 
         .. versionchanged:: 0.5
@@ -504,11 +506,17 @@ class _User(models.GitHubCore):
         """
         from .repos import Repository, StarredRepository
 
-        params = {'sort': sort, 'direction': direction}
+        params = {"sort": sort, "direction": direction}
         self._remove_none(params)
         url = self.starred_urlt.expand(owner=None, repo=None)
-        return self._iter(int(number), url, StarredRepository, params, etag,
-                          headers=Repository.STAR_HEADERS)
+        return self._iter(
+            int(number),
+            url,
+            StarredRepository,
+            params,
+            etag,
+            headers=Repository.STAR_HEADERS,
+        )
 
     def subscriptions(self, number=-1, etag=None):
         """Iterate over repositories subscribed to by this user.
@@ -520,7 +528,8 @@ class _User(models.GitHubCore):
         :returns: generator of :class:`Repository <github3.repos.Repository>`
         """
         from .repos import ShortRepository
-        url = self._build_url('subscriptions', base_url=self._api)
+
+        url = self._build_url("subscriptions", base_url=self._api)
         return self._iter(int(number), url, ShortRepository, etag=etag)
 
     @requires_auth
@@ -535,8 +544,8 @@ class _User(models.GitHubCore):
         :param str login: (required), new name of the user
         :returns: bool
         """
-        url = self._build_url('admin', 'users', self.login)
-        payload = {'login': login}
+        url = self._build_url("admin", "users", self.login)
+        payload = {"login": login}
         resp = self._boolean(self._patch(url, data=payload), 202, 403)
         return resp
 
@@ -551,11 +560,11 @@ class _User(models.GitHubCore):
             i.e., 'gist', 'user'
         :returns: :class:`Authorization <Authorization>`
         """
-        url = self._build_url('admin', 'users', self.login, 'authorizations')
+        url = self._build_url("admin", "users", self.login, "authorizations")
         data = {}
 
         if scopes:
-            data['scopes'] = scopes
+            data["scopes"] = scopes
 
         json = self._json(self._post(url, data=data), 201)
 
@@ -569,7 +578,7 @@ class _User(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('admin', 'users', self.login, 'authorizations')
+        url = self._build_url("admin", "users", self.login, "authorizations")
 
         return self._boolean(self._delete(url), 204, 403)
 
@@ -581,7 +590,7 @@ class _User(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('site_admin', base_url=self._api)
+        url = self._build_url("site_admin", base_url=self._api)
 
         return self._boolean(self._put(url), 204, 403)
 
@@ -595,7 +604,7 @@ class _User(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('site_admin', base_url=self._api)
+        url = self._build_url("site_admin", base_url=self._api)
 
         return self._boolean(self._delete(url), 204, 403)
 
@@ -610,7 +619,7 @@ class _User(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('suspended', base_url=self._api)
+        url = self._build_url("suspended", base_url=self._api)
 
         return self._boolean(self._put(url), 204, 403)
 
@@ -625,7 +634,7 @@ class _User(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('suspended', base_url=self._api)
+        url = self._build_url("suspended", base_url=self._api)
 
         return self._boolean(self._delete(url), 204, 403)
 
@@ -642,7 +651,7 @@ class _User(models.GitHubCore):
 
         :returns: bool -- True if successful, False otherwise
         """
-        url = self._build_url('admin', 'users', self.login)
+        url = self._build_url("admin", "users", self.login)
         return self._boolean(self._delete(url), 204, 403)
 
 
@@ -720,23 +729,23 @@ class User(_User):
         the user was last updated
     """
 
-    class_name = 'User'
+    class_name = "User"
 
     def _update_attributes(self, user):
         super(User, self)._update_attributes(user)
-        self.bio = user['bio']
-        self.blog = user['blog']
-        self.company = user['company']
-        self.created_at = self._strptime(user['created_at'])
-        self.email = user['email']
-        self.followers_count = user['followers']
-        self.following_count = user['following']
-        self.hireable = user['hireable']
-        self.location = user['location']
-        self.name = user['name']
-        self.public_gists_count = user['public_gists']
-        self.public_repos_count = user['public_repos']
-        self.updated_at = self._strptime(user['updated_at'])
+        self.bio = user["bio"]
+        self.blog = user["blog"]
+        self.company = user["company"]
+        self.created_at = self._strptime(user["created_at"])
+        self.email = user["email"]
+        self.followers_count = user["followers"]
+        self.following_count = user["following"]
+        self.hireable = user["hireable"]
+        self.location = user["location"]
+        self.name = user["name"]
+        self.public_gists_count = user["public_gists"]
+        self.public_repos_count = user["public_repos"]
+        self.updated_at = self._strptime(user["updated_at"])
 
 
 class ShortUser(_User):
@@ -829,7 +838,7 @@ class ShortUser(_User):
         A string of this exact resource retrievable from GitHub's API
     """
 
-    class_name = 'ShortUser'
+    class_name = "ShortUser"
     _refresh_to = User
 
 
@@ -872,14 +881,14 @@ class AuthenticatedUser(User):
         The name of the plan that you, the user, have purchased
     """
 
-    class_name = 'AuthenticatedUser'
+    class_name = "AuthenticatedUser"
 
     def _update_attributes(self, user):
         super(AuthenticatedUser, self)._update_attributes(user)
-        self.disk_usage = user['disk_usage']
-        self.owned_private_repos_count = user['owned_private_repos']
-        self.total_private_repos_count = user['total_private_repos']
-        self.plan = user.get('plan')
+        self.disk_usage = user["disk_usage"]
+        self.owned_private_repos_count = user["owned_private_repos"]
+        self.total_private_repos_count = user["total_private_repos"]
+        self.plan = user.get("plan")
         if self.plan is not None:
             self.plan = Plan(self.plan, self)
 
@@ -898,13 +907,13 @@ class Collaborator(_User):
         Admin, push, and pull permissions of a collaborator
     """
 
-    class_name = 'Collaborator'
+    class_name = "Collaborator"
     _refresh_to = User
 
     def _update_attributes(self, user):
         super(Collaborator, self)._update_attributes(user)
 
-        self.permissions = user['permissions']
+        self.permissions = user["permissions"]
 
 
 class Contributor(_User):
@@ -930,9 +939,9 @@ class Contributor(_User):
 
     """
 
-    class_name = 'Contributor'
+    class_name = "Contributor"
     _refresh_to = User
 
     def _update_attributes(self, contributor):
         super(Contributor, self)._update_attributes(contributor)
-        self.contributions_count = contributor['contributions']
+        self.contributions_count = contributor["contributions"]

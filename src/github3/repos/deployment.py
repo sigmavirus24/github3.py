@@ -61,20 +61,20 @@ class Deployment(GitHubCore):
     """
 
     def _update_attributes(self, deployment):
-        self._api = deployment['url']
-        self.created_at = self._strptime(deployment['created_at'])
-        self.creator = users.ShortUser(deployment['creator'], self)
-        self.description = deployment['description']
-        self.environment = deployment['environment']
-        self.id = deployment['id']
-        self.payload = deployment['payload']
-        self.ref = deployment['ref']
-        self.sha = deployment['sha']
-        self.statuses_url = deployment['statuses_url']
-        self.updated_at = self._strptime(deployment['updated_at'])
+        self._api = deployment["url"]
+        self.created_at = self._strptime(deployment["created_at"])
+        self.creator = users.ShortUser(deployment["creator"], self)
+        self.description = deployment["description"]
+        self.environment = deployment["environment"]
+        self.id = deployment["id"]
+        self.payload = deployment["payload"]
+        self.ref = deployment["ref"]
+        self.sha = deployment["sha"]
+        self.statuses_url = deployment["statuses_url"]
+        self.updated_at = self._strptime(deployment["updated_at"])
 
     def _repr(self):
-        return '<Deployment [{0} @ {1}]>'.format(self.id, self.sha)
+        return "<Deployment [{0} @ {1}]>".format(self.id, self.sha)
 
     def create_status(self, state, target_url=None, description=None):
         """Create a new deployment status for this deployment.
@@ -96,9 +96,12 @@ class Deployment(GitHubCore):
         """
         json = None
 
-        if state in ('pending', 'success', 'error', 'failure'):
-            data = {'state': state, 'target_url': target_url,
-                    'description': description}
+        if state in ("pending", "success", "error", "failure"):
+            data = {
+                "state": state,
+                "target_url": target_url,
+                "description": description,
+            }
             self._remove_none(data)
             response = self._post(self.statuses_url, data=data)
             json = self._json(response, 201)
@@ -119,8 +122,9 @@ class Deployment(GitHubCore):
         :rtype:
             :class:`~github3.repos.deployment.DeploymentStatus`
         """
-        i = self._iter(int(number), self.statuses_url, DeploymentStatus,
-                       etag=etag)
+        i = self._iter(
+            int(number), self.statuses_url, DeploymentStatus, etag=etag
+        )
         return i
 
 
@@ -165,15 +169,15 @@ class DeploymentStatus(GitHubCore):
     """
 
     def _update_attributes(self, status):
-        self._api = status['url']
-        self.created_at = self._strptime(status['created_at'])
-        self.creator = users.ShortUser(status['creator'], self)
-        self.deployment_url = status['deployment_url']
-        self.description = status['description']
-        self.id = status['id']
-        self.state = status['state']
-        self.target_url = status['target_url']
-        self.updated_at = self._strptime(status['updated_at'])
+        self._api = status["url"]
+        self.created_at = self._strptime(status["created_at"])
+        self.creator = users.ShortUser(status["creator"], self)
+        self.deployment_url = status["deployment_url"]
+        self.description = status["description"]
+        self.id = status["id"]
+        self.state = status["state"]
+        self.target_url = status["target_url"]
+        self.updated_at = self._strptime(status["updated_at"])
 
     def _repr(self):
-        return '<DeploymentStatus [{0}]>'.format(self.id)
+        return "<DeploymentStatus [{0}]>".format(self.id)

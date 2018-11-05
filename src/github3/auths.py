@@ -88,27 +88,27 @@ class Authorization(GitHubCore):
     """
 
     def _update_attributes(self, auth):
-        self._api = auth['url']
-        self.app = auth['app']
-        self.created_at = self._strptime(auth['created_at'])
-        self.fingerprint = auth['fingerprint']
-        self.id = auth['id']
-        self.note_url = auth['note_url']
-        self.note = auth['note']
-        self.scopes = auth['scopes']
-        self.token = auth['token']
-        self.token_last_eight = auth['token_last_eight']
-        self.updated_at = self._strptime(auth['updated_at'])
+        self._api = auth["url"]
+        self.app = auth["app"]
+        self.created_at = self._strptime(auth["created_at"])
+        self.fingerprint = auth["fingerprint"]
+        self.id = auth["id"]
+        self.note_url = auth["note_url"]
+        self.note = auth["note"]
+        self.scopes = auth["scopes"]
+        self.token = auth["token"]
+        self.token_last_eight = auth["token_last_eight"]
+        self.updated_at = self._strptime(auth["updated_at"])
 
     def _repr(self):
-        return '<Authorization [{0}]>'.format(self.name)
+        return "<Authorization [{0}]>".format(self.name)
 
     def _update(self, scopes_data, note, note_url):
         """Helper for add_scopes, replace_scopes, remove_scopes."""
         if note is not None:
-            scopes_data['note'] = note
+            scopes_data["note"] = note
         if note_url is not None:
-            scopes_data['note_url'] = note_url
+            scopes_data["note_url"] = note_url
         json = self._json(self._post(self._api, data=scopes_data), 200)
 
         if json:
@@ -134,7 +134,7 @@ class Authorization(GitHubCore):
         :rtype:
             bool
         """
-        return self._update({'add_scopes': scopes}, note, note_url)
+        return self._update({"add_scopes": scopes}, note, note_url)
 
     @requires_basic_auth
     def delete(self):
@@ -164,7 +164,7 @@ class Authorization(GitHubCore):
         :rtype:
             bool
         """
-        return self._update({'rm_scopes': scopes}, note, note_url)
+        return self._update({"rm_scopes": scopes}, note, note_url)
 
     @requires_basic_auth
     def replace_scopes(self, scopes, note=None, note_url=None):
@@ -183,4 +183,4 @@ class Authorization(GitHubCore):
         :rtype:
             bool
         """
-        return self._update({'scopes': scopes}, note, note_url)
+        return self._update({"scopes": scopes}, note, note_url)

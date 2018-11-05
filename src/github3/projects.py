@@ -54,23 +54,21 @@ class Project(models.GitHubCore):
         this project was last updated.
     """
 
-    CUSTOM_HEADERS = {
-        'Accept': 'application/vnd.github.inertia-preview+json',
-    }
+    CUSTOM_HEADERS = {"Accept": "application/vnd.github.inertia-preview+json"}
 
     def _update_attributes(self, project):
-        self._api = project['url']
-        self.body = project['body']
-        self.created_at = self._strptime(project['created_at'])
-        self.creator = users.ShortUser(project['creator'], self)
-        self.id = project['id']
-        self.name = project['name']
-        self.number = project['number']
-        self.owner_url = project['owner_url']
-        self.updated_at = self._strptime(project['updated_at'])
+        self._api = project["url"]
+        self.body = project["body"]
+        self.created_at = self._strptime(project["created_at"])
+        self.creator = users.ShortUser(project["creator"], self)
+        self.id = project["id"]
+        self.name = project["name"]
+        self.number = project["number"]
+        self.owner_url = project["owner_url"]
+        self.updated_at = self._strptime(project["updated_at"])
 
     def _repr(self):
-        return '<Project [#{0}]>'.format(self.id)
+        return "<Project [#{0}]>".format(self.id)
 
     def column(self, id):
         """Get a project column with the given ID.
@@ -82,7 +80,7 @@ class Project(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectColumn`
         """
-        url = self._build_url('projects', 'columns', str(id))
+        url = self._build_url("projects", "columns", str(id))
         json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(ProjectColumn, json)
 
@@ -101,13 +99,13 @@ class Project(models.GitHubCore):
         """
         # TODO(sigmaviurs24): Determine if we need to construct from scratch
         # or if we can use `self._api` with 'columns' to build the URL
-        url = self._build_url('projects', str(self.id), 'columns')
+        url = self._build_url("projects", str(self.id), "columns")
         return self._iter(
             int(number),
             url,
             ProjectColumn,
             headers=Project.CUSTOM_HEADERS,
-            etag=etag
+            etag=etag,
         )
 
     @requires_auth
@@ -121,11 +119,15 @@ class Project(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectColumn`
         """
-        url = self._build_url('columns', base_url=self._api)
+        url = self._build_url("columns", base_url=self._api)
         json = None
         if name:
-            json = self._json(self._post(
-                url, data={'name': name}, headers=Project.CUSTOM_HEADERS), 201)
+            json = self._json(
+                self._post(
+                    url, data={"name": name}, headers=Project.CUSTOM_HEADERS
+                ),
+                201,
+            )
         return self._instance_or_null(ProjectColumn, json)
 
     @requires_auth
@@ -137,8 +139,9 @@ class Project(models.GitHubCore):
         :rtype:
             bool
         """
-        return self._boolean(self._delete(
-            self._api, headers=self.CUSTOM_HEADERS), 204, 404)
+        return self._boolean(
+            self._delete(self._api, headers=self.CUSTOM_HEADERS), 204, 404
+        )
 
     @requires_auth
     def update(self, name=None, body=None):
@@ -153,13 +156,17 @@ class Project(models.GitHubCore):
         :rtype:
             bool
         """
-        data = {'name': name, 'body': body}
+        data = {"name": name, "body": body}
         json = None
         self._remove_none(data)
 
         if data:
-            json = self._json(self._patch(
-                self._api, data=dumps(data), headers=self.CUSTOM_HEADERS), 200)
+            json = self._json(
+                self._patch(
+                    self._api, data=dumps(data), headers=self.CUSTOM_HEADERS
+                ),
+                200,
+            )
 
         if json:
             self._update_attributes(json)
@@ -196,14 +203,14 @@ class ProjectColumn(models.GitHubCore):
     """
 
     def _update_attributes(self, project_column):
-        self.created_at = self._strptime(project_column['created_at'])
-        self.id = project_column['id']
-        self.name = project_column['name']
-        self.project_url = project_column['project_url']
-        self.updated_at = self._strptime(project_column['updated_at'])
+        self.created_at = self._strptime(project_column["created_at"])
+        self.id = project_column["id"]
+        self.name = project_column["name"]
+        self.project_url = project_column["project_url"]
+        self.updated_at = self._strptime(project_column["updated_at"])
 
     def _repr(self):
-        return '<ProjectColumn [#{0}]>'.format(self.id)
+        return "<ProjectColumn [#{0}]>".format(self.id)
 
     def card(self, id):
         """Get a project card with the given ID.
@@ -215,7 +222,7 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectCard`
         """
-        url = self._build_url('projects', 'columns', 'cards', str(id))
+        url = self._build_url("projects", "columns", "cards", str(id))
         json = self._json(self._get(url, headers=Project.CUSTOM_HEADERS), 200)
         return self._instance_or_null(ProjectCard, json)
 
@@ -232,13 +239,13 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             :class:`~github3.project.ProjectCard`
         """
-        url = self._build_url('projects', 'columns', str(self.id), 'cards')
+        url = self._build_url("projects", "columns", str(self.id), "cards")
         return self._iter(
             int(number),
             url,
             ProjectCard,
             headers=Project.CUSTOM_HEADERS,
-            etag=etag
+            etag=etag,
         )
 
     @requires_auth
@@ -257,11 +264,12 @@ class ProjectColumn(models.GitHubCore):
         if not content_id or not content_type:
             return None
 
-        url = self._build_url('projects', 'columns', str(self.id), 'cards')
+        url = self._build_url("projects", "columns", str(self.id), "cards")
         json = None
-        data = {'content_id': content_id, 'content_type': content_type}
-        json = self._json(self._post(
-            url, data=data, headers=Project.CUSTOM_HEADERS), 201)
+        data = {"content_id": content_id, "content_type": content_type}
+        json = self._json(
+            self._post(url, data=data, headers=Project.CUSTOM_HEADERS), 201
+        )
         return self._instance_or_null(ProjectCard, json)
 
     @requires_auth
@@ -280,7 +288,7 @@ class ProjectColumn(models.GitHubCore):
         """
         if not issue:
             return None
-        return self.create_card_with_content_id(issue.id, 'Issue')
+        return self.create_card_with_content_id(issue.id, "Issue")
 
     @requires_auth
     def create_card_with_note(self, note):
@@ -293,11 +301,15 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             :class:`~github3.projects.ProjectCard`
         """
-        url = self._build_url('projects', 'columns', str(self.id), 'cards')
+        url = self._build_url("projects", "columns", str(self.id), "cards")
         json = None
         if note:
-            json = self._json(self._post(
-                url, data={'note': note}, headers=Project.CUSTOM_HEADERS), 201)
+            json = self._json(
+                self._post(
+                    url, data={"note": note}, headers=Project.CUSTOM_HEADERS
+                ),
+                201,
+            )
         return self._instance_or_null(ProjectCard, json)
 
     @requires_auth
@@ -309,9 +321,10 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('projects', 'columns', str(self.id))
-        return self._boolean(self._delete(
-            url, headers=Project.CUSTOM_HEADERS), 204, 404)
+        url = self._build_url("projects", "columns", str(self.id))
+        return self._boolean(
+            self._delete(url, headers=Project.CUSTOM_HEADERS), 204, 404
+        )
 
     @requires_auth
     def move(self, position):
@@ -329,10 +342,13 @@ class ProjectColumn(models.GitHubCore):
         if not position:
             return False
 
-        url = self._build_url('projects', 'columns', str(self.id), 'moves')
-        data = {'position': position}
-        return self._boolean(self._post(
-            url, data=data, headers=Project.CUSTOM_HEADERS), 201, 404)
+        url = self._build_url("projects", "columns", str(self.id), "moves")
+        data = {"position": position}
+        return self._boolean(
+            self._post(url, data=data, headers=Project.CUSTOM_HEADERS),
+            201,
+            404,
+        )
 
     @requires_auth
     def update(self, name=None):
@@ -345,14 +361,18 @@ class ProjectColumn(models.GitHubCore):
         :rtype:
             bool
         """
-        data = {'name': name}
+        data = {"name": name}
         json = None
         self._remove_none(data)
 
         if data:
-            url = self._build_url('projects', 'columns', str(self.id))
-            json = self._json(self._patch(
-                url, data=dumps(data), headers=Project.CUSTOM_HEADERS), 200)
+            url = self._build_url("projects", "columns", str(self.id))
+            json = self._json(
+                self._patch(
+                    url, data=dumps(data), headers=Project.CUSTOM_HEADERS
+                ),
+                200,
+            )
 
         if json:
             self._update_attributes(json)
@@ -394,25 +414,25 @@ class ProjectCard(models.GitHubCore):
 
     def _update_attributes(self, project_card):
         #: The URL of this card's parent column
-        self.column_url = project_card['column_url']
+        self.column_url = project_card["column_url"]
 
         #: The URL of this card's associated content
-        self.content_url = project_card.get('content_url')
+        self.content_url = project_card.get("content_url")
 
         #: datetime object representing the last time the object was created
-        self.created_at = project_card['created_at']
+        self.created_at = project_card["created_at"]
 
         #: The ID of this card
-        self.id = project_card['id']
+        self.id = project_card["id"]
 
         #: The note attached to the card
-        self.note = project_card['note']
+        self.note = project_card["note"]
 
         #: datetime object representing the last time the object was changed
-        self.updated_at = project_card['updated_at']
+        self.updated_at = project_card["updated_at"]
 
     def _repr(self):
-        return '<ProjectCard [#{0}]>'.format(self.id)
+        return "<ProjectCard [#{0}]>".format(self.id)
 
     @requires_auth
     def delete(self):
@@ -423,9 +443,10 @@ class ProjectCard(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('projects', 'columns', 'cards', str(self.id))
-        return self._boolean(self._delete(
-            url, headers=Project.CUSTOM_HEADERS), 204, 404)
+        url = self._build_url("projects", "columns", "cards", str(self.id))
+        return self._boolean(
+            self._delete(url, headers=Project.CUSTOM_HEADERS), 204, 404
+        )
 
     @requires_auth
     def move(self, position, column_id):
@@ -445,11 +466,15 @@ class ProjectCard(models.GitHubCore):
         if not position or not column_id:
             return False
 
-        url = self._build_url('projects', 'columns', 'cards', str(self.id),
-                              'moves')
-        data = {'position': position, 'column_id': column_id}
-        return self._boolean(self._post(
-            url, data=data, headers=Project.CUSTOM_HEADERS), 201, 404)
+        url = self._build_url(
+            "projects", "columns", "cards", str(self.id), "moves"
+        )
+        data = {"position": position, "column_id": column_id}
+        return self._boolean(
+            self._post(url, data=data, headers=Project.CUSTOM_HEADERS),
+            201,
+            404,
+        )
 
     @requires_auth
     def update(self, note=None):
@@ -464,14 +489,20 @@ class ProjectCard(models.GitHubCore):
         :rtype:
             bool
         """
-        data = {'note': note}
+        data = {"note": note}
         json = None
         self._remove_none(data)
 
         if data:
-            url = self._build_url('projects', 'columns', 'cards', str(self.id))
-            json = self._json(self._patch(
-                url, data=dumps(data), headers=Project.CUSTOM_HEADERS), 200)
+            url = self._build_url(
+                "projects", "columns", "cards", str(self.id)
+            )
+            json = self._json(
+                self._patch(
+                    url, data=dumps(data), headers=Project.CUSTOM_HEADERS
+                ),
+                200,
+            )
 
         if json:
             self._update_attributes(json)

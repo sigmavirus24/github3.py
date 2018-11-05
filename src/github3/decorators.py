@@ -24,17 +24,20 @@ class RequestsStringIO(StringIO):
 
 def requires_auth(func):
     """Decorator to note which object methods require authorization."""
+
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        if hasattr(self, 'session') and self.session.has_auth():
+        if hasattr(self, "session") and self.session.has_auth():
             return func(self, *args, **kwargs)
         else:
             from .exceptions import error_for
+
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires authentication"}'
             )
             raise error_for(r)
+
     return auth_wrapper
 
 
@@ -45,17 +48,20 @@ def requires_basic_auth(func):
     authorization and won't work with token based authorization.
 
     """
+
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
-        if hasattr(self, 'session') and self.session.auth:
+        if hasattr(self, "session") and self.session.auth:
             return func(self, *args, **kwargs)
         else:
             from .exceptions import error_for
+
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires username/password authentication"}'
             )
             raise error_for(r)
+
     return auth_wrapper
 
 
@@ -66,6 +72,7 @@ def requires_app_credentials(func):
     client_secret to be used.
 
     """
+
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         client_id, client_secret = self.session.retrieve_client_credentials()
@@ -73,6 +80,7 @@ def requires_app_credentials(func):
             return func(self, *args, **kwargs)
         else:
             from .exceptions import error_for
+
             # Mock a 401 response
             r = generate_fake_error_response(
                 '{"message": "Requires username/password authentication"}'
@@ -87,16 +95,20 @@ def requires_app_bearer_auth(func):
 
     .. versionadded:: 1.2.0
     """
+
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         from . import session
+
         if isinstance(self.session.auth, session.AppBearerTokenAuth):
             return func(self, *args, **kwargs)
         else:
             from . import exceptions
+
             raise exceptions.MissingAppBearerAuthentication(
                 "This method requires GitHub App authentication."
             )
+
     return auth_wrapper
 
 
@@ -105,20 +117,24 @@ def requires_app_installation_auth(func):
 
     .. versionadded:: 1.2.0
     """
+
     @wraps(func)
     def auth_wrapper(self, *args, **kwargs):
         from . import session
+
         if isinstance(self.session.auth, session.AppInstallationTokenAuth):
             return func(self, *args, **kwargs)
         else:
             from . import exceptions
+
             raise exceptions.MissingAppInstallationAuthentication(
                 "This method requires GitHub App authentication."
             )
+
     return auth_wrapper
 
 
-def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
+def generate_fake_error_response(msg, status_code=401, encoding="utf-8"):
     """Generate a fake Response from requests."""
     r = Response()
     r.status_code = status_code
@@ -131,5 +147,5 @@ def generate_fake_error_response(msg, status_code=401, encoding='utf-8'):
 
 # Use mock decorators when generating documentation, so all functino signatures
 # are displayed correctly
-if os.getenv('GENERATING_DOCUMENTATION', None) == 'github3':
+if os.getenv("GENERATING_DOCUMENTATION", None) == "github3":
     requires_auth = requires_basic_auth = lambda x: x  # noqa  # (No coverage)

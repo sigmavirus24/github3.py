@@ -99,30 +99,28 @@ class Release(models.GitHubCore):
     """
 
     def _update_attributes(self, release):
-        self._api = self.url = release['url']
-        self.original_assets = [
-            Asset(i, self) for i in release['assets']
-        ]
-        self.assets_url = release['assets_url']
-        self.author = users.ShortUser(release['author'], self)
-        self.body = release['body']
-        self.created_at = self._strptime(release['created_at'])
-        self.draft = release['draft']
-        self.html_url = release['html_url']
-        self.id = release['id']
-        self.name = release['name']
-        self.prerelease = release['prerelease']
-        self.published_at = self._strptime(release['published_at'])
-        self.tag_name = release['tag_name']
-        self.tarball_url = release['tarball_url']
-        self.target_commitish = release['target_commitish']
-        self.upload_urlt = URITemplate(release['upload_url'])
-        self.zipball_url = release['zipball_url']
+        self._api = self.url = release["url"]
+        self.original_assets = [Asset(i, self) for i in release["assets"]]
+        self.assets_url = release["assets_url"]
+        self.author = users.ShortUser(release["author"], self)
+        self.body = release["body"]
+        self.created_at = self._strptime(release["created_at"])
+        self.draft = release["draft"]
+        self.html_url = release["html_url"]
+        self.id = release["id"]
+        self.name = release["name"]
+        self.prerelease = release["prerelease"]
+        self.published_at = self._strptime(release["published_at"])
+        self.tag_name = release["tag_name"]
+        self.tarball_url = release["tarball_url"]
+        self.target_commitish = release["target_commitish"]
+        self.upload_urlt = URITemplate(release["upload_url"])
+        self.zipball_url = release["zipball_url"]
 
     def _repr(self):
-        return '<Release [{0}]>'.format(self.name)
+        return "<Release [{0}]>".format(self.name)
 
-    def archive(self, format, path=''):
+    def archive(self, format, path=""):
         """Get the tarball or zipball archive for this release.
 
         :param str format:
@@ -139,8 +137,8 @@ class Release(models.GitHubCore):
             bool
         """
         resp = None
-        if format in ('tarball', 'zipball'):
-            repo_url = self._api[:self._api.rfind('/releases')]
+        if format in ("tarball", "zipball"):
+            repo_url = self._api[: self._api.rfind("/releases")]
             url = self._build_url(format, self.tag_name, base_url=repo_url)
             resp = self._get(url, allow_redirects=True, stream=True)
 
@@ -161,9 +159,10 @@ class Release(models.GitHubCore):
         """
         json = None
         if int(asset_id) > 0:
-            i = self._api.rfind('/')
-            url = self._build_url('assets', str(asset_id),
-                                  base_url=self._api[:i])
+            i = self._api.rfind("/")
+            url = self._build_url(
+                "assets", str(asset_id), base_url=self._api[:i]
+            )
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Asset, json)
 
@@ -179,7 +178,7 @@ class Release(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.release.Asset`
         """
-        url = self._build_url('assets', base_url=self._api)
+        url = self._build_url("assets", base_url=self._api)
         return self._iter(number, url, Asset, etag=etag)
 
     @requires_auth
@@ -194,15 +193,18 @@ class Release(models.GitHubCore):
             bool
         """
         url = self._api
-        return self._boolean(
-            self._delete(url),
-            204,
-            404
-        )
+        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def edit(self, tag_name=None, target_commitish=None, name=None, body=None,
-             draft=None, prerelease=None):
+    def edit(
+        self,
+        tag_name=None,
+        target_commitish=None,
+        name=None,
+        body=None,
+        draft=None,
+        prerelease=None,
+    ):
         """Edit this release.
 
         Only users with push access to the repository can edit a release.
@@ -229,17 +231,16 @@ class Release(models.GitHubCore):
         """
         url = self._api
         data = {
-            'tag_name': tag_name,
-            'target_commitish': target_commitish,
-            'name': name,
-            'body': body,
-            'draft': draft,
-            'prerelease': prerelease,
+            "tag_name": tag_name,
+            "target_commitish": target_commitish,
+            "name": name,
+            "body": body,
+            "draft": draft,
+            "prerelease": prerelease,
         }
         self._remove_none(data)
 
-        r = self.session.patch(
-            url, data=json.dumps(data))
+        r = self.session.patch(url, data=json.dumps(data))
 
         successful = self._boolean(r, 200, 404)
         if successful:
@@ -268,8 +269,8 @@ class Release(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.release.Asset`
         """
-        headers = {'Content-Type': content_type}
-        params = {'name': name, 'label': label}
+        headers = {"Content-Type": content_type}
+        params = {"name": name, "label": label}
         self._remove_none(params)
         url = self.upload_urlt.expand(params)
         r = self._post(url, data=asset, json=False, headers=headers)
@@ -356,23 +357,23 @@ class Asset(models.GitHubCore):
     """
 
     def _update_attributes(self, asset):
-        self._api = asset['url']
-        self.browser_download_url = asset['browser_download_url']
-        self.content_type = asset['content_type']
-        self.created_at = self._strptime(asset['created_at'])
-        self.download_count = asset['download_count']
+        self._api = asset["url"]
+        self.browser_download_url = asset["browser_download_url"]
+        self.content_type = asset["content_type"]
+        self.created_at = self._strptime(asset["created_at"])
+        self.download_count = asset["download_count"]
         self.download_url = self._api
-        self.id = asset['id']
-        self.label = asset['label']
-        self.name = asset['name']
-        self.size = asset['size']
-        self.state = asset['state']
-        self.updated_at = self._strptime(asset['updated_at'])
+        self.id = asset["id"]
+        self.label = asset["label"]
+        self.name = asset["name"]
+        self.size = asset["size"]
+        self.state = asset["state"]
+        self.updated_at = self._strptime(asset["updated_at"])
 
     def _repr(self):
-        return '<Asset [{0}]>'.format(self.name)
+        return "<Asset [{0}]>".format(self.name)
 
-    def download(self, path=''):
+    def download(self, path=""):
         """Download the data for this asset.
 
         :param path:
@@ -386,21 +387,19 @@ class Asset(models.GitHubCore):
         :rtype:
             str
         """
-        headers = {
-            'Accept': 'application/octet-stream'
-        }
-        resp = self._get(self._api, allow_redirects=False, stream=True,
-                         headers=headers)
+        headers = {"Accept": "application/octet-stream"}
+        resp = self._get(
+            self._api, allow_redirects=False, stream=True, headers=headers
+        )
         if resp.status_code == 302:
             # Amazon S3 will reject the redirected request unless we omit
             # certain request headers
-            headers.update({
-                'Content-Type': None,
-            })
+            headers.update({"Content-Type": None})
 
             with self.session.no_auth():
-                resp = self._get(resp.headers['location'], stream=True,
-                                 headers=headers)
+                resp = self._get(
+                    resp.headers["location"], stream=True, headers=headers
+                )
 
         if self._boolean(resp, 200, 404):
             return utils.stream_response_to_file(resp, path)
@@ -416,9 +415,7 @@ class Asset(models.GitHubCore):
             bool
         """
         url = self._api
-        return self._boolean(
-            self._delete(url), 204, 404
-        )
+        return self._boolean(self._delete(url), 204, 404)
 
     def edit(self, name, label=None):
         """Edit this asset.
@@ -434,12 +431,9 @@ class Asset(models.GitHubCore):
         """
         if not name:
             return False
-        edit_data = {'name': name, 'label': label}
+        edit_data = {"name": name, "label": label}
         self._remove_none(edit_data)
-        r = self._patch(
-            self._api,
-            data=json.dumps(edit_data)
-        )
+        r = self._patch(self._api, data=json.dumps(edit_data))
         successful = self._boolean(r, 200, 404)
         if successful:
             self._update_attributes(r.json())

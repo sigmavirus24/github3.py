@@ -59,16 +59,16 @@ class CommitSearchResult(models.GitHubCore):
     """
 
     def _update_attributes(self, data):
-        self._api = data['url']
-        self.author = users.ShortUser(data['author'], self)
-        self.comments_url = data['comments_url']
-        self.commit = git.ShortCommit(data['commit'], self)
-        self.committer = users.ShortUser(data['committer'], self)
-        self.html_url = data['html_url']
-        self.repository = repos.ShortRepository(data['repository'], self)
-        self.score = data['score']
-        self.sha = data['sha']
-        self.text_matches = data.get('text_matches', [])
+        self._api = data["url"]
+        self.author = users.ShortUser(data["author"], self)
+        self.comments_url = data["comments_url"]
+        self.commit = git.ShortCommit(data["commit"], self)
+        self.committer = users.ShortUser(data["committer"], self)
+        self.html_url = data["html_url"]
+        self.repository = repos.ShortRepository(data["repository"], self)
+        self.score = data["score"]
+        self.sha = data["sha"]
+        self.text_matches = data.get("text_matches", [])
 
     def _repr(self):
-        return '<CommitSearchResult [{0}]>'.format(self.sha[:7])
+        return "<CommitSearchResult [{0}]>".format(self.sha[:7])

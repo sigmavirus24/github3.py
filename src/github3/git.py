@@ -45,20 +45,23 @@ class Blob(models.GitHubCore):
     """
 
     def _update_attributes(self, blob):
-        self._api = blob['url']
-        self.content = blob['content']
-        self.encoding = blob['encoding']
-        self.size = blob['size']
-        self.sha = blob['sha']
+        self._api = blob["url"]
+        self.content = blob["content"]
+        self.encoding = blob["encoding"]
+        self.size = blob["size"]
+        self.sha = blob["sha"]
 
     def _repr(self):
-        return '<Blob [{0:.10}]>'.format(self.sha)
+        return "<Blob [{0:.10}]>".format(self.sha)
 
     @property
     def decoded(self):
         """Compatibility shim for the deprecated attribute."""
-        warnings.warn('The decoded attribute is deprecated. Use decode_content'
-                      ' instead.', DeprecationWarning)
+        warnings.warn(
+            "The decoded attribute is deprecated. Use decode_content"
+            " instead.",
+            DeprecationWarning,
+        )
         return self.decode_content()
 
     def decode_content(self):
@@ -72,29 +75,29 @@ class Blob(models.GitHubCore):
         :rtype:
             unicode
         """
-        if self.encoding == 'base64' and self.content:
-            return base64.b64decode(
-                self.content.encode('utf-8')
-            ).decode('utf-8')
+        if self.encoding == "base64" and self.content:
+            return base64.b64decode(self.content.encode("utf-8")).decode(
+                "utf-8"
+            )
         return self.content
 
 
 class _Commit(models.GitHubCore):
-    class_name = '_Commit'
+    class_name = "_Commit"
 
     def _update_attributes(self, commit):
-        self._api = commit['url']
-        self.author = commit['author']
-        if self.author.get('name'):
-            self._author_name = self.author['name']
-        self.committer = commit['committer']
+        self._api = commit["url"]
+        self.author = commit["author"]
+        if self.author.get("name"):
+            self._author_name = self.author["name"]
+        self.committer = commit["committer"]
         if self.committer:
-            self._commit_name = self.committer.get('name')
-        self.message = commit['message']
-        self.tree = CommitTree(commit['tree'], self)
+            self._commit_name = self.committer.get("name")
+        self.message = commit["message"]
+        self.tree = CommitTree(commit["tree"], self)
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.class_name, self.sha)
+        return "<{0} [{1}]>".format(self.class_name, self.sha)
 
 
 class Commit(_Commit):
@@ -127,17 +130,17 @@ class Commit(_Commit):
         for more information.
     """
 
-    class_name = 'Commit'
+    class_name = "Commit"
 
     def _update_attributes(self, commit):
         super(Commit, self)._update_attributes(commit)
-        self.parents = commit['parents']
-        self.sha = commit['sha']
+        self.parents = commit["parents"]
+        self.sha = commit["sha"]
         if not self.sha:
-            i = self._api.rfind('/')
-            self.sha = self._api[i + 1:]
+            i = self._api.rfind("/")
+            self.sha = self._api[i + 1 :]
         self._uniq = self.sha
-        self.verification = commit['verification']
+        self.verification = commit["verification"]
 
 
 class ShortCommit(_Commit):
@@ -173,7 +176,7 @@ class ShortCommit(_Commit):
         The git tree object this commit points to.
     """
 
-    class_name = 'ShortCommit'
+    class_name = "ShortCommit"
     _refresh_to = Commit
 
 
@@ -196,12 +199,12 @@ class Reference(models.GitHubCore):
     """
 
     def _update_attributes(self, ref):
-        self._api = ref['url']
-        self.object = GitObject(ref['object'], self)
-        self.ref = ref['ref']
+        self._api = ref["url"]
+        self.object = GitObject(ref["object"], self)
+        self.ref = ref["ref"]
 
     def _repr(self):
-        return '<Reference [{0}]>'.format(self.ref)
+        return "<Reference [{0}]>".format(self.ref)
 
     @requires_auth
     def delete(self):
@@ -227,7 +230,7 @@ class Reference(models.GitHubCore):
         :rtype:
             bool
         """
-        data = {'sha': sha, 'force': force}
+        data = {"sha": sha, "force": force}
         json = self._json(self._patch(self._api, data=dumps(data)), 200)
         if json:
             self._update_attributes(json)
@@ -256,12 +259,12 @@ class GitObject(models.GitHubCore):
     """
 
     def _update_attributes(self, obj):
-        self._api = obj['url']
-        self.sha = obj['sha']
-        self.type = obj['type']
+        self._api = obj["url"]
+        self.sha = obj["sha"]
+        self.type = obj["type"]
 
     def _repr(self):
-        return '<Git Object [{0}]>'.format(self.sha)
+        return "<Git Object [{0}]>".format(self.sha)
 
 
 class Tag(models.GitHubCore):
@@ -298,15 +301,15 @@ class Tag(models.GitHubCore):
     """
 
     def _update_attributes(self, tag):
-        self._api = tag['url']
-        self.message = tag['message']
-        self.object = GitObject(tag['object'], self)
-        self.sha = tag['sha']
-        self.tag = tag['tag']
-        self.tagger = tag['tagger']
+        self._api = tag["url"]
+        self.message = tag["message"]
+        self.object = GitObject(tag["object"], self)
+        self.sha = tag["sha"]
+        self.tag = tag["tag"]
+        self.tagger = tag["tagger"]
 
     def _repr(self):
-        return '<Tag [{0}]>'.format(self.tag)
+        return "<Tag [{0}]>".format(self.tag)
 
 
 class CommitTree(models.GitHubCore):
@@ -325,11 +328,11 @@ class CommitTree(models.GitHubCore):
     """
 
     def _update_attributes(self, tree):
-        self._api = tree['url']
-        self.sha = tree['sha']
+        self._api = tree["url"]
+        self.sha = tree["sha"]
 
     def _repr(self):
-        return '<CommitTree [{0}]>'.format(self.sha)
+        return "<CommitTree [{0}]>".format(self.sha)
 
     def to_tree(self):
         """Retrieve a full Tree object for this CommitTree.
@@ -365,14 +368,14 @@ class Tree(models.GitHubCore):
     """
 
     def _update_attributes(self, tree):
-        self._api = tree['url']
-        self.sha = tree['sha']
-        self.tree = tree['tree']
+        self._api = tree["url"]
+        self.sha = tree["sha"]
+        self.tree = tree["tree"]
         if self.tree:
             self.tree = [Hash(t, self) for t in self.tree]
 
     def _repr(self):
-        return '<Tree [{0}]>'.format(self.sha)
+        return "<Tree [{0}]>".format(self.sha)
 
     def __eq__(self, other):
         return self.as_dict() == other.as_dict()
@@ -388,8 +391,9 @@ class Tree(models.GitHubCore):
         :rtype:
             :class:`~github3.git.Tree`
         """
-        json = self._json(self._get(self._api, params={'recursive': '1'}),
-                          200)
+        json = self._json(
+            self._get(self._api, params={"recursive": "1"}), 200
+        )
         return self._instance_or_null(Tree, json)
 
 
@@ -427,15 +431,15 @@ class Hash(models.GitHubCore):
     """
 
     def _update_attributes(self, info):
-        self._api = info.get('url')
-        self.mode = info['mode']
-        self.path = info['path']
-        self.sha = info['sha']
+        self._api = info.get("url")
+        self.mode = info["mode"]
+        self.path = info["path"]
+        self.sha = info["sha"]
         self.size = None
-        self.type = info['type']
+        self.type = info["type"]
 
-        if self.type != 'tree':
-            self.size = info.get('size')
+        if self.type != "tree":
+            self.size = info.get("size")
 
     def _repr(self):
-        return '<Hash [{0}]>'.format(self.sha)
+        return "<Hash [{0}]>".format(self.sha)

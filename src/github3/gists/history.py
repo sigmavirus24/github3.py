@@ -52,17 +52,17 @@ class GistHistory(models.GitHubCore):
     """
 
     def _update_attributes(self, history):
-        self.url = self._api = history['url']
-        self.version = history['version']
-        self.user = users.ShortUser(history['user'], self)
-        self.change_status = history['change_status']
-        self.additions = self.change_status['additions']
-        self.deletions = self.change_status['deletions']
-        self.total = self.change_status['total']
-        self.committed_at = self._strptime(history['committed_at'])
+        self.url = self._api = history["url"]
+        self.version = history["version"]
+        self.user = users.ShortUser(history["user"], self)
+        self.change_status = history["change_status"]
+        self.additions = self.change_status["additions"]
+        self.deletions = self.change_status["deletions"]
+        self.total = self.change_status["total"]
+        self.committed_at = self._strptime(history["committed_at"])
 
     def _repr(self):
-        return '<Gist History [{0}]>'.format(self.version)
+        return "<Gist History [{0}]>".format(self.version)
 
     def gist(self):
         """Retrieve the gist at this version.
@@ -73,5 +73,6 @@ class GistHistory(models.GitHubCore):
             :class:`Gist <github3.gists.gist.Gist>`
         """
         from .gist import Gist
+
         json = self._json(self._get(self._api), 200)
         return self._instance_or_null(Gist, json)

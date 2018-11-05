@@ -56,18 +56,18 @@ class GistComment(models.GitHubCore):
     """
 
     def _update_attributes(self, comment):
-        self._api = comment['url']
-        self.author_association = comment['author_association']
-        self.body = comment['body']
-        self.body_html = comment['body_html']
-        self.body_text = comment['body_text']
-        self.created_at = self._strptime(comment['created_at'])
-        self.id = comment['id']
-        self.updated_at = self._strptime(comment['updated_at'])
-        self.user = users.ShortUser(comment['user'], self)
+        self._api = comment["url"]
+        self.author_association = comment["author_association"]
+        self.body = comment["body"]
+        self.body_html = comment["body_html"]
+        self.body_text = comment["body_text"]
+        self.created_at = self._strptime(comment["created_at"])
+        self.id = comment["id"]
+        self.updated_at = self._strptime(comment["updated_at"])
+        self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return '<Gist Comment [{0}]>'.format(self.user.login)
+        return "<Gist Comment [{0}]>".format(self.user.login)
 
     @decorators.requires_auth
     def delete(self):
@@ -92,8 +92,9 @@ class GistComment(models.GitHubCore):
             bool
         """
         if body:
-            json = self._json(self._patch(self._api,
-                                          json={'body': body}), 200)
+            json = self._json(
+                self._patch(self._api, json={"body": body}), 200
+            )
             if json:
                 self._update_attributes(json)
                 return True

@@ -46,17 +46,17 @@ class Hook(GitHubCore):
     """
 
     def _update_attributes(self, hook, session=None):
-        self._api = hook['url']
-        self.active = hook['active']
-        self.config = hook['config']
-        self.created_at = self._strptime(hook['created_at'])
-        self.events = hook['events']
-        self.id = hook['id']
-        self.name = hook['name']
-        self.updated_at = self._strptime(hook['updated_at'])
+        self._api = hook["url"]
+        self.active = hook["active"]
+        self.config = hook["config"]
+        self.created_at = self._strptime(hook["created_at"])
+        self.events = hook["events"]
+        self.id = hook["id"]
+        self.name = hook["name"]
+        self.updated_at = self._strptime(hook["updated_at"])
 
     def _repr(self):
-        return '<Hook [{0}]>'.format(self.name)
+        return "<Hook [{0}]>".format(self.name)
 
     @requires_auth
     def delete(self):
@@ -70,8 +70,9 @@ class Hook(GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def edit(self, config={}, events=[], add_events=[], rm_events=[],
-             active=True):
+    def edit(
+        self, config={}, events=[], add_events=[], rm_events=[], active=True
+    ):
         """Edit this hook.
 
         :param dict config:
@@ -91,15 +92,15 @@ class Hook(GitHubCore):
         :rtype:
             bool
         """
-        data = {'config': config, 'active': active}
+        data = {"config": config, "active": active}
         if events:
-            data['events'] = events
+            data["events"] = events
 
         if add_events:
-            data['add_events'] = add_events
+            data["add_events"] = add_events
 
         if rm_events:
-            data['remove_events'] = rm_events
+            data["remove_events"] = rm_events
 
         json = self._json(self._patch(self._api, data=dumps(data)), 200)
 
@@ -118,7 +119,7 @@ class Hook(GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('pings', base_url=self._api)
+        url = self._build_url("pings", base_url=self._api)
         return self._boolean(self._post(url), 204, 404)
 
     @requires_auth
@@ -130,5 +131,5 @@ class Hook(GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('tests', base_url=self._api)
+        url = self._build_url("tests", base_url=self._api)
         return self._boolean(self._post(url), 204, 404)

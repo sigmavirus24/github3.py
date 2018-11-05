@@ -1,11 +1,11 @@
 """Unit tests around github3's Subscription classes."""
 import github3
 
-from .helper import (UnitHelper, create_url_helper, create_example_data_helper)
+from .helper import UnitHelper, create_url_helper, create_example_data_helper
 
-get_example_data = create_example_data_helper('subscription_example')
+get_example_data = create_example_data_helper("subscription_example")
 url_for = create_url_helper(
-    'https://api.github.com/notifications/threads/1/subscription'
+    "https://api.github.com/notifications/threads/1/subscription"
 )
 
 
@@ -23,9 +23,7 @@ class TestSubscription(UnitHelper):
         """Show that a user can delete a subscription."""
         self.instance.delete()
 
-        self.session.delete.assert_called_once_with(
-            url_for()
-        )
+        self.session.delete.assert_called_once_with(url_for())
 
     def test_set(self):
         """Show that a user can set a subscription."""
@@ -33,6 +31,5 @@ class TestSubscription(UnitHelper):
         self.instance.set(True, False)
 
         self.put_called_with(
-            url_for(),
-            data={"ignored": False, "subscribed": True},
+            url_for(), data={"ignored": False, "subscribed": True}
         )

@@ -53,22 +53,23 @@ class Invitation(models.GitHubCore):
         the API, to update or cancel the invitation.
     """
 
-    class_name = 'Invitation'
-    allowed_permissions = frozenset(['admin', 'read', 'write'])
+    class_name = "Invitation"
+    allowed_permissions = frozenset(["admin", "read", "write"])
 
     def _update_attributes(self, invitation):
         from . import repo
-        self.created_at = self._strptime(invitation['created_at'])
-        self.html_url = invitation['html_url']
-        self.id = invitation['id']
-        self.invitee = users.ShortUser(invitation['invitee'], self)
-        self.inviter = users.ShortUser(invitation['inviter'], self)
-        self.permissions = invitation['permissions']
-        self.repository = repo.ShortRepository(invitation['repository'], self)
-        self.url = invitation['url']
+
+        self.created_at = self._strptime(invitation["created_at"])
+        self.html_url = invitation["html_url"]
+        self.id = invitation["id"]
+        self.invitee = users.ShortUser(invitation["invitee"], self)
+        self.inviter = users.ShortUser(invitation["inviter"], self)
+        self.permissions = invitation["permissions"]
+        self.repository = repo.ShortRepository(invitation["repository"], self)
+        self.url = invitation["url"]
 
     def _repr(self):
-        return '<Invitation [{0}]>'.format(self.repository.full_name)
+        return "<Invitation [{0}]>".format(self.repository.full_name)
 
     @requires_auth
     def accept(self):
@@ -102,7 +103,8 @@ class Invitation(models.GitHubCore):
             bool
         """
         url = self._build_url(
-            'invitations', self.id, base_url=self.repository.url)
+            "invitations", self.id, base_url=self.repository.url
+        )
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
@@ -118,11 +120,14 @@ class Invitation(models.GitHubCore):
             :class:`~github3.repos.invitation.Invitation`
         """
         if permissions not in self.allowed_permissions:
-            raise ValueError("'permissions' must be one of {0}".format(
-                ', '.join(sorted(self.allowed_permissions))
-            ))
+            raise ValueError(
+                "'permissions' must be one of {0}".format(
+                    ", ".join(sorted(self.allowed_permissions))
+                )
+            )
         url = self._build_url(
-            'invitations', self.id, base_url=self.repository.url)
-        data = {'permissions': permissions}
+            "invitations", self.id, base_url=self.repository.url
+        )
+        data = {"permissions": permissions}
         json = self._json(self._patch(url, data=dumps(data)), 200)
         return self._instance_or_null(Invitation, json)

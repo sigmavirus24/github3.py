@@ -68,25 +68,25 @@ class Milestone(GitHubCore):
     """
 
     def _update_attributes(self, milestone):
-        self._api = milestone['url']
-        self.closed_issues_count = milestone['closed_issues']
+        self._api = milestone["url"]
+        self.closed_issues_count = milestone["closed_issues"]
         self.closed_issues = self.closed_issues_count
-        self.created_at = self._strptime(milestone['created_at'])
-        self.creator = milestone['creator']
+        self.created_at = self._strptime(milestone["created_at"])
+        self.creator = milestone["creator"]
         if self.creator:
             self.creator = users.ShortUser(self.creator, self)
-        self.description = milestone['description']
-        self.due_on = self._strptime(milestone['due_on'])
-        self.id = milestone['id']
-        self.number = milestone['number']
-        self.open_issues_count = milestone['open_issues']
+        self.description = milestone["description"]
+        self.due_on = self._strptime(milestone["due_on"])
+        self.id = milestone["id"]
+        self.number = milestone["number"]
+        self.open_issues_count = milestone["open_issues"]
         self.open_issues = self.open_issues_count
-        self.state = milestone['state']
-        self.title = milestone['title']
-        self.updated_at = self._strptime(milestone['updated_at'])
+        self.state = milestone["state"]
+        self.title = milestone["title"]
+        self.updated_at = self._strptime(milestone["updated_at"])
 
     def _repr(self):
-        return '<Milestone [{0}]>'.format(self)
+        return "<Milestone [{0}]>".format(self)
 
     def __str__(self):
         return self.title
@@ -119,7 +119,7 @@ class Milestone(GitHubCore):
         :rtype:
             :class:`~github3.issues.label.ShortLabel`
         """
-        url = self._build_url('labels', base_url=self._api)
+        url = self._build_url("labels", base_url=self._api)
         return self._iter(int(number), url, label.ShortLabel, etag=etag)
 
     @requires_auth
@@ -142,8 +142,12 @@ class Milestone(GitHubCore):
         :rtype:
             bool
         """
-        data = {'title': title, 'state': state,
-                'description': description, 'due_on': due_on}
+        data = {
+            "title": title,
+            "state": state,
+            "description": description,
+            "due_on": due_on,
+        }
         self._remove_none(data)
         json = None
 

@@ -4,10 +4,8 @@ from .helper import create_url_helper
 
 import github3
 
-get_example_data = create_example_data_helper('license_example')
-url_for = create_url_helper(
-    'https://api.github.com/licenses/mit'
-)
+get_example_data = create_example_data_helper("license_example")
+url_for = create_url_helper("https://api.github.com/licenses/mit")
 
 
 class TestLicenses(UnitHelper):
@@ -19,17 +17,17 @@ class TestLicenses(UnitHelper):
     def test_get_attr(self):
         """Show that attributes exist in class."""
         attributes = [
-            'description',
-            'body',
-            'implementation',
-            'html_url',
-            'key',
-            'name',
-            'featured',
+            "description",
+            "body",
+            "implementation",
+            "html_url",
+            "key",
+            "name",
+            "featured",
         ]
         for attr in attributes:
-            assert(getattr(self.instance, attr))
+            assert getattr(self.instance, attr)
 
     def test_repr(self):
         """Show that instance string is formatted properly."""
-        assert(repr(self.instance).startswith('<License'))
+        assert repr(self.instance).startswith("<License")

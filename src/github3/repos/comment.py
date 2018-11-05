@@ -25,25 +25,25 @@ class _RepoComment(models.GitHubCore):
 
     """
 
-    class_name = '_RepoComment'
+    class_name = "_RepoComment"
 
     def _update_attributes(self, comment):
-        self._api = comment['url']
-        self.author_association = comment['author_association']
-        self.body = comment['body']
-        self.commit_id = comment['commit_id']
-        self.created_at = self._strptime(comment['created_at'])
-        self.html_url = comment['html_url']
-        self.id = comment['id']
-        self.line = comment['line']
-        self.path = comment['path']
-        self.position = comment['position']
-        self.updated_at = self._strptime(comment['updated_at'])
-        self.user = users.ShortUser(comment['user'], self)
+        self._api = comment["url"]
+        self.author_association = comment["author_association"]
+        self.body = comment["body"]
+        self.commit_id = comment["commit_id"]
+        self.created_at = self._strptime(comment["created_at"])
+        self.html_url = comment["html_url"]
+        self.id = comment["id"]
+        self.line = comment["line"]
+        self.path = comment["path"]
+        self.position = comment["position"]
+        self.updated_at = self._strptime(comment["updated_at"])
+        self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return '<{0} [{1}/{2}]>'.format(
-            self.class_name, self.commit_id[:7], self.user.login or ''
+        return "<{0} [{1}/{2}]>".format(
+            self.class_name, self.commit_id[:7], self.user.login or ""
         )
 
     @requires_auth
@@ -69,8 +69,9 @@ class _RepoComment(models.GitHubCore):
             bool
         """
         if body:
-            json = self._json(self._patch(self._api,
-                                          json={'body': body}), 200)
+            json = self._json(
+                self._patch(self._api, json={"body": body}), 200
+            )
             if json:
                 self._update_attributes(json)
                 return True
@@ -94,12 +95,12 @@ class RepoComment(_RepoComment):
         The plain-text formatted text of this comment.
     """
 
-    class_name = 'Repository Comment'
+    class_name = "Repository Comment"
 
     def _update_attributes(self, comment):
         super(RepoComment, self)._update_attributes(comment)
-        self.body_text = comment['body_text']
-        self.body_html = comment['body_html']
+        self.body_text = comment["body_text"]
+        self.body_html = comment["body_html"]
 
 
 class ShortComment(_RepoComment):
@@ -155,5 +156,5 @@ class ShortComment(_RepoComment):
         comment.
     """
 
-    class_name = 'Short Repository Comment'
+    class_name = "Short Repository Comment"
     _refresh_to = RepoComment

@@ -23,7 +23,7 @@ class GitHubCore(object):
     have.
     """
 
-    _ratelimit_resource = 'core'
+    _ratelimit_resource = "core"
     _refresh_to = None
 
     def __init__(self, json, session):
@@ -34,15 +34,15 @@ class GitHubCore(object):
         # Either or 'session' is an instance of a GitHubCore sub-class or it
         # is a session. In the former case it will have a 'session' attribute.
         # If it doesn't, we can just default to using the passed in session.
-        self.session = getattr(session, 'session', session)
+        self.session = getattr(session, "session", session)
 
         # set a sane default
-        self._github_url = 'https://api.github.com'
+        self._github_url = "https://api.github.com"
 
         if json is not None:
-            self.etag = json.pop('ETag', None)
-            self.last_modified = json.pop('Last-Modified', None)
-            self._uniq = json.get('url', None)
+            self.etag = json.pop("ETag", None)
+            self.last_modified = json.pop("Last-Modified", None)
+            self._uniq = json.get("url", None)
         self._json_data = json
         try:
             self._update_attributes(json)
@@ -102,7 +102,7 @@ class GitHubCore(object):
     def __repr__(self):
         repr_string = self._repr()
         if requests.compat.is_py2:
-            return repr_string.encode('utf-8')
+            return repr_string.encode("utf-8")
         return repr_string
 
     @classmethod
@@ -125,7 +125,7 @@ class GitHubCore(object):
         return hash(self._uniq)
 
     def _repr(self):
-        return '<github3-core at 0x{0:x}>'.format(id(self))
+        return "<github3-core at 0x{0:x}>".format(id(self))
 
     @staticmethod
     def _remove_none(data):
@@ -133,7 +133,7 @@ class GitHubCore(object):
             return
         for (k, v) in list(data.items()):
             if v is None:
-                del(data[k])
+                del (data[k])
 
     def _instance_or_null(self, instance_class, json):
         if json is not None and not isinstance(json, dict):
@@ -159,9 +159,11 @@ class GitHubCore(object):
                 # Received a response from someone passing in `etag=`
                 return None
 
-            LOG.warning('Expected status_code %d but got %d',
-                        expected_status_code,
-                        actual_status_code)
+            LOG.warning(
+                "Expected status_code %d but got %d",
+                expected_status_code,
+                actual_status_code,
+            )
 
         try:
             ret = response.json()
@@ -169,14 +171,14 @@ class GitHubCore(object):
             raise exceptions.UnexpectedResponse(response)
 
         headers = response.headers
-        if (include_cache_info and
-                (headers.get('Last-Modified') or headers.get('ETag')) and
-                isinstance(ret, dict)):
-            ret['Last-Modified'] = response.headers.get(
-                'Last-Modified', ''
-            )
-            ret['ETag'] = response.headers.get('ETag', '')
-        LOG.info('JSON was %sreturned', 'not ' if ret is None else '')
+        if (
+            include_cache_info
+            and (headers.get("Last-Modified") or headers.get("ETag"))
+            and isinstance(ret, dict)
+        ):
+            ret["Last-Modified"] = response.headers.get("Last-Modified", "")
+            ret["ETag"] = response.headers.get("ETag", "")
+        LOG.info("JSON was %sreturned", "not " if ret is None else "")
         return ret
 
     def _boolean(self, response, true_code, false_code):
@@ -192,34 +194,35 @@ class GitHubCore(object):
         try:
             request_method = getattr(self.session, method)
             return request_method(*args, **kwargs)
-        except (requests.exceptions.ConnectionError,
-                requests.exceptions.Timeout,
-                ) as exc:
+        except (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.Timeout,
+        ) as exc:
             raise exceptions.ConnectionError(exc)
         except requests.exceptions.RequestException as exc:
             raise exceptions.TransportError(exc)
 
     def _delete(self, url, **kwargs):
-        LOG.debug('DELETE %s with %s', url, kwargs)
-        return self._request('delete', url, **kwargs)
+        LOG.debug("DELETE %s with %s", url, kwargs)
+        return self._request("delete", url, **kwargs)
 
     def _get(self, url, **kwargs):
-        LOG.debug('GET %s with %s', url, kwargs)
-        return self._request('get', url, **kwargs)
+        LOG.debug("GET %s with %s", url, kwargs)
+        return self._request("get", url, **kwargs)
 
     def _patch(self, url, **kwargs):
-        LOG.debug('PATCH %s with %s', url, kwargs)
-        return self._request('patch', url, **kwargs)
+        LOG.debug("PATCH %s with %s", url, kwargs)
+        return self._request("patch", url, **kwargs)
 
     def _post(self, url, data=None, json=True, **kwargs):
         if json:
             data = jsonlib.dumps(data) if data is not None else data
-        LOG.debug('POST %s with %s, %s', url, data, kwargs)
-        return self._request('post', url, data, **kwargs)
+        LOG.debug("POST %s with %s, %s", url, data, kwargs)
+        return self._request("post", url, data, **kwargs)
 
     def _put(self, url, **kwargs):
-        LOG.debug('PUT %s with %s', url, kwargs)
-        return self._request('put', url, **kwargs)
+        LOG.debug("PUT %s with %s", url, kwargs)
+        return self._request("put", url, **kwargs)
 
     def _build_url(self, *args, **kwargs):
         """Build a new API url from scratch."""
@@ -229,7 +232,7 @@ class GitHubCore(object):
     def _api(self):
         value = "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
         if self._uri.query:
-            value += '?{}'.format(self._uri.query)
+            value += "?{}".format(self._uri.query)
         return value
 
     @_api.setter
@@ -251,6 +254,7 @@ class GitHubCore(object):
         :rtype: :class:`GitHubIterator <github3.structs.GitHubIterator>`
         """
         from .structs import GitHubIterator
+
         return GitHubIterator(count, url, cls, self, params, etag, headers)
 
     @property
@@ -259,9 +263,9 @@ class GitHubCore(object):
 
         :returns: int
         """
-        json = self._json(self._get(self._build_url('rate_limit')), 200)
-        core = json.get('resources', {}).get(self._ratelimit_resource, {})
-        self._remaining = core.get('remaining', 0)
+        json = self._json(self._get(self._build_url("rate_limit")), 200)
+        core = json.get("resources", {}).get(self._ratelimit_resource, {})
+        self._remaining = core.get("remaining", 0)
         return self._remaining
 
     def refresh(self, conditional=False):
@@ -289,12 +293,12 @@ class GitHubCore(object):
             as described in the `Conditional Requests`_ section of the docs
         :returns: self
         """
-        headers = getattr(self, 'CUSTOM_HEADERS', {})
+        headers = getattr(self, "CUSTOM_HEADERS", {})
         if conditional:
             if self.last_modified:
-                headers['If-Modified-Since'] = self.last_modified
+                headers["If-Modified-Since"] = self.last_modified
             elif self.etag:
-                headers['If-None-Match'] = self.etag
+                headers["If-None-Match"] = self.etag
 
         headers = headers or None
         json = self._json(self._get(self._api, headers=headers), 200)

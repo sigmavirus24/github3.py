@@ -13,7 +13,7 @@ from . import users
 TEN_MINUTES_AS_SECONDS = 10 * 60
 DEFAULT_JWT_TOKEN_EXPIRATION = TEN_MINUTES_AS_SECONDS
 APP_PREVIEW_HEADERS = {
-    'Accept': 'application/vnd.github.machine-man-preview+json',
+    "Accept": "application/vnd.github.machine-man-preview+json"
 }
 
 
@@ -81,15 +81,15 @@ class App(models.GitHubCore):
     """
 
     def _update_attributes(self, json):
-        self.created_at = self._strptime(json['created_at'])
-        self.description = json['description']
-        self.external_url = json['external_url']
-        self.html_url = json['html_url']
-        self.id = json['id']
-        self.name = json['name']
-        self.node_id = json['node_id']
-        self.owner = users.ShortUser(json['owner'], self)
-        self.updated_at = self._strptime(json['updated_at'])
+        self.created_at = self._strptime(json["created_at"])
+        self.description = json["description"]
+        self.external_url = json["external_url"]
+        self.html_url = json["html_url"]
+        self.id = json["id"]
+        self.name = json["name"]
+        self.node_id = json["node_id"]
+        self.owner = users.ShortUser(json["owner"], self)
+        self.updated_at = self._strptime(json["updated_at"])
 
     def _repr(self):
         return '<App ["{}" by {}]>'.format(self.name, str(self.owner))
@@ -119,20 +119,20 @@ class Installation(models.GitHubCore):
     """
 
     def _update_attributes(self, json):
-        self.access_tokens_url = json['access_tokens_url']
-        self.account = json['account']
-        self.app_id = json['app_id']
-        self.created_at = self._strptime(json['created_at'])
-        self.events = json['events']
-        self.html_url = json['html_url']
-        self.id = json['id']
-        self.permissions = json['permissions']
-        self.repositories_url = json['repositories_url']
-        self.repository_selection = json['repository_selection']
-        self.single_file_name = json['single_file_name']
-        self.target_id = json['target_id']
-        self.target_type = json['target_type']
-        self.updated_at = self._strptime(json['updated_at'])
+        self.access_tokens_url = json["access_tokens_url"]
+        self.account = json["account"]
+        self.app_id = json["app_id"]
+        self.created_at = self._strptime(json["created_at"])
+        self.events = json["events"]
+        self.html_url = json["html_url"]
+        self.id = json["id"]
+        self.permissions = json["permissions"]
+        self.repositories_url = json["repositories_url"]
+        self.repository_selection = json["repository_selection"]
+        self.single_file_name = json["single_file_name"]
+        self.target_id = json["target_id"]
+        self.target_type = json["target_type"]
+        self.updated_at = self._strptime(json["updated_at"])
 
 
 def _load_private_key(pem_key_bytes):
@@ -159,22 +159,17 @@ def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
     key = _load_private_key(private_key_pem)
     now = int(time.time())
     token = jwt.JWT(
-        header={
-            'alg': 'RS256'
-        },
-        claims={
-            'iat': now,
-            'exp': now + expire_in,
-            'iss': app_id,
-        },
-        algs=['RS256'],
+        header={"alg": "RS256"},
+        claims={"iat": now, "exp": now + expire_in, "iss": app_id},
+        algs=["RS256"],
     )
     token.make_signed_token(key)
     return token.serialize()
 
 
-def create_jwt_headers(private_key_pem, app_id,
-                       expire_in=DEFAULT_JWT_TOKEN_EXPIRATION):
+def create_jwt_headers(
+    private_key_pem, app_id, expire_in=DEFAULT_JWT_TOKEN_EXPIRATION
+):
     """Create an encrypted token for the specified App.
 
     :param bytes private_key_pem:
@@ -190,6 +185,6 @@ def create_jwt_headers(private_key_pem, app_id,
         dict
     """
     jwt_token = create_token(private_key_pem, app_id, expire_in)
-    headers = {'Authorization': 'Bearer {}'.format(jwt_token)}
+    headers = {"Authorization": "Bearer {}".format(jwt_token)}
     headers.update(APP_PREVIEW_HEADERS)
     return headers

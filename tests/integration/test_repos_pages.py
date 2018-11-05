@@ -7,9 +7,9 @@ class TestRepositoryPages(IntegrationHelper):
     def test_latest_pages_build(self):
         """Test the ability to retrieve the latest pages build for a repo."""
         self.token_login()
-        cassette_name = self.cassette_name('latest_pages_build')
+        cassette_name = self.cassette_name("latest_pages_build")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'delete_contents')
+            repository = self.gh.repository("github3py", "delete_contents")
             assert repository is not None
             latest_build = repository.latest_pages_build()
 
@@ -20,9 +20,9 @@ class TestRepositoryPages(IntegrationHelper):
         Test the ability to retrieve information about a repository's pages.
         """
         self.token_login()
-        cassette_name = self.cassette_name('pages')
+        cassette_name = self.cassette_name("pages")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'delete_contents')
+            repository = self.gh.repository("github3py", "delete_contents")
             assert repository is not None
             pages_info = repository.pages()
 
@@ -31,9 +31,9 @@ class TestRepositoryPages(IntegrationHelper):
     def test_pages_builds(self):
         """Test the ability to list the pages builds."""
         self.token_login()
-        cassette_name = self.cassette_name('pages_builds')
+        cassette_name = self.cassette_name("pages_builds")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository('github3py', 'delete_contents')
+            repository = self.gh.repository("github3py", "delete_contents")
             assert repository is not None
             for build in repository.pages_builds():
                 assert isinstance(build, github3.repos.pages.PagesBuild)

@@ -62,39 +62,38 @@ class IssueEvent(GitHubCore):
     """
 
     def _update_attributes(self, event):
-        self._api = event['url']
-        self.actor = users.ShortUser(event['actor'], self)
-        self.commit_id = event['commit_id']
-        self.commit_url = event['commit_url']
-        self.created_at = self._strptime(event['created_at'])
+        self._api = event["url"]
+        self.actor = users.ShortUser(event["actor"], self)
+        self.commit_id = event["commit_id"]
+        self.commit_url = event["commit_url"]
+        self.created_at = self._strptime(event["created_at"])
         # Only for 'assigned' and 'unassigned' events.
-        self.assignee = event.get('assignee')
+        self.assignee = event.get("assignee")
         if self.assignee:
             self.assignee = users.ShortUser(self.assignee, self)
-        self.assigner = event.get('assigner')
+        self.assigner = event.get("assigner")
         if self.assigner:
             self.assigner = users.ShortUser(self.assigner, self)
 
         # Only for 'review_requested' and 'review_request_removed' events.
-        self.review_requester = event.get('review_requester')
+        self.review_requester = event.get("review_requester")
         if self.review_requester:
-            self.review_requester = (
-                users.ShortUser(self.review_requester, self))
-        self.requested_reviewers = event.get('requested_reviewers')
+            self.review_requester = users.ShortUser(
+                self.review_requester, self
+            )
+        self.requested_reviewers = event.get("requested_reviewers")
         if self.requested_reviewers:
             self.requested_reviewers = [
                 users.ShortUser(reviewer, self)
                 for reviewer in self.requested_reviewers
             ]
 
-        self.event = event['event']
-        self.id = event['id']
+        self.event = event["event"]
+        self.id = event["id"]
         self._uniq = self._api
 
     def _repr(self):
-        return '<Issue Event [{0} by {1}]>'.format(
-            self.event, self.actor
-        )
+        return "<Issue Event [{0} by {1}]>".format(self.event, self.actor)
 
 
 class RepositoryIssueEvent(IssueEvent):
@@ -120,9 +119,10 @@ class RepositoryIssueEvent(IssueEvent):
     def _update_attributes(self, event):
         super(RepositoryIssueEvent, self)._update_attributes(event)
         from . import issue
-        self.issue = issue.ShortIssue(event['issue'], self)
+
+        self.issue = issue.ShortIssue(event["issue"], self)
 
     def _repr(self):
-        return '<Repository Issue Event on #{} [{} by {}]>'.format(
+        return "<Repository Issue Event on #{} [{} by {}]>".format(
             self.issue.number, self.event, self.actor.login
         )

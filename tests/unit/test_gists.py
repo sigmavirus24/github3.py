@@ -4,25 +4,25 @@ import github3
 
 from . import helper
 
-gist_example_data = helper.create_example_data_helper('gist_example')
+gist_example_data = helper.create_example_data_helper("gist_example")
 gist_example_issue_883 = helper.create_example_data_helper(
-    'gist_example_issue_883'
+    "gist_example_issue_883"
 )
 gist_example_short_data = helper.create_example_data_helper(
-    'gist_example_short'
+    "gist_example_short"
 )
 gist_history_example_data = helper.create_example_data_helper(
-    'gist_history_example'
+    "gist_history_example"
 )
 gist_comment_example_data = helper.create_example_data_helper(
-    'gist_comment_example'
+    "gist_comment_example"
 )
 gist_file_example_data = helper.create_example_data_helper(
-    'gist_file_example'
+    "gist_file_example"
 )
 
 url_for = helper.create_url_helper(
-    'https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a'
+    "https://api.github.com/gists/e20f1e6c9ca010cabc523a7356217f5a"
 )
 
 
@@ -34,10 +34,11 @@ class TestGist(helper.UnitHelper):
 
     def test_create_comment(self):
         """Show that a user can create a comment."""
-        self.instance.create_comment('some comment text')
+        self.instance.create_comment("some comment text")
 
-        self.post_called_with(url_for('comments'),
-                              data={'body': 'some comment text'})
+        self.post_called_with(
+            url_for("comments"), data={"body": "some comment text"}
+        )
 
     def test_create_comment_requires_a_body(self):
         """Show that a user cannot create an empty comment."""
@@ -53,11 +54,11 @@ class TestGist(helper.UnitHelper):
 
     def test_edit(self):
         """Show that a user can edit a gist."""
-        desc = 'description'
-        files = {'file': {'content': 'foo content bar'}}
+        desc = "description"
+        files = {"file": {"content": "foo content bar"}}
         self.instance.edit(desc, files)
 
-        self.patch_called_with(url_for(), data={desc: desc, 'files': files})
+        self.patch_called_with(url_for(), data={desc: desc, "files": files})
 
     def test_edit_requires_changes(self):
         """Show that a user must change something to edit a gist."""
@@ -69,13 +70,13 @@ class TestGist(helper.UnitHelper):
         """Show that a user can fork a gist."""
         self.instance.fork()
 
-        self.session.post.assert_called_once_with(url_for('forks'), None)
+        self.session.post.assert_called_once_with(url_for("forks"), None)
 
     def test_history(self):
         """Show that a user can get a gist's history."""
         history = self.instance.history[0]
         assert isinstance(history, github3.gists.history.GistHistory)
-        assert repr(history).startswith('<Gist History')
+        assert repr(history).startswith("<Gist History")
 
     def test_file(self):
         """Show that each file object is an instance of GistFile."""
@@ -86,19 +87,19 @@ class TestGist(helper.UnitHelper):
         """Show that a user can check if they starred a gist."""
         self.instance.is_starred()
 
-        self.session.get.assert_called_once_with(url_for('star'))
+        self.session.get.assert_called_once_with(url_for("star"))
 
     def test_star(self):
         """Show that a user can star a gist."""
         self.instance.star()
 
-        self.session.put.assert_called_once_with(url_for('star'))
+        self.session.put.assert_called_once_with(url_for("star"))
 
     def test_unstar(self):
         """Show that a user can unstar a gist."""
         self.instance.unstar()
 
-        self.session.delete.assert_called_once_with(url_for('star'))
+        self.session.delete.assert_called_once_with(url_for("star"))
 
     def test_to_str(self):
         """Show that a str(gist) is the same as the gist's id."""
@@ -114,7 +115,7 @@ class TestGistIssue883(helper.UnitHelper):
 
     def test_owner_is_not_required(self):
         """Show that a gist does not always have an owner."""
-        assert 'owner' not in self.instance.as_dict()
+        assert "owner" not in self.instance.as_dict()
 
 
 class TestGistRequiresAuth(helper.UnitRequiresAuthenticationHelper):
@@ -126,7 +127,7 @@ class TestGistRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def test_create_comment(self):
         """Show that a user needs to authenticate to create a comment."""
         with pytest.raises(github3.GitHubError):
-            self.instance.create_comment('foo')
+            self.instance.create_comment("foo")
 
     def test_delete(self):
         """Show that a user needs to authenticate to delete a gist."""
@@ -171,9 +172,7 @@ class TestGistIterators(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('comments'),
-            params={'per_page': 100},
-            headers={}
+            url_for("comments"), params={"per_page": 100}, headers={}
         )
 
     def test_commits(self):
@@ -182,9 +181,7 @@ class TestGistIterators(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('commits'),
-            params={'per_page': 100},
-            headers={}
+            url_for("commits"), params={"per_page": 100}, headers={}
         )
 
     def test_files(self):
@@ -200,9 +197,7 @@ class TestGistIterators(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('forks'),
-            params={'per_page': 100},
-            headers={}
+            url_for("forks"), params={"per_page": 100}, headers={}
         )
 
 
@@ -215,11 +210,10 @@ class TestGistHistory(helper.UnitHelper):
     def test_equality(self):
         """Show that two instances of a GistHistory are equal."""
         history = github3.gists.history.GistHistory(
-            gist_history_example_data(),
-            self.session
+            gist_history_example_data(), self.session
         )
         assert self.instance == history
-        history._uniq = 'foo'
+        history._uniq = "foo"
         assert self.instance != history
 
     def test_gist(self):
@@ -238,16 +232,15 @@ class TestGistComment(helper.UnitHelper):
     def test_equality(self):
         """Show that two instances of a GistComment are equal."""
         comment = github3.gists.comment.GistComment(
-            gist_comment_example_data(),
-            self.session
+            gist_comment_example_data(), self.session
         )
         assert self.instance == comment
-        comment._uniq = '1'
+        comment._uniq = "1"
         assert self.instance != comment
 
     def test_repr(self):
         """Excercise the GistComment repr."""
-        assert repr(self.instance).startswith('<Gist Comment')
+        assert repr(self.instance).startswith("<Gist Comment")
 
 
 class TestGistFile(helper.UnitHelper):

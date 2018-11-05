@@ -22,12 +22,12 @@ def alternate_week(week):
     :rtype:
         dict
     """
-    start_of_week = datetime.datetime.utcfromtimestamp(int(week['w']))
+    start_of_week = datetime.datetime.utcfromtimestamp(int(week["w"]))
     return {
-        'start of week': start_of_week.replace(tzinfo=dateutil.tz.tzutc()),
-        'additions': week['a'],
-        'deletions': week['d'],
-        'commits': week['c'],
+        "start of week": start_of_week.replace(tzinfo=dateutil.tz.tzutc()),
+        "additions": week["a"],
+        "deletions": week["d"],
+        "commits": week["c"],
     }
 
 
@@ -74,13 +74,13 @@ class ContributorStats(models.GitHubCore):
     """
 
     def _update_attributes(self, stats_object):
-        self.author = users.ShortUser(stats_object['author'], self)
-        self.total = stats_object['total']
-        self.weeks = stats_object['weeks']
+        self.author = users.ShortUser(stats_object["author"], self)
+        self.total = stats_object["total"]
+        self.weeks = stats_object["weeks"]
         alt_weeks = self.weeks
         if alt_weeks:
             alt_weeks = [alternate_week(w) for w in self.weeks]
         self.alternate_weeks = self.alt_weeks = alt_weeks
 
     def _repr(self):
-        return '<Contributor Statistics [{0}]>'.format(self.author)
+        return "<Contributor Statistics [{0}]>".format(self.author)

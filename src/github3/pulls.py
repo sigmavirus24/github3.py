@@ -62,23 +62,24 @@ class PullDestination(models.GitHubCore):
 
     def _update_attributes(self, dest):
         from .repos.repo import ShortRepository
-        self.ref = dest['ref']
-        self.label = dest['label']
-        self.user = dest.get('user')
+
+        self.ref = dest["ref"]
+        self.label = dest["label"]
+        self.user = dest.get("user")
         if self.user:
             self.user = users.ShortUser(self.user, self)
-        self.sha = dest['sha']
-        self._repo_name = ''
-        self._repo_owner = ''
-        repo = dest.get('repo')
+        self.sha = dest["sha"]
+        self._repo_name = ""
+        self._repo_owner = ""
+        repo = dest.get("repo")
         if repo:
-            self._repo_name = repo.get('name')
-            self._repo_owner = repo['owner']['login']
+            self._repo_name = repo.get("name")
+            self._repo_owner = repo["owner"]["login"]
             self.repository = ShortRepository(repo, self)
         self.repo = (self._repo_owner, self._repo_name)
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.direction, self.label)
+        return "<{0} [{1}]>".format(self.direction, self.label)
 
 
 class Head(PullDestination):
@@ -87,7 +88,7 @@ class Head(PullDestination):
     See :class:`~github3.pulls.PullDestination` for more details.
     """
 
-    destination = 'Head'
+    destination = "Head"
 
 
 class Base(PullDestination):
@@ -96,7 +97,7 @@ class Base(PullDestination):
     See :class:`~github3.pulls.PullDestination` for more details.
     """
 
-    destination = 'Base'
+    destination = "Base"
 
 
 class PullFile(models.GitHubCore):
@@ -156,19 +157,19 @@ class PullFile(models.GitHubCore):
     """
 
     def _update_attributes(self, pfile):
-        self.sha = pfile['sha']
-        self.filename = pfile['filename']
-        self.status = pfile['status']
-        self.additions_count = pfile['additions']
-        self.deletions_count = pfile['deletions']
-        self.changes_count = pfile['changes']
-        self.blob_url = pfile['blob_url']
-        self.raw_url = pfile['raw_url']
-        self.patch = pfile.get('patch')
-        self.contents_url = pfile['contents_url']
+        self.sha = pfile["sha"]
+        self.filename = pfile["filename"]
+        self.status = pfile["status"]
+        self.additions_count = pfile["additions"]
+        self.deletions_count = pfile["deletions"]
+        self.changes_count = pfile["changes"]
+        self.blob_url = pfile["blob_url"]
+        self.raw_url = pfile["raw_url"]
+        self.patch = pfile.get("patch")
+        self.contents_url = pfile["contents_url"]
 
     def _repr(self):
-        return '<Pull Request File [{0}]>'.format(self.filename)
+        return "<Pull Request File [{0}]>".format(self.filename)
 
     def contents(self):
         """Return the contents of the file.
@@ -191,52 +192,55 @@ class _PullRequest(models.GitHubCore):
         http://developer.github.com/v3/pulls/
     """
 
-    class_name = '_PullRequest'
+    class_name = "_PullRequest"
 
     def _update_attributes(self, pull):
         from . import orgs
-        self._api = pull['url']
-        self.assignee = pull['assignee']
+
+        self._api = pull["url"]
+        self.assignee = pull["assignee"]
         if self.assignee is not None:
             self.assignee = users.ShortUser(self.assignee, self)
-        self.assignees = [users.ShortUser(a, self) for a in pull['assignees']]
-        self.base = Base(pull['base'], self)
-        self.body = pull['body']
-        self.body_html = pull['body_html']
-        self.body_text = pull['body_text']
-        self.closed_at = self._strptime(pull['closed_at'])
-        self.comments_url = pull['comments_url']
-        self.commits_url = pull['commits_url']
-        self.created_at = self._strptime(pull['created_at'])
-        self.diff_url = pull['diff_url']
-        self.head = Head(pull['head'], self)
-        self.html_url = pull['html_url']
-        self.id = pull['id']
-        self.issue_url = pull['issue_url']
-        self.links = pull['_links']
-        self.merge_commit_sha = pull['merge_commit_sha']
-        self.merged_at = self._strptime(pull['merged_at'])
-        self.number = pull['number']
-        self.patch_url = pull['patch_url']
-        requested_reviewers = pull.get('requested_reviewers', [])
+        self.assignees = [users.ShortUser(a, self) for a in pull["assignees"]]
+        self.base = Base(pull["base"], self)
+        self.body = pull["body"]
+        self.body_html = pull["body_html"]
+        self.body_text = pull["body_text"]
+        self.closed_at = self._strptime(pull["closed_at"])
+        self.comments_url = pull["comments_url"]
+        self.commits_url = pull["commits_url"]
+        self.created_at = self._strptime(pull["created_at"])
+        self.diff_url = pull["diff_url"]
+        self.head = Head(pull["head"], self)
+        self.html_url = pull["html_url"]
+        self.id = pull["id"]
+        self.issue_url = pull["issue_url"]
+        self.links = pull["_links"]
+        self.merge_commit_sha = pull["merge_commit_sha"]
+        self.merged_at = self._strptime(pull["merged_at"])
+        self.number = pull["number"]
+        self.patch_url = pull["patch_url"]
+        requested_reviewers = pull.get("requested_reviewers", [])
         self.requested_reviewers = [
-            users.ShortUser(r, self) for r in requested_reviewers]
-        requested_teams = pull.get('requested_teams', [])
+            users.ShortUser(r, self) for r in requested_reviewers
+        ]
+        requested_teams = pull.get("requested_teams", [])
         self.requested_teams = [
-            orgs.ShortTeam(t, self) for t in requested_teams]
-        self.review_comment_urlt = URITemplate(pull['review_comment_url'])
-        self.review_comments_url = pull['review_comments_url']
+            orgs.ShortTeam(t, self) for t in requested_teams
+        ]
+        self.review_comment_urlt = URITemplate(pull["review_comment_url"])
+        self.review_comments_url = pull["review_comments_url"]
         self.repository = None
         if self.base:
             self.repository = self.base.repository
-        self.state = pull['state']
-        self.statuses_url = pull['statuses_url']
-        self.title = pull['title']
-        self.updated_at = self._strptime(pull['updated_at'])
-        self.user = users.ShortUser(pull['user'], self)
+        self.state = pull["state"]
+        self.statuses_url = pull["statuses_url"]
+        self.title = pull["title"]
+        self.updated_at = self._strptime(pull["updated_at"])
+        self.user = users.ShortUser(pull["user"], self)
 
     def _repr(self):
-        return '<{0} [#{1}]>'.format(self.class_name, self.number)
+        return "<{0} [#{1}]>".format(self.class_name, self.number)
 
     @requires_auth
     def close(self):
@@ -247,7 +251,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             bool
         """
-        return self.update(self.title, self.body, 'closed')
+        return self.update(self.title, self.body, "closed")
 
     @requires_auth
     def create_comment(self, body):
@@ -263,7 +267,7 @@ class _PullRequest(models.GitHubCore):
         url = self.comments_url
         json = None
         if body:
-            json = self._json(self._post(url, data={'body': body}), 201)
+            json = self._json(self._post(url, data={"body": body}), 201)
         return self._instance_or_null(IssueComment, json)
 
     @requires_auth
@@ -287,9 +291,13 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.pulls.ReviewComment`
         """
-        url = self._build_url('comments', base_url=self._api)
-        data = {'body': body, 'commit_id': commit_id, 'path': path,
-                'position': int(position)}
+        url = self._build_url("comments", base_url=self._api)
+        data = {
+            "body": body,
+            "commit_id": commit_id,
+            "path": path,
+            "position": int(position),
+        }
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(ReviewComment, json)
 
@@ -306,13 +314,14 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.pulls.ShortPullRequest`
         """
-        url = self._build_url('requested_reviewers', base_url=self._api)
+        url = self._build_url("requested_reviewers", base_url=self._api)
         data = {}
         if reviewers is not None:
-            data['reviewers'] = [getattr(r, 'login', r) for r in reviewers]
+            data["reviewers"] = [getattr(r, "login", r) for r in reviewers]
         if team_reviewers is not None:
-            data['team_reviewers'] = [
-                getattr(t, 'slug', t) for t in team_reviewers]
+            data["team_reviewers"] = [
+                getattr(t, "slug", t) for t in team_reviewers
+            ]
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(ShortPullRequest, json)
 
@@ -355,12 +364,12 @@ class _PullRequest(models.GitHubCore):
         """
         if comments is None:
             comments = []
-        url = self._build_url('reviews', base_url=self._api)
-        data = {'body': body, 'comments': comments}
+        url = self._build_url("reviews", base_url=self._api)
+        data = {"body": body, "comments": comments}
         if commit_id is not None:
-            data['commit_id'] = commit_id
+            data["commit_id"] = commit_id
         if event is not None:
-            data['event'] = event
+            data["event"] = event
         json = self._json(self._post(url, data=data), 200)
         return self._instance_or_null(PullReview, json)
 
@@ -377,13 +386,14 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('requested_reviewers', base_url=self._api)
+        url = self._build_url("requested_reviewers", base_url=self._api)
         data = {}
         if reviewers is not None:
-            data['reviewers'] = [getattr(r, 'login', r) for r in reviewers]
+            data["reviewers"] = [getattr(r, "login", r) for r in reviewers]
         if team_reviewers is not None:
-            data['team_reviewers'] = [
-                getattr(t, 'slug', t) for t in team_reviewers]
+            data["team_reviewers"] = [
+                getattr(t, "slug", t) for t in team_reviewers
+            ]
         return self._boolean(self._delete(url, data=dumps(data)), 200, 404)
 
     def diff(self):
@@ -394,9 +404,10 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             bytes
         """
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.diff'})
-        return resp.content if self._boolean(resp, 200, 404) else b''
+        resp = self._get(
+            self._api, headers={"Accept": "application/vnd.github.diff"}
+        )
+        return resp.content if self._boolean(resp, 200, 404) else b""
 
     def is_merged(self):
         """Check to see if the pull request was merged.
@@ -411,7 +422,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('merge', base_url=self._api)
+        url = self._build_url("merge", base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
     def issue(self):
@@ -438,7 +449,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.commit.ShortCommit`
         """
-        url = self._build_url('commits', base_url=self._api)
+        url = self._build_url("commits", base_url=self._api)
         return self._iter(int(number), url, rcommit.ShortCommit, etag=etag)
 
     def files(self, number=-1, etag=None):
@@ -452,7 +463,7 @@ class _PullRequest(models.GitHubCore):
         :returns: generator of pull request files
         :rtype: :class:`~PullFile`
         """
-        url = self._build_url('files', base_url=self._api)
+        url = self._build_url("files", base_url=self._api)
         return self._iter(int(number), url, PullFile, etag=etag)
 
     def issue_comments(self, number=-1, etag=None):
@@ -472,13 +483,18 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.comment.IssueComment`
         """
-        comments = self.links.get('comments', {})
-        url = comments.get('href')
+        comments = self.links.get("comments", {})
+        url = comments.get("href")
         return self._iter(int(number), url, IssueComment, etag=etag)
 
     @requires_auth
-    def merge(self, commit_message=None, sha=None, merge_method='merge',
-              commit_title=None):
+    def merge(
+        self,
+        commit_message=None,
+        sha=None,
+        merge_method="merge",
+        commit_title=None,
+    ):
         """Merge this pull request.
 
         .. versionchanged:: 1.3.0
@@ -505,18 +521,18 @@ class _PullRequest(models.GitHubCore):
             bool
         :returns: bool
         """
-        parameters = {'merge_method': merge_method}
+        parameters = {"merge_method": merge_method}
         if sha:
-            parameters['sha'] = sha
+            parameters["sha"] = sha
         if commit_message is not None:
-            parameters['commit_message'] = commit_message
+            parameters["commit_message"] = commit_message
         if commit_title is not None:
-            parameters['commit_title'] = commit_title
-        url = self._build_url('merge', base_url=self._api)
+            parameters["commit_title"] = commit_title
+        url = self._build_url("merge", base_url=self._api)
         json = self._json(self._put(url, data=dumps(parameters)), 200)
         if not json:
             return False
-        return json['merged']
+        return json["merged"]
 
     def patch(self):
         """Return the patch.
@@ -526,9 +542,10 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             bytes
         """
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.patch'})
-        return resp.content if self._boolean(resp, 200, 404) else b''
+        resp = self._get(
+            self._api, headers={"Accept": "application/vnd.github.patch"}
+        )
+        return resp.content if self._boolean(resp, 200, 404) else b""
 
     @requires_auth
     def reopen(self):
@@ -539,7 +556,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             bool
         """
-        return self.update(self.title, self.body, state='open')
+        return self.update(self.title, self.body, state="open")
 
     def review_comments(self, number=-1, etag=None):
         """Iterate over the review comments on this pull request.
@@ -554,7 +571,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.pulls.ReviewComment`
         """
-        url = self._build_url('comments', base_url=self._api)
+        url = self._build_url("comments", base_url=self._api)
         return self._iter(int(number), url, ReviewComment, etag=etag)
 
     def review_requests(self):
@@ -565,7 +582,7 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.pulls.ReviewRequests`
         """
-        url = self._build_url('requested_reviewers', base_url=self._api)
+        url = self._build_url("requested_reviewers", base_url=self._api)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(ReviewRequests, json)
 
@@ -582,12 +599,18 @@ class _PullRequest(models.GitHubCore):
         :rtype:
             :class:`~github3.pulls.PullReview`
         """
-        url = self._build_url('reviews', base_url=self._api)
+        url = self._build_url("reviews", base_url=self._api)
         return self._iter(int(number), url, PullReview, etag=etag)
 
     @requires_auth
-    def update(self, title=None, body=None, state=None, base=None,
-               maintainer_can_modify=None):
+    def update(
+        self,
+        title=None,
+        body=None,
+        state=None,
+        base=None,
+        maintainer_can_modify=None,
+    ):
         """Update this pull request.
 
         :param str title:
@@ -608,11 +631,11 @@ class _PullRequest(models.GitHubCore):
             bool
         """
         data = {
-            'title': title,
-            'body': body,
-            'state': state,
-            'base': base,
-            'maintainer_can_modify': maintainer_can_modify,
+            "title": title,
+            "body": body,
+            "state": state,
+            "base": base,
+            "maintainer_can_modify": maintainer_can_modify,
         }
         json = None
         self._remove_none(data)
@@ -684,21 +707,21 @@ class PullRequest(_PullRequest):
         The number of review comments on this pull request.
     """
 
-    class_name = 'Pull Request'
+    class_name = "Pull Request"
 
     def _update_attributes(self, pull):
         super(PullRequest, self)._update_attributes(pull)
-        self.additions_count = pull['additions']
-        self.deletions_count = pull['deletions']
-        self.comments_count = pull['comments']
-        self.commits_count = pull['commits']
-        self.mergeable = pull['mergeable']
-        self.mergeable_state = pull['mergeable_state']
-        self.merged = pull['merged']
-        self.merged_by = pull['merged_by']
+        self.additions_count = pull["additions"]
+        self.deletions_count = pull["deletions"]
+        self.comments_count = pull["comments"]
+        self.commits_count = pull["commits"]
+        self.mergeable = pull["mergeable"]
+        self.mergeable_state = pull["mergeable_state"]
+        self.merged = pull["merged"]
+        self.merged_by = pull["merged_by"]
         if self.merged_by is not None:
             self.merged_by = users.ShortUser(self.merged_by, self)
-        self.review_comments_count = pull['review_comments']
+        self.review_comments_count = pull["review_comments"]
 
 
 class ShortPullRequest(_PullRequest):
@@ -861,7 +884,7 @@ class ShortPullRequest(_PullRequest):
         this pull request.
     """
 
-    class_name = 'Short Pull Request'
+    class_name = "Short Pull Request"
     _refresh_to = PullRequest
 
 
@@ -930,20 +953,20 @@ class PullReview(models.GitHubCore):
     """
 
     def _update_attributes(self, review):
-        self.id = review['id']
-        self.author_association = review['author_association']
-        self.body = review['body']
-        self.body_html = review['body_html']
-        self.body_text = review['body_text']
-        self.commit_id = review['commit_id']
-        self.html_url = review['html_url']
-        self.user = users.ShortUser(review['user'], self)
-        self.state = review['state']
-        self.submitted_at = self._strptime(review.get('submitted_at'))
-        self.pull_request_url = review['pull_request_url']
+        self.id = review["id"]
+        self.author_association = review["author_association"]
+        self.body = review["body"]
+        self.body_html = review["body_html"]
+        self.body_text = review["body_text"]
+        self.commit_id = review["commit_id"]
+        self.html_url = review["html_url"]
+        self.user = users.ShortUser(review["user"], self)
+        self.state = review["state"]
+        self.submitted_at = self._strptime(review.get("submitted_at"))
+        self.pull_request_url = review["pull_request_url"]
 
     def _repr(self):
-        return '<Pull Request Review [{0}]>'.format(self.id)
+        return "<Pull Request Review [{0}]>".format(self.id)
 
     @requires_auth
     def submit(self, body, event=None):
@@ -962,11 +985,12 @@ class PullReview(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('reviews', self.id, 'events',
-                              base_url=self.pull_request_url)
-        data = {'body': body}
+        url = self._build_url(
+            "reviews", self.id, "events", base_url=self.pull_request_url
+        )
+        data = {"body": body}
         if event is not None:
-            data['event'] = event
+            data["event"] = event
         json = self._json(self._post(url, data=data), 200)
         if json:
             self._update_attributes(json)
@@ -1051,27 +1075,27 @@ class ReviewComment(models.GitHubCore):
     """
 
     def _update_attributes(self, comment):
-        self._api = comment['url']
-        self.id = comment['id']
-        self.author_association = comment['author_association']
-        self.body = comment['body']
-        self.body_html = comment['body_html']
-        self.body_text = comment['body_text']
-        self.commit_id = comment['commit_id']
-        self.created_at = self._strptime(comment['created_at'])
-        self.diff_hunk = comment['diff_hunk']
-        self.html_url = comment['html_url']
-        self.links = comment['_links']
-        self.original_commit_id = comment['original_commit_id']
-        self.original_position = comment['original_position']
-        self.path = comment['path']
-        self.position = comment['position']
-        self.pull_request_url = comment['pull_request_url']
-        self.updated_at = self._strptime(comment['updated_at'])
-        self.user = users.ShortUser(comment['user'], self)
+        self._api = comment["url"]
+        self.id = comment["id"]
+        self.author_association = comment["author_association"]
+        self.body = comment["body"]
+        self.body_html = comment["body_html"]
+        self.body_text = comment["body_text"]
+        self.commit_id = comment["commit_id"]
+        self.created_at = self._strptime(comment["created_at"])
+        self.diff_hunk = comment["diff_hunk"]
+        self.html_url = comment["html_url"]
+        self.links = comment["_links"]
+        self.original_commit_id = comment["original_commit_id"]
+        self.original_position = comment["original_position"]
+        self.path = comment["path"]
+        self.position = comment["position"]
+        self.pull_request_url = comment["pull_request_url"]
+        self.updated_at = self._strptime(comment["updated_at"])
+        self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return '<Review Comment [{0}]>'.format(self.user.login)
+        return "<Review Comment [{0}]>".format(self.user.login)
 
     @requires_auth
     def delete(self):
@@ -1096,8 +1120,9 @@ class ReviewComment(models.GitHubCore):
             bool
         """
         if body:
-            json = self._json(self._patch(self._api,
-                                          data=dumps({'body': body})), 200)
+            json = self._json(
+                self._patch(self._api, data=dumps({"body": body})), 200
+            )
             if json:
                 self._update_attributes(json)
                 return True
@@ -1114,12 +1139,13 @@ class ReviewComment(models.GitHubCore):
         :rtype:
             :class:`~github3.pulls.ReviewComment`
         """
-        url = self._build_url('comments', base_url=self.pull_request_url)
-        index = self._api.rfind('/') + 1
+        url = self._build_url("comments", base_url=self.pull_request_url)
+        index = self._api.rfind("/") + 1
         in_reply_to = int(self._api[index:])
-        json = self._json(self._post(url, data={
-            'body': body, 'in_reply_to': in_reply_to
-        }), 201)
+        json = self._json(
+            self._post(url, data={"body": body, "in_reply_to": in_reply_to}),
+            201,
+        )
         return self._instance_or_null(ReviewComment, json)
 
 
@@ -1139,11 +1165,14 @@ class ReviewRequests(models.GitHubCore):
     .. _Review Request Documentation:
        https://developer.github.com/v3/pulls/review_requests/
     """
+
     def _update_attributes(self, requests):
         from . import orgs
-        self.teams = [orgs.ShortTeam(t, self) for t in requests['teams']]
-        self.users = [users.ShortUser(u, self) for u in requests['users']]
+
+        self.teams = [orgs.ShortTeam(t, self) for t in requests["teams"]]
+        self.users = [users.ShortUser(u, self) for u in requests["users"]]
 
     def _repr(self):
-        return '<Review Requests [users: {0}, teams: {1}]>'.format(
-            len(self.users), len(self.teams))
+        return "<Review Requests [users: {0}, teams: {1}]>".format(
+            len(self.users), len(self.teams)
+        )

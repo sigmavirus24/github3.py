@@ -63,26 +63,26 @@ class Comparison(models.GitHubCore):
     """
 
     def _update_attributes(self, compare):
-        self._api = compare['url']
-        self.ahead_by = compare['ahead_by']
-        self.base_commit = commit.ShortCommit(compare['base_commit'], self)
-        self.behind_by = compare['behind_by']
-        self.commits = compare['commits']
+        self._api = compare["url"]
+        self.ahead_by = compare["ahead_by"]
+        self.base_commit = commit.ShortCommit(compare["base_commit"], self)
+        self.behind_by = compare["behind_by"]
+        self.commits = compare["commits"]
         if self.commits:
             self.commits = [
                 commit.ShortCommit(com, self) for com in self.commits
             ]
-        self.diff_url = compare['diff_url']
-        self.files = compare['files']
-        self.html_url = compare['html_url']
-        self.patch_url = compare['patch_url']
-        self.permalink_url = compare['permalink_url']
-        self.status = compare['status']
-        self.total_commits = compare['total_commits']
+        self.diff_url = compare["diff_url"]
+        self.files = compare["files"]
+        self.html_url = compare["html_url"]
+        self.patch_url = compare["patch_url"]
+        self.permalink_url = compare["permalink_url"]
+        self.status = compare["status"]
+        self.total_commits = compare["total_commits"]
         self._uniq = self.commits
 
     def _repr(self):
-        return '<Comparison of {0} commits>'.format(self.total_commits)
+        return "<Comparison of {0} commits>".format(self.total_commits)
 
     def diff(self):
         """Retrieve the diff for this comparison.
@@ -92,9 +92,10 @@ class Comparison(models.GitHubCore):
         :rtype:
             bytes
         """
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.diff'})
-        return resp.content if self._boolean(resp, 200, 404) else b''
+        resp = self._get(
+            self._api, headers={"Accept": "application/vnd.github.diff"}
+        )
+        return resp.content if self._boolean(resp, 200, 404) else b""
 
     def patch(self):
         """Retrieve the patch formatted diff for this commit.
@@ -104,6 +105,7 @@ class Comparison(models.GitHubCore):
         :rtype:
             bytes
         """
-        resp = self._get(self._api,
-                         headers={'Accept': 'application/vnd.github.patch'})
-        return resp.content if self._boolean(resp, 200, 404) else b''
+        resp = self._get(
+            self._api, headers={"Accept": "application/vnd.github.patch"}
+        )
+        return resp.content if self._boolean(resp, 200, 404) else b""

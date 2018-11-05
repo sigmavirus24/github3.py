@@ -51,15 +51,15 @@ class CodeSearchResult(models.GitHubCore):
     """
 
     def _update_attributes(self, data):
-        self._api = data['url']
-        self.git_url = data['git_url']
-        self.html_url = data['html_url']
-        self.name = data['name']
-        self.path = data['path']
-        self.repository = repos.ShortRepository(data['repository'], self)
-        self.score = data['score']
-        self.sha = data['sha']
-        self.text_matches = data.get('text_matches', [])
+        self._api = data["url"]
+        self.git_url = data["git_url"]
+        self.html_url = data["html_url"]
+        self.name = data["name"]
+        self.path = data["path"]
+        self.repository = repos.ShortRepository(data["repository"], self)
+        self.score = data["score"]
+        self.sha = data["sha"]
+        self.text_matches = data.get("text_matches", [])
 
     def _repr(self):
-        return '<CodeSearchResult [{0}]>'.format(self.path)
+        return "<CodeSearchResult [{0}]>".format(self.path)

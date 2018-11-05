@@ -7,19 +7,19 @@ from github3 import GitHubError
 from github3 import pulls
 
 get_pr_example_data = helper.create_example_data_helper(
-    'pull_request_example'
+    "pull_request_example"
 )
 get_pullreview_example_data = helper.create_example_data_helper(
-    'pull_review_example'
+    "pull_review_example"
 )
 
 
 url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/pulls/1347'
+    "https://api.github.com/repos/octocat/Hello-World/pulls/1347"
 )
 
 review_comment_url_for = helper.create_url_helper(
-    'https://api.github.com/repos/octocat/Hello-World/pulls/1/comments'
+    "https://api.github.com/repos/octocat/Hello-World/pulls/1/comments"
 )
 
 
@@ -36,65 +36,64 @@ class TestPullRequest(helper.UnitHelper):
         self.patch_called_with(
             url_for(),
             data={
-                'title': self.instance.title,
-                'body': self.instance.body,
-                'state': 'closed'
-            }
+                "title": self.instance.title,
+                "body": self.instance.body,
+                "state": "closed",
+            },
         )
 
     def test_create_comment(self):
         """Show that a user can comment on a PR."""
-        self.instance.create_comment('body')
+        self.instance.create_comment("body")
 
         self.post_called_with(
-            url_for('comments').replace('pulls', 'issues'),
-            data={'body': 'body'}
+            url_for("comments").replace("pulls", "issues"),
+            data={"body": "body"},
         )
 
     def test_create_review_comment(self):
         """Verify the request to create a review comment on a PR diff."""
-        self.instance.create_review_comment('body', 'sha', 'path', 6)
+        self.instance.create_review_comment("body", "sha", "path", 6)
 
         self.post_called_with(
-            url_for('comments'),
+            url_for("comments"),
             data={
-                'body': 'body',
-                'commit_id': 'sha',
-                'path': 'path',
-                'position': 6
-            }
+                "body": "body",
+                "commit_id": "sha",
+                "path": "path",
+                "position": 6,
+            },
         )
 
     def test_create_review_requests(self):
         """Verify the request to ask for reviews on a PR."""
-        self.instance.create_review_requests(reviewers=['sigmavirus24'])
+        self.instance.create_review_requests(reviewers=["sigmavirus24"])
 
         self.session.post.assert_called_once_with(
-            url_for('requested_reviewers'),
-            '{"reviewers": ["sigmavirus24"]}'
+            url_for("requested_reviewers"), '{"reviewers": ["sigmavirus24"]}'
         )
 
     def test_create_review(self):
         """Verify the request to create a review on a PR."""
-        self.instance.create_review('body', 'sha', 'APPROVED')
+        self.instance.create_review("body", "sha", "APPROVED")
 
         self.post_called_with(
-            url_for('reviews'),
+            url_for("reviews"),
             data={
-                'body': 'body',
-                'commit_id': 'sha',
-                'event': 'APPROVED',
-                'comments': [],
-            }
+                "body": "body",
+                "commit_id": "sha",
+                "event": "APPROVED",
+                "comments": [],
+            },
         )
 
     def test_delete_review_requests(self):
         """Verify the request to cancel review requests on a PR."""
-        self.instance.delete_review_requests(reviewers=['sigmavirus24'])
+        self.instance.delete_review_requests(reviewers=["sigmavirus24"])
 
         self.session.delete.assert_called_once_with(
-            url_for('requested_reviewers'),
-            data='{"reviewers": ["sigmavirus24"]}'
+            url_for("requested_reviewers"),
+            data='{"reviewers": ["sigmavirus24"]}',
         )
 
     def test_diff(self):
@@ -102,8 +101,7 @@ class TestPullRequest(helper.UnitHelper):
         self.instance.diff()
 
         self.session.get.assert_called_once_with(
-            url_for(),
-            headers={'Accept': 'application/vnd.github.diff'}
+            url_for(), headers={"Accept": "application/vnd.github.diff"}
         )
 
     def test_is_merged_request(self):
@@ -111,41 +109,41 @@ class TestPullRequest(helper.UnitHelper):
         self.instance.merged = False
         self.instance.is_merged()
 
-        self.session.get.assert_called_once_with(url_for('merge'))
+        self.session.get.assert_called_once_with(url_for("merge"))
 
     def test_issue(self):
         """Show that a user can retrieve the associated issue of a PR."""
         self.instance.issue()
 
         self.session.get.assert_called_once_with(
-            url_for().replace('pulls', 'issues')
+            url_for().replace("pulls", "issues")
         )
 
     def test_merge(self):
         """Show that a user can merge a Pull Request."""
         self.instance.merge()
 
-        self.put_called_with(
-            url_for('merge'),
-            data={"merge_method": "merge"}
-        )
+        self.put_called_with(url_for("merge"), data={"merge_method": "merge"})
 
     def test_merge_squash_message(self):
         """Show that a user can merge a Pull Request."""
-        self.instance.merge('commit message', merge_method='squash')
+        self.instance.merge("commit message", merge_method="squash")
 
         self.put_called_with(
-            url_for('merge'),
-            data={"merge_method": "squash", "commit_message": "commit message"}
+            url_for("merge"),
+            data={
+                "merge_method": "squash",
+                "commit_message": "commit message",
+            },
         )
 
     def test_merge_with_custom_title(self):
         """Show that user can merge a Pull Request with custom commit title"""
-        self.instance.merge(commit_title='commit title')
+        self.instance.merge(commit_title="commit title")
 
         self.put_called_with(
-            url_for('merge'),
-            data={"merge_method": "merge", "commit_title": "commit title"}
+            url_for("merge"),
+            data={"merge_method": "merge", "commit_title": "commit title"},
         )
 
     def test_patch(self):
@@ -153,8 +151,7 @@ class TestPullRequest(helper.UnitHelper):
         self.instance.patch()
 
         self.session.get.assert_called_once_with(
-            url_for(),
-            headers={'Accept': 'application/vnd.github.patch'}
+            url_for(), headers={"Accept": "application/vnd.github.patch"}
         )
 
     def test_reopen(self):
@@ -164,10 +161,10 @@ class TestPullRequest(helper.UnitHelper):
         self.patch_called_with(
             url_for(),
             data={
-                'title': self.instance.title,
-                'body': self.instance.body,
-                'state': 'open'
-            }
+                "title": self.instance.title,
+                "body": self.instance.body,
+                "state": "open",
+            },
         )
 
     def test_review_requests(self):
@@ -175,28 +172,28 @@ class TestPullRequest(helper.UnitHelper):
         self.instance.review_requests()
 
         self.session.get.assert_called_once_with(
-            url_for('requested_reviewers')
+            url_for("requested_reviewers")
         )
 
     def test_update(self):
         """Show that a user can update a Pull Request."""
-        self.instance.update('my new title',
-                             'my new body',
-                             'open')
+        self.instance.update("my new title", "my new body", "open")
 
         self.patch_called_with(
             url_for(),
             data={
-                'title': 'my new title',
-                'body': 'my new body',
-                'state': 'open'
-            }
+                "title": "my new title",
+                "body": "my new body",
+                "state": "open",
+            },
         )
 
     def test_attributes(self):
         """Show that we extract attributes correctly."""
-        assert (self.instance.merge_commit_sha ==
-                'e5bd3914e2e596debea16f433f57875b5b90bcd6')
+        assert (
+            self.instance.merge_commit_sha
+            == "e5bd3914e2e596debea16f433f57875b5b90bcd6"
+        )
         assert not self.instance.merged
         assert self.instance.mergeable
 
@@ -209,19 +206,17 @@ class TestPullReview(helper.UnitHelper):
 
     def test_submit(self):
         """Verify the request to submit a review"""
-        self.instance.submit('body', 'APPROVED')
+        self.instance.submit("body", "APPROVED")
 
         self.post_called_with(
-            url_for('reviews/{0}/events'.format(self.instance.id)),
-            data={
-                'body': 'body',
-                'event': 'APPROVED',
-            }
+            url_for("reviews/{0}/events".format(self.instance.id)),
+            data={"body": "body", "event": "APPROVED"},
         )
 
 
 class TestPullRequestRequiresAuthentication(
-        helper.UnitRequiresAuthenticationHelper):
+    helper.UnitRequiresAuthenticationHelper
+):
     """PullRequest unit tests that demonstrate which methods require auth."""
 
     described_class = pulls.PullRequest
@@ -235,7 +230,7 @@ class TestPullRequestRequiresAuthentication(
     def test_create_review_comment(self):
         """Show that you must be authenticated to close a Pull Request."""
         with pytest.raises(GitHubError):
-            self.instance.create_review_comment('', '', '', 1)
+            self.instance.create_review_comment("", "", "", 1)
 
     def test_create_review_requests(self):
         """Show that you must be authenticated to ask for reviews."""
@@ -258,7 +253,7 @@ class TestPullRequestRequiresAuthentication(
     def test_update(self):
         """Show that you must be authenticated to update a Pull Request."""
         with pytest.raises(GitHubError):
-            self.instance.update('foo', 'bar', 'bogus')
+            self.instance.update("foo", "bar", "bogus")
 
 
 class TestPullRequestIterator(helper.UnitIteratorHelper):
@@ -273,9 +268,7 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('commits'),
-            params={'per_page': 100},
-            headers={}
+            url_for("commits"), params={"per_page": 100}, headers={}
         )
 
     def test_issue_comments(self):
@@ -284,9 +277,9 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('comments').replace('pulls', 'issues'),
-            params={'per_page': 100},
-            headers={}
+            url_for("comments").replace("pulls", "issues"),
+            params={"per_page": 100},
+            headers={},
         )
 
     def test_files(self):
@@ -295,9 +288,7 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('files'),
-            params={'per_page': 100},
-            headers={}
+            url_for("files"), params={"per_page": 100}, headers={}
         )
 
     def test_review_comments(self):
@@ -306,9 +297,7 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('comments'),
-            params={'per_page': 100},
-            headers={}
+            url_for("comments"), params={"per_page": 100}, headers={}
         )
 
     def test_reviews(self):
@@ -317,9 +306,7 @@ class TestPullRequestIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('reviews'),
-            params={'per_page': 100},
-            headers={}
+            url_for("reviews"), params={"per_page": 100}, headers={}
         )
 
 
@@ -328,17 +315,16 @@ class TestReviewComment(helper.UnitHelper):
 
     described_class = pulls.ReviewComment
     get_comment_example_data = helper.create_example_data_helper(
-        'review_comment_example'
+        "review_comment_example"
     )
     example_data = get_comment_example_data()
 
     def test_reply(self):
         """Verify the request to reply to a review comment."""
-        self.instance.reply('foo')
+        self.instance.reply("foo")
 
         self.post_called_with(
-            review_comment_url_for(),
-            data={'body': 'foo', 'in_reply_to': 1}
+            review_comment_url_for(), data={"body": "foo", "in_reply_to": 1}
         )
 
     def test_reply_requires_authentication(self):
@@ -346,7 +332,7 @@ class TestReviewComment(helper.UnitHelper):
         self.session.has_auth.return_value = False
 
         with pytest.raises(GitHubError):
-            self.instance.reply('')
+            self.instance.reply("")
 
 
 class TestPullFile(helper.UnitHelper):
@@ -354,7 +340,7 @@ class TestPullFile(helper.UnitHelper):
 
     described_class = pulls.PullFile
     get_pull_file_example_data = helper.create_example_data_helper(
-        'pull_file_example'
+        "pull_file_example"
     )
     example_data = get_pull_file_example_data()
 
@@ -363,7 +349,7 @@ class TestPullFile(helper.UnitHelper):
         self.instance.contents()
 
         self.session.get.assert_called_once_with(
-            self.example_data['contents_url']
+            self.example_data["contents_url"]
         )
 
 
@@ -371,6 +357,6 @@ class TestPullFilePatch(TestPullFile):
     """Unit tests for the PullFile class with empty patch."""
 
     get_pull_file_patch_example_data = helper.create_example_data_helper(
-        'pull_file_missing_patch_example'
+        "pull_file_missing_patch_example"
     )
     example_data = get_pull_file_patch_example_data()

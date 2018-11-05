@@ -17,19 +17,32 @@ gh = GitHub()
 
 def deprecated(func):
     """Decorator to mark a function as deprecated."""
+
     @wraps(func)
     def deprecation_wrapper(*args, **kwargs):
         warnings.warn(
-            'The anonymous API function `github3.api.{0}` is deprecated. Use '
-            '`GitHub.{0}` instead.'.format(func.__name__), DeprecationWarning,
-            stacklevel=2)
+            "The anonymous API function `github3.api.{0}` is deprecated. Use "
+            "`GitHub.{0}` instead.".format(func.__name__),
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return func(*args, **kwargs)
+
     return deprecation_wrapper
 
 
 @deprecated
-def authorize(username, password, scopes, note='', note_url='', client_id='',
-              client_secret='', two_factor_callback=None, github=None):
+def authorize(
+    username,
+    password,
+    scopes,
+    note="",
+    note_url="",
+    client_id="",
+    client_secret="",
+    two_factor_callback=None,
+    github=None,
+):
     """Obtain an authorization token for the GitHub API.
 
     .. deprecated:: 1.2.0
@@ -55,8 +68,9 @@ def authorize(username, password, scopes, note='', note_url='', client_id='',
     """
     gh = github or GitHub()
     gh.login(two_factor_callback=two_factor_callback)
-    return gh.authorize(username, password, scopes, note, note_url, client_id,
-                        client_secret)
+    return gh.authorize(
+        username, password, scopes, note, note_url, client_id, client_secret
+    )
 
 
 def login(username=None, password=None, token=None, two_factor_callback=None):
@@ -85,8 +99,13 @@ def login(username=None, password=None, token=None, two_factor_callback=None):
     return g
 
 
-def enterprise_login(username=None, password=None, token=None, url=None,
-                     two_factor_callback=None):
+def enterprise_login(
+    username=None,
+    password=None,
+    token=None,
+    url=None,
+    two_factor_callback=None,
+):
     """Construct and return an authenticated GitHubEnterprise session.
 
     .. note::
@@ -105,8 +124,10 @@ def enterprise_login(username=None, password=None, token=None, url=None,
 
     """
     if not url:
-        raise ValueError('GitHub Enterprise requires you provide the URL of'
-                         ' the instance')
+        raise ValueError(
+            "GitHub Enterprise requires you provide the URL of"
+            " the instance"
+        )
 
     g = None
 
@@ -306,9 +327,20 @@ def gists_by(username, number=-1, etag=None):
 
 
 @deprecated
-def issues_on(owner, repository, milestone=None, state=None, assignee=None,
-              mentioned=None, labels=None, sort=None, direction=None,
-              since=None, number=-1, etag=None):
+def issues_on(
+    owner,
+    repository,
+    milestone=None,
+    state=None,
+    assignee=None,
+    mentioned=None,
+    labels=None,
+    sort=None,
+    direction=None,
+    since=None,
+    number=-1,
+    etag=None,
+):
     r"""Iterate over issues on owner/repository.
 
     .. deprecated:: 1.2.0
@@ -345,9 +377,20 @@ def issues_on(owner, repository, milestone=None, state=None, assignee=None,
 
     """
     if owner and repository:
-        return gh.issues_on(owner, repository, milestone, state, assignee,
-                            mentioned, labels, sort, direction, since, number,
-                            etag)
+        return gh.issues_on(
+            owner,
+            repository,
+            milestone,
+            state,
+            assignee,
+            mentioned,
+            labels,
+            sort,
+            direction,
+            since,
+            number,
+            etag,
+        )
     return iter([])
 
 
@@ -372,8 +415,9 @@ def organizations_with(username, number=-1, etag=None):
 
 
 @deprecated
-def repositories_by(username, type=None, sort=None, direction=None, number=-1,
-                    etag=None):
+def repositories_by(
+    username, type=None, sort=None, direction=None, number=-1, etag=None
+):
     """List public repositories for the specified ``username``.
 
     .. deprecated:: 1.2.0
@@ -403,8 +447,9 @@ def repositories_by(username, type=None, sort=None, direction=None, number=-1,
 
     """
     if login:
-        return gh.repositories_by(username, type, sort, direction, number,
-                                  etag)
+        return gh.repositories_by(
+            username, type, sort, direction, number, etag
+        )
     return iter([])
 
 
@@ -482,7 +527,7 @@ def issue(owner, repository, number):
 
 
 @deprecated
-def markdown(text, mode='', context='', raw=False):
+def markdown(text, mode="", context="", raw=False):
     """Render an arbitrary markdown document.
 
     .. deprecated:: 1.2.0
@@ -558,8 +603,15 @@ repository.__doc__ = gh.repository.__doc__
 
 
 @deprecated
-def search_code(query, sort=None, order=None, per_page=None,
-                text_match=False, number=-1, etag=None):
+def search_code(
+    query,
+    sort=None,
+    order=None,
+    per_page=None,
+    text_match=False,
+    number=-1,
+    etag=None,
+):
     """Find code via the code search API.
 
     .. deprecated:: 1.2.0
@@ -606,13 +658,21 @@ def search_code(query, sort=None, order=None, per_page=None,
     :return: generator of :class:`CodeSearchResult
         <github3.search.CodeSearchResult>`
     """
-    return gh.search_code(query, sort, order, per_page, text_match, number,
-                          etag)
+    return gh.search_code(
+        query, sort, order, per_page, text_match, number, etag
+    )
 
 
 @deprecated
-def search_issues(query, sort=None, order=None, per_page=None,
-                  text_match=False, number=-1, etag=None):
+def search_issues(
+    query,
+    sort=None,
+    order=None,
+    per_page=None,
+    text_match=False,
+    number=-1,
+    etag=None,
+):
     """Find issues by state and keyword
 
     .. deprecated:: 1.2.0
@@ -667,13 +727,21 @@ def search_issues(query, sort=None, order=None, per_page=None,
     :return: generator of :class:`IssueSearchResult
         <github3.search.IssueSearchResult>`
     """
-    return gh.search_issues(query, sort, order, per_page, text_match,
-                            number, etag)
+    return gh.search_issues(
+        query, sort, order, per_page, text_match, number, etag
+    )
 
 
 @deprecated
-def search_repositories(query, sort=None, order=None, per_page=None,
-                        text_match=False, number=-1, etag=None):
+def search_repositories(
+    query,
+    sort=None,
+    order=None,
+    per_page=None,
+    text_match=False,
+    number=-1,
+    etag=None,
+):
     """Find repositories via various criteria.
 
     .. deprecated:: 1.2.0
@@ -724,13 +792,21 @@ def search_repositories(query, sort=None, order=None, per_page=None,
     :param str etag: (optional), previous ETag header value
     :return: generator of :class:`Repository <github3.repos.Repository>`
     """
-    return gh.search_repositories(query, sort, order, per_page, text_match,
-                                  number, etag)
+    return gh.search_repositories(
+        query, sort, order, per_page, text_match, number, etag
+    )
 
 
 @deprecated
-def search_users(query, sort=None, order=None, per_page=None,
-                 text_match=False, number=-1, etag=None):
+def search_users(
+    query,
+    sort=None,
+    order=None,
+    per_page=None,
+    text_match=False,
+    number=-1,
+    etag=None,
+):
     """Find users via the Search API.
 
     .. deprecated:: 1.2.0
@@ -781,8 +857,9 @@ def search_users(query, sort=None, order=None, per_page=None,
     :return: generator of :class:`UserSearchResult
         <github3.search.UserSearchResult>`
     """
-    return gh.search_users(query, sort, order, per_page, text_match, number,
-                           etag)
+    return gh.search_users(
+        query, sort, order, per_page, text_match, number, etag
+    )
 
 
 @deprecated

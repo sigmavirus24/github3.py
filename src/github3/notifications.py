@@ -63,17 +63,18 @@ class Thread(models.GitHubCore):
 
     def _update_attributes(self, thread):
         from . import repos
-        self._api = thread['url']
-        self.id = thread['id']
-        self.last_read_at = self._strptime(thread['last_read_at'])
-        self.reason = thread['reason']
-        self.repository = repos.ShortRepository(thread['repository'], self)
-        self.subject = thread['subject']
-        self.unread = thread['unread']
-        self.updated_at = self._strptime(thread['updated_at'])
+
+        self._api = thread["url"]
+        self.id = thread["id"]
+        self.last_read_at = self._strptime(thread["last_read_at"])
+        self.reason = thread["reason"]
+        self.repository = repos.ShortRepository(thread["repository"], self)
+        self.subject = thread["subject"]
+        self.unread = thread["unread"]
+        self.updated_at = self._strptime(thread["updated_at"])
 
     def _repr(self):
-        return '<Thread [{0}]>'.format(self.subject.get('title'))
+        return "<Thread [{0}]>".format(self.subject.get("title"))
 
     def delete_subscription(self):
         """Delete subscription for this thread.
@@ -83,7 +84,7 @@ class Thread(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('subscription', base_url=self._api)
+        url = self._build_url("subscription", base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
     def mark(self):
@@ -110,8 +111,8 @@ class Thread(models.GitHubCore):
         :rtype:
             :class:`~github3.notifications.ThreadSubscription`
         """
-        url = self._build_url('subscription', base_url=self._api)
-        sub = {'subscribed': subscribed, 'ignored': ignored}
+        url = self._build_url("subscription", base_url=self._api)
+        sub = {"subscribed": subscribed, "ignored": ignored}
         json = self._json(self._put(url, data=dumps(sub)), 200)
         return self._instance_or_null(ThreadSubscription, json)
 
@@ -123,7 +124,7 @@ class Thread(models.GitHubCore):
         :rtype:
             :class:`~github3.notifications.ThreadSubscription`
         """
-        url = self._build_url('subscription', base_url=self._api)
+        url = self._build_url("subscription", base_url=self._api)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(ThreadSubscription, json)
 
@@ -163,17 +164,17 @@ class _Subscription(models.GitHubCore):
         The URL of the thread resource in the GitHub API.
     """
 
-    class_name = '_Subscription'
+    class_name = "_Subscription"
 
     def _update_attributes(self, sub):
-        self._api = sub['url']
-        self.created_at = self._strptime(sub['created_at'])
-        self.ignored = sub['ignored']
-        self.reason = sub['reason']
-        self.subscribed = sub['subscribed']
+        self._api = sub["url"]
+        self.created_at = self._strptime(sub["created_at"])
+        self.ignored = sub["ignored"]
+        self.reason = sub["reason"]
+        self.subscribed = sub["subscribed"]
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.class_name, self.subscribed)
+        return "<{0} [{1}]>".format(self.class_name, self.subscribed)
 
     def delete(self):
         """Delete this subscription.
@@ -195,7 +196,7 @@ class _Subscription(models.GitHubCore):
             (required), determines if notifications should be ignored from this
             thread.
         """
-        sub = {'subscribed': subscribed, 'ignored': ignored}
+        sub = {"subscribed": subscribed, "ignored": ignored}
         json = self._json(self._put(self._api, data=dumps(sub)), 200)
         self._update_attributes(json)
 
@@ -235,11 +236,11 @@ class ThreadSubscription(_Subscription):
         The URL of the thread resource in the GitHub API.
     """
 
-    class_name = 'ThreadSubscription'
+    class_name = "ThreadSubscription"
 
     def _update_subscription(self, sub):
         super(ThreadSubscription, self)._update_attributes(sub)
-        self.thread_url = sub['thread_url']
+        self.thread_url = sub["thread_url"]
 
 
 class RepositorySubscription(_Subscription):
@@ -277,8 +278,8 @@ class RepositorySubscription(_Subscription):
         A boolean attribute indicating whether the user is subscribed or not.
     """
 
-    class_name = 'RepositorySubscription'
+    class_name = "RepositorySubscription"
 
     def _update_subscription(self, sub):
         super(RepositorySubscription, self)._update_attributes(sub)
-        self.repository_url = sub.get('repository_url')
+        self.repository_url = sub.get("repository_url")

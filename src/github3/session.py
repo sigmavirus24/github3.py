@@ -17,8 +17,11 @@ __logs__ = getLogger(__package__)
 
 def requires_2fa(response):
     """Determine whether a response requires us to prompt the user for 2FA."""
-    if (response.status_code == 401 and 'X-GitHub-OTP' in response.headers and
-            'required' in response.headers['X-GitHub-OTP']):
+    if (
+        response.status_code == 401
+        and "X-GitHub-OTP" in response.headers
+        and "required" in response.headers["X-GitHub-OTP"]
+    ):
         return True
     return False
 
@@ -28,13 +31,13 @@ class BasicAuth(requests.auth.HTTPBasicAuth):
 
     def __repr__(self):
         """Use the username as the representation."""
-        return 'basic {}'.format(self.username)
+        return "basic {}".format(self.username)
 
 
 class TokenAuth(requests.auth.AuthBase):
     """Auth class that handles simple tokens."""
 
-    header_format_str = 'token {}'
+    header_format_str = "token {}"
 
     def __init__(self, token):
         """Store our token."""
@@ -42,7 +45,7 @@ class TokenAuth(requests.auth.AuthBase):
 
     def __repr__(self):
         """Return a nice view of the token in use."""
-        return 'token {}...'.format(self.token[:4])
+        return "token {}...".format(self.token[:4])
 
     def __ne__(self, other):
         """Test for equality, or the lack thereof."""
@@ -50,11 +53,11 @@ class TokenAuth(requests.auth.AuthBase):
 
     def __eq__(self, other):
         """Test for equality, or the lack thereof."""
-        return self.token == getattr(other, 'token', None)
+        return self.token == getattr(other, "token", None)
 
     def __call__(self, request):
         """Add the authorization header and format it."""
-        request.headers['Authorization'] = self.header_format_str.format(
+        request.headers["Authorization"] = self.header_format_str.format(
             self.token
         )
         return request
@@ -64,22 +67,27 @@ class GitHubSession(requests.Session):
     """Our slightly specialized Session object."""
 
     auth = None
-    __attrs__ = requests.Session.__attrs__ + ['base_url', 'two_factor_auth_cb']
+    __attrs__ = requests.Session.__attrs__ + [
+        "base_url",
+        "two_factor_auth_cb",
+    ]
 
     def __init__(self):
         """Slightly modify how we initialize our session."""
         super(GitHubSession, self).__init__()
-        self.headers.update({
-            # Only accept JSON responses
-            'Accept': 'application/vnd.github.v3.full+json',
-            # Only accept UTF-8 encoded data
-            'Accept-Charset': 'utf-8',
-            # Always sending JSON
-            'Content-Type': "application/json",
-            # Set our own custom User-Agent string
-            'User-Agent': 'github3.py/{0}'.format(__version__),
-            })
-        self.base_url = 'https://api.github.com'
+        self.headers.update(
+            {
+                # Only accept JSON responses
+                "Accept": "application/vnd.github.v3.full+json",
+                # Only accept UTF-8 encoded data
+                "Accept-Charset": "utf-8",
+                # Always sending JSON
+                "Content-Type": "application/json",
+                # Set our own custom User-Agent string
+                "User-Agent": "github3.py/{0}".format(__version__),
+            }
+        )
+        self.base_url = "https://api.github.com"
         self.two_factor_auth_cb = None
         self.request_counter = 0
 
@@ -96,28 +104,26 @@ class GitHubSession(requests.Session):
 
     def build_url(self, *args, **kwargs):
         """Build a new API url from scratch."""
-        parts = [kwargs.get('base_url') or self.base_url]
+        parts = [kwargs.get("base_url") or self.base_url]
         parts.extend(args)
         parts = [str(p) for p in parts]
         key = tuple(parts)
-        __logs__.info('Building a url from %s', key)
+        __logs__.info("Building a url from %s", key)
         if key not in __url_cache__:
-            __logs__.info('Missed the cache building the url')
-            __url_cache__[key] = '/'.join(parts)
+            __logs__.info("Missed the cache building the url")
+            __url_cache__[key] = "/".join(parts)
         return __url_cache__[key]
 
     def handle_two_factor_auth(self, args, kwargs):
         """Handler for when the user has 2FA turned on."""
-        headers = kwargs.pop('headers', {})
-        headers.update({
-            'X-GitHub-OTP': str(self.two_factor_auth_cb())
-            })
+        headers = kwargs.pop("headers", {})
+        headers.update({"X-GitHub-OTP": str(self.two_factor_auth_cb())})
         kwargs.update(headers=headers)
         return super(GitHubSession, self).request(*args, **kwargs)
 
     def has_auth(self):
         """Check for whether or not the user has authentication configured."""
-        return (self.auth or self.headers.get('Authorization'))
+        return self.auth or self.headers.get("Authorization")
 
     def oauth2_auth(self, client_id, client_secret):
         """Use OAuth2 for authentication.
@@ -127,7 +133,7 @@ class GitHubSession(requests.Session):
         :param str client_id: Client ID retrieved from GitHub
         :param str client_secret: Client secret retrieved from GitHub
         """
-        raise NotImplementedError('These features are not implemented yet')
+        raise NotImplementedError("These features are not implemented yet")
 
     def request(self, *args, **kwargs):
         """Make a request, count it, and handle 2FA if necessary."""
@@ -146,8 +152,8 @@ class GitHubSession(requests.Session):
 
         :returns: tuple(client_id, client_secret)
         """
-        client_id = self.params.get('client_id')
-        client_secret = self.params.get('client_secret')
+        client_id = self.params.get("client_id")
+        client_secret = self.params.get("client_secret")
         return (client_id, client_secret)
 
     def two_factor_auth_callback(self, callback):
@@ -156,7 +162,7 @@ class GitHubSession(requests.Session):
             return
 
         if not isinstance(callback, Callable):
-            raise ValueError('Your callback should be callable')
+            raise ValueError("Your callback should be callable")
 
         self.two_factor_auth_cb = callback
 
@@ -183,32 +189,34 @@ class GitHubSession(requests.Session):
         if not json:
             return
 
-        self.auth = AppInstallationTokenAuth(json['token'], json['expires_at'])
+        self.auth = AppInstallationTokenAuth(
+            json["token"], json["expires_at"]
+        )
 
     @contextmanager
     def temporary_basic_auth(self, *auth):
         """Allow us to temporarily swap out basic auth credentials."""
         old_basic_auth = self.auth
-        old_token_auth = self.headers.get('Authorization')
+        old_token_auth = self.headers.get("Authorization")
 
         self.basic_auth(*auth)
         yield
 
         self.auth = old_basic_auth
         if old_token_auth:
-            self.headers['Authorization'] = old_token_auth
+            self.headers["Authorization"] = old_token_auth
 
     @contextmanager
     def no_auth(self):
         """Unset authentication temporarily as a context manager."""
         old_basic_auth, self.auth = self.auth, None
-        old_token_auth = self.headers.pop('Authorization', None)
+        old_token_auth = self.headers.pop("Authorization", None)
 
         yield
 
         self.auth = old_basic_auth
         if old_token_auth:
-            self.headers['Authorization'] = old_token_auth
+            self.headers["Authorization"] = old_token_auth
 
 
 def _utcnow():
@@ -226,8 +234,8 @@ class AppInstallationTokenAuth(TokenAuth):
 
     def __repr__(self):
         """Return a nice view of the token in use."""
-        return 'app installation token {}... expiring at {}'.format(
-            self.token[:4], self.expires_at_str,
+        return "app installation token {}... expiring at {}".format(
+            self.token[:4], self.expires_at_str
         )
 
     @property
@@ -241,14 +249,16 @@ class AppInstallationTokenAuth(TokenAuth):
         if self.expired:
             raise exc.AppInstallationTokenExpired(
                 "Your app installation token expired at {}".format(
-                    self.expires_at_str))
+                    self.expires_at_str
+                )
+            )
         return super(AppInstallationTokenAuth, self).__call__(request)
 
 
 class AppBearerTokenAuth(TokenAuth):
     """Use JWT authentication but throw an exception on expiration."""
 
-    header_format_str = 'Bearer {}'
+    header_format_str = "Bearer {}"
 
     def __init__(self, token, expire_in):
         """Set-up our authentication handler."""
@@ -258,8 +268,8 @@ class AppBearerTokenAuth(TokenAuth):
 
     def __repr__(self):
         """Return a helpful view of the token."""
-        return 'app bearer token {} expiring at {}'.format(
-            self.token[:4], str(self.expires_at),
+        return "app bearer token {} expiring at {}".format(
+            self.token[:4], str(self.expires_at)
         )
 
     @property
@@ -272,5 +282,6 @@ class AppBearerTokenAuth(TokenAuth):
         """Add the authorization header and format it."""
         if self.expired:
             raise exc.AppTokenExpired(
-                "Your app token expired at {}".format(str(self.expires_at)))
+                "Your app token expired at {}".format(str(self.expires_at))
+            )
         return super(AppBearerTokenAuth, self).__call__(request)

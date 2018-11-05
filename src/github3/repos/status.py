@@ -11,20 +11,20 @@ from ..models import GitHubCore
 class _Status(models.GitHubCore):
     """Representation of a status on a repository."""
 
-    class_name = '_Status'
+    class_name = "_Status"
 
     def _update_attributes(self, status):
-        self._api = status['url']
-        self.context = status['context']
-        self.created_at = self._strptime(status['created_at'])
-        self.description = status['description']
-        self.id = status['id']
-        self.state = status['state']
-        self.target_url = status['target_url']
-        self.updated_at = self._strptime(status['updated_at'])
+        self._api = status["url"]
+        self.context = status["context"]
+        self.created_at = self._strptime(status["created_at"])
+        self.description = status["description"]
+        self.id = status["id"]
+        self.state = status["state"]
+        self.target_url = status["target_url"]
+        self.updated_at = self._strptime(status["updated_at"])
 
     def _repr(self):
-        return '<{s.class_name} [{s.id}:{s.state}]>'.format(s=self)
+        return "<{s.class_name} [{s.id}:{s.state}]>".format(s=self)
 
 
 class Status(_Status):
@@ -42,11 +42,11 @@ class Status(_Status):
         this status.
     """
 
-    class_name = 'Status'
+    class_name = "Status"
 
     def _update_attributes(self, status):
         super(Status, self)._update_attributes(status)
-        self.creator = users.ShortUser(status['creator'], self)
+        self.creator = users.ShortUser(status["creator"], self)
 
 
 class ShortStatus(_Status):
@@ -99,7 +99,7 @@ class ShortStatus(_Status):
         when this status was most recently updated.
     """
 
-    class_name = 'ShortStatus'
+    class_name = "ShortStatus"
     _refresh_to = Status
 
 
@@ -140,17 +140,18 @@ class CombinedStatus(GitHubCore):
 
     def _update_attributes(self, combined_status):
         from . import repo
-        self._api = combined_status['url']
-        self.commit_url = combined_status['commit_url']
+
+        self._api = combined_status["url"]
+        self.commit_url = combined_status["commit_url"]
         self.repository = repo.ShortRepository(
-            combined_status['repository'], self,
+            combined_status["repository"], self
         )
-        self.sha = combined_status['sha']
-        self.state = combined_status['state']
-        statuses = combined_status['statuses']
+        self.sha = combined_status["sha"]
+        self.state = combined_status["state"]
+        statuses = combined_status["statuses"]
         self.statuses = [ShortStatus(s, self) for s in statuses]
-        self.total_count = combined_status['total_count']
+        self.total_count = combined_status["total_count"]
 
     def _repr(self):
-        f = '<CombinedStatus [{s.state}:{s.total_count} sub-statuses]>'
+        f = "<CombinedStatus [{s.state}:{s.total_count} sub-statuses]>"
         return f.format(s=self)

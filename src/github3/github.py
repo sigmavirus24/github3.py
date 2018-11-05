@@ -26,12 +26,15 @@ from . import structs
 from . import users
 from . import utils
 
-from .decorators import (requires_auth, requires_basic_auth,
-                         requires_app_credentials)
+from .decorators import (
+    requires_auth,
+    requires_basic_auth,
+    requires_app_credentials,
+)
 
 
 _pubsub_re = re.compile(
-    r'https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+'
+    r"https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+"
 )
 
 
@@ -60,7 +63,7 @@ class GitHub(models.GitHubCore):
     call the GitHub object with authentication parameters.
     """
 
-    def __init__(self, username='', password='', token='', session=None):
+    def __init__(self, username="", password="", token="", session=None):
         """Create a new GitHub instance to talk to the API."""
         super(GitHub, self).__init__({}, session or self.new_session())
         if token:
@@ -70,8 +73,8 @@ class GitHub(models.GitHubCore):
 
     def _repr(self):
         if self.session.auth:
-            return '<GitHub [{!r}]>'.format(self.session.auth)
-        return '<Anonymous GitHub at 0x{0:x}>'.format(id(self))
+            return "<GitHub [{!r}]>".format(self.session.auth)
+        return "<Anonymous GitHub at 0x{0:x}>".format(id(self))
 
     @requires_auth
     def activate_membership(self, organization):
@@ -89,9 +92,11 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Membership`
         """
-        organization_name = getattr(organization, 'login', organization)
-        url = self._build_url('user', 'memberships', 'orgs', organization_name)
-        data = {'state': 'active'}
+        organization_name = getattr(organization, "login", organization)
+        url = self._build_url(
+            "user", "memberships", "orgs", organization_name
+        )
+        data = {"state": "active"}
         _json = self._json(self._patch(url, data=json.dumps(data)), 200)
         return self._instance_or_null(orgs.Membership, _json)
 
@@ -108,7 +113,7 @@ class GitHub(models.GitHubCore):
         """
         json = []
         if addresses:
-            url = self._build_url('user', 'emails')
+            url = self._build_url("user", "emails")
             json = self._json(self._post(url, data=addresses), 201)
         return [users.Email(email, self) for email in json] if json else []
 
@@ -125,11 +130,12 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.events.Event`
         """
-        url = self._build_url('events')
+        url = self._build_url("events")
         return self._iter(int(number), url, events.Event, etag=etag)
 
-    def all_organizations(self, number=-1, since=None, etag=None,
-                          per_page=None):
+    def all_organizations(
+        self, number=-1, since=None, etag=None, per_page=None
+    ):
         """Iterate over every organization in the order they were created.
 
         :param int number:
@@ -147,13 +153,18 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.ShortOrganization`
         """
-        url = self._build_url('organizations')
-        return self._iter(int(number), url, orgs.ShortOrganization,
-                          params={'since': since, 'per_page': per_page},
-                          etag=etag)
+        url = self._build_url("organizations")
+        return self._iter(
+            int(number),
+            url,
+            orgs.ShortOrganization,
+            params={"since": since, "per_page": per_page},
+            etag=etag,
+        )
 
-    def all_repositories(self, number=-1, since=None, etag=None,
-                         per_page=None):
+    def all_repositories(
+        self, number=-1, since=None, etag=None, per_page=None
+    ):
         """Iterate over every repository in the order they were created.
 
         :param int number:
@@ -171,10 +182,14 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository`
         """
-        url = self._build_url('repositories')
-        return self._iter(int(number), url, repo.ShortRepository,
-                          params={'since': since, 'per_page': per_page},
-                          etag=etag)
+        url = self._build_url("repositories")
+        return self._iter(
+            int(number),
+            url,
+            repo.ShortRepository,
+            params={"since": since, "per_page": per_page},
+            etag=etag,
+        )
 
     def all_users(self, number=-1, etag=None, per_page=None, since=None):
         """Iterate over every user in the order they signed up for GitHub.
@@ -197,9 +212,14 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.ShortUser`
         """
-        url = self._build_url('users')
-        return self._iter(int(number), url, users.ShortUser, etag=etag,
-                          params={'per_page': per_page, 'since': since})
+        url = self._build_url("users")
+        return self._iter(
+            int(number),
+            url,
+            users.ShortUser,
+            etag=etag,
+            params={"per_page": per_page, "since": since},
+        )
 
     def app(self, app_slug):
         """Retrieve information about a specific app using its "slug".
@@ -223,7 +243,7 @@ class GitHub(models.GitHubCore):
             https://developer.github.com/v3/apps/#get-a-single-github-app
         """
         headers = apps.APP_PREVIEW_HEADERS
-        url = self._build_url('apps', str(app_slug))
+        url = self._build_url("apps", str(app_slug))
         json = self._json(self._get(url, headers=headers), 200)
         return self._instance_or_null(apps.App, json)
 
@@ -248,9 +268,10 @@ class GitHub(models.GitHubCore):
         .. _Get a single installation:
             https://developer.github.com/v3/apps/#get-a-single-installation
         """
-        url = self._build_url('app', 'installations', str(installation_id))
-        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
-                          200)
+        url = self._build_url("app", "installations", str(installation_id))
+        json = self._json(
+            self._get(url, headers=apps.APP_PREVIEW_HEADERS), 200
+        )
         return self._instance_or_null(apps.Installation, json)
 
     @decorators.requires_app_bearer_auth
@@ -272,9 +293,13 @@ class GitHub(models.GitHubCore):
         .. _Find installations:
             https://developer.github.com/v3/apps/#find-installations
         """
-        url = self._build_url('app', 'installations')
-        return self._iter(int(number), url, apps.Installation,
-                          headers=apps.APP_PREVIEW_HEADERS)
+        url = self._build_url("app", "installations")
+        return self._iter(
+            int(number),
+            url,
+            apps.Installation,
+            headers=apps.APP_PREVIEW_HEADERS,
+        )
 
     @decorators.requires_app_bearer_auth
     def app_installation_for_organization(self, organization):
@@ -297,9 +322,10 @@ class GitHub(models.GitHubCore):
         .. _Find organization installation:
             https://developer.github.com/v3/apps/#find-organization-installation
         """
-        url = self._build_url('orgs', organization, 'installation')
-        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
-                          200)
+        url = self._build_url("orgs", organization, "installation")
+        json = self._json(
+            self._get(url, headers=apps.APP_PREVIEW_HEADERS), 200
+        )
         return self._instance_or_null(apps.Installation, json)
 
     @decorators.requires_app_bearer_auth
@@ -325,11 +351,12 @@ class GitHub(models.GitHubCore):
         .. _Find repository installation:
             https://developer.github.com/v3/apps/#find-repository-installation
         """
-        owner = getattr(owner, 'login', str(owner))
-        repository = getattr(repository, 'name', repository)
-        url = self._build_url('repos', owner, repository, 'installation')
-        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
-                          200)
+        owner = getattr(owner, "login", str(owner))
+        repository = getattr(repository, "name", repository)
+        url = self._build_url("repos", owner, repository, "installation")
+        json = self._json(
+            self._get(url, headers=apps.APP_PREVIEW_HEADERS), 200
+        )
         return self._instance_or_null(apps.Installation, json)
 
     @decorators.requires_app_bearer_auth
@@ -353,10 +380,11 @@ class GitHub(models.GitHubCore):
         .. _Find user installation:
             https://developer.github.com/v3/apps/#find-user-installation
         """
-        user = getattr(user, 'login', str(user))
-        url = self._build_url('users', user, 'installation')
-        json = self._json(self._get(url, headers=apps.APP_PREVIEW_HEADERS),
-                          200)
+        user = getattr(user, "login", str(user))
+        url = self._build_url("users", user, "installation")
+        json = self._json(
+            self._get(url, headers=apps.APP_PREVIEW_HEADERS), 200
+        )
         return self._instance_or_null(apps.Installation, json)
 
     @decorators.requires_app_bearer_auth
@@ -379,8 +407,9 @@ class GitHub(models.GitHubCore):
             https://developer.github.com/v3/apps/#get-the-authenticated-github-app
         """
         headers = apps.APP_PREVIEW_HEADERS
-        json = self._json(self._get(self._build_url('app'), headers=headers),
-                          200)
+        json = self._json(
+            self._get(self._build_url("app"), headers=headers), 200
+        )
         return self._instance_or_null(apps.App, json)
 
     @requires_basic_auth
@@ -394,7 +423,7 @@ class GitHub(models.GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._build_url('authorizations', str(id_num))
+            url = self._build_url("authorizations", str(id_num))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(auths.Authorization, json)
 
@@ -417,11 +446,19 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.auths.Authorization`
         """
-        url = self._build_url('authorizations')
+        url = self._build_url("authorizations")
         return self._iter(int(number), url, auths.Authorization, etag=etag)
 
-    def authorize(self, username, password, scopes=None, note='', note_url='',
-                  client_id='', client_secret=''):
+    def authorize(
+        self,
+        username,
+        password,
+        scopes=None,
+        note="",
+        note_url="",
+        client_id="",
+        client_secret="",
+    ):
         """Obtain an authorization token.
 
         The retrieved token will allow future consumers to use the API without
@@ -452,11 +489,15 @@ class GitHub(models.GitHubCore):
         json = None
 
         if username and password:
-            url = self._build_url('authorizations')
-            data = {'note': note, 'note_url': note_url,
-                    'client_id': client_id, 'client_secret': client_secret}
+            url = self._build_url("authorizations")
+            data = {
+                "note": note,
+                "note_url": note_url,
+                "client_id": client_id,
+                "client_secret": client_secret,
+            }
             if scopes:
-                data['scopes'] = scopes
+                data["scopes"] = scopes
 
             with self.session.temporary_basic_auth(username, password):
                 json = self._json(self._post(url, data=data), 201)
@@ -477,13 +518,16 @@ class GitHub(models.GitHubCore):
             bool
         """
         p = self.session.params
-        auth = (p.get('client_id'), p.get('client_secret'))
+        auth = (p.get("client_id"), p.get("client_secret"))
         if access_token and auth:
-            url = self._build_url('applications', str(auth[0]), 'tokens',
-                                  str(access_token))
-            resp = self._get(url, auth=auth, params={
-                'client_id': None, 'client_secret': None
-            })
+            url = self._build_url(
+                "applications", str(auth[0]), "tokens", str(access_token)
+            )
+            resp = self._get(
+                url,
+                auth=auth,
+                params={"client_id": None, "client_secret": None},
+            )
             return self._boolean(resp, 200, 404)
         return False
 
@@ -513,9 +557,12 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.gist.Gist`
         """
-        new_gist = {'description': description, 'public': public,
-                    'files': files}
-        url = self._build_url('gists')
+        new_gist = {
+            "description": description,
+            "public": public,
+            "files": files,
+        }
+        url = self._build_url("gists")
         json = self._json(self._post(url, data=new_gist), 201)
         return self._instance_or_null(gists.Gist, json)
 
@@ -532,14 +579,23 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.GPGKey`
         """
-        url = self._build_url('user', 'gpg_keys')
-        data = {'armored_public_key': armored_public_key}
+        url = self._build_url("user", "gpg_keys")
+        data = {"armored_public_key": armored_public_key}
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(users.GPGKey, json)
 
     @requires_auth
-    def create_issue(self, owner, repository, title, body=None, assignee=None,
-                     milestone=None, labels=[], assignees=None):
+    def create_issue(
+        self,
+        owner,
+        repository,
+        title,
+        body=None,
+        assignee=None,
+        milestone=None,
+        labels=[],
+        assignees=None,
+    ):
         """Create an issue on the repository.
 
         .. note::
@@ -583,8 +639,9 @@ class GitHub(models.GitHubCore):
             repo = self.repository(owner, repository)
 
         if repo is not None:
-            return repo.create_issue(title, body, assignee, milestone,
-                                     labels, assignees)
+            return repo.create_issue(
+                title, body, assignee, milestone, labels, assignees
+            )
 
         return self._instance_or_null(issues.ShortIssue, None)
 
@@ -607,16 +664,24 @@ class GitHub(models.GitHubCore):
         json = None
 
         if title and key:
-            data = {'title': title, 'key': key, 'read_only': read_only}
-            url = self._build_url('user', 'keys')
+            data = {"title": title, "key": key, "read_only": read_only}
+            url = self._build_url("user", "keys")
             req = self._post(url, data=data)
             json = self._json(req, 201)
         return self._instance_or_null(users.Key, json)
 
     @requires_auth
-    def create_repository(self, name, description='', homepage='',
-                          private=False, has_issues=True, has_wiki=True,
-                          auto_init=False, gitignore_template=''):
+    def create_repository(
+        self,
+        name,
+        description="",
+        homepage="",
+        private=False,
+        has_issues=True,
+        has_wiki=True,
+        auto_init=False,
+        gitignore_template="",
+    ):
         """Create a repository for the authenticated user.
 
         :param str name:
@@ -646,12 +711,17 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.Repository`
         """
-        url = self._build_url('user', 'repos')
-        data = {'name': name, 'description': description,
-                'homepage': homepage, 'private': private,
-                'has_issues': has_issues, 'has_wiki': has_wiki,
-                'auto_init': auto_init,
-                'gitignore_template': gitignore_template}
+        url = self._build_url("user", "repos")
+        data = {
+            "name": name,
+            "description": description,
+            "homepage": homepage,
+            "private": private,
+            "has_issues": has_issues,
+            "has_wiki": has_wiki,
+            "auto_init": auto_init,
+            "gitignore_template": gitignore_template,
+        }
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(repo.Repository, json)
 
@@ -666,9 +736,10 @@ class GitHub(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('user', 'emails')
-        return self._boolean(self._delete(url, data=json.dumps(addresses)),
-                             204, 404)
+        url = self._build_url("user", "emails")
+        return self._boolean(
+            self._delete(url, data=json.dumps(addresses)), 204, 404
+        )
 
     @requires_auth
     def emails(self, number=-1, etag=None):
@@ -684,7 +755,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.Email`
         """
-        url = self._build_url('user', 'emails')
+        url = self._build_url("user", "emails")
         return self._iter(int(number), url, users.Email, etag=etag)
 
     def emojis(self):
@@ -701,7 +772,7 @@ class GitHub(models.GitHubCore):
                     # ...
                 }
         """
-        url = self._build_url('emojis')
+        url = self._build_url("emojis")
         return self._json(self._get(url), 200, include_cache_info=False)
 
     @requires_basic_auth
@@ -713,20 +784,21 @@ class GitHub(models.GitHubCore):
         :rtype:
             dict
         """
+
         def replace_href(feed_dict):
             if not feed_dict:
                 return feed_dict
             ret_dict = {}
             # Let's pluck out what we're most interested in, the href value
-            href = feed_dict.pop('href', None)
+            href = feed_dict.pop("href", None)
             # Then we update the return dictionary with the rest of the values
             ret_dict.update(feed_dict)
             if href is not None:
                 # So long as there is something to template, let's template it
-                ret_dict['href'] = uritemplate.URITemplate(href)
+                ret_dict["href"] = uritemplate.URITemplate(href)
             return ret_dict
 
-        url = self._build_url('feeds')
+        url = self._build_url("feeds")
         json = self._json(self._get(url), 200, include_cache_info=False)
         if json is None:  # If something went wrong, get out early
             return None
@@ -735,7 +807,7 @@ class GitHub(models.GitHubCore):
         feeds = {}
 
         # Let's pop out the old links so we don't have to skip them below
-        old_links = json.pop('_links', {})
+        old_links = json.pop("_links", {})
         _links = {}
         # If _links is in the response JSON, iterate over that and recreate it
         # so that any templates contained inside can be turned into
@@ -750,7 +822,7 @@ class GitHub(models.GitHubCore):
                 _links[key] = replace_href(value)
 
         # Start building up our return dictionary
-        feeds['_links'] = _links
+        feeds["_links"] = _links
 
         for key, value in json.items():
             # This should roughly be the same logic as above.
@@ -774,7 +846,7 @@ class GitHub(models.GitHubCore):
         """
         resp = False
         if username:
-            url = self._build_url('user', 'following', username)
+            url = self._build_url("user", "following", username)
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
@@ -797,7 +869,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.ShortUser`
         """
-        url = self._build_url('users', username, 'following')
+        url = self._build_url("users", username, "following")
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     @requires_auth
@@ -818,7 +890,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.ShortUser`
         """
-        url = self._build_url('user', 'followers')
+        url = self._build_url("user", "followers")
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def followers_of(self, username, number=-1, etag=None):
@@ -840,7 +912,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.ShortUser`
         """
-        url = self._build_url('users', username, 'followers')
+        url = self._build_url("users", username, "followers")
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     @requires_auth
@@ -861,7 +933,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.ShortUser`
         """
-        url = self._build_url('user', 'following')
+        url = self._build_url("user", "following")
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
     def gist(self, id_num):
@@ -874,7 +946,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.gist.Gist`
         """
-        url = self._build_url('gists', str(id_num))
+        url = self._build_url("gists", str(id_num))
         json = self._json(self._get(url), 200)
         return self._instance_or_null(gists.Gist, json)
 
@@ -894,7 +966,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:~github3.gists.ShortGist`
         """
-        url = self._build_url('gists')
+        url = self._build_url("gists")
         return self._iter(int(number), url, gists.ShortGist, etag=etag)
 
     def gists_by(self, username, number=-1, etag=None):
@@ -914,7 +986,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.gists.ShortGist`
         """
-        url = self._build_url('users', username, 'gists')
+        url = self._build_url("users", username, "gists")
         return self._iter(int(number), url, gists.ShortGist, etag=etag)
 
     def gitignore_template(self, language):
@@ -925,11 +997,11 @@ class GitHub(models.GitHubCore):
         :rtype:
             str
         """
-        url = self._build_url('gitignore', 'templates', language)
+        url = self._build_url("gitignore", "templates", language)
         json = self._json(self._get(url), 200)
         if not json:
-            return ''
-        return json.get('source', '')
+            return ""
+        return json.get("source", "")
 
     def gitignore_templates(self):
         """Return the list of available templates.
@@ -939,7 +1011,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             [str]
         """
-        url = self._build_url('gitignore', 'templates')
+        url = self._build_url("gitignore", "templates")
         return self._json(self._get(url), 200) or []
 
     @requires_auth
@@ -953,7 +1025,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.GPGKey`
         """
-        url = self._build_url('user', 'gpg_keys', id_num)
+        url = self._build_url("user", "gpg_keys", id_num)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(users.GPGKey, json)
 
@@ -972,7 +1044,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.GPGKey`
         """
-        url = self._build_url('user', 'gpg_keys')
+        url = self._build_url("user", "gpg_keys")
         return self._iter(int(number), url, users.GPGKey, etag=etag)
 
     @requires_auth
@@ -989,7 +1061,7 @@ class GitHub(models.GitHubCore):
         """
         json = False
         if username:
-            url = self._build_url('user', 'following', username)
+            url = self._build_url("user", "following", username)
             json = self._boolean(self._get(url), 204, 404)
         return json
 
@@ -1008,7 +1080,7 @@ class GitHub(models.GitHubCore):
         """
         json = False
         if username and repo:
-            url = self._build_url('user', 'starred', username, repo)
+            url = self._build_url("user", "starred", username, repo)
             json = self._boolean(self._get(url), 204, 404)
         return json
 
@@ -1028,14 +1100,24 @@ class GitHub(models.GitHubCore):
         """
         json = None
         if username and repository and int(number) > 0:
-            url = self._build_url('repos', username, repository, 'issues',
-                                  str(number))
+            url = self._build_url(
+                "repos", username, repository, "issues", str(number)
+            )
             json = self._json(self._get(url), 200)
         return self._instance_or_null(issues.Issue, json)
 
     @requires_auth
-    def issues(self, filter='', state='', labels='', sort='', direction='',
-               since=None, number=-1, etag=None):
+    def issues(
+        self,
+        filter="",
+        state="",
+        labels="",
+        sort="",
+        direction="",
+        since=None,
+        number=-1,
+        etag=None,
+    ):
         """List all of the authenticated user's (and organization's) issues.
 
         .. versionchanged:: 0.9.0
@@ -1074,16 +1156,28 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.ShortIssue`
         """
-        url = self._build_url('issues')
+        url = self._build_url("issues")
         # issue_params will handle the since parameter
         params = issues.issue_params(
             filter, state, labels, sort, direction, since
         )
         return self._iter(int(number), url, issues.ShortIssue, params, etag)
 
-    def issues_on(self, username, repository, milestone=None, state=None,
-                  assignee=None, mentioned=None, labels=None, sort=None,
-                  direction=None, since=None, number=-1, etag=None):
+    def issues_on(
+        self,
+        username,
+        repository,
+        milestone=None,
+        state=None,
+        assignee=None,
+        mentioned=None,
+        labels=None,
+        sort=None,
+        direction=None,
+        since=None,
+        number=-1,
+        etag=None,
+    ):
         """List issues on owner/repository.
 
         Only owner and repository are required.
@@ -1131,14 +1225,21 @@ class GitHub(models.GitHubCore):
             :class:`~github3.issues.ShortIssue`
         """
         if username and repository:
-            url = self._build_url('repos', username, repository, 'issues')
+            url = self._build_url("repos", username, repository, "issues")
 
             params = repo.repo_issue_params(
-                milestone, state, assignee, mentioned,
-                labels, sort, direction, since,
+                milestone,
+                state,
+                assignee,
+                mentioned,
+                labels,
+                sort,
+                direction,
+                since,
             )
-            return self._iter(int(number), url, issues.ShortIssue,
-                              params=params, etag=etag)
+            return self._iter(
+                int(number), url, issues.ShortIssue, params=params, etag=etag
+            )
         return iter([])
 
     @requires_auth
@@ -1154,7 +1255,7 @@ class GitHub(models.GitHubCore):
         """
         json = None
         if int(id_num) > 0:
-            url = self._build_url('user', 'keys', str(id_num))
+            url = self._build_url("user", "keys", str(id_num))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(users.Key, json)
 
@@ -1172,7 +1273,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.Key`
         """
-        url = self._build_url('user', 'keys')
+        url = self._build_url("user", "keys")
         return self._iter(int(number), url, users.Key, etag=etag)
 
     def license(self, name):
@@ -1185,7 +1286,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.licenses.License`
         """
-        url = self._build_url('licenses', name)
+        url = self._build_url("licenses", name)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(licenses.License, json)
 
@@ -1197,11 +1298,16 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.licenses.ShortLicense`
         """
-        url = self._build_url('licenses')
+        url = self._build_url("licenses")
         return self._iter(int(number), url, licenses.ShortLicense, etag=etag)
 
-    def login(self, username=None, password=None, token=None,
-              two_factor_callback=None):
+    def login(
+        self,
+        username=None,
+        password=None,
+        token=None,
+        two_factor_callback=None,
+    ):
         """Log the user into GitHub for protected API calls.
 
         :param str username:
@@ -1222,8 +1328,12 @@ class GitHub(models.GitHubCore):
         # The Session method handles None for free.
         self.session.two_factor_auth_callback(two_factor_callback)
 
-    def login_as_app(self, private_key_pem, app_id,
-                     expire_in=apps.DEFAULT_JWT_TOKEN_EXPIRATION):
+    def login_as_app(
+        self,
+        private_key_pem,
+        app_id,
+        expire_in=apps.DEFAULT_JWT_TOKEN_EXPIRATION,
+    ):
         """Login as a GitHub Application.
 
         .. versionadded:: 1.2.0
@@ -1247,8 +1357,9 @@ class GitHub(models.GitHubCore):
         token = apps.create_token(private_key_pem, app_id, expire_in)
         self.session.app_bearer_token_auth(token, expire_in)
 
-    def login_as_app_installation(self, private_key_pem, app_id,
-                                  installation_id):
+    def login_as_app_installation(
+        self, private_key_pem, app_id, installation_id
+    ):
         """Login using your GitHub App's installation credentials.
 
         .. versionadded:: 1.2.0
@@ -1283,17 +1394,19 @@ class GitHub(models.GitHubCore):
         # NOTE(sigmavirus24): This JWT token does not need to last very long.
         # Instead of allowing it to stick around for 10 minutes, let's limit
         # it to 30 seconds.
-        headers = apps.create_jwt_headers(private_key_pem, app_id,
-                                          expire_in=30)
-        url = self._build_url('app', 'installations', str(installation_id),
-                              'access_tokens')
+        headers = apps.create_jwt_headers(
+            private_key_pem, app_id, expire_in=30
+        )
+        url = self._build_url(
+            "app", "installations", str(installation_id), "access_tokens"
+        )
         with self.session.no_auth():
             response = self.session.post(url, headers=headers)
             json = self._json(response, 201)
 
         self.session.app_installation_token_auth(json)
 
-    def markdown(self, text, mode='', context='', raw=False):
+    def markdown(self, text, mode="", context="", raw=False):
         """Render an arbitrary markdown document.
 
         :param str text:
@@ -1314,24 +1427,24 @@ class GitHub(models.GitHubCore):
         json = False
         headers = {}
         if raw:
-            url = self._build_url('markdown', 'raw')
+            url = self._build_url("markdown", "raw")
             data = text
-            headers['content-type'] = 'text/plain'
+            headers["content-type"] = "text/plain"
         else:
-            url = self._build_url('markdown')
+            url = self._build_url("markdown")
             data = {}
 
             if text:
-                data['text'] = text
+                data["text"] = text
 
-            if mode in ('markdown', 'gfm'):
-                data['mode'] = mode
+            if mode in ("markdown", "gfm"):
+                data["mode"] = mode
 
             if context:
-                data['context'] = context
+                data["context"] = context
             json = True
 
-        html = ''
+        html = ""
         if data:
             req = self._post(url, data=data, json=json, headers=headers)
             if req.ok:
@@ -1351,7 +1464,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.AuthenticatedUser`
         """
-        url = self._build_url('user')
+        url = self._build_url("user")
         json = self._json(self._get(url), 200)
         return self._instance_or_null(users.AuthenticatedUser, json)
 
@@ -1371,8 +1484,10 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Membership`
         """
-        organization_name = getattr(organization, 'login', organization)
-        url = self._build_url('user', 'memberships', 'orgs', organization_name)
+        organization_name = getattr(organization, "login", organization)
+        url = self._build_url(
+            "user", "memberships", "orgs", organization_name
+        )
         json = self._json(self._get(url), 200)
         return self._instance_or_null(orgs.Membership, json)
 
@@ -1389,12 +1504,13 @@ class GitHub(models.GitHubCore):
         :rtype:
             dict
         """
-        url = self._build_url('meta')
+        url = self._build_url("meta")
         return self._json(self._get(url), 200) or {}
 
     @requires_auth
-    def notifications(self, all=False, participating=False, number=-1,
-                      etag=None):
+    def notifications(
+        self, all=False, participating=False, number=-1, etag=None
+    ):
         """Iterate over the user's notification.
 
         :param bool all:
@@ -1413,11 +1529,11 @@ class GitHub(models.GitHubCore):
         """
         params = None
         if all is True:
-            params = {'all': 'true'}
+            params = {"all": "true"}
         elif participating is True:
-            params = {'participating': 'true'}
+            params = {"participating": "true"}
 
-        url = self._build_url('notifications')
+        url = self._build_url("notifications")
         return self._iter(
             int(number), url, notifications.Thread, params, etag=etag
         )
@@ -1432,9 +1548,9 @@ class GitHub(models.GitHubCore):
         :rtype:
             str (or unicode on Python 2)
         """
-        url = self._build_url('octocat')
-        req = self._get(url, params={'s': say})
-        return req.text if req.ok else ''
+        url = self._build_url("octocat")
+        req = self._get(url, params={"s": say})
+        return req.text if req.ok else ""
 
     def organization(self, username):
         """Return an Organization object for the login name.
@@ -1446,14 +1562,23 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Organization`
         """
-        url = self._build_url('orgs', username)
+        url = self._build_url("orgs", username)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(orgs.Organization, json)
 
     @requires_auth
-    def organization_issues(self, name, filter='', state='', labels='',
-                            sort='', direction='', since=None, number=-1,
-                            etag=None):
+    def organization_issues(
+        self,
+        name,
+        filter="",
+        state="",
+        labels="",
+        sort="",
+        direction="",
+        since=None,
+        number=-1,
+        etag=None,
+    ):
         """Iterate over the organization's issues.
 
         .. note::
@@ -1494,7 +1619,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.ShortIssue`
         """
-        url = self._build_url('orgs', name, 'issues')
+        url = self._build_url("orgs", name, "issues")
         # issue_params will handle the since parameter
         params = issues.issue_params(
             filter, state, labels, sort, direction, since
@@ -1519,7 +1644,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.ShortOrganization`
         """
-        url = self._build_url('user', 'orgs')
+        url = self._build_url("user", "orgs")
         return self._iter(int(number), url, orgs.ShortOrganization, etag=etag)
 
     def organizations_with(self, username, number=-1, etag=None):
@@ -1542,9 +1667,10 @@ class GitHub(models.GitHubCore):
             :class:`~github3.orgs.ShortOrganization`
         """
         if username:
-            url = self._build_url('users', username, 'orgs')
-            return self._iter(int(number), url, orgs.ShortOrganization,
-                              etag=etag)
+            url = self._build_url("users", username, "orgs")
+            return self._iter(
+                int(number), url, orgs.ShortOrganization, etag=etag
+            )
         return iter([])
 
     def project(self, number):
@@ -1560,9 +1686,10 @@ class GitHub(models.GitHubCore):
         number = int(number)
         json = None
         if number > 0:
-            url = self._build_url('projects', str(number))
-            json = self._json(self._get(
-                url, headers=projects.Project.CUSTOM_HEADERS), 200)
+            url = self._build_url("projects", str(number))
+            json = self._json(
+                self._get(url, headers=projects.Project.CUSTOM_HEADERS), 200
+            )
         return self._instance_or_null(projects.Project, json)
 
     def project_card(self, number):
@@ -1576,9 +1703,10 @@ class GitHub(models.GitHubCore):
         number = int(number)
         json = None
         if number > 0:
-            url = self._build_url('projects', 'columns', 'cards', str(number))
-            json = self._json(self._get(
-                url, headers=projects.Project.CUSTOM_HEADERS), 200)
+            url = self._build_url("projects", "columns", "cards", str(number))
+            json = self._json(
+                self._get(url, headers=projects.Project.CUSTOM_HEADERS), 200
+            )
         return self._instance_or_null(projects.ProjectCard, json)
 
     def project_column(self, number):
@@ -1592,9 +1720,10 @@ class GitHub(models.GitHubCore):
         number = int(number)
         json = None
         if number > 0:
-            url = self._build_url('projects', 'columns', str(number))
-            json = self._json(self._get(
-                url, headers=projects.Project.CUSTOM_HEADERS), 200)
+            url = self._build_url("projects", "columns", str(number))
+            json = self._json(
+                self._get(url, headers=projects.Project.CUSTOM_HEADERS), 200
+            )
         return self._instance_or_null(projects.ProjectColumn, json)
 
     def public_gists(self, number=-1, etag=None, since=None):
@@ -1619,12 +1748,12 @@ class GitHub(models.GitHubCore):
             :class:`~github3.gists.gist.ShortGist`
         """
         params = None
-        url = self._build_url('gists', 'public')
+        url = self._build_url("gists", "public")
         if since is not None:
-            params = {'since': utils.timestamp_parameter(since)}
-        return self._iter(int(number), url, gists.ShortGist,
-                          params=params,
-                          etag=etag)
+            params = {"since": utils.timestamp_parameter(since)}
+        return self._iter(
+            int(number), url, gists.ShortGist, params=params, etag=etag
+        )
 
     @requires_auth
     def organization_memberships(self, state=None, number=-1, etag=None):
@@ -1638,15 +1767,15 @@ class GitHub(models.GitHubCore):
             :class:`~github3.orgs.Membership`
         """
         params = None
-        url = self._build_url('user', 'memberships', 'orgs')
-        if state is not None and state.lower() in ('active', 'pending'):
-            params = {'state': state.lower()}
-        return self._iter(int(number), url, orgs.Membership,
-                          params=params,
-                          etag=etag)
+        url = self._build_url("user", "memberships", "orgs")
+        if state is not None and state.lower() in ("active", "pending"):
+            params = {"state": state.lower()}
+        return self._iter(
+            int(number), url, orgs.Membership, params=params, etag=etag
+        )
 
     @requires_auth
-    def pubsubhubbub(self, mode, topic, callback, secret=''):
+    def pubsubhubbub(self, mode, topic, callback, secret=""):
         """Create or update a pubsubhubbub hook.
 
         :param str mode:
@@ -1666,19 +1795,29 @@ class GitHub(models.GitHubCore):
         m = _pubsub_re.match(topic)
         status = False
         if mode and topic and callback and m:
-            data = [('hub.mode', mode), ('hub.topic', topic),
-                    ('hub.callback', callback)]
+            data = [
+                ("hub.mode", mode),
+                ("hub.topic", topic),
+                ("hub.callback", callback),
+            ]
             if secret:
-                data.append(('hub.secret', secret))
-            url = self._build_url('hub')
+                data.append(("hub.secret", secret))
+            url = self._build_url("hub")
             # This is not JSON data. It is meant to be form data
             # application/x-www-form-urlencoded works fine here, no need for
             # multipart/form-data
-            status = self._boolean(self._post(url, data=data, json=False,
-                                   headers={
-                                       'Content-Type':
-                                       'application/x-www-form-urlencoded'
-                                   }), 204, 404)
+            status = self._boolean(
+                self._post(
+                    url,
+                    data=data,
+                    json=False,
+                    headers={
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                ),
+                204,
+                404,
+            )
         return status
 
     def pull_request(self, owner, repository, number):
@@ -1695,8 +1834,9 @@ class GitHub(models.GitHubCore):
         """
         json = None
         if int(number) > 0:
-            url = self._build_url('repos', owner, repository, 'pulls',
-                                  str(number))
+            url = self._build_url(
+                "repos", owner, repository, "pulls", str(number)
+            )
             json = self._json(self._get(url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
 
@@ -1723,12 +1863,13 @@ class GitHub(models.GitHubCore):
         :rtype:
             dict
         """
-        url = self._build_url('rate_limit')
+        url = self._build_url("rate_limit")
         return self._json(self._get(url), 200)
 
     @requires_auth
-    def repositories(self, type=None, sort=None, direction=None, number=-1,
-                     etag=None):
+    def repositories(
+        self, type=None, sort=None, direction=None, number=-1, etag=None
+    ):
         """List repositories for the authenticated user, filterable by ``type``.
 
         .. versionchanged:: 0.6
@@ -1758,21 +1899,29 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository`
         """
-        url = self._build_url('user', 'repos')
+        url = self._build_url("user", "repos")
 
         params = {}
-        if type in ('all', 'owner', 'public', 'private', 'member'):
+        if type in ("all", "owner", "public", "private", "member"):
             params.update(type=type)
-        if sort in ('created', 'updated', 'pushed', 'full_name'):
+        if sort in ("created", "updated", "pushed", "full_name"):
             params.update(sort=sort)
-        if direction in ('asc', 'desc'):
+        if direction in ("asc", "desc"):
             params.update(direction=direction)
 
-        return self._iter(int(number), url, repo.ShortRepository, params,
-                          etag)
+        return self._iter(
+            int(number), url, repo.ShortRepository, params, etag
+        )
 
-    def repositories_by(self, username, type=None, sort=None, direction=None,
-                        number=-1, etag=None):
+    def repositories_by(
+        self,
+        username,
+        type=None,
+        sort=None,
+        direction=None,
+        number=-1,
+        etag=None,
+    ):
         """List public repositories for the specified ``username``.
 
         .. versionadded:: 0.6
@@ -1800,18 +1949,19 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository`
         """
-        url = self._build_url('users', username, 'repos')
+        url = self._build_url("users", username, "repos")
 
         params = {}
-        if type in ('all', 'owner', 'member'):
+        if type in ("all", "owner", "member"):
             params.update(type=type)
-        if sort in ('created', 'updated', 'pushed', 'full_name'):
+        if sort in ("created", "updated", "pushed", "full_name"):
             params.update(sort=sort)
-        if direction in ('asc', 'desc'):
+        if direction in ("asc", "desc"):
             params.update(direction=direction)
 
-        return self._iter(int(number), url, repo.ShortRepository, params,
-                          etag)
+        return self._iter(
+            int(number), url, repo.ShortRepository, params, etag
+        )
 
     def repository(self, owner, repository):
         """Retrieve the desired repository.
@@ -1827,7 +1977,7 @@ class GitHub(models.GitHubCore):
         """
         json = None
         if owner and repository:
-            url = self._build_url('repos', owner, repository)
+            url = self._build_url("repos", owner, repository)
             json = self._json(self._get(url), 200)
         return self._instance_or_null(repo.Repository, json)
 
@@ -1845,7 +1995,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.invitation.Invitation`
         """
-        url = self._build_url('user', 'repository_invitations')
+        url = self._build_url("user", "repository_invitations")
         return self._iter(int(number), url, invitation.Invitation, etag=etag)
 
     def repository_with_id(self, number):
@@ -1861,7 +2011,7 @@ class GitHub(models.GitHubCore):
         number = int(number)
         json = None
         if number > 0:
-            url = self._build_url('repositories', str(number))
+            url = self._build_url("repositories", str(number))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(repo.Repository, json)
 
@@ -1880,11 +2030,13 @@ class GitHub(models.GitHubCore):
             bool
         """
         client_id, client_secret = self.session.retrieve_client_credentials()
-        url = self._build_url('applications', str(client_id), 'tokens',
-                              access_token)
+        url = self._build_url(
+            "applications", str(client_id), "tokens", access_token
+        )
         with self.session.temporary_basic_auth(client_id, client_secret):
-            response = self._delete(url, params={'client_id': None,
-                                                 'client_secret': None})
+            response = self._delete(
+                url, params={"client_id": None, "client_secret": None}
+            )
 
         return self._boolean(response, 204, 404)
 
@@ -1903,15 +2055,24 @@ class GitHub(models.GitHubCore):
             bool
         """
         client_id, client_secret = self.session.retrieve_client_credentials()
-        url = self._build_url('applications', str(client_id), 'tokens')
+        url = self._build_url("applications", str(client_id), "tokens")
         with self.session.temporary_basic_auth(client_id, client_secret):
-            response = self._delete(url, params={'client_id': None,
-                                                 'client_secret': None})
+            response = self._delete(
+                url, params={"client_id": None, "client_secret": None}
+            )
 
         return self._boolean(response, 204, 404)
 
-    def search_code(self, query, sort=None, order=None, per_page=None,
-                    text_match=False, number=-1, etag=None):
+    def search_code(
+        self,
+        query,
+        sort=None,
+        order=None,
+        per_page=None,
+        text_match=False,
+        number=-1,
+        etag=None,
+    ):
         """Find code via the code search API.
 
         The query can contain any combination of the following supported
@@ -1956,27 +2117,35 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.search.code.CodeSearchResult`
         """
-        params = {'q': query}
+        params = {"q": query}
         headers = {}
 
-        if sort == 'indexed':
-            params['sort'] = sort
+        if sort == "indexed":
+            params["sort"] = sort
 
-        if sort and order in ('asc', 'desc'):
-            params['order'] = order
+        if sort and order in ("asc", "desc"):
+            params["order"] = order
 
         if text_match:
             headers = {
-                'Accept': 'application/vnd.github.v3.full.text-match+json'
-                }
+                "Accept": "application/vnd.github.v3.full.text-match+json"
+            }
 
-        url = self._build_url('search', 'code')
+        url = self._build_url("search", "code")
         return structs.SearchIterator(
             number, url, search.CodeSearchResult, self, params, etag, headers
         )
 
-    def search_commits(self, query, sort=None, order=None, per_page=None,
-                       text_match=False, number=-1, etag=None):
+    def search_commits(
+        self,
+        query,
+        sort=None,
+        order=None,
+        per_page=None,
+        text_match=False,
+        number=-1,
+        etag=None,
+    ):
         """Find commits via the commits search API.
 
         The query can contain any combination of the following supported
@@ -2035,29 +2204,44 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.search.commits.CommitSearchResult`
         """
-        params = {'q': query}
-        headers = {'Accept': 'application/vnd.github.cloak-preview'}
+        params = {"q": query}
+        headers = {"Accept": "application/vnd.github.cloak-preview"}
 
-        if sort in ('author-date', 'committer-date'):
-            params['sort'] = sort
+        if sort in ("author-date", "committer-date"):
+            params["sort"] = sort
 
-        if sort and order in ('asc', 'desc'):
-            params['order'] = order
+        if sort and order in ("asc", "desc"):
+            params["order"] = order
 
         if text_match:
-            headers['Accept'] = ', '.join([
-                headers['Accept'],
-                'application/vnd.github.v3.full.text-match+json'
-            ])
+            headers["Accept"] = ", ".join(
+                [
+                    headers["Accept"],
+                    "application/vnd.github.v3.full.text-match+json",
+                ]
+            )
 
-        url = self._build_url('search', 'commits')
+        url = self._build_url("search", "commits")
         return structs.SearchIterator(
-            number, url, search.CommitSearchResult,
-            self, params, etag, headers
+            number,
+            url,
+            search.CommitSearchResult,
+            self,
+            params,
+            etag,
+            headers,
         )
 
-    def search_issues(self, query, sort=None, order=None, per_page=None,
-                      text_match=False, number=-1, etag=None):
+    def search_issues(
+        self,
+        query,
+        sort=None,
+        order=None,
+        per_page=None,
+        text_match=False,
+        number=-1,
+        etag=None,
+    ):
         """Find issues by state and keyword.
 
         The query can contain any combination of the following supported
@@ -2112,28 +2296,35 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.search.issue.IssueSearchResult`
         """
-        params = {'q': query}
+        params = {"q": query}
         headers = {}
 
-        if sort in ('comments', 'created', 'updated'):
-            params['sort'] = sort
+        if sort in ("comments", "created", "updated"):
+            params["sort"] = sort
 
-        if order in ('asc', 'desc'):
-            params['order'] = order
+        if order in ("asc", "desc"):
+            params["order"] = order
 
         if text_match:
             headers = {
-                'Accept': 'application/vnd.github.v3.full.text-match+json'
-                }
+                "Accept": "application/vnd.github.v3.full.text-match+json"
+            }
 
-        url = self._build_url('search', 'issues')
+        url = self._build_url("search", "issues")
         return structs.SearchIterator(
             number, url, search.IssueSearchResult, self, params, etag, headers
         )
 
-    def search_repositories(self, query, sort=None, order=None,
-                            per_page=None, text_match=False, number=-1,
-                            etag=None):
+    def search_repositories(
+        self,
+        query,
+        sort=None,
+        order=None,
+        per_page=None,
+        text_match=False,
+        number=-1,
+        etag=None,
+    ):
         """Find repositories via various criteria.
 
         The query can contain any combination of the following supported
@@ -2183,28 +2374,41 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.search.repository.RepositorySearchResult`
         """
-        params = {'q': query}
+        params = {"q": query}
         headers = {}
 
-        if sort in ('stars', 'forks', 'updated'):
-            params['sort'] = sort
+        if sort in ("stars", "forks", "updated"):
+            params["sort"] = sort
 
-        if order in ('asc', 'desc'):
-            params['order'] = order
+        if order in ("asc", "desc"):
+            params["order"] = order
 
         if text_match:
             headers = {
-                'Accept': 'application/vnd.github.v3.full.text-match+json'
-                }
+                "Accept": "application/vnd.github.v3.full.text-match+json"
+            }
 
-        url = self._build_url('search', 'repositories')
+        url = self._build_url("search", "repositories")
         return structs.SearchIterator(
-            number, url, search.RepositorySearchResult, self, params, etag,
-            headers
+            number,
+            url,
+            search.RepositorySearchResult,
+            self,
+            params,
+            etag,
+            headers,
         )
 
-    def search_users(self, query, sort=None, order=None, per_page=None,
-                     text_match=False, number=-1, etag=None):
+    def search_users(
+        self,
+        query,
+        sort=None,
+        order=None,
+        per_page=None,
+        text_match=False,
+        number=-1,
+        etag=None,
+    ):
         """Find users via the Search API.
 
         The query can contain any combination of the following supported
@@ -2253,21 +2457,21 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.search.user.UserSearchResult`
         """
-        params = {'q': query}
+        params = {"q": query}
         headers = {}
 
-        if sort in ('followers', 'repositories', 'joined'):
-            params['sort'] = sort
+        if sort in ("followers", "repositories", "joined"):
+            params["sort"] = sort
 
-        if order in ('asc', 'desc'):
-            params['order'] = order
+        if order in ("asc", "desc"):
+            params["order"] = order
 
         if text_match:
             headers = {
-                'Accept': 'application/vnd.github.v3.full.text-match+json'
-                }
+                "Accept": "application/vnd.github.v3.full.text-match+json"
+            }
 
-        url = self._build_url('search', 'users')
+        url = self._build_url("search", "users")
         return structs.SearchIterator(
             number, url, search.UserSearchResult, self, params, etag, headers
         )
@@ -2280,7 +2484,7 @@ class GitHub(models.GitHubCore):
         :param str secret:
             40-character hexidecimal client_secret provided by GitHub
         """
-        self.session.params = {'client_id': id, 'client_secret': secret}
+        self.session.params = {"client_id": id, "client_secret": secret}
 
     def set_user_agent(self, user_agent):
         """Allow the user to set their own user agent string.
@@ -2291,7 +2495,7 @@ class GitHub(models.GitHubCore):
         """
         if not user_agent:
             return
-        self.session.headers.update({'User-Agent': user_agent})
+        self.session.headers.update({"User-Agent": user_agent})
 
     @requires_auth
     def star(self, username, repo):
@@ -2308,7 +2512,7 @@ class GitHub(models.GitHubCore):
         """
         resp = False
         if username and repo:
-            url = self._build_url('user', 'starred', username, repo)
+            url = self._build_url("user", "starred", username, repo)
             resp = self._boolean(self._put(url), 204, 404)
         return resp
 
@@ -2335,14 +2539,16 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository>`
         """
-        params = {'sort': sort, 'direction': direction}
+        params = {"sort": sort, "direction": direction}
         self._remove_none(params)
-        url = self._build_url('user', 'starred')
-        return self._iter(int(number), url, repo.ShortRepository, params,
-                          etag)
+        url = self._build_url("user", "starred")
+        return self._iter(
+            int(number), url, repo.ShortRepository, params, etag
+        )
 
-    def starred_by(self, username, sort=None, direction=None, number=-1,
-                   etag=None):
+    def starred_by(
+        self, username, sort=None, direction=None, number=-1, etag=None
+    ):
         """Iterate over repositories starred by ``username``.
 
         .. versionadded:: 1.0
@@ -2367,11 +2573,12 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository`
         """
-        params = {'sort': sort, 'direction': direction}
+        params = {"sort": sort, "direction": direction}
         self._remove_none(params)
-        url = self._build_url('users', str(username), 'starred')
-        return self._iter(int(number), url, repo.ShortRepository, params,
-                          etag)
+        url = self._build_url("users", str(username), "starred")
+        return self._iter(
+            int(number), url, repo.ShortRepository, params, etag
+        )
 
     @requires_auth
     def subscriptions(self, number=-1, etag=None):
@@ -2387,7 +2594,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository`
         """
-        url = self._build_url('user', 'subscriptions')
+        url = self._build_url("user", "subscriptions")
         return self._iter(int(number), url, repo.ShortRepository, etag=etag)
 
     def subscriptions_for(self, username, number=-1, etag=None):
@@ -2405,7 +2612,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.repo.ShortRepository`
         """
-        url = self._build_url('users', str(username), 'subscriptions')
+        url = self._build_url("users", str(username), "subscriptions")
         return self._iter(int(number), url, repo.ShortRepository, etag=etag)
 
     @requires_auth
@@ -2421,7 +2628,7 @@ class GitHub(models.GitHubCore):
         """
         resp = False
         if username:
-            url = self._build_url('user', 'following', username)
+            url = self._build_url("user", "following", username)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
@@ -2440,13 +2647,21 @@ class GitHub(models.GitHubCore):
         """
         resp = False
         if username and repo:
-            url = self._build_url('user', 'starred', username, repo)
+            url = self._build_url("user", "starred", username, repo)
             resp = self._boolean(self._delete(url), 204, 404)
         return resp
 
     @requires_auth
-    def update_me(self, name=None, email=None, blog=None, company=None,
-                  location=None, hireable=False, bio=None):
+    def update_me(
+        self,
+        name=None,
+        email=None,
+        blog=None,
+        company=None,
+        location=None,
+        hireable=False,
+        bio=None,
+    ):
         """Update the profile of the authenticated user.
 
         :param str name:
@@ -2466,11 +2681,17 @@ class GitHub(models.GitHubCore):
         :rtype:
             bool
         """
-        user = {'name': name, 'email': email, 'blog': blog,
-                'company': company, 'location': location,
-                'hireable': hireable, 'bio': bio}
+        user = {
+            "name": name,
+            "email": email,
+            "blog": blog,
+            "company": company,
+            "location": location,
+            "hireable": hireable,
+            "bio": bio,
+        }
         self._remove_none(user)
-        url = self._build_url('user')
+        url = self._build_url("user")
         _json = self._json(self._patch(url, data=json.dumps(user)), 200)
         if _json:
             self._update_attributes(_json)
@@ -2487,14 +2708,23 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.users.User`
         """
-        url = self._build_url('users', username)
+        url = self._build_url("users", username)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(users.User, json)
 
     @requires_auth
-    def user_issues(self, filter='', state='', labels='', sort='',
-                    direction='', since=None, per_page=None, number=-1,
-                    etag=None):
+    def user_issues(
+        self,
+        filter="",
+        state="",
+        labels="",
+        sort="",
+        direction="",
+        since=None,
+        per_page=None,
+        number=-1,
+        etag=None,
+    ):
         """List only the authenticated user's issues.
 
         Will not list organization's issues. See :meth:`organization_issues`.
@@ -2541,7 +2771,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.issues.ShortIssue`
         """
-        url = self._build_url('user', 'issues')
+        url = self._build_url("user", "issues")
         # issue_params will handle the since parameter
         params = issues.issue_params(
             filter, state, labels, sort, direction, since
@@ -2562,7 +2792,7 @@ class GitHub(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.ShortTeam`
         """
-        url = self._build_url('user', 'teams')
+        url = self._build_url("user", "teams")
         return self._iter(int(number), url, orgs.ShortTeam, etag=etag)
 
     def user_with_id(self, number):
@@ -2578,7 +2808,7 @@ class GitHub(models.GitHubCore):
         number = int(number)
         json = None
         if number > 0:
-            url = self._build_url('user', str(number))
+            url = self._build_url("user", str(number))
             json = self._json(self._get(url), 200)
         return self._instance_or_null(users.User, json)
 
@@ -2592,9 +2822,9 @@ class GitHub(models.GitHubCore):
         :rtype:
             str (on Python 3, unicode on Python 2)
         """
-        url = self._build_url('zen')
+        url = self._build_url("zen")
         resp = self._get(url)
-        return resp.text if resp.status_code == 200 else b''.decode('utf-8')
+        return resp.text if resp.status_code == 200 else b"".decode("utf-8")
 
 
 class GitHubEnterprise(GitHub):
@@ -2612,17 +2842,25 @@ class GitHubEnterprise(GitHub):
     override the validation by passing `verify=False`.
     """
 
-    def __init__(self, url, username='', password='', token='', verify=True,
-                 session=None):
+    def __init__(
+        self,
+        url,
+        username="",
+        password="",
+        token="",
+        verify=True,
+        session=None,
+    ):
         """Create a client for a GitHub Enterprise instance."""
-        super(GitHubEnterprise, self).__init__(username, password, token,
-                                               session=session)
-        self.session.base_url = url.rstrip('/') + '/api/v3'
+        super(GitHubEnterprise, self).__init__(
+            username, password, token, session=session
+        )
+        self.session.base_url = url.rstrip("/") + "/api/v3"
         self.session.verify = verify
         self.url = url
 
     def _repr(self):
-        return '<GitHub Enterprise [{0.url}]>'.format(self)
+        return "<GitHub Enterprise [{0.url}]>".format(self)
 
     @requires_auth
     def create_user(self, login, email):
@@ -2641,8 +2879,8 @@ class GitHubEnterprise(GitHub):
         :rtype:
             :class:`ShortUser <github3.users.ShortUser>`
         """
-        url = self._build_url('admin', 'users')
-        payload = {'login': login, 'email': email}
+        url = self._build_url("admin", "users")
+        payload = {"login": login, "email": email}
         json_data = self._json(self._post(url, data=payload), 201)
         return self._instance_or_null(users.ShortUser, json_data)
 
@@ -2660,10 +2898,20 @@ class GitHubEnterprise(GitHub):
             dict
         """
         stats = {}
-        if option.lower() in ('all', 'repos', 'hooks', 'pages', 'orgs',
-                              'users', 'pulls', 'issues', 'milestones',
-                              'gists', 'comments'):
-            url = self._build_url('enterprise', 'stats', option.lower())
+        if option.lower() in (
+            "all",
+            "repos",
+            "hooks",
+            "pages",
+            "orgs",
+            "users",
+            "pulls",
+            "issues",
+            "milestones",
+            "gists",
+            "comments",
+        ):
+            url = self._build_url("enterprise", "stats", option.lower())
             stats = self._json(self._get(url), 200)
         return stats
 
@@ -2677,10 +2925,10 @@ class GitHubStatus(models.GitHubCore):
     def __init__(self, session=None):
         """Create a status API client."""
         super(GitHubStatus, self).__init__({}, session or self.new_session())
-        self.session.base_url = 'https://status.github.com'
+        self.session.base_url = "https://status.github.com"
 
     def _repr(self):
-        return '<GitHub Status>'
+        return "<GitHub Status>"
 
     def _recipe(self, *args):
         url = self._build_url(*args)
@@ -2689,16 +2937,16 @@ class GitHubStatus(models.GitHubCore):
 
     def api(self):
         """Retrieve API status."""
-        return self._recipe('api.json')
+        return self._recipe("api.json")
 
     def status(self):
         """Retrieve overall status."""
-        return self._recipe('api', 'status.json')
+        return self._recipe("api", "status.json")
 
     def last_message(self):
         """Retrieve the last message."""
-        return self._recipe('api', 'last-message.json')
+        return self._recipe("api", "last-message.json")
 
     def messages(self):
         """Retrieve all messages."""
-        return self._recipe('api', 'messages.json')
+        return self._recipe("api", "messages.json")

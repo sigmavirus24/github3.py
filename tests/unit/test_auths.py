@@ -3,7 +3,7 @@ import github3
 
 from . import helper
 
-url_for = helper.create_url_helper('https://api.github.com/authorizations/1')
+url_for = helper.create_url_helper("https://api.github.com/authorizations/1")
 
 
 class TestAuthorization(helper.UnitHelper):
@@ -12,39 +12,43 @@ class TestAuthorization(helper.UnitHelper):
 
     described_class = github3.auths.Authorization
     get_auth_example_data = helper.create_example_data_helper(
-        'authorization_example'
+        "authorization_example"
     )
     example_data = get_auth_example_data()
 
     def test_add_scopes(self):
         """Test the request to add scopes to an authorization."""
-        self.instance.add_scopes(['scope-one', 'scope-two'])
+        self.instance.add_scopes(["scope-one", "scope-two"])
 
-        self.post_called_with(url_for(''), data={
-            'add_scopes': ['scope-one', 'scope-two'],
-        })
+        self.post_called_with(
+            url_for(""), data={"add_scopes": ["scope-one", "scope-two"]}
+        )
 
     def test_delete(self):
         """Test the request to delete an authorization."""
         self.instance.delete()
 
-        self.session.delete.assert_called_once_with(url_for(''))
+        self.session.delete.assert_called_once_with(url_for(""))
 
     def test_remove_scopes(self):
         """Test the request to remove scopes from an authorization."""
-        self.instance.remove_scopes(['scope-one', 'scope-two', 'scope-three'])
+        self.instance.remove_scopes(["scope-one", "scope-two", "scope-three"])
 
-        self.post_called_with(url_for(''), data={
-            'rm_scopes': ['scope-one', 'scope-two', 'scope-three'],
-        })
+        self.post_called_with(
+            url_for(""),
+            data={"rm_scopes": ["scope-one", "scope-two", "scope-three"]},
+        )
 
     def test_replace_scopes(self):
         """Test the request to replace the scopes on an authorization."""
-        self.instance.replace_scopes(['scope-one', 'scope-two', 'scope-three'])
+        self.instance.replace_scopes(
+            ["scope-one", "scope-two", "scope-three"]
+        )
 
-        self.post_called_with(url_for(''), data={
-            'scopes': ['scope-one', 'scope-two', 'scope-three'],
-        })
+        self.post_called_with(
+            url_for(""),
+            data={"scopes": ["scope-one", "scope-two", "scope-three"]},
+        )
 
 
 class TestAuthorizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):

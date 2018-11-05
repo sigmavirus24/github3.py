@@ -23,17 +23,17 @@ class PagesInfo(models.GitHubCore):
     """
 
     def _update_attributes(self, info):
-        self._api = info['url']
-        self.cname = info['cname']
-        self.custom_404 = info['custom_404']
-        self.status = info['status']
+        self._api = info["url"]
+        self.cname = info["cname"]
+        self.custom_404 = info["custom_404"]
+        self.status = info["status"]
 
     def _repr(self):
-        info = self.cname or ''
+        info = self.cname or ""
         if info:
-            info += '/'
-        info += self.status or ''
-        return '<Pages Info [{0}]>'.format(info)
+            info += "/"
+        info += self.status or ""
+        return "<Pages Info [{0}]>".format(info)
 
 
 class PagesBuild(models.GitHubCore):
@@ -74,14 +74,15 @@ class PagesBuild(models.GitHubCore):
 
     def _update_attributes(self, build):
         from .. import users
-        self._api = build['url']
-        self.commit = build['commit']
-        self.created_at = self._strptime(build['created_at'])
-        self.duration = build['duration']
-        self.error = build['error']
-        self.pusher = users.ShortUser(build['pusher'], self)
-        self.status = build['status']
-        self.updated_at = self._strptime(build['updated_at'])
+
+        self._api = build["url"]
+        self.commit = build["commit"]
+        self.created_at = self._strptime(build["created_at"])
+        self.duration = build["duration"]
+        self.error = build["error"]
+        self.pusher = users.ShortUser(build["pusher"], self)
+        self.status = build["status"]
+        self.updated_at = self._strptime(build["updated_at"])
 
     def _repr(self):
-        return '<Pages Build [{0}/{1}]>'.format(self.commit, self.status)
+        return "<Pages Build [{0}/{1}]>".format(self.commit, self.status)

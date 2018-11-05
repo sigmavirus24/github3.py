@@ -3,10 +3,10 @@ import github3
 
 from . import helper
 
-get_commit_example_data = helper.create_example_data_helper('commit_example')
+get_commit_example_data = helper.create_example_data_helper("commit_example")
 example_commit_data = get_commit_example_data()
 
-url_for = helper.create_url_helper(example_commit_data['url'])
+url_for = helper.create_url_helper(example_commit_data["url"])
 
 
 class TestRepoCommitIterator(helper.UnitIteratorHelper):
@@ -22,9 +22,7 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('statuses'),
-            params={'per_page': 100},
-            headers={}
+            url_for("statuses"), params={"per_page": 100}, headers={}
         )
 
     def test_comments(self):
@@ -33,7 +31,5 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('comments'),
-            params={'per_page': 100},
-            headers={}
+            url_for("comments"), params={"per_page": 100}, headers={}
         )

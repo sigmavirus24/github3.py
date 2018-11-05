@@ -61,20 +61,20 @@ class IssueComment(models.GitHubCore):
     """
 
     def _update_attributes(self, comment):
-        self._api = comment['url']
-        self.author_association = comment['author_association']
-        self.body = comment['body']
-        self.body_html = comment['body_html']
-        self.body_text = comment['body_text']
-        self.created_at = self._strptime(comment['created_at'])
-        self.html_url = comment['html_url']
-        self.id = comment['id']
-        self.issue_url = comment['issue_url']
-        self.updated_at = self._strptime(comment['updated_at'])
-        self.user = users.ShortUser(comment['user'], self)
+        self._api = comment["url"]
+        self.author_association = comment["author_association"]
+        self.body = comment["body"]
+        self.body_html = comment["body_html"]
+        self.body_text = comment["body_text"]
+        self.created_at = self._strptime(comment["created_at"])
+        self.html_url = comment["html_url"]
+        self.id = comment["id"]
+        self.issue_url = comment["issue_url"]
+        self.updated_at = self._strptime(comment["updated_at"])
+        self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return '<IssueComment [{0}]>'.format(self.user.login)
+        return "<IssueComment [{0}]>".format(self.user.login)
 
     @decorators.requires_auth
     def delete(self):
@@ -93,8 +93,9 @@ class IssueComment(models.GitHubCore):
         :returns: bool
         """
         if body:
-            json = self._json(self._patch(self._api,
-                                          json={'body': body}), 200)
+            json = self._json(
+                self._patch(self._api, json={"body": body}), 200
+            )
             if json:
                 self._update_attributes(json)
                 return True
@@ -111,14 +112,14 @@ def issue_comment_params(sort, direction, since):
     """
     params = {}
 
-    if sort in ('created', 'updated'):
-        params['sort'] = sort
+    if sort in ("created", "updated"):
+        params["sort"] = sort
 
-    if direction in ('asc', 'desc'):
-        params['direction'] = direction
+    if direction in ("asc", "desc"):
+        params["direction"] = direction
 
     since = utils.timestamp_parameter(since)
     if since:
-        params['since'] = since
+        params["since"] = since
 
     return params

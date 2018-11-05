@@ -17,20 +17,20 @@ class _Branch(models.GitHubCore):
 
     # The Accept header will likely be removable once the feature is out of
     # preview mode. See: http://git.io/v4O1e
-    PREVIEW_HEADERS = {'Accept': 'application/vnd.github.loki-preview+json'}
+    PREVIEW_HEADERS = {"Accept": "application/vnd.github.loki-preview+json"}
 
-    class_name = 'Repository Branch'
+    class_name = "Repository Branch"
 
     def _update_attributes(self, branch):
-        self.commit = commit.MiniCommit(branch['commit'], self)
-        self.name = branch['name']
-        base = self.commit.url.split('/commit', 1)[0]
-        self._api = self._build_url('branches', self.name, base_url=base)
+        self.commit = commit.MiniCommit(branch["commit"], self)
+        self.name = branch["name"]
+        base = self.commit.url.split("/commit", 1)[0]
+        self._api = self._build_url("branches", self.name, base_url=base)
 
     def _repr(self):
-        return '<{0} [{1}]>'.format(self.class_name, self.name)
+        return "<{0} [{1}]>".format(self.class_name, self.name)
 
-    def latest_sha(self, differs_from=''):
+    def latest_sha(self, differs_from=""):
         """Check if SHA-1 is the same as the remote branch.
 
         See: https://git.io/vaqIw
@@ -44,11 +44,11 @@ class _Branch(models.GitHubCore):
         """
         # If-None-Match returns 200 instead of 304 value does not have quotes
         headers = {
-            'Accept': 'application/vnd.github.v3.sha',
-            'If-None-Match': '"{0}"'.format(differs_from)
+            "Accept": "application/vnd.github.v3.sha",
+            "If-None-Match": '"{0}"'.format(differs_from),
         }
-        base = self._api.split('/branches', 1)[0]
-        url = self._build_url('commits', self.name, base_url=base)
+        base = self._api.split("/branches", 1)[0]
+        url = self._build_url("commits", self.name, base_url=base)
         resp = self._get(url, headers=headers)
         if self._boolean(resp, 200, 304):
             return resp.text
@@ -66,8 +66,8 @@ class _Branch(models.GitHubCore):
         :rtype:
             :class:`~github3.repos.branch.BranchProtection`
         """
-        url = self._build_url('protection', base_url=self._api)
-        preview_key = 'required_approving_review_count'
+        url = self._build_url("protection", base_url=self._api)
+        preview_key = "required_approving_review_count"
         headers = BranchProtection.PREVIEW_HEADERS_MAP[preview_key]
         resp = self._get(url, headers=headers)
         json = self._json(resp, 200)
@@ -93,26 +93,26 @@ class _Branch(models.GitHubCore):
             bool
         """
         previous_values = None
-        previous_protection = getattr(self, 'original_protection', {})
+        previous_protection = getattr(self, "original_protection", {})
         if previous_protection:
-            previous_values = previous_protection.get('required_status_checks',
-                                                      {})
+            previous_values = previous_protection.get(
+                "required_status_checks", {}
+            )
         if enforcement is None and previous_values:
-            enforcement = previous_values['enforcement_level']
+            enforcement = previous_values["enforcement_level"]
         if status_checks is None and previous_values:
-            status_checks = previous_values['contexts']
+            status_checks = previous_values["contexts"]
 
         edit = {
-            'protection': {
-                'enabled': True,
-                'required_status_checks': {
-                    'enforcement_level': enforcement,
-                    'contexts': status_checks,
+            "protection": {
+                "enabled": True,
+                "required_status_checks": {
+                    "enforcement_level": enforcement,
+                    "contexts": status_checks,
                 },
-            },
+            }
         }
-        resp = self._patch(self._api, json=edit,
-                           headers=self.PREVIEW_HEADERS)
+        resp = self._patch(self._api, json=edit, headers=self.PREVIEW_HEADERS)
         json = self._json(resp, 200)
         if self._boolean(resp, 200, 404):
             self._update_attributes(json)
@@ -122,9 +122,8 @@ class _Branch(models.GitHubCore):
     @decorators.requires_auth
     def unprotect(self):
         """Disable force push protection on this branch."""
-        edit = {'protection': {'enabled': False}}
-        resp = self._patch(self._api, json=edit,
-                           headers=self.PREVIEW_HEADERS)
+        edit = {"protection": {"enabled": False}}
+        resp = self._patch(self._api, json=edit, headers=self.PREVIEW_HEADERS)
         json = self._json(resp, 200)
         if self._boolean(resp, 200, 404):
             self._update_attributes(json)
@@ -171,19 +170,19 @@ class Branch(_Branch):
         The URL to access and manage details about this branch's protection.
     """
 
-    class_name = 'Repository Branch'
+    class_name = "Repository Branch"
 
     def _update_attributes(self, branch):
         super(Branch, self)._update_attributes(branch)
-        self.commit = commit.ShortCommit(branch['commit'], self)
+        self.commit = commit.ShortCommit(branch["commit"], self)
         #: Returns '_links' attribute.
-        self.links = branch['_links']
+        self.links = branch["_links"]
         #: Provides the branch's protection status.
-        self.protected = branch['protected']
-        self.original_protection = branch['protection']
-        self.protection_url = branch['protection_url']
-        if self.links and 'self' in self.links:
-            self._api = self.links['self']
+        self.protected = branch["protected"]
+        self.original_protection = branch["protection"]
+        self.protection_url = branch["protection_url"]
+        if self.links and "self" in self.links:
+            self._api = self.links["self"]
 
 
 class ShortBranch(_Branch):
@@ -209,7 +208,7 @@ class ShortBranch(_Branch):
         The name of this branch.
     """
 
-    class_name = 'Short Repository Branch'
+    class_name = "Short Repository Branch"
     _refresh_to = Branch
 
 
@@ -251,19 +250,19 @@ class BranchProtection(models.GitHubCore):
     """
 
     PREVIEW_HEADERS_MAP = {
-        'required_approving_review_count': {
-            'Accept': 'application/vnd.github.luke-cage-preview+json',
+        "required_approving_review_count": {
+            "Accept": "application/vnd.github.luke-cage-preview+json"
         },
-        'requires_signed_commits': {
-            'Accept': 'application/vnd.github.zzzax-preview+json',
+        "requires_signed_commits": {
+            "Accept": "application/vnd.github.zzzax-preview+json"
         },
-        'nested_teams': {
-            'Accept': 'application/vnd.github.hellcat-preview+json',
+        "nested_teams": {
+            "Accept": "application/vnd.github.hellcat-preview+json"
         },
     }
 
     def _update_attributes(self, protection):
-        self._api = protection['url']
+        self._api = protection["url"]
 
         def _set_conditional_attr(name, cls):
             value = protection.get(name)
@@ -271,16 +270,24 @@ class BranchProtection(models.GitHubCore):
             if getattr(self, name):
                 setattr(self, name, cls(value, self))
 
-        _set_conditional_attr('enforce_admins', ProtectionEnforceAdmins)
-        _set_conditional_attr('restrictions', ProtectionRestrictions)
-        _set_conditional_attr('required_pull_request_reviews',
-                              ProtectionRequiredPullRequestReviews)
-        _set_conditional_attr('required_status_checks',
-                              ProtectionRequiredStatusChecks)
+        _set_conditional_attr("enforce_admins", ProtectionEnforceAdmins)
+        _set_conditional_attr("restrictions", ProtectionRestrictions)
+        _set_conditional_attr(
+            "required_pull_request_reviews",
+            ProtectionRequiredPullRequestReviews,
+        )
+        _set_conditional_attr(
+            "required_status_checks", ProtectionRequiredStatusChecks
+        )
 
     @decorators.requires_auth
-    def update(self, enforce_admins=None, required_status_checks=None,
-               required_pull_request_reviews=None, restrictions=None):
+    def update(
+        self,
+        enforce_admins=None,
+        required_status_checks=None,
+        required_pull_request_reviews=None,
+        restrictions=None,
+    ):
         """Enable force push protection and configure status check enforcement.
 
         See: http://git.io/v4Gvu
@@ -306,51 +313,52 @@ class BranchProtection(models.GitHubCore):
             :class:`~github3.repos.branch.BranchProtection`
         """
         current_status = {
-            'enforce_admins': getattr(self.enforce_admins, 'enabled', False),
-            'required_status_checks': (
+            "enforce_admins": getattr(self.enforce_admins, "enabled", False),
+            "required_status_checks": (
                 self.required_status_checks.as_dict()
                 if self.required_status_checks is not None
                 else None
             ),
-            'required_pull_request_reviews': (
+            "required_pull_request_reviews": (
                 self.required_pull_request_reviews.as_dict()
                 if self.required_pull_request_reviews is not None
                 else None
             ),
-            'restrictions': (
+            "restrictions": (
                 self.restrictions.as_dict()
                 if self.restrictions is not None
                 else None
             ),
         }
         edit = {
-            'enabled': True,
-            'enforce_admins': (
+            "enabled": True,
+            "enforce_admins": (
                 enforce_admins
                 if enforce_admins is not None
-                else current_status['enforce_admins']
+                else current_status["enforce_admins"]
             ),
-            'required_status_checks': (
+            "required_status_checks": (
                 required_status_checks
                 if required_status_checks is not None
-                else current_status['required_status_checks']
+                else current_status["required_status_checks"]
             ),
-            'required_pull_request_reviews': (
+            "required_pull_request_reviews": (
                 required_pull_request_reviews
                 if required_pull_request_reviews is not None
-                else current_status['required_pull_request_reviews']
+                else current_status["required_pull_request_reviews"]
             ),
-            'restrictions': (
+            "restrictions": (
                 restrictions
                 if restrictions is not None
-                else current_status['restrictions']
+                else current_status["restrictions"]
             ),
         }
 
-        preview_key = 'required_approving_review_count'
+        preview_key = "required_approving_review_count"
         headers = BranchProtection.PREVIEW_HEADERS_MAP[preview_key]
-        json = self._json(self._put(self._api, json=edit,
-                                    headers=headers), 200)
+        json = self._json(
+            self._put(self._api, json=edit, headers=headers), 200
+        )
         self._update_attributes(json)
         return self
 
@@ -392,21 +400,23 @@ class ProtectionEnforceAdmins(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        self._api = protection['url']
-        self.enabled = protection['enabled']
+        self._api = protection["url"]
+        self.enabled = protection["enabled"]
 
     @decorators.requires_auth
     def enable(self):
         """Enable Admin enforcement for protected branch."""
-        resp = self._post(self._api,
-                          headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        resp = self._post(
+            self._api, headers=BranchProtection.PREVIEW_HEADERS_MAP
+        )
         return self._boolean(resp, 200, 404)
 
     @decorators.requires_auth
     def disable(self):
         """Disable Admin enforcement for protected branch."""
-        resp = self._delete(self._api,
-                            headers=BranchProtection.PREVIEW_HEADERS_MAP)
+        resp = self._delete(
+            self._api, headers=BranchProtection.PREVIEW_HEADERS_MAP
+        )
         return self._boolean(resp, 204, 404)
 
 
@@ -453,21 +463,20 @@ class ProtectionRestrictions(models.GitHubCore):
 
     def _update_attributes(self, protection):
         from .. import orgs, users
-        self._api = protection['url']
-        self.users_url = protection['users_url']
-        self.teams_url = protection['teams_url']
-        self.original_users = protection['users']
+
+        self._api = protection["url"]
+        self.users_url = protection["users_url"]
+        self.teams_url = protection["teams_url"]
+        self.original_users = protection["users"]
         if self.original_users:
             self.original_users = [
-                users.ShortUser(user, self)
-                for user in self.original_users
+                users.ShortUser(user, self) for user in self.original_users
             ]
 
-        self.original_teams = protection['teams']
+        self.original_teams = protection["teams"]
         if self.original_teams:
             self.original_teams = [
-                orgs.ShortTeam(team, self)
-                for team in self.original_teams
+                orgs.ShortTeam(team, self) for team in self.original_teams
             ]
 
     @decorators.requires_auth
@@ -491,9 +500,9 @@ class ProtectionRestrictions(models.GitHubCore):
             List[github3.orgs.ShortTeam]
         """
         from .. import orgs
-        headers = BranchProtection.PREVIEW_HEADERS_MAP['nested_teams']
-        resp = self._post(self.teams_url, data=teams,
-                          headers=headers)
+
+        headers = BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"]
+        resp = self._post(self.teams_url, data=teams, headers=headers)
         json = self._json(resp, 200)
         return [orgs.ShortTeam(team, self) for team in json] if json else []
 
@@ -519,6 +528,7 @@ class ProtectionRestrictions(models.GitHubCore):
         """
         json = self._json(self._post(self.users_url, data=users), 200)
         from .. import users
+
         return [users.ShortUser(user, self) for user in json] if json else []
 
     @decorators.requires_auth
@@ -552,9 +562,9 @@ class ProtectionRestrictions(models.GitHubCore):
             List[github3.orgs.ShortTeam]
         """
         from .. import orgs
-        headers = BranchProtection.PREVIEW_HEADERS_MAP['nested_teams']
-        resp = self._delete(self.teams_url, json=teams,
-                            headers=headers)
+
+        headers = BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"]
+        resp = self._delete(self.teams_url, json=teams, headers=headers)
         json = self._json(resp, 200)
         return [orgs.ShortTeam(team, self) for team in json] if json else []
 
@@ -576,6 +586,7 @@ class ProtectionRestrictions(models.GitHubCore):
         resp = self._delete(self.users_url, json=users)
         json = self._json(resp, 200)
         from .. import users
+
         return [users.ShortUser(user, self) for user in json] if json else []
 
     @decorators.requires_auth
@@ -594,7 +605,8 @@ class ProtectionRestrictions(models.GitHubCore):
             List[github3.orgs.ShortTeam]
         """
         from .. import orgs
-        headers = BranchProtection.PREVIEW_HEADERS_MAP['nested_teams']
+
+        headers = BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"]
         resp = self._put(self.teams_url, json=teams, headers=headers)
         json = self._json(resp, 200)
         return [orgs.ShortTeam(team, self) for team in json] if json else []
@@ -626,9 +638,12 @@ class ProtectionRestrictions(models.GitHubCore):
             :class:`~github3.orgs.ShortTeam`
         """
         from .. import orgs
+
         return self._iter(
-            int(number), self.teams_url, orgs.ShortTeam,
-            headers=BranchProtection.PREVIEW_HEADERS_MAP['nested_teams'],
+            int(number),
+            self.teams_url,
+            orgs.ShortTeam,
+            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def users(self, number=-1):
@@ -640,6 +655,7 @@ class ProtectionRestrictions(models.GitHubCore):
             :class:`~github3.users.ShortUser`
         """
         from .. import users
+
         return self._iter(int(number), self.users_url, users.ShortUser)
 
 
@@ -683,26 +699,28 @@ class ProtectionRequiredPullRequestReviews(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        self._api = protection['url']
-        self.dismiss_stale_reviews = protection['dismiss_stale_reviews']
+        self._api = protection["url"]
+        self.dismiss_stale_reviews = protection["dismiss_stale_reviews"]
         # Use a temporary value to stay under line-length restrictions
-        value = protection['require_code_owner_reviews']
+        value = protection["require_code_owner_reviews"]
         self.require_code_owner_reviews = value
         # Use a temporary value to stay under line-length restrictions
-        value = protection['required_approving_review_count']
+        value = protection["required_approving_review_count"]
         self.required_approving_review_count = value
         self.dismissal_restrictions = None
-        if 'dismissal_restrictions' in protection:
+        if "dismissal_restrictions" in protection:
             self.dismissal_restrictions = ProtectionRestrictions(
-                protection['dismissal_restrictions'],
-                self,
+                protection["dismissal_restrictions"], self
             )
 
     @decorators.requires_auth
-    def update(self, dismiss_stale_reviews=None,
-               require_code_owner_reviews=None,
-               required_approving_review_count=None,
-               dismissal_restrictions=None):
+    def update(
+        self,
+        dismiss_stale_reviews=None,
+        require_code_owner_reviews=None,
+        required_approving_review_count=None,
+        dismissal_restrictions=None,
+    ):
         """Update the configuration for the Required Pull Request Reviews.
 
         :param bool dismiss_stale_reviews:
@@ -722,47 +740,47 @@ class ProtectionRequiredPullRequestReviews(models.GitHubCore):
             :class:`~github3.repos.branch.ProtectionRequiredPullRequestReviews`
         """
         existing_values = {
-            'dismiss_stale_reviews': self.dismiss_stale_reviews,
-            'dismissal_restrictions': {
-                'users': [
-                    getattr(u, 'login', u)
-                    for u in getattr(self.dismissal_restrictions,
-                                     'original_users',
-                                     [])
+            "dismiss_stale_reviews": self.dismiss_stale_reviews,
+            "dismissal_restrictions": {
+                "users": [
+                    getattr(u, "login", u)
+                    for u in getattr(
+                        self.dismissal_restrictions, "original_users", []
+                    )
                 ],
-                'teams': [
-                    getattr(t, 'slug', t)
-                    for t in getattr(self.dismissal_restrictions,
-                                     'original_teams',
-                                     [])
+                "teams": [
+                    getattr(t, "slug", t)
+                    for t in getattr(
+                        self.dismissal_restrictions, "original_teams", []
+                    )
                 ],
             },
-            'require_code_owner_reviews': self.require_code_owner_reviews,
-            'required_approving_review_count': (
+            "require_code_owner_reviews": self.require_code_owner_reviews,
+            "required_approving_review_count": (
                 self.required_approving_review_count
             ),
         }
 
         update_json = {
-            'dismiss_stale_reviews': (
+            "dismiss_stale_reviews": (
                 dismiss_stale_reviews
                 if dismiss_stale_reviews is not None
-                else existing_values['dismiss_stale_reviews']
+                else existing_values["dismiss_stale_reviews"]
             ),
-            'require_code_owner_reviews': (
+            "require_code_owner_reviews": (
                 require_code_owner_reviews
                 if require_code_owner_reviews is not None
-                else existing_values['require_code_owner_reviews']
+                else existing_values["require_code_owner_reviews"]
             ),
-            'required_approving_review_count': (
+            "required_approving_review_count": (
                 required_approving_review_count
                 if required_approving_review_count is not None
-                else existing_values['required_approving_review_count']
+                else existing_values["required_approving_review_count"]
             ),
-            'dismissal_restrictions': (
+            "dismissal_restrictions": (
                 dismissal_restrictions
                 if dismissal_restrictions is not None
-                else existing_values['dismissal_restrictions']
+                else existing_values["dismissal_restrictions"]
             ),
         }
         resp = self._patch(self._api, json=update_json)
@@ -807,10 +825,10 @@ class ProtectionRequiredStatusChecks(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        self._api = protection['url']
-        self.strict = protection['strict']
-        self.original_contexts = protection['contexts']
-        self.contexts_url = protection['contexts_url']
+        self._api = protection["url"]
+        self.strict = protection["strict"]
+        self.original_contexts = protection["contexts"]
+        self.contexts_url = protection["contexts_url"]
 
     @decorators.requires_auth
     def add_contexts(self, contexts):
@@ -928,9 +946,9 @@ class ProtectionRequiredStatusChecks(models.GitHubCore):
         update_data = {}
         json = None
         if strict is not None:
-            update_data['strict'] = strict
+            update_data["strict"] = strict
         if contexts is not None:
-            update_data['contexts'] = contexts
+            update_data["contexts"] = contexts
         if update_data:
             resp = self._patch(self.url, json=update_data)
             json = self._json(resp, 200)

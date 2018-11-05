@@ -6,9 +6,9 @@ from .user import UserSearchResult
 
 
 __all__ = (
-    'CodeSearchResult',
-    'CommitSearchResult',
-    'IssueSearchResult',
-    'RepositorySearchResult',
-    'UserSearchResult',
+    "CodeSearchResult",
+    "CommitSearchResult",
+    "IssueSearchResult",
+    "RepositorySearchResult",
+    "UserSearchResult",
 )

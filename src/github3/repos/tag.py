@@ -43,13 +43,13 @@ class RepoTag(models.GitHubCore):
     """
 
     def _update_attributes(self, tag):
-        self.commit = commit.MiniCommit(tag['commit'], self)
-        self.name = tag['name']
-        self.tarball_url = tag['tarball_url']
-        self.zipball_url = tag['zipball_url']
+        self.commit = commit.MiniCommit(tag["commit"], self)
+        self.name = tag["name"]
+        self.tarball_url = tag["tarball_url"]
+        self.zipball_url = tag["zipball_url"]
 
     def _repr(self):
-        return '<Repository Tag [{0}]>'.format(self)
+        return "<Repository Tag [{0}]>".format(self)
 
     def __str__(self):
         return self.name
