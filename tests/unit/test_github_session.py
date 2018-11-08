@@ -30,6 +30,37 @@ class TestGitHubSession:
         assert "User-Agent" in s.headers
         assert s.headers["User-Agent"].startswith("github3.py/")
 
+    @mock.patch.object(requests.Session, 'request')
+    def test_default_timeout(self, request_mock):
+        """Test that default timeout values are used"""
+        response = mock.Mock()
+        response.configure_mock(status_code=200, headers={})
+        request_mock.return_value = response
+        s = self.build_session()
+        r = s.get("http://example.com")
+        assert r is response
+        request_mock.assert_called_once_with(
+            "GET", "http://example.com", allow_redirects=True,
+            timeout=(4, 1)
+        )
+
+    @mock.patch.object(requests.Session, 'request')
+    def test_custom_timeout(self, request_mock):
+        """Test that custom timeout values are used"""
+        response = mock.Mock()
+        response.configure_mock(status_code=200, headers={})
+        request_mock.return_value = response
+        s = session.GitHubSession(
+            default_connect_timeout=300,
+            default_read_timeout=400
+        )
+        r = s.get("http://example.com")
+        assert r is response
+        request_mock.assert_called_once_with(
+            "GET", "http://example.com", allow_redirects=True,
+            timeout=(300, 400)
+        )
+
     def test_build_url(self):
         """Test that GitHubSessions build basic URLs"""
         s = self.build_session()
@@ -117,7 +148,8 @@ class TestGitHubSession:
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
-            "GET", "http://example.com", allow_redirects=True
+            "GET", "http://example.com", allow_redirects=True,
+            timeout=(4, 1)
         )
 
     @mock.patch.object(requests.Session, "request")

@@ -34,3 +34,9 @@ GitHubStatus Object
 
 .. autoclass:: github3.github.GitHubStatus
     :members:
+
+
+GitHubSession Object
+====================
+
+.. autoclass:: github3.session.GitHubSession

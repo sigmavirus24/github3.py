@@ -174,3 +174,5 @@ Contributors
 - Raphael Vogel (@RaphaelVogel)
 
 - Andreas Burger (@AndreasBurger)
+
+- James E. Blair (@jeblair)
