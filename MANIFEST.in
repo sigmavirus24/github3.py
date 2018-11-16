@@ -5,9 +5,6 @@ include CONTRIBUTING.rst
 include tox.ini
 include report_issue.py
 prune *.pyc
-recursive-include docs *.rst *.py
-recursive-include tests *.py *.json
-recursive-include tests/json *
-recursive-include tests/unit/json *
-recursive-include images *.png
+graft docs
+graft tests
 prune docs/_build
