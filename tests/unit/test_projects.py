@@ -5,6 +5,7 @@ import pytest
 from . import helper
 
 from github3 import GitHubError
+from github3 import exceptions
 from github3 import issues
 from github3 import projects
 
@@ -258,6 +259,45 @@ class TestProjectCard(helper.UnitHelper):
             card_url_for("1478"),
             data={"note": "my new note"},
             headers=projects.Project.CUSTOM_HEADERS,
+        )
+
+    def test_retrieve_issue_from_content_fails(self):
+        """Verify we raise an exception because we can't retrieve anything."""
+        self.instance.content_url = None
+        with pytest.raises(exceptions.CardHasNoContentUrl):
+            self.instance.retrieve_issue_from_content()
+
+        assert self.session.get.called is False
+
+    def test_retrieve_issue_from_content(self):
+        """Verify we retrieve the card's issue content."""
+        self.instance.retrieve_issue_from_content()
+
+        self.session.get.assert_called_once_with(
+            "https://api.github.com/repos/api-playground/projects-test/"
+            "issues/3"
+        )
+
+    def test_retrieve_pull_request_from_content_fails_without_content_url(
+        self
+    ):
+        """Verify we raise an exception because we can't retrieve anything."""
+        self.instance.content_url = None
+        with pytest.raises(exceptions.CardHasNoContentUrl):
+            self.instance.retrieve_pull_request_from_content()
+
+        assert self.session.get.called is False
+
+    def test_retrieve_pull_request_from_content(self):
+        """Verify we retrieve the card's issue content."""
+        self.instance.content_url = self.instance.content_url.replace(
+            "issues", "pulls"
+        )
+        self.instance.retrieve_pull_request_from_content()
+
+        self.session.get.assert_called_once_with(
+            "https://api.github.com/repos/api-playground/projects-test/"
+            "pulls/3"
         )
 
 

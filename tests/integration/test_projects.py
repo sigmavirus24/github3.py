@@ -217,3 +217,32 @@ class TestProjectCard(IntegrationHelper):
             assert card.update("new note content") is True
             card.delete()
             column.delete()
+
+    def test_retrieve_issue_from_content(self):
+        """Verify we can retrieve an issue from a card."""
+        self.token_login()
+        cassette_name = self.cassette_name("retrieve_issue_from_content")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("github3py", "delete_contents")
+            project = repository.project(1177360)
+            column = project.column(1941635)
+            card = column.card(15057578)
+            assert isinstance(
+                card.retrieve_issue_from_content(), github3.issues.issue.Issue
+            )
+
+    def test_retrieve_pull_request_from_content(self):
+        """Verify we can retrieve a pull request from a card."""
+        self.token_login()
+        cassette_name = self.cassette_name(
+            "retrieve_pull_request_from_content"
+        )
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("github3py", "delete_contents")
+            project = repository.project(1177360)
+            column = project.column(1941635)
+            card = column.card(15057575)
+            assert isinstance(
+                card.retrieve_pull_request_from_content(),
+                github3.pulls.PullRequest,
+            )
