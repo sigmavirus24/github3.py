@@ -170,3 +170,7 @@ Contributors
 - Jenny Li (@imjennyli)
 
 - Chandan Singh (@cs-shadow)
+
+- Raphael Vogel (@RaphaelVogel)
+
+- Andreas Burger (@AndreasBurger)
