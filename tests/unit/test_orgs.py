@@ -3,16 +3,21 @@ import mock
 import pytest
 
 from github3 import GitHubError
-from github3.orgs import Organization
+from github3.orgs import Organization, OrganizationHook
 from github3.projects import Project
 
 from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/orgs/github")
+hook_url_for = helper.create_url_helper(
+    "https://api.github.com/orgs/octocat/hooks/1"
+)
 
 get_org_example_data = helper.create_example_data_helper("org_example")
+get_hook_example_data = helper.create_example_data_helper("org_hook_example")
 
 example_data = get_org_example_data()
+hook_example_data = get_hook_example_data()
 
 
 class TestOrganization(helper.UnitHelper):
@@ -87,6 +92,58 @@ class TestOrganization(helper.UnitHelper):
                 "permission": "push",
             },
         )
+
+    def test_create_hook(self):
+        """Show that one can create a hook for an organization."""
+        data = {
+            "name": "web",
+            "config": {
+                "url": "http://example.com/webhook",
+                "content_type": "json",
+            },
+        }
+
+        self.instance.create_hook(**data)
+        self.post_called_with(
+            url_for("hooks"),
+            data={
+                "name": "web",
+                "config": {
+                    "url": "http://example.com/webhook",
+                    "content_type": "json",
+                },
+                "events": ["push"],
+                "active": True,
+            },
+        )
+
+    def test_create_hook_requires_valid_name(self):
+        """Test that the hook has a valid name."""
+        self.instance.create_hook(name="", config="config")
+
+        assert self.session.post.called is False
+
+    def test_create_hook_requires_valid_config(self):
+        """Test that the hook has a valid config."""
+        self.instance.create_hook(name="name", config={})
+
+        assert self.session.post.called is False
+
+    def test_create_hook_requires_valid_name_and_config(self):
+        """Test that the hook has a valid config."""
+        self.instance.create_hook(name="name", config="foo")
+
+        assert self.session.post.called is False
+
+    def test_hook(self):
+        """Verify the request for retrieving a hook on an organization."""
+        self.instance.hook(1)
+        self.session.get.assert_called_once_with(url_for("hooks/1"))
+
+    def test_hook_required_hook(self):
+        """Verify the request for retrieving a hook on an organization."""
+        self.instance.hook(-1)
+        assert self.session.get.called is False
 
     def test_edit(self):
         """Show that one can edit the organization."""
@@ -303,6 +360,21 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         with pytest.raises(GitHubError):
             self.instance.remove_membership()
 
+    def test_create_hook(self):
+        """Verify that creating a hook requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.create_hook("foo", "config")
+
+    def test_get_hook(self):
+        """Verify that retrieving a hook requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.hook(1)
+
+    def test_get_hooks(self):
+        """Verify that retrieving all hooks requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.hooks()
+
 
 class TestOrganizationIterator(helper.UnitIteratorHelper):
     """Test Organization methods that return iterators."""
@@ -460,3 +532,77 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             params={"per_page": 100},
             headers={"Accept": "application/vnd.github.korra-preview"},
         )
+
+    def test_hooks(self):
+        """Test the ability to iterate over hooks of an organization."""
+        i = self.instance.hooks()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for("hooks"), params={"per_page": 100}, headers={}
+        )
+
+
+class TestOrganizationHook(helper.UnitHelper):
+    """Test methods on OrganizationHook class."""
+
+    described_class = OrganizationHook
+    example_data = hook_example_data
+
+    def test_str(self):
+        """Show that instance string is formatted correctly."""
+        assert str(self.instance) == "<OrganizationHook [{0}]>".format(
+            self.instance.name
+        )
+
+    def test_delete(self):
+        """Verify the request for deleting a hook on an organization."""
+        self.instance.delete()
+
+        self.session.delete.assert_called_once_with(hook_url_for())
+
+    def test_edit(self):
+        """Verify the request for editing a hook on an organization."""
+        config = {"url": "https://fake-url.com", "content_type": "json"}
+
+        self.instance.edit(config=config, events=["push"])
+        data = {"config": config, "events": ["push"], "active": True}
+        self.patch_called_with(hook_url_for(), data=data)
+
+    def test_edit_failed(self):
+        """Verify the request for editing a hook on an organization."""
+
+        assert self.instance.edit() is False
+
+    def test_ping(self):
+        """Verify the request for ping a hook on an organization."""
+        self.instance.ping()
+
+        self.post_called_with(hook_url_for("pings"))
+
+
+class TestOrganizationHookRequiresAuth(
+    helper.UnitRequiresAuthenticationHelper
+):
+    """Test methods on OrganizationHook object that require authentication."""
+
+    described_class = OrganizationHook
+    example_data = hook_example_data
+
+    def test_delete(self):
+        """Show that a user must be authenticated
+        to delete a hook on an organization.
+        """
+        self.assert_requires_auth(self.instance.delete)
+
+    def test_edit(self):
+        """Show that a user must be authenticated
+        to edit a hook on an organization.
+        """
+        self.assert_requires_auth(self.instance.edit)
+
+    def test_ping(self):
+        """Show that a user must be authenticated
+        to ping a hook on an organization.
+        """
+        self.assert_requires_auth(self.instance.ping)
