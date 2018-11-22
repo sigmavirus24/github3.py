@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-github3.projects
-=============
-
-This module contains all the classes relating to projects.
-"""
+"""This module contains all the classes relating to projects."""
 from json import dumps
 
+from . import exceptions
 from . import models
+from . import pulls
 from . import users
 from .decorators import requires_auth
+from .issues import issue
 
 
 class Project(models.GitHubCore):
@@ -508,3 +506,59 @@ class ProjectCard(models.GitHubCore):
             self._update_attributes(json)
             return True
         return False
+
+    def retrieve_issue_from_content(self):
+        """Attempt to retrieve an Issue from the content url.
+
+        :returns:
+            The issue that backs up this particular project card if the card
+            has a content_url.
+
+            .. note::
+
+                Cards can be created from Issues and Pull Requests. Pull
+                Requests are also technically Issues so this method is always
+                safe to call.
+        :rtype:
+            :class:`~github3.issues.issue.Issue`
+        :raises:
+            :class:`~github3.exceptions.CardHasNoContentUrl`
+        """
+        if self.content_url is None:
+            raise exceptions.CardHasNoContentUrl(
+                "Card {} has no content_url".format(self.id)
+            )
+        parsed = self._uri_parse(self.content_url)
+        _, owner, repository, _, number = parsed.path[1:].split("/", 5)
+        resp = self._get(
+            self._build_url("repos", owner, repository, "issues", number)
+        )
+        json = self._json(resp, 200)
+        return self._instance_or_null(issue.Issue, json)
+
+    def retrieve_pull_request_from_content(self):
+        """Attempt to retrieve an PullRequest from the content url.
+
+        :returns:
+            The pull request that backs this particular project card if the
+            card has a content_url.
+
+            .. note::
+
+                Cards can be created from Issues and Pull Requests.
+        :rtype:
+            :class:`~github3.issues.issue.Issue`
+        :raises:
+            :class:`~github3.exceptions.CardHasNoContentUrl`
+        """
+        if self.content_url is None:
+            raise exceptions.CardHasNoContentUrl(
+                "Card {} has no content_url".format(self.id)
+            )
+        parsed = self._uri_parse(self.content_url)
+        _, owner, repository, _, number = parsed.path[1:].split("/", 5)
+        resp = self._get(
+            self._build_url("repos", owner, repository, "pulls", number)
+        )
+        json = self._json(resp, 200)
+        return self._instance_or_null(pulls.PullRequest, json)

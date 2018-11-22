@@ -68,6 +68,18 @@ class MissingAppInstallationAuthentication(MissingAppAuthentication):
     pass
 
 
+class CardHasNoContentUrl(GitHubException):
+    """Raised when attempting a card has no ``content_url``.
+
+    We use this in methods to retrieve the underlying issue or pull request
+    based on the ``content_url``.
+
+    .. versionadded:: 1.3.0
+    """
+
+    pass
+
+
 class GitHubError(GitHubException):
     """The base exception class for all response-related exceptions.
 

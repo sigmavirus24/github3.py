@@ -235,10 +235,14 @@ class GitHubCore(object):
             value += "?{}".format(self._uri.query)
         return value
 
+    @staticmethod
+    def _uri_parse(uri):
+        return requests.compat.urlparse(uri)
+
     @_api.setter
     def _api(self, uri):
         if uri:
-            self._uri = requests.compat.urlparse(uri)
+            self._uri = self._uri_parse(uri)
         self.url = uri
 
     def _iter(self, count, url, cls, params=None, etag=None, headers=None):
