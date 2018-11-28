@@ -325,3 +325,106 @@ class TestOrganization(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization("Thunderbird-client", auth_needed=True)
             assert o.remove_membership("AFineOldWine")
+
+    def test_create_hook(self):
+        """Test the ability to create a hook for an organization."""
+        self.token_login()
+        cassette_name = self.cassette_name("create_hook")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("vogelhome", auth_needed=True)
+            data = {
+                "name": "web",
+                "config": {
+                    "url": "http://example.com/webhook",
+                    "content_type": "json",
+                },
+            }
+            hook = o.create_hook(**data)
+            assert isinstance(hook, github3.orgs.OrganizationHook)
+
+    def test_hook(self):
+        """Test the ability to retrieve a hook from an organization."""
+        self.token_login()
+        cassette_name = self.cassette_name("hook")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("vogelhome", auth_needed=True)
+            hook_id = next(o.hooks()).id
+            hook = o.hook(hook_id)
+        assert isinstance(hook, github3.orgs.OrganizationHook)
+
+    def test_hooks(self):
+        """Test that a user can iterate over the hooks of an organization."""
+        self.basic_login()
+        cassette_name = self.cassette_name("hooks")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("vogelhome", auth_needed=True)
+            hooks = list(o.hooks())
+
+        assert len(hooks) > 0
+        for hook in hooks:
+            assert isinstance(hook, github3.orgs.OrganizationHook)
+
+
+class TestOrganizationHook(IntegrationHelper):
+
+    """Integration tests for OrganizationHook object."""
+
+    def test_delete(self):
+        """Test the ability to delete a hook on an organization."""
+        self.token_login()
+        cassette_name = self.cassette_name("delete")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization("vogelhome")
+            hook = o.create_hook(
+                "web",
+                config={
+                    "url": "https://httpbin.org/post",
+                    "content_type": "json",
+                },
+            )
+            deleted = hook.delete()
+
+        assert deleted is True
+
+    def test_edit(self):
+        """Test the ability to edit a hook on an organization."""
+        self.token_login()
+        cassette_name = self.cassette_name("edit")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization("vogelhome")
+            hook = o.create_hook(
+                "web",
+                config={
+                    "url": "https://httpbin.org/post",
+                    "content_type": "json",
+                },
+            )
+            data = {
+                "config": {
+                    "url": "https://requestb.in/15u72q01",
+                    "content_type": "json",
+                },
+                "events": ["pull_request"],
+            }
+            edited = hook.edit(**data)
+            hook.delete()
+
+        assert edited
+
+    def test_ping(self):
+        """Test the ability to ping a hook on an organization."""
+        self.token_login()
+        cassette_name = self.cassette_name("ping")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.gh.organization("vogelhome")
+            hook = o.create_hook(
+                "web",
+                config={
+                    "url": "https://httpbin.org/post",
+                    "content_type": "json",
+                },
+            )
+            pinged = hook.ping()
+            hook.delete()
+
+        assert pinged

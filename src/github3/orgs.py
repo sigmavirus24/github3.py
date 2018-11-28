@@ -572,6 +572,35 @@ class _Organization(models.GitHubCore):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
+    def create_hook(self, name, config, events=["push"], active=True):
+        """Create a hook on this organization.
+
+        :param str name:
+            (required), name of the hook
+        :param dict config:
+            (required), key-value pairs which act as settings for this hook
+        :param list events:
+            (optional), events the hook is triggered for
+        :param bool active:
+            (optional), whether the hook is actually triggered
+        :returns:
+            the created hook
+        :rtype:
+            :class:`~github3.orgs.OrganizationHook`
+        """
+        json = None
+        if name and config and isinstance(config, dict):
+            url = self._build_url("hooks", base_url=self._api)
+            data = {
+                "name": name,
+                "config": config,
+                "events": events,
+                "active": active,
+            }
+            json = self._json(self._post(url, data=data), 201)
+        return OrganizationHook(json, self) if json else None
+
+    @requires_auth
     def create_project(self, name, body=""):
         """Create a project for this organization.
 
@@ -790,6 +819,40 @@ class _Organization(models.GitHubCore):
             self._update_attributes(json)
             return True
         return False
+
+    @requires_auth
+    def hook(self, hook_id):
+        """Get a single hook.
+
+        :param int hook_id:
+            (required), id of the hook
+        :returns:
+            the hook
+        :rtype:
+            :class:`~github3.orgs.OrganizationHook`
+        """
+        json = None
+        if int(hook_id) > 0:
+            url = self._build_url("hooks", str(hook_id), base_url=self._api)
+            json = self._json(self._get(url), 200)
+        return self._instance_or_null(OrganizationHook, json)
+
+    @requires_auth
+    def hooks(self, number=-1, etag=None):
+        """Iterate over hooks registered on this organization.
+
+        :param int number:
+            (optional), number of hoks to return. Default: -1
+            returns all hooks
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of hooks
+        :rtype:
+            :class:`~github3.orgs.OrganizationHook`
+        """
+        url = self._build_url("hooks", base_url=self._api)
+        return self._iter(int(number), url, OrganizationHook, etag=etag)
 
     @requires_auth
     def invite(
@@ -1461,3 +1524,105 @@ class Membership(models.GitHubCore):
             self._update_attributes(json)
             return True
         return False
+
+
+class OrganizationHook(models.GitHubCore):
+    """The representation of a hook on an organization.
+
+    See also: https://developer.github.com/v3/orgs/hooks/
+
+    This object has the following attributes:
+
+    .. attribute:: active
+
+        A boolean attribute describing whether the hook is active or not.
+
+    .. attribute:: config
+
+        A dictionary containing the configuration for this hook.
+
+    .. attribute:: created_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this hook was created.
+
+    .. attribute:: events
+
+        The list of events which trigger this hook.
+
+    .. attribute:: id
+
+        The unique identifier for this hook.
+
+    .. attribute:: name
+
+        The name provided to this hook.
+
+    .. attribute:: updated_at
+
+        A :class:`~datetime.datetime` object representing the date and time
+        when this hook was updated.
+    """
+
+    def _update_attributes(self, hook, session=None):
+        self._api = hook["url"]
+        self.active = hook["active"]
+        self.config = hook["config"]
+        self.created_at = self._strptime(hook["created_at"])
+        self.events = hook["events"]
+        self.id = hook["id"]
+        self.name = hook["name"]
+        self.updated_at = self._strptime(hook["updated_at"])
+
+    def _repr(self):
+        return "<OrganizationHook [{0}]>".format(self.name)
+
+    @requires_auth
+    def delete(self):
+        """Delete this hook.
+
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        return self._boolean(self._delete(self._api), 204, 404)
+
+    @requires_auth
+    def edit(self, config={}, events=[], active=True):
+        """Edit this hook.
+
+        :param dict config:
+            (required), key-value pairs which act as settings for this hook
+        :param list events:
+            (optional), which events should this be triggered for
+        :param bool active:
+            (optional), should this event be active
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        data = {"config": config, "active": active}
+        if events:
+            data["events"] = events
+
+        json = self._json(self._patch(self._api, data=dumps(data)), 200)
+
+        if json:
+            self._update_attributes(json)
+            return True
+
+        return False
+
+    @requires_auth
+    def ping(self):
+        """Ping this hook.
+
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("pings", base_url=self._api)
+        return self._boolean(self._post(url), 204, 404)
