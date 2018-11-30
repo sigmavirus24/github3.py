@@ -885,10 +885,21 @@ class AuthenticatedUser(User):
 
     def _update_attributes(self, user):
         super(AuthenticatedUser, self)._update_attributes(user)
-        self.disk_usage = user["disk_usage"]
-        self.owned_private_repos_count = user["owned_private_repos"]
-        self.total_private_repos_count = user["total_private_repos"]
-        self.plan = user.get("plan")
+        user_can_be_see = {
+            "disk_usage": None,
+            "owned_private_repos_count": None,
+            "total_private_repos_count": None,
+            "plan": None,
+        }
+        user_can_be_see.update(user)
+        self.disk_usage = user_can_be_see["disk_usage"]
+        self.owned_private_repos_count = user_can_be_see[
+            "owned_private_repos_count"
+        ]
+        self.total_private_repos_count = user_can_be_see[
+            "total_private_repos_count"
+        ]
+        self.plan = user_can_be_see.get("plan")
         if self.plan is not None:
             self.plan = Plan(self.plan, self)
 

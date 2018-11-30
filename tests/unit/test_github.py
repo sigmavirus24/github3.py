@@ -1580,6 +1580,7 @@ class TestGitHubIssue797(helper.UnitHelper):
     def test_issue_797(self):
         """user auth without user scope"""
         import mock
+
         without_user_scope_json = {
             "login": "hogehoge",
             "id": 1,
@@ -1611,7 +1612,18 @@ class TestGitHubIssue797(helper.UnitHelper):
             "followers": 20,
             "following": 0,
             "created_at": "2018-11-30T09:25:26Z",
-            "updated_at": "2018-11-30T09:38:56Z"
+            "updated_at": "2018-11-30T09:38:56Z",
         }
-        self.session.get.return_value = mock.Mock(status_code=200, json=lambda: without_user_scope_json)
-        self.instance.me()
+        self.session.get.return_value = mock.Mock(
+            status_code=200, json=lambda: without_user_scope_json
+        )
+        user = self.instance.me()
+        self.assertEqual(
+            [
+                user.disk_usage,
+                user.owned_private_repos_count,
+                user.total_private_repos_count,
+                user.plan,
+            ],
+            [None, None, None, None],
+        )
