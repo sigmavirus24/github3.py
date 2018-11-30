@@ -176,3 +176,6 @@ Contributors
 - Andreas Burger (@AndreasBurger)
 
 - James E. Blair (@jeblair)
+
+- Tatsuya Matoba (@mtb-beta)
+
