@@ -1572,3 +1572,46 @@ class TestGitHubStatus(helper.UnitHelper):
         with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
             self.instance.status()
             _recipe.assert_called_once_with("api", "status.json")
+
+
+class TestGitHubIssue797(helper.UnitHelper):
+    described_class = GitHub
+
+    def test_issue_797(self):
+        """user auth without user scope"""
+        import mock
+        without_user_scope_json = {
+            "login": "hogehoge",
+            "id": 1,
+            "node_id": "xxxxxxxx",
+            "avatar_url": "https://github.com/images/error/hogehoge.gif",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/hogehoge",
+            "html_url": "https://github.com/hogehoge",
+            "followers_url": "https://api.github.com/users/hogehoge/followers",
+            "following_url": "https://api.github.com/users/hogehoge/following{/other_user}",
+            "gists_url": "https://api.github.com/users/hogehoge/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/hogehoge/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/hogehoge/subscriptions",
+            "organizations_url": "https://api.github.com/users/hogehoge/orgs",
+            "repos_url": "https://api.github.com/users/hogehoge/repos",
+            "events_url": "https://api.github.com/users/hogehoge/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/hogehoge/received_events",
+            "type": "User",
+            "site_admin": False,
+            "name": "fugafuga hogehoge",
+            "company": "GitHub",
+            "blog": "https://example.com/blog",
+            "location": "Tokyo",
+            "email": "hogehoge@example.com",
+            "hireable": False,
+            "bio": "There once was...",
+            "public_repos": 2,
+            "public_gists": 1,
+            "followers": 20,
+            "following": 0,
+            "created_at": "2018-11-30T09:25:26Z",
+            "updated_at": "2018-11-30T09:38:56Z"
+        }
+        self.session.get.return_value = mock.Mock(status_code=200, json=lambda: without_user_scope_json)
+        self.instance.me()
