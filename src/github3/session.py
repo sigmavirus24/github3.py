@@ -64,7 +64,28 @@ class TokenAuth(requests.auth.AuthBase):
 
 
 class GitHubSession(requests.Session):
-    """Our slightly specialized Session object."""
+    """Our slightly specialized Session object.
+
+    Normally this is created automatically by
+    :class:`~github3.github.GitHub`.  To use alternate values for
+    network timeouts, this class can be instantiated directly and
+    passed to the GitHub object.  For example:
+
+    .. code-block:: python
+
+       gh = github.GitHub(session=session.GitHubSession(
+           default_connect_timeout=T, default_read_timeout=N))
+
+    :param default_connect_timeout:
+       the number of seconds to wait when establishing a connection to
+       GitHub
+    :type default_connect_timeout:
+       float
+    :param default_read_timeout:
+       the number of seconds to wait for a response from GitHub
+    :type default_read_timeout:
+       float
+    """
 
     auth = None
     __attrs__ = requests.Session.__attrs__ + [
@@ -72,9 +93,11 @@ class GitHubSession(requests.Session):
         "two_factor_auth_cb",
     ]
 
-    def __init__(self):
+    def __init__(self, default_connect_timeout=4, default_read_timeout=1):
         """Slightly modify how we initialize our session."""
         super(GitHubSession, self).__init__()
+        self.default_connect_timeout = default_connect_timeout
+        self.default_read_timeout = default_read_timeout
         self.headers.update(
             {
                 # Only accept JSON responses
@@ -90,6 +113,11 @@ class GitHubSession(requests.Session):
         self.base_url = "https://api.github.com"
         self.two_factor_auth_cb = None
         self.request_counter = 0
+
+    @property
+    def timeout(self):
+        """Return the timeout tuple as expected by Requests"""
+        return (self.default_connect_timeout, self.default_read_timeout)
 
     def basic_auth(self, username, password):
         """Set the Basic Auth credentials on this Session.
@@ -137,6 +165,7 @@ class GitHubSession(requests.Session):
 
     def request(self, *args, **kwargs):
         """Make a request, count it, and handle 2FA if necessary."""
+        kwargs.setdefault('timeout', self.timeout)
         response = super(GitHubSession, self).request(*args, **kwargs)
         self.request_counter += 1
         if requires_2fa(response) and self.two_factor_auth_cb:
