@@ -1590,14 +1590,20 @@ class TestGitHubIssue797(helper.UnitHelper):
             "url": "https://api.github.com/users/hogehoge",
             "html_url": "https://github.com/hogehoge",
             "followers_url": "https://api.github.com/users/hogehoge/followers",
-            "following_url": "https://api.github.com/users/hogehoge/following{/other_user}",
-            "gists_url": "https://api.github.com/users/hogehoge/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/hogehoge/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/hogehoge/subscriptions",
+            "following_url":
+                "https://api.github.com/users/hogehoge/following{/other_user}",
+            "gists_url":
+                "https://api.github.com/users/hogehoge/gists{/gist_id}",
+            "starred_url":
+                "https://api.github.com/users/hogehoge/starred{/owner}{/repo}",
+            "subscriptions_url":
+                "https://api.github.com/users/hogehoge/subscriptions",
             "organizations_url": "https://api.github.com/users/hogehoge/orgs",
             "repos_url": "https://api.github.com/users/hogehoge/repos",
-            "events_url": "https://api.github.com/users/hogehoge/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/hogehoge/received_events",
+            "events_url":
+                "https://api.github.com/users/hogehoge/events{/privacy}",
+            "received_events_url":
+                "https://api.github.com/users/hogehoge/received_events",
             "type": "User",
             "site_admin": False,
             "name": "fugafuga hogehoge",
