@@ -54,6 +54,8 @@ class GitHubCore(object):
 
     def __getattr__(self, attribute):
         """Proxy access to stored JSON."""
+        if attribute == '_json_data':
+            raise AttributeError(attribute)
         if attribute not in self._json_data:
             raise AttributeError(attribute)
         value = self._json_data.get(attribute)
