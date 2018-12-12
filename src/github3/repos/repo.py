@@ -415,7 +415,7 @@ class _Repository(models.GitHubCore):
             (optional), GitHub login, real name, or email to
             filter commits by (using commit author)
         :param int number:
-            (optional), number of comments to return. Default:
+            (optional), number of commits to return. Default:
             -1 returns all comments
         :param str etag:
             (optional), ETag from a previous request to the same endpoint
