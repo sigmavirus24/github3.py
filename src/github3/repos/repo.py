@@ -2423,12 +2423,6 @@ class _Repository(models.GitHubCore):
 
         This replaces ``Repository#set_subscription``
 
-        :param bool subscribed:
-            (required), determines if notifications should
-            be received from this repository.
-        :param bool ignored:
-            (required), determines if notifications should be
-            ignored from this repository.
         :returns:
             the new repository subscription
         :rtype:
@@ -2436,8 +2430,7 @@ class _Repository(models.GitHubCore):
         """
         url = self._build_url("subscription", base_url=self._api)
         json = self._json(
-            self._put(url, data=jsonlib.dumps({"subcribed": True})), 200
-        )
+            self._put(url, data=jsonlib.dumps({"subscribed": True})), 200)
         return self._instance_or_null(
             notifications.RepositorySubscription, json
         )
@@ -2556,6 +2549,47 @@ class _Repository(models.GitHubCore):
             params = {"recursive": 1} if recursive else None
             json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(git.Tree, json)
+
+    @requires_auth
+    def unignore(self):
+        """Unignore notifications from this repository for the user.
+
+        .. versionadded:: 1.3
+
+        This replaces ``Repository#set_subscription``.
+
+        :returns:
+            the new repository subscription
+        :rtype:
+            :class:~github3.notifications.RepositorySubscription`
+        """
+        url = self._build_url("subscription", base_url=self._api)
+        json = self._json(
+            self._put(url, data=jsonlib.dumps({"ignored": False})), 200
+        )
+        return self._instance_or_null(
+            notifications.RepositorySubscription, json
+        )
+
+    @requires_auth
+    def unsubscribe(self):
+        """Unsubscribe the user to this repository's notifications.
+
+        .. versionadded:: 1.3
+
+        This replaces ``Repository#set_subscription``
+
+        :returns:
+            the new repository subscription
+        :rtype:
+            :class:`~github3.notifications.RepositorySubscription`
+        """
+        url = self._build_url("subscription", base_url=self._api)
+        json = self._json(
+            self._put(url, data=jsonlib.dumps({"subscribed": False})), 200)
+        return self._instance_or_null(
+            notifications.RepositorySubscription, json
+        )
 
     def weekly_commit_count(self):
         """Retrieve the total commit counts.
