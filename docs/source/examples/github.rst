@@ -176,3 +176,23 @@ This is the same as::
     me = g.me() # or me = g.user(your_user_name)
     if me.update(new_name, blog, company, bio=bio):
         print('Profile updated.')
+
+
+Logging in as an Application, or Application Installation
+---------------------------------------------------------
+
+To login as an application you only need the app_id and private key. 
+
+::
+    # start with anonymous GitHub object
+    gh = github3.GitHub()
+    
+    # login as application, and access installations
+	gh.login_as_app(private_key_pem=key_file_pem, app_id=app_identifier)
+    gh.app_installations()
+    
+	# OR login as application installation, and access permissable resources
+	gh.login_as_app_installation(private_key_pem=key_file_pem, app_id=app_identifier, installation_id=install_id)
+    access_token = gh.session.auth.token
+    
+See the GitHub Apps API for more information.
