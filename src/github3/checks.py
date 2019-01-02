@@ -39,14 +39,14 @@ class CheckPullRequest(models.GitHubCore):
     """
 
     def _update_attributes(self, pull):
-        self.id = pull['id']
-        self.number = pull['number']
-        self.base = pull['base']
-        self.head = pull['head']
-        self._api = self.url = pull['url']
+        self.id = pull["id"]
+        self.number = pull["number"]
+        self.base = pull["base"]
+        self.head = pull["head"]
+        self._api = self.url = pull["url"]
 
     def _repr(self):
-        return '<CheckPullRequest [#{0}]>'.format(self.number)
+        return "<CheckPullRequest [#{0}]>".format(self.number)
 
     def to_pull(self):
         """Retrieve a full PullRequest object for this CheckPullRequest.
@@ -57,6 +57,7 @@ class CheckPullRequest(models.GitHubCore):
             :class:`~github3.pulls.PullRequest`
         """
         from . import pulls
+
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(pulls.PullRequest, json)
 
@@ -103,16 +104,17 @@ class CheckApp(models.GitHubCore):
     """
 
     def _update_attributes(self, app):
-        self.description = app['description']
-        self.external_url = app['external_url']
-        self.html_url = app['html_url']
-        self.id = app['id']
-        self.name = app['name']
-        self.owner = app['owner']
+        self.description = app["description"]
+        self.external_url = app["external_url"]
+        self.html_url = app["html_url"]
+        self.id = app["id"]
+        self.name = app["name"]
+        self.owner = app["owner"]
 
     def _repr(self):
-        return '<App ["{}" by {}]>'.format(self.name,
-                                           str(self.owner['login']))
+        return '<App ["{}" by {}]>'.format(
+            self.name, str(self.owner["login"])
+        )
 
     def to_app(self):
         """Retrieve a full App object for this CheckApp.
@@ -123,6 +125,7 @@ class CheckApp(models.GitHubCore):
             :class:`~github3.apps.App`
         """
         from . import apps
+
         json = self._json(self._get(self.url), 200)
         return self._instance_or_null(apps.App, json)
 
@@ -189,31 +192,30 @@ class CheckSuite(models.GitHubCore):
         http://developer.github.com/v3/checks/suites/
     """
 
-    class_name = 'CheckSuite'
-    CUSTOM_HEADERS = {
-        'Accept': 'application/vnd.github.antiope-preview+json'
-    }
+    class_name = "CheckSuite"
+    CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def _update_attributes(self, suite):
         # Import here, because a toplevel import causes an import loop
         from . import repos
-        self._api = suite['url']
-        self.status = suite['status']
-        self.conclusion = suite['conclusion']
-        self.head_branch = suite['head_branch']
-        self.head_sha = suite['head_sha']
-        self.before = suite['before']
-        self.after = suite['after']
-        prs = suite.get('pull_requests', [])
+
+        self._api = suite["url"]
+        self.status = suite["status"]
+        self.conclusion = suite["conclusion"]
+        self.head_branch = suite["head_branch"]
+        self.head_sha = suite["head_sha"]
+        self.before = suite["before"]
+        self.after = suite["after"]
+        prs = suite.get("pull_requests", [])
         self.origional_pull_requests = [
             CheckPullRequest(p, self) for p in prs
         ]
-        self.repository = repos.ShortRepository(suite['repository'], self)
-        self.id = suite['id']
-        self.app = CheckApp(suite['app'], self)
+        self.repository = repos.ShortRepository(suite["repository"], self)
+        self.id = suite["id"]
+        self.app = CheckApp(suite["app"], self)
 
     def _repr(self):
-        return '<{s.class_name} [{s.id}:{s.status}]>'.format(s=self)
+        return "<{s.class_name} [{s.id}:{s.status}]>".format(s=self)
 
     @decorators.requires_app_installation_auth
     def rerequest(self):
@@ -224,9 +226,10 @@ class CheckSuite(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('rerequest', base_url=self._api)
-        return self._boolean(self._post(
-            url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404)
+        url = self._build_url("rerequest", base_url=self._api)
+        return self._boolean(
+            self._post(url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404
+        )
 
     @decorators.requires_app_installation_auth
     def check_runs(self):
@@ -237,9 +240,10 @@ class CheckSuite(models.GitHubCore):
         :rtype:
             :class:`~github3.checks.CheckRun`
         """
-        url = self._build_url('check-runs', base_url=self._api)
-        return self._iter(-1, url, CheckRun,
-                          headers=CheckSuite.CUSTOM_HEADERS)
+        url = self._build_url("check-runs", base_url=self._api)
+        return self._iter(
+            -1, url, CheckRun, headers=CheckSuite.CUSTOM_HEADERS
+        )
 
 
 class CheckRun(models.GitHubCore):
@@ -317,38 +321,45 @@ class CheckRun(models.GitHubCore):
         http://developer.github.com/v3/checks/runs/
     """
 
-    class_name = 'CheckRun'
-    CUSTOM_HEADERS = {
-        'Accept': 'application/vnd.github.antiope-preview+json'
-    }
+    class_name = "CheckRun"
+    CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def _update_attributes(self, run):
-        self._api = run['url']
-        self.html_url = run['html_url']
-        self.status = run['status']
-        self.conclusion = run['conclusion']
-        self.started_at = self._strptime(run['started_at'])
-        self.completed_at = self._strptime(run['completed_at'])
-        self.head_sha = run['head_sha']
-        self.name = run['name']
-        prs = run.get('pull_requests', [])
+        self._api = run["url"]
+        self.html_url = run["html_url"]
+        self.status = run["status"]
+        self.conclusion = run["conclusion"]
+        self.started_at = self._strptime(run["started_at"])
+        self.completed_at = self._strptime(run["completed_at"])
+        self.head_sha = run["head_sha"]
+        self.name = run["name"]
+        prs = run.get("pull_requests", [])
         self.origional_pull_requests = [
             CheckPullRequest(p, self) for p in prs
         ]
-        self.id = run['id']
-        self.external_id = run['external_id']
-        self.app = CheckApp(run['app'], self)
-        self.check_suite = run['check_suite']['id']
+        self.id = run["id"]
+        self.external_id = run["external_id"]
+        self.app = CheckApp(run["app"], self)
+        self.check_suite = run["check_suite"]["id"]
         # self.output = CheckRunOutput(run['output'], self)
-        self.output = run['output']  # TODO: turn into an object
+        self.output = run["output"]  # TODO: turn into an object
 
     def _repr(self):
-        return '<{s.class_name} [{s.name}:{s.status}]>'.format(s=self)
+        return "<{s.class_name} [{s.name}:{s.status}]>".format(s=self)
 
     @decorators.requires_app_installation_auth
-    def update(self, name=None, details_url=None, external_id=None,
-               started_at=None, status=None, conclusion=None,
-               completed_at=None, output=None, actions=None):
+    def update(
+        self,
+        name=None,
+        details_url=None,
+        external_id=None,
+        started_at=None,
+        status=None,
+        conclusion=None,
+        completed_at=None,
+        output=None,
+        actions=None,
+    ):
         """Update this check run.
 
         All parameters are optional.
@@ -385,17 +396,28 @@ class CheckRun(models.GitHubCore):
             bool
         """
         # TODO: Clean output dict, actions array. Need a deep recursive clean
-        data = {'name': name, 'details_url': details_url, 'external_id':
-                external_id, 'started_at': started_at, 'status': status,
-                'conclusion': conclusion, 'completed_at': completed_at,
-                'output': output, 'actions': actions}
+        data = {
+            "name": name,
+            "details_url": details_url,
+            "external_id": external_id,
+            "started_at": started_at,
+            "status": status,
+            "conclusion": conclusion,
+            "completed_at": completed_at,
+            "output": output,
+            "actions": actions,
+        }
         self._remove_none(data)
         json = None
 
         if data:
-            json = self._json(self._patch(
-                self._api, data=dumps(data),
-                headers=CheckSuite.CUSTOM_HEADERS), 200
+            json = self._json(
+                self._patch(
+                    self._api,
+                    data=dumps(data),
+                    headers=CheckSuite.CUSTOM_HEADERS,
+                ),
+                200,
             )
         if json:
             self._update_attributes(json)
@@ -411,6 +433,7 @@ class CheckRun(models.GitHubCore):
         :rtype:
             bool
         """
-        url = self._build_url('rerequest', base_url=self._api)
-        return self._boolean(self._post(
-            url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404)
+        url = self._build_url("rerequest", base_url=self._api)
+        return self._boolean(
+            self._post(url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404
+        )

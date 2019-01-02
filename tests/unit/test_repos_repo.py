@@ -1379,38 +1379,24 @@ class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
     def test_check_run(self):
         """Verify the request for retrieving a check run on a repository."""
         self.instance.check_run(1)
-        self.session.get.assert_called_once_with(
-            url_for('check-runs/1')
-        )
+        self.session.get.assert_called_once_with(url_for("check-runs/1"))
 
     def test_check_suite(self):
         """Verify the request for retrieving a check run on a repository."""
         self.instance.check_suite(1)
-        self.session.get.assert_called_once_with(
-            url_for('check-suites/1')
-        )
+        self.session.get.assert_called_once_with(url_for("check-suites/1"))
 
     def test_create_check_run(self):
         """Verify the request for creating a check run on a suite."""
-        data = {
-            'name': 'testcheck',
-        }
-        self.instance.create_check_run(head_sha='fake-sha', **data)
-        self.post_called_with(
-            url_for('check-runs'),
-            data=data
-        )
+        data = {"name": "testcheck"}
+        self.instance.create_check_run(head_sha="fake-sha", **data)
+        self.post_called_with(url_for("check-runs"), data=data)
 
     def test_create_check_suite(self):
         """Verify the request for creating a check suite on a commit."""
-        data = {
-            'head_sha': 'fake-sha',
-        }
+        data = {"head_sha": "fake-sha"}
         self.instance.create_check_suite(**data)
-        self.post_called_with(
-            url_for('check-suites'),
-            data=data
-        )
+        self.post_called_with(url_for("check-suites"), data=data)
 
 
 class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
@@ -1428,13 +1414,14 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def test_create_check_run(self):
         """Verify the request for creating a check run on a suite."""
         with pytest.raises(GitHubException):
-            self.instance.create_check_run(head_sha='fake-sha',
-                                           name='testcheck')
+            self.instance.create_check_run(
+                head_sha="fake-sha", name="testcheck"
+            )
 
     def test_create_check_suite(self):
         """Verify the request for creating a check run on a suite."""
         with pytest.raises(GitHubException):
-            self.instance.create_check_suite(head_sha='fake-sha')
+            self.instance.create_check_suite(head_sha="fake-sha")
 
     def test_create_ref(self):
         """Verify that creating a tag requires authentication."""

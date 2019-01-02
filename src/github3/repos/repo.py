@@ -278,8 +278,7 @@ class _Repository(models.GitHubCore):
         """
         data = None
         if int(id) > 0:
-            url = self._build_url('check-runs', str(id),
-                                  base_url=self._api)
+            url = self._build_url("check-runs", str(id), base_url=self._api)
             data = self._json(self._get(url), 200)
         return self._instance_or_null(checks.CheckRun, data)
 
@@ -298,8 +297,7 @@ class _Repository(models.GitHubCore):
         """
         data = None
         if int(id) > 0:
-            url = self._build_url('check-suites', str(id),
-                                  base_url=self._api)
+            url = self._build_url("check-suites", str(id), base_url=self._api)
             data = self._json(self._get(url), 200)
         return self._instance_or_null(checks.CheckSuite, data)
 
@@ -558,10 +556,19 @@ class _Repository(models.GitHubCore):
         return self._iter(int(number), url, users.Contributor, params, etag)
 
     @decorators.requires_app_installation_auth
-    def create_check_run(self, name, head_sha, details_url=None,
-                         external_id=None, started_at=None, status=None,
-                         conclusion=None, completed_at=None, output=None,
-                         actions=None):
+    def create_check_run(
+        self,
+        name,
+        head_sha,
+        details_url=None,
+        external_id=None,
+        started_at=None,
+        status=None,
+        conclusion=None,
+        completed_at=None,
+        output=None,
+        actions=None,
+    ):
         """Create a check run object on a commit
 
         .. versionadded:: 1.3.0
@@ -602,12 +609,19 @@ class _Repository(models.GitHubCore):
         json = None
         # TODO: Cleanse output dict, actions array
         if name and head_sha:
-            data = {'name': name, 'details_url': details_url, 'external_id':
-                    external_id, 'started_at': started_at, 'status': status,
-                    'conclusion': conclusion, 'completed_at': completed_at,
-                    'output': output, 'actions': actions}
+            data = {
+                "name": name,
+                "details_url": details_url,
+                "external_id": external_id,
+                "started_at": started_at,
+                "status": status,
+                "conclusion": conclusion,
+                "completed_at": completed_at,
+                "output": output,
+                "actions": actions,
+            }
             self._remove_none(data)
-            url = self._build_url('check-runs', base_url=self._api)
+            url = self._build_url("check-runs", base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(checks.CheckRun, json)
 
@@ -626,9 +640,9 @@ class _Repository(models.GitHubCore):
         """
         json = None
         if head_sha:
-            data = {'head_sha': head_sha}
+            data = {"head_sha": head_sha}
             self._remove_none(data)
-            url = self._build_url('check-suites', base_url=self._api)
+            url = self._build_url("check-suites", base_url=self._api)
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(checks.CheckSuite, json)
 
@@ -2545,7 +2559,8 @@ class _Repository(models.GitHubCore):
         """
         url = self._build_url("subscription", base_url=self._api)
         json = self._json(
-            self._put(url, data=jsonlib.dumps({"subscribed": True})), 200)
+            self._put(url, data=jsonlib.dumps({"subscribed": True})), 200
+        )
         return self._instance_or_null(
             notifications.RepositorySubscription, json
         )
@@ -2701,7 +2716,8 @@ class _Repository(models.GitHubCore):
         """
         url = self._build_url("subscription", base_url=self._api)
         json = self._json(
-            self._put(url, data=jsonlib.dumps({"subscribed": False})), 200)
+            self._put(url, data=jsonlib.dumps({"subscribed": False})), 200
+        )
         return self._instance_or_null(
             notifications.RepositorySubscription, json
         )

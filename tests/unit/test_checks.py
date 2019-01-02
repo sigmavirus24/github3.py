@@ -7,16 +7,18 @@ import github3
 from github3.checks import CheckRun, CheckSuite
 from github3.exceptions import GitHubException
 
-from .helper import (UnitAppInstallHelper, UnitRequiresAuthenticationHelper,
-                     UnitIteratorAppInstHelper, create_url_helper,
-                     create_example_data_helper)
-
-url_for = create_url_helper(
-    'https://api.github.com/repos/github/hello-world'
+from .helper import (
+    UnitAppInstallHelper,
+    UnitRequiresAuthenticationHelper,
+    UnitIteratorAppInstHelper,
+    create_url_helper,
+    create_example_data_helper,
 )
 
-check_run_example_data = create_example_data_helper('check_run_example')
-check_suite_example_data = create_example_data_helper('check_suite_example')
+url_for = create_url_helper("https://api.github.com/repos/github/hello-world")
+
+check_run_example_data = create_example_data_helper("check_run_example")
+check_suite_example_data = create_example_data_helper("check_suite_example")
 
 
 class TestCheckRun(UnitAppInstallHelper):
@@ -26,13 +28,13 @@ class TestCheckRun(UnitAppInstallHelper):
     def test_update(self):
         """Show that a check run can be updated"""
 
-        data = {'name': 'newname'}
+        data = {"name": "newname"}
         self.instance.update(**data)
 
         self.session.patch.assert_called_once_with(
-            url_for('check-runs/4'),
+            url_for("check-runs/4"),
             dumps(data),
-            headers=CheckRun.CUSTOM_HEADERS
+            headers=CheckRun.CUSTOM_HEADERS,
         )
 
     def test_rerequest(self):
@@ -40,22 +42,19 @@ class TestCheckRun(UnitAppInstallHelper):
 
         self.instance.rerequest()
         self.session.post.assert_called_once_with(
-            url_for('check-runs/4/rerequest'),
+            url_for("check-runs/4/rerequest"),
             None,
-            headers=CheckRun.CUSTOM_HEADERS
+            headers=CheckRun.CUSTOM_HEADERS,
         )
 
     def test_check_run_types(self):
         """Check that we get the right types"""
 
-        assert isinstance(
-            self.instance.app,
-            github3.checks.CheckApp
-        )
+        assert isinstance(self.instance.app, github3.checks.CheckApp)
 
         assert isinstance(
             self.instance.origional_pull_requests[0],
-            github3.checks.CheckPullRequest
+            github3.checks.CheckPullRequest,
         )
 
 
@@ -66,7 +65,7 @@ class TestCheckRunRequiresAuth(UnitRequiresAuthenticationHelper):
     def test_update_requires_auth(self):
         """Show updating a run requires auth"""
         with pytest.raises(GitHubException):
-            self.instance.update(name='newname')
+            self.instance.update(name="newname")
 
     def test_rerequest_requires_auth(self):
         """Show rerequesting a run requires auth"""
@@ -83,22 +82,18 @@ class TestCheckSuite(UnitAppInstallHelper):
 
         self.instance.rerequest()
         self.session.post.assert_called_once_with(
-            url_for('check-suites/5/rerequest'),
+            url_for("check-suites/5/rerequest"),
             None,
-            headers=CheckSuite.CUSTOM_HEADERS
+            headers=CheckSuite.CUSTOM_HEADERS,
         )
 
     def test_check_suite_types(self):
         """Check that we get the right types"""
 
-        assert isinstance(
-            self.instance.app,
-            github3.checks.CheckApp
-        )
+        assert isinstance(self.instance.app, github3.checks.CheckApp)
 
         assert isinstance(
-            self.instance.repository,
-            github3.repos.ShortRepository
+            self.instance.repository, github3.repos.ShortRepository
         )
 
 
@@ -111,9 +106,9 @@ class TestCheckSuiteIteratorAppInstAuth(UnitIteratorAppInstHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for('check-suites/5/check-runs'),
-            params={'per_page': 100},
-            headers=CheckSuite.CUSTOM_HEADERS
+            url_for("check-suites/5/check-runs"),
+            params={"per_page": 100},
+            headers=CheckSuite.CUSTOM_HEADERS,
         )
 
 

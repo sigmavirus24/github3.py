@@ -47,9 +47,10 @@ class _RepoCommit(models.GitHubCore):
         :rtype:
             :class:`~github3.checks.CheckRun`
         """
-        url = self._build_url('check-runs', base_url=self._api)
-        return self._iter(-1, url, checks.CheckRun,
-                          headers=checks.CheckRun.CUSTOM_HEADERS)
+        url = self._build_url("check-runs", base_url=self._api)
+        return self._iter(
+            -1, url, checks.CheckRun, headers=checks.CheckRun.CUSTOM_HEADERS
+        )
 
     @decorators.requires_app_installation_auth
     def check_suites(self):
@@ -62,9 +63,13 @@ class _RepoCommit(models.GitHubCore):
         :rtype:
             :class:`~github3.checks.CheckSuite`
         """
-        url = self._build_url('check-suites', base_url=self._api)
-        return self._iter(-1, url, checks.CheckSuite,
-                          headers=checks.CheckSuite.CUSTOM_HEADERS)
+        url = self._build_url("check-suites", base_url=self._api)
+        return self._iter(
+            -1,
+            url,
+            checks.CheckSuite,
+            headers=checks.CheckSuite.CUSTOM_HEADERS,
+        )
 
     def diff(self):
         """Retrieve the diff for this commit.
