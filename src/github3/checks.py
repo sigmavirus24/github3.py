@@ -170,7 +170,7 @@ class CheckSuite(models.GitHubCore):
         A representation of the repository the suite belongs to as
         :class:`~github3.repos.repo.ShortRepository`.
 
-    .. attribute:: origional_pull_requests
+    .. attribute:: original_pull_requests
 
         A list of representations of the pull requests the suite belongs to as
         :class:`~github3.checks.CheckPullRequest`.
@@ -207,9 +207,7 @@ class CheckSuite(models.GitHubCore):
         self.before = suite["before"]
         self.after = suite["after"]
         prs = suite.get("pull_requests", [])
-        self.origional_pull_requests = [
-            CheckPullRequest(p, self) for p in prs
-        ]
+        self.original_pull_requests = [CheckPullRequest(p, self) for p in prs]
         self.repository = repos.ShortRepository(suite["repository"], self)
         self.id = suite["id"]
         self.app = CheckApp(suite["app"], self)
@@ -281,7 +279,7 @@ class CheckRun(models.GitHubCore):
         when this check run completed. If this run is not completed it will
         be ``None``.
 
-    .. attribute:: origional_pull_requests
+    .. attribute:: original_pull_requests
 
         A list of representations of the pull requests the run belongs to as
         :class:`~github3.checks.CheckPullRequest`.
@@ -334,9 +332,7 @@ class CheckRun(models.GitHubCore):
         self.head_sha = run["head_sha"]
         self.name = run["name"]
         prs = run.get("pull_requests", [])
-        self.origional_pull_requests = [
-            CheckPullRequest(p, self) for p in prs
-        ]
+        self.original_pull_requests = [CheckPullRequest(p, self) for p in prs]
         self.id = run["id"]
         self.external_id = run["external_id"]
         self.app = CheckApp(run["app"], self)
