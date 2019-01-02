@@ -279,7 +279,9 @@ class _Repository(models.GitHubCore):
         data = None
         if int(id) > 0:
             url = self._build_url("check-runs", str(id), base_url=self._api)
-            data = self._json(self._get(url), 200)
+            data = self._json(
+                self._get(url, headers=checks.CheckRun.CUSTOM_HEADERS), 200
+            )
         return self._instance_or_null(checks.CheckRun, data)
 
     @decorators.requires_app_installation_auth
@@ -298,7 +300,9 @@ class _Repository(models.GitHubCore):
         data = None
         if int(id) > 0:
             url = self._build_url("check-suites", str(id), base_url=self._api)
-            data = self._json(self._get(url), 200)
+            data = self._json(
+                self._get(url, headers=checks.CheckSuite.CUSTOM_HEADERS), 200
+            )
         return self._instance_or_null(checks.CheckSuite, data)
 
     def code_frequency(self, number=-1, etag=None):
@@ -622,7 +626,12 @@ class _Repository(models.GitHubCore):
             }
             self._remove_none(data)
             url = self._build_url("check-runs", base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            json = self._json(
+                self._post(
+                    url, headers=checks.CheckRun.CUSTOM_HEADERS, data=data
+                ),
+                201,
+            )
         return self._instance_or_null(checks.CheckRun, json)
 
     @decorators.requires_app_installation_auth
@@ -643,7 +652,12 @@ class _Repository(models.GitHubCore):
             data = {"head_sha": head_sha}
             self._remove_none(data)
             url = self._build_url("check-suites", base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            json = self._json(
+                self._post(
+                    url, data=data, headers=checks.CheckSuite.CUSTOM_HEADERS
+                ),
+                201,
+            )
         return self._instance_or_null(checks.CheckSuite, json)
 
     @decorators.requires_auth

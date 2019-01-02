@@ -1375,28 +1375,37 @@ class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
 
     described_class = Repository
     example_data = repo_example_data
+    preview_header = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def test_check_run(self):
         """Verify the request for retrieving a check run on a repository."""
         self.instance.check_run(1)
-        self.session.get.assert_called_once_with(url_for("check-runs/1"))
+        self.session.get.assert_called_once_with(
+            url_for("check-runs/1"), headers=self.preview_header
+        )
 
     def test_check_suite(self):
         """Verify the request for retrieving a check run on a repository."""
         self.instance.check_suite(1)
-        self.session.get.assert_called_once_with(url_for("check-suites/1"))
+        self.session.get.assert_called_once_with(
+            url_for("check-suites/1"), headers=self.preview_header
+        )
 
     def test_create_check_run(self):
         """Verify the request for creating a check run on a suite."""
         data = {"name": "testcheck"}
         self.instance.create_check_run(head_sha="fake-sha", **data)
-        self.post_called_with(url_for("check-runs"), data=data)
+        self.post_called_with(
+            url_for("check-runs"), data=data, headers=self.preview_header
+        )
 
     def test_create_check_suite(self):
         """Verify the request for creating a check suite on a commit."""
         data = {"head_sha": "fake-sha"}
         self.instance.create_check_suite(**data)
-        self.post_called_with(url_for("check-suites"), data=data)
+        self.post_called_with(
+            url_for("check-suites"), data=data, headers=self.preview_header
+        )
 
 
 class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
