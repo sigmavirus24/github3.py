@@ -112,7 +112,12 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
         return next(self.__i__)
 
     def _get_json(self, response):
-        return self._json(response, 200)
+        json = self._json(response, 200)
+        if isinstance(json, dict):
+            list_key = getattr(self.cls, "list_response_dict_key", None)
+            if list_key is not None:
+                return json.get(list_key)
+        return json
 
     def refresh(self, conditional=False):
         self.count = self.original
