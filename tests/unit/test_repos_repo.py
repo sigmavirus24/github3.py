@@ -1393,8 +1393,8 @@ class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
 
     def test_create_check_run(self):
         """Verify the request for creating a check run on a suite."""
-        data = {"name": "testcheck"}
-        self.instance.create_check_run(head_sha="fake-sha", **data)
+        data = {"name": "testcheck", "head_sha": "fake-sha"}
+        self.instance.create_check_run(**data)
         self.post_called_with(
             url_for("check-runs"), data=data, headers=self.preview_header
         )

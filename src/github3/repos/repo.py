@@ -615,6 +615,7 @@ class _Repository(models.GitHubCore):
         if name and head_sha:
             data = {
                 "name": name,
+                "head_sha": head_sha,
                 "details_url": details_url,
                 "external_id": external_id,
                 "started_at": started_at,
