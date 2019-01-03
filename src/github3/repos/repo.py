@@ -600,7 +600,7 @@ class _Repository(models.GitHubCore):
             format: YYYY-MM-DDTHH:MM:SSZ
         :param dict output:
             (optional), key-value pairs representing the output. Format:
-            {'title': 'string', 'summary', 'text, can be markdown', 'text':
+            {'title': 'string', 'summary': 'text, can be markdown', 'text':
             'text, can be markdown', 'annotations': [{}], 'images': [{}]}
         :param array actions:
             (optiona), array of action objects. Object format is:
