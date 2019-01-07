@@ -1541,6 +1541,50 @@ class _Repository(models.GitHubCore):
             return True
         return False
 
+    @decorators.requires_auth
+    def auto_trigger_checks(self, app_id, enabled=True):
+        """Change preferences for automatic creation of check suites.
+
+        .. versionadded:: 1.3.0
+
+        Enable/disable the automatic flow when creating check suites.
+        By default, the check suite is automatically created each time code
+        is pushed. When the automatic creation is disable they can be created
+        manually.
+
+        :param int app_id:
+            (required), the id of the GitHub App
+        :param bool enabled
+            (optional), enable automatic creation of check suites
+            Default: True
+        :returns:
+            the check suite settings for this repository
+        :rtype:
+            dict
+        """
+        url = self._build_url(
+            "check-suites", "preferences", base_url=self._api
+        )
+        headers = {"Accept": "application/vnd.github.antiope-preview+json"}
+        json = self._json(
+            self._patch(
+                url,
+                headers=headers,
+                data=jsonlib.dumps(
+                    {
+                        "auto_trigger_checks": [
+                            {"app_id": app_id, "setting": enabled}
+                        ]
+                    }
+                ),
+            ),
+            200,
+            include_cache_info=False,
+        )
+        if json and json.get("repository"):
+            del json["repository"]
+        return json
+
     def events(self, number=-1, etag=None):
         """Iterate over events on this repository.
 
