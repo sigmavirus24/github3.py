@@ -1,4 +1,6 @@
 """Integration tests for methods implemented on Check* classes."""
+import datetime
+
 import pytest
 
 import github3
@@ -82,3 +84,85 @@ class TestCheckSuite(IntegrationHelper):
                 pytest.fail(
                     "No setting in response for app: {}".format(app_id)
                 )
+
+
+class TestCheckRun(IntegrationHelper):
+    def get_repo(self, repository="westphahl/github3.py"):
+        owner, name = repository.split("/")
+        return self.gh.repository(owner, name)
+
+    def get_branch(self, repository=None, name="checks-test"):
+        repo = repository or self.get_repo()
+        return repo.branch(name)
+
+    def test_create_check_run(self):
+        cassette_name = self.cassette_name("create_check_run")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            repo = self.get_repo()
+            branch = self.get_branch(repo)
+
+            check_run = repo.create_check_run(
+                name="test_create_check_run", head_sha=branch.commit.sha
+            )
+            assert isinstance(check_run, github3.checks.CheckRun)
+
+    def test_check_runs_in_suite(self):
+        cassette_name = self.cassette_name("check_runs_in_suite")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            branch = self.get_branch()
+            check_suite = next(branch.commit.check_suites())
+
+            check_runs = list(check_suite.check_runs())
+            assert check_runs != []
+            for run in check_runs:
+                assert isinstance(run, github3.checks.CheckRun)
+
+    def test_check_runs_for_ref(self):
+        cassette_name = self.cassette_name("check_runs_for_ref")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            branch = self.get_branch()
+
+            check_runs = list(branch.commit.check_runs())
+            assert check_runs != []
+            for run in check_runs:
+                assert isinstance(run, github3.checks.CheckRun)
+
+    def test_check_run_by_id(self):
+        cassette_name = self.cassette_name("check_run_by_id")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            repo = self.get_repo()
+            branch = self.get_branch(repo)
+
+            check_run = next(branch.commit.check_runs())
+            assert check_run == repo.check_run(check_run.id)
+
+    def test_update_check_run(self):
+        cassette_name = self.cassette_name("update_check_run")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            repo = self.get_repo()
+            branch = self.get_branch(repo)
+
+            check_run = repo.create_check_run(
+                name="test_update_check_run", head_sha=branch.commit.sha
+            )
+            assert check_run.status == "queued"
+            assert check_run.conclusion is None
+            assert check_run.update(status="in_progress")
+            check_run.refresh()
+            assert check_run.status == "in_progress"
+            completed_at = datetime.datetime(
+                2019, 1, 1, 13, 37, tzinfo=datetime.timezone.utc
+            )
+            assert check_run.update(
+                status="completed",
+                conclusion="success",
+                completed_at=completed_at.isoformat(),
+            )
+            check_run.refresh()
+            assert check_run.status == "completed"
+            assert check_run.conclusion == "success"
