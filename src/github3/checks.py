@@ -421,17 +421,3 @@ class CheckRun(models.GitHubCore):
             self._update_attributes(json)
             return True
         return False
-
-    @decorators.requires_app_installation_auth
-    def rerequest(self):
-        """Rerequest the check suite.
-
-        :returns:
-            True if successful, False otherwise
-        :rtype:
-            bool
-        """
-        url = self._build_url("rerequest", base_url=self._api)
-        return self._boolean(
-            self._post(url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404
-        )

@@ -37,16 +37,6 @@ class TestCheckRun(UnitAppInstallHelper):
             headers=CheckRun.CUSTOM_HEADERS,
         )
 
-    def test_rerequest(self):
-        """Show that a check run can be rerequested"""
-
-        self.instance.rerequest()
-        self.session.post.assert_called_once_with(
-            url_for("check-runs/4/rerequest"),
-            None,
-            headers=CheckRun.CUSTOM_HEADERS,
-        )
-
     def test_check_run_types(self):
         """Check that we get the right types"""
 
@@ -66,11 +56,6 @@ class TestCheckRunRequiresAuth(UnitRequiresAuthenticationHelper):
         """Show updating a run requires auth"""
         with pytest.raises(GitHubException):
             self.instance.update(name="newname")
-
-    def test_rerequest_requires_auth(self):
-        """Show rerequesting a run requires auth"""
-        with pytest.raises(GitHubException):
-            self.instance.rerequest()
 
 
 class TestCheckSuite(UnitAppInstallHelper):
