@@ -504,7 +504,7 @@ class CheckRun(models.GitHubCore):
             {'title': 'string', 'summary', 'text, can be markdown', 'text':
             'text, can be markdown', 'annotations': [{}], 'images': [{}]}
         :param array actions:
-            (optiona), array of action objects. Object format is:
+            (optional), array of action objects. Object format is:
             {'label': 'text', 'description', 'text', 'identifier', 'text'}
         :returns:
             True if successful, False otherwise
