@@ -335,7 +335,6 @@ class CheckRunOutput(models.GitHubCore):
     """
 
     class_name = "CheckRunOutput"
-    CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def _update_attributes(self, output):
         self.title = output["title"]
