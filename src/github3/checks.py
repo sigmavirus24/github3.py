@@ -246,6 +246,47 @@ class CheckSuite(models.GitHubCore):
 
 
 class CheckRunAnnotation(models.GitHubCore):
+    """Representation of an annotation of a check run.
+
+    .. versionadded:: 1.3.0
+
+    .. attribute:: path
+
+        The path of the file of the annotation.
+
+    .. attribute:: start_line
+
+        The start line of the annotation.
+
+    .. attribute:: end_line
+
+        The end line of the annotation.
+
+    .. attribute:: start_column
+
+        The start column of the annotation.
+
+    .. attribute:: end_column
+
+        The end column of the annotation.
+
+    .. attribute:: annotation_level
+
+        The level of the annotation. Can be one of 'notice', 'warning'
+        or 'failure'.
+
+    .. attribute:: title
+
+        The title that represents the annotation.
+
+    .. attribute:: message
+
+        The short descript of the feedback for the lines of code.
+
+    .. attribute:: raw_details
+
+        The details about this annotation.
+    """
 
     class_name = "CheckRunAnnotation"
     CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
@@ -268,6 +309,30 @@ class CheckRunAnnotation(models.GitHubCore):
 
 
 class CheckRunOutput(models.GitHubCore):
+    """Representation of the output of a check run.
+
+    .. versionadded:: 1.3.0
+
+    .. attribute:: title
+
+        The title for the check run output.
+
+    .. attribute:: summary
+
+        The summary for the check run output.
+
+    .. attribute:: text
+
+        The output text of the check run.
+
+    .. attribute:: annotations_count
+
+        The number of annotations for this check run.
+
+    .. attribute:: annotations_url
+
+        The URL to retrieve the annotations
+    """
 
     class_name = "CheckRunOutput"
     CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
