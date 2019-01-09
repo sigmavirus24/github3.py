@@ -245,6 +245,28 @@ class CheckSuite(models.GitHubCore):
         )
 
 
+class CheckRunAnnotation(models.GitHubCore):
+
+    class_name = "CheckRunAnnotation"
+    CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
+
+    def _repr(self):
+        return "<{s.class_name} [{s.path}:{s.start_line}-{s.end_line}]>".format(
+            s=self
+        )
+
+    def _update_attributes(self, note):
+        self.path = note["path"]
+        self.start_line = note["start_line"]
+        self.end_line = note["end_line"]
+        self.start_column = note["start_column"]
+        self.end_column = note["end_column"]
+        self.annotation_level = note["annotation_level"]
+        self.title = note["title"]
+        self.message = note["message"]
+        self.raw_details = note["raw_details"]
+
+
 class CheckRunOutput(models.GitHubCore):
 
     class_name = "CheckRunOutput"
@@ -259,6 +281,23 @@ class CheckRunOutput(models.GitHubCore):
 
     def _repr(self):
         return "<{s.class_name} [{s.title}]>".format(s=self)
+
+    @decorators.requires_app_installation_auth
+    def annotations(self):
+        """Retrieve the annotations for a check run.
+
+        :returns:
+            the annotations for this check run
+        :rtype:
+            :class:`~github3.checks.CheckRunAnnotations`
+        """
+        url = self._build_url(base_url=self.annotations_url)
+        return self._iter(
+            -1,
+            url,
+            CheckRunAnnotation,
+            headers=CheckRunAnnotation.CUSTOM_HEADERS,
+        )
 
 
 class CheckRun(models.GitHubCore):

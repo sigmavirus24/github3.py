@@ -166,3 +166,68 @@ class TestCheckRun(IntegrationHelper):
             check_run.refresh()
             assert check_run.status == "completed"
             assert check_run.conclusion == "success"
+
+    def test_check_run_annotations(self):
+        cassette_name = self.cassette_name("check_run_annotations")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            repo = self.get_repo()
+            branch = self.get_branch(repo)
+
+            output = {
+                "title": "Check run title",
+                "summary": "Summary of this check run",
+                "annotations": [
+                    {
+                        "path": "AUTHORS.rst",
+                        "start_line": 179,
+                        "end_line": 180,
+                        "annotation_level": "failure",
+                        "message": "Should be removed",
+                    },
+                    {
+                        "path": "AUTHORS.rst",
+                        "start_line": 180,
+                        "end_line": 180,
+                        "annotation_level": "warning",
+                        "message": "Not sure if he is a contributor",
+                    },
+                    {
+                        "path": "AUTHORS.rst",
+                        "start_line": 180,
+                        "end_line": 180,
+                        "annotation_level": "notice",
+                        "message": "lol",
+                    },
+                ],
+            }
+
+            check_run = repo.create_check_run(
+                name="test_check_run_annotations",
+                head_sha=branch.commit.sha,
+                status="in_progress",
+                output=output,
+                actions=[
+                    {
+                        "label": "Abort",
+                        "description": "Abort the check run",
+                        "identifier": "abort_check_xyz",
+                    }
+                ],
+            )
+            assert check_run.status == "in_progress"
+            assert len(list(check_run.output.annotations())) == 3
+
+            completed_at = datetime.datetime(
+                2019, 1, 1, 13, 37, tzinfo=datetime.timezone.utc
+            )
+            assert check_run.update(
+                status="completed",
+                conclusion="failure",
+                completed_at=completed_at.isoformat(),
+                actions=[],
+            )
+            check_run.refresh()
+            assert check_run.status == "completed"
+            assert check_run.conclusion == "failure"
+            assert len(list(check_run.output.annotations())) == 3
