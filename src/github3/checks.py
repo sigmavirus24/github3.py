@@ -245,6 +245,22 @@ class CheckSuite(models.GitHubCore):
         )
 
 
+class CheckRunOutput(models.GitHubCore):
+
+    class_name = "CheckRunOutput"
+    CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
+
+    def _update_attributes(self, output):
+        self.title = output["title"]
+        self.summary = output["summary"]
+        self.text = output["text"]
+        self.annotations_count = output["annotations_count"]
+        self.annotations_url = output["annotations_url"]
+
+    def _repr(self):
+        return "<{s.class_name} [{s.title}]>".format(s=self)
+
+
 class CheckRun(models.GitHubCore):
     """The :class:`CheckRun <CheckRun>` object.
 
@@ -339,8 +355,7 @@ class CheckRun(models.GitHubCore):
         self.external_id = run["external_id"]
         self.app = CheckApp(run["app"], self)
         self.check_suite = run["check_suite"]["id"]
-        # self.output = CheckRunOutput(run['output'], self)
-        self.output = run["output"]  # TODO: turn into an object
+        self.output = CheckRunOutput(run["output"], self)
 
     def _repr(self):
         return "<{s.class_name} [{s.name}:{s.status}]>".format(s=self)
