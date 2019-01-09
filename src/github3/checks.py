@@ -325,7 +325,7 @@ class CheckRun(models.GitHubCore):
     .. attribute:: output
 
         A :class:`~github3.checks.CheckRunOutput` representing the output
-        of this check run. (TODO: Implement this object)
+        of this check run.
 
     .. attribute:: app
 
