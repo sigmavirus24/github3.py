@@ -10,7 +10,8 @@ from github3.exceptions import GitHubException
 from .helper import (
     UnitAppInstallHelper,
     UnitRequiresAuthenticationHelper,
-    UnitIteratorAppInstHelper,
+    UnitHelper,
+    UnitIteratorHelper,
     create_url_helper,
     create_example_data_helper,
 )
@@ -58,7 +59,7 @@ class TestCheckRunRequiresAuth(UnitRequiresAuthenticationHelper):
             self.instance.update(name="newname")
 
 
-class TestCheckSuite(UnitAppInstallHelper):
+class TestCheckSuite(UnitHelper):
     described_class = CheckSuite
     example_data = check_suite_example_data()
 
@@ -82,7 +83,7 @@ class TestCheckSuite(UnitAppInstallHelper):
         )
 
 
-class TestCheckSuiteIteratorAppInstAuth(UnitIteratorAppInstHelper):
+class TestCheckSuiteIterator(UnitIteratorHelper):
     described_class = CheckSuite
     example_data = check_suite_example_data()
 
@@ -95,13 +96,3 @@ class TestCheckSuiteIteratorAppInstAuth(UnitIteratorAppInstHelper):
             params={"per_page": 100},
             headers=CheckSuite.CUSTOM_HEADERS,
         )
-
-
-class TestCheckSuiteRequiresAuth(UnitRequiresAuthenticationHelper):
-    described_class = CheckSuite
-    example_data = check_suite_example_data()
-
-    def test_rerequest_requires_auth(self):
-        """Show rerequesting a run requires auth"""
-        with pytest.raises(GitHubException):
-            self.instance.rerequest()

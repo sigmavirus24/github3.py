@@ -216,7 +216,6 @@ class CheckSuite(models.GitHubCore):
     def _repr(self):
         return "<{s.class_name} [{s.id}:{s.status}]>".format(s=self)
 
-    @decorators.requires_app_installation_auth
     def rerequest(self):
         """Rerequest the check suite.
 
@@ -230,7 +229,6 @@ class CheckSuite(models.GitHubCore):
             self._post(url, headers=CheckSuite.CUSTOM_HEADERS), 201, 404
         )
 
-    @decorators.requires_app_installation_auth
     def check_runs(self):
         """Retrieve the check runs for this suite.
 
@@ -346,7 +344,6 @@ class CheckRunOutput(models.GitHubCore):
     def _repr(self):
         return "<{s.class_name} [{s.title}]>".format(s=self)
 
-    @decorators.requires_app_installation_auth
     def annotations(self):
         """Retrieve the annotations for a check run.
 
