@@ -1,6 +1,7 @@
 """Integration tests for methods implemented on Check* classes."""
 import datetime
 
+import dateutil
 import pytest
 
 import github3
@@ -156,7 +157,7 @@ class TestCheckRun(IntegrationHelper):
             check_run.refresh()
             assert check_run.status == "in_progress"
             completed_at = datetime.datetime(
-                2019, 1, 1, 13, 37, tzinfo=datetime.timezone.utc
+                2019, 1, 1, 13, 37, tzinfo=dateutil.tz.UTC
             )
             assert check_run.update(
                 status="completed",
@@ -219,7 +220,7 @@ class TestCheckRun(IntegrationHelper):
             assert len(list(check_run.output.annotations())) == 3
 
             completed_at = datetime.datetime(
-                2019, 1, 1, 13, 37, tzinfo=datetime.timezone.utc
+                2019, 1, 1, 13, 37, tzinfo=dateutil.tz.UTC
             )
             assert check_run.update(
                 status="completed",
