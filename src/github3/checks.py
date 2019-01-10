@@ -216,6 +216,7 @@ class CheckSuite(models.GitHubCore):
     def _repr(self):
         return "<{s.class_name} [{s.id}:{s.status}]>".format(s=self)
 
+    @decorators.requires_auth
     def rerequest(self):
         """Rerequest the check suite.
 

@@ -1,8 +1,5 @@
 """Unit tests for Repository Commits."""
 import github3
-import pytest
-
-from github3.exceptions import GitHubException
 
 from . import helper
 
@@ -66,19 +63,3 @@ class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
             params={"per_page": 100},
             headers=github3.checks.CheckSuite.CUSTOM_HEADERS,
         )
-
-
-class TestRepoCommitRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
-    """Unit test for auth required Repository Commit methods."""
-
-    described_class = github3.repos.commit.RepoCommit
-    example_data = example_commit_data
-
-    def test_check_runs(self):
-        with pytest.raises(GitHubException):
-            self.instance.check_runs()
-
-    def test_check_suites(self):
-        with pytest.raises(GitHubException):
-            self.instance.check_suites()

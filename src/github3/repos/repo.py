@@ -263,7 +263,6 @@ class _Repository(models.GitHubCore):
             headers=branch.Branch.PREVIEW_HEADERS,
         )
 
-    @decorators.requires_app_installation_auth
     def check_run(self, id):
         """Return a single check run.
 
@@ -284,7 +283,6 @@ class _Repository(models.GitHubCore):
             )
         return self._instance_or_null(checks.CheckRun, data)
 
-    @decorators.requires_app_installation_auth
     def check_suite(self, id):
         """Return a single check suite.
 
