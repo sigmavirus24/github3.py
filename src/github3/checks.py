@@ -290,9 +290,9 @@ class CheckRunAnnotation(models.GitHubCore):
     CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def _repr(self):
-        return "<{s.class_name} [{s.path}:{s.start_line}-{s.end_line}]>".format(
-            s=self
-        )
+        return (
+            "<{s.class_name} [{s.path}:{s.start_line}-{s.end_line}]>"
+        ).format(s=self)
 
     def _update_attributes(self, note):
         self.path = note["path"]

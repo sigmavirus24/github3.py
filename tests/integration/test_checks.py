@@ -69,7 +69,7 @@ class TestCheckSuite(IntegrationHelper):
             json = repo.auto_trigger_checks(app_id, enabled=False)
             for pref in json["preferences"]["auto_trigger_checks"]:
                 if pref["app_id"] == app_id:
-                    assert pref["setting"] == False
+                    assert not pref["setting"]
                     break
             else:
                 pytest.fail(
@@ -79,7 +79,7 @@ class TestCheckSuite(IntegrationHelper):
             json = repo.auto_trigger_checks(app_id, enabled=True)
             for pref in json["preferences"]["auto_trigger_checks"]:
                 if pref["app_id"] == app_id:
-                    assert pref["setting"] == True
+                    assert pref["setting"]
                     break
             else:
                 pytest.fail(
