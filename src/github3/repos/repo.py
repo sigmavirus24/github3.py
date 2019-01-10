@@ -1554,7 +1554,7 @@ class _Repository(models.GitHubCore):
 
         :param int app_id:
             (required), the id of the GitHub App
-        :param bool enabled
+        :param bool enabled:
             (optional), enable automatic creation of check suites
             Default: True
         :returns:
