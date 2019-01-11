@@ -512,7 +512,6 @@ class CheckRun(models.GitHubCore):
         :rtype:
             bool
         """
-        # TODO: Clean output dict, actions array. Need a deep recursive clean
         data = {
             "name": name,
             "details_url": details_url,
