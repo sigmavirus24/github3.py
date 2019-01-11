@@ -499,11 +499,12 @@ class CheckRun(models.GitHubCore):
             format: YYYY-MM-DDTHH:MM:SSZ
         :param dict output:
             (optional), key-value pairs representing the output. Format:
-            {'title': 'string', 'summary', 'text, can be markdown', 'text':
-            'text, can be markdown', 'annotations': [{}], 'images': [{}]}
-        :param array actions:
-            (optional), array of action objects. Object format is:
-            {'label': 'text', 'description', 'text', 'identifier', 'text'}
+            ``{'title': 'string', 'summary', 'text, can be markdown', 'text':
+            'text, can be markdown', 'annotations': [{}], 'images': [{}]}``
+        :param list actions:
+            (optional), list of action objects. Format is:
+            ``[{'label': 'text', 'description', 'text', 'identifier', 'text'},
+            ...]``
         :returns:
             True if successful, False otherwise
         :rtype:
