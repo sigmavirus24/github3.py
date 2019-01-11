@@ -12,7 +12,15 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
 
     def __init__(
-        self, count, url, cls, session, params=None, etag=None, headers=None
+        self,
+        count,
+        url,
+        cls,
+        session,
+        params=None,
+        etag=None,
+        headers=None,
+        list_key=None,
     ):
         models.GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
@@ -41,6 +49,8 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
         self.last_response = None
         #: Last status code received
         self.last_status = 0
+        #: Key to get the list of items in case a dict is returned
+        self.list_key = list_key
 
         if etag:
             self.headers.update({"If-None-Match": etag})
@@ -81,6 +91,17 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
             if json is None:
                 break
 
+            # Some APIs return the list of items inside a dict
+            if isinstance(json, dict) and self.list_key is not None:
+                try:
+                    json = json[self.list_key]
+                except KeyError:
+                    raise exceptions.UnprocessableResponseBody(
+                        "GitHub's API returned a body that could not be"
+                        " handled",
+                        json,
+                    )
+
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):
                 if issubclass(self.cls, models.GitHubCore):
@@ -112,12 +133,7 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
         return next(self.__i__)
 
     def _get_json(self, response):
-        json = self._json(response, 200)
-        if isinstance(json, dict):
-            list_key = getattr(self.cls, "list_response_dict_key", None)
-            if list_key is not None:
-                return json.get(list_key)
-        return json
+        return self._json(response, 200)
 
     def refresh(self, conditional=False):
         self.count = self.original

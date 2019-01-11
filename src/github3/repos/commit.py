@@ -48,7 +48,11 @@ class _RepoCommit(models.GitHubCore):
         """
         url = self._build_url("check-runs", base_url=self._api)
         return self._iter(
-            -1, url, checks.CheckRun, headers=checks.CheckRun.CUSTOM_HEADERS
+            -1,
+            url,
+            checks.CheckRun,
+            headers=checks.CheckRun.CUSTOM_HEADERS,
+            list_key="check_runs",
         )
 
     def check_suites(self):
@@ -67,6 +71,7 @@ class _RepoCommit(models.GitHubCore):
             url,
             checks.CheckSuite,
             headers=checks.CheckSuite.CUSTOM_HEADERS,
+            list_key="check_suites",
         )
 
     def diff(self):

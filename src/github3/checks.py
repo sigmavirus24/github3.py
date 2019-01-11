@@ -193,7 +193,6 @@ class CheckSuite(models.GitHubCore):
     """
 
     class_name = "CheckSuite"
-    list_response_dict_key = "check_suites"
     CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def _update_attributes(self, suite):
@@ -240,7 +239,11 @@ class CheckSuite(models.GitHubCore):
         """
         url = self._build_url("check-runs", base_url=self._api)
         return self._iter(
-            -1, url, CheckRun, headers=CheckSuite.CUSTOM_HEADERS
+            -1,
+            url,
+            CheckRun,
+            headers=CheckRun.CUSTOM_HEADERS,
+            list_key="check_runs",
         )
 
 
@@ -438,7 +441,6 @@ class CheckRun(models.GitHubCore):
     """
 
     class_name = "CheckRun"
-    list_response_dict_key = "check_runs"
     CUSTOM_HEADERS = {"Accept": "application/vnd.github.antiope-preview+json"}
 
     def _update_attributes(self, run):
