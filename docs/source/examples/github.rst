@@ -184,15 +184,28 @@ Logging in as an Application, or Application Installation
 To login as an application you only need the app_id and private key. 
 
 ::
+
+    # Read the key file created by GitHub
+    with open('path/to/private-key.pem', 'rb') as pem_file:
+        key_file_pem = pem_file.read()
+
     # start with anonymous GitHub object
     gh = github3.GitHub()
-    
+
     # login as application, and access installations
-	gh.login_as_app(private_key_pem=key_file_pem, app_id=app_identifier)
+    gh.login_as_app(private_key_pem=key_file_pem, app_id=app_identifier)
     gh.app_installations()
-    
-	# OR login as application installation, and access permissable resources
-	gh.login_as_app_installation(private_key_pem=key_file_pem, app_id=app_identifier, installation_id=install_id)
+
+    # OR obtain installation token for additional App APIs. 
+    # Installation ID is provided in GitHub webhook during a user's install.
+    gh.login_as_app_installation(key_file_pem, app_identifier, install_id)
     access_token = gh.session.auth.token
-    
-See the GitHub Apps API for more information.
+    # (i.e. list all repos accessible to this installation)
+    response = requests.get('https://api.github.com/installation/repositories',
+        headers = {
+            "Authorization" : 'token ' + access_token,
+            "Accept": 'application/vnd.github.machine-man-preview+json'
+        }
+    )
+
+See the [GitHub Apps API](https://developer.github.com/v3/apps/) for more information.
