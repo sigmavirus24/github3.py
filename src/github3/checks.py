@@ -114,13 +114,8 @@ class CheckApp(models.GitHubCore):
         self.id = app["id"]
         self.name = app["name"]
         self.owner = app["owner"]
-        _, self.slug = app["html_url"].rsplit("/", 1)
-
-    @property
-    def url(self):
-        return self._build_url("apps", self.slug)
-
-    _api = url
+        _, slug = app["html_url"].rsplit("/", 1)
+        self._api = self.url = self._build_url("apps", slug)
 
     def _repr(self):
         return '<App ["{}" by {}]>'.format(
@@ -138,7 +133,7 @@ class CheckApp(models.GitHubCore):
         from . import apps
 
         headers = getattr(self, "CUSTOM_HEADERS", None)
-        json = self._json(self._get(self.url, headers=headers), 200)
+        json = self._json(self._get(self._api, headers=headers), 200)
         return self._instance_or_null(apps.App, json)
 
     refresh = to_app

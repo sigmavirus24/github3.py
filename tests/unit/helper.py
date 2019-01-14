@@ -90,6 +90,7 @@ class UnitHelper(unittest.TestCase):
         session.post.return_value = None
         session.put.return_value = None
         session.has_auth.return_value = True
+        session.build_url = self.get_build_url_proxy()
         return session
 
     def create_instance_of_described_class(self):
@@ -213,6 +214,7 @@ class UnitIteratorHelper(UnitHelper):
         session.patch.return_value = null
         session.post.return_value = null
         session.put.return_value = null
+        session.build_url = self.get_build_url_proxy()
         return session
 
     def get_next(self, iterator):
