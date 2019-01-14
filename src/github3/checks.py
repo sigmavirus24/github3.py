@@ -103,6 +103,10 @@ class CheckApp(models.GitHubCore):
         representing the app owner
     """
 
+    CUSTOM_HEADERS = {
+        "Accept": "application/vnd.github.machine-man-preview+json"
+    }
+
     def _update_attributes(self, app):
         self.description = app["description"]
         self.external_url = app["external_url"]
@@ -110,6 +114,13 @@ class CheckApp(models.GitHubCore):
         self.id = app["id"]
         self.name = app["name"]
         self.owner = app["owner"]
+        _, self.slug = app["html_url"].rsplit("/", 1)
+
+    @property
+    def url(self):
+        return self._build_url("apps", self.slug)
+
+    _api = url
 
     def _repr(self):
         return '<App ["{}" by {}]>'.format(
@@ -126,7 +137,8 @@ class CheckApp(models.GitHubCore):
         """
         from . import apps
 
-        json = self._json(self._get(self.url), 200)
+        headers = getattr(self, "CUSTOM_HEADERS", None)
+        json = self._json(self._get(self.url, headers=headers), 200)
         return self._instance_or_null(apps.App, json)
 
     refresh = to_app

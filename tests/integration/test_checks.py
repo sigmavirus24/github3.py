@@ -87,6 +87,21 @@ class TestCheckSuite(IntegrationHelper):
                 )
 
 
+class TestCheckApp(IntegrationHelper):
+    def test_check_app_refresh(self):
+        cassette_name = self.cassette_name("create_check_run")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+            repo = self.gh.repository("westphahl", "github3.py")
+            branch = repo.branch("checks-test")
+            check_suite = next(branch.commit.check_suites())
+
+            app = check_suite.app
+            assert isinstance(app, github3.checks.CheckApp)
+            app = app.refresh()
+            assert isinstance(app, github3.apps.App)
+
+
 class TestCheckRun(IntegrationHelper):
     def get_repo(self, repository="westphahl/github3.py"):
         owner, name = repository.split("/")
