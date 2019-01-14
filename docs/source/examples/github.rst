@@ -181,7 +181,7 @@ This is the same as::
 Logging in as an Application, or Application Installation
 ---------------------------------------------------------
 
-To login as an application you only need the app_id and private key. 
+To login as an application you only need the app_id and private key.
 
 ::
 
@@ -196,7 +196,7 @@ To login as an application you only need the app_id and private key.
     gh.login_as_app(private_key_pem=key_file_pem, app_id=app_identifier)
     gh.app_installations()
 
-    # OR obtain installation token for additional App APIs. 
+    # OR obtain installation token for additional App APIs.
     # Installation ID is provided in GitHub webhook during a user's install.
     gh.login_as_app_installation(key_file_pem, app_identifier, install_id)
     access_token = gh.session.auth.token
