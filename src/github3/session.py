@@ -165,7 +165,7 @@ class GitHubSession(requests.Session):
 
     def request(self, *args, **kwargs):
         """Make a request, count it, and handle 2FA if necessary."""
-        kwargs.setdefault('timeout', self.timeout)
+        kwargs.setdefault("timeout", self.timeout)
         response = super(GitHubSession, self).request(*args, **kwargs)
         self.request_counter += 1
         if requires_2fa(response) and self.two_factor_auth_cb:

@@ -245,7 +245,16 @@ class GitHubCore(object):
             self._uri = self._uri_parse(uri)
         self.url = uri
 
-    def _iter(self, count, url, cls, params=None, etag=None, headers=None):
+    def _iter(
+        self,
+        count,
+        url,
+        cls,
+        params=None,
+        etag=None,
+        headers=None,
+        list_key=None,
+    ):
         """Generic iterator for this project.
 
         :param int count: How many items to return.
@@ -254,12 +263,16 @@ class GitHubCore(object):
         :param params dict: (optional) Parameters for the request
         :param str etag: (optional), ETag from the last call
         :param dict headers: (optional) HTTP Headers for the request
+        :param str list_key: (optional) Key for extracting the list of items
+            from a dict response
         :returns: A lazy iterator over the pagianted resource
         :rtype: :class:`GitHubIterator <github3.structs.GitHubIterator>`
         """
         from .structs import GitHubIterator
 
-        return GitHubIterator(count, url, cls, self, params, etag, headers)
+        return GitHubIterator(
+            count, url, cls, self, params, etag, headers, list_key
+        )
 
     @property
     def ratelimit_remaining(self):
