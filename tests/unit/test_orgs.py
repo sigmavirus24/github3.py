@@ -90,7 +90,9 @@ class TestOrganization(helper.UnitHelper):
                 "name": "team-name",
                 "repo_names": [],
                 "permission": "push",
+                "privacy": "secret",
             },
+            headers=None,
         )
 
     def test_create_hook(self):
