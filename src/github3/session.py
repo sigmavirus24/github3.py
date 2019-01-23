@@ -93,7 +93,7 @@ class GitHubSession(requests.Session):
         "two_factor_auth_cb",
     ]
 
-    def __init__(self, default_connect_timeout=4, default_read_timeout=1):
+    def __init__(self, default_connect_timeout=4, default_read_timeout=10):
         """Slightly modify how we initialize our session."""
         super(GitHubSession, self).__init__()
         self.default_connect_timeout = default_connect_timeout
