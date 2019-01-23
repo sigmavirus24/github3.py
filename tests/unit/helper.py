@@ -90,6 +90,7 @@ class UnitHelper(unittest.TestCase):
         session.post.return_value = None
         session.put.return_value = None
         session.has_auth.return_value = True
+        session.build_url = self.get_build_url_proxy()
         return session
 
     def create_instance_of_described_class(self):
@@ -213,6 +214,7 @@ class UnitIteratorHelper(UnitHelper):
         session.patch.return_value = null
         session.post.return_value = null
         session.put.return_value = null
+        session.build_url = self.get_build_url_proxy()
         return session
 
     def get_next(self, iterator):
@@ -241,6 +243,17 @@ class UnitIteratorHelper(UnitHelper):
         self.get_json_mock.stop()
 
 
+class UnitIteratorAppInstHelper(UnitIteratorHelper):
+    """Helper for iterable unittests that require app installation."""
+
+    def after_setup(self):
+        """Set session app installation"""
+        MockedAuth = mock.create_autospec(
+            github3.session.AppInstallationTokenAuth
+        )
+        self.session.auth = MockedAuth
+
+
 class UnitSearchIteratorHelper(UnitIteratorHelper):
 
     """Base class for search iterator based unit tests."""
@@ -257,6 +270,17 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
         """Use UnitIteratorHelper's setUp and patch _get_json."""
         super(UnitSearchIteratorHelper, self).setUp()
         self.patch_get_json()
+
+
+class UnitAppInstallHelper(UnitHelper):
+    """Helper for unittests that require app installation."""
+
+    def after_setup(self):
+        """Set session app installation"""
+        MockedAuth = mock.create_autospec(
+            github3.session.AppInstallationTokenAuth
+        )
+        self.session.auth = MockedAuth
 
 
 class UnitRequiresAuthenticationHelper(UnitHelper):
