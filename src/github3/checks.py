@@ -58,7 +58,10 @@ class CheckPullRequest(models.GitHubCore):
         """
         from . import pulls
 
-        json = self._json(self._get(self.url), 200)
+        json = self._json(
+            self._get(self.url, headers=pulls.PULLS_PREVIEW_HEADERS),
+            200,
+        )
         return self._instance_or_null(pulls.PullRequest, json)
 
     refresh = to_pull

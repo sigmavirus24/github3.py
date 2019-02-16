@@ -4,7 +4,7 @@ import mock
 import pytest
 
 from base64 import b64encode
-from github3 import GitHubError
+from github3 import GitHubError, pulls
 from github3.exceptions import GitHubException
 from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
@@ -324,7 +324,11 @@ class TestRepository(helper.UnitHelper):
         """Verify the request for creating a pull request."""
         data = {"title": "foo", "base": "master", "head": "feature_branch"}
         self.instance._create_pull(data)
-        self.post_called_with(url_for("pulls"), data=data)
+        self.post_called_with(
+            url_for("pulls"),
+            data=data,
+            headers=pulls.PULLS_PREVIEW_HEADERS,
+        )
 
     def test_create_pull(self):
         """Verify the request for creating a pull request."""
@@ -804,7 +808,10 @@ class TestRepository(helper.UnitHelper):
     def test_pull_request(self):
         """Verify the request for retrieving a pull request."""
         self.instance.pull_request(1)
-        self.session.get.assert_called_once_with(url_for("pulls/1"))
+        self.session.get.assert_called_once_with(
+            url_for("pulls/1"),
+            headers=pulls.PULLS_PREVIEW_HEADERS,
+        )
 
     def test_pull_request_required_number(self):
         """Verify the request for retrieving a pull request."""
@@ -1273,7 +1280,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for("pulls"),
             params={"per_page": 100, "sort": "created", "direction": "desc"},
-            headers={},
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_pull_requests_ignore_invalid_state(self):
@@ -1284,7 +1291,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for("pulls"),
             params={"per_page": 100, "sort": "created", "direction": "desc"},
-            headers={},
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_refs(self):

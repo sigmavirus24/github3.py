@@ -558,7 +558,8 @@ class ProjectCard(models.GitHubCore):
         parsed = self._uri_parse(self.content_url)
         _, owner, repository, _, number = parsed.path[1:].split("/", 5)
         resp = self._get(
-            self._build_url("repos", owner, repository, "pulls", number)
+            self._build_url("repos", owner, repository, "pulls", number),
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
         json = self._json(resp, 200)
         return self._instance_or_null(pulls.PullRequest, json)

@@ -1,6 +1,6 @@
 import pytest
 
-from github3 import GitHubEnterprise, GitHubError
+from github3 import GitHubEnterprise, GitHubError, pulls
 from github3.github import GitHub, GitHubStatus
 from github3.projects import Project
 
@@ -540,7 +540,8 @@ class TestGitHub(helper.UnitHelper):
         )
 
         self.session.get.assert_called_once_with(
-            url_for("repos/octocat/hello-world/pulls/1")
+            url_for("repos/octocat/hello-world/pulls/1"),
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_pull_request_negative_id(self):

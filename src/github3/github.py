@@ -1837,7 +1837,10 @@ class GitHub(models.GitHubCore):
             url = self._build_url(
                 "repos", owner, repository, "pulls", str(number)
             )
-            json = self._json(self._get(url), 200)
+            json = self._json(
+                self._get(url, headers=pulls.PULLS_PREVIEW_HEADERS),
+                200,
+            )
         return self._instance_or_null(pulls.PullRequest, json)
 
     def rate_limit(self):

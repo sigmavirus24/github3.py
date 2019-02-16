@@ -4,6 +4,7 @@ import github3
 import dateutil.parser
 import mock
 
+from github3 import pulls
 from github3.issues.label import Label
 from github3.issues import Issue
 from . import helper
@@ -270,7 +271,8 @@ class TestIssue(helper.UnitHelper):
         self.instance.pull_request()
 
         self.session.get.assert_called_once_with(
-            self.instance.pull_request_urls["url"]
+            self.instance.pull_request_urls["url"],
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_pull_request_without_urls(self):

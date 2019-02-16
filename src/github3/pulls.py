@@ -14,6 +14,10 @@ from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
 
+PULLS_PREVIEW_HEADERS = {
+    "Accept": "application/vnd.github.shadow-cat-preview"
+}
+
 
 class PullDestination(models.GitHubCore):
     """The object that represents a pull request destination.
@@ -211,6 +215,7 @@ class _PullRequest(models.GitHubCore):
         self.commits_url = pull["commits_url"]
         self.created_at = self._strptime(pull["created_at"])
         self.diff_url = pull["diff_url"]
+        self.draft = pull.get("draft", False)
         self.head = Head(pull["head"], self)
         self.html_url = pull["html_url"]
         self.id = pull["id"]
@@ -322,7 +327,14 @@ class _PullRequest(models.GitHubCore):
             data["team_reviewers"] = [
                 getattr(t, "slug", t) for t in team_reviewers
             ]
-        json = self._json(self._post(url, data=data), 201)
+        json = self._json(
+            self._post(
+                url,
+                data=data,
+                headers=PULLS_PREVIEW_HEADERS,
+            ),
+            201,
+        )
         return self._instance_or_null(ShortPullRequest, json)
 
     @requires_auth
@@ -641,7 +653,14 @@ class _PullRequest(models.GitHubCore):
         self._remove_none(data)
 
         if data:
-            json = self._json(self._patch(self._api, data=dumps(data)), 200)
+            json = self._json(
+                self._patch(
+                    self._api,
+                    data=dumps(data),
+                    headers=PULLS_PREVIEW_HEADERS,
+                ),
+                200,
+            )
 
         if json:
             self._update_attributes(json)
@@ -795,6 +814,21 @@ class ShortPullRequest(_PullRequest):
     .. attribute:: diff_url
 
         The URL to retrieve the diff for this pull request via the API.
+
+    .. attribute:: draft
+
+        .. versionadded:: 1.3.1
+
+        A boolean attribute indicating whether the pull request is a draft
+        or not.
+
+        .. note::
+
+            Draft status is only available for repositories with GitHub Free
+            and GitHubPro, and in public and private repositories with
+            GitHub Team, GitHub Enterprise CLoud, and GitHub Enterprise
+            Server. Unless specific Draft state is provided by GitHub API
+            we will set the attribute to to ``False``.
 
     .. attribute:: head
 

@@ -117,7 +117,14 @@ class _Repository(models.GitHubCore):
         json = None
         if data:
             url = self._build_url("pulls", base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            json = self._json(
+                self._post(
+                    url,
+                    data=data,
+                    headers=pulls.PULLS_PREVIEW_HEADERS,
+                ),
+                201,
+            )
         return self._instance_or_null(pulls.ShortPullRequest, json)
 
     @decorators.requires_auth
@@ -2349,7 +2356,10 @@ class _Repository(models.GitHubCore):
         json = None
         if int(number) > 0:
             url = self._build_url("pulls", str(number), base_url=self._api)
-            json = self._json(self._get(url), 200)
+            json = self._json(
+                self._get(url, headers=pulls.PULLS_PREVIEW_HEADERS),
+                200,
+            )
         return self._instance_or_null(pulls.PullRequest, json)
 
     def pull_requests(
@@ -2408,7 +2418,12 @@ class _Repository(models.GitHubCore):
         params.update(head=head, base=base, sort=sort, direction=direction)
         self._remove_none(params)
         return self._iter(
-            int(number), url, pulls.ShortPullRequest, params, etag
+            int(number),
+            url,
+            pulls.ShortPullRequest,
+            params,
+            etag,
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def readme(self):

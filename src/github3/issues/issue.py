@@ -344,7 +344,13 @@ class _Issue(models.GitHubCore):
         if self.pull_request_urls is not None:
             pull_request_url = self.pull_request_urls.get("url")
         if pull_request_url:
-            json = self._json(self._get(pull_request_url), 200)
+            json = self._json(
+                self._get(
+                    pull_request_url,
+                    headers=pulls.PULLS_PREVIEW_HEADERS,
+                    ),
+                200,
+            )
         return self._instance_or_null(pulls.PullRequest, json)
 
     @requires_auth

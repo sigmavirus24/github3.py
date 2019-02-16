@@ -8,6 +8,7 @@ from github3 import GitHubError
 from github3 import exceptions
 from github3 import issues
 from github3 import projects
+from github3 import pulls
 
 
 get_project_example_data = helper.create_example_data_helper(
@@ -297,7 +298,8 @@ class TestProjectCard(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(
             "https://api.github.com/repos/api-playground/projects-test/"
-            "pulls/3"
+            "pulls/3",
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
 

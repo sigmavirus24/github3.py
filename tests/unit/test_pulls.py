@@ -40,6 +40,7 @@ class TestPullRequest(helper.UnitHelper):
                 "body": self.instance.body,
                 "state": "closed",
             },
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_create_comment(self):
@@ -70,7 +71,9 @@ class TestPullRequest(helper.UnitHelper):
         self.instance.create_review_requests(reviewers=["sigmavirus24"])
 
         self.session.post.assert_called_once_with(
-            url_for("requested_reviewers"), '{"reviewers": ["sigmavirus24"]}'
+            url_for("requested_reviewers"),
+            '{"reviewers": ["sigmavirus24"]}',
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_create_review(self):
@@ -165,6 +168,7 @@ class TestPullRequest(helper.UnitHelper):
                 "body": self.instance.body,
                 "state": "open",
             },
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_review_requests(self):
@@ -186,6 +190,7 @@ class TestPullRequest(helper.UnitHelper):
                 "body": "my new body",
                 "state": "open",
             },
+            headers=pulls.PULLS_PREVIEW_HEADERS,
         )
 
     def test_attributes(self):
