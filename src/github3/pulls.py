@@ -826,7 +826,7 @@ class ShortPullRequest(_PullRequest):
 
             Draft status is only available for repositories with GitHub Free
             and GitHubPro, and in public and private repositories with
-            GitHub Team, GitHub Enterprise CLoud, and GitHub Enterprise
+            GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise
             Server. Unless specific Draft state is provided by GitHub API
             we will set the attribute to to ``False``.
 
