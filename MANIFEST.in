@@ -6,7 +6,7 @@ include tox.ini
 include report_issue.py
 prune *.pyc
 recursive-include docs *.rst *.py
-recursive-include tests *.py *.json
+recursive-include tests *.py *.json *.pub
 recursive-include tests/json *
 recursive-include tests/unit/json *
 recursive-include images *.png
