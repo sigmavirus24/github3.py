@@ -102,7 +102,7 @@ class Label(_Label):
 
         The hexadecimeal representation of the background color of this label.
 
-    .. attribute:: desciption
+    .. attribute:: description
 
         The description for this label.
 
