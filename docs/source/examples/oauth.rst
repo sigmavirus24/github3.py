@@ -52,7 +52,7 @@ application.
 
     with open(CREDENTIALS_FILE, 'w') as fd:
         fd.write(auth.token + '\n')
-        fd.write(auth.id)
+        fd.write("%s" % auth.id)
 
 In the future, you can then read that token in without having to bother your
 user. If at some later point in the lifetime of your application you need more
