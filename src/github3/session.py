@@ -9,6 +9,9 @@ except ImportError:
 import datetime
 from contextlib import contextmanager
 from logging import getLogger
+from math import ceil
+from time import sleep
+from time import time
 
 import dateutil.parser
 import requests
@@ -254,6 +257,52 @@ class GitHubSession(requests.Session):
         self.auth = old_basic_auth
         if old_token_auth:
             self.headers["Authorization"] = old_token_auth
+
+
+class AdaptativeGitHubSession(GitHubSession):
+    """Session managing rate limits.
+
+    Rate limit is managed by sleeping between calls to be a good Github
+    citizen.
+    """
+    def __init__(self, default_connect_timeout=4, default_read_timeout=10):
+        """Slightly modify how we initialize our session."""
+        super(AdaptativeGitHubSession, self).__init__(default_connect_timeout,
+                                                      default_read_timeout)
+        self._rate_limit = {}
+
+    def _extract_rate_limit_headers(self, headers):
+        if ('X-RateLimit-Limit' in headers and
+            'X-RateLimit-Remaining' in headers and
+            'X-RateLimit-Reset' in headers):
+            self._rate_limit['limit'] = int(headers['X-RateLimit-Limit'])
+            self._rate_limit['remaining'] = int(headers['X-RateLimit-Remaining'])
+            self._rate_limit['reset'] = int(headers['X-RateLimit-Reset'])
+        else:
+            __logs__.info('No X-RateLimit headers')
+
+    def request(self, *args, **kwargs):
+        """Sleep if necessary, make a request and get rate limit headers"""
+        if 'remaining' in self._rate_limit:
+            __logs__.debug('_rate_limit=%s' % self._rate_limit)
+            if self._rate_limit['remaining'] == 0:
+                secs = self._rate_limit['reset'] - int(time())
+                if secs > 0:
+                    __logs__.info('Reached max calls: sleeping for %d s' % secs)
+                    sleep(secs)
+            elif self._rate_limit['remaining'] > 0:
+                secs = int(ceil((self._rate_limit['reset'] - int(time())) //
+                                (self._rate_limit['remaining'] + 1)))
+                if secs > 0:
+                    __logs__.info('Rate limiting: sleeping for %d s' % secs)
+                    sleep(secs)
+        res = super(AdaptativeGitHubSession, self).request(*args, **kwargs)
+        self._extract_rate_limit_headers(res.headers)
+        if res.status_code in (403, 502):
+            __logs__.warning('Exhausted API limit or server error (%d). '
+                             'Restarting call.' % res.status_code)
+            return self.request(*args, **kwargs)
+        return res
 
 
 def _utcnow():
