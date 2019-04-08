@@ -461,7 +461,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.gh.octocat()
             assert o is not None
-            assert o is not ""
+            assert o != ""
             o = self.gh.octocat(say)
             assert say in o
 
