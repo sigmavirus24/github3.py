@@ -79,4 +79,4 @@ Here's how to check the status of the imported issue.
 
     import github3
     issue = repository.imported_issue(issue_num)
-    print issue.status
+    print(issue.status)
