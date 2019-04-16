@@ -178,3 +178,5 @@ Contributors
 - James E. Blair (@jeblair)
 
 - Simon Westphahl (@westphahl)
+
+- Steven Nyman (@stevennyman)
