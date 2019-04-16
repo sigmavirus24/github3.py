@@ -126,7 +126,7 @@ Create a commit to change an existing file
 
 ::
 
-    repo.contents('/README.md').update('commit message', 'file content'.encode('utf-8'))
+    repo.file_contents('/README.md').update('commit message', 'file content'.encode('utf-8'))
 
 Follow another user on GitHub
 -----------------------------
