@@ -926,6 +926,12 @@ class PullReview(models.GitHubCore):
 
         The SHA of the commit that the review was left on.
 
+        .. note::
+
+            It is possible for the attribute to be set to ``None``, if the
+            review references a commit that is no longer available in the pull
+            request branch, such as after a force push.
+
     .. attribute:: html_url
 
         .. versionadded:: 1.0.0
@@ -958,7 +964,9 @@ class PullReview(models.GitHubCore):
         self.body = review["body"]
         self.body_html = review["body_html"]
         self.body_text = review["body_text"]
-        self.commit_id = review["commit_id"]
+        # NOTE(pabelanger): In some cases, commit_id could be missing on a
+        # PullReview.
+        self.commit_id = review.get("commit_id", None)
         self.html_url = review["html_url"]
         self.user = users.ShortUser(review["user"], self)
         self.state = review["state"]
