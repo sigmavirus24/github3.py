@@ -91,6 +91,9 @@ class GitHubSession(requests.Session):
     __attrs__ = requests.Session.__attrs__ + [
         "base_url",
         "two_factor_auth_cb",
+        "default_connect_timeout",
+        "default_read_timeout",
+        "request_counter",
     ]
 
     def __init__(self, default_connect_timeout=4, default_read_timeout=10):
