@@ -133,7 +133,7 @@ Old name                                      New name
 ``GitHub#iter_repo_issues``                   ``GitHub#issues_on``
 ``GitHub#iter_keys``                          ``GitHub#keys``
 ``GitHub#iter_orgs``                          ``GitHub#{organizations,organizations_with}``
-``GitHub#iter_repos``                         ``GitHub#reposistories``
+``GitHub#iter_repos``                         ``GitHub#repositories``
 ``GitHub#iter_user_repos``                    ``GitHub#repositories_by``
 ``GitHub#iter_user_teams``                    ``GitHub#user_teams``
 ``Issue#iter_comments``                       ``Issue#comments``
