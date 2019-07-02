@@ -164,6 +164,7 @@ class TestGitHub(helper.UnitHelper):
                 "has_wiki": True,
                 "auto_init": False,
                 "gitignore_template": "",
+                "has_projects": True
             },
         )
 
