@@ -180,3 +180,5 @@ Contributors
 - Simon Westphahl (@westphahl)
 
 - Steven Nyman (@stevennyman)
+
+- Tigran Tchougourian (@NargiT)

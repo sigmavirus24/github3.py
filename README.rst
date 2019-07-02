@@ -6,6 +6,12 @@ wrapper around the GitHub API (v3).
 
 See HISTORY.rst for any "breaking" changes.
 
+.. image:: https://travis-ci.org/sigmavirus24/github3.py.svg?branch=master
+    :target: https://travis-ci.org/sigmavirus24/github3.py
+
+.. image:: https://ci.appveyor.com/api/projects/status/github/sigmavirus24/github3.py?branch=master
+    :target: https://ci.appveyor.com/project/sigmavirus24/github3-py/branch/master
+
 Installation
 ------------
 
