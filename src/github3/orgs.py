@@ -640,6 +640,7 @@ class _Organization(models.GitHubCore):
         auto_init=False,
         gitignore_template="",
         license_template="",
+        has_projects=True
     ):
         """Create a repository for this organization.
 
@@ -676,6 +677,9 @@ class _Organization(models.GitHubCore):
         :param str license_template:
             (optional), name of the license; this is ignored if auto_int is
             False.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository. API
+            default: ``True``
         :returns:
             the created repository
         :rtype:
@@ -692,6 +696,7 @@ class _Organization(models.GitHubCore):
             "license_template": license_template,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
+            "has_projects": has_projects
         }
         if int(team_id) > 0:
             data.update({"team_id": team_id})

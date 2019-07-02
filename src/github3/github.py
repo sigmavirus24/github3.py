@@ -681,6 +681,7 @@ class GitHub(models.GitHubCore):
         has_wiki=True,
         auto_init=False,
         gitignore_template="",
+        has_projects=True
     ):
         """Create a repository for the authenticated user.
 
@@ -706,6 +707,9 @@ class GitHub(models.GitHubCore):
         :param str gitignore_template:
             (optional), name of the git template to use; ignored if auto_init =
             False.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository. API
+            default: ``True``
         :returns:
             created repository
         :rtype:
@@ -721,6 +725,7 @@ class GitHub(models.GitHubCore):
             "has_wiki": has_wiki,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
+            "has_projects": has_projects
         }
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(repo.Repository, json)
