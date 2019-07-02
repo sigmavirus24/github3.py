@@ -77,6 +77,7 @@ class TestOrganization(helper.UnitHelper):
                 "team_id": 1,
                 "gitignore_template": "",
                 "license_template": "",
+                "has_projects": True
             },
         )
 
