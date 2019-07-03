@@ -44,6 +44,17 @@ this in a virtual environment. These need to be installed for the tests to run.
 .. _coverage: http://nedbatchelder.com/code/coverage/
 .. _mock: https://mock.readthedocs.io/en/latest/
 
+Build status
+~~~~~~~~~~~~
+
+You can find `master` build statuses for different environments.
+
+- travis_
+- appveyor_
+
+.. _travis: https://travis-ci.org/sigmavirus24/github3.py
+.. _appveyor: https://ci.appveyor.com/project/sigmavirus24/github3-py/branch/master
+
 License
 -------
 
