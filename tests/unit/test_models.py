@@ -3,6 +3,7 @@ import json
 import pytest
 import requests
 
+from copy import copy
 from datetime import datetime, timedelta
 from github3 import exceptions, GitHubError
 from github3.models import GitHubCore
@@ -205,6 +206,10 @@ class TestGitHubCore(helper.UnitHelper):
     def test_strptime_time_str_required(self):
         """Verify that method converts ISO 8601 formatted string."""
         assert self.instance._strptime("") is None
+
+    def test_can_be_copied(self):
+        """Verify that a GithubCore object can be copied."""
+        assert copy(self.instance) is not None
 
 
 class TestGitHubCoreIssue672(helper.UnitHelper):
