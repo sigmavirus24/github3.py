@@ -182,3 +182,5 @@ Contributors
 - Steven Nyman (@stevennyman)
 
 - Tigran Tchougourian (@NargiT)
+
+- Dimitri Merejkowsky (@dmerejkowsky)
