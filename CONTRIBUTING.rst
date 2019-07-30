@@ -56,6 +56,8 @@ Guidelines for Contributing to github3.py
 
 #. Please follow pep-0008_. Feel free to also use flake8_ to help.
 
+#. Import modules, not class or functions
+
 .. links
 .. _README: ./README.rst
 .. _easy: https://github.com/sigmavirus24/github3.py/issues?labels=Easy&page=1&state=open
