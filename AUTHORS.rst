@@ -183,4 +183,6 @@ Contributors
 
 - Tigran Tchougourian (@NargiT)
 
+- Samuel Mendes (@smendes)
+
 - Dimitri Merejkowsky (@dmerejkowsky)
