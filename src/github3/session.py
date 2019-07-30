@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """Module containing session and auth logic."""
-from collections import Callable
+try:
+    import collections.abc as abc_collections
+except ImportError:
+    # For Python 2.7 compatibility
+    import collections as abc_collections
+
 import datetime
 from contextlib import contextmanager
 from logging import getLogger
@@ -193,7 +198,7 @@ class GitHubSession(requests.Session):
         if not callback:
             return
 
-        if not isinstance(callback, Callable):
+        if not isinstance(callback, abc_collections.Callable):
             raise ValueError("Your callback should be callable")
 
         self.two_factor_auth_cb = callback
