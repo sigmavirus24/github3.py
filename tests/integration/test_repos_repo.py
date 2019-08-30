@@ -454,6 +454,28 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(pull_request, github3.pulls.ShortPullRequest)
 
+    def test_create_pull_draft(self):
+        """Test the ability to create a draft pull request on a repository."""
+        self.token_login()
+        cassette_name = self.cassette_name("create_pull_draft")
+        with self.recorder.use_cassette(cassette_name):
+            original_repository = self.gh.repository(
+                "github3py", "github3.py"
+            )
+            repository = original_repository.create_fork(
+                organization="testgh3py"
+            )
+            pull_request = repository.create_pull(
+                title="Update forked repo",
+                base="master",
+                head="testgh3py:develop",
+                body="Testing the ability to create a draft pull request",
+                draft=True,
+            )
+            repository.delete()
+
+        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
+
     def test_create_pull_from_issue(self):
         """Verify creation of a pull request from an issue."""
         self.token_login()

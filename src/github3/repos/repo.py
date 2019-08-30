@@ -117,7 +117,7 @@ class _Repository(models.GitHubCore):
         json = None
         if data:
             url = self._build_url("pulls", base_url=self._api)
-            json = self._json(self._post(url, data=data), 201)
+            json = self._json(self._post(url, data=data, headers=pulls.PULLS_PREVIEW_HEADERS), 201)
         return self._instance_or_null(pulls.ShortPullRequest, json)
 
     @decorators.requires_auth
@@ -1097,7 +1097,7 @@ class _Repository(models.GitHubCore):
         return self._instance_or_null(projects.Project, json)
 
     @decorators.requires_auth
-    def create_pull(self, title, base, head, body=None):
+    def create_pull(self, title, base, head, body=None, draft=False):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
         :param str title:
@@ -1108,16 +1108,18 @@ class _Repository(models.GitHubCore):
             (required), e.g., 'username:branch'
         :param str body:
             (optional), markdown formatted description
+        :param draft boolean:
+            (optional), whether to create a draft pull request
         :returns:
             the created pull request
         :rtype:
             :class:`~github3.pulls.ShortPullRequest`
         """
-        data = {"title": title, "body": body, "base": base, "head": head}
+        data = {"title": title, "body": body, "base": base, "head": head, "draft": draft}
         return self._create_pull(data)
 
     @decorators.requires_auth
-    def create_pull_from_issue(self, issue, base, head):
+    def create_pull_from_issue(self, issue, base, head, draft=False):
         """Create a pull request from issue #``issue``.
 
         :param int issue:
@@ -1126,13 +1128,15 @@ class _Repository(models.GitHubCore):
             (required), e.g., 'master'
         :param str head:
             (required), e.g., 'username:branch'
+        :param draft boolean:
+            (optional), whether to create a draft pull request
         :returns:
             the created pull request
         :rtype:
             :class:`~github3.pulls.ShortPullRequest`
         """
         if int(issue) > 0:
-            data = {"issue": issue, "base": base, "head": head}
+            data = {"issue": issue, "base": base, "head": head, "draft": draft}
             return self._create_pull(data)
         return None
 

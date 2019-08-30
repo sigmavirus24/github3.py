@@ -322,9 +322,13 @@ class TestRepository(helper.UnitHelper):
 
     def test_create_pull_private(self):
         """Verify the request for creating a pull request."""
-        data = {"title": "foo", "base": "master", "head": "feature_branch"}
+        data = {"title": "foo", "base": "master", "head": "feature_branch", "draft": True}
         self.instance._create_pull(data)
-        self.post_called_with(url_for("pulls"), data=data)
+        self.post_called_with(
+            url_for("pulls"),
+            data=data,
+            headers={'Accept': 'application/vnd.github.shadow-cat-preview'},
+        )
 
     def test_create_pull(self):
         """Verify the request for creating a pull request."""
@@ -333,6 +337,7 @@ class TestRepository(helper.UnitHelper):
             "base": "master",
             "head": "feature_branch",
             "body": "body",
+            "draft": True,
         }
         with helper.mock.patch.object(Repository, "_create_pull") as pull:
             self.instance.create_pull(**data)
@@ -341,7 +346,7 @@ class TestRepository(helper.UnitHelper):
     def test_create_pull_from_issue(self):
         """Verify the request for creating a pull request from an issue."""
         with helper.mock.patch.object(Repository, "_create_pull") as pull:
-            data = {"issue": 1, "base": "master", "head": "feature_branch"}
+            data = {"issue": 1, "base": "master", "head": "feature_branch", "draft": True}
             self.instance.create_pull_from_issue(**data)
             pull.assert_called_once_with(data)
 

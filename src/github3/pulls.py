@@ -15,6 +15,11 @@ from .issues import Issue
 from .issues.comment import IssueComment
 
 
+PULLS_PREVIEW_HEADERS = {
+    "Accept": "application/vnd.github.shadow-cat-preview",
+}
+
+
 class PullDestination(models.GitHubCore):
     """The object that represents a pull request destination.
 

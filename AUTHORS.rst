@@ -186,3 +186,5 @@ Contributors
 - Samuel Mendes (@smendes)
 
 - Dimitri Merejkowsky (@dmerejkowsky)
+
+- Damien Baty (@dbaty)
