@@ -581,6 +581,29 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(traffic.ViewsStats, json)
 
+    def clones(self, per='day'):
+        """Get the total number of repository clones and breakdown per day or
+        week for the last 14 days.
+
+        .. versionadded:: 1.4.0
+
+        See also: https://developer.github.com/v3/repos/traffic/
+
+        :param str per:
+            (optional), ('day', 'week'), clones reporting period. Default 'day'
+            will return clones per day for the last 14 days.
+        :returns:
+            clones data
+        :rtype:
+            :class:`~github3.repos.traffic.ClonesStats`
+        """
+        params = {}
+        if per in ("day", "week"):
+            params.update(per=per)
+        url = self._build_url("traffic", "clones", base_url=self._api)
+        json = self._json(self._get(url, params=params), 200)
+        return self._instance_or_null(traffic.ClonesStats, json)
+
     @decorators.requires_app_installation_auth
     def create_check_run(
         self,
