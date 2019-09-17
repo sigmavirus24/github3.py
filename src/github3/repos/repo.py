@@ -44,6 +44,7 @@ from . import stats
 from . import status
 from . import tag
 from . import topics
+from . import traffic
 
 
 class _Repository(models.GitHubCore):
@@ -556,6 +557,29 @@ class _Repository(models.GitHubCore):
         if anon:
             params = {"anon": "true"}
         return self._iter(int(number), url, users.Contributor, params, etag)
+
+    def views(self, per='day'):
+        """Get the total number of repository views and breakdown per day or
+        week for the last 14 days.
+
+        .. versionadded:: 1.4.0
+
+        See also: https://developer.github.com/v3/repos/traffic/
+
+        :param str per:
+            (optional), ('day', 'week'), views reporting period. Default 'day'
+            will return views per day for the last 14 days.
+        :returns:
+            views data
+        :rtype:
+            :class:`~github3.repos.traffic.ViewsStats`
+        """
+        params = {}
+        if per in ("day", "week"):
+            params.update(per=per)
+        url = self._build_url("traffic", "views", base_url=self._api)
+        json = self._json(self._get(url, params=params), 200)
+        return self._instance_or_null(traffic.ViewsStats, json)
 
     @decorators.requires_app_installation_auth
     def create_check_run(
