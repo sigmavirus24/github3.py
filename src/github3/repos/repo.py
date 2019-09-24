@@ -577,6 +577,8 @@ class _Repository(models.GitHubCore):
         params = {}
         if per in ("day", "week"):
             params.update(per=per)
+        else:
+            raise ValueError("per must be 'day' or 'week'")
         url = self._build_url("traffic", "views", base_url=self._api)
         json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(traffic.ViewsStats, json)
@@ -600,6 +602,8 @@ class _Repository(models.GitHubCore):
         params = {}
         if per in ("day", "week"):
             params.update(per=per)
+        else:
+            raise ValueError("per must be 'day' or 'week'")
         url = self._build_url("traffic", "clones", base_url=self._api)
         json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(traffic.ClonesStats, json)
