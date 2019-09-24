@@ -180,3 +180,9 @@ Contributors
 - Simon Westphahl (@westphahl)
 
 - Steven Nyman (@stevennyman)
+
+- Tigran Tchougourian (@NargiT)
+
+- Samuel Mendes (@smendes)
+
+- Dimitri Merejkowsky (@dmerejkowsky)

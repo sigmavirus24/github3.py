@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-import collections
+try:
+    import collections.abc as abc_collections
+except ImportError:
+    # For Python 2.7 compatibility
+    import collections as abc_collections
 import functools
 
 from requests.compat import urlparse, urlencode
@@ -8,7 +12,7 @@ from . import exceptions
 from . import models
 
 
-class GitHubIterator(models.GitHubCore, collections.Iterator):
+class GitHubIterator(models.GitHubCore, abc_collections.Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
 
     def __init__(
