@@ -573,6 +573,8 @@ class _Repository(models.GitHubCore):
             views data
         :rtype:
             :class:`~github3.repos.traffic.ViewsStats`
+        :raises:
+            ValueError if per is not a valid choice
         """
         params = {}
         if per in ("day", "week"):
@@ -598,6 +600,8 @@ class _Repository(models.GitHubCore):
             clones data
         :rtype:
             :class:`~github3.repos.traffic.ClonesStats`
+        :raises:
+            ValueError if per is not a valid choice
         """
         params = {}
         if per in ("day", "week"):
