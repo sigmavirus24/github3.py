@@ -310,6 +310,19 @@ class TestOrganization(IntegrationHelper):
             fetched_team = o.team(first_team.id)
             assert first_team == fetched_team
 
+    def test_team_by_name(self):
+        """Test the ability retrieve an individual team by name."""
+        self.auto_login()
+        cassette_name = self.cassette_name("team_by_name")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization('erico-sandbox')
+
+            # Grab a team, any team
+            first_team = next(o.teams())
+
+            fetched_team = o.team_by_name(first_team.slug)
+            assert first_team == fetched_team
+
     def test_invitations(self):
         """Show that a user can retrieve an org's invites."""
         cassette_name = self.cassette_name("invitations")

@@ -228,6 +228,14 @@ class TestOrganization(helper.UnitHelper):
             "https://api.github.com/teams/10"
         )
 
+    def test_team_by_name(self):
+        """Show that a user can retrieve a team by name."""
+        self.instance.team_by_name('team-name')
+
+        self.session.get.assert_called_once_with(
+            "https://api.github.com/orgs/github/teams/team-name"
+        )
+
     def test_team_requires_positive_team_id(self):
         """Show that team requires a team_id greater than 0."""
         self.instance.team(-1)

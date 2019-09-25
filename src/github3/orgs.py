@@ -1265,6 +1265,21 @@ class _Organization(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Team, json)
 
+    @requires_auth
+    def team_by_name(self, team_slug):
+        """Return the team specified by ``team_slug``.
+
+        :param str team_slug:
+            (required), slug for the team
+        :returns:
+            the team identified by the slug in this organization
+        :rtype:
+            :class:`~github3.orgs.Team`
+        """
+        url = self._build_url("teams", str(team_slug), base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(Team, json)
+
 
 class Organization(_Organization):
     """Object for the full representation of a Organization.
