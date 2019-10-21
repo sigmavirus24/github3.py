@@ -188,3 +188,5 @@ Contributors
 - Dimitri Merejkowsky (@dmerejkowsky)
 
 - Erico Fusco (@ericofusco)
+
+- Radomir Stevanovic (@randomir)
