@@ -206,7 +206,7 @@ class _Team(models.GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
-    def members(self, role=None, number=-1, etag=None):
+    def members(self, role=None, number=-1, etag=None, show_child_members=False):
         """Iterate over the members of this team.
 
         :param str role:
@@ -228,6 +228,8 @@ class _Team(models.GitHubCore):
         if role in self.filterable_member_roles:
             params["role"] = role
             headers["Accept"] = "application/vnd.github.ironman-preview+json"
+        if show_child_members:
+            headers["Accept"] = "application/vnd.github.hellcat-preview+json"
         url = self._build_url("members", base_url=self._api)
         return self._iter(
             int(number),
