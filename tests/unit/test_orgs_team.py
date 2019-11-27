@@ -168,3 +168,19 @@ class TestTeamIterator(helper.UnitIteratorHelper):
             params={"per_page": 100},
             headers={"Accept": "application/vnd.github.ironman-preview+json"},
         )
+        
+    def test_teams(self):
+        """Show that one can iterate over all child teams of a Team."""
+        i = self.instance.teams()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for("teams"), params={"per_page": 100}, headers={}
+        )
+        
+    def test_teams_requires_auth(self):
+        """Show that one needs to authenticate to get child teams."""
+        self.session.has_auth.return_value = False
+
+        with pytest.raises(GitHubError):
+            self.instance.teams()
