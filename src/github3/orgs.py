@@ -327,6 +327,18 @@ class _Team(models.GitHubCore):
         url = self._build_url("repos", repository, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
+    @requires_auth
+    def teams(self, number=-1, etag=None):
+        headers = {"Accept": "application/vnd.github.hellcat-preview+json"}
+        url = self._build_url("teams", base_url=self._api)
+        return self._iter(
+            int(number),
+            url,
+            users.ShortUser,
+            etag=etag,
+            headers=headers,
+        )
+
 
 class Team(_Team):
     """Object representing a team in the GitHub API.
