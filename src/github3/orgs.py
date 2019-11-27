@@ -329,6 +329,18 @@ class _Team(models.GitHubCore):
 
     @requires_auth
     def teams(self, number=-1, etag=None):
+        """Iterate over the child teams of this team.
+
+        :param int number:
+            (optional), number of users to iterate over.  Default: -1 iterates
+            over all values
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of the child teams of this team
+        :rtype:
+            :class:`~github3.orgs.ShortTeam`
+        """
         headers = {"Accept": "application/vnd.github.hellcat-preview+json"}
         url = self._build_url("teams", base_url=self._api)
         return self._iter(
