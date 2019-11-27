@@ -334,7 +334,7 @@ class _Team(models.GitHubCore):
         return self._iter(
             int(number),
             url,
-            users.ShortUser,
+            ShortTeam,
             etag=etag,
             headers=headers,
         )
