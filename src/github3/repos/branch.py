@@ -407,7 +407,7 @@ class ProtectionEnforceAdmins(models.GitHubCore):
     def enable(self):
         """Enable Admin enforcement for protected branch."""
         resp = self._post(
-            self._api, headers=BranchProtection.PREVIEW_HEADERS_MAP
+            self._api
         )
         return self._boolean(resp, 200, 404)
 
@@ -415,7 +415,7 @@ class ProtectionEnforceAdmins(models.GitHubCore):
     def disable(self):
         """Disable Admin enforcement for protected branch."""
         resp = self._delete(
-            self._api, headers=BranchProtection.PREVIEW_HEADERS_MAP
+            self._api
         )
         return self._boolean(resp, 204, 404)
 
