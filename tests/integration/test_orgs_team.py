@@ -118,3 +118,12 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             team = self.get_team(id=923595)
             assert team.remove_repository("github3py/urllib3") is True
+
+    def test_teams(self):
+        """Show that a user can retrieve a team's child teams."""
+        cassette_name = self.cassette_name("teams")
+        with self.recorder.use_cassette(cassette_name):
+            t = self.get_team()
+            for member in t.teams():
+                assert isinstance(member, github3.orgs.ShortTeam)
+
