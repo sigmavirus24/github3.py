@@ -190,3 +190,5 @@ Contributors
 - Erico Fusco (@ericofusco)
 
 - Ben Jefferies (@benjefferies)
+
+- Bharat Raghunathan (@Bharat123rox)
