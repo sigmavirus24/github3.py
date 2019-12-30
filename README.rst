@@ -4,8 +4,6 @@
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
 
-See HISTORY.rst for any "breaking" changes.
-
 Installation
 ------------
 
@@ -81,7 +79,9 @@ Install the dependencies from requirements.txt e.g.:
 Author
 ------
 
-Ian Stapleton Cordasco (sigmavirus24)
+Ian Stapleton Cordasco (sigmavirus24_)
+
+.. _sigmavirus24: https://github.com/sigmavirus24
 
 Contact Options
 ---------------
@@ -90,7 +90,8 @@ Contact Options
   you may have
 - If you dislike Stack Overflow it is preferred that you send an email to 
   github3.py@librelist.com
-- You may also contact (via email) the author directly with 
+- You may also contact (via email_) the author directly with 
   questions/suggestions/comments or if you wish to include sensitive data.
 
 .. _github3.py: http://stackoverflow.com/questions/tagged/github3.py
+.. _email: mailto:graffatcolmingov@gmail.com
