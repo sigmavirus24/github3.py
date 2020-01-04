@@ -3297,7 +3297,8 @@ class ShortRepository(_Repository):
 
     .. attribute:: owner
 
-        The owner of the repository, e.g., ``sigmavirus24``.
+        A :class:`~github3.users.ShortUser` object representing the owner of
+        the repository.
 
     .. attribute:: private
 

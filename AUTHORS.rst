@@ -192,3 +192,5 @@ Contributors
 - Radomir Stevanovic (@randomir)
 
 - Ben Jefferies (@benjefferies)
+
+- Kevin P. Fleming (@kpfleming)

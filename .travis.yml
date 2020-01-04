@@ -17,25 +17,22 @@ matrix:
   include:
     - python: 2.7
       env: TOXENV=py27
-    - python: 3.4
-      env: TOXENV=py34
     - python: 3.5
       env: TOXENV=py35
     - python: 3.6
       env: TOXENV=py36
     - python: 3.7
       env: TOXENV=py37
-      dist: xenial    # required for Python >= 3.7
+    - python: 3.8
+      env: TOXENV=py38
     - python: nightly
       env: TOXENV=py38
-      dist: xenial    # required for Python >= 3.7
     - python: pypy
       env: TOXENV=pypy
     - python: 2.7
       env: TOXENV=py27-flake8
-    - python: 3.7
-      dist: xenial    # required for Python >= 3.7
-      env: TOXENV=py37-flake8
+    - python: 3.8
+      env: TOXENV=py38-flake8
     - env: TOXENV=docstrings
     - env: TOXENV=notebooks
     - env: TOXENV=readme
@@ -45,5 +42,3 @@ matrix:
   allow_failures:
   - env: TOXENV=docstrings
   - env: TOXENV=notebooks
-
-sudo: false
