@@ -191,4 +191,6 @@ Contributors
 
 - Ben Jefferies (@benjefferies)
 
+- Bharat Raghunathan (@Bharat123rox)
+
 - Kevin P. Fleming (@kpfleming)
