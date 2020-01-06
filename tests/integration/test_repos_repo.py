@@ -1,4 +1,7 @@
 """Integration tests for Repositories."""
+import itertools
+import datetime
+
 import github3
 import github3.exceptions as exc
 
@@ -1346,6 +1349,55 @@ class TestRepository(helper.IntegrationHelper):
         assert isinstance(weekly_commit_count, dict)
         assert len(weekly_commit_count.get("owner")) == 52
         assert len(weekly_commit_count.get("all")) == 52
+
+    def test_traffic_views(self):
+        """
+        Test the ability to retrieve the daily and weekly views traffic stats
+        on a repository.
+        """
+        cassette_name = self.cassette_name("repo_traffic")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("randomir", "envie")
+            daily_views = repository.views()
+            weekly_views = repository.views(per="week")
+
+        assert isinstance(daily_views, github3.repos.traffic.ViewsStats)
+        assert isinstance(weekly_views, github3.repos.traffic.ViewsStats)
+
+        assert daily_views.count == weekly_views.count == 18
+        assert daily_views.uniques == weekly_views.uniques == 3
+        assert len(daily_views.views) == 4
+        assert len(weekly_views.views) == 2
+
+        for v in itertools.chain(daily_views.views, weekly_views.views):
+            assert isinstance(v['timestamp'], datetime.datetime)
+            assert isinstance(v['count'], int)
+            assert isinstance(v['uniques'], int)
+
+    def test_traffic_clones(self):
+        """
+        Test the ability to retrieve the daily and weekly clones traffic stats
+        on a repository.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name("repo_traffic")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("randomir", "envie")
+            daily_clones = repository.clones()
+            weekly_clones = repository.clones(per="week")
+
+        assert isinstance(daily_clones, github3.repos.traffic.ClonesStats)
+        assert isinstance(weekly_clones, github3.repos.traffic.ClonesStats)
+
+        assert daily_clones.count == weekly_clones.count == 3
+        assert daily_clones.uniques == weekly_clones.uniques == 3
+        assert len(daily_clones.clones) == 3
+        assert len(weekly_clones.clones) == 2
+
+        for v in itertools.chain(daily_clones.clones, weekly_clones.clones):
+            assert isinstance(v['timestamp'], datetime.datetime)
+            assert isinstance(v['count'], int)
+            assert isinstance(v['uniques'], int)
 
 
 class TestContents(helper.IntegrationHelper):
