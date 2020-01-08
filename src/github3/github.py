@@ -2930,7 +2930,7 @@ class GitHubStatus(models.GitHubCore):
     def __init__(self, session=None):
         """Create a status API client."""
         super(GitHubStatus, self).__init__({}, session or self.new_session())
-        self.session.base_url = "https://status.github.com"
+        self.session.base_url = "https://www.githubstatus.com/api/v2"
 
     def _repr(self):
         return "<GitHub Status>"
@@ -2940,18 +2940,34 @@ class GitHubStatus(models.GitHubCore):
         resp = self._get(url)
         return resp.json() if self._boolean(resp, 200, 404) else {}
 
-    def api(self):
-        """Retrieve API status."""
-        return self._recipe("api.json")
+    def summary(self):
+        """Retrieve status page overall summary."""
+        return self._recipe("summary.json")
 
     def status(self):
         """Retrieve overall status."""
-        return self._recipe("api", "status.json")
+        return self._recipe("status.json")
 
-    def last_message(self):
-        """Retrieve the last message."""
-        return self._recipe("api", "last-message.json")
+    def components(self):
+        """Retrieve listing of status page components."""
+        return self._recipe("components.json")
 
-    def messages(self):
-        """Retrieve all messages."""
-        return self._recipe("api", "messages.json")
+    def unresolved_incidents(self):
+        """Retrive any on-going or unresolved incidents."""
+        return self._recipe("incidents", "unresolved.json")
+
+    def incidents(self):
+        """Retrieve 50 most recent incidents on the status page."""
+        return self._recipe("incidents.json")
+
+    def upcoming_scheduled_maintenances(self):
+        """Retrieve any upcoming scheduled maintenances for GitHub."""
+        return self._recipe("scheduled-maintenances", "upcoming.json")
+
+    def active_scheduled_maintenances(self):
+        """Retrieve any in-progress scheduled maintenances for GitHub."""
+        return self._recipe("scheduled-maintenances", "active.json")
+
+    def scheduled_maintenances(self):
+        """Retrieve 50 most recent scheduled maintenances."""
+        return self._recipe("scheduled-maintenances.json")

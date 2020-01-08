@@ -779,34 +779,66 @@ class TestGitHubStatus(GitHubStatusHelper):
     def setUp(self):
         super(TestGitHubStatus, self).setUp()
 
-    def test_api(self):
-        """Test the ability to check the status of /api."""
-        cassette_name = self.cassette_name("api")
+    def test_summary(self):
+        """Test the ability to check the status of /summary.json."""
+        cassette_name = self.cassette_name("summary")
         with self.recorder.use_cassette(cassette_name):
-            api = self.gh.api()
+            summary = self.gh.summary()
 
-        assert isinstance(api, dict)
-
-    def test_last_message(self):
-        """Test the ability to check the status of /api/last-message."""
-        cassette_name = self.cassette_name("last_message")
-        with self.recorder.use_cassette(cassette_name):
-            last_message = self.gh.last_message()
-
-        assert isinstance(last_message, dict)
-
-    def test_messages(self):
-        """Test the ability to check the status of /api/messages."""
-        cassette_name = self.cassette_name("messages")
-        with self.recorder.use_cassette(cassette_name):
-            messages = self.gh.messages()
-
-        assert isinstance(messages, list)
+        assert isinstance(summary, dict)
 
     def test_status(self):
-        """Test the ability to check the status of /api/status."""
+        """Test the ability to check the status of /status.json."""
         cassette_name = self.cassette_name("status")
         with self.recorder.use_cassette(cassette_name):
             status = self.gh.status()
 
         assert isinstance(status, dict)
+
+    def test_components(self):
+        """Test the ability to check the status of /components.json."""
+        cassette_name = self.cassette_name("components")
+        with self.recorder.use_cassette(cassette_name):
+            components = self.gh.components()
+
+        assert isinstance(components, dict)
+
+    def test_unresolved_incidents(self):
+        """Test the ability to check the status of /incidents/unresolved.json."""
+        cassette_name = self.cassette_name("unresolved_incidents")
+        with self.recorder.use_cassette(cassette_name):
+            unresolved_incidents = self.gh.unresolved_incidents()
+
+        assert isinstance(unresolved_incidents, dict)
+
+    def test_incidents(self):
+        """Test the ability to check the status of /incidents.json."""
+        cassette_name = self.cassette_name("incidents")
+        with self.recorder.use_cassette(cassette_name):
+            incidents = self.gh.incidents()
+
+        assert isinstance(incidents, dict)
+
+    def test_upcoming_scheduled_maintenances(self):
+        """Test the ability to check the status of /scheduled-maintenances/upcoming.json."""
+        cassette_name = self.cassette_name("upcoming_scheduled_maintenances")
+        with self.recorder.use_cassette(cassette_name):
+            upcoming_scheduled_maintenances = self.gh.upcoming_scheduled_maintenances()
+
+        assert isinstance(upcoming_scheduled_maintenances, dict)
+
+    def test_active_scheduled_maintenances(self):
+        """Test the ability to check the status of /scheduled-maintenances/active.json."""
+        cassette_name = self.cassette_name("active_scheduled_maintenances")
+        with self.recorder.use_cassette(cassette_name):
+            active_scheduled_maintenances = self.gh.active_scheduled_maintenances()
+
+        assert isinstance(active_scheduled_maintenances, dict)
+
+    def test_scheduled_maintenances(self):
+        """Test the ability to check the status of /scheduled-maintenances.json."""
+        cassette_name = self.cassette_name("scheduled_maintenances")
+        with self.recorder.use_cassette(cassette_name):
+            scheduled_maintenances = self.gh.scheduled_maintenances()
+
+        assert isinstance(scheduled_maintenances, dict)

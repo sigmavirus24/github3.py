@@ -1545,31 +1545,56 @@ class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
 
 
 class TestGitHubStatus(helper.UnitHelper):
-
     """Test methods on GitHubStatus."""
 
     described_class = GitHubStatus
 
-    def test_api(self):
-        """Verify the request for /api."""
+    def test_summary(self):
+        """Verify the request for /summary.json."""
         with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.api()
-            _recipe.assert_called_once_with("api.json")
-
-    def test_last_message(self):
-        """Verify the request for /api/last-message."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.last_message()
-            _recipe.assert_called_once_with("api", "last-message.json")
-
-    def test_messages(self):
-        """Verify the request for /api/messages."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.messages()
-            _recipe.assert_called_once_with("api", "messages.json")
+            self.instance.summary()
+            _recipe.assert_called_once_with("summary.json")
 
     def test_status(self):
-        """Verify the request for /api/status."""
+        """Verify the request for /status.json."""
         with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
             self.instance.status()
-            _recipe.assert_called_once_with("api", "status.json")
+            _recipe.assert_called_once_with("status.json")
+
+    def test_components(self):
+        """Verify the request for /components.json."""
+        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
+            self.instance.components()
+            _recipe.assert_called_once_with("components.json")
+
+    def test_unresolved_incidents(self):
+        """Verify the request for /incidents/unresolved.json."""
+        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
+            self.instance.unresolved_incidents()
+            _recipe.assert_called_once_with("incidents", "unresolved.json")
+
+    def test_incidents(self):
+        """Verify the request for /incidents.json."""
+        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
+            self.instance.incidents()
+            _recipe.assert_called_once_with("incidents.json")
+
+    def test_upcoming_scheduled_maintenances(self):
+        """Verify the request for /scheduled-maintenances/upcoming.json."""
+        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
+            self.instance.upcoming_scheduled_maintenances()
+            _recipe.assert_called_once_with("scheduled-maintenances",
+                                            "upcoming.json")
+
+    def test_active_scheduled_maintenances(self):
+        """Verify the request for /scheduled-maintenances/active.json."""
+        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
+            self.instance.active_scheduled_maintenances()
+            _recipe.assert_called_once_with("scheduled-maintenances",
+                                            "active.json")
+
+    def test_scheduled_maintenances(self):
+        """Verify the request for /scheduled-maintenances.json."""
+        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
+            self.instance.scheduled_maintenances()
+            _recipe.assert_called_once_with("scheduled-maintenances.json")
