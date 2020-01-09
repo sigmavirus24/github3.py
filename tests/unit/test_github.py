@@ -1,7 +1,7 @@
 import pytest
 
 from github3 import GitHubEnterprise, GitHubError
-from github3.github import GitHub, GitHubStatus
+from github3.github import GitHub
 from github3.projects import Project
 
 from . import helper
@@ -1542,59 +1542,3 @@ class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
         assert str(self.instance) == "<GitHub Enterprise [{0}]>".format(
             enterprise_url_for()
         )
-
-
-class TestGitHubStatus(helper.UnitHelper):
-    """Test methods on GitHubStatus."""
-
-    described_class = GitHubStatus
-
-    def test_summary(self):
-        """Verify the request for /summary.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.summary()
-            _recipe.assert_called_once_with("summary.json")
-
-    def test_status(self):
-        """Verify the request for /status.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.status()
-            _recipe.assert_called_once_with("status.json")
-
-    def test_components(self):
-        """Verify the request for /components.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.components()
-            _recipe.assert_called_once_with("components.json")
-
-    def test_unresolved_incidents(self):
-        """Verify the request for /incidents/unresolved.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.unresolved_incidents()
-            _recipe.assert_called_once_with("incidents", "unresolved.json")
-
-    def test_incidents(self):
-        """Verify the request for /incidents.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.incidents()
-            _recipe.assert_called_once_with("incidents.json")
-
-    def test_upcoming_scheduled_maintenances(self):
-        """Verify the request for /scheduled-maintenances/upcoming.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.upcoming_scheduled_maintenances()
-            _recipe.assert_called_once_with("scheduled-maintenances",
-                                            "upcoming.json")
-
-    def test_active_scheduled_maintenances(self):
-        """Verify the request for /scheduled-maintenances/active.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.active_scheduled_maintenances()
-            _recipe.assert_called_once_with("scheduled-maintenances",
-                                            "active.json")
-
-    def test_scheduled_maintenances(self):
-        """Verify the request for /scheduled-maintenances.json."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.scheduled_maintenances()
-            _recipe.assert_called_once_with("scheduled-maintenances.json")

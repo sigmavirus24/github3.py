@@ -56,14 +56,13 @@ from .api import (
     user,
     zen,
 )
-from .github import GitHub, GitHubEnterprise, GitHubStatus
+from .github import GitHub, GitHubEnterprise
 from .exceptions import GitHubError
 
 __all__ = (
     "GitHub",
     "GitHubEnterprise",
     "GitHubError",
-    "GitHubStatus",
     "authorize",
     "login",
     "enterprise_login",
