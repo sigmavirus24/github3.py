@@ -9,7 +9,6 @@ import uritemplate
 from .helper import (
     GitHubEnterpriseHelper,
     IntegrationHelper,
-    GitHubStatusHelper,
 )
 
 GPG_KEY = (
@@ -773,40 +772,3 @@ class TestGitHubEnterprise(GitHubEnterpriseHelper):
             stats = self.gh.admin_stats("all")
 
         assert isinstance(stats, dict)
-
-
-class TestGitHubStatus(GitHubStatusHelper):
-    def setUp(self):
-        super(TestGitHubStatus, self).setUp()
-
-    def test_api(self):
-        """Test the ability to check the status of /api."""
-        cassette_name = self.cassette_name("api")
-        with self.recorder.use_cassette(cassette_name):
-            api = self.gh.api()
-
-        assert isinstance(api, dict)
-
-    def test_last_message(self):
-        """Test the ability to check the status of /api/last-message."""
-        cassette_name = self.cassette_name("last_message")
-        with self.recorder.use_cassette(cassette_name):
-            last_message = self.gh.last_message()
-
-        assert isinstance(last_message, dict)
-
-    def test_messages(self):
-        """Test the ability to check the status of /api/messages."""
-        cassette_name = self.cassette_name("messages")
-        with self.recorder.use_cassette(cassette_name):
-            messages = self.gh.messages()
-
-        assert isinstance(messages, list)
-
-    def test_status(self):
-        """Test the ability to check the status of /api/status."""
-        cassette_name = self.cassette_name("status")
-        with self.recorder.use_cassette(cassette_name):
-            status = self.gh.status()
-
-        assert isinstance(status, dict)
