@@ -1514,6 +1514,7 @@ class _Repository(models.GitHubCore):
         allow_squash_merge=None,
         allow_rebase_merge=None,
         has_projects=None,
+        delete_branch_on_merge=None
     ):
         """Edit this repository.
 
@@ -1567,6 +1568,10 @@ class _Repository(models.GitHubCore):
             (optional), If ``True``, enable projects for this repository.
             If ``False``, disable projects projects for this repository.
             API default: ``None`` - leave value unchanged.
+        :param bool delete_branch_on_merge:
+            (optional), If not ``None``, change whether head branches will
+            automatically be deleted when pull requests are merged.
+            API default: ``None`` - leave value unchanged.
         :returns:
             True if successful, False otherwise
         :rtype:
@@ -1587,6 +1592,7 @@ class _Repository(models.GitHubCore):
             "allow_squash_merge": allow_squash_merge,
             "allow_rebase_merge": allow_rebase_merge,
             "has_projects": has_projects,
+            "delete_branch_on_merge": delete_branch_on_merge,
         }
         self._remove_none(edit)
         json = None
@@ -2928,6 +2934,11 @@ class Repository(_Repository):
         This is the default branch of the repository as configured by its
         administrator(s).
 
+    .. attribute:: delete_branch_on_merge
+
+        Whether head branches will be automatically deleted when pull requests
+        are merged.
+
     .. attribute:: forks_count
 
         This is the number of forks of the repository.
@@ -3056,6 +3067,7 @@ class Repository(_Repository):
         self.clone_url = repo["clone_url"]
         self.created_at = self._strptime(repo["created_at"])
         self.default_branch = repo["default_branch"]
+        self.delete_branch_on_merge = repo["delete_branch_on_merge"]
         self.forks_count = repo["forks_count"]
         self.fork_count = self.forks_count
         self.git_url = repo["git_url"]
