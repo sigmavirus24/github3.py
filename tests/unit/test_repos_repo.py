@@ -560,6 +560,7 @@ class TestRepository(helper.UnitHelper):
             "allow_squash_merge": True,
             "allow_merge_commit": False,
             "has_projects": False,
+            "delete_branch_on_merge": True
         }
 
         with unittest.mock.patch.object(
