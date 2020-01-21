@@ -206,3 +206,5 @@ Contributors
 - Adeodato Simó (@dato)
 
 - Gunnar Andersson (@gunnarx)
+
+- Nathan Walters (@nwalters512)
