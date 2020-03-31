@@ -10,17 +10,10 @@ try:
 except ImportError:
     pass
 
-if hasattr(__builtins__, 'raw_input'):
-    prompt = raw_input
-else:
-    prompt = input
-
 
 def prompt_user(prompt_str):
-    val = ''
-    while not val:
-        val = prompt(prompt_str)
-    return val
+    return input(prompt_str).strip() or prompt_user(prompt_str)
+
 
 if len(sys.argv) > 1 and sys.argv[1] in ('-h', '--help', '-?'):
     print("Usage: {0} [-h|-?|--help]".format(sys.argv[0]))
