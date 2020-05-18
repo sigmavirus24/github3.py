@@ -1,5 +1,8 @@
 """Organization unit tests."""
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 import pytest
 
 from github3 import GitHubError

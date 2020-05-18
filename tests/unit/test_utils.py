@@ -2,7 +2,10 @@ from datetime import datetime
 from github3.utils import stream_response_to_file, timestamp_parameter
 
 import io
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 import pytest
 import requests
 

@@ -2,7 +2,10 @@
 """Unit tests for the Issue class."""
 import github3
 import dateutil.parser
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from github3.issues.label import Label
 from github3.issues import Issue
