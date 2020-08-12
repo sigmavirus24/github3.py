@@ -1544,37 +1544,6 @@ class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
         )
 
 
-class TestGitHubStatus(helper.UnitHelper):
-
-    """Test methods on GitHubStatus."""
-
-    described_class = GitHubStatus
-
-    def test_api(self):
-        """Verify the request for /api."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.api()
-            _recipe.assert_called_once_with("api.json")
-
-    def test_last_message(self):
-        """Verify the request for /api/last-message."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.last_message()
-            _recipe.assert_called_once_with("api", "last-message.json")
-
-    def test_messages(self):
-        """Verify the request for /api/messages."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.messages()
-            _recipe.assert_called_once_with("api", "messages.json")
-
-    def test_status(self):
-        """Verify the request for /api/status."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.status()
-            _recipe.assert_called_once_with("api", "status.json")
-
-
 class TestGitHubIssue797(helper.UnitHelper):
     described_class = GitHub
 
