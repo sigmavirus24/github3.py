@@ -12,6 +12,8 @@ import json as jsonlib
 
 import uritemplate as urit
 
+from .. import checks
+from .. import decorators
 from .. import events
 from .. import exceptions
 from .. import git
@@ -42,8 +44,7 @@ from . import stats
 from . import status
 from . import tag
 from . import topics
-
-from ..decorators import requires_auth
+from . import traffic
 
 
 class _Repository(models.GitHubCore):
@@ -120,7 +121,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(pulls.ShortPullRequest, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def add_collaborator(self, username):
         """Add ``username`` as a collaborator to a repository.
 
@@ -262,6 +263,46 @@ class _Repository(models.GitHubCore):
             etag=etag,
             headers=branch.Branch.PREVIEW_HEADERS,
         )
+
+    def check_run(self, id):
+        """Return a single check run.
+
+        .. versionadded:: 1.3.0
+
+        :param int id:
+            (required), id of the check run
+        :returns:
+            the check run
+        :rtype:
+            :class:`~github3.checks.CheckRun`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url("check-runs", str(id), base_url=self._api)
+            data = self._json(
+                self._get(url, headers=checks.CheckRun.CUSTOM_HEADERS), 200
+            )
+        return self._instance_or_null(checks.CheckRun, data)
+
+    def check_suite(self, id):
+        """Return a single check suite.
+
+        .. versionadded:: 1.3.0
+
+        :param int id:
+            (required), id of the check suite
+        :returns:
+            the check suite
+        :rtype:
+            :class:`~github3.checks.CheckSuite`
+        """
+        data = None
+        if int(id) > 0:
+            url = self._build_url("check-suites", str(id), base_url=self._api)
+            data = self._json(
+                self._get(url, headers=checks.CheckSuite.CUSTOM_HEADERS), 200
+            )
+        return self._instance_or_null(checks.CheckSuite, data)
 
     def code_frequency(self, number=-1, etag=None):
         """Iterate over the code frequency per week.
@@ -415,8 +456,8 @@ class _Repository(models.GitHubCore):
             (optional), GitHub login, real name, or email to
             filter commits by (using commit author)
         :param int number:
-            (optional), number of comments to return. Default:
-            -1 returns all comments
+            (optional), number of commits to return. Default:
+            -1 returns all commits
         :param str etag:
             (optional), ETag from a previous request to the same endpoint
         :param since:
@@ -517,7 +558,164 @@ class _Repository(models.GitHubCore):
             params = {"anon": "true"}
         return self._iter(int(number), url, users.Contributor, params, etag)
 
-    @requires_auth
+    def views(self, per='day'):
+        """Get the total number of repository views and breakdown per day or
+        week for the last 14 days.
+
+        .. versionadded:: 1.4.0
+
+        See also: https://developer.github.com/v3/repos/traffic/
+
+        :param str per:
+            (optional), ('day', 'week'), views reporting period. Default 'day'
+            will return views per day for the last 14 days.
+        :returns:
+            views data
+        :rtype:
+            :class:`~github3.repos.traffic.ViewsStats`
+        :raises:
+            ValueError if per is not a valid choice
+        """
+        params = {}
+        if per in ("day", "week"):
+            params.update(per=per)
+        else:
+            raise ValueError("per must be 'day' or 'week'")
+        url = self._build_url("traffic", "views", base_url=self._api)
+        json = self._json(self._get(url, params=params), 200)
+        return self._instance_or_null(traffic.ViewsStats, json)
+
+    def clones(self, per='day'):
+        """Get the total number of repository clones and breakdown per day or
+        week for the last 14 days.
+
+        .. versionadded:: 1.4.0
+
+        See also: https://developer.github.com/v3/repos/traffic/
+
+        :param str per:
+            (optional), ('day', 'week'), clones reporting period. Default 'day'
+            will return clones per day for the last 14 days.
+        :returns:
+            clones data
+        :rtype:
+            :class:`~github3.repos.traffic.ClonesStats`
+        :raises:
+            ValueError if per is not a valid choice
+        """
+        params = {}
+        if per in ("day", "week"):
+            params.update(per=per)
+        else:
+            raise ValueError("per must be 'day' or 'week'")
+        url = self._build_url("traffic", "clones", base_url=self._api)
+        json = self._json(self._get(url, params=params), 200)
+        return self._instance_or_null(traffic.ClonesStats, json)
+
+    @decorators.requires_app_installation_auth
+    def create_check_run(
+        self,
+        name,
+        head_sha,
+        details_url=None,
+        external_id=None,
+        started_at=None,
+        status=None,
+        conclusion=None,
+        completed_at=None,
+        output=None,
+        actions=None,
+    ):
+        """Create a check run object on a commit
+
+        .. versionadded:: 1.3.0
+
+        :param str name:
+            (required), The name of the check
+        :param str head_sha:
+            (required), The SHA of the commit
+        :param str details_url:
+            (optional), The URL of the integrator's site that has the full
+            details of the check
+        :param str external_id:
+            (optional), A reference for the run on the integrator's system
+        :param str started_at:
+            (optional), ISO 8601 time format: YYYY-MM-DDTHH:MM:SSZ
+        :param str status:
+            (optional), ('queued', 'in_progress', 'completed')
+        :param str conclusion:
+            (optional), Required if you provide 'completed_at', or a
+            'status' of 'completed'. The final conclusion of the check.
+            ('success', 'failure', 'neutral', 'cancelled', 'timed_out',
+            'action_required')
+        :param str completed_at:
+            (optional), Required if you provide 'conclusion'. ISO 8601 time
+            format: YYYY-MM-DDTHH:MM:SSZ
+        :param dict output:
+            (optional), key-value pairs representing the output. Format:
+            ``{'title': 'string', 'summary': 'text, can be markdown', 'text':
+            'text, can be markdown', 'annotations': [{}], 'images': [{}]}``
+        :param list actions:
+            (optional), list of action objects. Format is:
+            ``[{'label': 'text', 'description', 'text', 'identifier', 'text'},
+            ...]``
+        :returns:
+            the created check run
+        :rtype:
+            :class:`~github3.checks.CheckRun`
+        """
+        json = None
+        # TODO: Cleanse output dict, actions array
+        if name and head_sha:
+            data = {
+                "name": name,
+                "head_sha": head_sha,
+                "details_url": details_url,
+                "external_id": external_id,
+                "started_at": started_at,
+                "status": status,
+                "conclusion": conclusion,
+                "completed_at": completed_at,
+                "output": output,
+                "actions": actions,
+            }
+            self._remove_none(data)
+            url = self._build_url("check-runs", base_url=self._api)
+            json = self._json(
+                self._post(
+                    url, headers=checks.CheckRun.CUSTOM_HEADERS, data=data
+                ),
+                201,
+            )
+        return self._instance_or_null(checks.CheckRun, json)
+
+    @decorators.requires_app_installation_auth
+    def create_check_suite(self, head_sha):
+        """Create a check suite object on a commit
+
+        .. versionadded:: 1.3.0
+
+        :param str head_sha:
+            The sha of the head commit.
+        :returns:
+            the created check suite
+        :rtype:
+            :class:`~github3.checks.CheckSuite`
+        """
+        json = None
+        if head_sha:
+            data = {"head_sha": head_sha}
+            self._remove_none(data)
+            url = self._build_url("check-suites", base_url=self._api)
+            json = self._json(
+                self._post(
+                    url, data=data, headers=checks.CheckSuite.CUSTOM_HEADERS
+                ),
+                201,
+            )
+        return self._instance_or_null(checks.CheckSuite, json)
+
+    @decorators.requires_auth
     def create_blob(self, content, encoding):
         """Create a blob with ``content``.
 
@@ -539,7 +737,7 @@ class _Repository(models.GitHubCore):
                 sha = json.get("sha")
         return sha
 
-    @requires_auth
+    @decorators.requires_auth
     def create_branch_ref(self, name, sha=None):
         """Create a branch git reference.
 
@@ -558,7 +756,7 @@ class _Repository(models.GitHubCore):
         ref = "refs/heads/%s" % name
         return self.create_ref(ref, sha)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_comment(self, body, sha, path=None, position=None, line=1):
         """Create a comment on a commit.
 
@@ -592,7 +790,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(comment.RepoComment, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_commit(
         self, message, tree, parents, author=None, committer=None
     ):
@@ -635,7 +833,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(git.Commit, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_deployment(
         self,
         ref,
@@ -686,7 +884,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(deployment.Deployment, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_file(
         self, path, message, content, branch=None, committer=None, author=None
     ):
@@ -740,7 +938,7 @@ class _Repository(models.GitHubCore):
                 json["commit"] = git.Commit(json["commit"], self)
         return json
 
-    @requires_auth
+    @decorators.requires_auth
     def create_fork(self, organization=None):
         """Create a fork of this repository.
 
@@ -760,7 +958,7 @@ class _Repository(models.GitHubCore):
         json = self._json(resp, 202)
         return self._instance_or_null(Repository, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_hook(self, name, config, events=["push"], active=True):
         """Create a hook on this repository.
 
@@ -789,7 +987,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return hook.Hook(json, self) if json else None
 
-    @requires_auth
+    @decorators.requires_auth
     def create_issue(
         self,
         title,
@@ -842,7 +1040,7 @@ class _Repository(models.GitHubCore):
 
         return self._instance_or_null(issues.ShortIssue, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_key(self, title, key, read_only=False):
         """Create a deploy key.
 
@@ -864,7 +1062,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(users.Key, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_label(self, name, color, description=None):
         """Create a label for this repository.
 
@@ -892,7 +1090,7 @@ class _Repository(models.GitHubCore):
             json = self._json(resp, 201)
         return self._instance_or_null(label.Label, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_milestone(
         self, title, state=None, description=None, due_on=None
     ):
@@ -927,7 +1125,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(milestone.Milestone, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_project(self, name, body=None):
         """Create a project for this repository.
 
@@ -953,7 +1151,7 @@ class _Repository(models.GitHubCore):
             )
         return self._instance_or_null(projects.Project, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_pull(self, title, base, head, body=None):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
@@ -973,7 +1171,7 @@ class _Repository(models.GitHubCore):
         data = {"title": title, "body": body, "base": base, "head": head}
         return self._create_pull(data)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_pull_from_issue(self, issue, base, head):
         """Create a pull request from issue #``issue``.
 
@@ -993,7 +1191,7 @@ class _Repository(models.GitHubCore):
             return self._create_pull(data)
         return None
 
-    @requires_auth
+    @decorators.requires_auth
     def create_ref(self, ref, sha):
         """Create a reference in this repository.
 
@@ -1017,7 +1215,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(git.Reference, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_release(
         self,
         tag_name,
@@ -1061,7 +1259,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(release.Release, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_status(
         self, sha, state, target_url=None, description=None, context="default"
     ):
@@ -1097,7 +1295,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(status.Status, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_tag(
         self, tag, message, sha, obj_type, tagger, lightweight=False
     ):
@@ -1154,7 +1352,7 @@ class _Repository(models.GitHubCore):
                 self.create_ref("refs/tags/" + tag, json.get("sha"))
         return self._instance_or_null(git.Tag, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def create_tree(self, tree, base_tree=None):
         """Create a tree on this repository.
 
@@ -1178,7 +1376,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(git.Tree, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def delete(self):
         """Delete this repository.
 
@@ -1189,7 +1387,7 @@ class _Repository(models.GitHubCore):
         """
         return self._boolean(self._delete(self._api), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def delete_key(self, key_id):
         """Delete the key with the specified id from your deploy keys list.
 
@@ -1203,7 +1401,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("keys", str(key_id), base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def delete_subscription(self):
         """Delete the user's subscription to this repository.
 
@@ -1297,7 +1495,7 @@ class _Repository(models.GitHubCore):
             (j.get("name"), contents.Contents(j, self)) for j in json
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def edit(
         self,
         name,
@@ -1397,6 +1595,50 @@ class _Repository(models.GitHubCore):
             return True
         return False
 
+    @decorators.requires_auth
+    def auto_trigger_checks(self, app_id, enabled=True):
+        """Change preferences for automatic creation of check suites.
+
+        .. versionadded:: 1.3.0
+
+        Enable/disable the automatic flow when creating check suites.
+        By default, the check suite is automatically created each time code
+        is pushed. When the automatic creation is disable they can be created
+        manually.
+
+        :param int app_id:
+            (required), the id of the GitHub App
+        :param bool enabled:
+            (optional), enable automatic creation of check suites
+            Default: True
+        :returns:
+            the check suite settings for this repository
+        :rtype:
+            dict
+        """
+        url = self._build_url(
+            "check-suites", "preferences", base_url=self._api
+        )
+        headers = {"Accept": "application/vnd.github.antiope-preview+json"}
+        json = self._json(
+            self._patch(
+                url,
+                headers=headers,
+                data=jsonlib.dumps(
+                    {
+                        "auto_trigger_checks": [
+                            {"app_id": app_id, "setting": enabled}
+                        ]
+                    }
+                ),
+            ),
+            200,
+            include_cache_info=False,
+        )
+        if json and json.get("repository"):
+            del json["repository"]
+        return json
+
     def events(self, number=-1, etag=None):
         """Iterate over events on this repository.
 
@@ -1469,7 +1711,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(git.Commit, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def hook(self, hook_id):
         """Get a single hook.
 
@@ -1486,7 +1728,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(hook.Hook, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def hooks(self, number=-1, etag=None):
         """Iterate over hooks registered on this repository.
 
@@ -1503,7 +1745,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("hooks", base_url=self._api)
         return self._iter(int(number), url, hook.Hook, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def ignore(self):
         """Ignore notifications from this repository for the user.
 
@@ -1524,7 +1766,7 @@ class _Repository(models.GitHubCore):
             notifications.RepositorySubscription, json
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def imported_issue(self, imported_issue_id):
         """Retrieve imported issue specified by imported issue id.
 
@@ -1544,7 +1786,7 @@ class _Repository(models.GitHubCore):
         json = self._json(data, 200)
         return self._instance_or_null(issue_import.ImportedIssue, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def imported_issues(self, number=-1, since=None, etag=None):
         """Retrieve the collection of imported issues via the API.
 
@@ -1579,7 +1821,7 @@ class _Repository(models.GitHubCore):
             headers=issue_import.ImportedIssue.IMPORT_CUSTOM_HEADERS,
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def import_issue(
         self,
         title,
@@ -1645,7 +1887,7 @@ class _Repository(models.GitHubCore):
         json = self._json(data, 202)
         return self._instance_or_null(issue_import.ImportedIssue, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def invitations(self, number=-1, etag=None):
         """Iterate over the invitations to this repository.
 
@@ -1677,7 +1919,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("assignees", str(username), base_url=self._api)
         return self._boolean(self._get(url), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def is_collaborator(self, username):
         """Check to see if ``username`` is a collaborator on this repository.
 
@@ -1797,7 +2039,7 @@ class _Repository(models.GitHubCore):
 
         return self._iter(int(number), url, issues.ShortIssue, params, etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def key(self, id_num):
         """Get the specified deploy key.
 
@@ -1814,7 +2056,7 @@ class _Repository(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return users.Key(json, self) if json else None
 
-    @requires_auth
+    @decorators.requires_auth
     def keys(self, number=-1, etag=None):
         """Iterate over deploy keys on this repository.
 
@@ -1889,7 +2131,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("languages", base_url=self._api)
         return self._iter(int(number), url, tuple, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def latest_pages_build(self):
         """Get the build information for the most recent Pages build.
 
@@ -1928,7 +2170,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(licenses.RepositoryLicense, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def mark_notifications(self, last_read=""):
         """Mark all notifications in this repository as read.
 
@@ -1950,7 +2192,7 @@ class _Repository(models.GitHubCore):
             self._put(url, data=jsonlib.dumps(mark)), 205, 404
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def merge(self, base, head, message=""):
         """Perform a merge from ``head`` into ``base``.
 
@@ -2046,7 +2288,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("events", base_url=base)
         return self._iter(int(number), url, events.Event, etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def notifications(
         self, all=False, participating=False, since=None, number=-1, etag=None
     ):
@@ -2082,7 +2324,7 @@ class _Repository(models.GitHubCore):
             int(number), url, notifications.Thread, params, etag
         )
 
-    @requires_auth
+    @decorators.requires_auth
     def pages(self):
         """Get information about this repository's pages site.
 
@@ -2095,7 +2337,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url), 200)
         return self._instance_or_null(pages.PagesInfo, json)
 
-    @requires_auth
+    @decorators.requires_auth
     def pages_builds(self, number=-1, etag=None):
         """Iterate over pages builds of this repository.
 
@@ -2330,7 +2572,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("releases", base_url=self._api)
         return self._iter(int(number), url, release.Release, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def remove_collaborator(self, username):
         """Remove collaborator ``username`` from the repository.
 
@@ -2351,7 +2593,7 @@ class _Repository(models.GitHubCore):
         )
         return self._boolean(self._delete(url), 204, 404)
 
-    @requires_auth
+    @decorators.requires_auth
     def replace_topics(self, new_topics):
         """Replace the repository topics with ``new_topics``.
 
@@ -2415,7 +2657,7 @@ class _Repository(models.GitHubCore):
             url = self._build_url("statuses", sha, base_url=self._api)
         return self._iter(int(number), url, status.Status, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def subscribe(self):
         """Subscribe the user to this repository's notifications.
 
@@ -2423,12 +2665,6 @@ class _Repository(models.GitHubCore):
 
         This replaces ``Repository#set_subscription``
 
-        :param bool subscribed:
-            (required), determines if notifications should
-            be received from this repository.
-        :param bool ignored:
-            (required), determines if notifications should be
-            ignored from this repository.
         :returns:
             the new repository subscription
         :rtype:
@@ -2436,7 +2672,7 @@ class _Repository(models.GitHubCore):
         """
         url = self._build_url("subscription", base_url=self._api)
         json = self._json(
-            self._put(url, data=jsonlib.dumps({"subcribed": True})), 200
+            self._put(url, data=jsonlib.dumps({"subscribed": True})), 200
         )
         return self._instance_or_null(
             notifications.RepositorySubscription, json
@@ -2458,7 +2694,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("subscribers", base_url=self._api)
         return self._iter(int(number), url, users.ShortUser, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def subscription(self):
         """Return subscription for this Repository.
 
@@ -2507,7 +2743,7 @@ class _Repository(models.GitHubCore):
         url = self._build_url("tags", base_url=self._api)
         return self._iter(int(number), url, tag.RepoTag, etag=etag)
 
-    @requires_auth
+    @decorators.requires_auth
     def teams(self, number=-1, etag=None):
         """Iterate over teams with access to this repository.
 
@@ -2556,6 +2792,48 @@ class _Repository(models.GitHubCore):
             params = {"recursive": 1} if recursive else None
             json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(git.Tree, json)
+
+    @decorators.requires_auth
+    def unignore(self):
+        """Unignore notifications from this repository for the user.
+
+        .. versionadded:: 1.3
+
+        This replaces ``Repository#set_subscription``.
+
+        :returns:
+            the new repository subscription
+        :rtype:
+            :class:~github3.notifications.RepositorySubscription`
+        """
+        url = self._build_url("subscription", base_url=self._api)
+        json = self._json(
+            self._put(url, data=jsonlib.dumps({"ignored": False})), 200
+        )
+        return self._instance_or_null(
+            notifications.RepositorySubscription, json
+        )
+
+    @decorators.requires_auth
+    def unsubscribe(self):
+        """Unsubscribe the user to this repository's notifications.
+
+        .. versionadded:: 1.3
+
+        This replaces ``Repository#set_subscription``
+
+        :returns:
+            the new repository subscription
+        :rtype:
+            :class:`~github3.notifications.RepositorySubscription`
+        """
+        url = self._build_url("subscription", base_url=self._api)
+        json = self._json(
+            self._put(url, data=jsonlib.dumps({"subscribed": False})), 200
+        )
+        return self._instance_or_null(
+            notifications.RepositorySubscription, json
+        )
 
     def weekly_commit_count(self):
         """Retrieve the total commit counts.
@@ -3019,7 +3297,8 @@ class ShortRepository(_Repository):
 
     .. attribute:: owner
 
-        The owner of the repository, e.g., ``sigmavirus24``.
+        A :class:`~github3.users.ShortUser` object representing the owner of
+        the repository.
 
     .. attribute:: private
 

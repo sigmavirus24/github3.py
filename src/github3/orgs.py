@@ -431,6 +431,10 @@ class _Organization(models.GitHubCore):
         http://developer.github.com/v3/orgs/
     """
 
+    PREVIEW_HEADERS = {
+        "Accept": "application/vnd.github.hellcat-preview+json"
+    }
+
     class_name = "_Organization"
 
     # Filters available when listing members. Note: ``"2fa_disabled"``
@@ -636,6 +640,7 @@ class _Organization(models.GitHubCore):
         auto_init=False,
         gitignore_template="",
         license_template="",
+        has_projects=True
     ):
         """Create a repository for this organization.
 
@@ -672,6 +677,9 @@ class _Organization(models.GitHubCore):
         :param str license_template:
             (optional), name of the license; this is ignored if auto_int is
             False.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository. API
+            default: ``True``
         :returns:
             the created repository
         :rtype:
@@ -688,6 +696,7 @@ class _Organization(models.GitHubCore):
             "license_template": license_template,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
+            "has_projects": has_projects
         }
         if int(team_id) > 0:
             data.update({"team_id": team_id})
@@ -709,7 +718,14 @@ class _Organization(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def create_team(self, name, repo_names=[], permission="pull"):
+    def create_team(
+        self,
+        name,
+        repo_names=[],
+        permission="pull",
+        parent_team_id=None,
+        privacy="secret",
+    ):
         """Create a new team and return it.
 
         This only works if the authenticated user owns this organization.
@@ -727,6 +743,14 @@ class _Organization(models.GitHubCore):
                 repositories accessible by this team
             - ``admin`` -- members can push, pull and administer
                 repositories accessible by this team
+        :param int parent_team_id:
+            (optional), the ID of a team to set as the parent team.
+        :param str privacy:
+            (optional), options:
+
+            - ``secret`` -- (default) only visible to organization
+                owners and members of this team
+            - ``closed`` -- visible to all members of this organization
         :returns:
             the created team
         :rtype:
@@ -736,9 +760,18 @@ class _Organization(models.GitHubCore):
             "name": name,
             "repo_names": repo_names,
             "permission": permission,
+            "privacy": privacy,
         }
+        headers = (
+            self.PREVIEW_HEADERS
+            if parent_team_id or privacy == "closed"
+            else None
+        )
+        if parent_team_id:
+            data.update({"parent_team_id": parent_team_id})
+
         url = self._build_url("teams", base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data, headers=headers), 201)
         return self._instance_or_null(Team, json)
 
     @requires_auth
@@ -1230,6 +1263,21 @@ class _Organization(models.GitHubCore):
         if int(team_id) > 0:
             url = self._build_url("teams", str(team_id))
             json = self._json(self._get(url), 200)
+        return self._instance_or_null(Team, json)
+
+    @requires_auth
+    def team_by_name(self, team_slug):
+        """Return the team specified by ``team_slug``.
+
+        :param str team_slug:
+            (required), slug for the team
+        :returns:
+            the team identified by the slug in this organization
+        :rtype:
+            :class:`~github3.orgs.Team`
+        """
+        url = self._build_url("teams", str(team_slug), base_url=self._api)
+        json = self._json(self._get(url), 200)
         return self._instance_or_null(Team, json)
 
 

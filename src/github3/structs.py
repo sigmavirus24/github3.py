@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-import collections
+try:
+    import collections.abc as abc_collections
+except ImportError:
+    # For Python 2.7 compatibility
+    import collections as abc_collections
 import functools
 
 from requests.compat import urlparse, urlencode
@@ -8,11 +12,19 @@ from . import exceptions
 from . import models
 
 
-class GitHubIterator(models.GitHubCore, collections.Iterator):
+class GitHubIterator(models.GitHubCore, abc_collections.Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
 
     def __init__(
-        self, count, url, cls, session, params=None, etag=None, headers=None
+        self,
+        count,
+        url,
+        cls,
+        session,
+        params=None,
+        etag=None,
+        headers=None,
+        list_key=None,
     ):
         models.GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
@@ -41,6 +53,8 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
         self.last_response = None
         #: Last status code received
         self.last_status = 0
+        #: Key to get the list of items in case a dict is returned
+        self.list_key = list_key
 
         if etag:
             self.headers.update({"If-None-Match": etag})
@@ -80,6 +94,17 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
 
             if json is None:
                 break
+
+            # Some APIs return the list of items inside a dict
+            if isinstance(json, dict) and self.list_key is not None:
+                try:
+                    json = json[self.list_key]
+                except KeyError:
+                    raise exceptions.UnprocessableResponseBody(
+                        "GitHub's API returned a body that could not be"
+                        " handled",
+                        json,
+                    )
 
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):

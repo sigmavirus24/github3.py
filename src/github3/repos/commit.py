@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from . import status
-from .. import git, models, users
+from .. import checks, git, models, users
 from .comment import RepoComment
 
 
@@ -35,6 +35,44 @@ class _RepoCommit(models.GitHubCore):
 
     def _repr(self):
         return "<{0} [{1}]>".format(self.class_name, self.sha[:7])
+
+    def check_runs(self):
+        """Retrieve the check runs for this commit.
+
+        .. versionadded:: 1.3.0
+
+        :returns:
+            the check runs for this commit
+        :rtype:
+            :class:`~github3.checks.CheckRun`
+        """
+        url = self._build_url("check-runs", base_url=self._api)
+        return self._iter(
+            -1,
+            url,
+            checks.CheckRun,
+            headers=checks.CheckRun.CUSTOM_HEADERS,
+            list_key="check_runs",
+        )
+
+    def check_suites(self):
+        """Retrieve the check suites for this commit.
+
+        .. versionadded:: 1.3.0
+
+        :returns:
+            the check suites for this commit
+        :rtype:
+            :class:`~github3.checks.CheckSuite`
+        """
+        url = self._build_url("check-suites", base_url=self._api)
+        return self._iter(
+            -1,
+            url,
+            checks.CheckSuite,
+            headers=checks.CheckSuite.CUSTOM_HEADERS,
+            list_key="check_suites",
+        )
 
     def diff(self):
         """Retrieve the diff for this commit.

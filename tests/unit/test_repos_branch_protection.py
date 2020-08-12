@@ -34,7 +34,6 @@ class TestProtectionEnforceAdmins(helper.UnitHelper):
         self.instance.enable()
         self.post_called_with(
             enforce_admins_url_for(),
-            headers=BranchProtection.PREVIEW_HEADERS_MAP,
         )
 
     def test_disable(self):
@@ -42,7 +41,6 @@ class TestProtectionEnforceAdmins(helper.UnitHelper):
         self.instance.disable()
         self.delete_called_with(
             enforce_admins_url_for(),
-            headers=BranchProtection.PREVIEW_HEADERS_MAP,
         )
 
 

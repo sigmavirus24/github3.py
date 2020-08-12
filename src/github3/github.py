@@ -681,6 +681,7 @@ class GitHub(models.GitHubCore):
         has_wiki=True,
         auto_init=False,
         gitignore_template="",
+        has_projects=True
     ):
         """Create a repository for the authenticated user.
 
@@ -706,6 +707,9 @@ class GitHub(models.GitHubCore):
         :param str gitignore_template:
             (optional), name of the git template to use; ignored if auto_init =
             False.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository. API
+            default: ``True``
         :returns:
             created repository
         :rtype:
@@ -721,6 +725,7 @@ class GitHub(models.GitHubCore):
             "has_wiki": has_wiki,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
+            "has_projects": has_projects
         }
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(repo.Repository, json)
@@ -2914,39 +2919,3 @@ class GitHubEnterprise(GitHub):
             url = self._build_url("enterprise", "stats", option.lower())
             stats = self._json(self._get(url), 200)
         return stats
-
-
-class GitHubStatus(models.GitHubCore):
-    """A sleek interface to the GitHub System Status API.
-
-    This will only ever return the JSON objects returned by the API.
-    """
-
-    def __init__(self, session=None):
-        """Create a status API client."""
-        super(GitHubStatus, self).__init__({}, session or self.new_session())
-        self.session.base_url = "https://status.github.com"
-
-    def _repr(self):
-        return "<GitHub Status>"
-
-    def _recipe(self, *args):
-        url = self._build_url(*args)
-        resp = self._get(url)
-        return resp.json() if self._boolean(resp, 200, 404) else {}
-
-    def api(self):
-        """Retrieve API status."""
-        return self._recipe("api.json")
-
-    def status(self):
-        """Retrieve overall status."""
-        return self._recipe("api", "status.json")
-
-    def last_message(self):
-        """Retrieve the last message."""
-        return self._recipe("api", "last-message.json")
-
-    def messages(self):
-        """Retrieve all messages."""
-        return self._recipe("api", "messages.json")

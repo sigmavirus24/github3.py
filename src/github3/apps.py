@@ -80,6 +80,10 @@ class App(models.GitHubCore):
         https://developer.github.com/v3/apps/
     """
 
+    CUSTOM_HEADERS = {
+        "Accept": "application/vnd.github.machine-man-preview+json"
+    }
+
     def _update_attributes(self, json):
         self.created_at = self._strptime(json["created_at"])
         self.description = json["description"]
@@ -90,6 +94,8 @@ class App(models.GitHubCore):
         self.node_id = json["node_id"]
         self.owner = users.ShortUser(json["owner"], self)
         self.updated_at = self._strptime(json["updated_at"])
+        _, slug = json["html_url"].rsplit("/", 1)
+        self._api = self.url = self._build_url("apps", slug)
 
     def _repr(self):
         return '<App ["{}" by {}]>'.format(self.name, str(self.owner))

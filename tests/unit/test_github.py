@@ -1,7 +1,7 @@
 import pytest
 
 from github3 import GitHubEnterprise, GitHubError
-from github3.github import GitHub, GitHubStatus
+from github3.github import GitHub
 from github3.projects import Project
 
 from . import helper
@@ -164,6 +164,7 @@ class TestGitHub(helper.UnitHelper):
                 "has_wiki": True,
                 "auto_init": False,
                 "gitignore_template": "",
+                "has_projects": True
             },
         )
 

@@ -77,6 +77,7 @@ class TestOrganization(helper.UnitHelper):
                 "team_id": 1,
                 "gitignore_template": "",
                 "license_template": "",
+                "has_projects": True
             },
         )
 
@@ -90,7 +91,9 @@ class TestOrganization(helper.UnitHelper):
                 "name": "team-name",
                 "repo_names": [],
                 "permission": "push",
+                "privacy": "secret",
             },
+            headers=None,
         )
 
     def test_create_hook(self):
@@ -223,6 +226,14 @@ class TestOrganization(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(
             "https://api.github.com/teams/10"
+        )
+
+    def test_team_by_name(self):
+        """Show that a user can retrieve a team by name."""
+        self.instance.team_by_name('team-name')
+
+        self.session.get.assert_called_once_with(
+            "https://api.github.com/orgs/github/teams/team-name"
         )
 
     def test_team_requires_positive_team_id(self):

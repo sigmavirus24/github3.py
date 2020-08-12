@@ -1,0 +1,59 @@
+1.3.0: 2019-01-24
+-----------------
+
+Features Added
+``````````````
+
+- Add partial support for the Checks API:
+
+  - Add support for listing check runs via ``check_runs`` and check suites
+    via ``check_suites`` methods to ``RepoCommit``, ``MiniCommit`` and
+    ``ShortCommit`` classes
+
+  - ``CheckRun.update`` to update the check run
+
+  - ``CheckSuite.check_runs`` to retrieve the check runs for this suite
+
+  - ``CheckRunOutput.annotations`` class to retrieve the annotations for a
+    check run
+
+- Add ``unignore`` method to unignore notifications from repository for the
+  user, to ``Repository`` and ``ShortRepository`` classes.
+
+- Add ``unsubscribe`` method to unsubscribe the user to repository's
+  notifications, to ``Repository`` and ``ShortRepository`` classes.
+
+- Add support for webhooks in an organization by adding:
+
+  - ``OrganizationHook`` class
+
+  - ``create_hook``, ``hook``, and ``hooks`` methods to ``ShortOrganization``
+    and ``Organization`` classes
+
+- A ``Project.retrieve_issue_from_content`` method was added to retrieve an
+  Issue from the content url.
+
+- A ``Project.retrieve_pull_request_from_content`` method was added to
+  retrieve a PullRequest from the content url.
+
+- Add support for Parent/Child teams via the ``hellicat-preview`` API preview
+  type.
+
+- Add support for specifying merge commit titles when merging a Pull Request.
+
+
+Bugs Fixed
+``````````
+
+- Stop hard-coding GitHub url that breaks work with a GitHub Enterprise
+  instance.
+
+- Set default connect and read timeouts in ``GitHubSession`` to avoid hangs.
+
+
+.. links
+.. _Checks API:
+    https://developer.github.com/v3/orgs/checks/
+
+.. _Webhooks API:
+    https://developer.github.com/v3/orgs/hooks/

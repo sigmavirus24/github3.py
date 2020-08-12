@@ -55,15 +55,14 @@ class IntegrationHelper(unittest.TestCase):
             self.current_cassette.is_recording()
             and self.private_key_bytes
             and self.app_id
-            and self.installation_id
+            and self.app_installation_id
         ):
             self.gh.login_as_app_installation(
                 self.private_key_bytes,
                 app_id=self.app_id,
                 installation_id=self.app_installation_id,
-                expire_in=30,
             )
-            token = self.gh.session.auth
+            token = self.gh.session.auth.token
         else:
             token = "v1.{}".format("x" * 10)
             now = datetime.datetime.now(tz=dateutil.tz.UTC)
@@ -124,8 +123,3 @@ betamax.Betamax.register_request_matcher(CustomHeadersMatcher)
 class GitHubEnterpriseHelper(IntegrationHelper):
     def get_client(self):
         return github3.GitHubEnterprise(self.enterprise_url)
-
-
-class GitHubStatusHelper(IntegrationHelper):
-    def get_client(self):
-        return github3.GitHubStatus()

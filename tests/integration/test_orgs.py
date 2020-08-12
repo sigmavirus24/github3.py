@@ -96,6 +96,23 @@ class TestOrganization(IntegrationHelper):
             assert isinstance(t, github3.orgs.Team)
             assert t.delete() is True
 
+    def test_create_team_child(self):
+        """Test the ability to create a new child team."""
+        self.auto_login()
+        cassette_name = self.cassette_name("create_team_parent")
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            o = self.get_organization()
+
+            parent_t = o.create_team("temp-team", privacy="closed")
+            assert isinstance(parent_t, github3.orgs.Team)
+
+            with self.recorder.use_cassette(
+                self.cassette_name("create_team_child"), **self.betamax_kwargs
+            ):
+                t = o.create_team("temp-team-child", parent_team_id=2589002)
+                assert isinstance(parent_t, github3.orgs.Team)
+                assert t.delete() is True
+
     def test_edit(self):
         """Test the ability to edit an organization."""
         self.auto_login()
@@ -291,6 +308,19 @@ class TestOrganization(IntegrationHelper):
             first_team = next(o.teams())
 
             fetched_team = o.team(first_team.id)
+            assert first_team == fetched_team
+
+    def test_team_by_name(self):
+        """Test the ability retrieve an individual team by name."""
+        self.auto_login()
+        cassette_name = self.cassette_name("team_by_name")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization('erico-sandbox')
+
+            # Grab a team, any team
+            first_team = next(o.teams())
+
+            fetched_team = o.team_by_name(first_team.slug)
             assert first_team == fetched_team
 
     def test_invitations(self):

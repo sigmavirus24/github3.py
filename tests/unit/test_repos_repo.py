@@ -5,6 +5,7 @@ import pytest
 
 from base64 import b64encode
 from github3 import GitHubError
+from github3.exceptions import GitHubException
 from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
@@ -927,6 +928,48 @@ class TestRepository(helper.UnitHelper):
             url_for("stats/participation")
         )
 
+    def test_views_default(self):
+        """Verify the request for retrieving repository daily views."""
+        self.instance.views()
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/views"), params={"per": "day"}
+        )
+
+    def test_views_weekly(self):
+        """Verify the request for retrieving repository weekly views."""
+        self.instance.views(per="week")
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/views"), params={"per": "week"}
+        )
+
+    def test_views_invalid_per(self):
+        """Verify invalid views resolution raises ValueError."""
+        with pytest.raises(ValueError):
+            self.instance.views(per="invalid")
+
+    def test_clones_default(self):
+        """Verify the request for retrieving repository daily clones."""
+        self.instance.clones()
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/clones"), params={"per": "day"}
+        )
+
+    def test_clones_weekly(self):
+        """Verify the request for retrieving repository weekly clones."""
+        self.instance.clones(per="week")
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/clones"), params={"per": "week"}
+        )
+
+    def test_clones_invalid_per(self):
+        """Verify invalid clones resolution raises ValueError."""
+        with pytest.raises(ValueError):
+            self.instance.clones(per="invalid")
+
 
 class TestRepositoryIterator(helper.UnitIteratorHelper):
 
@@ -1368,6 +1411,45 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         )
 
 
+class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
+
+    """Unit test for regular Repository methods."""
+
+    described_class = Repository
+    example_data = repo_example_data
+    preview_header = {"Accept": "application/vnd.github.antiope-preview+json"}
+
+    def test_check_run(self):
+        """Verify the request for retrieving a check run on a repository."""
+        self.instance.check_run(1)
+        self.session.get.assert_called_once_with(
+            url_for("check-runs/1"), headers=self.preview_header
+        )
+
+    def test_check_suite(self):
+        """Verify the request for retrieving a check run on a repository."""
+        self.instance.check_suite(1)
+        self.session.get.assert_called_once_with(
+            url_for("check-suites/1"), headers=self.preview_header
+        )
+
+    def test_create_check_run(self):
+        """Verify the request for creating a check run on a suite."""
+        data = {"name": "testcheck", "head_sha": "fake-sha"}
+        self.instance.create_check_run(**data)
+        self.post_called_with(
+            url_for("check-runs"), data=data, headers=self.preview_header
+        )
+
+    def test_create_check_suite(self):
+        """Verify the request for creating a check suite on a commit."""
+        data = {"head_sha": "fake-sha"}
+        self.instance.create_check_suite(**data)
+        self.post_called_with(
+            url_for("check-suites"), data=data, headers=self.preview_header
+        )
+
+
 class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Unit test for regular Repository methods."""
@@ -1379,6 +1461,18 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that adding a collaborator requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.add_collaborator("foo")
+
+    def test_create_check_run(self):
+        """Verify the request for creating a check run on a suite."""
+        with pytest.raises(GitHubException):
+            self.instance.create_check_run(
+                head_sha="fake-sha", name="testcheck"
+            )
+
+    def test_create_check_suite(self):
+        """Verify the request for creating a check run on a suite."""
+        with pytest.raises(GitHubException):
+            self.instance.create_check_suite(head_sha="fake-sha")
 
     def test_create_ref(self):
         """Verify that creating a tag requires authentication."""

@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 """Module containing session and auth logic."""
-from collections import Callable
+try:
+    import collections.abc as abc_collections
+except ImportError:
+    # For Python 2.7 compatibility
+    import collections as abc_collections
+
 import datetime
 from contextlib import contextmanager
 from logging import getLogger
@@ -91,9 +96,12 @@ class GitHubSession(requests.Session):
     __attrs__ = requests.Session.__attrs__ + [
         "base_url",
         "two_factor_auth_cb",
+        "default_connect_timeout",
+        "default_read_timeout",
+        "request_counter",
     ]
 
-    def __init__(self, default_connect_timeout=4, default_read_timeout=1):
+    def __init__(self, default_connect_timeout=4, default_read_timeout=10):
         """Slightly modify how we initialize our session."""
         super(GitHubSession, self).__init__()
         self.default_connect_timeout = default_connect_timeout
@@ -165,7 +173,7 @@ class GitHubSession(requests.Session):
 
     def request(self, *args, **kwargs):
         """Make a request, count it, and handle 2FA if necessary."""
-        kwargs.setdefault('timeout', self.timeout)
+        kwargs.setdefault("timeout", self.timeout)
         response = super(GitHubSession, self).request(*args, **kwargs)
         self.request_counter += 1
         if requires_2fa(response) and self.two_factor_auth_cb:
@@ -190,7 +198,7 @@ class GitHubSession(requests.Session):
         if not callback:
             return
 
-        if not isinstance(callback, Callable):
+        if not isinstance(callback, abc_collections.Callable):
             raise ValueError("Your callback should be callable")
 
         self.two_factor_auth_cb = callback
