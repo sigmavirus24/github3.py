@@ -55,3 +55,14 @@ class TestRepoCommit(helper.IntegrationHelper):
                 "6a0470c992dd97d97fa0fee503153b125141ca4c"
             )
             assert commit.author != commit.committer
+
+    def test_associated_pull_requests(self):
+        """Test the ability to retrieve associated pull requests of commit."""
+        cassette_name = self.cassette_name("associated_pull_requests")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("sigmavirus24", "github3.py")
+            commit = repository.commit(
+                "6b12e37bdc1bea465f04a53262194ab332711ee8"
+            )
+            for pr in commit.associated_pull_requests():
+                assert isinstance(pr, github3.pulls.ShortPullRequest)

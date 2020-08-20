@@ -26,6 +26,11 @@ class _RepoCommit(models.GitHubCore):
 
     """
 
+    PREVIEW_HEADERS = {
+        "Accept": "application/vnd.github.groot-preview+json,"
+                  "application/vnd.github.v3.full+json"
+    }
+
     class_name = "_RepoCommit"
 
     def _update_attributes(self, commit):
@@ -138,6 +143,30 @@ class _RepoCommit(models.GitHubCore):
         """
         url = self._build_url("comments", base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
+
+    def associated_pull_requests(self, number=-1, etag=None):
+        """Iterate pull requests associated with a commit.
+
+        :param int number:
+            (optional), number of comments to return. Default: -1 returns all
+            pull requests
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of pull requests
+        :rtype:
+            :class:~github3.pulls.PullRequest`
+        """
+        from .. import pulls
+
+        url = self._build_url("pulls", base_url=self._api)
+        return self._iter(
+            number,
+            url,
+            pulls.ShortPullRequest,
+            etag=etag,
+            headers=self.PREVIEW_HEADERS
+        )
 
 
 class RepoCommit(_RepoCommit):

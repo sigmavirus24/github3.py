@@ -976,10 +976,10 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
-            for l in repository.languages():
-                assert "ETag" not in l
-                assert "Last-Modified" not in l
-                assert isinstance(l, tuple)
+            for lang in repository.languages():
+                assert "ETag" not in lang
+                assert "Last-Modified" not in lang
+                assert isinstance(lang, tuple)
 
     def test_license(self):
         """Test that a repository's license can be retrieved."""
