@@ -9,15 +9,16 @@ jobs:
     strategy:
       matrix:
         python:
-          # - { VERSION: "2.7", TOXENV: "py27" }
-          # - { VERSION: "2.7", TOXENV: "py27-flake8"}
-          # - { VERSION: "3.5", TOXENV: "py35" }
-          # - { VERSION: "3.6", TOXENV: "py36" }
-          # - { VERSION: "3.7", TOXENV: "py37" }
-          # - { VERSION: "3.8", TOXENV: "py38-flake8,py38-flake8,docstrings,notebooks,readme,doclint,docs,commitlint"}
-          - { VERSION: "3.8", TOXENV: "docstrings", ALLOW_FAILURE: "true"}
-          # - { VERSION: "pypy2", TOXENV: "pypy" }
-          # - { VERSION: "pypy3", TOXENV: "pypy" }
+          - { VERSION: "2.7", TOXENV: "py27", ALLOW_FAILURE: false }
+          - { VERSION: "2.7", TOXENV: "py27-flake8", ALLOW_FAILURE: false}
+          - { VERSION: "3.5", TOXENV: "py35", ALLOW_FAILURE: false }
+          - { VERSION: "3.6", TOXENV: "py36", ALLOW_FAILURE: false }
+          - { VERSION: "3.7", TOXENV: "py37",ALLOW_FAILURE: false }
+          - { VERSION: "3.8", TOXENV: "py38-flake8,readme,doclint,docs,commitlint"}
+          - { VERSION: "3.8", TOXENV: "docstrings", ALLOW_FAILURE: true}
+          - { VERSION: "3.8", TOXENV: "notebooks", ALLOW_FAILURE: true}
+          - { VERSION: "pypy2", TOXENV: "pypy", ALLOW_FAILURE: false }
+          - { VERSION: "pypy3", TOXENV: "pypy", ALLOW_FAILURE: false }
 
     steps:
       - uses: actions/checkout@v2
