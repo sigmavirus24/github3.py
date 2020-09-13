@@ -13,8 +13,8 @@ jobs:
           - { VERSION: "2.7", TOXENV: "py27-flake8", ALLOW_FAILURE: false}
           - { VERSION: "3.5", TOXENV: "py35", ALLOW_FAILURE: false }
           - { VERSION: "3.6", TOXENV: "py36", ALLOW_FAILURE: false }
-          - { VERSION: "3.7", TOXENV: "py37",ALLOW_FAILURE: false }
-          - { VERSION: "3.8", TOXENV: "py38-flake8,readme,doclint,docs,commitlint"}
+          - { VERSION: "3.7", TOXENV: "py37", ALLOW_FAILURE: false }
+          - { VERSION: "3.8", TOXENV: "py38-flake8,readme,doclint,docs,commitlint",ALLOW_FAILURE: false }
           - { VERSION: "3.8", TOXENV: "docstrings", ALLOW_FAILURE: true}
           - { VERSION: "3.8", TOXENV: "notebooks", ALLOW_FAILURE: true}
           - { VERSION: "pypy2", TOXENV: "pypy", ALLOW_FAILURE: false }
