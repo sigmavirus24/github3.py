@@ -15,7 +15,7 @@ jobs:
           # - { VERSION: "3.6", TOXENV: "py36" }
           # - { VERSION: "3.7", TOXENV: "py37" }
           # - { VERSION: "3.8", TOXENV: "py38-flake8,py38-flake8,docstrings,notebooks,readme,doclint,docs,commitlint"}
-          - { VERSION: "3.8", TOXENV: "docstrings", ALLOW_FAIURE: true}
+          - { VERSION: "3.8", TOXENV: "docstrings", ALLOW_FAILURE: true}
           # - { VERSION: "pypy2", TOXENV: "pypy" }
           # - { VERSION: "pypy3", TOXENV: "pypy" }
 
