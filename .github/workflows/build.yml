@@ -1,11 +1,9 @@
-
-name: all the pythons on Ubuntu
+name: Python tests
 
 on: [push]
 
 jobs:
   test:
-
 
     runs-on: ubuntu-latest
     strategy:
