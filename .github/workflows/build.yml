@@ -1,9 +1,9 @@
-name: Python package
+name: all the pythons on Ubuntu
 
 on: [push]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
     strategy:
