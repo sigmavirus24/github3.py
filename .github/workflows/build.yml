@@ -1,9 +1,11 @@
+
 name: all the pythons on Ubuntu
 
 on: [push]
 
 jobs:
   test:
+
 
     runs-on: ubuntu-latest
     strategy:
