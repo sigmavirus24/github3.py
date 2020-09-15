@@ -1,0 +1,36 @@
+name: Python tests
+
+on: [push]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python:
+          - { VERSION: "2.7", TOXENV: "py27", ALLOW_FAILURE: false }
+          - { VERSION: "2.7", TOXENV: "py27-flake8", ALLOW_FAILURE: false}
+          - { VERSION: "3.5", TOXENV: "py35", ALLOW_FAILURE: false }
+          - { VERSION: "3.6", TOXENV: "py36", ALLOW_FAILURE: false }
+          - { VERSION: "3.7", TOXENV: "py37", ALLOW_FAILURE: false }
+          - { VERSION: "3.8", TOXENV: "py38-flake8,readme,doclint,docs,commitlint",ALLOW_FAILURE: false }
+          - { VERSION: "3.8", TOXENV: "docstrings", ALLOW_FAILURE: true}
+          - { VERSION: "pypy2", TOXENV: "pypy", ALLOW_FAILURE: false }
+          - { VERSION: "pypy3", TOXENV: "pypy", ALLOW_FAILURE: false }
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.PYTHON.VERSION }}
+      - name: Install Tox and any other packages
+        run: pip install tox
+      - name: Run Tox
+        run: tox
+        env:
+          TOXENV: ${{ matrix.PYTHON.TOXENV }}
+          GH_RECORD_MODE: "none"
+        continue-on-error: ${{ matrix.PYTHON.ALLOW_FAILURE }}
+        
