@@ -47,10 +47,10 @@ Build status
 
 You can find `master` build statuses for different environments.
 
-- travis_
+- Github_
 - appveyor_
 
-.. _travis: https://travis-ci.org/sigmavirus24/github3.py
+.. _Github: https://github.com/sigmavirus24/github3.py/actions
 .. _appveyor: https://ci.appveyor.com/project/sigmavirus24/github3-py/branch/master
 
 License
