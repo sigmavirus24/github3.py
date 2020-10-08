@@ -217,6 +217,7 @@ class _PullRequest(models.GitHubCore):
         self.issue_url = pull["issue_url"]
         self.links = pull["_links"]
         self.merge_commit_sha = pull["merge_commit_sha"]
+        self.mergeable = pull["mergeable"]
         self.merged_at = self._strptime(pull["merged_at"])
         self.number = pull["number"]
         self.patch_url = pull["patch_url"]
@@ -825,6 +826,11 @@ class ShortPullRequest(_PullRequest):
         If merged, holds commit sha of the merge commit, squashed commit on
         the base branch or the commit that the base branch was updated to
         after rebasing the PR.
+
+    .. attribute:: mergeable
+
+        A boolean attribute indicating whether GitHub deems this pull request
+        is mergeable.
 
     .. attribute:: merged_at
 
