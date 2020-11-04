@@ -6,6 +6,7 @@ import time
 
 from jwcrypto import jwk
 from jwcrypto import jwt
+from requests.auth import AuthBase
 
 from . import models
 from . import users
@@ -173,8 +174,25 @@ def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
     return token.serialize()
 
 
-def create_jwt_headers(
-    private_key_pem, app_id, expire_in=DEFAULT_JWT_TOKEN_EXPIRATION
+class TokenAuthHandler(AuthBase):
+
+    def __init__(self, private_key_pem, app_id, expire_in):
+        self.token = private_key_pem
+        self.app_id = app_id
+        self.expire_in = expire_in
+
+    def token(self):
+        return create_token(self.private_key_pem, self.app_id, self.expire_in)
+
+    def __call__(self, r):
+
+        r.headers['Authorization'] = "Bearer {}".format(self.token())
+        r.headers.update(APP_PREVIEW_HEADERS)
+        return r
+
+
+def create_jwt_handler(
+        private_key_pem, app_id, expire_in=DEFAULT_JWT_TOKEN_EXPIRATION
 ):
     """Create an encrypted token for the specified App.
 
@@ -188,9 +206,6 @@ def create_jwt_headers(
     :returns:
         Dictionary of headers for retrieving a token from a JWT.
     :rtype:
-        dict
+        Authentication handler to be passed to requests auth
     """
-    jwt_token = create_token(private_key_pem, app_id, expire_in)
-    headers = {"Authorization": "Bearer {}".format(jwt_token)}
-    headers.update(APP_PREVIEW_HEADERS)
-    return headers
+    return TokenAuthHandler(private_key_pem, app_id, expire_in)
