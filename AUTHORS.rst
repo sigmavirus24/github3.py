@@ -204,3 +204,5 @@ Contributors
 - Dmitry Kiselev (@dmitrykiselev27)
 
 - Adeodato Simó (@dato)
+
+- JP Sullivan (@j3p0uk)

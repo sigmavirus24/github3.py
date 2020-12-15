@@ -319,12 +319,12 @@ class BranchProtection(models.GitHubCore):
                 else None
             ),
             "required_pull_request_reviews": (
-                self.required_pull_request_reviews.as_dict()
+                self.required_pull_request_reviews.as_update_dict()
                 if self.required_pull_request_reviews is not None
                 else None
             ),
             "restrictions": (
-                self.restrictions.as_dict()
+                self.restrictions.as_update_dict()
                 if self.restrictions is not None
                 else None
             ),
@@ -350,6 +350,13 @@ class BranchProtection(models.GitHubCore):
                 restrictions
                 if restrictions is not None
                 else current_status["restrictions"]
+            ),
+            "allow_deletions": self.allow_deletions.get("enabled", False),
+            "allow_force_pushes": self.allow_force_pushes.get(
+                "enabled", False
+            ),
+            "required_linear_history": self.required_linear_history.get(
+                "enabled", False
             ),
         }
 
@@ -653,6 +660,19 @@ class ProtectionRestrictions(models.GitHubCore):
 
         return self._iter(int(number), self.users_url, users.ShortUser)
 
+    def as_update_dict(self):
+        curr_dict = self.as_dict()
+        if "apps" in curr_dict.keys():
+            new_apps = [u["slug"] for u in curr_dict["apps"]]
+            curr_dict["apps"] = new_apps
+        if "teams" in curr_dict.keys():
+            new_teams = [u["slug"] for u in curr_dict["teams"]]
+            curr_dict["teams"] = new_teams
+        if "users" in curr_dict.keys():
+            new_users = [u["login"] for u in curr_dict["users"]]
+            curr_dict["users"] = new_users
+        return curr_dict
+
 
 class ProtectionRequiredPullRequestReviews(models.GitHubCore):
     """The representation of a sub-portion of branch protection.
@@ -795,6 +815,23 @@ class ProtectionRequiredPullRequestReviews(models.GitHubCore):
         """
         resp = self._delete(self._api)
         return self._boolean(resp, 204, 404)
+
+    def as_update_dict(self):
+        curr_dict = self.as_dict()
+        if curr_dict.get("dismissal_restrictions") is not None:
+            if "teams" in curr_dict["dismissal_restrictions"].keys():
+                new_teams = [
+                    u["slug"]
+                    for u in curr_dict["dismissal_restrictions"]["teams"]
+                ]
+                curr_dict["dismissal_restrictions"]["teams"] = new_teams
+            if "users" in curr_dict["dismissal_restrictions"].keys():
+                new_users = [
+                    u["login"]
+                    for u in curr_dict["dismissal_restrictions"]["users"]
+                ]
+                curr_dict["dismissal_restrictions"]["users"] = new_users
+        return curr_dict
 
 
 class ProtectionRequiredStatusChecks(models.GitHubCore):
