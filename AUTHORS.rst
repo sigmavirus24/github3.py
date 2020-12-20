@@ -200,3 +200,5 @@ Contributors
 - Andrew Hayworth (@ahayworth)
 
 - Dmitry Kiselev (@dmitrykiselev27)
+
+- Adeodato Simó (@dato)
