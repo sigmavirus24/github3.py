@@ -22,6 +22,7 @@ from . import projects
 from . import pulls
 from .repos import repo
 from . import search
+from . import session
 from . import structs
 from . import users
 from . import utils
@@ -1399,14 +1400,15 @@ class GitHub(models.GitHubCore):
         # NOTE(sigmavirus24): This JWT token does not need to last very long.
         # Instead of allowing it to stick around for 10 minutes, let's limit
         # it to 30 seconds.
-        headers = apps.create_jwt_headers(
-            private_key_pem, app_id, expire_in=30
-        )
+        jwt_token = apps.create_token(private_key_pem, app_id, expire_in=30)
+        bearer_auth = session.AppBearerTokenAuth(jwt_token, 30)
         url = self._build_url(
             "app", "installations", str(installation_id), "access_tokens"
         )
         with self.session.no_auth():
-            response = self.session.post(url, headers=headers)
+            response = self.session.post(
+                url, auth=bearer_auth, headers=apps.APP_PREVIEW_HEADERS
+            )
             json = self._json(response, 201)
 
         self.session.app_installation_token_auth(json)
