@@ -202,7 +202,7 @@ class RepositoryLicense(models.GitHubCore):
         :returns:
             plain-text content of this license
         :rtype:
-            text (unicode on Python 2, str on Python 3)
+            text (str on Python 3)
         """
         if self.encoding == "base64":
             return base64.b64decode(self.content.encode("utf-8")).decode(

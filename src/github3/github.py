@@ -682,7 +682,7 @@ class GitHub(models.GitHubCore):
         has_wiki=True,
         auto_init=False,
         gitignore_template="",
-        has_projects=True
+        has_projects=True,
     ):
         """Create a repository for the authenticated user.
 
@@ -726,7 +726,7 @@ class GitHub(models.GitHubCore):
             "has_wiki": has_wiki,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
-            "has_projects": has_projects
+            "has_projects": has_projects,
         }
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(repo.Repository, json)
@@ -1428,7 +1428,7 @@ class GitHub(models.GitHubCore):
         :returns:
             the HTML formatted markdown text
         :rtype:
-            str (or unicode on Python 2)
+            str
         """
         data = None
         json = False
@@ -1553,7 +1553,7 @@ class GitHub(models.GitHubCore):
         :returns:
             ascii art of Octocat
         :rtype:
-            str (or unicode on Python 2)
+            str
         """
         url = self._build_url("octocat")
         req = self._get(url, params={"s": say})
@@ -2827,7 +2827,7 @@ class GitHub(models.GitHubCore):
         :returns:
             the zen of GitHub
         :rtype:
-            str (on Python 3, unicode on Python 2)
+            str
         """
         url = self._build_url("zen")
         resp = self._get(url)

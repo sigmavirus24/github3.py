@@ -1,5 +1,5 @@
 """Organization unit tests."""
-import mock
+import unittest.mock
 import pytest
 
 from github3 import GitHubError
@@ -77,7 +77,7 @@ class TestOrganization(helper.UnitHelper):
                 "team_id": 1,
                 "gitignore_template": "",
                 "license_template": "",
-                "has_projects": True
+                "has_projects": True,
             },
         )
 
@@ -230,7 +230,7 @@ class TestOrganization(helper.UnitHelper):
 
     def test_team_by_name(self):
         """Show that a user can retrieve a team by name."""
-        self.instance.team_by_name('team-name')
+        self.instance.team_by_name("team-name")
 
         self.session.get.assert_called_once_with(
             "https://api.github.com/orgs/github/teams/team-name"
@@ -404,7 +404,7 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             headers={},
         )
 
-    @mock.patch("warnings.warn")
+    @unittest.mock.patch("warnings.warn")
     def test_events(self, warn_mock):
         """Show that one can iterate over an organization's events."""
         i = self.instance.events()

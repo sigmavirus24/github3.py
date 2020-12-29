@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module containing session and auth logic."""
-try:
-    import collections.abc as abc_collections
-except ImportError:
-    # For Python 2.7 compatibility
-    import collections as abc_collections
+import collections.abc as abc_collections
+
 
 import datetime
 from contextlib import contextmanager

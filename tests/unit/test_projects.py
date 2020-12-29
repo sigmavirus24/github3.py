@@ -279,7 +279,7 @@ class TestProjectCard(helper.UnitHelper):
         )
 
     def test_retrieve_pull_request_from_content_fails_without_content_url(
-        self
+        self,
     ):
         """Verify we raise an exception because we can't retrieve anything."""
         self.instance.content_url = None

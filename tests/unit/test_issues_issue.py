@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
+import unittest.mock
 import github3
 import dateutil.parser
-import mock
 
 from github3.issues.label import Label
 from github3.issues import Issue
@@ -114,7 +114,7 @@ class TestIssue(helper.UnitHelper):
 
     def test_assign(self):
         """Verify the request for assigning an issue."""
-        with mock.patch.object(Issue, "edit") as edit:
+        with unittest.mock.patch.object(Issue, "edit") as edit:
             edit.return_value = True
             labels = [str(label) for label in self.instance.original_labels]
             self.instance.assign(username="sigmavirus24")
@@ -282,7 +282,9 @@ class TestIssue(helper.UnitHelper):
 
     def test_remove_all_labels(self):
         """Verify that all labels are removed."""
-        with mock.patch.object(Issue, "replace_labels") as replace_labels:
+        with unittest.mock.patch.object(
+            Issue, "replace_labels"
+        ) as replace_labels:
             replace_labels.return_value = []
             assert self.instance.remove_all_labels() == []
             replace_labels.assert_called_once_with([])
@@ -312,7 +314,7 @@ class TestIssue(helper.UnitHelper):
     def test_reopen(self):
         """Test the request for reopening an issue."""
         labels = [str(label) for label in self.instance.original_labels]
-        with mock.patch.object(Issue, "edit") as edit:
+        with unittest.mock.patch.object(Issue, "edit") as edit:
             self.instance.reopen()
             edit.assert_called_once_with(
                 self.instance.title,

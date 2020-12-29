@@ -42,7 +42,7 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for("comments").replace("comments", "pulls"),
             params={"per_page": 100},
-            headers=github3.repos.commit._RepoCommit.PREVIEW_HEADERS
+            headers=github3.repos.commit._RepoCommit.PREVIEW_HEADERS,
         )
 
 

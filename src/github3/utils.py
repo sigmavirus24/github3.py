@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """A collection of useful utilities."""
-try:
-    import collections.abc as abc_collections
-except ImportError:
-    # For Python 2.7 compatibility
-    import collections as abc_collections
+import collections.abc as abc_collections
+
 import datetime
 import re
 

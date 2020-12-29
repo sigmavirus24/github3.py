@@ -1,8 +1,7 @@
 """Unit tests for github3.api."""
 import github3
 import unittest
-
-from .helper import mock
+import unittest.mock
 
 
 class TestAPI(unittest.TestCase):
@@ -10,7 +9,7 @@ class TestAPI(unittest.TestCase):
     """All tests for the github3.api module."""
 
     def setUp(self):
-        self.mocked_github = mock.patch(
+        self.mocked_github = unittest.mock.patch(
             "github3.api.gh", autospec=github3.GitHub
         )
         self.gh = self.mocked_github.start()
@@ -43,15 +42,15 @@ class TestAPI(unittest.TestCase):
     def test_authorize(self):
         """Show that github3.authorize proxies to GitHub."""
         args = ("login", "password", ["scope"], "note", "url.com", "", "")
-        with mock.patch("github3.api.GitHub") as gh:
+        with unittest.mock.patch("github3.api.GitHub") as gh:
             github3.authorize(*args)
             gh().authorize.assert_called_once_with(*args)
 
     def test_authorize_with_github_argument(self):
         """Show that github3.authorize can use an existing GitHub object."""
         args = ("login", "password", ["scope"], "note", "url.com", "", "")
-        github = mock.Mock(spec_set=github3.GitHub)
-        with mock.patch("github3.api.GitHub") as gh:
+        github = unittest.mock.Mock(spec_set=github3.GitHub)
+        with unittest.mock.patch("github3.api.GitHub") as gh:
             github3.authorize(*args, github=github)
             gh().assert_not_called()
             github.authorize.assert_called_once_with(*args)
@@ -65,7 +64,9 @@ class TestAPI(unittest.TestCase):
     def test_enterprise_login(self):
         """Show that github3.enterprise_login returns GitHubEnterprise."""
         args = ("login", "password", None, "https://url.com/", None)
-        with mock.patch.object(github3.GitHubEnterprise, "login") as login:
+        with unittest.mock.patch.object(
+            github3.GitHubEnterprise, "login"
+        ) as login:
             g = github3.enterprise_login(*args)
             assert isinstance(g, github3.GitHubEnterprise)
             login.assert_called_once_with("login", "password", None, None)
@@ -110,7 +111,7 @@ class TestAPI(unittest.TestCase):
     def test_login(self):
         """Show that github3.login proxies to GitHub."""
         args = ("login", "password", None, None)
-        with mock.patch.object(github3.GitHub, "login") as login:
+        with unittest.mock.patch.object(github3.GitHub, "login") as login:
             g = github3.login(*args)
             assert isinstance(g, github3.GitHub)
             assert not isinstance(g, github3.GitHubEnterprise)

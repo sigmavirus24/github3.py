@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-try:
-    import collections.abc as abc_collections
-except ImportError:
-    # For Python 2.7 compatibility
-    import collections as abc_collections
+import collections.abc as abc_collections
+
 import functools
 
 from requests.compat import urlparse, urlencode

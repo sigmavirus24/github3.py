@@ -1,6 +1,7 @@
 """Unit tests for Repositories."""
 import datetime
-import mock
+import unittest.mock
+
 import pytest
 
 from base64 import b64encode
@@ -120,7 +121,7 @@ class TestRepository(helper.UnitHelper):
 
         b64_encoded_content = b64encode(data["content"]).decode("utf-8")
         data.update({"content": b64_encoded_content})
-        del (data["path"])
+        del data["path"]
 
         self.put_called_with(url_for("contents/hello.txt"), data=data)
 
@@ -314,7 +315,9 @@ class TestRepository(helper.UnitHelper):
 
     def test_create_pull_private_required_data(self):
         """Verify the request for creating a pull request."""
-        with helper.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
+        with unittest.mock.patch.object(
+            GitHubCore, "_remove_none"
+        ) as rm_none:
             data = {}
             self.instance._create_pull(data)
             rm_none.assert_called_once_with({})
@@ -334,20 +337,20 @@ class TestRepository(helper.UnitHelper):
             "head": "feature_branch",
             "body": "body",
         }
-        with helper.mock.patch.object(Repository, "_create_pull") as pull:
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             self.instance.create_pull(**data)
             pull.assert_called_once_with(data)
 
     def test_create_pull_from_issue(self):
         """Verify the request for creating a pull request from an issue."""
-        with helper.mock.patch.object(Repository, "_create_pull") as pull:
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             data = {"issue": 1, "base": "master", "head": "feature_branch"}
             self.instance.create_pull_from_issue(**data)
             pull.assert_called_once_with(data)
 
     def test_create_pull_from_issue_required_issue_number(self):
         """Verify the request for creating a pull request from an issue."""
-        with helper.mock.patch.object(Repository, "_create_pull") as pull:
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             pull_request = self.instance.create_pull_from_issue(
                 issue=-1, base="master", head="feature_branch"
             )
@@ -404,7 +407,9 @@ class TestRepository(helper.UnitHelper):
             "description": "bar",
             "context": "default",
         }
-        with helper.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
+        with unittest.mock.patch.object(
+            GitHubCore, "_remove_none"
+        ) as rm_none:
             self.instance.create_status(sha="fake-sha", **data)
             rm_none.assert_called_once_with(data)
             self.post_called_with(url_for("statuses/fake-sha"), data=data)
@@ -546,7 +551,9 @@ class TestRepository(helper.UnitHelper):
             "has_projects": False,
         }
 
-        with mock.patch.object(Repository, "_update_attributes") as up_attr:
+        with unittest.mock.patch.object(
+            Repository, "_update_attributes"
+        ) as up_attr:
             assert self.instance.edit(**data) is True
             assert up_attr.called is True
             self.patch_called_with(url_for(), data=data)
@@ -630,7 +637,9 @@ class TestRepository(helper.UnitHelper):
                 {"created_at": "2014-03-18T17:15:42Z", "body": "comment body"}
             ],
         }
-        with mock.patch.object(GitHubCore, "_remove_none") as rm_none:
+        with unittest.mock.patch.object(
+            GitHubCore, "_remove_none"
+        ) as rm_none:
             self.instance.import_issue(**data)
             rm_none.assert_any_call(issue["issue"])
             rm_none.assert_any_call(issue)

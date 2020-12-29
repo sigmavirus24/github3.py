@@ -41,8 +41,9 @@ class ViewsStats(models.GitHubCore):
                 view["timestamp"] = self._strptime(view["timestamp"])
 
     def _repr(self):
-        return ("<Views Statistics "
-                "[{s.count}, {s.uniques} unique]>").format(s=self)
+        return (
+            "<Views Statistics " "[{s.count}, {s.uniques} unique]>"
+        ).format(s=self)
 
 
 class ClonesStats(models.GitHubCore):
@@ -81,5 +82,6 @@ class ClonesStats(models.GitHubCore):
                 clone["timestamp"] = self._strptime(clone["timestamp"])
 
     def _repr(self):
-        return ("<Clones Statistics "
-                "[{s.count}, {s.uniques} unique]>").format(s=self)
+        return (
+            "<Clones Statistics " "[{s.count}, {s.uniques} unique]>"
+        ).format(s=self)

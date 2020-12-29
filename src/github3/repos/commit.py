@@ -28,7 +28,7 @@ class _RepoCommit(models.GitHubCore):
 
     PREVIEW_HEADERS = {
         "Accept": "application/vnd.github.groot-preview+json,"
-                  "application/vnd.github.v3.full+json"
+        "application/vnd.github.v3.full+json"
     }
 
     class_name = "_RepoCommit"
@@ -165,7 +165,7 @@ class _RepoCommit(models.GitHubCore):
             url,
             pulls.ShortPullRequest,
             etag=etag,
-            headers=self.PREVIEW_HEADERS
+            headers=self.PREVIEW_HEADERS,
         )
 
 
