@@ -1,6 +1,6 @@
-=========================
-Release Notes and History
-=========================
+===========================
+ Release Notes and History
+===========================
 
 All of the release notes that have been recorded for github3.py are organized
 here with the newest releases first.
