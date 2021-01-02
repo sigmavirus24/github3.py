@@ -31,15 +31,6 @@ class TestOrganization(IntegrationHelper):
 
         return team
 
-    def test_add_member(self):
-        """Test the ability to add a member to an organization."""
-        self.auto_login()
-        cassette_name = self.cassette_name("add_member")
-        with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization()
-            team = self.get_team(o)
-            assert o.add_member("esacteksab", team.id) is True
-
     def test_add_repository(self):
         """Test the ability to add a repository to an organization."""
         self.auto_login()
@@ -153,16 +144,6 @@ class TestOrganization(IntegrationHelper):
             for event in o.all_events(username="gh3test"):
                 assert isinstance(event, github3.events.Event)
 
-    def test_events(self):
-        """Test retrieving an organization's public event stream."""
-        cassette_name = self.cassette_name("public_events")
-        with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization()
-
-            for event in o.events():
-                assert isinstance(event, github3.events.Event)
-                assert isinstance(event.as_json(), str)
-
     def test_public_events(self):
         """Test retrieving an organization's public event stream."""
         cassette_name = self.cassette_name("public_events")
@@ -274,19 +255,6 @@ class TestOrganization(IntegrationHelper):
                 o.publicize_member("esacteksab")
 
             assert o.publicize_member("omgjlk") is True
-
-    def test_remove_member(self):
-        """Test the ability to remove a member of the organization."""
-        self.auto_login()
-        cassette_name = self.cassette_name("remove_member")
-        with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization()
-            team = self.get_team(o)
-
-            # First add the user
-            assert o.add_member("gh3test", team.id) is True
-            # Now remove them
-            assert o.remove_member("gh3test") is True
 
     def test_remove_repository(self):
         """Test the ability to remove a repository from a team."""

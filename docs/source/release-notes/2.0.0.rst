@@ -1,4 +1,4 @@
-1.4.0: 2020-12-29
+2.0.0: 2020-01-02
 -----------------
 
 Features Added
@@ -9,3 +9,49 @@ Features Added
 - Update CI/CD to thoroughly test all supported version.
 - Remove compatibility imports for Python 2.
 - Remove dev-dependency for mock.
+
+Removals
+````````
+
+Removal of already deprecated code on version 1.x:
+
+  - ``Api#all_events`` use ``github.GitHub.all_events``
+  - ``Api#all_repositories`` use ``github.GitHub.all_repositories``
+  - ``Api#all_users`` use ``github.GitHub.all_users``
+  - ``Api#authorize`` use ``github.GitHub.authorize``
+  - ``Api#create_gist`` use ``github.GitHub.create_gist``
+  - ``Api#emojis``
+  - ``Api#followed_by`` use ``github.GitHub.followed_by``
+  - ``Api#followers_of`` use ``github.GitHub.followers_of``
+  - ``Api#gist`` use ``github.GitHub.gist``
+  - ``Api#gists_by`` use ``github.GitHub.gists_by``
+  - ``Api#gitignore_template`` use ``github.GitHub.gitignore_template``
+  - ``Api#gitignore_templates`` use ``github.GitHub.gitignore_templates``
+  - ``Api#issue`` use ``github.GitHub.issue``
+  - ``Api#issues_on`` use ``github.GitHub.issues_on``
+  - ``Api#markdown`` use ``github.GitHub.markdown``
+  - ``Api#octocat`` use ``github.GitHub.octocat``
+  - ``Api#organization``
+  - ``Api#organizations_with`` use ``github.GitHub.organizations_with``
+  - ``Api#public_gists`` use ``github.GitHub.public_gists``
+  - ``Api#pull_request`` use ``github.GitHub.pull_request``
+  - ``Api#rate_limit``
+  - ``Api#repositories_by`` use ``github.GitHub.organizations_with``
+  - ``Api#repository``
+  - ``Api#search_code`` use ``github.GitHub.search_code``
+  - ``Api#search_issues`` use ``github.GitHub.search_issues``
+  - ``Api#search_repositories`` use ``github.GitHub.search_repositories``
+  - ``Api#search_users`` use ``github.GitHub.search_users``
+  - ``Api#starred_by`` use ``github.GitHub.starred_by``
+  - ``Api#subscriptions_for`` use ``github.GitHub.subscriptions_for``
+  - ``Api#user``
+  - ``Api#zen`` use ``github.GitHub.zen``
+  - ``Git#Blob.decoded`` use ``Git#Blob.decode_content``
+  - ``Team#is_member`` use ``Login#is_member``
+  - ``Team#add_member`` use ``Team#add_or_update_membership``
+  - ``Team#invite`` use ``Team#add_or_update_membership``
+  - ``Team#remove_member`` use ``Team#add_or_update_membership``
+  - ``Organization#add_member`` add ``username`` to ``team``.
+  - ``Organization#events`` use ``Organization#public_events``
+  - ``Issue#assign`` use ``issues.issue.Issue.add_assignees``
+

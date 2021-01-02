@@ -2,7 +2,6 @@
 """This module contains all of the classes related to organizations."""
 from __future__ import unicode_literals
 
-import warnings
 from json import dumps
 
 from uritemplate import URITemplate
@@ -34,30 +33,6 @@ class _Team(models.GitHubCore):
 
     def _repr(self):
         return "<{s.class_name} [{s.name}]>".format(s=self)
-
-    @requires_auth
-    def add_member(self, username):
-        """Add ``username`` to this team.
-
-        .. deprecated:: 1.0.0
-
-            Use :meth:`add_or_update_membership` instead.
-
-        :param str username:
-            the username of the user you would like to add to this team.
-        :returns:
-            True if successfully added, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This is no longer supported by the GitHub API, see "
-            "https://developer.github.com/changes/2014-09-23-one-more-week"
-            "-before-the-add-team-member-api-breaking-change/",
-            DeprecationWarning,
-        )
-        url = self._build_url("members", username, base_url=self._api)
-        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
     def add_or_update_membership(self, username, role="member"):
@@ -161,51 +136,6 @@ class _Team(models.GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
-    def invite(self, username):
-        """Invite the user to join this team.
-
-        .. deprecated:: 1.2.0
-
-            Use :meth:`add_or_update_membership` instead.
-
-        This returns a dictionary like so::
-
-            {'state': 'pending', 'url': 'https://api.github.com/teams/...'}
-
-        :param str username:
-            (required), login of user to invite to join this team.
-        :returns:
-            dictionary of the invitation response
-        :rtype:
-            dict
-        """
-        warnings.warn(
-            "This method is deprecated. Please use "
-            "``add_or_update_membership`` instead.",
-            DeprecationWarning,
-        )
-        return self.add_or_update_membership(username)
-
-    @requires_auth
-    def is_member(self, username):
-        """Check if ``login`` is a member of this team.
-
-        :param str username:
-            (required), username name of the user
-        :returns:
-            True if the user is a member, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This method is deprecated. Please use "
-            "``membership_for`` instead.",
-            DeprecationWarning,
-        )
-        url = self._build_url("members", username, base_url=self._api)
-        return self._boolean(self._get(url), 204, 404)
-
-    @requires_auth
     def members(self, role=None, number=-1, etag=None):
         """Iterate over the members of this team.
 
@@ -272,30 +202,6 @@ class _Team(models.GitHubCore):
         url = self._build_url("memberships", username, base_url=self._api)
         json = self._json(self._get(url), 200)
         return json or {}
-
-    @requires_auth
-    def remove_member(self, username):
-        """Remove ``username`` from this team.
-
-        .. deprecated:: 1.0.0
-
-            Use :meth:`revoke_membership` instead.
-
-        :param str username:
-            (required), username of the member to remove
-        :returns:
-            True if successful, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This is no longer supported by the GitHub API, see "
-            "https://developer.github.com/changes/2014-09-23-one-more-week"
-            "-before-the-add-team-member-api-breaking-change/",
-            DeprecationWarning,
-        )
-        url = self._build_url("members", username, base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
     def revoke_membership(self, username):
@@ -473,53 +379,6 @@ class _Organization(models.GitHubCore):
         return "<{s.class_name} [{s.login}{display}]>".format(
             s=self, display=display_name
         )
-
-    @requires_auth
-    def add_member(self, username, team_id):
-        """Add ``username`` to ``team`` and thereby to this organization.
-
-        .. warning::
-
-            This method is no longer valid. To add a member to a team, you
-            must now retrieve the team directly, and use the ``invite``
-            method.
-
-        .. warning::
-
-            This method is no longer valid. To add a member to a team, you
-            must now retrieve the team directly, and use the ``invite``
-            method.
-
-        Any user that is to be added to an organization, must be added
-        to a team as per the GitHub api.
-
-        .. versionchanged:: 1.0
-
-            The second parameter used to be ``team`` but has been changed to
-            ``team_id``. This parameter is now required to be an integer to
-            improve performance of this method.
-
-        :param str username:
-            (required), login name of the user to be added
-        :param int team_id:
-            (required), team id
-        :returns:
-            True if successful, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This is no longer supported by the GitHub API, see "
-            "https://developer.github.com/changes/2014-09-23-one-more-week"
-            "-before-the-add-team-member-api-breaking-change/",
-            DeprecationWarning,
-        )
-
-        if int(team_id) < 0:
-            return False
-
-        url = self._build_url("teams", str(team_id), "members", str(username))
-        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
     def add_or_update_membership(self, username, role="member"):
@@ -978,29 +837,6 @@ class _Organization(models.GitHubCore):
         """
         url = self._build_url("users", username, "events", "orgs", self.login)
         return self._iter(int(number), url, Event, etag=etag)
-
-    def events(self, number=-1, etag=None):
-        """Iterate over public events for this org (deprecated).
-
-        .. deprecated:: 1.0.0
-
-            Use :meth:`public_events` instead.
-
-        :param int number:
-            (optional), number of events to return. Default: -1 iterates over
-            all events available.
-        :param str etag:
-            (optional), ETag from a previous request to the same endpoint
-        :returns:
-            generator of events
-        :rtype:
-            :class:`~github3.events.Event`
-        """
-        warnings.warn(
-            "This method is deprecated. Please use ``public_events`` instead.",
-            DeprecationWarning,
-        )
-        return self.public_events(number, etag=etag)
 
     def public_events(self, number=-1, etag=None):
         """Iterate over public events for this org.

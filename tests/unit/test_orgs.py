@@ -1,5 +1,4 @@
 """Organization unit tests."""
-import unittest.mock
 import pytest
 
 from github3 import GitHubError
@@ -25,14 +24,6 @@ class TestOrganization(helper.UnitHelper):
 
     described_class = Organization
     example_data = get_org_example_data()
-
-    def test_add_member(self):
-        """Show that an authenticated user can add a member to an org."""
-        self.instance.add_member("user", 10)
-
-        self.session.put.assert_called_once_with(
-            "https://api.github.com/teams/10/members/user"
-        )
 
     def test_add_repository(self):
         """Show that one can add a repository to an organization."""
@@ -296,11 +287,6 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     described_class = Organization
     example_data = get_org_example_data()
 
-    def test_add_member(self):
-        """Show that one must be authenticated to add a member to an org."""
-        with pytest.raises(GitHubError):
-            self.instance.add_member("user", 10)
-
     def test_add_repository(self):
         """Show that one must be authenticated to add a repo to an org."""
         with pytest.raises(GitHubError):
@@ -402,21 +388,6 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             "https://api.github.com/users/dummy/events/orgs/github",
             params={"per_page": 100},
             headers={},
-        )
-
-    @unittest.mock.patch("warnings.warn")
-    def test_events(self, warn_mock):
-        """Show that one can iterate over an organization's events."""
-        i = self.instance.events()
-        self.get_next(i)
-
-        self.session.get.assert_called_once_with(
-            url_for("events"), params={"per_page": 100}, headers={}
-        )
-
-        warn_mock.assert_called_once_with(
-            "This method is deprecated. Please use ``public_events`` instead.",
-            DeprecationWarning,
         )
 
     def test_members(self):
