@@ -4,6 +4,8 @@
 github3.py is a comprehensive, actively developed and extraordinarily stable 
 wrapper around the GitHub API (v3).
 
+Note: This library currently works with Python 3.6+ or pypy3. For older versions, please use version 1.3.0.
+
 Installation
 ------------
 
@@ -36,11 +38,9 @@ this in a virtual environment. These need to be installed for the tests to run.
 
 - betamax_
 - coverage_ by Ned Batchelder
-- mock_ by Michael Foord
 
 .. _betamax: https://github.com/sigmavirus24/betamax
 .. _coverage: http://nedbatchelder.com/code/coverage/
-.. _mock: https://mock.readthedocs.io/en/latest/
 
 Build status
 ~~~~~~~~~~~~

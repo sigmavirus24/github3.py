@@ -1,14 +1,11 @@
 """Base classes and helpers for unit tests."""
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 import github3
 import json
 import os.path
 import sys
 import pytest
 import unittest
+import unittest.mock
 
 
 def create_url_helper(base_url):
@@ -73,7 +70,9 @@ class UnitHelper(unittest.TestCase):
 
     def create_mocked_session(self):
         """Use mock to auto-spec a GitHubSession and return an instance."""
-        MockedSession = mock.create_autospec(github3.session.GitHubSession)
+        MockedSession = unittest.mock.create_autospec(
+            github3.session.GitHubSession
+        )
         return MockedSession()
 
     def create_session_mock(self, *args):
@@ -81,7 +80,7 @@ class UnitHelper(unittest.TestCase):
         session = self.create_mocked_session()
         base_attrs = ["headers", "auth"]
         attrs = dict(
-            (key, mock.Mock()) for key in set(args).union(base_attrs)
+            (key, unittest.mock.Mock()) for key in set(args).union(base_attrs)
         )
         session.configure_mock(**attrs)
         session.delete.return_value = None
@@ -226,7 +225,7 @@ class UnitIteratorHelper(UnitHelper):
 
     def patch_get_json(self):
         """Patch a GitHubIterator's _get_json method."""
-        self.get_json_mock = mock.patch.object(
+        self.get_json_mock = unittest.mock.patch.object(
             github3.structs.GitHubIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
@@ -248,7 +247,7 @@ class UnitIteratorAppInstHelper(UnitIteratorHelper):
 
     def after_setup(self):
         """Set session app installation"""
-        MockedAuth = mock.create_autospec(
+        MockedAuth = unittest.mock.create_autospec(
             github3.session.AppInstallationTokenAuth
         )
         self.session.auth = MockedAuth
@@ -260,7 +259,7 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
 
     def patch_get_json(self):
         """Patch a SearchIterator's _get_json method."""
-        self.get_json_mock = mock.patch.object(
+        self.get_json_mock = unittest.mock.patch.object(
             github3.structs.SearchIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
@@ -277,7 +276,7 @@ class UnitAppInstallHelper(UnitHelper):
 
     def after_setup(self):
         """Set session app installation"""
-        MockedAuth = mock.create_autospec(
+        MockedAuth = unittest.mock.create_autospec(
             github3.session.AppInstallationTokenAuth
         )
         self.session.auth = MockedAuth

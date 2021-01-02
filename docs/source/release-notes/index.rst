@@ -5,6 +5,12 @@
 All of the release notes that have been recorded for github3.py are organized
 here with the newest releases first.
 
+2.x Release Series
+==================
+
+.. toctree::
+    2.0.0
+
 1.x Release Series
 ==================
 

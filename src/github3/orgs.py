@@ -640,7 +640,7 @@ class _Organization(models.GitHubCore):
         auto_init=False,
         gitignore_template="",
         license_template="",
-        has_projects=True
+        has_projects=True,
     ):
         """Create a repository for this organization.
 
@@ -696,7 +696,7 @@ class _Organization(models.GitHubCore):
             "license_template": license_template,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
-            "has_projects": has_projects
+            "has_projects": has_projects,
         }
         if int(team_id) > 0:
             data.update({"team_id": team_id})

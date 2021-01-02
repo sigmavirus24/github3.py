@@ -558,7 +558,7 @@ class _Repository(models.GitHubCore):
             params = {"anon": "true"}
         return self._iter(int(number), url, users.Contributor, params, etag)
 
-    def views(self, per='day'):
+    def views(self, per="day"):
         """Get the total number of repository views and breakdown per day or
         week for the last 14 days.
 
@@ -585,7 +585,7 @@ class _Repository(models.GitHubCore):
         json = self._json(self._get(url, params=params), 200)
         return self._instance_or_null(traffic.ViewsStats, json)
 
-    def clones(self, per='day'):
+    def clones(self, per="day"):
         """Get the total number of repository clones and breakdown per day or
         week for the last 14 days.
 
@@ -726,7 +726,7 @@ class _Repository(models.GitHubCore):
         :returns:
             string of the SHA returned
         :returns:
-            str (on Python 3, unicode on Python 2)
+            str
         """
         sha = ""
         if encoding in ("base64", "utf-8"):

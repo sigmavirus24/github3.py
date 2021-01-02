@@ -315,7 +315,7 @@ class TestOrganization(IntegrationHelper):
         self.auto_login()
         cassette_name = self.cassette_name("team_by_name")
         with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization('erico-sandbox')
+            o = self.get_organization("erico-sandbox")
 
             # Grab a team, any team
             first_team = next(o.teams())

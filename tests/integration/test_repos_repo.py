@@ -1370,9 +1370,9 @@ class TestRepository(helper.IntegrationHelper):
         assert len(weekly_views.views) == 2
 
         for v in itertools.chain(daily_views.views, weekly_views.views):
-            assert isinstance(v['timestamp'], datetime.datetime)
-            assert isinstance(v['count'], int)
-            assert isinstance(v['uniques'], int)
+            assert isinstance(v["timestamp"], datetime.datetime)
+            assert isinstance(v["count"], int)
+            assert isinstance(v["uniques"], int)
 
     def test_traffic_clones(self):
         """
@@ -1395,9 +1395,9 @@ class TestRepository(helper.IntegrationHelper):
         assert len(weekly_clones.clones) == 2
 
         for v in itertools.chain(daily_clones.clones, weekly_clones.clones):
-            assert isinstance(v['timestamp'], datetime.datetime)
-            assert isinstance(v['count'], int)
-            assert isinstance(v['uniques'], int)
+            assert isinstance(v["timestamp"], datetime.datetime)
+            assert isinstance(v["count"], int)
+            assert isinstance(v["uniques"], int)
 
 
 class TestContents(helper.IntegrationHelper):

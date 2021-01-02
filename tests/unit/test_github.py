@@ -1,3 +1,5 @@
+import unittest.mock
+
 import pytest
 
 from github3 import GitHubEnterprise, GitHubError
@@ -164,7 +166,7 @@ class TestGitHub(helper.UnitHelper):
                 "has_wiki": True,
                 "auto_init": False,
                 "gitignore_template": "",
-                "has_projects": True
+                "has_projects": True,
             },
         )
 
@@ -325,7 +327,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = helper.mock.Mock(ok=True)
+        self.session.post.return_value = unittest.mock.Mock(ok=True)
         text = "##Hello"
         mode = "markdown"
         self.instance.markdown(text=text, mode=mode)
@@ -335,7 +337,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown_raw(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = helper.mock.Mock(ok=True)
+        self.session.post.return_value = unittest.mock.Mock(ok=True)
         text = "Hello"
         raw = True
         self.instance.markdown(text=text, raw=raw)
@@ -347,7 +349,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown_gfm(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = helper.mock.Mock(ok=True)
+        self.session.post.return_value = unittest.mock.Mock(ok=True)
         text = "##Hello"
         mode = "gfm"
         context = "sigmavirus24/github3.py"
@@ -371,7 +373,9 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = helper.mock.Mock(ok=True, text="egg")
+        self.session.get.return_value = unittest.mock.Mock(
+            ok=True, text="egg"
+        )
         egg = self.instance.octocat(say="hello")
         self.session.get.assert_called_once_with(
             url_for("octocat"), params={"s": "hello"}
@@ -381,7 +385,9 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat_response_not_ok(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = helper.mock.Mock(ok=False, text="egg")
+        self.session.get.return_value = unittest.mock.Mock(
+            ok=False, text="egg"
+        )
 
         egg = self.instance.octocat(say="hello")
 
@@ -722,7 +728,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_zen(self):
         """Verify the request for returning a quote from Zen of Github."""
-        self.session.get.return_value = helper.mock.Mock(
+        self.session.get.return_value = unittest.mock.Mock(
             status_code=200, text="hello"
         )
         self.instance.zen()

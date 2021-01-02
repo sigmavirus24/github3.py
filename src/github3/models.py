@@ -134,7 +134,7 @@ class GitHubCore(object):
             return
         for (k, v) in list(data.items()):
             if v is None:
-                del (data[k])
+                del data[k]
 
     def _instance_or_null(self, instance_class, json):
         if json is not None and not isinstance(json, dict):

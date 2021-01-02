@@ -5,12 +5,7 @@ from functools import wraps
 from requests.models import Response
 import os
 
-try:  # (No coverage)
-    # python2
-    from StringIO import StringIO  # (No coverage)
-except ImportError:  # (No coverage)
-    # python3
-    from io import BytesIO as StringIO
+from io import BytesIO as StringIO
 
 
 class RequestsStringIO(StringIO):
