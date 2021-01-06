@@ -6,7 +6,6 @@ See also: http://developer.github.com/v3/git/
 """
 from __future__ import unicode_literals
 import base64
-import warnings
 
 from json import dumps
 
@@ -22,7 +21,6 @@ class Blob(models.GitHubCore):
     .. versionchanged:: 1.0.0
 
        - The :attr:`content` is no longer forcibly coerced to bytes.
-       - The :attr:`decoded` is deprecated in favor of :meth:`decode_content`.
 
     This object has the following atributes
 
@@ -53,16 +51,6 @@ class Blob(models.GitHubCore):
 
     def _repr(self):
         return "<Blob [{0:.10}]>".format(self.sha)
-
-    @property
-    def decoded(self):
-        """Compatibility shim for the deprecated attribute."""
-        warnings.warn(
-            "The decoded attribute is deprecated. Use decode_content"
-            " instead.",
-            DeprecationWarning,
-        )
-        return self.decode_content()
 
     def decode_content(self):
         """Return the unencoded content of this blob.

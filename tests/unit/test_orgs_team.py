@@ -14,12 +14,6 @@ class TestTeam(helper.UnitHelper):
     described_class = Team
     example_data = get_team_example_data()
 
-    def test_add_member(self):
-        """Show that one can add a member to an organization team."""
-        self.instance.add_member("user")
-
-        self.session.put.assert_called_once_with(url_for("members/user"))
-
     def test_add_repository(self):
         """Show that one can add a repository to an organization team."""
         self.instance.add_repository("name-of-repo")
@@ -52,20 +46,6 @@ class TestTeam(helper.UnitHelper):
 
         self.session.get.assert_called_once_with(url_for("repos/org/repo"))
 
-    def test_is_member(self):
-        """Show that a user can check if another user is a team member."""
-        self.instance.is_member("username")
-
-        self.session.get.assert_called_once_with(url_for("members/username"))
-
-    def test_remove_member(self):
-        """Show that a user can check if another user is a team member."""
-        self.instance.remove_member("username")
-
-        self.session.delete.assert_called_once_with(
-            url_for("members/username")
-        )
-
     def test_remove_repository(self):
         """Show that a user can remove a repository from a team."""
         self.instance.remove_repository("repo")
@@ -76,11 +56,6 @@ class TestTeam(helper.UnitHelper):
 class TestTeamRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     described_class = Team
     example_data = get_team_example_data()
-
-    def test_add_member_requires_auth(self):
-        """Show that adding a repo to a team requires authentication."""
-        with pytest.raises(GitHubError):
-            self.instance.add_member("user")
 
     def test_add_repository_requires_auth(self):
         """Show that adding a repo to a team requires authentication."""
@@ -101,16 +76,6 @@ class TestTeamRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that checking a team's access to a repo needs auth."""
         with pytest.raises(GitHubError):
             self.instance.has_repository("org/repo")
-
-    def test_is_member_requires_auth(self):
-        """Show that checking a user's team membership requires auth."""
-        with pytest.raises(GitHubError):
-            self.instance.is_member("user")
-
-    def test_remove_member_requires_auth(self):
-        """Show that removing a team member requires authentication."""
-        with pytest.raises(GitHubError):
-            self.instance.remove_member("user")
 
     def test_remove_repository_requires_auth(self):
         """Show that removing a repo from a team requires authentication."""

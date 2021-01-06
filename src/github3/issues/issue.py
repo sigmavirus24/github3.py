@@ -2,7 +2,6 @@
 """Module containing the Issue logic."""
 from __future__ import unicode_literals
 
-import warnings
 from json import dumps
 
 from uritemplate import URITemplate
@@ -103,37 +102,6 @@ class _Issue(models.GitHubCore):
         url = self._build_url("labels", base_url=self._api)
         json = self._json(self._post(url, data=args), 200)
         return [label.ShortLabel(lbl, self) for lbl in json] if json else []
-
-    @requires_auth
-    def assign(self, username):
-        """Assign user ``username`` to this issue.
-
-        .. deprecated:: 1.2.0
-
-            Use :meth:`github3.issues.issue.Issue.add_assignees` instead.
-
-        This is a short cut for :meth:`~github3.issues.issue.Issue.edit`.
-
-        :param str username:
-            username of the person to assign this issue to
-        :returns:
-            True if successful, False, otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This method is deprecated. Please use ``add_assignees`` "
-            "instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        if not username:
-            return False
-        number = self.milestone.number if self.milestone else None
-        labels = [str(lbl) for lbl in self.original_labels]
-        return self.edit(
-            self.title, self.body, username, self.state, number, labels
-        )
 
     @requires_auth
     def close(self):

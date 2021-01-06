@@ -50,10 +50,6 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that adding a label requires authentication."""
         self.assert_requires_auth(self.instance.add_labels, "enhancement")
 
-    def test_assign(self):
-        """Verify that assigning an issue requires authentication."""
-        self.assert_requires_auth(self.instance.assign, "sigmavirus24")
-
     def test_close(self):
         """Verify that closing an issue requires authentication."""
         self.assert_requires_auth(self.instance.close)
@@ -111,26 +107,6 @@ class TestIssue(helper.UnitHelper):
         """Verify the request for adding a label."""
         self.instance.add_labels("enhancement")
         self.post_called_with(url_for("labels"), data=["enhancement"])
-
-    def test_assign(self):
-        """Verify the request for assigning an issue."""
-        with unittest.mock.patch.object(Issue, "edit") as edit:
-            edit.return_value = True
-            labels = [str(label) for label in self.instance.original_labels]
-            self.instance.assign(username="sigmavirus24")
-            edit.assert_called_once_with(
-                self.instance.title,
-                self.instance.body,
-                "sigmavirus24",
-                self.instance.state,
-                self.instance.milestone.number,
-                labels,
-            )
-
-    def test_assign_empty_username(self):
-        """Verify the request when assigning a username."""
-        self.instance.assign("")
-        assert self.session.patch.called is False
 
     def test_close(self):
         """Verify the request for closing an issue."""

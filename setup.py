@@ -62,7 +62,7 @@ class PyTest(setuptools.command.test.test):  # noqa: D101
         # import here, cause outside the eggs aren't loaded
         import pytest
 
-        warnings.warn("pyton setup.py test support is deprecated.", DeprecationWarning)
+        warnings.warn("python setup.py test support is deprecated.", DeprecationWarning)
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
