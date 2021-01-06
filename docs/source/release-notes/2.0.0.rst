@@ -1,4 +1,4 @@
-2.0.0: 2020-01-02
+2.0.0: 2020-01-06
 -----------------
 
 Features Added
@@ -13,7 +13,9 @@ Features Added
 Removals
 ````````
 
-Removal of already deprecated code on version 1.x:
+* Removal of legacy unicode future imports.
+
+* Removal of already deprecated code on version 1.x:
 
 - ``github3.api.all_events`` use ``github.GitHub.all_events``
 - ``github3.api.all_repositories`` use ``github.GitHub.all_repositories``
