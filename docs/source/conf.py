@@ -45,8 +45,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'github3.py'
-copyright = u'2012-2018 - Ian Stapleton Cordasco'
+project = 'github3.py'
+copyright = '2012-2021 - Ian Stapleton Cordasco'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -186,8 +186,8 @@ htmlhelp_basename = 'github3.pydoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'github3.py.tex', u'github3.py Documentation',
-   u'Ian Cordasco', 'manual'),
+  ('index', 'github3.py.tex', 'github3.py Documentation',
+   'Ian Cordasco', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -219,8 +219,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'github3.py', u'github3.py Documentation',
-     [u'Ian Cordasco'], 1)
+    ('index', 'github3.py', 'github3.py Documentation',
+     ['Ian Cordasco'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -232,7 +232,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'github3.py', u'github3.py Documentation', u'Ian Cordasco',
+  ('index', 'github3.py', 'github3.py Documentation', 'Ian Cordasco',
    'github3.py', 'Wrapper for GitHub API v3', 'Miscellaneous'),
 ]
 

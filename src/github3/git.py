@@ -4,7 +4,6 @@ This module contains all the classes relating to Git Data.
 
 See also: http://developer.github.com/v3/git/
 """
-from __future__ import unicode_literals
 import base64
 
 from json import dumps

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Release logic for the GitHub API."""
-from __future__ import unicode_literals
 
 import json
 

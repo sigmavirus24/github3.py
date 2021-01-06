@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Module containing the Issue logic."""
-from __future__ import unicode_literals
-
 from json import dumps
 
 from uritemplate import URITemplate

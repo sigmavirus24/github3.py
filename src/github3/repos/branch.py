@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Implementation of a branch on a repository."""
-from __future__ import unicode_literals
 
 from . import commit
 from .. import decorators

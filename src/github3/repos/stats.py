@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Repository and contributor stats logic."""
-from __future__ import unicode_literals
 
 import datetime
 

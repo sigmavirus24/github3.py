@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Invitation related logic."""
-from __future__ import unicode_literals
 
 from json import dumps
 

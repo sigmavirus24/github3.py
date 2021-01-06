@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """The module containing deployment logic."""
-from __future__ import unicode_literals
 
 from .. import users
 

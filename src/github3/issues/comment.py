@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Module with class(es) representing issue comments."""
-from __future__ import unicode_literals
-
 from .. import decorators
 from .. import models
 from .. import users

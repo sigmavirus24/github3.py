@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains only the Hook object for GitHub's Hook API."""
-from __future__ import unicode_literals
 
 from json import dumps
 from ..decorators import requires_auth

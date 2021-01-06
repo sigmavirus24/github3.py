@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Module containing the GistFile object."""
-from __future__ import unicode_literals
-
 from .. import models
 
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module provides the basic models used in github3.py."""
-from __future__ import unicode_literals
-
 import json as jsonlib
 import logging
 

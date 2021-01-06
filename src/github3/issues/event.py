@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Issue events logic."""
-from __future__ import unicode_literals
-
 from .. import users
 from ..models import GitHubCore
 

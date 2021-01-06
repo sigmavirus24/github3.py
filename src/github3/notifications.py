@@ -4,8 +4,6 @@ This module contains the classes relating to notifications.
 
 See also: http://developer.github.com/v3/activity/notifications/
 """
-from __future__ import unicode_literals
-
 from json import dumps
 from . import models
 

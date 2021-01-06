@@ -159,7 +159,7 @@ class TestIssue(helper.UnitHelper):
             "body": "issue body",
             "assignee": "sigmavirus24",
             "state": "closed",
-            "labels": [u"标签1", u"标签2"],
+            "labels": ["标签1", "标签2"],
         }
         self.instance.edit(**data)
         self.patch_called_with(url_for(), data=data)

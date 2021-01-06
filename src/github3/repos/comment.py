@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the RepoComment class."""
-from __future__ import unicode_literals
 
 from .. import models
 from .. import users

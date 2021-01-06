@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Code search results implementation."""
-from __future__ import unicode_literals
 
 from .. import models
 from .. import repos

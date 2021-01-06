@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the Contents object."""
-from __future__ import unicode_literals
 
 from base64 import b64decode, b64encode
 from json import dumps

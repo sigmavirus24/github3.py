@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains all the classes relating to Checks."""
-from __future__ import unicode_literals
-
 from json import dumps
 
 from . import decorators

@@ -5,7 +5,6 @@ The Repository objects represent various different repository representations
 returned by GitHub.
 
 """
-from __future__ import unicode_literals
 
 import base64
 import json as jsonlib

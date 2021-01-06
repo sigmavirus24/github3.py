@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the Gist, ShortGist, and GistFork objects."""
-from __future__ import unicode_literals
-
 from json import dumps
 
 from .. import models

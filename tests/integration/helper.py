@@ -23,7 +23,7 @@ class IntegrationHelper(unittest.TestCase):
         self.token = os.environ.get("GH_AUTH", "x" * 20)
         self.app_id = int(os.environ.get("GH_APP_ID", "0"))
         self.private_key_bytes = os.environ.get(
-            "GH_APP_PRIVATE_KEY", u""
+            "GH_APP_PRIVATE_KEY", ""
         ).encode("utf8")
         self.app_installation_id = int(
             os.environ.get("GH_APP_INSTALLATION_ID", "0")

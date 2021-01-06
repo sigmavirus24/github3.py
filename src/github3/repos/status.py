@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the Status object for GitHub's commit status API."""
-from __future__ import unicode_literals
 
 from .. import models
 from .. import users
