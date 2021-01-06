@@ -4,8 +4,6 @@ This module contains the classes relating to licenses.
 
 See also: https://developer.github.com/v3/licenses/
 """
-from __future__ import unicode_literals
-
 import base64
 
 from . import models

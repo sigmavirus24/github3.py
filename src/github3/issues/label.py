@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Module containing the logic for labels."""
-from __future__ import unicode_literals
 
 from json import dumps
 from ..decorators import requires_auth

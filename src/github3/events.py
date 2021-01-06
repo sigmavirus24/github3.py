@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the classes related to Events."""
-from __future__ import unicode_literals
-
 import copy
 
 from . import models

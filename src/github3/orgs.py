@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains all of the classes related to organizations."""
-from __future__ import unicode_literals
-
 from json import dumps
 
 from uritemplate import URITemplate

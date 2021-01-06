@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """GitHub Pages related logic."""
-from __future__ import unicode_literals
 
 from .. import models
 

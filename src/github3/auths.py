@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the Authorization object."""
-from __future__ import unicode_literals
-
 from .decorators import requires_basic_auth
 from .models import GitHubCore
 

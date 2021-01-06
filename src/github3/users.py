@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains everything relating to Users."""
-from __future__ import unicode_literals
-
 from json import dumps
 
 from github3.auths import Authorization

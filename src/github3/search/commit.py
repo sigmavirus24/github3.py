@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Commit search results implementation."""
-from __future__ import unicode_literals
 
 from .. import git
 from .. import models

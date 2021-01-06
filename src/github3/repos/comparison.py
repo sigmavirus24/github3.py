@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the Comparison object."""
-from __future__ import unicode_literals
 
 from . import commit
 from .. import models

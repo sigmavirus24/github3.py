@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Issue search results implementation."""
-from __future__ import unicode_literals
 
 from ..models import GitHubCore
 from ..issues import ShortIssue

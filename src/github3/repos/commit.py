@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """This module contains the RepoCommit classes."""
-from __future__ import unicode_literals
 
 from . import status
 from .. import checks, git, models, users
