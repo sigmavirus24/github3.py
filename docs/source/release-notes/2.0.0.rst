@@ -1,4 +1,4 @@
-2.0.0: 2020-01-06
+2.0.0: 2020-01-10
 -----------------
 
 Features Added
@@ -9,6 +9,11 @@ Features Added
 - Update CI/CD to thoroughly test all supported version.
 - Remove compatibility imports for Python 2.
 - Remove dev-dependency for mock.
+
+Bugs Fixed
+``````````
+
+* Key errors on Gist.history.
 
 Removals
 ````````
@@ -56,4 +61,3 @@ Removals
 - ``Organization#add_member`` add ``username`` to ``team``.
 - ``Organization#events`` use ``Organization#public_events``
 - ``Issue#assign`` use ``issues.issue.Issue.add_assignees``
-
