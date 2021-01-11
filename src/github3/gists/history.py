@@ -53,11 +53,11 @@ class GistHistory(models.GitHubCore):
         self.url = self._api = history["url"]
         self.version = history["version"]
         self.user = users.ShortUser(history["user"], self)
-        self.change_status = history.get("change_status")
+        self.change_status = history["change_status"]
         self.additions = self.change_status.get("additions")
         self.deletions = self.change_status.get("deletions")
-        self.total = self.change_status.get("total")
-        self.committed_at = self._strptime(history.get("committed_at"))
+        self.total = self.change_status["total"]
+        self.committed_at = self._strptime(history["committed_at"])
 
     def _repr(self) -> str:
         return f"<Gist History [{self.version}]>"
