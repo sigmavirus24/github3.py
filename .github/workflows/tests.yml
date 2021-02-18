@@ -1,0 +1,139 @@
+name: Tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+    name: ${{ matrix.session }} ${{ matrix.python-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { python-version: 3.9, os: ubuntu-latest, session: "pre-commit" }
+          - { python-version: 3.9, os: ubuntu-latest, session: "safety" }
+          # - { python-version: 3.9, os: ubuntu-latest, session: "mypy" }
+          # - { python-version: 3.8, os: ubuntu-latest, session: "mypy" }
+          # - { python-version: 3.7, os: ubuntu-latest, session: "mypy" }
+          - { python-version: 3.9, os: ubuntu-latest, session: "tests" }
+          - { python-version: 3.8, os: ubuntu-latest, session: "tests" }
+          - { python-version: 3.7, os: ubuntu-latest, session: "tests" }
+          - { python-version: 3.9, os: windows-latest, session: "tests" }
+          - { python-version: 3.9, os: macos-latest, session: "tests" }
+          # - { python-version: 3.9, os: ubuntu-latest, session: "typeguard" }
+          - { python-version: 3.9, os: ubuntu-latest, session: "xdoctest" }
+          - { python-version: 3.8, os: ubuntu-latest, session: "docs-build" }
+
+    env:
+      NOXSESSION: ${{ matrix.session }}
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Install Poetry
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt poetry
+          poetry --version
+
+      - name: Install Nox
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt nox nox-poetry
+          nox --version
+
+      - name: Compute pre-commit cache key
+        if: matrix.session == 'pre-commit'
+        id: pre-commit-cache
+        shell: python
+        run: |
+          import hashlib
+          import sys
+
+          python = "py{}.{}".format(*sys.version_info[:2])
+          payload = sys.version.encode() + sys.executable.encode()
+          digest = hashlib.sha256(payload).hexdigest()
+          result = "${{ runner.os }}-{}-{}-pre-commit".format(python, digest[:8])
+
+          print("::set-output name=result::{}".format(result))
+
+      - name: Restore pre-commit cache
+        uses: actions/cache@v2.1.4
+        if: matrix.session == 'pre-commit'
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ steps.pre-commit-cache.outputs.result }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            ${{ steps.pre-commit-cache.outputs.result }}-
+
+      - name: Run Nox
+        run: |
+          nox --force-color --python=${{ matrix.python-version }}
+
+      - name: Upload coverage data
+        if: always() && matrix.session == 'tests'
+        uses: "actions/upload-artifact@v2.2.2"
+        with:
+          name: coverage-data
+          path: ".coverage.*"
+
+      - name: Upload documentation
+        if: matrix.session == 'docs-build'
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          name: docs
+          path: docs/_build
+
+  coverage:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2.2.1
+        with:
+          python-version: 3.9
+
+      - name: Upgrade pip
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt pip
+          pip --version
+
+      - name: Install Poetry
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt poetry
+          poetry --version
+
+      - name: Install Nox
+        run: |
+          pip install --constraint=.github/workflows/constraints.txt nox nox-poetry
+          nox --version
+
+      - name: Download coverage data
+        uses: actions/download-artifact@v2.0.8
+        with:
+          name: coverage-data
+
+      - name: Combine coverage data and display human readable report
+        run: |
+          nox --force-color --session=coverage
+
+      - name: Create coverage report
+        run: |
+          nox --force-color --session=coverage -- xml
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v1.2.1

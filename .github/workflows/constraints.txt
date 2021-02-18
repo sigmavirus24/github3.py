@@ -1,2 +1,4 @@
-pip==20.3.3
+pip==21.0.1
 tox==3.20.1
+poetry==1.1.4
+virtualenv==20.4.2

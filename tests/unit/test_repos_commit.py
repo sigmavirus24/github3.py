@@ -1,6 +1,5 @@
 """Unit tests for Repository Commits."""
-import github3
-
+import github4
 from . import helper
 
 get_commit_example_data = helper.create_example_data_helper("commit_example")
@@ -13,7 +12,7 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
 
     """Unit tests for RepoCommit iterator methods."""
 
-    described_class = github3.repos.commit.RepoCommit
+    described_class = github4.repos.commit.RepoCommit
     example_data = example_commit_data
 
     def test_statuses(self):
@@ -42,7 +41,7 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for("comments").replace("comments", "pulls"),
             params={"per_page": 100},
-            headers=github3.repos.commit._RepoCommit.PREVIEW_HEADERS,
+            headers=github4.repos.commit._RepoCommit.PREVIEW_HEADERS,
         )
 
 
@@ -50,7 +49,7 @@ class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
 
     """Unit tests for RepoCommit iterator methods."""
 
-    described_class = github3.repos.commit.RepoCommit
+    described_class = github4.repos.commit.RepoCommit
     example_data = example_commit_data
 
     def test_check_runs(self):
@@ -61,7 +60,7 @@ class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
         self.session.get.assert_called_once_with(
             url_for("check-runs"),
             params={"per_page": 100},
-            headers=github3.checks.CheckRun.CUSTOM_HEADERS,
+            headers=github4.checks.CheckRun.CUSTOM_HEADERS,
         )
 
     def test_check_suits(self):
@@ -72,5 +71,5 @@ class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
         self.session.get.assert_called_once_with(
             url_for("check-suites"),
             params={"per_page": 100},
-            headers=github3.checks.CheckSuite.CUSTOM_HEADERS,
+            headers=github4.checks.CheckSuite.CUSTOM_HEADERS,
         )

@@ -1,1 +1,109 @@
-{"http_interactions": [{"request": {"body": {"encoding": "utf-8", "string": ""}, "headers": {"User-Agent": "github3.py/1.0.0a4", "Accept-Encoding": "gzip, deflate", "Accept": "application/vnd.github.v3.full+json", "Connection": "keep-alive", "Accept-Charset": "utf-8", "Content-Type": "application/json", "Authorization": "Basic <BASIC_AUTH>"}, "method": "GET", "uri": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286"}, "response": {"body": {"encoding": "utf-8", "base64_string": "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", "string": ""}, "headers": {"Server": "GitHub.com", "Date": "Thu, 25 Jan 2018 12:43:12 GMT", "Content-Type": "application/json; charset=utf-8", "Transfer-Encoding": "chunked", "Status": "200 OK", "X-RateLimit-Limit": "5000", "X-RateLimit-Remaining": "4999", "X-RateLimit-Reset": "1516887792", "Cache-Control": "private, max-age=60, s-maxage=60", "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP", "ETag": "W/\"372adf02e27bae1dded67e7e7c603169\"", "Last-Modified": "Tue, 26 Dec 2017 15:52:13 GMT", "X-GitHub-Media-Type": "github.v3; param=full; format=json", "Access-Control-Expose-Headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval", "Access-Control-Allow-Origin": "*", "Content-Security-Policy": "default-src 'none'", "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "deny", "X-XSS-Protection": "1; mode=block", "X-Runtime-rack": "0.262153", "Content-Encoding": "gzip", "X-GitHub-Request-Id": "8BFA:2D36F:10FC775:3218FBD:5A69D0E0"}, "status": {"code": 200, "message": "OK"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286"}, "recorded_at": "2018-01-25T12:43:12"}, {"request": {"body": {"encoding": "utf-8", "string": "{\"body\": \"Testing review comments\", \"commit_id\": \"4437428aefdb50913e2acabd0552bd13021dc38f\", \"path\": \"github3/pulls.py\", \"position\": 6}"}, "headers": {"User-Agent": "github3.py/1.0.0a4", "Accept-Encoding": "gzip, deflate", "Accept": "application/vnd.github.v3.full+json", "Connection": "keep-alive", "Accept-Charset": "utf-8", "Content-Type": "application/json", "Content-Length": "135", "Authorization": "Basic <BASIC_AUTH>"}, "method": "POST", "uri": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286/comments"}, "response": {"body": {"encoding": "utf-8", "string": "{\"url\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/comments/163831550\",\"pull_request_review_id\":91507151,\"id\":163831550,\"diff_hunk\":\"@@ -195,6 +195,25 @@ def close(self):\\n         \\\"\\\"\\\"\\n         return self.update(self.title, self.body, 'closed')\\n \\n+    @requires_auth\\n+    def create_review_comment(self, body, commit_id, path, position):\\n+        \\\"\\\"\\\"Create a review comment on this pull request.\",\"path\":\"github3/pulls.py\",\"position\":6,\"original_position\":6,\"commit_id\":\"fe5dd44af3eb7110a4a1f8c38f0c9bb235349ff6\",\"original_commit_id\":\"4437428aefdb50913e2acabd0552bd13021dc38f\",\"user\":{\"login\":\"gh3test\",\"id\":2354350,\"avatar_url\":\"https://avatars2.githubusercontent.com/u/2354350?v=4\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/gh3test\",\"html_url\":\"https://github.com/gh3test\",\"followers_url\":\"https://api.github.com/users/gh3test/followers\",\"following_url\":\"https://api.github.com/users/gh3test/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/gh3test/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/gh3test/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/gh3test/subscriptions\",\"organizations_url\":\"https://api.github.com/users/gh3test/orgs\",\"repos_url\":\"https://api.github.com/users/gh3test/repos\",\"events_url\":\"https://api.github.com/users/gh3test/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/gh3test/received_events\",\"type\":\"User\",\"site_admin\":false},\"body\":\"Testing review comments\",\"created_at\":\"2018-01-25T12:43:12Z\",\"updated_at\":\"2018-01-25T12:43:12Z\",\"html_url\":\"https://github.com/sigmavirus24/github3.py/pull/286#discussion_r163831550\",\"pull_request_url\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/286\",\"author_association\":\"NONE\",\"_links\":{\"self\":{\"href\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/comments/163831550\"},\"html\":{\"href\":\"https://github.com/sigmavirus24/github3.py/pull/286#discussion_r163831550\"},\"pull_request\":{\"href\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/286\"}},\"body_html\":\"<p>Testing review comments</p>\",\"body_text\":\"Testing review comments\"}"}, "headers": {"Server": "GitHub.com", "Date": "Thu, 25 Jan 2018 12:43:13 GMT", "Content-Type": "application/json; charset=utf-8", "Content-Length": "2149", "Status": "201 Created", "X-RateLimit-Limit": "5000", "X-RateLimit-Remaining": "4998", "X-RateLimit-Reset": "1516887792", "Cache-Control": "private, max-age=60, s-maxage=60", "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP", "ETag": "\"c72a7036a3b42e41a69835d039443704\"", "Location": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/comments/163831550", "X-GitHub-Media-Type": "github.v3; param=full; format=json", "Access-Control-Expose-Headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval", "Access-Control-Allow-Origin": "*", "Content-Security-Policy": "default-src 'none'", "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "deny", "X-XSS-Protection": "1; mode=block", "X-Runtime-rack": "0.407083", "X-GitHub-Request-Id": "8BFA:2D36F:10FC792:3219002:5A69D0E0"}, "status": {"code": 201, "message": "Created"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286/comments"}, "recorded_at": "2018-01-25T12:43:13"}], "recorded_with": "betamax/0.8.0"}
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": { "encoding": "utf-8", "string": "" },
+        "headers": {
+          "User-Agent": "github3.py/1.0.0a4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "application/vnd.github.v3.full+json",
+          "Connection": "keep-alive",
+          "Accept-Charset": "utf-8",
+          "Content-Type": "application/json",
+          "Authorization": "Basic <BASIC_AUTH>"
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "base64_string": "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",
+          "string": ""
+        },
+        "headers": {
+          "Server": "GitHub.com",
+          "Date": "Thu, 25 Jan 2018 12:43:12 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Transfer-Encoding": "chunked",
+          "Status": "200 OK",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Remaining": "4999",
+          "X-RateLimit-Reset": "1516887792",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "ETag": "W/\"372adf02e27bae1dded67e7e7c603169\"",
+          "Last-Modified": "Tue, 26 Dec 2017 15:52:13 GMT",
+          "X-GitHub-Media-Type": "github.v3; param=full; format=json",
+          "Access-Control-Expose-Headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Access-Control-Allow-Origin": "*",
+          "Content-Security-Policy": "default-src 'none'",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-XSS-Protection": "1; mode=block",
+          "X-Runtime-rack": "0.262153",
+          "Content-Encoding": "gzip",
+          "X-GitHub-Request-Id": "8BFA:2D36F:10FC775:3218FBD:5A69D0E0"
+        },
+        "status": { "code": 200, "message": "OK" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286"
+      },
+      "recorded_at": "2018-01-25T12:43:12"
+    },
+    {
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"body\": \"Testing review comments\", \"commit_id\": \"4437428aefdb50913e2acabd0552bd13021dc38f\", \"path\": \"github3/pulls.py\", \"position\": 6}"
+        },
+        "headers": {
+          "User-Agent": "github3.py/1.0.0a4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "application/vnd.github.v3.full+json",
+          "Connection": "keep-alive",
+          "Accept-Charset": "utf-8",
+          "Content-Type": "application/json",
+          "Content-Length": "135",
+          "Authorization": "Basic <BASIC_AUTH>"
+        },
+        "method": "POST",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286/comments"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "{\"url\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/comments/163831550\",\"pull_request_review_id\":91507151,\"id\":163831550,\"diff_hunk\":\"@@ -195,6 +195,25 @@ def close(self):\\n         \\\"\\\"\\\"\\n         return self.update(self.title, self.body, 'closed')\\n \\n+    @requires_auth\\n+    def create_review_comment(self, body, commit_id, path, position):\\n+        \\\"\\\"\\\"Create a review comment on this pull request.\",\"path\":\"github3/pulls.py\",\"position\":6,\"original_position\":6,\"commit_id\":\"fe5dd44af3eb7110a4a1f8c38f0c9bb235349ff6\",\"original_commit_id\":\"4437428aefdb50913e2acabd0552bd13021dc38f\",\"user\":{\"login\":\"gh3test\",\"id\":2354350,\"avatar_url\":\"https://avatars2.githubusercontent.com/u/2354350?v=4\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/gh3test\",\"html_url\":\"https://github.com/gh3test\",\"followers_url\":\"https://api.github.com/users/gh3test/followers\",\"following_url\":\"https://api.github.com/users/gh3test/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/gh3test/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/gh3test/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/gh3test/subscriptions\",\"organizations_url\":\"https://api.github.com/users/gh3test/orgs\",\"repos_url\":\"https://api.github.com/users/gh3test/repos\",\"events_url\":\"https://api.github.com/users/gh3test/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/gh3test/received_events\",\"type\":\"User\",\"site_admin\":false},\"body\":\"Testing review comments\",\"created_at\":\"2018-01-25T12:43:12Z\",\"updated_at\":\"2018-01-25T12:43:12Z\",\"html_url\":\"https://github.com/sigmavirus24/github3.py/pull/286#discussion_r163831550\",\"pull_request_url\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/286\",\"author_association\":\"NONE\",\"_links\":{\"self\":{\"href\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/comments/163831550\"},\"html\":{\"href\":\"https://github.com/sigmavirus24/github3.py/pull/286#discussion_r163831550\"},\"pull_request\":{\"href\":\"https://api.github.com/repos/sigmavirus24/github3.py/pulls/286\"}},\"body_html\":\"<p>Testing review comments</p>\",\"body_text\":\"Testing review comments\"}"
+        },
+        "headers": {
+          "Server": "GitHub.com",
+          "Date": "Thu, 25 Jan 2018 12:43:13 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": "2149",
+          "Status": "201 Created",
+          "X-RateLimit-Limit": "5000",
+          "X-RateLimit-Remaining": "4998",
+          "X-RateLimit-Reset": "1516887792",
+          "Cache-Control": "private, max-age=60, s-maxage=60",
+          "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP",
+          "ETag": "\"c72a7036a3b42e41a69835d039443704\"",
+          "Location": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/comments/163831550",
+          "X-GitHub-Media-Type": "github.v3; param=full; format=json",
+          "Access-Control-Expose-Headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Access-Control-Allow-Origin": "*",
+          "Content-Security-Policy": "default-src 'none'",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-XSS-Protection": "1; mode=block",
+          "X-Runtime-rack": "0.407083",
+          "X-GitHub-Request-Id": "8BFA:2D36F:10FC792:3219002:5A69D0E0"
+        },
+        "status": { "code": 201, "message": "Created" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/pulls/286/comments"
+      },
+      "recorded_at": "2018-01-25T12:43:13"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

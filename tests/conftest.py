@@ -1,8 +1,8 @@
 import base64
-import betamax
 import os
-import pytest
 
+import betamax
+import pytest
 from betamax_matchers import json_body
 
 credentials = [
@@ -33,9 +33,7 @@ with betamax.Betamax.configure() as config:
 @pytest.fixture
 def betamax_simple_body(request):
     """Return configuration to match cassette on uri, method and body."""
-    request.cls.betamax_simple_body = {
-        "match_requests_on": ["uri", "method", "body"]
-    }
+    request.cls.betamax_simple_body = {"match_requests_on": ["uri", "method", "body"]}
 
 
 @pytest.fixture

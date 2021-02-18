@@ -1,4 +1,0 @@
-0.6.1: 2013-04-06
------------------
-
-- Add equality for labels courtesy of Alejandro Gomez (@alejandrogomez)

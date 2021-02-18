@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-
-import os
-import json
 import getpass
+import json
+import os
+
 import requests
 
 IGNORE = (

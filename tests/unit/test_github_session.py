@@ -9,7 +9,7 @@ import pytest
 
 import requests
 
-from github3 import session
+from github4 import session
 
 
 class TestGitHubSession:
@@ -29,7 +29,7 @@ class TestGitHubSession:
         assert "Content-Type" in s.headers
         assert s.headers["Content-Type"] == "application/json"
         assert "User-Agent" in s.headers
-        assert s.headers["User-Agent"].startswith("github3.py/")
+        assert s.headers["User-Agent"].startswith("github4.py/")
 
     @unittest.mock.patch.object(requests.Session, "request")
     def test_default_timeout(self, request_mock):
@@ -50,9 +50,7 @@ class TestGitHubSession:
         response = unittest.mock.Mock()
         response.configure_mock(status_code=200, headers={})
         request_mock.return_value = response
-        s = session.GitHubSession(
-            default_connect_timeout=300, default_read_timeout=400
-        )
+        s = session.GitHubSession(default_connect_timeout=300, default_read_timeout=400)
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
@@ -132,14 +130,10 @@ class TestGitHubSession:
         s.two_factor_auth_callback(lambda: "fake")
         args = ("GET", "http://example.com")
         s.handle_two_factor_auth(args, {})
-        request_mock.assert_called_once_with(
-            *args, headers={"X-GitHub-OTP": "fake"}
-        )
+        request_mock.assert_called_once_with(*args, headers={"X-GitHub-OTP": "fake"})
 
     @unittest.mock.patch.object(requests.Session, "request")
-    def test_request_ignores_responses_that_do_not_require_2fa(
-        self, request_mock
-    ):
+    def test_request_ignores_responses_that_do_not_require_2fa(self, request_mock):
         """Test that request does not try to handle 2fa when it should not"""
         response = unittest.mock.Mock()
         response.configure_mock(status_code=200, headers={})
@@ -222,9 +216,7 @@ class TestGitHubSession:
         with unittest.mock.patch.dict("os.environ", {"HOME": str(tmpdir)}):
             # prepare_request triggers reading of .netrc files
             pr = s.prepare_request(
-                requests.Request(
-                    "GET", "https://api.github.com/users/sigmavirus24"
-                )
+                requests.Request("GET", "https://api.github.com/users/sigmavirus24")
             )
             auth_header = pr.headers["Authorization"]
             assert auth_header == "token {0}".format(token)

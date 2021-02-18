@@ -65,9 +65,7 @@ class TestBranch(IntegrationHelper):
 
     def test_latest_sha(self):
         cassette_name = self.cassette_name("latest_sha")
-        betamax_kwargs = {
-            "match_requests_on": ["method", "uri", "if-none-match"]
-        }
+        betamax_kwargs = {"match_requests_on": ["method", "uri", "if-none-match"]}
         with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
             repository = self.gh.repository("PyCQA", "flake8")
             branch = repository.branch("stable/2.6")
@@ -78,9 +76,7 @@ class TestBranch(IntegrationHelper):
 
     def test_latest_sha_differs(self):
         cassette_name = self.cassette_name("latest_sha_differs")
-        betamax_kwargs = {
-            "match_requests_on": ["method", "uri", "if-none-match"]
-        }
+        betamax_kwargs = {"match_requests_on": ["method", "uri", "if-none-match"]}
         with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             branch = repository.branch("develop")

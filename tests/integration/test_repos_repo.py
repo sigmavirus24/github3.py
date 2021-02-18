@@ -1,12 +1,11 @@
 """Integration tests for Repositories."""
-import itertools
 import datetime
-
-import github3
-import github3.exceptions as exc
+import itertools
 
 import pytest
 
+import github4
+import github4.exceptions as exc
 from . import helper
 
 
@@ -31,7 +30,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("kennethreitz", "requests")
             assert repository is not None
             for assignee in repository.assignees():
-                assert isinstance(assignee, github3.users.ShortUser)
+                assert isinstance(assignee, github4.users.ShortUser)
 
     def test_blob(self):
         """Test the ability to retrieve blob on a repository."""
@@ -39,7 +38,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             blob = repository.blob("e1bacfb242c7dee1d24aef52df23d7a3f7442ea3")
-            assert isinstance(blob, github3.git.Blob)
+            assert isinstance(blob, github4.git.Blob)
 
     def test_branch(self):
         """Test the ability to retrieve a single branch in a repository."""
@@ -48,7 +47,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             branch = repository.branch("develop")
-            assert isinstance(branch, github3.repos.branch.Branch)
+            assert isinstance(branch, github4.repos.branch.Branch)
             assert "enabled" in branch.original_protection
 
     def test_branches(self):
@@ -58,7 +57,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for branch in repository.branches():
-                assert isinstance(branch, github3.repos.branch.ShortBranch)
+                assert isinstance(branch, github4.repos.branch.ShortBranch)
 
     def test_project(self):
         """Test the ability to retrieve a single repository project."""
@@ -72,7 +71,7 @@ class TestRepository(helper.IntegrationHelper):
                 "test-project", body="test body"
             )
             project = repository.project(created_project.id)
-            assert isinstance(project, github3.projects.Project)
+            assert isinstance(project, github4.projects.Project)
             repository.delete()
 
     def test_projects(self):
@@ -86,7 +85,7 @@ class TestRepository(helper.IntegrationHelper):
             repository.create_project("test-project-0", body="test body")
             repository.create_project("test-project-1", body="test body")
             for project in repository.projects():
-                assert isinstance(project, github3.projects.Project)
+                assert isinstance(project, github4.projects.Project)
             repository.delete()
 
     def test_protected_branches(self):
@@ -97,7 +96,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             assert all(
-                isinstance(b, github3.repos.branch.ShortBranch)
+                isinstance(b, github4.repos.branch.ShortBranch)
                 for b in repository.branches(protected=True)
             )
 
@@ -119,7 +118,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for collaborator in repository.collaborators():
-                assert isinstance(collaborator, github3.users.Collaborator)
+                assert isinstance(collaborator, github4.users.Collaborator)
 
     def test_comments(self):
         """Test the ability to retrieve comments on a repository."""
@@ -128,7 +127,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for comment in repository.comments():
-                assert isinstance(comment, github3.repos.comment.RepoComment)
+                assert isinstance(comment, github4.repos.comment.RepoComment)
 
     def test_commit_activity(self):
         """Test the ability to retrieve commit activity on a repo."""
@@ -145,7 +144,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             comment = repository.commit_comment(1380832)
-            assert isinstance(comment, github3.repos.comment.RepoComment)
+            assert isinstance(comment, github4.repos.comment.RepoComment)
 
     def test_commits(self):
         """Test the ability to retrieve commits on a repository."""
@@ -154,7 +153,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for commit in repository.commits(number=25):
-                assert isinstance(commit, github3.repos.commit.ShortCommit)
+                assert isinstance(commit, github4.repos.commit.ShortCommit)
 
     def test_compare_commits(self):
         """Test the ability to compare two commits."""
@@ -164,7 +163,7 @@ class TestRepository(helper.IntegrationHelper):
             base = "a811e1a270f65eecb65755eca38d888cbefcb0a7"
             head = "76dcc6cb4b9860034be81b7e58adc286a115aa97"
             comparison = repository.compare_commits(base, head)
-            assert isinstance(comparison, github3.repos.comparison.Comparison)
+            assert isinstance(comparison, github4.repos.comparison.Comparison)
 
     def test_contributor_statistics(self):
         """Test the ability to retrieve contributor statistics for a repo."""
@@ -173,7 +172,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for stat in repository.contributor_statistics():
-                assert isinstance(stat, github3.repos.stats.ContributorStats)
+                assert isinstance(stat, github4.repos.stats.ContributorStats)
 
     def test_contributors(self):
         """Test the ability to retrieve the contributors to a repository."""
@@ -182,7 +181,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for contributor in repository.contributors():
-                assert isinstance(contributor, github3.users.Contributor)
+                assert isinstance(contributor, github4.users.Contributor)
                 assert isinstance(contributor.contributions, int)
 
     def test_create_blob(self):
@@ -209,7 +208,7 @@ class TestRepository(helper.IntegrationHelper):
             sha = "1ad1d8309317a4240d5f17b23a2e7dab25e4cb10"
             assert isinstance(
                 repository.create_comment(body, sha),
-                github3.repos.comment.RepoComment,
+                github4.repos.comment.RepoComment,
             )
 
     def test_create_commit(self):
@@ -229,14 +228,12 @@ class TestRepository(helper.IntegrationHelper):
                 "tree": "6857122c4eff3ea461516c066f6bb1eba206d694",
             }
             commit = repository.create_commit(**data)
-            assert isinstance(commit, github3.git.Commit)
+            assert isinstance(commit, github4.git.Commit)
 
     def test_create_commit_with_empty_committer(self):
         """Show that UnProcessableEntity is raised with empty comitter."""
         self.token_login()
-        cassette_name = self.cassette_name(
-            ("create_commit_with_" "empty_committer")
-        )
+        cassette_name = self.cassette_name(("create_commit_with_" "empty_committer"))
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "github3.py")
             data = {
@@ -274,7 +271,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             deployment = repository.create_deployment("0.1.0")
 
-        assert isinstance(deployment, github3.repos.deployment.Deployment)
+        assert isinstance(deployment, github4.repos.deployment.Deployment)
 
     def test_create_file(self):
         """Test the ability to create a file on a repository."""
@@ -296,10 +293,8 @@ class TestRepository(helper.IntegrationHelper):
             created_file = repository.create_file(**data)
             created_file["content"].delete("Delete hello.txt")
 
-        assert isinstance(
-            created_file["content"], github3.repos.contents.Contents
-        )
-        assert isinstance(created_file["commit"], github3.git.Commit)
+        assert isinstance(created_file["content"], github4.repos.contents.Contents)
+        assert isinstance(created_file["commit"], github4.git.Commit)
 
     def test_create_fork(self):
         """Test the ability to fork a repository."""
@@ -309,10 +304,10 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
             repository = self.gh.repository("kennethreitz", "requests")
             forked_repo = repository.create_fork()
-            assert isinstance(forked_repo, github3.repos.Repository)
+            assert isinstance(forked_repo, github4.repos.Repository)
 
             org_forked_repo = repository.create_fork("github3py")
-            assert isinstance(org_forked_repo, github3.repos.Repository)
+            assert isinstance(org_forked_repo, github4.repos.Repository)
 
     def test_create_hook(self):
         """Test the ability to create a hook for a repository."""
@@ -328,7 +323,7 @@ class TestRepository(helper.IntegrationHelper):
                 },
             }
             hook = repository.create_hook(**data)
-            assert isinstance(hook, github3.repos.hook.Hook)
+            assert isinstance(hook, github4.repos.hook.Hook)
 
     def test_create_issue(self):
         """Test the ability to create an issue for a repository."""
@@ -342,7 +337,7 @@ class TestRepository(helper.IntegrationHelper):
                 "assignee": "itsmemattchung",
             }
             issue = repository.create_issue(**data)
-            assert isinstance(issue, github3.issues.issue.ShortIssue)
+            assert isinstance(issue, github4.issues.issue.ShortIssue)
 
     def test_create_issue_multiple_assignees(self):
         """
@@ -359,7 +354,7 @@ class TestRepository(helper.IntegrationHelper):
                 "assignees": ["itsmemattchung", "sigmavirus24"],
             }
             issue = repository.create_issue(**data)
-            assert isinstance(issue, github3.issues.issue.ShortIssue)
+            assert isinstance(issue, github4.issues.issue.ShortIssue)
 
     def test_create_issue_both_assignee_and_assignees(self):
         """
@@ -367,9 +362,7 @@ class TestRepository(helper.IntegrationHelper):
         and assignees.
         """
         self.token_login()
-        cassette_name = self.cassette_name(
-            "create_issue_both_assignee_and_assignees"
-        )
+        cassette_name = self.cassette_name("create_issue_both_assignee_and_assignees")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             data = {
@@ -399,7 +392,7 @@ class TestRepository(helper.IntegrationHelper):
             )
             data = {"title": "Deploy Key", "key": key}
             key = repository.create_key(**data)
-            assert isinstance(key, github3.users.Key)
+            assert isinstance(key, github4.users.Key)
 
     def test_create_label(self):
         """Test the ability to create a label on a repository."""
@@ -410,7 +403,7 @@ class TestRepository(helper.IntegrationHelper):
             label = repository.create_label("fakelabel", "fad8c7")
             label.delete()
 
-        assert isinstance(label, github3.issues.label.Label)
+        assert isinstance(label, github4.issues.label.Label)
 
     def test_create_milestone(self):
         """Test the ability to create a milestone on a repository."""
@@ -421,7 +414,7 @@ class TestRepository(helper.IntegrationHelper):
             milestone = repository.create_milestone("foo")
             milestone.delete()
 
-        assert isinstance(milestone, github3.issues.milestone.Milestone)
+        assert isinstance(milestone, github4.issues.milestone.Milestone)
 
     def test_create_project(self):
         """Test the ability to create a project on a repository."""
@@ -429,24 +422,18 @@ class TestRepository(helper.IntegrationHelper):
         cassette_name = self.cassette_name("create_repo_project")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "delete_contents")
-            project = repository.create_project(
-                "test-project", body="test body"
-            )
+            project = repository.create_project("test-project", body="test body")
             project.delete()
 
-        assert isinstance(project, github3.projects.Project)
+        assert isinstance(project, github4.projects.Project)
 
     def test_create_pull(self):
         """Test the ability to create a pull request on a repository."""
         self.token_login()
         cassette_name = self.cassette_name("create_pull")
         with self.recorder.use_cassette(cassette_name):
-            original_repository = self.gh.repository(
-                "github3py", "github3.py"
-            )
-            repository = original_repository.create_fork(
-                organization="testgh3py"
-            )
+            original_repository = self.gh.repository("github3py", "github3.py")
+            repository = original_repository.create_fork(organization="testgh3py")
             pull_request = repository.create_pull(
                 title="Update forked repo",
                 base="master",
@@ -455,7 +442,7 @@ class TestRepository(helper.IntegrationHelper):
             )
             repository.delete()
 
-        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
+        assert isinstance(pull_request, github4.pulls.ShortPullRequest)
 
     def test_create_pull_from_issue(self):
         """Verify creation of a pull request from an issue."""
@@ -468,7 +455,7 @@ class TestRepository(helper.IntegrationHelper):
                 issue=issue.number, base="master", head="sigmavirus24:master"
             )
 
-        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
+        assert isinstance(pull_request, github4.pulls.ShortPullRequest)
 
     def test_create_ref(self):
         """Verify the ability to create a reference on a repository."""
@@ -480,7 +467,7 @@ class TestRepository(helper.IntegrationHelper):
             ref = repository.create_ref(
                 "refs/tags/test-tag-{}".format(master.sha[:6]), master
             )
-            assert isinstance(ref, github3.git.Reference)
+            assert isinstance(ref, github4.git.Reference)
             ref.delete()
 
     def test_create_branch_ref(self):
@@ -493,7 +480,7 @@ class TestRepository(helper.IntegrationHelper):
             ref = repository.create_branch_ref(
                 "test-branch-{}".format(master.sha[:6]), master
             )
-            assert isinstance(ref, github3.git.Reference)
+            assert isinstance(ref, github4.git.Reference)
             ref.delete()
 
     def test_create_release(self):
@@ -510,7 +497,7 @@ class TestRepository(helper.IntegrationHelper):
             )
             release.delete()
 
-        assert isinstance(release, github3.repos.release.Release)
+        assert isinstance(release, github4.repos.release.Release)
 
     def test_create_status(self):
         """Test the ability to create a status object on a commit."""
@@ -523,7 +510,7 @@ class TestRepository(helper.IntegrationHelper):
                 state="failure",
             )
 
-        assert isinstance(status, github3.repos.status.Status)
+        assert isinstance(status, github4.repos.status.Status)
 
     def test_create_tag(self):
         """Test the ability to create an annotated tag on a repository."""
@@ -544,16 +531,14 @@ class TestRepository(helper.IntegrationHelper):
                 },
             )
 
-        assert isinstance(tag, github3.git.Tag)
+        assert isinstance(tag, github4.git.Tag)
 
     def test_delete(self):
         """Test that a repository can be deleted."""
         self.basic_login()
         cassette_name = self.cassette_name("delete")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.create_repository(
-                "gh3test", "delete-me-in-seconds"
-            )
+            repository = self.gh.create_repository("gh3test", "delete-me-in-seconds")
             assert repository is not None
             assert repository.delete() is True
 
@@ -585,7 +570,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             deployment = repository.deployment(797)
 
-        assert isinstance(deployment, github3.repos.deployment.Deployment)
+        assert isinstance(deployment, github4.repos.deployment.Deployment)
 
     def test_deployments(self):
         """Test that a repository's deployments may be retrieved."""
@@ -594,7 +579,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for d in repository.deployments():
-                assert isinstance(d, github3.repos.deployment.Deployment)
+                assert isinstance(d, github4.repos.deployment.Deployment)
 
     def test_directory_contents(self):
         """Test that a directory's contents can be retrieved."""
@@ -605,14 +590,14 @@ class TestRepository(helper.IntegrationHelper):
 
         for (filename, content) in contents:
             assert content.name == filename
-            assert isinstance(content, github3.repos.contents.Contents)
+            assert isinstance(content, github4.repos.contents.Contents)
 
     def test_directory_contents_for_a_file(self):
         """Verify we raise a sensical exception for a directory's contents."""
         cassette_name = self.cassette_name("not_really_directory_contents")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
-            with pytest.raises(github3.exceptions.UnprocessableResponseBody):
+            with pytest.raises(github4.exceptions.UnprocessableResponseBody):
                 repository.directory_contents("README.rst")
 
     def test_edit(self):
@@ -639,9 +624,7 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name("edit_has_projects")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jacquerie", "flask-shell-bpython"
-            )
+            repository = self.gh.repository("jacquerie", "flask-shell-bpython")
             assert repository.has_projects is True
             repository.edit("flask-shell-bpython", has_projects=False)
             assert repository.has_projects is False
@@ -656,7 +639,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(events) > 0
         for event in events:
-            assert isinstance(event, github3.events.Event)
+            assert isinstance(event, github4.events.Event)
 
     def test_file_contents(self):
         """Test that a file's contents can be retrieved."""
@@ -665,7 +648,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             contents = repository.file_contents("github3/repos/repo.py")
 
-        assert isinstance(contents, github3.repos.contents.Contents)
+        assert isinstance(contents, github4.repos.contents.Contents)
         assert contents.content is not None
         assert contents.decoded is not None
 
@@ -679,17 +662,15 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(forks) > 0
         for fork in forks:
-            assert isinstance(fork, github3.repos.ShortRepository)
+            assert isinstance(fork, github4.repos.ShortRepository)
 
     def test_git_commit(self):
         """Test the ability to retrieve a commit from a repository."""
         cassette_name = self.cassette_name("git_commit")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
-            commit = repository.git_commit(
-                "9ea7482560c9e70c66019f7981aa1727caf888e0"
-            )
-        assert isinstance(commit, github3.git.Commit)
+            commit = repository.git_commit("9ea7482560c9e70c66019f7981aa1727caf888e0")
+        assert isinstance(commit, github4.git.Commit)
 
     def test_hook(self):
         """Test the ability to retrieve a hook from a repository."""
@@ -699,7 +680,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("github3py", "github3.py")
             hook_id = next(repository.hooks()).id
             hook = repository.hook(hook_id)
-        assert isinstance(hook, github3.repos.hook.Hook)
+        assert isinstance(hook, github4.repos.hook.Hook)
 
     def test_hooks(self):
         """Test that a user can iterate over the hooks of a repository."""
@@ -712,16 +693,14 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(hooks) > 0
         for hook in hooks:
-            assert isinstance(hook, github3.repos.hook.Hook)
+            assert isinstance(hook, github4.repos.hook.Hook)
 
     def test_ignore(self):
         """Test that a user can ignore the notifications on a repository."""
         self.basic_login()
         cassette_name = self.cassette_name("ignore")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jnewland", "gmond_python_modules"
-            )
+            repository = self.gh.repository("jnewland", "gmond_python_modules")
             assert repository is not None
             subscription = repository.ignore()
             assert subscription.ignored is True
@@ -731,14 +710,12 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name("invitations")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jacquerie", "flask-shell-bpython"
-            )
+            repository = self.gh.repository("jacquerie", "flask-shell-bpython")
             invitations = list(repository.invitations())
 
         assert len(invitations) > 0
         for invitation in invitations:
-            assert isinstance(invitation, github3.repos.invitation.Invitation)
+            assert isinstance(invitation, github4.repos.invitation.Invitation)
 
     def test_is_assignee(self):
         """
@@ -768,7 +745,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             issue = repository.issue(525)
-        assert isinstance(issue, github3.issues.issue.Issue)
+        assert isinstance(issue, github4.issues.issue.Issue)
 
     def test_issue_with_multiple_assignees(self):
         """Test the ability to retrieve an issue from a repository."""
@@ -776,7 +753,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             issue = repository.issue(637)
-        assert isinstance(issue, github3.issues.issue.Issue)
+        assert isinstance(issue, github4.issues.issue.Issue)
         assert isinstance(issue.assignees, list)
 
     def test_imported_issue(self):
@@ -794,9 +771,7 @@ class TestRepository(helper.IntegrationHelper):
             imported_issue = repository.imported_issue(imported_issue.id)
             repository.delete()
 
-        assert isinstance(
-            imported_issue, github3.repos.issue_import.ImportedIssue
-        )
+        assert isinstance(imported_issue, github4.repos.issue_import.ImportedIssue)
 
     def test_imported_issues(self):
         """Test the ability to retrieve imported issues."""
@@ -818,9 +793,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(imported_issues) > 0
         for imported_issue in imported_issues:
-            assert isinstance(
-                imported_issue, github3.repos.issue_import.ImportedIssue
-            )
+            assert isinstance(imported_issue, github4.repos.issue_import.ImportedIssue)
 
     def test_import_issue(self):
         """Test the ability to import an issue."""
@@ -836,9 +809,7 @@ class TestRepository(helper.IntegrationHelper):
             imported_issue = repository.import_issue(**issue)
             repository.delete()
 
-        assert isinstance(
-            imported_issue, github3.repos.issue_import.ImportedIssue
-        )
+        assert isinstance(imported_issue, github4.repos.issue_import.ImportedIssue)
 
     def test_import_issue_with_comments(self):
         """
@@ -859,9 +830,7 @@ class TestRepository(helper.IntegrationHelper):
             imported_issue = repository.import_issue(**issue)
             repository.delete()
 
-        assert isinstance(
-            imported_issue, github3.repos.issue_import.ImportedIssue
-        )
+        assert isinstance(imported_issue, github4.repos.issue_import.ImportedIssue)
 
     def test_issue_events(self):
         """Test that a user can iterate over issue events in a repo."""
@@ -872,7 +841,7 @@ class TestRepository(helper.IntegrationHelper):
             events = list(repository.issue_events(number=50))
 
         for ev in events:
-            assert isinstance(ev, github3.issues.event.RepositoryIssueEvent)
+            assert isinstance(ev, github4.issues.event.RepositoryIssueEvent)
 
     def test_issues_sorts_ascendingly(self):
         """Test that issues will be returned in ascending order."""
@@ -885,7 +854,7 @@ class TestRepository(helper.IntegrationHelper):
         assert len(issues) > 0
         last_issue = None
         for issue in issues:
-            assert isinstance(issue, github3.issues.ShortIssue)
+            assert isinstance(issue, github4.issues.ShortIssue)
             if last_issue:
                 assert last_issue.number < issue.number
             last_issue = issue
@@ -921,7 +890,7 @@ class TestRepository(helper.IntegrationHelper):
             key = repository.key(created_key.id)
             key.delete()
 
-        assert isinstance(key, github3.users.Key)
+        assert isinstance(key, github4.users.Key)
 
     def test_keys(self):
         """Test that the user can retrieve all deploy keys."""
@@ -947,7 +916,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(keys) > 0
         for key in keys:
-            assert isinstance(key, github3.users.Key)
+            assert isinstance(key, github4.users.Key)
 
     def test_label(self):
         """Test that a user can retrieve a repository's label."""
@@ -955,7 +924,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             label = repository.label("bug")
-        assert isinstance(label, github3.issues.label.Label)
+        assert isinstance(label, github4.issues.label.Label)
         assert label.description is not None
 
     def test_labels(self):
@@ -968,7 +937,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(labels) > 0
         for label in labels:
-            assert isinstance(label, github3.issues.label.Label)
+            assert isinstance(label, github4.issues.label.Label)
 
     def test_languages(self):
         """Test that a repository's languages can be retrieved."""
@@ -987,7 +956,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "github3.py")
             license = repository.license()
-            assert isinstance(license, github3.licenses.RepositoryLicense)
+            assert isinstance(license, github4.licenses.RepositoryLicense)
 
     def test_mark_notifications(self):
         """Verify we can mark all notifications on a repository as read."""
@@ -1005,7 +974,7 @@ class TestRepository(helper.IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "fork_this")
             commit = repository.merge("master", "new-branch")
-        assert isinstance(commit, github3.repos.commit.ShortCommit)
+        assert isinstance(commit, github4.repos.commit.ShortCommit)
 
     def test_milestone(self):
         """Test the ability to retrieve a milestone on a repository."""
@@ -1014,7 +983,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             milestone = repository.milestone(7)
-        assert isinstance(milestone, github3.issues.milestone.Milestone)
+        assert isinstance(milestone, github4.issues.milestone.Milestone)
 
     def test_milestones(self):
         """Test the ability to retrieve the milestones in a repository."""
@@ -1026,7 +995,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(milestones) > 0
         for milestone in milestones:
-            assert isinstance(milestone, github3.issues.milestone.Milestone)
+            assert isinstance(milestone, github4.issues.milestone.Milestone)
 
     def test_network_events(self):
         """Test that a user can retrieve the events of a repo's network."""
@@ -1038,7 +1007,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(events) > 0
         for event in events:
-            assert isinstance(event, github3.events.Event)
+            assert isinstance(event, github4.events.Event)
 
     def test_notifications(self):
         """Test that a user can retrieve their repo notifications."""
@@ -1051,7 +1020,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(notifications) > 0
         for notification in notifications:
-            assert isinstance(notification, github3.notifications.Thread)
+            assert isinstance(notification, github4.notifications.Thread)
 
     def test_original_license(self):
         """Test that a repository's license is present initially."""
@@ -1060,7 +1029,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("github3py", "github3.py")
             assert repository is not None
             assert isinstance(
-                repository.original_license, github3.licenses.ShortLicense
+                repository.original_license, github4.licenses.ShortLicense
             )
 
     def test_pull_request(self):
@@ -1070,7 +1039,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             pull_request = repository.pull_request(546)
 
-        assert isinstance(pull_request, github3.pulls.PullRequest)
+        assert isinstance(pull_request, github4.pulls.PullRequest)
 
     def test_pull_requests(self):
         """Test that a user can retrieve the pull requests from a repo."""
@@ -1082,7 +1051,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(pulls) > 0
         for pull in pulls:
-            assert isinstance(pull, github3.pulls.ShortPullRequest)
+            assert isinstance(pull, github4.pulls.ShortPullRequest)
 
     def test_pull_requests_accepts_sort_and_direction(self):
         """Test that pull_requests now takes a sort parameter."""
@@ -1091,9 +1060,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "betamax")
             assert repository is not None
             last_pr = None
-            for pr in repository.pull_requests(
-                sort="updated", direction="asc"
-            ):
+            for pr in repository.pull_requests(sort="updated", direction="asc"):
                 assert pr is not None
                 if last_pr:
                     assert last_pr.updated_at < pr.updated_at
@@ -1106,7 +1073,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             readme = repository.readme()
 
-        assert isinstance(readme, github3.repos.contents.Contents)
+        assert isinstance(readme, github4.repos.contents.Contents)
 
     def test_ref(self):
         """Test the ability to retrieve a ref."""
@@ -1115,7 +1082,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             ref = repository.ref("tags/0.9.3")
 
-        assert isinstance(ref, github3.git.Reference)
+        assert isinstance(ref, github4.git.Reference)
 
     def test_release(self):
         """Test the ability to retrieve a single release."""
@@ -1125,7 +1092,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             release = repository.release(76677)
 
-        assert isinstance(release, github3.repos.release.Release)
+        assert isinstance(release, github4.repos.release.Release)
 
     def test_latest_release(self):
         """Test the ability to retrieve the latest release."""
@@ -1135,7 +1102,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             release = repository.latest_release()
 
-        assert isinstance(release, github3.repos.release.Release)
+        assert isinstance(release, github4.repos.release.Release)
 
     def test_release_from_tag(self):
         """Test the ability to retrieve a release by tag name."""
@@ -1145,7 +1112,7 @@ class TestRepository(helper.IntegrationHelper):
             assert repository is not None
             release = repository.release_from_tag("v0.7.1")
 
-        assert isinstance(release, github3.repos.release.Release)
+        assert isinstance(release, github4.repos.release.Release)
 
     def test_releases(self):
         """Test the ability to iterate over releases on a repository."""
@@ -1154,7 +1121,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             assert repository is not None
             for release in repository.releases():
-                assert isinstance(release, github3.repos.release.Release)
+                assert isinstance(release, github4.repos.release.Release)
 
     def test_refs(self):
         """Test the ability to retrieve the references from a repository."""
@@ -1167,10 +1134,10 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(references) > 0
         for ref in references:
-            assert isinstance(ref, github3.git.Reference)
+            assert isinstance(ref, github4.git.Reference)
 
     def test_refs_raises_unprocessable_exception(self):
-        """Verify github3.exceptions.UnprocessableResponseBody is raised."""
+        """Verify github4.exceptions.UnprocessableResponseBody is raised."""
         cassette_name = self.cassette_name("invalid_refs")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
@@ -1184,9 +1151,7 @@ class TestRepository(helper.IntegrationHelper):
         cassette_name = self.cassette_name("remove_collaborator")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "test_rename1")
-            removed_collaborator = repository.remove_collaborator(
-                "littleboyd"
-            )
+            removed_collaborator = repository.remove_collaborator("littleboyd")
 
         assert removed_collaborator is True
 
@@ -1195,12 +1160,10 @@ class TestRepository(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name("replace_topics")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jacquerie", "flask-shell-bpython"
-            )
+            repository = self.gh.repository("jacquerie", "flask-shell-bpython")
             topics = repository.replace_topics(["flask", "bpython", "python"])
 
-        assert isinstance(topics, github3.repos.topics.Topics)
+        assert isinstance(topics, github4.repos.topics.Topics)
         assert len(topics.names) == 3
 
     def test_stargazers(self):
@@ -1213,7 +1176,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(stargazers) > 0
         for user in stargazers:
-            assert isinstance(user, github3.users.ShortUser)
+            assert isinstance(user, github4.users.ShortUser)
 
     def test_statuses(self):
         """Test the ability to retrieve a commit's statuses."""
@@ -1222,14 +1185,12 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("pycqa", "flake8")
             assert repository is not None
             statuses = list(
-                repository.statuses(
-                    "f8344997267b8ca87a96c690a3515a443005b653"
-                )
+                repository.statuses("f8344997267b8ca87a96c690a3515a443005b653")
             )
 
         assert len(statuses) > 0
         for status in statuses:
-            assert isinstance(status, github3.repos.status.Status)
+            assert isinstance(status, github4.repos.status.Status)
 
     def test_subscribers(self):
         """Test the ability to retrieve a repository's subscribers."""
@@ -1241,7 +1202,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(subscribers) > 0
         for user in subscribers:
-            assert isinstance(user, github3.users.ShortUser)
+            assert isinstance(user, github4.users.ShortUser)
 
     def test_subscribe(self):
         """Test the ability to subscribe to a repository's notifications."""
@@ -1264,9 +1225,7 @@ class TestRepository(helper.IntegrationHelper):
             subscription = repository.subscription()
             repository.delete_subscription()
 
-        assert isinstance(
-            subscription, github3.notifications.RepositorySubscription
-        )
+        assert isinstance(subscription, github4.notifications.RepositorySubscription)
 
     def test_tag(self):
         """Test the ability to retrieve an annotated tag."""
@@ -1275,7 +1234,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             tag = repository.tag("bf1eca5702d6408ab8dbf395c49c2c903a116d33")
 
-        assert isinstance(tag, github3.git.Tag)
+        assert isinstance(tag, github4.git.Tag)
 
     def test_tags(self):
         """Test the ability to retrieve a repository's tags."""
@@ -1287,7 +1246,7 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(tags) > 0
         for tag in tags:
-            assert isinstance(tag, github3.repos.tag.RepoTag)
+            assert isinstance(tag, github4.repos.tag.RepoTag)
 
     def test_teams(self):
         """Test the ability to retrieve teams assigned to a repo."""
@@ -1300,18 +1259,16 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(teams) > 0
         for team in teams:
-            assert isinstance(team, github3.orgs.ShortTeam)
+            assert isinstance(team, github4.orgs.ShortTeam)
 
     def test_topics(self):
         """Test the ability to retrieve topics from a repository."""
         cassette_name = self.cassette_name("topics")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jacquerie", "flask-shell-bpython"
-            )
+            repository = self.gh.repository("jacquerie", "flask-shell-bpython")
             topics = repository.topics()
 
-        assert isinstance(topics, github3.repos.topics.Topics)
+        assert isinstance(topics, github4.repos.topics.Topics)
         assert len(topics.names) == 3
 
     def test_tree(self):
@@ -1321,7 +1278,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             tree = repository.tree("52a3f30e05cf434285e775979f01f1a8355049a7")
 
-        assert isinstance(tree, github3.git.Tree)
+        assert isinstance(tree, github4.git.Tree)
         assert len(tree.tree) == 18
 
     def test_tree_recursive(self):
@@ -1333,7 +1290,7 @@ class TestRepository(helper.IntegrationHelper):
                 "52a3f30e05cf434285e775979f01f1a8355049a7", recursive=True
             )
 
-        assert isinstance(tree, github3.git.Tree)
+        assert isinstance(tree, github4.git.Tree)
         assert len(tree.tree) == 275
 
     def test_weekly_commit_count(self):
@@ -1361,8 +1318,8 @@ class TestRepository(helper.IntegrationHelper):
             daily_views = repository.views()
             weekly_views = repository.views(per="week")
 
-        assert isinstance(daily_views, github3.repos.traffic.ViewsStats)
-        assert isinstance(weekly_views, github3.repos.traffic.ViewsStats)
+        assert isinstance(daily_views, github4.repos.traffic.ViewsStats)
+        assert isinstance(weekly_views, github4.repos.traffic.ViewsStats)
 
         assert daily_views.count == weekly_views.count == 18
         assert daily_views.uniques == weekly_views.uniques == 3
@@ -1386,8 +1343,8 @@ class TestRepository(helper.IntegrationHelper):
             daily_clones = repository.clones()
             weekly_clones = repository.clones(per="week")
 
-        assert isinstance(daily_clones, github3.repos.traffic.ClonesStats)
-        assert isinstance(weekly_clones, github3.repos.traffic.ClonesStats)
+        assert isinstance(daily_clones, github4.repos.traffic.ClonesStats)
+        assert isinstance(weekly_clones, github4.repos.traffic.ClonesStats)
 
         assert daily_clones.count == weekly_clones.count == 3
         assert daily_clones.uniques == weekly_clones.uniques == 3
@@ -1424,14 +1381,10 @@ class TestContents(helper.IntegrationHelper):
             repository = self.gh.repository("github3py", "delete_contents")
             repository.create_file("test.txt", "Create test.txt", b"testing")
             content = repository.file_contents("test.txt")
-            update = content.update(
-                message="Updating test.txt", content=b"HELLO"
-            )
+            update = content.update(message="Updating test.txt", content=b"HELLO")
             assert isinstance(update, dict)
-            assert isinstance(
-                update["content"], github3.repos.contents.Contents
-            )
-            assert isinstance(update["commit"], github3.git.Commit)
+            assert isinstance(update["content"], github4.repos.contents.Contents)
+            assert isinstance(update["commit"], github4.git.Commit)
 
             # Clean-up
             update["content"].delete("Deleting test.txt from repository")
@@ -1561,9 +1514,7 @@ class TestRepoCommit(helper.IntegrationHelper):
         cassette_name = self.cassette_name("diff")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
-            commit = repository.commit(
-                "51cfbf8cbf98b0ba5006b3490f553bc05d4461e4"
-            )
+            commit = repository.commit("51cfbf8cbf98b0ba5006b3490f553bc05d4461e4")
             diff = commit.diff()
 
         assert diff
@@ -1573,9 +1524,7 @@ class TestRepoCommit(helper.IntegrationHelper):
         cassette_name = self.cassette_name("patch")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
-            commit = repository.commit(
-                "51cfbf8cbf98b0ba5006b3490f553bc05d4461e4"
-            )
+            commit = repository.commit("51cfbf8cbf98b0ba5006b3490f553bc05d4461e4")
             patch = commit.patch()
 
         assert patch
@@ -1590,9 +1539,7 @@ class TestComparison(helper.IntegrationHelper):
         cassette_name = self.cassette_name("diff")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
-            comparison = repository.compare_commits(
-                base="master", head="develop"
-            )
+            comparison = repository.compare_commits(base="master", head="develop")
             diff = comparison.diff()
 
         assert diff
@@ -1602,9 +1549,7 @@ class TestComparison(helper.IntegrationHelper):
         cassette_name = self.cassette_name("patch")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("sigmavirus24", "github3.py")
-            comparison = repository.compare_commits(
-                base="master", head="develop"
-            )
+            comparison = repository.compare_commits(base="master", head="develop")
             patch = comparison.patch()
 
         assert patch

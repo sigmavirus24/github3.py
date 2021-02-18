@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
 import unittest.mock
-import github3
+
 import dateutil.parser
 
-from github3.issues.label import Label
-from github3.issues import Issue
+import github4
 from . import helper
+from github4.issues import Issue
+from github4.issues.label import Label
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/issues/comments"
@@ -22,21 +23,17 @@ label_url_for = helper.create_url_helper(
 
 get_issue_example_data = helper.create_example_data_helper("issue_example")
 
-get_issue_event_example_data = helper.create_example_data_helper(
-    "issue_event_example"
-)
+get_issue_event_example_data = helper.create_example_data_helper("issue_event_example")
 get_issue_assigned_event_example_data = helper.create_example_data_helper(
     "issue_assigned_event_example"
 )
-get_issue_label_example_data = helper.create_example_data_helper(
-    "issue_label_example"
-)
+get_issue_label_example_data = helper.create_example_data_helper("issue_label_example")
 
 
 class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Test Issue methods that require Authentication."""
 
-    described_class = github3.issues.Issue
+    described_class = github4.issues.Issue
     example_data = get_issue_example_data()
 
     def after_setup(self):
@@ -56,9 +53,7 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     def test_create_comment(self):
         """Verify that creating a comment requires authentication."""
-        self.assert_requires_auth(
-            self.instance.create_comment, body="comment body"
-        )
+        self.assert_requires_auth(self.instance.create_comment, body="comment body")
 
     def test_edit_comment(self):
         """Verify that editing a comment requires authentication."""
@@ -92,7 +87,7 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 class TestIssue(helper.UnitHelper):
     """Test Issue methods that make simple requests."""
 
-    described_class = github3.issues.Issue
+    described_class = github4.issues.Issue
     example_data = get_issue_example_data()
 
     def test_add_assignees(self):
@@ -211,11 +206,11 @@ class TestIssue(helper.UnitHelper):
     def test_enterprise(self):
         """Show that enterprise data can be instantiated as Issue."""
         json = helper.create_example_data_helper("issue_enterprise")()
-        assert github3.issues.Issue(json, self.session)
+        assert github4.issues.Issue(json, self.session)
 
     def test_equality(self):
         """Show that two instances of Issue are equal."""
-        issue = github3.issues.Issue(get_issue_example_data(), self.session)
+        issue = github4.issues.Issue(get_issue_example_data(), self.session)
         assert self.instance == issue
 
         issue._uniq = 1
@@ -233,9 +228,7 @@ class TestIssue(helper.UnitHelper):
         GitHub sometimes returns `pull` as part of of the `html_url` for Issue
         requests.
         """
-        issue = Issue(
-            helper.create_example_data_helper("issue_137")(), self.session
-        )
+        issue = Issue(helper.create_example_data_helper("issue_137")(), self.session)
         self.assertEqual(
             issue.html_url,
             "https://github.com/sigmavirus24/github3.py/pull/1",
@@ -245,9 +238,7 @@ class TestIssue(helper.UnitHelper):
         """Verify the request to retrieve an associated Pull Request."""
         self.instance.pull_request()
 
-        self.session.get.assert_called_once_with(
-            self.instance.pull_request_urls["url"]
-        )
+        self.session.get.assert_called_once_with(self.instance.pull_request_urls["url"])
 
     def test_pull_request_without_urls(self):
         """Verify no request is made if no pull request url is present."""
@@ -258,9 +249,7 @@ class TestIssue(helper.UnitHelper):
 
     def test_remove_all_labels(self):
         """Verify that all labels are removed."""
-        with unittest.mock.patch.object(
-            Issue, "replace_labels"
-        ) as replace_labels:
+        with unittest.mock.patch.object(Issue, "replace_labels") as replace_labels:
             replace_labels.return_value = []
             assert self.instance.remove_all_labels() == []
             replace_labels.assert_called_once_with([])
@@ -269,17 +258,13 @@ class TestIssue(helper.UnitHelper):
         """Verify the request for removing assignees from an issue."""
         self.instance.remove_assignees(["octocat"])
 
-        self.session.patch.assert_called_once_with(
-            url_for(), data='{"assignees": []}'
-        )
+        self.session.patch.assert_called_once_with(url_for(), data='{"assignees": []}')
 
     def test_remove_label(self):
         """Verify the request for removing a label from an issue."""
         self.instance.remove_label("enhancement")
 
-        self.session.delete.assert_called_once_with(
-            url_for("labels/enhancement")
-        )
+        self.session.delete.assert_called_once_with(url_for("labels/enhancement"))
 
     def test_remove_lock(self):
         """Verify the request for removing a lock from an issue."""
@@ -311,7 +296,7 @@ class TestIssue(helper.UnitHelper):
 class TestIssueIterators(helper.UnitIteratorHelper):
     """Test Issue methods that return iterators."""
 
-    described_class = github3.issues.Issue
+    described_class = github4.issues.Issue
     example_data = get_issue_example_data()
 
     def test_comments(self):
@@ -345,7 +330,7 @@ class TestIssueIterators(helper.UnitIteratorHelper):
 class TestLabelRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Test that ensure certain methods on Label class requires auth."""
 
-    described_class = github3.issues.label.Label
+    described_class = github4.issues.label.Label
     example_data = get_issue_label_example_data()
 
     def test_delete(self):
@@ -362,7 +347,7 @@ class TestLabelRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 class TestLabel(helper.UnitHelper):
     """Unit Test for Label."""
 
-    described_class = github3.issues.label.Label
+    described_class = github4.issues.label.Label
     example_data = get_issue_label_example_data()
 
     def test_equality(self):
@@ -379,9 +364,7 @@ class TestLabel(helper.UnitHelper):
 
     def test_repr(self):
         """Show that instance string is formatted correctly."""
-        assert repr(self.instance) == "<Label [{0}]>".format(
-            self.instance.name
-        )
+        assert repr(self.instance) == "<Label [{0}]>".format(self.instance.name)
 
     def test_str(self):
         """Show that instance is formated as a string correctly."""
@@ -404,9 +387,7 @@ class TestLabel(helper.UnitHelper):
         self.patch_called_with(
             label_url_for(),
             data=data,
-            headers={
-                "Accept": "application/vnd.github.symmetra-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.symmetra-preview+json"},
         )
 
     def test_update_without_description(self):
@@ -416,16 +397,14 @@ class TestLabel(helper.UnitHelper):
         self.patch_called_with(
             label_url_for(),
             data=data,
-            headers={
-                "Accept": "application/vnd.github.symmetra-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.symmetra-preview+json"},
         )
 
 
 class TestIssueEvent(helper.UnitHelper):
     """Unit test for IssueEvent."""
 
-    described_class = github3.issues.event.IssueEvent
+    described_class = github4.issues.event.IssueEvent
     example_data = get_issue_event_example_data()
 
     def test_repr(self):
@@ -441,7 +420,7 @@ class TestIssueEvent(helper.UnitHelper):
 
     def test_assignee(self):
         """Show that assignees are correctly parsed ShortUser objects"""
-        assigned_event = github3.issues.event.IssueEvent(
+        assigned_event = github4.issues.event.IssueEvent(
             get_issue_assigned_event_example_data(), self.session
         )
         assert assigned_event.assignee.login == "sigmavirus24"
@@ -449,10 +428,10 @@ class TestIssueEvent(helper.UnitHelper):
 
     def test_equality(self):
         """Show that two instances of IssueEvent are equal."""
-        issue_event = github3.issues.event.IssueEvent(
+        issue_event = github4.issues.event.IssueEvent(
             get_issue_event_example_data(), self.session
         )
-        assigned_event = github3.issues.event.IssueEvent(
+        assigned_event = github4.issues.event.IssueEvent(
             get_issue_assigned_event_example_data(), self.session
         )
 

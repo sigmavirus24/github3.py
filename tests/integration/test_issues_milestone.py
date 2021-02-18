@@ -1,5 +1,4 @@
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -21,8 +20,7 @@ class TestMilestone(IntegrationHelper):
             repository = self.gh.repository("github3py", "delete_contents")
             milestone = repository.create_milestone("test-milestone")
             assert (
-                milestone.update(title="integration", description="delete me")
-                is True
+                milestone.update(title="integration", description="delete me") is True
             )
             assert milestone.delete() is True
 
@@ -34,4 +32,4 @@ class TestMilestone(IntegrationHelper):
             milestone = issue.milestone
             assert milestone is not None
             for label in milestone.labels():
-                assert isinstance(label, github3.issues.label.ShortLabel)
+                assert isinstance(label, github4.issues.label.ShortLabel)

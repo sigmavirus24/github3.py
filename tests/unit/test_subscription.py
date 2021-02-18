@@ -1,7 +1,8 @@
-"""Unit tests around github3's Subscription classes."""
-import github3
-
-from .helper import UnitHelper, create_url_helper, create_example_data_helper
+"""Unit tests around github4's Subscription classes."""
+import github4
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("subscription_example")
 url_for = create_url_helper(
@@ -12,7 +13,7 @@ url_for = create_url_helper(
 class TestSubscription(UnitHelper):
     """Subscription unit tests."""
 
-    described_class = github3.notifications._Subscription
+    described_class = github4.notifications._Subscription
     example_data = get_example_data()
 
     def test_repr(self):
@@ -30,6 +31,4 @@ class TestSubscription(UnitHelper):
         self.instance._update_attributes = lambda *args: None
         self.instance.set(True, False)
 
-        self.put_called_with(
-            url_for(), data={"ignored": False, "subscribed": True}
-        )
+        self.put_called_with(url_for(), data={"ignored": False, "subscribed": True})

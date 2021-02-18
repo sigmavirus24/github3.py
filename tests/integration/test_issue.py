@@ -1,9 +1,8 @@
 """Integration tests for Issues."""
-import github3
-import github3.exceptions as exc
-
 import pytest
 
+import github4
+import github4.exceptions as exc
 from .helper import IntegrationHelper
 
 
@@ -36,7 +35,7 @@ class TestIssue(IntegrationHelper):
 
         assert len(labels) > 0
         for label in labels:
-            assert isinstance(label, github3.issues.label.ShortLabel)
+            assert isinstance(label, github4.issues.label.ShortLabel)
 
     def test_comment(self):
         """Test the ability to retrieve an issue comment."""
@@ -47,7 +46,7 @@ class TestIssue(IntegrationHelper):
             )
             comment = issue.comment("165547512")
 
-        assert isinstance(comment, github3.issues.comment.IssueComment)
+        assert isinstance(comment, github4.issues.comment.IssueComment)
 
     def test_comments(self):
         """Test the ability to retrieve comments on an issue."""
@@ -59,7 +58,7 @@ class TestIssue(IntegrationHelper):
 
         assert len(comments) > 0
         for comment in comments:
-            assert isinstance(comment, github3.issues.comment.IssueComment)
+            assert isinstance(comment, github4.issues.comment.IssueComment)
 
     def test_closed(self):
         """Test the ability to close an issue."""
@@ -83,11 +82,9 @@ class TestIssue(IntegrationHelper):
                 username="sigmavirus24", repository="github3.py", number=509
             )
 
-            comment = issue.create_comment(
-                body="Comment from integration test"
-            )
+            comment = issue.create_comment(body="Comment from integration test")
 
-        assert isinstance(comment, github3.issues.comment.IssueComment)
+        assert isinstance(comment, github4.issues.comment.IssueComment)
 
     def test_edit(self):
         """Test the ability to edit an issue."""
@@ -147,8 +144,8 @@ class TestIssue(IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             issue = repository.issue(218)
             for event in issue.events():
-                assert isinstance(event, github3.issues.event.IssueEvent)
-                assert isinstance(event.actor, github3.users.ShortUser)
+                assert isinstance(event, github4.issues.event.IssueEvent)
+                assert isinstance(event.actor, github4.users.ShortUser)
 
     def test_labels(self):
         """Test the ability to iterate over issue labels."""
@@ -157,16 +154,14 @@ class TestIssue(IntegrationHelper):
             issue = self.gh.issue("sigmavirus24", "github3.py", 187)
             assert issue is not None
             for label in issue.labels():
-                assert isinstance(label, github3.issues.label.ShortLabel)
+                assert isinstance(label, github4.issues.label.ShortLabel)
 
     def test_lock(self):
         """Test the ability to lock an issue."""
         self.auto_login()
         cassette_name = self.cassette_name("lock")
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(
-                username="omgjlk", repository="demobrigade", number=1
-            )
+            issue = self.gh.issue(username="omgjlk", repository="demobrigade", number=1)
             locked = issue.lock()
 
         assert locked is True
@@ -179,7 +174,7 @@ class TestIssue(IntegrationHelper):
             assert issue is not None
             pull_request = issue.pull_request()
 
-        assert isinstance(pull_request, github3.pulls.PullRequest)
+        assert isinstance(pull_request, github4.pulls.PullRequest)
 
     def test_remove_all_labels(self):
         """Test the ability to remove all labels from an issue."""
@@ -229,7 +224,7 @@ class TestIssue(IntegrationHelper):
 
         assert len(labels) > 0
         for label in labels:
-            assert isinstance(label, github3.issues.label.ShortLabel)
+            assert isinstance(label, github4.issues.label.ShortLabel)
 
     def test_replace_labels(self):
         """Test the ability to replace labels from an issue."""
@@ -244,16 +239,14 @@ class TestIssue(IntegrationHelper):
 
         assert len(replaced_labels) == len(labels)
         for replaced_label in replaced_labels:
-            assert isinstance(replaced_label, github3.issues.label.ShortLabel)
+            assert isinstance(replaced_label, github4.issues.label.ShortLabel)
 
     def test_unlock(self):
         """Test the ability to lock an issue."""
         self.auto_login()
         cassette_name = self.cassette_name("unlock")
         with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(
-                username="omgjlk", repository="demobrigade", number=1
-            )
+            issue = self.gh.issue(username="omgjlk", repository="demobrigade", number=1)
             unlocked = issue.unlock()
 
         assert unlocked is True

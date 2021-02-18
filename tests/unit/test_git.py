@@ -1,6 +1,7 @@
-import github3
-
-from .helper import UnitHelper, create_example_data_helper, create_url_helper
+import github4
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("tree_example")
 url_for = create_url_helper(
@@ -9,9 +10,7 @@ url_for = create_url_helper(
 )
 
 reference_url_for = create_url_helper(
-    "https://api.github.com/repos/"
-    "octocat/Hello-World/"
-    "git/refs/heads/featureA"
+    "https://api.github.com/repos/" "octocat/Hello-World/" "git/refs/heads/featureA"
 )
 
 get_commit_example_data = create_example_data_helper("git_commit_example")
@@ -22,38 +21,36 @@ get_reference_example_data = create_example_data_helper("reference_example")
 class TestTree(UnitHelper):
     """Tree unit test"""
 
-    described_class = github3.git.Tree
+    described_class = github4.git.Tree
     example_data = get_example_data()
 
     def test_eq(self):
         """Assert that two trees are equal."""
-        tree = github3.git.Tree(get_example_data(), self.session)
+        tree = github4.git.Tree(get_example_data(), self.session)
         assert self.instance == tree
 
     def test_ne(self):
         """Assert that two trees are not equal."""
-        tree = github3.git.Tree(get_example_data(), self.session)
+        tree = github4.git.Tree(get_example_data(), self.session)
         tree._json_data["truncated"] = True
         assert self.instance != tree
 
     def test_repr(self):
         """Assert Tree in in the repr."""
-        assert isinstance(self.instance, github3.git.Tree)
+        assert isinstance(self.instance, github4.git.Tree)
         assert repr(self.instance).startswith("<Tree")
 
     def test_recurse(self):
         """Assert that URL is called"""
         self.instance.recurse()
-        self.session.get.assert_called_once_with(
-            url_for(), params={"recursive": "1"}
-        )
+        self.session.get.assert_called_once_with(url_for(), params={"recursive": "1"})
 
 
 class TestCommit(UnitHelper):
 
     """Commit unit test."""
 
-    described_class = github3.git.Commit
+    described_class = github4.git.Commit
     example_data = get_commit_example_data()
 
     def test_repr(self):
@@ -64,7 +61,7 @@ class TestGitTag(UnitHelper):
 
     """Git Tag unit test."""
 
-    described_class = github3.git.Tag
+    described_class = github4.git.Tag
     example_data = get_git_tag_example_data()
 
     def test_repr(self):
@@ -75,7 +72,7 @@ class TestReference(UnitHelper):
 
     """Reference unit test."""
 
-    described_class = github3.git.Reference
+    described_class = github4.git.Reference
     example_data = get_reference_example_data()
 
     def test_delete(self):

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Gist."""
+import github4
 from .helper import IntegrationHelper
-
-import github3
 
 
 class TestGist(IntegrationHelper):
@@ -16,7 +15,7 @@ class TestGist(IntegrationHelper):
             gist = self.gh.gist(3342247)
             assert gist is not None
             for comment in gist.comments():
-                assert isinstance(comment, github3.gists.comment.GistComment)
+                assert isinstance(comment, github4.gists.comment.GistComment)
 
     def test_create_comment(self):
         """Show that a user can comment on a gist."""
@@ -32,18 +31,16 @@ class TestGist(IntegrationHelper):
             end
             ```"""
             )
-            assert isinstance(c, github3.gists.comment.GistComment)
+            assert isinstance(c, github4.gists.comment.GistComment)
 
     def test_commits(self):
         """Show that a user can iterate over the commits in a gist."""
         cassette_name = self.cassette_name("commits")
-        with self.recorder.use_cassette(
-            cassette_name, preserve_exact_body_bytes=True
-        ):
+        with self.recorder.use_cassette(cassette_name, preserve_exact_body_bytes=True):
             gist = self.gh.gist(1834570)
             assert gist is not None
             for commit in gist.commits():
-                assert isinstance(commit, github3.gists.history.GistHistory)
+                assert isinstance(commit, github4.gists.history.GistHistory)
 
     def test_delete(self):
         """Show that a user can delete a gist."""
@@ -54,7 +51,7 @@ class TestGist(IntegrationHelper):
                 "Title",
                 {"filename.py": {"content": "# -*- coding: utf-8 -*-"}},
             )
-            assert isinstance(gist, github3.gists.Gist)
+            assert isinstance(gist, github4.gists.Gist)
             assert gist.delete() is True
 
     def test_edit(self):
@@ -66,7 +63,7 @@ class TestGist(IntegrationHelper):
                 "Title",
                 {"filename.py": {"content": "# -*- coding: utf-8 -*-"}},
             )
-            assert isinstance(gist, github3.gists.Gist)
+            assert isinstance(gist, github4.gists.Gist)
             assert (
                 gist.edit(
                     "Updated description",
@@ -86,7 +83,7 @@ class TestGist(IntegrationHelper):
             assert gists is not None
             for gist in gists:
                 for _file in gist.files.values():
-                    assert isinstance(_file, github3.gists.file.ShortGistFile)
+                    assert isinstance(_file, github4.gists.file.ShortGistFile)
 
     def test_fork(self):
         """Show that a user can fork another user's gist."""
@@ -96,19 +93,17 @@ class TestGist(IntegrationHelper):
             gist = self.gh.gist("8de9b9b0ae2e45383d85")
             assert gist is not None
             forked = gist.fork()
-            assert isinstance(forked, github3.gists.ShortGist)
+            assert isinstance(forked, github4.gists.ShortGist)
             assert str(forked.owner) == "gh3test"
 
     def test_forks(self):
         """Show that a user can iterate over the forks of a gist."""
         cassette_name = self.cassette_name("forks")
-        with self.recorder.use_cassette(
-            cassette_name, preserve_exact_body_bytes=True
-        ):
+        with self.recorder.use_cassette(cassette_name, preserve_exact_body_bytes=True):
             gist = self.gh.gist(1834570)
             assert gist is not None
             for fork in gist.forks():
-                assert isinstance(fork, github3.gists.ShortGist)
+                assert isinstance(fork, github4.gists.ShortGist)
 
     def test_is_starred(self):
         """Show that a user can check if they've starred a gist."""

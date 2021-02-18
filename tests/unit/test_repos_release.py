@@ -1,18 +1,16 @@
+import json
 import unittest.mock
 
-from github3.repos.release import Release, Asset
-from github3.users import ShortUser
-
-from .helper import (
-    UnitHelper,
-    UnitIteratorHelper,
-    create_url_helper,
-    create_example_data_helper,
-)
-
-import github3
-import json
 import pytest
+
+import github4
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
+from .helper import UnitIteratorHelper
+from github4.repos.release import Asset
+from github4.repos.release import Release
+from github4.users import ShortUser
 
 url_for = create_url_helper(
     "https://api.github.com/repos/sigmavirus24/github3.py/releases"
@@ -46,8 +44,7 @@ class TestRelease(UnitHelper):
         self.instance.archive(format="tarball")
 
         self.session.get.assert_called_once_with(
-            "https://api.github.com/repos/sigmavirus24/github3.py/"
-            "tarball/v0.7.1",
+            "https://api.github.com/repos/sigmavirus24/github3.py/" "tarball/v0.7.1",
             allow_redirects=True,
             stream=True,
         )
@@ -57,8 +54,7 @@ class TestRelease(UnitHelper):
         self.instance.archive(format="zipball")
 
         self.session.get.assert_called_once_with(
-            "https://api.github.com/repos/sigmavirus24/github3.py/"
-            "zipball/v0.7.1",
+            "https://api.github.com/repos/sigmavirus24/github3.py/" "zipball/v0.7.1",
             allow_redirects=True,
             stream=True,
         )
@@ -79,13 +75,9 @@ class TestRelease(UnitHelper):
         )
         with open(__file__) as fd:
             content = fd.read()
-            self.instance.upload_asset(
-                "text/plain", "test_repos_release.py", content
-            )
+            self.instance.upload_asset("text/plain", "test_repos_release.py", content)
             self.post_called_with(
-                uploads_url_for(
-                    "/76677/assets?name=%s" % "test_repos_release.py"
-                ),
+                uploads_url_for("/76677/assets?name=%s" % "test_repos_release.py"),
                 data=content,
                 headers={"Content-Type": "text/plain"},
             )
@@ -140,9 +132,7 @@ class TestAsset(UnitHelper):
     @pytest.mark.xfail
     def test_download(self):
         """Verify the request to download an Asset file."""
-        with unittest.mock.patch(
-            "github3.utils.stream_response_to_file"
-        ) as stream:
+        with unittest.mock.patch("github4.utils.stream_response_to_file") as stream:
             self.instance.download()
 
         self.session.get.assert_called_once_with(
@@ -155,9 +145,7 @@ class TestAsset(UnitHelper):
 
     def test_download_with_302(self):
         """Verify the request to download an Asset file."""
-        with unittest.mock.patch.object(
-            github3.models.GitHubCore, "_get"
-        ) as get:
+        with unittest.mock.patch.object(github4.models.GitHubCore, "_get") as get:
             get.return_value.status_code = 302
             get.return_value.headers = {"location": "https://fakeurl"}
             self.instance.download()

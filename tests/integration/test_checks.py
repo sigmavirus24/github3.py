@@ -4,8 +4,7 @@ import datetime
 import dateutil
 import pytest
 
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -28,7 +27,7 @@ class TestCheckSuite(IntegrationHelper):
             branch = self.get_branch(repo)
 
             suite = repo.create_check_suite(branch.commit.sha)
-            assert isinstance(suite, github3.checks.CheckSuite)
+            assert isinstance(suite, github4.checks.CheckSuite)
 
     def test_check_suite_by_id(self):
         cassette_name = self.cassette_name("check_suite_by_id")
@@ -47,7 +46,7 @@ class TestCheckSuite(IntegrationHelper):
             branch = self.get_branch()
 
             for suite in branch.commit.check_suites():
-                assert isinstance(suite, github3.checks.CheckSuite)
+                assert isinstance(suite, github4.checks.CheckSuite)
 
     def test_rerequest_check_suite(self):
         cassette_name = self.cassette_name("rerequest_check_suite")
@@ -72,9 +71,7 @@ class TestCheckSuite(IntegrationHelper):
                     assert not pref["setting"]
                     break
             else:
-                pytest.fail(
-                    "No setting in response for app: {}".format(app_id)
-                )
+                pytest.fail("No setting in response for app: {}".format(app_id))
 
             json = repo.auto_trigger_checks(app_id, enabled=True)
             for pref in json["preferences"]["auto_trigger_checks"]:
@@ -82,9 +79,7 @@ class TestCheckSuite(IntegrationHelper):
                     assert pref["setting"]
                     break
             else:
-                pytest.fail(
-                    "No setting in response for app: {}".format(app_id)
-                )
+                pytest.fail("No setting in response for app: {}".format(app_id))
 
 
 class TestCheckApp(IntegrationHelper):
@@ -97,9 +92,9 @@ class TestCheckApp(IntegrationHelper):
             check_suite = next(branch.commit.check_suites())
 
             app = check_suite.app
-            assert isinstance(app, github3.checks.CheckApp)
+            assert isinstance(app, github4.checks.CheckApp)
             app = app.refresh()
-            assert isinstance(app, github3.apps.App)
+            assert isinstance(app, github4.apps.App)
 
 
 class TestCheckRun(IntegrationHelper):
@@ -121,7 +116,7 @@ class TestCheckRun(IntegrationHelper):
             check_run = repo.create_check_run(
                 name="test_create_check_run", head_sha=branch.commit.sha
             )
-            assert isinstance(check_run, github3.checks.CheckRun)
+            assert isinstance(check_run, github4.checks.CheckRun)
 
     def test_check_runs_in_suite(self):
         cassette_name = self.cassette_name("check_runs_in_suite")
@@ -133,7 +128,7 @@ class TestCheckRun(IntegrationHelper):
             check_runs = list(check_suite.check_runs())
             assert check_runs != []
             for run in check_runs:
-                assert isinstance(run, github3.checks.CheckRun)
+                assert isinstance(run, github4.checks.CheckRun)
 
     def test_check_runs_for_ref(self):
         cassette_name = self.cassette_name("check_runs_for_ref")
@@ -144,7 +139,7 @@ class TestCheckRun(IntegrationHelper):
             check_runs = list(branch.commit.check_runs())
             assert check_runs != []
             for run in check_runs:
-                assert isinstance(run, github3.checks.CheckRun)
+                assert isinstance(run, github4.checks.CheckRun)
 
     def test_check_run_by_id(self):
         cassette_name = self.cassette_name("check_run_by_id")
@@ -171,9 +166,7 @@ class TestCheckRun(IntegrationHelper):
             assert check_run.update(status="in_progress")
             check_run.refresh()
             assert check_run.status == "in_progress"
-            completed_at = datetime.datetime(
-                2019, 1, 1, 13, 37, tzinfo=dateutil.tz.UTC
-            )
+            completed_at = datetime.datetime(2019, 1, 1, 13, 37, tzinfo=dateutil.tz.UTC)
             assert check_run.update(
                 status="completed",
                 conclusion="success",
@@ -234,9 +227,7 @@ class TestCheckRun(IntegrationHelper):
             assert check_run.status == "in_progress"
             assert len(list(check_run.output.annotations())) == 3
 
-            completed_at = datetime.datetime(
-                2019, 1, 1, 13, 37, tzinfo=dateutil.tz.UTC
-            )
+            completed_at = datetime.datetime(2019, 1, 1, 13, 37, tzinfo=dateutil.tz.UTC)
             assert check_run.update(
                 status="completed",
                 conclusion="failure",

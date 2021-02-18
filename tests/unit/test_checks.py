@@ -1,20 +1,18 @@
-"""Unit tests around github3's Checks classes."""
-import pytest
+"""Unit tests around github4's Checks classes."""
 from json import dumps
 
-import github3
+import pytest
 
-from github3.checks import CheckRun, CheckSuite
-from github3.exceptions import GitHubException
-
-from .helper import (
-    UnitAppInstallHelper,
-    UnitRequiresAuthenticationHelper,
-    UnitHelper,
-    UnitIteratorHelper,
-    create_url_helper,
-    create_example_data_helper,
-)
+import github4
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitAppInstallHelper
+from .helper import UnitHelper
+from .helper import UnitIteratorHelper
+from .helper import UnitRequiresAuthenticationHelper
+from github4.checks import CheckRun
+from github4.checks import CheckSuite
+from github4.exceptions import GitHubException
 
 url_for = create_url_helper("https://api.github.com/repos/github/hello-world")
 
@@ -41,11 +39,11 @@ class TestCheckRun(UnitAppInstallHelper):
     def test_check_run_types(self):
         """Check that we get the right types"""
 
-        assert isinstance(self.instance.app, github3.checks.CheckApp)
+        assert isinstance(self.instance.app, github4.checks.CheckApp)
 
         assert isinstance(
             self.instance.original_pull_requests[0],
-            github3.checks.CheckPullRequest,
+            github4.checks.CheckPullRequest,
         )
 
 
@@ -76,11 +74,9 @@ class TestCheckSuite(UnitHelper):
     def test_check_suite_types(self):
         """Check that we get the right types"""
 
-        assert isinstance(self.instance.app, github3.checks.CheckApp)
+        assert isinstance(self.instance.app, github4.checks.CheckApp)
 
-        assert isinstance(
-            self.instance.repository, github3.repos.ShortRepository
-        )
+        assert isinstance(self.instance.repository, github4.repos.ShortRepository)
 
 
 class TestCheckSuiteIterator(UnitIteratorHelper):

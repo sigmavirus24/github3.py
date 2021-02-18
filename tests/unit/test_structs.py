@@ -1,7 +1,7 @@
 import unittest.mock
 
 from .helper import UnitHelper
-from github3.structs import GitHubIterator
+from github4.structs import GitHubIterator
 
 
 class TestGitHubIterator(UnitHelper):

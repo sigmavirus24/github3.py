@@ -1,1 +1,234 @@
-{"http_interactions": [{"request": {"body": {"encoding": "utf-8", "string": ""}, "headers": {"User-Agent": ["github3.py/1.2.0"], "Accept-Encoding": ["gzip, deflate"], "Accept": ["application/vnd.github.v3.full+json"], "Connection": ["keep-alive"], "Accept-Charset": ["utf-8"], "Content-Type": ["application/json"], "Authorization": ["token <AUTH_TOKEN>"]}, "method": "GET", "uri": "https://api.github.com/repos/sigmavirus24/github3.py"}, "response": {"body": {"encoding": "utf-8", "base64_string": "H4sIAAAAAAAAA62YUW/bNhDHv4rglz7MtWwrTlIBQRegQZsBTbo224q+GLREW2wkUSMpu7aQ774/SUmWDNROyj00tWnej8fj3fF41YDFgzC4mIwvJpPhIOcxneuRwcd3N5v79I80ev9mR75+Xkf54+5ud7PBvx8DTCQZxawVU0m5CEbFFmPLMk3n9Q+SrTKyZqKU0zO/N6sQbE0UhJcklXQ44JucikFYDVK+YjmYXVFQtTbTs/FlMO6r9+f531/v0uj77fjju9Xu4/XVFSYToImYlyIFKFGqkKHv20EZjKwepaQi4rmiuRpFPPNL3+Lfrq/OgFiJGmLMgIEDWMFqjhUGTPoHKicqSw90sEsbkYPJS56mfAPKodanFvJbSW17Q2H56hcpkKx8rhIK42FLT9oQTKqXK2WkKhy5VHAkzZE4EUHjFytWy0Et7SFPlS9owQ2wXMhIsEIxnr9cwZ40aFysSM525NdokJaAaNVeroqRgjRdwxdfLm7FKt9EVLTVphE0omwNY/8i8kAeRLUtdKD/BafQpmeKzkmc6UA18fs0RJg919v7iSCm7SligQ9s6N2+yjzipWwhiNh6Sy48hjAVJFJwT2+DXOO9v1UfysUr6X2++fLgXX+6xRTIIJ5hQwYzeiSPPSpWPOcZi7wN2Y68W2/DxaPHc+/TViX4bzq6GHrB6Ez/mQ2NSDA6x/6w5mObmY4Gvjm7Xiz3d6dJJ470KALRDQBUeqRbJ46Wr3z8rcMxQqYgCy6I4qdyznEFe6DK737VrqgoyZwUNwCAEs7dLGkAADEpS/qsyDi+ccORfhN+eZktbMZ8TtAdR1sCdCUS10ROqZMFW0jlN0kdoZVHiRu2YVS+/WROm6ycVNXywCxSvnDi4J71DaTyZULsNabmrtppqmb0oIIunVXVjBaqhON5GzU1pEXiDlU4eic9G4Zf1RZNSb4qycqN2kJw6vqmX5HdyRroeOzsKUDqAk+wReme5PYcraktPRDvbibdY/ZQU88cr5JOGKBTFxkTZBk7VVYcJ9aIntv/D1jtp4do/f10FXRaXc2o/H1Otkm/prtYt876jZ7dNerXhJNLNAy/+q0gKtGZC0sVRFAXpWuEXy0IarXRaFQllJiqPEON5BbBlgAUEVGCotNFz6phoOrJiDLF/lKrGaP4TzmJnWzbQgC0x+iiqyV0z7/Aw9dJQQPoEjOWUql47nhCLaXLzrliSxY958FzPNx6oOqtZHlEhyRNh/BaxSIGP0bdrk8RBSd1s5AlYBvoO9iHTkrh0k5WF9QyKt8+VGNapHzrnIU6GB3EgqLbEc+JwiNnOp5MX4+D15PgYfImnF2Gs+Ab5pRF3Jtz+RrTpm8exhdhMAtnUz2nKGXSwbRTJmEQhFMzBWm19mt8Qt/jJz2HzjtFdzIgKGWyF/x9Lxb+pItTi0UpHPQgkp6/5vrwrjstClUTntECtUenvWPlghEMHaOBEfNIjhjX22I7zJtNZ+cXvRoj4mWO07icYXhDFMph3ObdwaY2wSL2wagXJnJuI38QKlGicaVHCsG/00jJ7tg+23Qmbtgjax+WRlIXUO2IfS3WOgRTdOIyJgSvO1k50kObZtGVajpnBc1rnRr1zwMEG4toLrHzSr8dsQfT1sEW6tbcff1VFvEP2+u7u7/+8uXm88Pt/Z32Rt08s0t224HR+cP79Pu3f2a7bw/XVwM8/O0LNTTq8r0ug1Br0Ri2tnNMl6RM1dy+GKBURiSe9tqxqchgWN3L0SrXzQVrYu30jWl1jrSfsTSyDN/M5b8lgeuai6iZZn8xQzCKroD6vwiqr8K+TE6VbhA0RjQb6lZ6zbmcPf0HHTQRMS8VAAA=", "string": ""}, "headers": {"Server": ["GitHub.com"], "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"], "Content-Type": ["application/json; charset=utf-8"], "Transfer-Encoding": ["chunked"], "Status": ["200 OK"], "X-RateLimit-Limit": ["5000"], "X-RateLimit-Remaining": ["4996"], "X-RateLimit-Reset": ["1546202173"], "Cache-Control": ["private, max-age=60, s-maxage=60"], "Vary": ["Accept, Authorization, Cookie, X-GitHub-OTP"], "ETag": ["W/\"023ad01676989e78e09c0e07fa9d92ed\""], "Last-Modified": ["Sat, 29 Dec 2018 07:35:52 GMT"], "X-OAuth-Scopes": ["admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user"], "X-Accepted-OAuth-Scopes": ["repo"], "X-GitHub-Media-Type": ["github.v3; param=full; format=json"], "Access-Control-Expose-Headers": ["ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"], "Access-Control-Allow-Origin": ["*"], "Strict-Transport-Security": ["max-age=31536000; includeSubdomains; preload"], "X-Frame-Options": ["deny"], "X-Content-Type-Options": ["nosniff"], "X-XSS-Protection": ["1; mode=block"], "Referrer-Policy": ["origin-when-cross-origin, strict-origin-when-cross-origin"], "Content-Security-Policy": ["default-src 'none'"], "Content-Encoding": ["gzip"], "X-GitHub-Request-Id": ["C3B4:4F24:26B4D96D:4724664F:5C291E82"]}, "status": {"code": 200, "message": "OK"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py"}, "recorded_at": "2018-12-30T19:37:38"}, {"request": {"body": {"encoding": "utf-8", "string": "{\"subscribed\": true}"}, "headers": {"User-Agent": ["github3.py/1.2.0"], "Accept-Encoding": ["gzip, deflate"], "Accept": ["application/vnd.github.v3.full+json"], "Connection": ["keep-alive"], "Accept-Charset": ["utf-8"], "Content-Type": ["application/json"], "Content-Length": ["20"], "Authorization": ["token <AUTH_TOKEN>"]}, "method": "PUT", "uri": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"}, "response": {"body": {"encoding": "utf-8", "base64_string": "H4sIAAAAAAAAA52OQQqDMBBF7zJrNZpaLDlHV24kaqoD0YSZSUFK795Ie4IuH+/z/38Bp5EnwtHNYISSKwCXPdCJD+s5MznLYQezJ+8LmDKKmwcrYEDXza2sm7Ju71qba2earocCEvksV5HIRikbsVpQ1jRWU9gUuRhYMS6bfSIl1q362ksVD/W7EwXz5LmdwyiBjuH/Unh/AO744cHnAAAA", "string": ""}, "headers": {"Server": ["GitHub.com"], "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"], "Content-Type": ["application/json; charset=utf-8"], "Transfer-Encoding": ["chunked"], "Status": ["200 OK"], "X-RateLimit-Limit": ["5000"], "X-RateLimit-Remaining": ["4995"], "X-RateLimit-Reset": ["1546202173"], "Cache-Control": ["private, max-age=60, s-maxage=60"], "Vary": ["Accept, Authorization, Cookie, X-GitHub-OTP"], "ETag": ["W/\"bc4e6655b9e76a49566fc459918bab6b\""], "X-OAuth-Scopes": ["admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user"], "X-Accepted-OAuth-Scopes": ["notifications, repo"], "X-GitHub-Media-Type": ["github.v3; param=full; format=json"], "Access-Control-Expose-Headers": ["ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"], "Access-Control-Allow-Origin": ["*"], "Strict-Transport-Security": ["max-age=31536000; includeSubdomains; preload"], "X-Frame-Options": ["deny"], "X-Content-Type-Options": ["nosniff"], "X-XSS-Protection": ["1; mode=block"], "Referrer-Policy": ["origin-when-cross-origin, strict-origin-when-cross-origin"], "Content-Security-Policy": ["default-src 'none'"], "Content-Encoding": ["gzip"], "X-GitHub-Request-Id": ["C3B4:4F24:26B4D986:47246677:5C291E82"]}, "status": {"code": 200, "message": "OK"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"}, "recorded_at": "2018-12-30T19:37:38"}, {"request": {"body": {"encoding": "utf-8", "string": ""}, "headers": {"User-Agent": ["github3.py/1.2.0"], "Accept-Encoding": ["gzip, deflate"], "Accept": ["application/vnd.github.v3.full+json"], "Connection": ["keep-alive"], "Accept-Charset": ["utf-8"], "Content-Type": ["application/json"], "Authorization": ["token <AUTH_TOKEN>"]}, "method": "GET", "uri": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"}, "response": {"body": {"encoding": "utf-8", "base64_string": "H4sIAAAAAAAAA52OQQqDMBBF7zJrNZpaLDlHV24kaqoD0YSZSUFK795Ie4IuH+/z/38Bp5EnwtHNYISSKwCXPdCJD+s5MznLYQezJ+8LmDKKmwcrYEDXza2sm7Ju71qba2earocCEvksV5HIRikbsVpQ1jRWU9gUuRhYMS6bfSIl1q362ksVD/W7EwXz5LmdwyiBjuH/Unh/AO744cHnAAAA", "string": ""}, "headers": {"Server": ["GitHub.com"], "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"], "Content-Type": ["application/json; charset=utf-8"], "Transfer-Encoding": ["chunked"], "Status": ["200 OK"], "X-RateLimit-Limit": ["5000"], "X-RateLimit-Remaining": ["4994"], "X-RateLimit-Reset": ["1546202173"], "Cache-Control": ["private, max-age=60, s-maxage=60"], "Vary": ["Accept, Authorization, Cookie, X-GitHub-OTP"], "ETag": ["W/\"bc4e6655b9e76a49566fc459918bab6b\""], "X-OAuth-Scopes": ["admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user"], "X-Accepted-OAuth-Scopes": ["notifications, repo"], "X-GitHub-Media-Type": ["github.v3; param=full; format=json"], "Access-Control-Expose-Headers": ["ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"], "Access-Control-Allow-Origin": ["*"], "Strict-Transport-Security": ["max-age=31536000; includeSubdomains; preload"], "X-Frame-Options": ["deny"], "X-Content-Type-Options": ["nosniff"], "X-XSS-Protection": ["1; mode=block"], "Referrer-Policy": ["origin-when-cross-origin, strict-origin-when-cross-origin"], "Content-Security-Policy": ["default-src 'none'"], "Content-Encoding": ["gzip"], "X-GitHub-Request-Id": ["C3B4:4F24:26B4D997:47246698:5C291E82"]}, "status": {"code": 200, "message": "OK"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"}, "recorded_at": "2018-12-30T19:37:38"}, {"request": {"body": {"encoding": "utf-8", "string": ""}, "headers": {"User-Agent": ["github3.py/1.2.0"], "Accept-Encoding": ["gzip, deflate"], "Accept": ["application/vnd.github.v3.full+json"], "Connection": ["keep-alive"], "Accept-Charset": ["utf-8"], "Content-Type": ["application/json"], "Content-Length": ["0"], "Authorization": ["token <AUTH_TOKEN>"]}, "method": "DELETE", "uri": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"}, "response": {"body": {"encoding": null, "string": ""}, "headers": {"Server": ["GitHub.com"], "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"], "Content-Type": ["application/octet-stream"], "Status": ["204 No Content"], "X-RateLimit-Limit": ["5000"], "X-RateLimit-Remaining": ["4993"], "X-RateLimit-Reset": ["1546202173"], "Access-Control-Expose-Headers": ["ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"], "Access-Control-Allow-Origin": ["*"], "Strict-Transport-Security": ["max-age=31536000; includeSubdomains; preload"], "X-Frame-Options": ["deny"], "X-Content-Type-Options": ["nosniff"], "X-XSS-Protection": ["1; mode=block"], "Referrer-Policy": ["origin-when-cross-origin, strict-origin-when-cross-origin"], "Content-Security-Policy": ["default-src 'none'"], "X-GitHub-Request-Id": ["C3B4:4F24:26B4D9AE:472466BD:5C291E82"]}, "status": {"code": 204, "message": "No Content"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"}, "recorded_at": "2018-12-30T19:37:38"}], "recorded_with": "betamax/0.8.1"}
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": { "encoding": "utf-8", "string": "" },
+        "headers": {
+          "User-Agent": ["github3.py/1.2.0"],
+          "Accept-Encoding": ["gzip, deflate"],
+          "Accept": ["application/vnd.github.v3.full+json"],
+          "Connection": ["keep-alive"],
+          "Accept-Charset": ["utf-8"],
+          "Content-Type": ["application/json"],
+          "Authorization": ["token <AUTH_TOKEN>"]
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "base64_string": "H4sIAAAAAAAAA62YUW/bNhDHv4rglz7MtWwrTlIBQRegQZsBTbo224q+GLREW2wkUSMpu7aQ774/SUmWDNROyj00tWnej8fj3fF41YDFgzC4mIwvJpPhIOcxneuRwcd3N5v79I80ev9mR75+Xkf54+5ud7PBvx8DTCQZxawVU0m5CEbFFmPLMk3n9Q+SrTKyZqKU0zO/N6sQbE0UhJcklXQ44JucikFYDVK+YjmYXVFQtTbTs/FlMO6r9+f531/v0uj77fjju9Xu4/XVFSYToImYlyIFKFGqkKHv20EZjKwepaQi4rmiuRpFPPNL3+Lfrq/OgFiJGmLMgIEDWMFqjhUGTPoHKicqSw90sEsbkYPJS56mfAPKodanFvJbSW17Q2H56hcpkKx8rhIK42FLT9oQTKqXK2WkKhy5VHAkzZE4EUHjFytWy0Et7SFPlS9owQ2wXMhIsEIxnr9cwZ40aFysSM525NdokJaAaNVeroqRgjRdwxdfLm7FKt9EVLTVphE0omwNY/8i8kAeRLUtdKD/BafQpmeKzkmc6UA18fs0RJg919v7iSCm7SligQ9s6N2+yjzipWwhiNh6Sy48hjAVJFJwT2+DXOO9v1UfysUr6X2++fLgXX+6xRTIIJ5hQwYzeiSPPSpWPOcZi7wN2Y68W2/DxaPHc+/TViX4bzq6GHrB6Ez/mQ2NSDA6x/6w5mObmY4Gvjm7Xiz3d6dJJ470KALRDQBUeqRbJ46Wr3z8rcMxQqYgCy6I4qdyznEFe6DK737VrqgoyZwUNwCAEs7dLGkAADEpS/qsyDi+ccORfhN+eZktbMZ8TtAdR1sCdCUS10ROqZMFW0jlN0kdoZVHiRu2YVS+/WROm6ycVNXywCxSvnDi4J71DaTyZULsNabmrtppqmb0oIIunVXVjBaqhON5GzU1pEXiDlU4eic9G4Zf1RZNSb4qycqN2kJw6vqmX5HdyRroeOzsKUDqAk+wReme5PYcraktPRDvbibdY/ZQU88cr5JOGKBTFxkTZBk7VVYcJ9aIntv/D1jtp4do/f10FXRaXc2o/H1Otkm/prtYt876jZ7dNerXhJNLNAy/+q0gKtGZC0sVRFAXpWuEXy0IarXRaFQllJiqPEON5BbBlgAUEVGCotNFz6phoOrJiDLF/lKrGaP4TzmJnWzbQgC0x+iiqyV0z7/Aw9dJQQPoEjOWUql47nhCLaXLzrliSxY958FzPNx6oOqtZHlEhyRNh/BaxSIGP0bdrk8RBSd1s5AlYBvoO9iHTkrh0k5WF9QyKt8+VGNapHzrnIU6GB3EgqLbEc+JwiNnOp5MX4+D15PgYfImnF2Gs+Ab5pRF3Jtz+RrTpm8exhdhMAtnUz2nKGXSwbRTJmEQhFMzBWm19mt8Qt/jJz2HzjtFdzIgKGWyF/x9Lxb+pItTi0UpHPQgkp6/5vrwrjstClUTntECtUenvWPlghEMHaOBEfNIjhjX22I7zJtNZ+cXvRoj4mWO07icYXhDFMph3ObdwaY2wSL2wagXJnJuI38QKlGicaVHCsG/00jJ7tg+23Qmbtgjax+WRlIXUO2IfS3WOgRTdOIyJgSvO1k50kObZtGVajpnBc1rnRr1zwMEG4toLrHzSr8dsQfT1sEW6tbcff1VFvEP2+u7u7/+8uXm88Pt/Z32Rt08s0t224HR+cP79Pu3f2a7bw/XVwM8/O0LNTTq8r0ug1Br0Ri2tnNMl6RM1dy+GKBURiSe9tqxqchgWN3L0SrXzQVrYu30jWl1jrSfsTSyDN/M5b8lgeuai6iZZn8xQzCKroD6vwiqr8K+TE6VbhA0RjQb6lZ6zbmcPf0HHTQRMS8VAAA=",
+          "string": ""
+        },
+        "headers": {
+          "Server": ["GitHub.com"],
+          "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"],
+          "Content-Type": ["application/json; charset=utf-8"],
+          "Transfer-Encoding": ["chunked"],
+          "Status": ["200 OK"],
+          "X-RateLimit-Limit": ["5000"],
+          "X-RateLimit-Remaining": ["4996"],
+          "X-RateLimit-Reset": ["1546202173"],
+          "Cache-Control": ["private, max-age=60, s-maxage=60"],
+          "Vary": ["Accept, Authorization, Cookie, X-GitHub-OTP"],
+          "ETag": ["W/\"023ad01676989e78e09c0e07fa9d92ed\""],
+          "Last-Modified": ["Sat, 29 Dec 2018 07:35:52 GMT"],
+          "X-OAuth-Scopes": [
+            "admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user"
+          ],
+          "X-Accepted-OAuth-Scopes": ["repo"],
+          "X-GitHub-Media-Type": ["github.v3; param=full; format=json"],
+          "Access-Control-Expose-Headers": [
+            "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"
+          ],
+          "Access-Control-Allow-Origin": ["*"],
+          "Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains; preload"
+          ],
+          "X-Frame-Options": ["deny"],
+          "X-Content-Type-Options": ["nosniff"],
+          "X-XSS-Protection": ["1; mode=block"],
+          "Referrer-Policy": [
+            "origin-when-cross-origin, strict-origin-when-cross-origin"
+          ],
+          "Content-Security-Policy": ["default-src 'none'"],
+          "Content-Encoding": ["gzip"],
+          "X-GitHub-Request-Id": ["C3B4:4F24:26B4D96D:4724664F:5C291E82"]
+        },
+        "status": { "code": 200, "message": "OK" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py"
+      },
+      "recorded_at": "2018-12-30T19:37:38"
+    },
+    {
+      "request": {
+        "body": { "encoding": "utf-8", "string": "{\"subscribed\": true}" },
+        "headers": {
+          "User-Agent": ["github3.py/1.2.0"],
+          "Accept-Encoding": ["gzip, deflate"],
+          "Accept": ["application/vnd.github.v3.full+json"],
+          "Connection": ["keep-alive"],
+          "Accept-Charset": ["utf-8"],
+          "Content-Type": ["application/json"],
+          "Content-Length": ["20"],
+          "Authorization": ["token <AUTH_TOKEN>"]
+        },
+        "method": "PUT",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "base64_string": "H4sIAAAAAAAAA52OQQqDMBBF7zJrNZpaLDlHV24kaqoD0YSZSUFK795Ie4IuH+/z/38Bp5EnwtHNYISSKwCXPdCJD+s5MznLYQezJ+8LmDKKmwcrYEDXza2sm7Ju71qba2earocCEvksV5HIRikbsVpQ1jRWU9gUuRhYMS6bfSIl1q362ksVD/W7EwXz5LmdwyiBjuH/Unh/AO744cHnAAAA",
+          "string": ""
+        },
+        "headers": {
+          "Server": ["GitHub.com"],
+          "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"],
+          "Content-Type": ["application/json; charset=utf-8"],
+          "Transfer-Encoding": ["chunked"],
+          "Status": ["200 OK"],
+          "X-RateLimit-Limit": ["5000"],
+          "X-RateLimit-Remaining": ["4995"],
+          "X-RateLimit-Reset": ["1546202173"],
+          "Cache-Control": ["private, max-age=60, s-maxage=60"],
+          "Vary": ["Accept, Authorization, Cookie, X-GitHub-OTP"],
+          "ETag": ["W/\"bc4e6655b9e76a49566fc459918bab6b\""],
+          "X-OAuth-Scopes": [
+            "admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user"
+          ],
+          "X-Accepted-OAuth-Scopes": ["notifications, repo"],
+          "X-GitHub-Media-Type": ["github.v3; param=full; format=json"],
+          "Access-Control-Expose-Headers": [
+            "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"
+          ],
+          "Access-Control-Allow-Origin": ["*"],
+          "Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains; preload"
+          ],
+          "X-Frame-Options": ["deny"],
+          "X-Content-Type-Options": ["nosniff"],
+          "X-XSS-Protection": ["1; mode=block"],
+          "Referrer-Policy": [
+            "origin-when-cross-origin, strict-origin-when-cross-origin"
+          ],
+          "Content-Security-Policy": ["default-src 'none'"],
+          "Content-Encoding": ["gzip"],
+          "X-GitHub-Request-Id": ["C3B4:4F24:26B4D986:47246677:5C291E82"]
+        },
+        "status": { "code": 200, "message": "OK" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"
+      },
+      "recorded_at": "2018-12-30T19:37:38"
+    },
+    {
+      "request": {
+        "body": { "encoding": "utf-8", "string": "" },
+        "headers": {
+          "User-Agent": ["github3.py/1.2.0"],
+          "Accept-Encoding": ["gzip, deflate"],
+          "Accept": ["application/vnd.github.v3.full+json"],
+          "Connection": ["keep-alive"],
+          "Accept-Charset": ["utf-8"],
+          "Content-Type": ["application/json"],
+          "Authorization": ["token <AUTH_TOKEN>"]
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "base64_string": "H4sIAAAAAAAAA52OQQqDMBBF7zJrNZpaLDlHV24kaqoD0YSZSUFK795Ie4IuH+/z/38Bp5EnwtHNYISSKwCXPdCJD+s5MznLYQezJ+8LmDKKmwcrYEDXza2sm7Ju71qba2earocCEvksV5HIRikbsVpQ1jRWU9gUuRhYMS6bfSIl1q362ksVD/W7EwXz5LmdwyiBjuH/Unh/AO744cHnAAAA",
+          "string": ""
+        },
+        "headers": {
+          "Server": ["GitHub.com"],
+          "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"],
+          "Content-Type": ["application/json; charset=utf-8"],
+          "Transfer-Encoding": ["chunked"],
+          "Status": ["200 OK"],
+          "X-RateLimit-Limit": ["5000"],
+          "X-RateLimit-Remaining": ["4994"],
+          "X-RateLimit-Reset": ["1546202173"],
+          "Cache-Control": ["private, max-age=60, s-maxage=60"],
+          "Vary": ["Accept, Authorization, Cookie, X-GitHub-OTP"],
+          "ETag": ["W/\"bc4e6655b9e76a49566fc459918bab6b\""],
+          "X-OAuth-Scopes": [
+            "admin:gpg_key, admin:org, admin:org_hook, admin:public_key, admin:repo_hook, delete_repo, gist, notifications, repo, user"
+          ],
+          "X-Accepted-OAuth-Scopes": ["notifications, repo"],
+          "X-GitHub-Media-Type": ["github.v3; param=full; format=json"],
+          "Access-Control-Expose-Headers": [
+            "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"
+          ],
+          "Access-Control-Allow-Origin": ["*"],
+          "Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains; preload"
+          ],
+          "X-Frame-Options": ["deny"],
+          "X-Content-Type-Options": ["nosniff"],
+          "X-XSS-Protection": ["1; mode=block"],
+          "Referrer-Policy": [
+            "origin-when-cross-origin, strict-origin-when-cross-origin"
+          ],
+          "Content-Security-Policy": ["default-src 'none'"],
+          "Content-Encoding": ["gzip"],
+          "X-GitHub-Request-Id": ["C3B4:4F24:26B4D997:47246698:5C291E82"]
+        },
+        "status": { "code": 200, "message": "OK" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"
+      },
+      "recorded_at": "2018-12-30T19:37:38"
+    },
+    {
+      "request": {
+        "body": { "encoding": "utf-8", "string": "" },
+        "headers": {
+          "User-Agent": ["github3.py/1.2.0"],
+          "Accept-Encoding": ["gzip, deflate"],
+          "Accept": ["application/vnd.github.v3.full+json"],
+          "Connection": ["keep-alive"],
+          "Accept-Charset": ["utf-8"],
+          "Content-Type": ["application/json"],
+          "Content-Length": ["0"],
+          "Authorization": ["token <AUTH_TOKEN>"]
+        },
+        "method": "DELETE",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"
+      },
+      "response": {
+        "body": { "encoding": null, "string": "" },
+        "headers": {
+          "Server": ["GitHub.com"],
+          "Date": ["Sun, 30 Dec 2018 19:37:38 GMT"],
+          "Content-Type": ["application/octet-stream"],
+          "Status": ["204 No Content"],
+          "X-RateLimit-Limit": ["5000"],
+          "X-RateLimit-Remaining": ["4993"],
+          "X-RateLimit-Reset": ["1546202173"],
+          "Access-Control-Expose-Headers": [
+            "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type"
+          ],
+          "Access-Control-Allow-Origin": ["*"],
+          "Strict-Transport-Security": [
+            "max-age=31536000; includeSubdomains; preload"
+          ],
+          "X-Frame-Options": ["deny"],
+          "X-Content-Type-Options": ["nosniff"],
+          "X-XSS-Protection": ["1; mode=block"],
+          "Referrer-Policy": [
+            "origin-when-cross-origin, strict-origin-when-cross-origin"
+          ],
+          "Content-Security-Policy": ["default-src 'none'"],
+          "X-GitHub-Request-Id": ["C3B4:4F24:26B4D9AE:472466BD:5C291E82"]
+        },
+        "status": { "code": 204, "message": "No Content" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py/subscription"
+      },
+      "recorded_at": "2018-12-30T19:37:38"
+    }
+  ],
+  "recorded_with": "betamax/0.8.1"
+}

@@ -1,12 +1,10 @@
 """Unit tests for the Milestone class."""
 import datetime
-import github3
 
+import github4
 from . import helper
 
-get_milestone_example_data = helper.create_example_data_helper(
-    "milestone_example"
-)
+get_milestone_example_data = helper.create_example_data_helper("milestone_example")
 example_data = get_milestone_example_data()
 
 url_for = helper.create_url_helper(
@@ -17,7 +15,7 @@ url_for = helper.create_url_helper(
 class TestMilestoneRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Test Milestone methods that require authentication."""
 
-    described_class = github3.issues.milestone.Milestone
+    described_class = github4.issues.milestone.Milestone
     example_data = example_data
 
     def test_delete(self):
@@ -38,7 +36,7 @@ class TestMilestoneRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 class TestMilestone(helper.UnitHelper):
     """Test Milestone methods."""
 
-    described_class = github3.issues.milestone.Milestone
+    described_class = github4.issues.milestone.Milestone
     example_data = example_data
 
     def test_delete(self):
@@ -51,14 +49,14 @@ class TestMilestone(helper.UnitHelper):
         """Show that creator is None when json attribute is set to None."""
         json = self.instance.as_dict().copy()
         json["creator"] = None
-        milestone = github3.issues.milestone.Milestone(json, self.session)
+        milestone = github4.issues.milestone.Milestone(json, self.session)
         assert milestone.creator is None
 
     def test_due_on(self):
         """Show that due on attribute is a datetime object."""
         json = self.instance.as_dict().copy()
         json["due_on"] = "2012-12-31T23:59:59Z"
-        milestone = github3.issues.milestone.Milestone(json, self.session)
+        milestone = github4.issues.milestone.Milestone(json, self.session)
         assert isinstance(milestone.due_on, datetime.datetime)
 
     def test_repr(self):
@@ -95,7 +93,7 @@ class TestMilestoneIterator(helper.UnitIteratorHelper):
 
     """Test Milestone methods that return iterators."""
 
-    described_class = github3.issues.milestone.Milestone
+    described_class = github4.issues.milestone.Milestone
     example_data = example_data
 
     def test_labels(self):

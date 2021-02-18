@@ -1,17 +1,18 @@
-.. image::
-    https://raw.github.com/sigmavirus24/github3.py/master/docs/img/gh3-logo.png
+github4.py
+==========
 
-github3.py is a comprehensive, actively developed and extraordinarily stable 
-wrapper around the GitHub API (v3).
+github4.py an actively developed wrapper around the GitHub API that forks github3.py_.
 
-Note: This library currently works with Python 3.6+ or pypy3. For older versions, please use version 1.3.0.
+Note: This library currently works with Python 3.7+ or pypy3. For older versions, please use github3.py_ version 1.3.0.
 
 Installation
 ------------
 
-::
+You can install *github4.py* via pip_ from PyPI_:
 
-    $ pip install github3.py
+.. code:: console
+
+   $ pip install github4.py
 
 Dependencies
 ------------
@@ -27,13 +28,13 @@ Contributing
 
 Please read the `CONTRIBUTING`_ document.
 
-.. _CONTRIBUTING: https://github.com/sigmavirus24/github3.py/blob/master/CONTRIBUTING.rst
+.. _CONTRIBUTING: https://github.com/staticdev/github4.py/blob/master/CONTRIBUTING.rst
 
 Testing
 ~~~~~~~
 
-You can run either ``pip install -r dev-requirements.txt`` to install the 
-following before testing or simply ``make test-deps``. It is suggested you do 
+You can run either ``pip install -r dev-requirements.txt`` to install the
+following before testing or simply ``make test-deps``. It is suggested you do
 this in a virtual environment. These need to be installed for the tests to run.
 
 - betamax_
@@ -50,15 +51,26 @@ You can find `master` build statuses for different environments.
 - Github_
 - appveyor_
 
-.. _Github: https://github.com/sigmavirus24/github3.py/actions
+.. _Github: https://github.com/staticdev/github4.py/actions
 .. _appveyor: https://ci.appveyor.com/project/sigmavirus24/github3-py/branch/master
+
+Contributing
+------------
+
+Contributions are very welcome.
+To learn more, see the `Contributor Guide`_.
 
 License
 -------
 
-Modified BSD license_
+Distributed under the terms of the MIT_ license,
+*github4.py* is free and open source software.
 
-.. _license: https://github.com/sigmavirus24/github3.py/blob/master/LICENSE
+Issues
+------
+
+If you encounter any problems,
+please `file an issue`_ along with a detailed description.
 
 Examples
 --------
@@ -67,31 +79,15 @@ See the docs_ for more examples.
 
 .. _docs: https://github3.readthedocs.io/en/latest/index.html#more-examples
 
-Testing
-~~~~~~~
+Credits
+-------
 
-Install the dependencies from requirements.txt e.g.:
-
-::
-
-    make tests
-
-Author
-------
-
-Ian Stapleton Cordasco (sigmavirus24_)
+Original author of github3.py_ is Ian Stapleton Cordasco (sigmavirus24_).
 
 .. _sigmavirus24: https://github.com/sigmavirus24
-
-Contact Options
----------------
-
-- Feel free to use the `github3.py`_ tag on Stack Overflow for any questions 
-  you may have
-- If you dislike Stack Overflow it is preferred that you send an email to 
-  github3.py@librelist.com
-- You may also contact (via email_) the author directly with 
-  questions/suggestions/comments or if you wish to include sensitive data.
-
 .. _github3.py: http://stackoverflow.com/questions/tagged/github3.py
-.. _email: mailto:graffatcolmingov@gmail.com
+.. _MIT: http://opensource.org/licenses/MIT
+.. _PyPI: https://pypi.org/
+.. _file an issue: https://github.com/staticdev/github4.py/issues
+.. _pip: https://pip.pypa.io/
+.. _Contributor Guide: CONTRIBUTING.rst

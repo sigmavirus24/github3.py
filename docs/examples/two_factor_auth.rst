@@ -1,0 +1,27 @@
+Using Two-factor Authentication with github4.py
+===============================================
+
+GitHub recently added support for Two-factor Authentication to ``github.com``
+and shortly thereafter added support for it on ``api.github.com``. In version
+0.8, github4.py also added support for it and you can use it right now.
+
+To use Two-factor Authentication, you must define your own function that will
+return your one time authentication code. You then provide that function when
+logging in with github4.py.
+
+For example:
+
+.. code::
+
+    import github4
+
+    def my_two_factor_function():
+        # The user could accidentally press Enter before being ready,
+        # let's protect them from doing that.
+        return input('Enter 2FA code: ').strip() or my_two_factor_function()
+
+    g = github4.login('staticdev', 'my_password',
+                      two_factor_callback=my_two_factor_function)
+
+Then each time the API tells github4.py it requires a Two-factor Authentication
+code, github4.py will call ``my_two_factor_function`` which prompt you for it.

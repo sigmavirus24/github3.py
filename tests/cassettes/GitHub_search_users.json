@@ -1,1 +1,47 @@
-{"http_interactions": [{"request": {"body": "", "headers": {"Accept-Charset": "utf-8", "Content-Type": "application/json", "Accept-Encoding": "gzip, deflate, compress", "Accept": "application/vnd.github.v3.full+json", "User-Agent": "github3.py/0.8.1"}, "method": "GET", "uri": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100"}, "response": {"body": {"base64_string": "H4sIAAAAAAAAA5WTzW6EIBSF34VkumrE/1GTSdNN36CrpjGIqDQKBtDp1My796LtdDqLNiQmELjf8XAuLMhIQ/qSykkYVAT3iBs2aFS8LKiXLReoQIN8k0MlEezVawmZiSGqnFQPu50xoy4wbtW27FE54G2Kw4TuaZCFYdRUcUhimhIW0Kyu0ibxm7x6qA8rvosed+ETfLxmwnAqhfZabrqpsmqwTmNK4jDKiF/lMIR+TWni5yRt9kkW55U3ivZOHd7B47eP0ppF/zkA4PcxyMivfo0nzZTGPwl0ZuhvD34xelXXyL6XR2Bviv+SxxcIXG1zLlp3AYAWLE3HoEVg/2xD4do4WVmBBdsBgrQSGlquWO1i5wsBM0cBPhas2ChXranSVPHRcOi0k+I1CEJStUTwD+IsBKAG3hpyMrACALIZLqoTuRELHhWfCT3ZGBSjjM+QqbvaDQpi5jQyuPDP0HGbMDzjktSDfcBGTQxWqFRQEPiJ5+dptD+/nj8BnkWGJP0DAAA=", "encoding": "utf-8"}, "headers": {"status": "200 OK", "x-ratelimit-remaining": "9", "x-github-media-type": "github.v3; param=full; format=json", "x-content-type-options": "nosniff", "access-control-expose-headers": "ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval", "transfer-encoding": "chunked", "x-github-request-id": "48A0C4D9:5BD7:50C8F65:52F8D7DD", "content-encoding": "gzip", "vary": "Accept-Encoding", "server": "GitHub.com", "cache-control": "no-cache", "x-ratelimit-limit": "10", "access-control-allow-credentials": "true", "date": "Mon, 10 Feb 2014 13:45:01 GMT", "access-control-allow-origin": "*", "content-type": "application/json; charset=utf-8", "x-ratelimit-reset": "1392039961"}, "url": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100", "status_code": 200}, "recorded_at": "2014-02-10T13:45:01"}], "recorded_with": "betamax"}
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": "",
+        "headers": {
+          "Accept-Charset": "utf-8",
+          "Content-Type": "application/json",
+          "Accept-Encoding": "gzip, deflate, compress",
+          "Accept": "application/vnd.github.v3.full+json",
+          "User-Agent": "github3.py/0.8.1"
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA5WTzW6EIBSF34VkumrE/1GTSdNN36CrpjGIqDQKBtDp1My796LtdDqLNiQmELjf8XAuLMhIQ/qSykkYVAT3iBs2aFS8LKiXLReoQIN8k0MlEezVawmZiSGqnFQPu50xoy4wbtW27FE54G2Kw4TuaZCFYdRUcUhimhIW0Kyu0ibxm7x6qA8rvosed+ETfLxmwnAqhfZabrqpsmqwTmNK4jDKiF/lMIR+TWni5yRt9kkW55U3ivZOHd7B47eP0ppF/zkA4PcxyMivfo0nzZTGPwl0ZuhvD34xelXXyL6XR2Bviv+SxxcIXG1zLlp3AYAWLE3HoEVg/2xD4do4WVmBBdsBgrQSGlquWO1i5wsBM0cBPhas2ChXranSVPHRcOi0k+I1CEJStUTwD+IsBKAG3hpyMrACALIZLqoTuRELHhWfCT3ZGBSjjM+QqbvaDQpi5jQyuPDP0HGbMDzjktSDfcBGTQxWqFRQEPiJ5+dptD+/nj8BnkWGJP0DAAA=",
+          "encoding": "utf-8"
+        },
+        "headers": {
+          "status": "200 OK",
+          "x-ratelimit-remaining": "9",
+          "x-github-media-type": "github.v3; param=full; format=json",
+          "x-content-type-options": "nosniff",
+          "access-control-expose-headers": "ETag, Link, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "transfer-encoding": "chunked",
+          "x-github-request-id": "48A0C4D9:5BD7:50C8F65:52F8D7DD",
+          "content-encoding": "gzip",
+          "vary": "Accept-Encoding",
+          "server": "GitHub.com",
+          "cache-control": "no-cache",
+          "x-ratelimit-limit": "10",
+          "access-control-allow-credentials": "true",
+          "date": "Mon, 10 Feb 2014 13:45:01 GMT",
+          "access-control-allow-origin": "*",
+          "content-type": "application/json; charset=utf-8",
+          "x-ratelimit-reset": "1392039961"
+        },
+        "url": "https://api.github.com/search/users?q=tom+followers%3A%3E1000&per_page=100",
+        "status_code": 200
+      },
+      "recorded_at": "2014-02-10T13:45:01"
+    }
+  ],
+  "recorded_with": "betamax"
+}

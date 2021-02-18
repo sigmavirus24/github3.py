@@ -2,8 +2,7 @@
 """Integration tests for methods implemented on Organization."""
 import pytest
 
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -18,7 +17,7 @@ class TestOrganization(IntegrationHelper):
         if auth_needed:
             self.token_login()
         o = self.gh.organization(name)
-        assert isinstance(o, github3.orgs.Organization)
+        assert isinstance(o, github4.orgs.Organization)
         return o
 
     def get_team(self, organization, team_name="Do Not Delete"):
@@ -47,7 +46,7 @@ class TestOrganization(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
             o = self.get_organization(name="github3py")
             r = o.create_project("test-project", body="test body")
-            assert isinstance(r, github3.projects.Project)
+            assert isinstance(r, github4.projects.Project)
             assert r.delete() is True
 
     def test_create_repository(self):
@@ -57,7 +56,7 @@ class TestOrganization(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
             o = self.get_organization()
             r = o.create_repository("test-repository", description="hi")
-            assert isinstance(r, github3.repos.Repository)
+            assert isinstance(r, github4.repos.Repository)
             assert r.delete() is True
 
     def test_conceal_member(self):
@@ -69,7 +68,7 @@ class TestOrganization(IntegrationHelper):
 
             # Get a public member of the organization
             public_member = next(o.public_members())
-            assert isinstance(public_member, github3.users.ShortUser)
+            assert isinstance(public_member, github4.users.ShortUser)
 
             # Conceal their membership
             assert o.conceal_member(public_member) is True
@@ -84,7 +83,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             t = o.create_team("temp-team")
-            assert isinstance(t, github3.orgs.Team)
+            assert isinstance(t, github4.orgs.Team)
             assert t.delete() is True
 
     def test_create_team_child(self):
@@ -95,13 +94,13 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             parent_t = o.create_team("temp-team", privacy="closed")
-            assert isinstance(parent_t, github3.orgs.Team)
+            assert isinstance(parent_t, github4.orgs.Team)
 
             with self.recorder.use_cassette(
                 self.cassette_name("create_team_child"), **self.betamax_kwargs
             ):
                 t = o.create_team("temp-team-child", parent_team_id=2589002)
-                assert isinstance(parent_t, github3.orgs.Team)
+                assert isinstance(parent_t, github4.orgs.Team)
                 assert t.delete() is True
 
     def test_edit(self):
@@ -142,7 +141,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization("testgh3py")
 
             for event in o.all_events(username="gh3test"):
-                assert isinstance(event, github3.events.Event)
+                assert isinstance(event, github4.events.Event)
 
     def test_public_events(self):
         """Test retrieving an organization's public event stream."""
@@ -151,7 +150,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for event in o.public_events():
-                assert isinstance(event, github3.events.Event)
+                assert isinstance(event, github4.events.Event)
 
     def test_members(self):
         """Test the ability to retrieve an organization's members."""
@@ -161,11 +160,9 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.members():
-                assert isinstance(member, github3.users.ShortUser)
+                assert isinstance(member, github4.users.ShortUser)
 
-    @pytest.mark.xfail(
-        reason="sigmavirus24 needs to actually write a test for this."
-    )
+    @pytest.mark.xfail(reason="sigmavirus24 needs to actually write a test for this.")
     def test_can_filter_organization_members(self):
         """
         Test the ability to filter an organization's members by
@@ -178,7 +175,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.members(filter="2fa_disabled"):
-                assert isinstance(member, github3.users.ShortUser)
+                assert isinstance(member, github4.users.ShortUser)
 
     def test_can_filter_members_by_role(self):
         """Test the ability to filter an organization's members by role."""
@@ -188,7 +185,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.members(role="all"):
-                assert isinstance(member, github3.users.ShortUser)
+                assert isinstance(member, github4.users.ShortUser)
 
     def test_project(self):
         """Test the ability to retrieve a single organization project."""
@@ -211,7 +208,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for project in o.projects():
-                assert isinstance(project, github3.projects.Project)
+                assert isinstance(project, github4.projects.Project)
 
     def test_public_members(self):
         """Test the ability to retrieve an organization's public members."""
@@ -221,7 +218,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for member in o.public_members():
-                assert isinstance(member, github3.users.ShortUser)
+                assert isinstance(member, github4.users.ShortUser)
 
     def test_repositories(self):
         """Test the ability to retrieve an organization's repositories."""
@@ -230,7 +227,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for repo in o.repositories():
-                assert isinstance(repo, github3.repos.ShortRepository)
+                assert isinstance(repo, github4.repos.ShortRepository)
 
     def test_teams(self):
         """Test the ability to retrieve an organization's teams."""
@@ -240,7 +237,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
 
             for team in o.teams():
-                assert isinstance(team, github3.orgs.ShortTeam)
+                assert isinstance(team, github4.orgs.ShortTeam)
 
     def test_publicize_member(self):
         """Test the ability to publicize a member of the organization."""
@@ -251,7 +248,7 @@ class TestOrganization(IntegrationHelper):
 
             # Show that we cannot publicize someone other than the current
             # user
-            with pytest.raises(github3.GitHubError):
+            with pytest.raises(github4.GitHubError):
                 o.publicize_member("esacteksab")
 
             assert o.publicize_member("omgjlk") is True
@@ -297,7 +294,7 @@ class TestOrganization(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization("mozillatw", auth_needed=True)
             for invite in o.invitations():
-                assert isinstance(invite, github3.orgs.Invitation)
+                assert isinstance(invite, github4.orgs.Invitation)
 
     def test_invite(self):
         """Show that a user can invite a new member."""
@@ -306,9 +303,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization(auth_needed=True)
             team = self.get_team(o)
             # 2354350 is gh3test
-            assert o.invite(
-                [team.id], invitee_id=2354350, role="direct_member"
-            )
+            assert o.invite([team.id], invitee_id=2354350, role="direct_member")
 
     def test_membership(self):
         """Show that a user can obtain the membership status."""
@@ -338,7 +333,7 @@ class TestOrganization(IntegrationHelper):
                 },
             }
             hook = o.create_hook(**data)
-            assert isinstance(hook, github3.orgs.OrganizationHook)
+            assert isinstance(hook, github4.orgs.OrganizationHook)
 
     def test_hook(self):
         """Test the ability to retrieve a hook from an organization."""
@@ -348,7 +343,7 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization("vogelhome", auth_needed=True)
             hook_id = next(o.hooks()).id
             hook = o.hook(hook_id)
-        assert isinstance(hook, github3.orgs.OrganizationHook)
+        assert isinstance(hook, github4.orgs.OrganizationHook)
 
     def test_hooks(self):
         """Test that a user can iterate over the hooks of an organization."""
@@ -360,7 +355,7 @@ class TestOrganization(IntegrationHelper):
 
         assert len(hooks) > 0
         for hook in hooks:
-            assert isinstance(hook, github3.orgs.OrganizationHook)
+            assert isinstance(hook, github4.orgs.OrganizationHook)
 
 
 class TestOrganizationHook(IntegrationHelper):

@@ -1,6 +1,5 @@
 """Integration tests for Repository Invitation objects."""
-import github3
-
+import github4
 from . import helper
 
 
@@ -28,9 +27,7 @@ class TestInvitation(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name("delete")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jacquerie", "flask-shell-bpython"
-            )
+            repository = self.gh.repository("jacquerie", "flask-shell-bpython")
             for invitation in repository.invitations():
                 assert invitation.delete() is True
 
@@ -39,11 +36,9 @@ class TestInvitation(helper.IntegrationHelper):
         self.token_login()
         cassette_name = self.cassette_name("update")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository(
-                "jacquerie", "flask-shell-bpython"
-            )
+            repository = self.gh.repository("jacquerie", "flask-shell-bpython")
             for invitation in repository.invitations():
                 updated_invitation = invitation.update(permissions="admin")
                 assert isinstance(
-                    updated_invitation, github3.repos.invitation.Invitation
+                    updated_invitation, github4.repos.invitation.Invitation
                 )

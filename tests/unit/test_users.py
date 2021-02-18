@@ -1,15 +1,12 @@
 import pytest
 
-import github3
-
+import github4
 from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/users/octocat")
 github_url_for = helper.create_url_helper("https://api.github.com")
 
-gpg_key_url_for = helper.create_url_helper(
-    "https://api.github.com/user/gpg_keys"
-)
+gpg_key_url_for = helper.create_url_helper("https://api.github.com/user/gpg_keys")
 
 key_url_for = helper.create_url_helper("https://api.github.com/user/keys")
 
@@ -23,26 +20,22 @@ get_users_example_data = helper.create_example_data_helper("users_example")
 get_user_gpg_key_example_data = helper.create_example_data_helper(
     "user_gpg_key_example"
 )
-get_user_key_example_data = helper.create_example_data_helper(
-    "user_key_example"
-)
+get_user_key_example_data = helper.create_example_data_helper("user_key_example")
 
 example_data = get_users_example_data()
-authenticated_user_2_12_example_data = (
-    get_authenticated_user_2_12_example_data()
-)
+authenticated_user_2_12_example_data = get_authenticated_user_2_12_example_data()
 
 
 class TestUser(helper.UnitHelper):
 
     """Test methods on User class."""
 
-    described_class = github3.users.User
+    described_class = github4.users.User
     example_data = get_users_example_data()
 
     def test_equality(self):
         """Show that two instances are equal."""
-        user = github3.users.User(get_users_example_data(), self.session)
+        user = github4.users.User(get_users_example_data(), self.session)
         self.instance == user
 
         user._uniq += 1
@@ -63,16 +56,14 @@ class TestUser(helper.UnitHelper):
     def test_is_following(self):
         """Verify request for checking if a user is following a user."""
         self.instance.is_following("sigmavirus24")
-        self.session.get.assert_called_once_with(
-            url_for("/following/sigmavirus24")
-        )
+        self.session.get.assert_called_once_with(url_for("/following/sigmavirus24"))
 
 
 class TestUserGPGKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Unit tests that demonstrate which GPGKey methods require auth."""
 
-    described_class = github3.users.GPGKey
+    described_class = github4.users.GPGKey
     example_data = get_user_gpg_key_example_data()
 
     def test_delete(self):
@@ -84,7 +75,7 @@ class TestUserGPGKey(helper.UnitHelper):
 
     """Unit tests for the GPGKey object."""
 
-    described_class = github3.users.GPGKey
+    described_class = github4.users.GPGKey
     example_data = get_user_gpg_key_example_data()
 
     def test_delete(self):
@@ -98,7 +89,7 @@ class TestUserKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test that ensure certain methods on Key class requires auth."""
 
-    described_class = github3.users.Key
+    described_class = github4.users.Key
     example_data = get_user_key_example_data()
 
     def test_update(self):
@@ -116,12 +107,12 @@ class TestUserKey(helper.UnitHelper):
 
     """Test methods on Key class."""
 
-    described_class = github3.users.Key
+    described_class = github4.users.Key
     example_data = get_user_key_example_data()
 
     def test_equality(self):
         """Show that two instances of Key are equal."""
-        key = github3.users.Key(get_user_key_example_data(), self.session)
+        key = github4.users.Key(get_user_key_example_data(), self.session)
         assert self.instance == key
 
         key._uniq += "cruft"
@@ -148,7 +139,7 @@ class TestUserIterators(helper.UnitIteratorHelper):
 
     """Test User methods that return iterators."""
 
-    described_class = github3.users.User
+    described_class = github4.users.User
     example_data = example_data.copy()
 
     def test_events(self):
@@ -268,12 +259,12 @@ class TestUsersRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test that ensure certain methods on the User class requires auth."""
 
-    described_class = github3.users.User
+    described_class = github4.users.User
     example_data = example_data.copy()
 
     def test_organization_events(self):
         """Test that #organization_events requires authentication."""
-        with pytest.raises(github3.GitHubError):
+        with pytest.raises(github4.GitHubError):
             self.instance.organization_events("foo")
 
 
@@ -281,15 +272,13 @@ class TestPlan(helper.UnitHelper):
 
     """Test for methods on Plan class."""
 
-    described_class = github3.users.Plan
+    described_class = github4.users.Plan
     example_data = get_authenticated_user_example_data()["plan"]
 
     def test_str(self):
         """Show that the instance string is formatted correctly."""
         assert str(self.instance) == self.instance.name
-        assert repr(self.instance) == "<Plan [{0}]>".format(
-            self.instance.name
-        )
+        assert repr(self.instance) == "<Plan [{0}]>".format(self.instance.name)
 
     def test_is_free(self):
         """Show that user can check if the plan is free."""
@@ -300,7 +289,7 @@ class TestAuthenticatedUserCompatibility_2_12(helper.UnitHelper):
 
     """Test methods on AuthenticatedUser from Github Enterprise 2.12."""
 
-    described_class = github3.users.AuthenticatedUser
+    described_class = github4.users.AuthenticatedUser
     example_data = authenticated_user_2_12_example_data
 
     def test_user(self):

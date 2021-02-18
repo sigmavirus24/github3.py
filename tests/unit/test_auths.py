@@ -1,6 +1,5 @@
 """Unit tests for the auths module."""
-import github3
-
+import github4
 from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/authorizations/1")
@@ -10,10 +9,8 @@ class TestAuthorization(helper.UnitHelper):
 
     """Authorization unit tests."""
 
-    described_class = github3.auths.Authorization
-    get_auth_example_data = helper.create_example_data_helper(
-        "authorization_example"
-    )
+    described_class = github4.auths.Authorization
+    get_auth_example_data = helper.create_example_data_helper("authorization_example")
     example_data = get_auth_example_data()
 
     def test_add_scopes(self):
@@ -41,9 +38,7 @@ class TestAuthorization(helper.UnitHelper):
 
     def test_replace_scopes(self):
         """Test the request to replace the scopes on an authorization."""
-        self.instance.replace_scopes(
-            ["scope-one", "scope-two", "scope-three"]
-        )
+        self.instance.replace_scopes(["scope-one", "scope-two", "scope-three"])
 
         self.post_called_with(
             url_for(""),
@@ -55,7 +50,7 @@ class TestAuthorizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Test methods that require authentication on Authorization."""
 
-    described_class = github3.auths.Authorization
+    described_class = github4.auths.Authorization
     example_data = TestAuthorization.example_data.copy()
 
     def after_setup(self):

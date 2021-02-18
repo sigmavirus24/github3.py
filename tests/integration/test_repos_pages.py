@@ -1,5 +1,4 @@
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -13,7 +12,7 @@ class TestRepositoryPages(IntegrationHelper):
             assert repository is not None
             latest_build = repository.latest_pages_build()
 
-        assert isinstance(latest_build, github3.repos.pages.PagesBuild)
+        assert isinstance(latest_build, github4.repos.pages.PagesBuild)
 
     def test_pages(self):
         """
@@ -26,7 +25,7 @@ class TestRepositoryPages(IntegrationHelper):
             assert repository is not None
             pages_info = repository.pages()
 
-        assert isinstance(pages_info, github3.repos.pages.PagesInfo)
+        assert isinstance(pages_info, github4.repos.pages.PagesInfo)
 
     def test_pages_builds(self):
         """Test the ability to list the pages builds."""
@@ -36,4 +35,4 @@ class TestRepositoryPages(IntegrationHelper):
             repository = self.gh.repository("github3py", "delete_contents")
             assert repository is not None
             for build in repository.pages_builds():
-                assert isinstance(build, github3.repos.pages.PagesBuild)
+                assert isinstance(build, github4.repos.pages.PagesBuild)
