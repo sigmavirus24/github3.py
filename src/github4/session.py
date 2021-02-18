@@ -2,14 +2,13 @@
 import collections.abc as abc_collections
 import datetime
 from contextlib import contextmanager
-from importlib.metadata import version
 from logging import getLogger
 
 import dateutil.parser
 import requests
 
 from . import exceptions as exc
-
+from . import __version__
 
 __url_cache__ = {}
 __logs__ = getLogger(__package__)
@@ -108,7 +107,7 @@ class GitHubSession(requests.Session):
                 # Always sending JSON
                 "Content-Type": "application/json",
                 # Set our own custom User-Agent string
-                "User-Agent": f"github4.py/{version}",
+                "User-Agent": f"github4.py/{__version__}",
             }
         )
         self.base_url = "https://api.github.com"
