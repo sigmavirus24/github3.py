@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "github4"
-version = "1.3.0"
+version = "1.4.0"
 description = "Python wrapper for the GitHub API"
 authors = ["Thiago Carvalho D'Ávila <thiagocavila@gmail.com>"]
 license = "MIT"
