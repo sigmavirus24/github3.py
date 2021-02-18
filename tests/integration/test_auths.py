@@ -1,6 +1,5 @@
-"""Integration tests for the github3.auths module."""
-import github3
-
+"""Integration tests for the github4.auths module."""
+import github4
 from .helper import IntegrationHelper
 
 
@@ -20,7 +19,7 @@ class TestAuthorization(IntegrationHelper):
                 note="testing github3.py",
             )
             auth = self.gh.authorization(created_auth.id)
-            assert isinstance(auth, github3.auths.Authorization)
+            assert isinstance(auth, github4.auths.Authorization)
             assert auth.add_scopes(["user"]) is True
             auth.delete()
 
@@ -35,7 +34,7 @@ class TestAuthorization(IntegrationHelper):
                 scopes=["gist"],
                 note="testing github3.py",
             )
-            assert isinstance(auth, github3.auths.Authorization)
+            assert isinstance(auth, github4.auths.Authorization)
             assert auth.delete() is True
 
     def test_remove_scopes(self):
@@ -49,7 +48,7 @@ class TestAuthorization(IntegrationHelper):
                 scopes=["gist", "user", "public_repo"],
                 note="testing github3.py",
             )
-            assert isinstance(auth, github3.auths.Authorization)
+            assert isinstance(auth, github4.auths.Authorization)
             assert auth.remove_scopes(["user", "public_repo"]) is True
             auth.delete()
 
@@ -64,6 +63,6 @@ class TestAuthorization(IntegrationHelper):
                 scopes=["gist"],
                 note="testing github3.py",
             )
-            assert isinstance(auth, github3.auths.Authorization)
+            assert isinstance(auth, github4.auths.Authorization)
             assert auth.replace_scopes(["user", "public_repo"]) is True
             auth.delete()

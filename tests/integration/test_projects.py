@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Project."""
-
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -32,7 +30,7 @@ class TestProject(IntegrationHelper):
             project = repository.project(1177360)
 
             for column in project.columns():
-                assert isinstance(column, github3.projects.ProjectColumn)
+                assert isinstance(column, github4.projects.ProjectColumn)
 
     def test_create_column(self):
         """Test the ability to create a column in a project."""
@@ -42,7 +40,7 @@ class TestProject(IntegrationHelper):
             repository = self.gh.repository("github3py", "delete_contents")
             project = repository.project(1177360)
             column = project.create_column("test column")
-            assert isinstance(column, github3.projects.ProjectColumn)
+            assert isinstance(column, github4.projects.ProjectColumn)
             assert column.delete() is True
 
     def test_delete(self):
@@ -94,7 +92,7 @@ class TestProjectColumn(IntegrationHelper):
             assert card is not None
 
             for card in column.cards():
-                assert isinstance(card, github3.projects.ProjectCard)
+                assert isinstance(card, github4.projects.ProjectCard)
 
             card.delete()
             column.delete()
@@ -109,7 +107,7 @@ class TestProjectColumn(IntegrationHelper):
             column = project.create_column("test column")
             issues = list(repository.issues())
             card = column.create_card_with_content_id(issues[0].id, "Issue")
-            assert isinstance(column, github3.projects.ProjectColumn)
+            assert isinstance(column, github4.projects.ProjectColumn)
             assert card.delete() is True
             column.delete()
 
@@ -123,7 +121,7 @@ class TestProjectColumn(IntegrationHelper):
             column = project.create_column("test column")
             issues = list(repository.issues())
             card = column.create_card_with_issue(issues[0])
-            assert isinstance(column, github3.projects.ProjectColumn)
+            assert isinstance(column, github4.projects.ProjectColumn)
             assert card.delete() is True
             column.delete()
 
@@ -136,7 +134,7 @@ class TestProjectColumn(IntegrationHelper):
             project = repository.project(1177360)
             column = project.create_column("test column")
             card = column.create_card_with_note("note content")
-            assert isinstance(column, github3.projects.ProjectColumn)
+            assert isinstance(column, github4.projects.ProjectColumn)
             assert card.delete() is True
             column.delete()
 
@@ -228,15 +226,13 @@ class TestProjectCard(IntegrationHelper):
             column = project.column(1941635)
             card = column.card(15057578)
             assert isinstance(
-                card.retrieve_issue_from_content(), github3.issues.issue.Issue
+                card.retrieve_issue_from_content(), github4.issues.issue.Issue
             )
 
     def test_retrieve_pull_request_from_content(self):
         """Verify we can retrieve a pull request from a card."""
         self.token_login()
-        cassette_name = self.cassette_name(
-            "retrieve_pull_request_from_content"
-        )
+        cassette_name = self.cassette_name("retrieve_pull_request_from_content")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "delete_contents")
             project = repository.project(1177360)
@@ -244,5 +240,5 @@ class TestProjectCard(IntegrationHelper):
             card = column.card(15057575)
             assert isinstance(
                 card.retrieve_pull_request_from_content(),
-                github3.pulls.PullRequest,
+                github4.pulls.PullRequest,
             )

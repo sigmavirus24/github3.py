@@ -1,1 +1,55 @@
-{"http_interactions": [{"request": {"body": {"encoding": "utf-8", "string": ""}, "headers": {"User-Agent": "github3.py/1.0.0a4", "Accept-Encoding": "gzip, deflate", "Accept": "application/vnd.github.drax-preview+json", "Connection": "keep-alive", "Accept-Charset": "utf-8", "Content-Type": "application/json"}, "method": "GET", "uri": "https://api.github.com/repos/sigmavirus24/github3.py"}, "response": {"body": {"encoding": "utf-8", "base64_string": "H4sIAAAAAAAAA62YTZPiNhCG/wrlaxgEmAmzrtra5JTklD1sLrlQwhZYO7blkmQI45r/nlcfNjZb4WOUCwVG/ehVS93uVhvxLEri9WK+XiymUUVLFiXRnuu82caz+hRNo11TFBv/h+L7kh64bNRyRUajxLFiMkraqBB7XoExHAqKmWa5mr/E82lED1RTuWlkgXG51rVKCHEPVTxz2EYxmYpKs0rPUlGShjjrL4fPK+D20kMMN8KDC1jNPccZA6bIhaJcl8WFBje1NbkYvBNFIY6gXKq+NRHpLY0rLYVX+w9SYNkSoXMG52FJ78YRXOnHRVmrFjuo9IZnhqOwI5JlDwvzdpBlDsB7SySrhQU2W5VKXmsuqscFjqxBE3JPK/5GP0aDtQLESHtcirWCNTvgLD5u7sxaUkt+oOnJuEaylPEDnP1B5IU9iPpUm7j9C4fCuJ5rtqFZaeJwRwvF3qeRnV5jkH0wRdjde/rHcZ6xflcx4deTzkU1KfhWUnma7ISccMSs3NEUZ3VyRB6Z4LhOfuP692Y7+fXrH4cYAjHutVdyNXKt80fBOJZjSDf25CoC4QkAJL2yUxDH2LcEnz6eUoQ63QpJtbiVNK4LHIFaMvxpzpJmtAwSbgEA5UKEedICAOJKNeyuo3194ZajSBc/VVNuXcq7J2quox0BWqlCnq8YC/JgD2lJl5URDlWah2E7RkvcN7vbdB8k1dgDsy3ENoiDFyWxkJaonLr3kN6EqjNUwxhBJdsFSzWMHqpl4H5bmQbSI/ES1Nj6IJ0dg7TeowWt9g3dh1F7CHbdvKr39O1mEXM9ds4UIE2FJvm2CU9yZ45R6moHxHuYS8+YM9QWJNfLnBsOGBQ21gVlyW/VBdeJHjE69v8D1pzTS7T5fbuMuS3XMFpyzsku6Xt6iHd91u90Dufw7UDQkegYpP2ppjo3mQtT1VSyENEeQdotRbE1m83anFFbVpdMBkawIwBFZZqjagzR2XYMVD0l1bZa3xmZGar3QtAsyLc9BEC3jSFaHWG4/zUa0SCBFjAklrxgSosqLMeeKUN2JTTf8fSejuV6uI1A7RfFq5RNaVFMcWo1TznOMWpts4soOFmYhxwBy8A9gOtUCoYjHeR1yRyjJa7TzFhdiFNwFhpgTBBLhu4m21CNrmQ5Xyyf5vHTIv62+JQ8vyTP8d8Y09TZaMz6CcOWL9/mq+T552Rlx9SNygeYbsgyTlbPyfyTGYK06s81vuHiAp+4LPnh0mDQp5irCBgqlZ8NfzmbJf9xq+LN0gIH9CKS7p/zcPmuu20KqbkoWY3aY3A/4+zi+jSDqzM0dZlI1YwLszD+hpGLl/UiHlUZqWgq7Md6tZpGR6pREON9PnzYVSd9J2mmpmrjYj9KtGxMq4ontRTfWarV8Nk53wwGHvkrPze5xtKUUP0T1y96Dcv1GhmaSyn8ZVSFBNEnWlws+V5Z1Kzymjr5i/kz4o2nrFJYemvaRyzCXs1gDf627E//U9XZP2gLo8TxbcNrvqItd+1nYpUMpoE3zQSd07wPM7ajTaE3rh/AfBkamULUZkamj+hkO3mWN6yi/Irj1fu/AEmXgfITAAA=", "string": ""}, "headers": {"Server": "GitHub.com", "Date": "Fri, 29 Dec 2017 00:45:23 GMT", "Content-Type": "application/json; charset=utf-8", "Transfer-Encoding": "chunked", "Status": "200 OK", "X-RateLimit-Limit": "60", "X-RateLimit-Remaining": "52", "X-RateLimit-Reset": "1514511495", "Cache-Control": "public, max-age=60, s-maxage=60", "Vary": "Accept", "ETag": "W/\"24874e5968a8c097a2217e95cbeb7fcf\"", "Last-Modified": "Thu, 28 Dec 2017 04:56:43 GMT", "X-GitHub-Media-Type": "github.v3; param=drax-preview; format=json", "Access-Control-Expose-Headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval", "Access-Control-Allow-Origin": "*", "Content-Security-Policy": "default-src 'none'", "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "deny", "X-XSS-Protection": "1; mode=block", "X-Runtime-rack": "0.037665", "Content-Encoding": "gzip", "X-GitHub-Request-Id": "C764:8329:717B72D:12E0AB47:5A459023"}, "status": {"code": 200, "message": "OK"}, "url": "https://api.github.com/repos/sigmavirus24/github3.py"}, "recorded_at": "2017-12-29T00:45:23"}], "recorded_with": "betamax/0.8.0"}
+{
+  "http_interactions": [
+    {
+      "request": {
+        "body": { "encoding": "utf-8", "string": "" },
+        "headers": {
+          "User-Agent": "github3.py/1.0.0a4",
+          "Accept-Encoding": "gzip, deflate",
+          "Accept": "application/vnd.github.drax-preview+json",
+          "Connection": "keep-alive",
+          "Accept-Charset": "utf-8",
+          "Content-Type": "application/json"
+        },
+        "method": "GET",
+        "uri": "https://api.github.com/repos/sigmavirus24/github3.py"
+      },
+      "response": {
+        "body": {
+          "encoding": "utf-8",
+          "base64_string": "H4sIAAAAAAAAA62YTZPiNhCG/wrlaxgEmAmzrtra5JTklD1sLrlQwhZYO7blkmQI45r/nlcfNjZb4WOUCwVG/ehVS93uVhvxLEri9WK+XiymUUVLFiXRnuu82caz+hRNo11TFBv/h+L7kh64bNRyRUajxLFiMkraqBB7XoExHAqKmWa5mr/E82lED1RTuWlkgXG51rVKCHEPVTxz2EYxmYpKs0rPUlGShjjrL4fPK+D20kMMN8KDC1jNPccZA6bIhaJcl8WFBje1NbkYvBNFIY6gXKq+NRHpLY0rLYVX+w9SYNkSoXMG52FJ78YRXOnHRVmrFjuo9IZnhqOwI5JlDwvzdpBlDsB7SySrhQU2W5VKXmsuqscFjqxBE3JPK/5GP0aDtQLESHtcirWCNTvgLD5u7sxaUkt+oOnJuEaylPEDnP1B5IU9iPpUm7j9C4fCuJ5rtqFZaeJwRwvF3qeRnV5jkH0wRdjde/rHcZ6xflcx4deTzkU1KfhWUnma7ISccMSs3NEUZ3VyRB6Z4LhOfuP692Y7+fXrH4cYAjHutVdyNXKt80fBOJZjSDf25CoC4QkAJL2yUxDH2LcEnz6eUoQ63QpJtbiVNK4LHIFaMvxpzpJmtAwSbgEA5UKEedICAOJKNeyuo3194ZajSBc/VVNuXcq7J2quox0BWqlCnq8YC/JgD2lJl5URDlWah2E7RkvcN7vbdB8k1dgDsy3ENoiDFyWxkJaonLr3kN6EqjNUwxhBJdsFSzWMHqpl4H5bmQbSI/ES1Nj6IJ0dg7TeowWt9g3dh1F7CHbdvKr39O1mEXM9ds4UIE2FJvm2CU9yZ45R6moHxHuYS8+YM9QWJNfLnBsOGBQ21gVlyW/VBdeJHjE69v8D1pzTS7T5fbuMuS3XMFpyzsku6Xt6iHd91u90Dufw7UDQkegYpP2ppjo3mQtT1VSyENEeQdotRbE1m83anFFbVpdMBkawIwBFZZqjagzR2XYMVD0l1bZa3xmZGar3QtAsyLc9BEC3jSFaHWG4/zUa0SCBFjAklrxgSosqLMeeKUN2JTTf8fSejuV6uI1A7RfFq5RNaVFMcWo1TznOMWpts4soOFmYhxwBy8A9gOtUCoYjHeR1yRyjJa7TzFhdiFNwFhpgTBBLhu4m21CNrmQ5Xyyf5vHTIv62+JQ8vyTP8d8Y09TZaMz6CcOWL9/mq+T552Rlx9SNygeYbsgyTlbPyfyTGYK06s81vuHiAp+4LPnh0mDQp5irCBgqlZ8NfzmbJf9xq+LN0gIH9CKS7p/zcPmuu20KqbkoWY3aY3A/4+zi+jSDqzM0dZlI1YwLszD+hpGLl/UiHlUZqWgq7Md6tZpGR6pREON9PnzYVSd9J2mmpmrjYj9KtGxMq4ontRTfWarV8Nk53wwGHvkrPze5xtKUUP0T1y96Dcv1GhmaSyn8ZVSFBNEnWlws+V5Z1Kzymjr5i/kz4o2nrFJYemvaRyzCXs1gDf627E//U9XZP2gLo8TxbcNrvqItd+1nYpUMpoE3zQSd07wPM7ajTaE3rh/AfBkamULUZkamj+hkO3mWN6yi/Irj1fu/AEmXgfITAAA=",
+          "string": ""
+        },
+        "headers": {
+          "Server": "GitHub.com",
+          "Date": "Fri, 29 Dec 2017 00:45:23 GMT",
+          "Content-Type": "application/json; charset=utf-8",
+          "Transfer-Encoding": "chunked",
+          "Status": "200 OK",
+          "X-RateLimit-Limit": "60",
+          "X-RateLimit-Remaining": "52",
+          "X-RateLimit-Reset": "1514511495",
+          "Cache-Control": "public, max-age=60, s-maxage=60",
+          "Vary": "Accept",
+          "ETag": "W/\"24874e5968a8c097a2217e95cbeb7fcf\"",
+          "Last-Modified": "Thu, 28 Dec 2017 04:56:43 GMT",
+          "X-GitHub-Media-Type": "github.v3; param=drax-preview; format=json",
+          "Access-Control-Expose-Headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+          "Access-Control-Allow-Origin": "*",
+          "Content-Security-Policy": "default-src 'none'",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "deny",
+          "X-XSS-Protection": "1; mode=block",
+          "X-Runtime-rack": "0.037665",
+          "Content-Encoding": "gzip",
+          "X-GitHub-Request-Id": "C764:8329:717B72D:12E0AB47:5A459023"
+        },
+        "status": { "code": 200, "message": "OK" },
+        "url": "https://api.github.com/repos/sigmavirus24/github3.py"
+      },
+      "recorded_at": "2017-12-29T00:45:23"
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

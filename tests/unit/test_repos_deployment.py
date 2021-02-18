@@ -1,11 +1,8 @@
 """Unit tests for Deployment methods."""
-import github3
-
-from .helper import (
-    UnitIteratorHelper,
-    create_url_helper,
-    create_example_data_helper,
-)
+import github4
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitIteratorHelper
 
 url_for = create_url_helper(
     "https://api.github.com/repos/octocat/example/deployments/1"
@@ -20,7 +17,7 @@ class TestDeploymentIterators(UnitIteratorHelper):
 
     """Test Deployment methods that return iterators."""
 
-    described_class = github3.repos.deployment.Deployment
+    described_class = github4.repos.deployment.Deployment
     example_data = example_data
 
     def test_statuses(self):

@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""Issue search results implementation."""
+from ..issues import ShortIssue
+from ..models import GitHubCore
+
+
+class IssueSearchResult(GitHubCore):
+    """A representation of a search result containing an issue.
+
+    This object has the following attributes:
+
+    .. attribute:: issue
+
+        A :class:`~github4.issues.issue.ShortIssue` representing the issue
+        found in this search result.
+
+    .. attribute:: score
+
+        The confidence score of this search result.
+
+    .. attribute:: text_matches
+
+        A list of matches in the issue for this search result.
+
+        .. note::
+
+            To receive these, you must pass ``text_match=True`` to
+            :meth:`~github4.github.GitHub.search_issues`.
+    """
+
+    def _update_attributes(self, data):
+        result = data.copy()
+        self.score = result.pop("score")
+        self.text_matches = result.pop("text_matches", [])
+        self.issue = ShortIssue(result, self)
+
+    def _repr(self):
+        return "<IssueSearchResult [{0}]>".format(self.issue)

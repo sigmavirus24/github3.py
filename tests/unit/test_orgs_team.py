@@ -1,9 +1,8 @@
 import pytest
 
-from github3 import GitHubError
-from github3.orgs import Team
-
 from . import helper
+from github4 import GitHubError
+from github4.orgs import Team
 
 url_for = helper.create_url_helper("https://api.github.com/teams/1")
 
@@ -22,9 +21,7 @@ class TestTeam(helper.UnitHelper):
 
         self.instance.add_repository("name-of-repo", permission="push")
 
-        self.put_called_with(
-            url_for("repos/name-of-repo"), data={"permission": "push"}
-        )
+        self.put_called_with(url_for("repos/name-of-repo"), data={"permission": "push"})
 
     def test_delete(self):
         """Show that a user can delete an organization team."""
@@ -36,9 +33,7 @@ class TestTeam(helper.UnitHelper):
         """Show that a user can edit a team."""
         self.instance.edit("name", "admin")
 
-        self.patch_called_with(
-            url_for(), data={"name": "name", "permission": "admin"}
-        )
+        self.patch_called_with(url_for(), data={"name": "name", "permission": "admin"})
 
     def test_has_repository(self):
         """Show that a user can check if a team has access to a repository."""

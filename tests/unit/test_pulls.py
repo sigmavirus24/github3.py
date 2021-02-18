@@ -1,17 +1,12 @@
-"""Unit tests for the github3.pulls module."""
+"""Unit tests for the github4.pulls module."""
 import pytest
 
 from . import helper
+from github4 import GitHubError
+from github4 import pulls
 
-from github3 import GitHubError
-from github3 import pulls
-
-get_pr_example_data = helper.create_example_data_helper(
-    "pull_request_example"
-)
-get_pullreview_example_data = helper.create_example_data_helper(
-    "pull_review_example"
-)
+get_pr_example_data = helper.create_example_data_helper("pull_request_example")
+get_pullreview_example_data = helper.create_example_data_helper("pull_review_example")
 
 
 url_for = helper.create_url_helper(
@@ -115,9 +110,7 @@ class TestPullRequest(helper.UnitHelper):
         """Show that a user can retrieve the associated issue of a PR."""
         self.instance.issue()
 
-        self.session.get.assert_called_once_with(
-            url_for().replace("pulls", "issues")
-        )
+        self.session.get.assert_called_once_with(url_for().replace("pulls", "issues"))
 
     def test_merge(self):
         """Show that a user can merge a Pull Request."""
@@ -171,9 +164,7 @@ class TestPullRequest(helper.UnitHelper):
         """Verify the request to fetch the review requests from a PR."""
         self.instance.review_requests()
 
-        self.session.get.assert_called_once_with(
-            url_for("requested_reviewers")
-        )
+        self.session.get.assert_called_once_with(url_for("requested_reviewers"))
 
     def test_update(self):
         """Show that a user can update a Pull Request."""
@@ -191,8 +182,7 @@ class TestPullRequest(helper.UnitHelper):
     def test_attributes(self):
         """Show that we extract attributes correctly."""
         assert (
-            self.instance.merge_commit_sha
-            == "e5bd3914e2e596debea16f433f57875b5b90bcd6"
+            self.instance.merge_commit_sha == "e5bd3914e2e596debea16f433f57875b5b90bcd6"
         )
         assert not self.instance.merged
         assert self.instance.mergeable
@@ -214,9 +204,7 @@ class TestPullReview(helper.UnitHelper):
         )
 
 
-class TestPullRequestRequiresAuthentication(
-    helper.UnitRequiresAuthenticationHelper
-):
+class TestPullRequestRequiresAuthentication(helper.UnitRequiresAuthenticationHelper):
     """PullRequest unit tests that demonstrate which methods require auth."""
 
     described_class = pulls.PullRequest
@@ -339,18 +327,14 @@ class TestPullFile(helper.UnitHelper):
     """Unit tests for the PullFile class."""
 
     described_class = pulls.PullFile
-    get_pull_file_example_data = helper.create_example_data_helper(
-        "pull_file_example"
-    )
+    get_pull_file_example_data = helper.create_example_data_helper("pull_file_example")
     example_data = get_pull_file_example_data()
 
     def test_contents(self):
         """Verify the request made to fetch a pull request file contents."""
         self.instance.contents()
 
-        self.session.get.assert_called_once_with(
-            self.example_data["contents_url"]
-        )
+        self.session.get.assert_called_once_with(self.example_data["contents_url"])
 
 
 class TestPullFilePatch(TestPullFile):

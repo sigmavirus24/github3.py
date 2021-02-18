@@ -1,2 +1,5 @@
-pip==20.3.3
-tox==3.20.1
+pip==21.0.1
+nox==2020.12.31
+nox-poetry==0.8.1
+poetry==1.1.4
+virtualenv==20.4.2

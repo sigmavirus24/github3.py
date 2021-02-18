@@ -1,5 +1,5 @@
 """Unit tests for methods implemented on Branch."""
-import github3
+import github4
 from . import helper
 
 get_example_data = helper.create_example_data_helper("repos_branch_example")
@@ -14,7 +14,7 @@ url_for_commits = helper.create_url_helper(
 class TestBranch(helper.UnitHelper):
     """Branch unit tests."""
 
-    described_class = github3.repos.branch.Branch
+    described_class = github4.repos.branch.Branch
     example_data = get_example_data()
 
     def test_latest_sha(self):
@@ -24,9 +24,7 @@ class TestBranch(helper.UnitHelper):
             "If-None-Match": '"123"',
         }
         self.instance.latest_sha(differs_from="123")
-        self.session.get.assert_called_once_with(
-            url_for_commits(), headers=headers
-        )
+        self.session.get.assert_called_once_with(url_for_commits(), headers=headers)
 
     def test_protect(self):
         """Verify the request to protect a branch."""
@@ -97,7 +95,7 @@ class TestBranchRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Unit tests for Branch methods that require authentication."""
 
-    described_class = github3.repos.branch.Branch
+    described_class = github4.repos.branch.Branch
     example_data = get_example_data()
 
     def test_protect(self):

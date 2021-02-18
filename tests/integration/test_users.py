@@ -1,10 +1,11 @@
 """Integration tests for the User class."""
-import github3
 import datetime
+
 import pytest
 
+import github4
 from .helper import IntegrationHelper
-from github3.exceptions import MethodNotAllowed
+from github4.exceptions import MethodNotAllowed
 
 GPG_KEY = (
     # Generated for this alone then deleted
@@ -42,7 +43,7 @@ class TestGPGKey(IntegrationHelper):
         cassette_name = self.cassette_name("delete")
         with self.recorder.use_cassette(cassette_name):
             gpg_key = self.gh.create_gpg_key(GPG_KEY)
-            assert isinstance(gpg_key, github3.users.GPGKey)
+            assert isinstance(gpg_key, github4.users.GPGKey)
             assert gpg_key.delete() is True
 
 
@@ -90,7 +91,7 @@ class TestUser(IntegrationHelper):
 
         assert len(events) > 0
         for event in events:
-            assert isinstance(event, github3.events.Event)
+            assert isinstance(event, github4.events.Event)
 
     def test_followers(self):
         """Show that a user can retrieve any user's followers."""
@@ -101,7 +102,7 @@ class TestUser(IntegrationHelper):
 
         assert len(followers) > 0
         for follower in followers:
-            assert isinstance(follower, github3.users.ShortUser)
+            assert isinstance(follower, github4.users.ShortUser)
 
     def test_following(self):
         """Show that a user can retrieve users that a user is following."""
@@ -112,7 +113,7 @@ class TestUser(IntegrationHelper):
 
         assert len(following) > 0
         for person in following:
-            assert isinstance(person, github3.users.ShortUser)
+            assert isinstance(person, github4.users.ShortUser)
 
     def test_gpg_keys(self):
         """Show that a user can retrieve any user's GPG keys."""
@@ -123,7 +124,7 @@ class TestUser(IntegrationHelper):
 
         assert len(gpg_keys) > 0
         for gpg_key in gpg_keys:
-            assert isinstance(gpg_key, github3.users.GPGKey)
+            assert isinstance(gpg_key, github4.users.GPGKey)
 
     def test_keys(self):
         """Show that a user can retrieve any user's public keys."""
@@ -134,7 +135,7 @@ class TestUser(IntegrationHelper):
 
         assert len(keys) > 0
         for key in keys:
-            assert isinstance(key, github3.users.Key)
+            assert isinstance(key, github4.users.Key)
 
     def test_is_assignee_on(self):
         """Show that a user can check if a user can be assigned issues."""
@@ -162,7 +163,7 @@ class TestUser(IntegrationHelper):
 
         assert len(events) > 0
         for event in events:
-            assert isinstance(event, github3.events.Event)
+            assert isinstance(event, github4.events.Event)
 
     def test_organizations(self):
         """Show that a user can retrieve any user's organizations."""
@@ -170,7 +171,7 @@ class TestUser(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             u = self.gh.user("sigmavirus24")
             for o in u.organizations(number=25):
-                assert isinstance(o, github3.orgs.ShortOrganization)
+                assert isinstance(o, github4.orgs.ShortOrganization)
 
     def test_received_events(self):
         """Show that a user can retrieve any user's received events."""
@@ -182,7 +183,7 @@ class TestUser(IntegrationHelper):
 
         assert len(events) > 0
         for event in events:
-            assert isinstance(event, github3.events.Event)
+            assert isinstance(event, github4.events.Event)
 
     def test_starred_repositories(self):
         """Show that a user can retrieve the repositories starred by a user."""
@@ -193,7 +194,7 @@ class TestUser(IntegrationHelper):
 
         assert len(repos) > 0
         for starred in repos:
-            assert isinstance(starred, github3.repos.StarredRepository)
+            assert isinstance(starred, github4.repos.StarredRepository)
             assert isinstance(starred.starred_at, datetime.datetime)
 
     def test_subscriptions(self):
@@ -205,4 +206,4 @@ class TestUser(IntegrationHelper):
 
         assert len(repos) > 0
         for repository in repos:
-            assert isinstance(repository, github3.repos.ShortRepository)
+            assert isinstance(repository, github4.repos.ShortRepository)

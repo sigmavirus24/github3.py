@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Team."""
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -18,14 +17,14 @@ class TestTeam(IntegrationHelper):
     def get_organization(self, organization="github3py"):
         """Get the desired organization."""
         o = self.gh.organization(organization)
-        assert isinstance(o, github3.orgs.Organization)
+        assert isinstance(o, github4.orgs.Organization)
         return o
 
     def get_team(self, organization="github3py", id=189901):
         """Get our desired team."""
         o = self.get_organization(organization)
         t = o.team(id)
-        assert isinstance(t, github3.orgs.Team)
+        assert isinstance(t, github4.orgs.Team)
         return t
 
     def test_add_repository(self):
@@ -41,7 +40,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
             t = o.create_team("delete-me")
-            assert isinstance(t, github3.orgs.Team)
+            assert isinstance(t, github4.orgs.Team)
             assert t.delete() is True
 
     def test_edit(self):
@@ -51,7 +50,7 @@ class TestTeam(IntegrationHelper):
             o = self.get_organization()
             # Create a new team to play with
             t = o.create_team("edit-me")
-            assert isinstance(t, github3.orgs.Team)
+            assert isinstance(t, github4.orgs.Team)
             # Edit the new team
             assert t.edit("delete-me", permission="admin") is True
             # Assert that the name has changed
@@ -72,7 +71,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()
             for member in t.members():
-                assert isinstance(member, github3.users.ShortUser)
+                assert isinstance(member, github4.users.ShortUser)
 
     def test_can_filter_members_by_role(self):
         """Test the ability to filter an team's members by role."""
@@ -81,7 +80,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()
             for member in t.members(role="all"):
-                assert isinstance(member, github3.users.ShortUser)
+                assert isinstance(member, github4.users.ShortUser)
 
     def test_repositories(self):
         """Show that a user can retrieve a team's repositories."""
@@ -89,7 +88,7 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             t = self.get_team()
             for repository in t.repositories():
-                assert isinstance(repository, github3.repos.ShortRepository)
+                assert isinstance(repository, github4.repos.ShortRepository)
 
     def test_remove_repository(self):
         """Show a user can remove a repository from a team."""

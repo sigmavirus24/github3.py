@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """Integration tests for methods implemented on PullRequest."""
-import github3
-from github3 import repos
-
+import github4
 from .helper import IntegrationHelper
+from github4 import repos
 
 
 class TestPullRequest(IntegrationHelper):
@@ -13,7 +12,7 @@ class TestPullRequest(IntegrationHelper):
         """Get the pull request we wish to use in this test."""
         owner, repo = repository.split("/")
         p = self.gh.pull_request(owner, repo, num)
-        assert isinstance(p, github3.pulls.PullRequest)
+        assert isinstance(p, github4.pulls.PullRequest)
         return p
 
     def test_close(self):
@@ -21,9 +20,7 @@ class TestPullRequest(IntegrationHelper):
         self.basic_login()
         cassette_name = self.cassette_name("close")
         with self.recorder.use_cassette(cassette_name):
-            p = self.get_pull_request(
-                repository="github3py/delete_contents", num=2
-            )
+            p = self.get_pull_request(repository="github3py/delete_contents", num=2)
             assert p.close() is True
 
     def test_create_comment(self):
@@ -33,7 +30,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=423)
             comment = p.create_comment("Testing pull request comment")
-        assert isinstance(comment, github3.issues.comment.IssueComment)
+        assert isinstance(comment, github4.issues.comment.IssueComment)
 
     def test_commits(self):
         """Show that one can iterate over a PR's commits."""
@@ -41,7 +38,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for commit in p.commits():
-                assert isinstance(commit, github3.repos.commit.ShortCommit)
+                assert isinstance(commit, github4.repos.commit.ShortCommit)
 
     def test_create_review_comment(self):
         """Show that a user can create an in-line reveiw comment on a PR."""
@@ -55,7 +52,7 @@ class TestPullRequest(IntegrationHelper):
                 path="github3/pulls.py",
                 position=6,
             )
-        assert isinstance(comment, github3.pulls.ReviewComment)
+        assert isinstance(comment, github4.pulls.ReviewComment)
 
     def test_create_review_requests(self):
         """Show that a user can create review requests on a PR."""
@@ -63,10 +60,8 @@ class TestPullRequest(IntegrationHelper):
         cassette_name = self.cassette_name("create_review_requests")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=873)
-            pull_request = p.create_review_requests(
-                reviewers=["sigmavirus24"]
-            )
-        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
+            pull_request = p.create_review_requests(reviewers=["sigmavirus24"])
+        assert isinstance(pull_request, github4.pulls.ShortPullRequest)
 
     def test_create_review(self):
         """Verify the request to create a pending review on a PR."""
@@ -74,10 +69,8 @@ class TestPullRequest(IntegrationHelper):
         cassette_name = self.cassette_name("create_review")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=819)
-            comment = p.create_review(
-                body="Testing create review", event="COMMENT"
-            )
-        assert isinstance(comment, github3.pulls.PullReview)
+            comment = p.create_review(body="Testing create review", event="COMMENT")
+        assert isinstance(comment, github4.pulls.PullReview)
 
     def test_delete_review_requests(self):
         """Show that a user can delete review requests on a PR."""
@@ -85,9 +78,7 @@ class TestPullRequest(IntegrationHelper):
         cassette_name = self.cassette_name("delete_review_requests")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=873)
-            assert (
-                p.delete_review_requests(reviewers=["sigmavirus24"]) is True
-            )
+            assert p.delete_review_requests(reviewers=["sigmavirus24"]) is True
 
     def test_diff(self):
         """Show that one can retrieve a bytestring diff of a PR."""
@@ -104,7 +95,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for pr_file in p.files():
-                assert isinstance(pr_file, github3.pulls.PullFile)
+                assert isinstance(pr_file, github4.pulls.PullFile)
 
     def test_is_merged(self):
         """Show that one can check if a PR was merged."""
@@ -119,7 +110,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             issue = p.issue()
-            assert isinstance(issue, github3.issues.Issue)
+            assert isinstance(issue, github4.issues.Issue)
 
     def test_issue_comments(self):
         """Show that one can iterate over a PR's issue comments."""
@@ -127,9 +118,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for comment in p.issue_comments():
-                assert isinstance(
-                    comment, github3.issues.comment.IssueComment
-                )
+                assert isinstance(comment, github4.issues.comment.IssueComment)
 
     def test_patch(self):
         """Show that a user can get the patch from a PR."""
@@ -146,17 +135,15 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=671)
             for pull_review in p.reviews():
-                assert isinstance(pull_review, github3.pulls.PullReview)
-                assert isinstance(pull_review.user, github3.users.ShortUser)
+                assert isinstance(pull_review, github4.pulls.PullReview)
+                assert isinstance(pull_review.user, github4.users.ShortUser)
 
     def test_reopen(self):
         """Show that one can reopen an open Pull Request."""
         self.basic_login()
         cassette_name = self.cassette_name("reopen")
         with self.recorder.use_cassette(cassette_name):
-            p = self.get_pull_request(
-                repository="github3py/delete_contents", num=2
-            )
+            p = self.get_pull_request(repository="github3py/delete_contents", num=2)
             assert p.reopen() is True
 
     def test_review_comments(self):
@@ -165,7 +152,7 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
             for comment in p.review_comments():
-                assert isinstance(comment, github3.pulls.ReviewComment)
+                assert isinstance(comment, github4.pulls.ReviewComment)
 
     def test_review_requests(self):
         """Show that one can retrieve the review requests of a PR."""
@@ -173,16 +160,14 @@ class TestPullRequest(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=873)
             review_requests = p.review_requests()
-        assert isinstance(review_requests, github3.pulls.ReviewRequests)
+        assert isinstance(review_requests, github4.pulls.ReviewRequests)
 
     def test_update(self):
         """Show that one can update an open Pull Request."""
         self.basic_login()
         cassette_name = self.cassette_name("update")
         with self.recorder.use_cassette(cassette_name):
-            p = self.get_pull_request(
-                repository="github3py/delete_contents", num=2
-            )
+            p = self.get_pull_request(repository="github3py/delete_contents", num=2)
             assert p.update(p.title) is True
 
     def test_repository(self):
@@ -191,7 +176,7 @@ class TestPullRequest(IntegrationHelper):
         cassette_name = self.cassette_name("single")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
-            assert isinstance(p.repository, github3.repos.ShortRepository)
+            assert isinstance(p.repository, github4.repos.ShortRepository)
 
 
 class TestPullReview(IntegrationHelper):
@@ -218,7 +203,7 @@ class TestReviewComment(IntegrationHelper):
             p = self.gh.pull_request("github3py", "delete_contents", 2)
             c = next(p.review_comments())
             comment = c.reply("Replying to comments is fun.")
-        assert isinstance(comment, github3.pulls.ReviewComment)
+        assert isinstance(comment, github4.pulls.ReviewComment)
 
 
 class TestPullFile(IntegrationHelper):

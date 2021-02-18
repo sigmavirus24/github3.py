@@ -1,16 +1,14 @@
 """Organization unit tests."""
 import pytest
 
-from github3 import GitHubError
-from github3.orgs import Organization, OrganizationHook
-from github3.projects import Project
-
 from . import helper
+from github4 import GitHubError
+from github4.orgs import Organization
+from github4.orgs import OrganizationHook
+from github4.projects import Project
 
 url_for = helper.create_url_helper("https://api.github.com/orgs/github")
-hook_url_for = helper.create_url_helper(
-    "https://api.github.com/orgs/octocat/hooks/1"
-)
+hook_url_for = helper.create_url_helper("https://api.github.com/orgs/octocat/hooks/1")
 
 get_org_example_data = helper.create_example_data_helper("org_example")
 get_hook_example_data = helper.create_example_data_helper("org_hook_example")
@@ -37,9 +35,7 @@ class TestOrganization(helper.UnitHelper):
         """Show that one can conceal an organization member."""
         self.instance.conceal_member("concealed")
 
-        self.session.delete.assert_called_once_with(
-            url_for("public_members/concealed")
-        )
+        self.session.delete.assert_called_once_with(url_for("public_members/concealed"))
 
     def test_create_project(self):
         """Show that one can create a project in an organization."""
@@ -164,9 +160,7 @@ class TestOrganization(helper.UnitHelper):
         """Show that a user can if another user is a public org member."""
         self.instance.is_public_member("username")
 
-        self.session.get.assert_called_once_with(
-            url_for("public_members/username")
-        )
+        self.session.get.assert_called_once_with(url_for("public_members/username"))
 
     def test_project(self):
         """Show that a user can access a single organization project."""
@@ -181,17 +175,13 @@ class TestOrganization(helper.UnitHelper):
         """Show that a user can publicize their own membership."""
         self.instance.publicize_member("username")
 
-        self.session.put.assert_called_once_with(
-            url_for("public_members/username")
-        )
+        self.session.put.assert_called_once_with(url_for("public_members/username"))
 
     def test_remove_member(self):
         """Show that one can remove a user from an organization."""
         self.instance.remove_member("username")
 
-        self.session.delete.assert_called_once_with(
-            url_for("members/username")
-        )
+        self.session.delete.assert_called_once_with(url_for("members/username"))
 
     def test_remove_repository(self):
         """Show that one can remove a repository from a team."""
@@ -215,9 +205,7 @@ class TestOrganization(helper.UnitHelper):
         """Show that a user can retrieve a team by id."""
         self.instance.team(10)
 
-        self.session.get.assert_called_once_with(
-            "https://api.github.com/teams/10"
-        )
+        self.session.get.assert_called_once_with("https://api.github.com/teams/10")
 
     def test_team_by_name(self):
         """Show that a user can retrieve a team by name."""
@@ -276,9 +264,7 @@ class TestOrganization(helper.UnitHelper):
         """Show that one can cancel a membership in an organization."""
         self.instance.remove_membership("username")
 
-        self.session.delete.assert_called_once_with(
-            url_for("memberships/username")
-        )
+        self.session.delete.assert_called_once_with(url_for("memberships/username"))
 
 
 class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
@@ -563,9 +549,7 @@ class TestOrganizationHook(helper.UnitHelper):
         self.post_called_with(hook_url_for("pings"))
 
 
-class TestOrganizationHookRequiresAuth(
-    helper.UnitRequiresAuthenticationHelper
-):
+class TestOrganizationHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Test methods on OrganizationHook object that require authentication."""
 
     described_class = OrganizationHook

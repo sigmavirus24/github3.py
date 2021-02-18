@@ -1,5 +1,4 @@
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -13,11 +12,9 @@ class TestGitHubSession(IntegrationHelper):
         self.gh.login(two_factor_callback=two_factor_auth)
 
         cassette_name = self.cassette_name("two_factor_authentication")
-        assert isinstance(self.session, github3.session.GitHubSession)
+        assert isinstance(self.session, github4.session.GitHubSession)
 
         match = ["method", "uri", "gh3-headers"]
-        with self.recorder.use_cassette(
-            cassette_name, match_requests_on=match
-        ):
+        with self.recorder.use_cassette(cassette_name, match_requests_on=match):
             r = self.session.get("https://api.github.com/users/sigmavirus24")
             assert r.status_code == 200

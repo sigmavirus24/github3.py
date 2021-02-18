@@ -1,22 +1,22 @@
 """Unit tests for Repositories."""
 import datetime
 import unittest.mock
+from base64 import b64encode
 
 import pytest
 
-from base64 import b64encode
-from github3 import GitHubError
-from github3.exceptions import GitHubException
-from github3.repos.comment import RepoComment
-from github3.repos.commit import RepoCommit
-from github3.repos.comparison import Comparison
-from github3.repos.contents import Contents
-from github3.repos.hook import Hook
-from github3.repos.repo import Repository, ShortRepository
-from github3.models import GitHubCore
-from github3.projects import Project
-
 from . import helper
+from github4 import GitHubError
+from github4.exceptions import GitHubException
+from github4.models import GitHubCore
+from github4.projects import Project
+from github4.repos.comment import RepoComment
+from github4.repos.commit import RepoCommit
+from github4.repos.comparison import Comparison
+from github4.repos.contents import Contents
+from github4.repos.hook import Hook
+from github4.repos.repo import Repository
+from github4.repos.repo import ShortRepository
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/comments/1"
@@ -37,23 +37,13 @@ contents_url_for = helper.create_url_helper(
 hook_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/hooks/1"
 )
-url_for = helper.create_url_helper(
-    "https://api.github.com/repos/octocat/Hello-World"
-)
+url_for = helper.create_url_helper("https://api.github.com/repos/octocat/Hello-World")
 get_repo_example_data = helper.create_example_data_helper("repo_example")
-get_repo_2_12_example_data = helper.create_example_data_helper(
-    "repo_2_12_example"
-)
-get_comment_example_data = helper.create_example_data_helper(
-    "comment_example"
-)
+get_repo_2_12_example_data = helper.create_example_data_helper("repo_2_12_example")
+get_comment_example_data = helper.create_example_data_helper("comment_example")
 get_commit_example_data = helper.create_example_data_helper("commit_example")
-get_compare_example_data = helper.create_example_data_helper(
-    "compare_example"
-)
-get_content_example_data = helper.create_example_data_helper(
-    "content_example"
-)
+get_compare_example_data = helper.create_example_data_helper("compare_example")
+get_content_example_data = helper.create_example_data_helper("content_example")
 get_hook_example_data = helper.create_example_data_helper("hook_example")
 create_file_contents_example_data = helper.create_example_data_helper(
     "create_file_contents_example"
@@ -79,9 +69,7 @@ class TestRepository(helper.UnitHelper):
         """Verify the request to add a collaborator to a repository."""
         self.instance.add_collaborator("sigmavirus24")
 
-        self.session.put.assert_called_once_with(
-            url_for("collaborators/sigmavirus24")
-        )
+        self.session.put.assert_called_once_with(url_for("collaborators/sigmavirus24"))
 
     def test_add_null_collaborator(self):
         """Verify no request is made when adding `None` as a collaborator."""
@@ -149,9 +137,7 @@ class TestRepository(helper.UnitHelper):
         """Verify the request to fork a repository to an organization."""
         self.instance.create_fork("mattchung")
 
-        self.post_called_with(
-            url_for("forks"), data={"organization": "mattchung"}
-        )
+        self.post_called_with(url_for("forks"), data={"organization": "mattchung"})
 
     def test_create_hook(self):
         """Verify the request to create a hook."""
@@ -270,9 +256,7 @@ class TestRepository(helper.UnitHelper):
         self.post_called_with(
             url_for("labels"),
             data=data,
-            headers={
-                "Accept": "application/vnd.github.symmetra-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.symmetra-preview+json"},
         )
 
     def test_create_label_required_name(self):
@@ -315,9 +299,7 @@ class TestRepository(helper.UnitHelper):
 
     def test_create_pull_private_required_data(self):
         """Verify the request for creating a pull request."""
-        with unittest.mock.patch.object(
-            GitHubCore, "_remove_none"
-        ) as rm_none:
+        with unittest.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
             data = {}
             self.instance._create_pull(data)
             rm_none.assert_called_once_with({})
@@ -407,9 +389,7 @@ class TestRepository(helper.UnitHelper):
             "description": "bar",
             "context": "default",
         }
-        with unittest.mock.patch.object(
-            GitHubCore, "_remove_none"
-        ) as rm_none:
+        with unittest.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
             self.instance.create_status(sha="fake-sha", **data)
             rm_none.assert_called_once_with(data)
             self.post_called_with(url_for("statuses/fake-sha"), data=data)
@@ -462,9 +442,7 @@ class TestRepository(helper.UnitHelper):
         """Verify the request to create a tree."""
         self.instance.create_tree([{"foo": "bar"}])
 
-        self.post_called_with(
-            url_for("git/trees"), data={"tree": [{"foo": "bar"}]}
-        )
+        self.post_called_with(url_for("git/trees"), data={"tree": [{"foo": "bar"}]})
 
     def test_create_tree_with_base_tree(self):
         """Verify the request to create a tree with a base tree."""
@@ -551,9 +529,7 @@ class TestRepository(helper.UnitHelper):
             "has_projects": False,
         }
 
-        with unittest.mock.patch.object(
-            Repository, "_update_attributes"
-        ) as up_attr:
+        with unittest.mock.patch.object(Repository, "_update_attributes") as up_attr:
             assert self.instance.edit(**data) is True
             assert up_attr.called is True
             self.patch_called_with(url_for(), data=data)
@@ -579,9 +555,7 @@ class TestRepository(helper.UnitHelper):
     def test_git_commit(self):
         """Verify the request for retrieving a git commit from a repository."""
         self.instance.git_commit("fake-sha")
-        self.session.get.assert_called_once_with(
-            url_for("git/commits/fake-sha")
-        )
+        self.session.get.assert_called_once_with(url_for("git/commits/fake-sha"))
 
     def test_hook(self):
         """Verify the request for retrieving a hook on a repository."""
@@ -637,9 +611,7 @@ class TestRepository(helper.UnitHelper):
                 {"created_at": "2014-03-18T17:15:42Z", "body": "comment body"}
             ],
         }
-        with unittest.mock.patch.object(
-            GitHubCore, "_remove_none"
-        ) as rm_none:
+        with unittest.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
             self.instance.import_issue(**data)
             rm_none.assert_any_call(issue["issue"])
             rm_none.assert_any_call(issue)
@@ -647,9 +619,7 @@ class TestRepository(helper.UnitHelper):
         self.post_called_with(
             url_for("import/issues"),
             data=issue,
-            headers={
-                "Accept": "application/vnd.github.golden-comet-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.golden-comet-preview+json"},
         )
 
     def test_imported_issue(self):
@@ -657,9 +627,7 @@ class TestRepository(helper.UnitHelper):
         self.instance.imported_issue(1)
         self.session.get.assert_called_once_with(
             url_for("import/issues/1"),
-            headers={
-                "Accept": "application/vnd.github.golden-comet-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.golden-comet-preview+json"},
         )
 
     def test_is_collaborator_required_username(self):
@@ -676,9 +644,7 @@ class TestRepository(helper.UnitHelper):
         repository.
         """
         self.instance.is_collaborator("octocat")
-        self.session.get.assert_called_once_with(
-            url_for("collaborators/octocat")
-        )
+        self.session.get.assert_called_once_with(url_for("collaborators/octocat"))
 
     def test_issue(self):
         """Verify the request for retrieving an issue on a repository."""
@@ -707,9 +673,7 @@ class TestRepository(helper.UnitHelper):
         self.instance.label("bug")
         self.session.get.assert_called_once_with(
             url_for("labels/bug"),
-            headers={
-                "Accept": "application/vnd.github.symmetra-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.symmetra-preview+json"},
         )
 
     def test_label_required_name(self):
@@ -721,9 +685,7 @@ class TestRepository(helper.UnitHelper):
         """Test retrieving the most recent pages build."""
         self.instance.latest_pages_build()
 
-        self.session.get.assert_called_once_with(
-            url_for("pages/builds/latest")
-        )
+        self.session.get.assert_called_once_with(url_for("pages/builds/latest"))
 
     def test_latest_release(self):
         """Test the request for retrieving the latest release"""
@@ -759,9 +721,7 @@ class TestRepository(helper.UnitHelper):
 
     def test_merge(self):
         """Verify the request for performing a merge on a repository."""
-        self.instance.merge(
-            base="develop", head="feature", message="merging now"
-        )
+        self.instance.merge(base="develop", head="feature", message="merging now")
 
         self.post_called_with(
             url_for("merges"),
@@ -828,9 +788,7 @@ class TestRepository(helper.UnitHelper):
     def test_ref(self):
         """Verify the request for retrieving a reference."""
         self.instance.ref("heads/develop")
-        self.session.get.assert_called_once_with(
-            url_for("git/refs/heads/develop")
-        )
+        self.session.get.assert_called_once_with(url_for("git/refs/heads/develop"))
 
     def test_ref_required_ref(self):
         """Verify the request for retrieving a reference."""
@@ -841,17 +799,13 @@ class TestRepository(helper.UnitHelper):
         """Test the request for retrieving release by tag name"""
         self.instance.release_from_tag("v1.0.0")
 
-        self.session.get.assert_called_once_with(
-            url_for("releases/tags/v1.0.0")
-        )
+        self.session.get.assert_called_once_with(url_for("releases/tags/v1.0.0"))
 
     def test_remove_collaborator(self):
         """Verify the request for removing a collaborator."""
         self.instance.remove_collaborator("octocat")
 
-        self.session.delete.assert_called_once_with(
-            url_for("collaborators/octocat")
-        )
+        self.session.delete.assert_called_once_with(url_for("collaborators/octocat"))
 
     def test_remove_collaborator_required_username(self):
         """Verify the request for removing a collaborator."""
@@ -933,9 +887,7 @@ class TestRepository(helper.UnitHelper):
         """Verify the request for retrieving total commit counts."""
         self.instance.weekly_commit_count()
 
-        self.session.get.assert_called_once_with(
-            url_for("stats/participation")
-        )
+        self.session.get.assert_called_once_with(url_for("stats/participation"))
 
     def test_views_default(self):
         """Verify the request for retrieving repository daily views."""
@@ -1198,9 +1150,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for("import/issues"),
             params={"per_page": 100, "since": "2015-03-15"},
-            headers={
-                "Accept": "application/vnd.github.golden-comet-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.golden-comet-preview+json"},
         )
 
     def test_invitations(self):
@@ -1247,9 +1197,7 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.session.get.assert_called_once_with(
             url_for("labels"),
             params={"per_page": 100},
-            headers={
-                "Accept": "application/vnd.github.symmetra-preview+json"
-            },
+            headers={"Accept": "application/vnd.github.symmetra-preview+json"},
         )
 
     def test_languages(self):
@@ -1474,9 +1422,7 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def test_create_check_run(self):
         """Verify the request for creating a check run on a suite."""
         with pytest.raises(GitHubException):
-            self.instance.create_check_run(
-                head_sha="fake-sha", name="testcheck"
-            )
+            self.instance.create_check_run(head_sha="fake-sha", name="testcheck")
 
     def test_create_check_suite(self):
         """Verify the request for creating a check run on a suite."""
@@ -1529,9 +1475,7 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         Verify that creating a pull request from issue requires authentication.
         """
         with pytest.raises(GitHubError):
-            self.instance.create_pull_from_issue(
-                issue=1, title="foo", base="master"
-            )
+            self.instance.create_pull_from_issue(issue=1, title="foo", base="master")
 
     def test_create_status(self):
         """
@@ -1688,9 +1632,7 @@ class TestContents(helper.UnitHelper):
 
     def test_str(self):
         """Verify that instance string is formatted properly."""
-        assert str(self.instance) == "<Contents [{0}]>".format(
-            self.instance.path
-        )
+        assert str(self.instance) == "<Contents [{0}]>".format(self.instance.path)
 
     def test_update(self):
         """

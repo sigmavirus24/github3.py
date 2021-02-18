@@ -2,14 +2,12 @@
 """Integration tests for methods implemented on GitHub."""
 from datetime import datetime
 
-import github3
 import pytest
 import uritemplate
 
-from .helper import (
-    GitHubEnterpriseHelper,
-    IntegrationHelper,
-)
+import github4
+from .helper import GitHubEnterpriseHelper
+from .helper import IntegrationHelper
 
 GPG_KEY = (
     # Generated for this alone then deleted
@@ -60,7 +58,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             membership = self.gh.activate_membership("sv24-archive")
 
-        assert isinstance(membership, github3.orgs.Membership)
+        assert isinstance(membership, github4.orgs.Membership)
 
     def test_authenticated_app(self):
         """Validate an app can retrieve its own metadata."""
@@ -69,7 +67,7 @@ class TestGitHub(IntegrationHelper):
             self.app_bearer_login()
             app = self.gh.authenticated_app()
 
-        assert isinstance(app, github3.apps.App)
+        assert isinstance(app, github4.apps.App)
 
     def test_authorize(self):
         """Test the ability to create an authorization."""
@@ -85,7 +83,7 @@ class TestGitHub(IntegrationHelper):
                 note_url="http://example.com",
             )
 
-        assert isinstance(auth, github3.auths.Authorization)
+        assert isinstance(auth, github4.auths.Authorization)
 
     def test_add_email_addresses(self):
         """Add email addresses to the authorized user's account."""
@@ -97,7 +95,7 @@ class TestGitHub(IntegrationHelper):
             )
 
         for email in emails:
-            assert isinstance(email, github3.users.Email)
+            assert isinstance(email, github4.users.Email)
 
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist."""
@@ -108,7 +106,7 @@ class TestGitHub(IntegrationHelper):
                 "Gist Title", {"filename.py": {"content": "#content"}}
             )
 
-        assert isinstance(g, github3.gists.Gist)
+        assert isinstance(g, github4.gists.Gist)
         assert g.public is True
 
     def test_create_gpg_key(self):
@@ -117,7 +115,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("create_gpg_key")
         with self.recorder.use_cassette(cassette_name):
             gpg_key = self.gh.create_gpg_key(GPG_KEY)
-            assert isinstance(gpg_key, github3.users.GPGKey)
+            assert isinstance(gpg_key, github4.users.GPGKey)
             assert gpg_key.delete() is True
 
     def test_create_issue(self):
@@ -132,7 +130,7 @@ class TestGitHub(IntegrationHelper):
                 "Let's see how well this works with Betamax",
             )
 
-        assert isinstance(i, github3.issues.ShortIssue)
+        assert isinstance(i, github4.issues.ShortIssue)
         assert i.title == "Test issue creation"
         assert i.body == "Let's see how well this works with Betamax"
 
@@ -152,7 +150,7 @@ class TestGitHub(IntegrationHelper):
                 assignees=["omgjlk", "sigmavirus24"],
             )
 
-        assert isinstance(i, github3.issues.ShortIssue)
+        assert isinstance(i, github4.issues.ShortIssue)
         assert i.title == "Test issue creation assignees"
         assert i.body == "Let's see how well this works with Betamax"
         assert ["omgjlk", "sigmavirus24"] == [a.login for a in i.assignees]
@@ -165,7 +163,7 @@ class TestGitHub(IntegrationHelper):
             k = self.gh.create_key("Key name", SSH_KEY)
             k.delete()
 
-        assert isinstance(k, github3.users.Key)
+        assert isinstance(k, github4.users.Key)
         assert k.title == "Key name"
         assert k.key == SSH_KEY
 
@@ -178,7 +176,7 @@ class TestGitHub(IntegrationHelper):
                 "my-new-repo", description="Test repo creation"
             )
 
-        assert isinstance(r, github3.repos.Repository)
+        assert isinstance(r, github4.repos.Repository)
         assert str(r).endswith("/my-new-repo")
 
     def test_delete_email_addresses(self):
@@ -235,9 +233,7 @@ class TestGitHub(IntegrationHelper):
                 links = [links]
             for link in links:
                 href = link.get("href")
-                assert href is None or isinstance(
-                    href, uritemplate.URITemplate
-                )
+                assert href is None or isinstance(href, uritemplate.URITemplate)
 
     def test_gist(self):
         """Test the ability to retrieve a single gist."""
@@ -245,7 +241,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             g = self.gh.gist(7160899)
 
-        assert isinstance(g, github3.gists.Gist)
+        assert isinstance(g, github4.gists.Gist)
 
     def test_gitignore_template(self):
         """Test the ability to retrieve a single gitignore template."""
@@ -262,9 +258,9 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("gpg_key")
         with self.recorder.use_cassette(cassette_name):
             created_gpg_key = self.gh.create_gpg_key(GPG_KEY)
-            assert isinstance(created_gpg_key, github3.users.GPGKey)
+            assert isinstance(created_gpg_key, github4.users.GPGKey)
             retrieved_gpg_key = self.gh.gpg_key(created_gpg_key.id)
-            assert isinstance(retrieved_gpg_key, github3.users.GPGKey)
+            assert isinstance(retrieved_gpg_key, github4.users.GPGKey)
             assert created_gpg_key == retrieved_gpg_key
             assert created_gpg_key.delete() is True
 
@@ -274,11 +270,11 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("gpg_keys")
         with self.recorder.use_cassette(cassette_name):
             created_gpg_key = self.gh.create_gpg_key(GPG_KEY)
-            assert isinstance(created_gpg_key, github3.users.GPGKey)
+            assert isinstance(created_gpg_key, github4.users.GPGKey)
             retrieved_gpg_keys = list(self.gh.gpg_keys())
             assert len(retrieved_gpg_keys) > 0
             for retrieved_gpg_key in retrieved_gpg_keys:
-                assert isinstance(retrieved_gpg_key, github3.users.GPGKey)
+                assert isinstance(retrieved_gpg_key, github4.users.GPGKey)
             assert created_gpg_key in retrieved_gpg_keys
             assert created_gpg_key.delete() is True
 
@@ -288,7 +284,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("key")
         with self.recorder.use_cassette(cassette_name):
             key = self.gh.key(14948033)
-        assert isinstance(key, github3.users.Key)
+        assert isinstance(key, github4.users.Key)
 
     def test_license(self):
         """Test the ability to retrieve a single license."""
@@ -296,7 +292,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             license = self.gh.license("mit")
 
-        assert isinstance(license, github3.licenses.License)
+        assert isinstance(license, github4.licenses.License)
 
     def test_licenses(self):
         """Test the ability to retrieve open source licenses."""
@@ -306,7 +302,7 @@ class TestGitHub(IntegrationHelper):
             assert len(licenses) > 0
 
             license = licenses[0]
-            assert isinstance(license, github3.licenses.ShortLicense)
+            assert isinstance(license, github4.licenses.ShortLicense)
 
     def test_markdown(self):
         """Test the ability to render a markdown document."""
@@ -322,7 +318,7 @@ class TestGitHub(IntegrationHelper):
         """Test the ability to retrieve a single gitignore template."""
         cassette_name = self.cassette_name("non_existent_gitignore_template")
         with self.recorder.use_cassette(cassette_name):
-            with pytest.raises(github3.exceptions.NotFoundError):
+            with pytest.raises(github4.exceptions.NotFoundError):
                 self.gh.gitignore_template("i_donut_exist")
 
     def test_gitignore_templates(self):
@@ -354,42 +350,42 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             i = self.gh.issue("sigmavirus24", "github3.py", 1)
 
-        assert isinstance(i, github3.issues.Issue)
+        assert isinstance(i, github4.issues.Issue)
 
     def test_all_organizations(self):
         """Test the ability to iterate over all of the organizations."""
         cassette_name = self.cassette_name("all_organizations")
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.all_organizations(number=25):
-                assert isinstance(r, github3.orgs.ShortOrganization)
+                assert isinstance(r, github4.orgs.ShortOrganization)
 
     def test_all_repositories(self):
         """Test the ability to iterate over all of the repositories."""
         cassette_name = self.cassette_name("iter_all_repos")
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.all_repositories(number=25):
-                assert isinstance(r, github3.repos.ShortRepository)
+                assert isinstance(r, github4.repos.ShortRepository)
 
     def test_all_users(self):
         """Test the ability to iterate over all of the users."""
         cassette_name = self.cassette_name("iter_all_users")
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.all_users(number=25):
-                assert isinstance(u, github3.users.ShortUser)
+                assert isinstance(u, github4.users.ShortUser)
 
     def test_all_events(self):
         """Test the ability to iterate over all public events."""
         cassette_name = self.cassette_name("all_events")
         with self.recorder.use_cassette(cassette_name):
             for e in self.gh.all_events(number=25):
-                assert isinstance(e, github3.events.Event)
+                assert isinstance(e, github4.events.Event)
 
     def test_followers_of(self):
         """Test the ability to iterate over a user's followers."""
         cassette_name = self.cassette_name("followers_of")
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.followers_of("sigmavirus24", number=25):
-                assert isinstance(u, github3.users.ShortUser)
+                assert isinstance(u, github4.users.ShortUser)
 
     def test_followers(self):
         """
@@ -401,7 +397,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("followers_auth")
         with self.recorder.use_cassette(cassette_name):
             for u in self.gh.followers():
-                assert isinstance(u, github3.users.ShortUser)
+                assert isinstance(u, github4.users.ShortUser)
 
     def test_user_teams(self):
         """Test the ability to iterate over a user's teams."""
@@ -409,7 +405,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("iter_user_teams")
         with self.recorder.use_cassette(cassette_name):
             for t in self.gh.user_teams():
-                assert isinstance(t, github3.orgs.ShortTeam)
+                assert isinstance(t, github4.orgs.ShortTeam)
 
     def test_me(self):
         """Test the ability to retrieve the authenticated user's info."""
@@ -418,7 +414,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             me = self.gh.me()
 
-        assert isinstance(me, github3.users.User)
+        assert isinstance(me, github4.users.User)
 
     def test_meta(self):
         """Test the ability to get the CIDR formatted addresses."""
@@ -433,7 +429,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("unread_notifications")
         with self.recorder.use_cassette(cassette_name):
             for notification in self.gh.notifications():
-                assert isinstance(notification, github3.notifications.Thread)
+                assert isinstance(notification, github4.notifications.Thread)
                 assert notification.unread is True
 
     def test_notifications_all(self):
@@ -444,7 +440,7 @@ class TestGitHub(IntegrationHelper):
             read_notifications = []
             unread_notifications = []
             for notification in self.gh.notifications(all=True):
-                assert isinstance(notification, github3.notifications.Thread)
+                assert isinstance(notification, github4.notifications.Thread)
                 if notification.unread:
                     unread_notifications.append(notification)
                 else:
@@ -470,7 +466,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.gh.organization("github3py")
 
-        assert isinstance(o, github3.orgs.Organization)
+        assert isinstance(o, github4.orgs.Organization)
 
     def test_project(self):
         """Test the ability to retrieve a project by its id."""
@@ -479,7 +475,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             r = self.gh.project(398318)
 
-        assert isinstance(r, github3.projects.Project)
+        assert isinstance(r, github4.projects.Project)
 
     def test_project_card(self):
         """Test the ability to retrieve a project card by its id."""
@@ -488,7 +484,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             r = self.gh.project_card(2665856)
 
-        assert isinstance(r, github3.projects.ProjectCard)
+        assert isinstance(r, github4.projects.ProjectCard)
 
     def test_project_column(self):
         """Test the ability to retrieve a project column by its id."""
@@ -497,7 +493,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             r = self.gh.project_column(957217)
 
-        assert isinstance(r, github3.projects.ProjectColumn)
+        assert isinstance(r, github4.projects.ProjectColumn)
 
     def test_public_gists(self):
         """Test the ability to iterate over the public gists."""
@@ -505,16 +501,14 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("public_gists")
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.public_gists(since=since, number=25):
-                assert isinstance(r, github3.gists.ShortGist)
+                assert isinstance(r, github4.gists.ShortGist)
                 assert r.updated_at.replace(tzinfo=None) >= since
 
     def test_pubsubhubbub(self):
         """Test the ability to create a pubsubhubbub hook."""
         self.token_login()
         cassette_name = self.cassette_name("pubsubhubbub")
-        with self.recorder.use_cassette(
-            cassette_name, **self.betamax_simple_body
-        ):
+        with self.recorder.use_cassette(cassette_name, **self.betamax_simple_body):
             topic = "https://github.com/itsmemattchung/github3.py/events/push"
             status = self.gh.pubsubhubbub(
                 mode="subscribe",
@@ -529,7 +523,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             p = self.gh.pull_request("sigmavirus24", "github3.py", 119)
 
-        assert isinstance(p, github3.pulls.PullRequest)
+        assert isinstance(p, github4.pulls.PullRequest)
 
     def test_rate_limit(self):
         """Test the ability to retrieve rate information."""
@@ -546,7 +540,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             r = self.gh.repository("sigmavirus24", "github3.py")
 
-        assert isinstance(r, github3.repos.repo.Repository)
+        assert isinstance(r, github4.repos.repo.Repository)
 
     def test_repository_invitations(self):
         """Test the ability to retrieve the repository invitation."""
@@ -557,7 +551,7 @@ class TestGitHub(IntegrationHelper):
 
         assert len(invitations) > 0
         for invitation in invitations:
-            assert isinstance(invitation, github3.repos.invitation.Invitation)
+            assert isinstance(invitation, github4.repos.invitation.Invitation)
 
     def test_repository_with_id(self):
         """Test the ability to retrieve a repository by its id."""
@@ -565,7 +559,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             r = self.gh.repository_with_id(11439734)
 
-        assert isinstance(r, github3.repos.repo.Repository)
+        assert isinstance(r, github4.repos.repo.Repository)
 
     def test_repositories(self):
         """Test the ability to retrieve an authenticated user's repos."""
@@ -573,55 +567,47 @@ class TestGitHub(IntegrationHelper):
         self.basic_login()
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.repositories():
-                assert isinstance(r, github3.repos.ShortRepository)
+                assert isinstance(r, github4.repos.ShortRepository)
 
     def test_repositories_by(self):
         """Test the ability to retrieve a user's repositories."""
         cassette_name = self.cassette_name("repositories_by")
         with self.recorder.use_cassette(cassette_name):
             for r in self.gh.repositories_by("dstufft"):
-                assert isinstance(r, github3.repos.ShortRepository)
+                assert isinstance(r, github4.repos.ShortRepository)
 
     def test_search_code(self):
         """Test the ability to use the code search endpoint."""
         cassette_name = self.cassette_name("search_code")
         with self.recorder.use_cassette(cassette_name):
             result_iterator = self.gh.search_code(
-                "HTTPAdapter in:file language:python"
-                " repo:kennethreitz/requests"
+                "HTTPAdapter in:file language:python" " repo:kennethreitz/requests"
             )
             code_result = next(result_iterator)
 
-        assert isinstance(code_result, github3.search.CodeSearchResult)
+        assert isinstance(code_result, github4.search.CodeSearchResult)
 
     def test_search_code_with_text_match(self):
         """Test the ability to use the code search endpoint."""
         cassette_name = self.cassette_name("search_code_with_text_match")
-        with self.recorder.use_cassette(
-            cassette_name, match_requests_on=self.match_on
-        ):
+        with self.recorder.use_cassette(cassette_name, match_requests_on=self.match_on):
             result_iterator = self.gh.search_code(
-                (
-                    "HTTPAdapter in:file language:python"
-                    " repo:kennethreitz/requests"
-                ),
+                ("HTTPAdapter in:file language:python" " repo:kennethreitz/requests"),
                 text_match=True,
             )
             code_result = next(result_iterator)
 
-        assert isinstance(code_result, github3.search.CodeSearchResult)
+        assert isinstance(code_result, github4.search.CodeSearchResult)
         assert len(code_result.text_matches) > 0
 
     def test_search_commits(self):
         """Test the ability to search for commits."""
         cassette_name = self.cassette_name("search_commits")
         with self.recorder.use_cassette(cassette_name):
-            result_iterator = self.gh.search_commits(
-                "css repo:octocat/Spoon-Knife"
-            )
+            result_iterator = self.gh.search_commits("css repo:octocat/Spoon-Knife")
             commit_result = next(result_iterator)
 
-        assert isinstance(commit_result, github3.search.CommitSearchResult)
+        assert isinstance(commit_result, github4.search.CommitSearchResult)
 
     def test_search_commits_with_text_match(self):
         """Test the ability to search for commits  with text matches."""
@@ -632,7 +618,7 @@ class TestGitHub(IntegrationHelper):
             )
             commit_result = next(result_iterator)
 
-        assert isinstance(commit_result, github3.search.CommitSearchResult)
+        assert isinstance(commit_result, github4.search.CommitSearchResult)
         assert len(commit_result.text_matches) > 0
 
     def test_search_users(self):
@@ -640,23 +626,19 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("search_users")
         with self.recorder.use_cassette(cassette_name):
             users = self.gh.search_users("tom followers:>1000")
-            assert isinstance(next(users), github3.search.UserSearchResult)
+            assert isinstance(next(users), github4.search.UserSearchResult)
 
-        assert isinstance(users, github3.structs.SearchIterator)
+        assert isinstance(users, github4.structs.SearchIterator)
 
     def test_search_users_with_text_match(self):
         """Test the ability to use the user search endpoint."""
         cassette_name = self.cassette_name("search_users_with_text_match")
-        with self.recorder.use_cassette(
-            cassette_name, match_requests_on=self.match_on
-        ):
-            users = self.gh.search_users(
-                "tom followers:>1000", text_match=True
-            )
+        with self.recorder.use_cassette(cassette_name, match_requests_on=self.match_on):
+            users = self.gh.search_users("tom followers:>1000", text_match=True)
             user_result = next(users)
-            assert isinstance(user_result, github3.search.UserSearchResult)
+            assert isinstance(user_result, github4.search.UserSearchResult)
 
-        assert isinstance(users, github3.structs.SearchIterator)
+        assert isinstance(users, github4.structs.SearchIterator)
         assert len(user_result.text_matches) > 0
 
     def test_search_issues(self):
@@ -664,37 +646,31 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("search_issues")
         with self.recorder.use_cassette(cassette_name):
             issues = self.gh.search_issues("github3 label:Bug")
-            assert isinstance(next(issues), github3.search.IssueSearchResult)
+            assert isinstance(next(issues), github4.search.IssueSearchResult)
 
-        assert isinstance(issues, github3.structs.SearchIterator)
+        assert isinstance(issues, github4.structs.SearchIterator)
 
     def test_search_repositories(self):
         """Test the ability to use the repository search endpoint."""
         cassette_name = self.cassette_name("search_repositories")
         with self.recorder.use_cassette(cassette_name):
             repos = self.gh.search_repositories("github3 language:python")
-            assert isinstance(
-                next(repos), github3.search.RepositorySearchResult
-            )
+            assert isinstance(next(repos), github4.search.RepositorySearchResult)
 
-        assert isinstance(repos, github3.structs.SearchIterator)
+        assert isinstance(repos, github4.structs.SearchIterator)
 
     def test_search_repositories_with_text_match(self):
         """Test the ability to use the repository search endpoint."""
         self.token_login()
         cassette_name = self.cassette_name("search_repositories_text_match")
-        with self.recorder.use_cassette(
-            cassette_name, match_requests_on=self.match_on
-        ):
+        with self.recorder.use_cassette(cassette_name, match_requests_on=self.match_on):
             repos = self.gh.search_repositories(
                 "github3 language:python", text_match=True
             )
             repo_result = next(repos)
-            assert isinstance(
-                repo_result, github3.search.RepositorySearchResult
-            )
+            assert isinstance(repo_result, github4.search.RepositorySearchResult)
 
-        assert isinstance(repos, github3.structs.SearchIterator)
+        assert isinstance(repos, github4.structs.SearchIterator)
         assert len(repo_result.text_matches) > 0
 
     def test_star(self):
@@ -719,14 +695,11 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             sigmavirus24 = self.gh.user("sigmavirus24")
 
-        assert isinstance(sigmavirus24, github3.users.User)
+        assert isinstance(sigmavirus24, github4.users.User)
         try:
             assert repr(sigmavirus24)
         except UnicodeEncodeError:
-            self.fail(
-                "Regression caught. See PR #52. Names must be utf-8"
-                " encoded"
-            )
+            self.fail("Regression caught. See PR #52. Names must be utf-8" " encoded")
 
     def test_unfollow(self):
         """Test the ability to unfollow a user."""
@@ -752,7 +725,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             sigmavirus24 = self.gh.user_with_id(240830)
 
-        assert isinstance(sigmavirus24, github3.users.User)
+        assert isinstance(sigmavirus24, github4.users.User)
 
     def test_zen(self):
         """Test the ability to retrieve tidbits of Zen."""

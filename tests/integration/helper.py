@@ -6,10 +6,9 @@ import unittest
 import betamax
 import dateutil.tz
 import pytest
-
 from betamax.cassette import cassette
 
-import github3
+import github4
 
 
 @pytest.mark.usefixtures("betamax_simple_body")
@@ -22,18 +21,14 @@ class IntegrationHelper(unittest.TestCase):
         self.password = os.environ.get("GH_PASSWORD", "bar")
         self.token = os.environ.get("GH_AUTH", "x" * 20)
         self.app_id = int(os.environ.get("GH_APP_ID", "0"))
-        self.private_key_bytes = os.environ.get(
-            "GH_APP_PRIVATE_KEY", ""
-        ).encode("utf8")
-        self.app_installation_id = int(
-            os.environ.get("GH_APP_INSTALLATION_ID", "0")
-        )
+        self.private_key_bytes = os.environ.get("GH_APP_PRIVATE_KEY", "").encode("utf8")
+        self.app_installation_id = int(os.environ.get("GH_APP_INSTALLATION_ID", "0"))
         self.gh = self.get_client()
         self.session = self.gh.session
         self.recorder = betamax.Betamax(self.session)
 
     def get_client(self):
-        return github3.GitHub()
+        return github4.GitHub()
 
     def token_login(self):
         self.gh.login(token=self.token)
@@ -122,4 +117,4 @@ betamax.Betamax.register_request_matcher(CustomHeadersMatcher)
 @pytest.mark.usefixtures("enterprise_url")
 class GitHubEnterpriseHelper(IntegrationHelper):
     def get_client(self):
-        return github3.GitHubEnterprise(self.enterprise_url)
+        return github4.GitHubEnterprise(self.enterprise_url)

@@ -1,14 +1,17 @@
 import io
 import json
+from copy import copy
+from datetime import datetime
+from datetime import timedelta
+from unittest import TestCase
+
 import pytest
 import requests
 
-from copy import copy
-from datetime import datetime, timedelta
-from github3 import exceptions, GitHubError
-from github3.models import GitHubCore
-from unittest import TestCase
 from . import helper
+from github4 import exceptions
+from github4 import GitHubError
+from github4.models import GitHubCore
 
 
 class MyTestRefreshClass(GitHubCore):
@@ -77,9 +80,7 @@ class TestGitHubCore(helper.UnitHelper):
         response.status_code = 512
         response.raw = io.BytesIO()
         with pytest.raises(exceptions.GitHubError):
-            self.instance._boolean(
-                response=response, true_code=200, false_code=204
-            )
+            self.instance._boolean(response=response, true_code=200, false_code=204)
 
     def test_boolean_false_code(self):
         """Verify boolean tests for response codes correctly."""
@@ -93,9 +94,7 @@ class TestGitHubCore(helper.UnitHelper):
 
     def test_boolean_empty_response(self):
         """Verify boolean tests for response codes correctly."""
-        boolean = self.instance._boolean(
-            response=None, true_code=200, false_code=204
-        )
+        boolean = self.instance._boolean(response=None, true_code=200, false_code=204)
 
         assert boolean is False
 
@@ -143,24 +142,18 @@ class TestGitHubCore(helper.UnitHelper):
         instance = self.instance.refresh()
         assert isinstance(instance, MyTestRefreshClass)
         expected_headers = None
-        self.session.get.assert_called_once_with(
-            self.url, headers=expected_headers
-        )
+        self.session.get.assert_called_once_with(self.url, headers=expected_headers)
 
     def test_refresh_custom_headers(self):
         """Verify the request of refreshing an object."""
         self.instance.CUSTOM_HEADERS = {
             "Accept": "application/vnd.github.drax-preview+json"
         }
-        expected_headers = {
-            "Accept": "application/vnd.github.drax-preview+json"
-        }
+        expected_headers = {"Accept": "application/vnd.github.drax-preview+json"}
 
         self.instance.refresh()
 
-        self.session.get.assert_called_once_with(
-            self.url, headers=expected_headers
-        )
+        self.session.get.assert_called_once_with(self.url, headers=expected_headers)
 
     def test_refresh_last_modified(self):
         """Verify the request of refreshing an object."""
@@ -168,9 +161,7 @@ class TestGitHubCore(helper.UnitHelper):
 
         self.instance.refresh(conditional=True)
 
-        self.session.get.assert_called_once_with(
-            self.url, headers=expected_headers
-        )
+        self.session.get.assert_called_once_with(self.url, headers=expected_headers)
 
     def test_refresh_etag(self):
         """Verify the request of refreshing an object."""
@@ -179,9 +170,7 @@ class TestGitHubCore(helper.UnitHelper):
 
         self.instance.refresh(conditional=True)
 
-        self.session.get.assert_called_once_with(
-            self.url, headers=expected_headers
-        )
+        self.session.get.assert_called_once_with(self.url, headers=expected_headers)
 
     def test_refresh_json(self):
         """Verify refreshing an object updates stored json data."""

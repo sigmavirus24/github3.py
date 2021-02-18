@@ -1,6 +1,6 @@
-import github3
-
-from .helper import UnitHelper, create_example_data_helper
+import github4
+from .helper import create_example_data_helper
+from .helper import UnitHelper
 
 get_combined_status_example_data = create_example_data_helper(
     "repos_combined_status_example"
@@ -11,7 +11,7 @@ class TestCombinedStatus(UnitHelper):
 
     """Commit unit test."""
 
-    described_class = github3.repos.status.CombinedStatus
+    described_class = github4.repos.status.CombinedStatus
     example_data = get_combined_status_example_data()
 
     def test_repr(self):

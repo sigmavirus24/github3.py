@@ -1,16 +1,11 @@
 """Unit tests for methods implemented on Branch Protection."""
-
-import github3
-from github3.repos.branch import BranchProtection
-
+import github4
 from . import helper
+from github4.repos.branch import BranchProtection
 
-protection_example_data = helper.create_example_data_helper(
-    "branch_protection_example"
-)
+protection_example_data = helper.create_example_data_helper("branch_protection_example")
 protection_url_for = helper.create_url_helper(
-    "https://api.github.com/repos/octocat/Hello-World/"
-    "branches/master/protection"
+    "https://api.github.com/repos/octocat/Hello-World/" "branches/master/protection"
 )
 
 
@@ -26,7 +21,7 @@ enforce_admins_example_data = helper.create_example_data_helper(
 class TestProtectionEnforceAdmins(helper.UnitHelper):
     """Unit tests around the ProtectionRequiredPullRequestReviews class."""
 
-    described_class = github3.repos.branch.ProtectionEnforceAdmins
+    described_class = github4.repos.branch.ProtectionEnforceAdmins
     example_data = enforce_admins_example_data()
 
     def test_enable(self):
@@ -58,20 +53,16 @@ protection_required_pull_request_reviews_data = (
 class TestProtectionRequiredPullRequestReviews(helper.UnitHelper):
     """Unit tests around the ProtectionRequiredPullRequestReviews class."""
 
-    described_class = (
-        github3.repos.branch.ProtectionRequiredPullRequestReviews
-    )
+    described_class = github4.repos.branch.ProtectionRequiredPullRequestReviews
     example_data = protection_required_pull_request_reviews_data()
 
     def test_update(self):
         """Verify the request to update required PR review protections."""
         teams = [
-            team.slug
-            for team in self.instance.dismissal_restrictions.original_teams
+            team.slug for team in self.instance.dismissal_restrictions.original_teams
         ]
         users = [
-            user.login
-            for user in self.instance.dismissal_restrictions.original_users
+            user.login for user in self.instance.dismissal_restrictions.original_users
         ]
         update_json = {
             "dismiss_stale_reviews": self.instance.dismiss_stale_reviews,
@@ -88,9 +79,7 @@ class TestProtectionRequiredPullRequestReviews(helper.UnitHelper):
 
     def test_delete(self):
         self.instance.delete()
-        self.delete_called_with(
-            protection_required_pull_request_reviews_url_for()
-        )
+        self.delete_called_with(protection_required_pull_request_reviews_url_for())
 
 
 protection_restrictions_url_for = helper.create_url_helper(
@@ -113,7 +102,7 @@ protection_restrictions_example_data = helper.create_example_data_helper(
 class TestProtectionRestrictions(helper.UnitHelper):
     """Unit tests around the ProtectionRestrictions class."""
 
-    described_class = github3.repos.branch.ProtectionRestrictions
+    described_class = github4.repos.branch.ProtectionRestrictions
     example_data = protection_restrictions_example_data()
 
     def test_add_teams(self):
@@ -190,7 +179,7 @@ protection_required_status_checks_example_data = (
 class TestProtectionRequiredStatusChecks(helper.UnitHelper):
     """Unit tests around the ProtectionRequiredStatusChecks class."""
 
-    described_class = github3.repos.branch.ProtectionRequiredStatusChecks
+    described_class = github4.repos.branch.ProtectionRequiredStatusChecks
     example_data = protection_required_status_checks_example_data()
 
     def test_add_contexts(self):

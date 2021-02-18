@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for the github3.projects module."""
+"""Unit tests for the github4.projects module."""
 import pytest
 
 from . import helper
+from github4 import exceptions
+from github4 import GitHubError
+from github4 import issues
+from github4 import projects
 
-from github3 import GitHubError
-from github3 import exceptions
-from github3 import issues
-from github3 import projects
 
-
-get_project_example_data = helper.create_example_data_helper(
-    "project_example"
-)
+get_project_example_data = helper.create_example_data_helper("project_example")
 get_project_card_example_data = helper.create_example_data_helper(
     "project_card_example"
 )
@@ -23,12 +20,8 @@ get_issue_example_data = helper.create_example_data_helper("issue_example")
 
 
 url_for = helper.create_url_helper("https://api.github.com/projects/1002604")
-card_url_for = helper.create_url_helper(
-    "https://api.github.com/projects/columns/cards"
-)
-columns_url_for = helper.create_url_helper(
-    "https://api.github.com/projects/columns"
-)
+card_url_for = helper.create_url_helper("https://api.github.com/projects/columns/cards")
+columns_url_for = helper.create_url_helper("https://api.github.com/projects/columns")
 
 
 class TestProject(helper.UnitHelper):
@@ -274,8 +267,7 @@ class TestProjectCard(helper.UnitHelper):
         self.instance.retrieve_issue_from_content()
 
         self.session.get.assert_called_once_with(
-            "https://api.github.com/repos/api-playground/projects-test/"
-            "issues/3"
+            "https://api.github.com/repos/api-playground/projects-test/" "issues/3"
         )
 
     def test_retrieve_pull_request_from_content_fails_without_content_url(
@@ -290,14 +282,11 @@ class TestProjectCard(helper.UnitHelper):
 
     def test_retrieve_pull_request_from_content(self):
         """Verify we retrieve the card's issue content."""
-        self.instance.content_url = self.instance.content_url.replace(
-            "issues", "pulls"
-        )
+        self.instance.content_url = self.instance.content_url.replace("issues", "pulls")
         self.instance.retrieve_pull_request_from_content()
 
         self.session.get.assert_called_once_with(
-            "https://api.github.com/repos/api-playground/projects-test/"
-            "pulls/3"
+            "https://api.github.com/repos/api-playground/projects-test/" "pulls/3"
         )
 
 

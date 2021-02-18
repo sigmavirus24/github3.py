@@ -25,8 +25,7 @@ class TestGitHubCore(IntegrationHelper):
         # Re-run cassette to test functions under test.
         with self.recorder.use_cassette(cassette_name):
             result_iterator = self.gh.search_code(
-                "HTTPAdapter in:file language:python"
-                " repo:kennethreitz/requests"
+                "HTTPAdapter in:file language:python" " repo:kennethreitz/requests"
             )
             ratelimit_remaining_search = result_iterator.ratelimit_remaining
             ratelimit_remaining_core = self.gh.ratelimit_remaining

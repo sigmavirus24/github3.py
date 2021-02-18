@@ -1,5 +1,5 @@
 """Integration test for Notifications."""
-import github3
+import github4
 from .helper import IntegrationHelper
 
 
@@ -15,10 +15,10 @@ class TestThread(IntegrationHelper):
             threads = list(repository.notifications(all=True))
             assert len(threads) > 0
             thread = threads[0]
-            assert isinstance(thread, github3.notifications.Thread)
+            assert isinstance(thread, github4.notifications.Thread)
             assert isinstance(
                 thread.subscription(),
-                github3.notifications.ThreadSubscription,
+                github4.notifications.ThreadSubscription,
             )
 
 
@@ -35,6 +35,4 @@ class TestThreadSubscription(IntegrationHelper):
             assert len(threads) > 0
             subscription = threads[0].subscription()
             assert subscription.set(True, False) is None
-            assert isinstance(
-                subscription, github3.notifications.ThreadSubscription
-            )
+            assert isinstance(subscription, github4.notifications.ThreadSubscription)

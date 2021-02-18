@@ -1,11 +1,12 @@
 """Base classes and helpers for unit tests."""
-import github3
 import json
 import os.path
 import sys
-import pytest
-import unittest
 import unittest.mock
+
+import pytest
+
+import github4
 
 
 def create_url_helper(base_url):
@@ -38,7 +39,7 @@ def build_url(self, *args, **kwargs):
     """A function to proxy to the actual GitHubSession#build_url method."""
     # We want to assert what is happening with the actual calls to the
     # Internet. We can proxy this.
-    return github3.session.GitHubSession().build_url(*args, **kwargs)
+    return github4.session.GitHubSession().build_url(*args, **kwargs)
 
 
 def enterprise_build_url_builder(enterprise_url):
@@ -48,7 +49,7 @@ def enterprise_build_url_builder(enterprise_url):
         """A function to proxy to the actual GitHubSession#build_url method."""
         # We want to assert what is happening with the actual calls to the
         # Internet. We can proxy this.
-        return github3.session.GitHubSession().build_url(
+        return github4.session.GitHubSession().build_url(
             *args, base_url=enterprise_url, **kwargs
         )
 
@@ -70,18 +71,14 @@ class UnitHelper(unittest.TestCase):
 
     def create_mocked_session(self):
         """Use mock to auto-spec a GitHubSession and return an instance."""
-        MockedSession = unittest.mock.create_autospec(
-            github3.session.GitHubSession
-        )
+        MockedSession = unittest.mock.create_autospec(github4.session.GitHubSession)
         return MockedSession()
 
     def create_session_mock(self, *args):
         """Create a mocked session and add headers and auth attributes."""
         session = self.create_mocked_session()
         base_attrs = ["headers", "auth"]
-        attrs = dict(
-            (key, unittest.mock.Mock()) for key in set(args).union(base_attrs)
-        )
+        attrs = dict((key, unittest.mock.Mock()) for key in set(args).union(base_attrs))
         session.configure_mock(**attrs)
         session.delete.return_value = None
         session.get.return_value = None
@@ -226,7 +223,7 @@ class UnitIteratorHelper(UnitHelper):
     def patch_get_json(self):
         """Patch a GitHubIterator's _get_json method."""
         self.get_json_mock = unittest.mock.patch.object(
-            github3.structs.GitHubIterator, "_get_json"
+            github4.structs.GitHubIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
         self.patched_get_json.return_value = []
@@ -248,7 +245,7 @@ class UnitIteratorAppInstHelper(UnitIteratorHelper):
     def after_setup(self):
         """Set session app installation"""
         MockedAuth = unittest.mock.create_autospec(
-            github3.session.AppInstallationTokenAuth
+            github4.session.AppInstallationTokenAuth
         )
         self.session.auth = MockedAuth
 
@@ -260,7 +257,7 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
     def patch_get_json(self):
         """Patch a SearchIterator's _get_json method."""
         self.get_json_mock = unittest.mock.patch.object(
-            github3.structs.SearchIterator, "_get_json"
+            github4.structs.SearchIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
         self.patched_get_json.return_value = []
@@ -277,7 +274,7 @@ class UnitAppInstallHelper(UnitHelper):
     def after_setup(self):
         """Set session app installation"""
         MockedAuth = unittest.mock.create_autospec(
-            github3.session.AppInstallationTokenAuth
+            github4.session.AppInstallationTokenAuth
         )
         self.session.auth = MockedAuth
 
@@ -296,7 +293,7 @@ class UnitRequiresAuthenticationHelper(UnitHelper):
         Assert error is raised if function is called without
         authentication.
         """
-        with pytest.raises(github3.exceptions.AuthenticationFailed):
+        with pytest.raises(github4.exceptions.AuthenticationFailed):
             func(*args, **kwargs)
 
 
@@ -328,9 +325,7 @@ class NullObject(object):
         return "" if is_py3 else "".decode()
 
     def __repr__(self):
-        return "<NullObject({0})>".format(
-            repr(self.__getattribute__("initializer"))
-        )
+        return "<NullObject({0})>".format(repr(self.__getattribute__("initializer")))
 
     def __getitem__(self, index):
         return self

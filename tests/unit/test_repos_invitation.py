@@ -1,6 +1,5 @@
 """Unit tests for Repository Invitation objects."""
-import github3
-
+import github4
 from . import helper
 
 get_invitation_example_data = helper.create_example_data_helper(
@@ -17,7 +16,7 @@ url_for_inviter = helper.create_url_helper(
 class TestInvitation(helper.UnitHelper):
     """Unit tests for the Invitation object."""
 
-    described_class = github3.repos.invitation.Invitation
+    described_class = github4.repos.invitation.Invitation
     example_data = example_invitation_data
 
     def test_accept(self):
@@ -50,7 +49,7 @@ class TestInvitation(helper.UnitHelper):
 class TestInvitationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Unit tests that demonstrate which Invitation methods require auth."""
 
-    described_class = github3.repos.invitation.Invitation
+    described_class = github4.repos.invitation.Invitation
     example_data = example_invitation_data
 
     def test_accept(self):

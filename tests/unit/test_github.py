@@ -2,11 +2,11 @@ import unittest.mock
 
 import pytest
 
-from github3 import GitHubEnterprise, GitHubError
-from github3.github import GitHub
-from github3.projects import Project
-
 from . import helper
+from github4 import GitHubEnterprise
+from github4 import GitHubError
+from github4.github import GitHub
+from github4.projects import Project
 
 
 def url_for(path=""):
@@ -14,9 +14,7 @@ def url_for(path=""):
     return "https://api.github.com/" + path.strip("/")
 
 
-enterprise_url_for = helper.create_url_helper(
-    "https://enterprise.github3.com"
-)
+enterprise_url_for = helper.create_url_helper("https://enterprise.github3.com")
 
 
 class TestGitHub(helper.UnitHelper):
@@ -196,9 +194,7 @@ class TestGitHub(helper.UnitHelper):
         """Test the request to follow a user."""
         self.instance.follow("username")
 
-        self.session.put.assert_called_once_with(
-            url_for("user/following/username")
-        )
+        self.session.put.assert_called_once_with(url_for("user/following/username"))
 
     def test_follow_requires_a_username(self):
         """Test that GitHub#follow requires a username."""
@@ -216,17 +212,13 @@ class TestGitHub(helper.UnitHelper):
         """Test the request to retrieve a gitignore template."""
         self.instance.gitignore_template("Python")
 
-        self.session.get.assert_called_once_with(
-            url_for("gitignore/templates/Python")
-        )
+        self.session.get.assert_called_once_with(url_for("gitignore/templates/Python"))
 
     def test_gitignore_templates(self):
         """Test the request to retrieve gitignore templates."""
         self.instance.gitignore_templates()
 
-        self.session.get.assert_called_once_with(
-            url_for("gitignore/templates")
-        )
+        self.session.get.assert_called_once_with(url_for("gitignore/templates"))
 
     def test_gpg_key(self):
         """Verify the request to retrieve a GPG key."""
@@ -238,9 +230,7 @@ class TestGitHub(helper.UnitHelper):
         """Test the request to check if the user is following a user."""
         self.instance.is_following("username")
 
-        self.session.get.assert_called_once_with(
-            url_for("user/following/username")
-        )
+        self.session.get.assert_called_once_with(url_for("user/following/username"))
 
     def test_is_starred(self):
         """Test the request to check if the user starred a repository."""
@@ -266,9 +256,7 @@ class TestGitHub(helper.UnitHelper):
         """Test the request to retrieve a single issue."""
         self.instance.issue("owner", "repo", 1)
 
-        self.session.get.assert_called_once_with(
-            url_for("repos/owner/repo/issues/1")
-        )
+        self.session.get.assert_called_once_with(url_for("repos/owner/repo/issues/1"))
 
     def test_issue_requires_username(self):
         """Test GitHub#issue requires a non-None username."""
@@ -321,9 +309,7 @@ class TestGitHub(helper.UnitHelper):
         callback = _callback
         self.instance.login(token=token, two_factor_callback=callback)
         self.session.token_auth.assert_called_once_with(token)
-        self.session.two_factor_auth_callback.assert_called_once_with(
-            callback
-        )
+        self.session.two_factor_auth_callback.assert_called_once_with(callback)
 
     def test_markdown(self):
         """Verify the request for rendering a markdown document."""
@@ -373,9 +359,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = unittest.mock.Mock(
-            ok=True, text="egg"
-        )
+        self.session.get.return_value = unittest.mock.Mock(ok=True, text="egg")
         egg = self.instance.octocat(say="hello")
         self.session.get.assert_called_once_with(
             url_for("octocat"), params={"s": "hello"}
@@ -385,9 +369,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat_response_not_ok(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = unittest.mock.Mock(
-            ok=False, text="egg"
-        )
+        self.session.get.return_value = unittest.mock.Mock(ok=False, text="egg")
 
         egg = self.instance.octocat(say="hello")
 
@@ -542,9 +524,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_pull_request(self):
         """Verify the request for retrieving a pull request."""
-        self.instance.pull_request(
-            owner="octocat", repository="hello-world", number=1
-        )
+        self.instance.pull_request(owner="octocat", repository="hello-world", number=1)
 
         self.session.get.assert_called_once_with(
             url_for("repos/octocat/hello-world/pulls/1")
@@ -552,9 +532,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_pull_request_negative_id(self):
         """Verify the request for retrieving a pull request."""
-        self.instance.pull_request(
-            owner="octocat", repository="hello-world", number=-1
-        )
+        self.instance.pull_request(owner="octocat", repository="hello-world", number=-1)
 
         self.session.get.called is False
 
@@ -705,9 +683,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_set_user_agent(self):
         self.instance.set_user_agent("github3py")
-        self.session.headers.update.assert_called_once_with(
-            {"User-Agent": "github3py"}
-        )
+        self.session.headers.update.assert_called_once_with({"User-Agent": "github3py"})
 
     def test_star_required_username_and_repo(self):
         assert self.instance.star(username="", repo="") is False
@@ -1124,9 +1100,7 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
 
     def test_respositories_accepts_params(self):
         """Show that an #repositories accepts params."""
-        i = self.instance.repositories(
-            type="all", direction="desc", sort="created"
-        )
+        i = self.instance.repositories(type="all", direction="desc", sort="created")
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
@@ -1283,9 +1257,7 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 
     def test_search_code(self):
         """Verify the request to search for code."""
-        i = self.instance.search_code(
-            "addClass in:file language:js repo:jquery/jquery"
-        )
+        i = self.instance.search_code("addClass in:file language:js repo:jquery/jquery")
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
@@ -1358,9 +1330,7 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
         )
 
 
-class TestGitHubRequiresAuthentication(
-    helper.UnitRequiresAuthenticationHelper
-):
+class TestGitHubRequiresAuthentication(helper.UnitRequiresAuthenticationHelper):
 
     """Test methods that require authentication."""
 
@@ -1389,9 +1359,7 @@ class TestGitHubRequiresAuthentication(
 
     def test_create_issue(self):
         """Show that GitHub#create_issue requires auth."""
-        self.assert_requires_auth(
-            self.instance.create_issue, "owner", "repo", "title"
-        )
+        self.assert_requires_auth(self.instance.create_issue, "owner", "repo", "title")
 
     def test_create_key(self):
         """Show that GitHub#create_key requires auth."""
@@ -1497,9 +1465,7 @@ class TestGitHubAuthorizations(helper.UnitHelper):
     example_data = None
 
     def create_session_mock(self, *args):
-        session = super(TestGitHubAuthorizations, self).create_session_mock(
-            *args
-        )
+        session = super(TestGitHubAuthorizations, self).create_session_mock(*args)
         session.retrieve_client_credentials.return_value = ("id", "secret")
         return session
 
@@ -1513,9 +1479,7 @@ class TestGitHubAuthorizations(helper.UnitHelper):
             "https://api.github.com/applications/id/tokens/access_token",
             params={"client_id": None, "client_secret": None},
         )
-        self.session.temporary_basic_auth.assert_called_once_with(
-            "id", "secret"
-        )
+        self.session.temporary_basic_auth.assert_called_once_with("id", "secret")
 
     def test_revoke_authorizations(self):
         """Test that GitHub#revoke_authorizations calls the expected methods.
@@ -1527,9 +1491,7 @@ class TestGitHubAuthorizations(helper.UnitHelper):
             "https://api.github.com/applications/id/tokens",
             params={"client_id": None, "client_secret": None},
         )
-        self.session.temporary_basic_auth.assert_called_once_with(
-            "id", "secret"
-        )
+        self.session.temporary_basic_auth.assert_called_once_with("id", "secret")
 
 
 class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):

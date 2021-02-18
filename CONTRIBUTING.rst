@@ -1,69 +1,123 @@
-Guidelines for Contributing to github3.py
-=========================================
+Contributor Guide
+=================
 
-#. Read the README_
+Thank you for your interest in improving this project.
+This project is open-source under the `MIT license`_ and
+welcomes contributions in the form of bug reports, feature requests, and pull requests.
 
-#. Please do **not** use the issue tracker for questions.
+Here is a list of important resources for contributors:
 
-#. Please use GitHub's search feature to look for already reported issues 
-   before reporting your own.
+- `Source Code`_
+- `Documentation`_
+- `Issue Tracker`_
+- `Code of Conduct`_
 
-#. Regardless of the magnitude your pull request (a couple lines to a couple 
-   hundred lines), please add your name to the AUTHORS.rst_ file under the 
-   heading Contributors.
+.. _MIT license: https://opensource.org/licenses/MIT
+.. _Source Code: https://github.com/staticdev/human-readable
+.. _Documentation: https://human-readable.readthedocs.io/
+.. _Issue Tracker: https://github.com/staticdev/human-readable/issues
 
-#. There is a label for issues that should be minor and should be a good way
-   to become acquainted with the project. The easy_ label is the over-arching 
-   way to determine which issues you can dig into without a great deal of 
-   prior knowledge. Most of these issues have a `Pair with Ian`_ label which 
-   means that if you would like, I (@sigmavirus24) will happily pair program 
-   with you to solve the issue.
+How to report a bug
+-------------------
 
-#. If you're fixing a bug, please write a regression test. All the tests are 
-   structured like so::
+Report bugs on the `Issue Tracker`_.
 
-    tests/
-    - test_<module_name>.py
-        + Test<ClassName>
-          - def test_function_or_attribute
+When filing an issue, make sure to answer these questions:
 
-   Please do not add your regression test to an existing test, but create a 
-   new one. You can use the form ``test_issue_<number>``. In a docstring add 
-   the link and a short description of the regression issue. For example, if 
-   you found a bug in the class ``Issue``, write your test in the file 
-   ``test_issues.py`` in the class ``TestIssue``. You can place the new test 
-   in any order, e.g., below all the existing tests, near a related one, &c.
+- Which operating system and Python version are you using?
+- Which version of this project are you using?
+- What did you do?
+- What did you expect to see?
+- What did you see instead?
 
-#. If you're adding a new section of the API that does not already exist, 
-   please also add tests to the test suite.
+The best way to get your bug fixed is to provide a test case,
+and/or steps to reproduce the issue.
 
-#. If you're adding additional functionality beyond what the API covers, 
-   please open an issue request first and of course add tests to cover the 
-   functionality in the event it is accepted.
 
-   Also, please be certain to add docstrings_ to these functions. Follow the 
-   example of other docstrings.
+How to request a feature
+------------------------
 
-#. In case you haven't caught on, for anything you add, write tests.
+Request features on the `Issue Tracker`_.
 
-#. Be cordial_. Seriously, anyone who isn't cordial will be sent packing, 
-   regardless of the value of their contributions. I will not tolerate some 
-   contributors creating a hostile environment for others.
 
-#. Rebase your fork/branch if needed and possible before submitting a pull 
-   request. This makes my life easier. If you honestly have no idea what I'm 
-   talking about, don't worry, I'll take care of it.
+How to set up your development environment
+------------------------------------------
 
-#. Please follow pep-0008_. Feel free to also use flake8_ to help.
+You need Python 3.7+ and the following tools:
 
-#. Import modules, not class or functions
+- Poetry_
+- Nox_
+- nox-poetry_
 
-.. links
-.. _README: ./README.rst
-.. _easy: https://github.com/sigmavirus24/github3.py/issues?labels=Easy&page=1&state=open
-.. _Pair with Ian: https://github.com/sigmavirus24/github3.py/issues?labels=Pair+with+Ian&page=1&state=open
-.. _AUTHORS.rst: ./AUTHORS.rst
-.. _cordial: http://www.kennethreitz.org/essays/be-cordial-or-be-on-your-way
-.. _pep-0008: http://www.python.org/dev/peps/pep-0008/
-.. _docstrings: http://www.python.org/dev/peps/pep-0257/
-.. _flake8: http://pypi.python.org/pypi/flake8
+Install the package with development requirements:
+
+.. code:: console
+
+   $ poetry install
+
+You can now run an interactive Python session,
+or the command-line interface:
+
+.. code:: console
+
+   $ poetry run python
+   $ poetry run human-readable
+
+.. _Poetry: https://python-poetry.org/
+.. _Nox: https://nox.thea.codes/
+.. _nox-poetry: https://nox-poetry.readthedocs.io/
+
+
+How to test the project
+-----------------------
+
+Run the full test suite:
+
+.. code:: console
+
+   $ nox
+
+List the available Nox sessions:
+
+.. code:: console
+
+   $ nox --list-sessions
+
+You can also run a specific Nox session.
+For example, invoke the unit test suite like this:
+
+.. code:: console
+
+   $ nox --session=tests
+
+Unit tests are located in the ``tests`` directory,
+and are written using the pytest_ testing framework.
+
+.. _pytest: https://pytest.readthedocs.io/
+
+
+How to submit changes
+---------------------
+
+Open a `pull request`_ to submit changes to this project.
+
+Your pull request needs to meet the following guidelines for acceptance:
+
+- The Nox test suite must pass without errors and warnings.
+- Include unit tests. This project maintains 100% code coverage.
+- If your changes add functionality, update the documentation accordingly.
+
+Feel free to submit early, though—we can always iterate on this.
+
+To run linting and code formatting checks before commiting your change, you can install pre-commit as a Git hook by running the following command:
+
+.. code:: console
+
+   $ nox --session=pre-commit -- install
+
+It is recommended to open an issue before starting work on anything.
+This will allow a chance to talk it over with the owners and validate your approach.
+
+.. _pull request: https://github.com/staticdev/human-readable/pulls
+.. github-only
+.. _Code of Conduct: CODE_OF_CONDUCT.rst

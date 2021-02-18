@@ -1,6 +1,7 @@
-import github3
-from github3.github import GitHubEnterprise
-from .helper import UnitHelper, create_example_data_helper
+import github4
+from .helper import create_example_data_helper
+from .helper import UnitHelper
+from github4.github import GitHubEnterprise
 
 get_example_user = create_example_data_helper("user_example")
 
@@ -10,7 +11,7 @@ base_url = "https://ghe.example.com/"
 
 
 def _build_url(_, *args, **kwargs):
-    return github3.session.GitHubSession().build_url(
+    return github4.session.GitHubSession().build_url(
         base_url=base_url + "api/v3", *args, **kwargs
     )
 
@@ -43,7 +44,7 @@ class TestGitHubEnterprise(UnitHelper):
 
 
 class TestUserAdministration(UnitHelper):
-    described_class = github3.users.User
+    described_class = github4.users.User
     example_data = example_data
     # Remove the end of the string starting with 'users'
     base_url = example_data["url"][: example_data["url"].rfind("users")]
@@ -52,9 +53,7 @@ class TestUserAdministration(UnitHelper):
         return self.base_url + "users/" + example_data["login"] + path
 
     def url_for_admin(self, path=""):
-        return (
-            self.base_url + "admin/users/" + str(example_data["login"]) + path
-        )
+        return self.base_url + "admin/users/" + str(example_data["login"]) + path
 
     def test_delete_user(self):
         """Show that an admin can ask for user deletion."""
@@ -86,27 +85,19 @@ class TestUserAdministration(UnitHelper):
     def test_promote(self):
         """Show that an admin can promote a specific user."""
         self.instance.promote()
-        self.session.put.assert_called_once_with(
-            self.url_for_user("/site_admin")
-        )
+        self.session.put.assert_called_once_with(self.url_for_user("/site_admin"))
 
     def test_demote(self):
         """Show that an admin can demote another admin."""
         self.instance.demote()
-        self.session.delete.assert_called_once_with(
-            self.url_for_user("/site_admin")
-        )
+        self.session.delete.assert_called_once_with(self.url_for_user("/site_admin"))
 
     def test_suspend(self):
         """Show that an admin can suspend a user."""
         self.instance.suspend()
-        self.session.put.assert_called_once_with(
-            self.url_for_user("/suspended")
-        )
+        self.session.put.assert_called_once_with(self.url_for_user("/suspended"))
 
     def test_unsuspend(self):
         """Show that an admin can unsuspend a user."""
         self.instance.unsuspend()
-        self.session.delete.assert_called_once_with(
-            self.url_for_user("/suspended")
-        )
+        self.session.delete.assert_called_once_with(self.url_for_user("/suspended"))

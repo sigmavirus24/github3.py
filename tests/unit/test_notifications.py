@@ -1,7 +1,8 @@
 """Unit tests around the Thread class."""
-import github3
-
-from .helper import UnitHelper, create_example_data_helper, create_url_helper
+import github4
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("notification_example")
 url_for = create_url_helper("https://api.github.com/notifications/threads/1")
@@ -10,14 +11,12 @@ url_for = create_url_helper("https://api.github.com/notifications/threads/1")
 class TestThread(UnitHelper):
     """Notification unit tests."""
 
-    described_class = github3.notifications.Thread
+    described_class = github4.notifications.Thread
     example_data = get_example_data()
 
     def test_equality(self):
         """Test equality/inequality between two instances."""
-        thread = github3.notifications.Thread(
-            get_example_data(), self.session
-        )
+        thread = github4.notifications.Thread(get_example_data(), self.session)
         assert self.instance == thread
         thread._uniq = 1
         assert self.instance != thread

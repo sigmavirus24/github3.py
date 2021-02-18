@@ -1,6 +1,5 @@
 """Deployment integration tests."""
-import github3
-
+import github4
 from .helper import IntegrationHelper
 
 
@@ -24,7 +23,7 @@ class TestDeployment(IntegrationHelper):
             assert deployment is not None
             status = deployment.create_status("success")
 
-        assert isinstance(status, github3.repos.deployment.DeploymentStatus)
+        assert isinstance(status, github4.repos.deployment.DeploymentStatus)
 
     def test_statuses(self):
         """Show that a user can retrieve deployment statuses."""
@@ -37,6 +36,4 @@ class TestDeployment(IntegrationHelper):
             statuses = list(deployment.statuses(5))
 
         for status in statuses:
-            assert isinstance(
-                status, github3.repos.deployment.DeploymentStatus
-            )
+            assert isinstance(status, github4.repos.deployment.DeploymentStatus)
