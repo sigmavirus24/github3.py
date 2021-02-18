@@ -1,10 +1,9 @@
 import os
 import tempfile
 
-# import pytest
-
 import github4
 from .helper import IntegrationHelper
+# import pytest
 
 
 class TestRelease(IntegrationHelper):
