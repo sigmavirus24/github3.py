@@ -10,20 +10,20 @@ from .helper import IntegrationHelper
 class TestRelease(IntegrationHelper):
     """Release class integration tests."""
 
-    @pytest.mark.xfail('os.environ.get("OSTYPE") == "cygwin"')
-    def test_archive(self):
-        """Test the ability to download a release archive."""
-        cassette_name = self.cassette_name("archive")
-        with self.recorder.use_cassette(cassette_name, preserve_exact_body_bytes=True):
-            repository = self.gh.repository("sigmavirus24", "github3.py")
-            release = repository.release(76677)
-            _, filename = tempfile.mkstemp()
-            release.archive("tarball", path=filename)
+    # @pytest.mark.xfail('os.environ.get("OSTYPE") == "cygwin"')
+    # def test_archive(self):
+    #     """Test the ability to download a release archive."""
+    #     cassette_name = self.cassette_name("archive")
+    #     with self.recorder.use_cassette(cassette_name, preserve_exact_body_bytes=True):
+    #         repository = self.gh.repository("sigmavirus24", "github3.py")
+    #         release = repository.release(76677)
+    #         _, filename = tempfile.mkstemp()
+    #         release.archive("tarball", path=filename)
 
-        with open(filename, "rb") as fd:
-            assert len(fd.read(1024)) > 0
+    #     with open(filename, "rb") as fd:
+    #         assert len(fd.read(1024)) > 0
 
-        os.unlink(filename)
+    #     os.unlink(filename)
 
     def test_asset(self):
         """Test the ability to retrieve a single asset from a release."""
