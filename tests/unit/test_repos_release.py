@@ -1,7 +1,7 @@
 import json
 import unittest.mock
 
-# import pytest
+import pytest
 
 import github4
 from .helper import create_example_data_helper

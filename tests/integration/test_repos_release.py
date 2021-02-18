@@ -1,7 +1,7 @@
 import os
 import tempfile
 
-import pytest
+# import pytest
 
 import github4
 from .helper import IntegrationHelper
