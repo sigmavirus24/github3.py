@@ -7,8 +7,9 @@ from logging import getLogger
 import dateutil.parser
 import requests
 
-from . import exceptions as exc
 from . import __version__
+from . import exceptions as exc
+
 
 __url_cache__ = {}
 __logs__ = getLogger(__package__)
