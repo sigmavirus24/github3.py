@@ -990,7 +990,7 @@ class _Organization(models.GitHubCore):
         url = self._build_url("memberships", username, base_url=self._api)
         return self._boolean(self._delete(url), 204, 404)
 
-    def repositories(self, type="", number=-1, etag=None):
+    def repositories(self, type="", number=-1, etag=None, page=None):
         """Iterate over repos for this organization.
 
         :param str type:
@@ -1001,6 +1001,8 @@ class _Organization(models.GitHubCore):
             all available.
         :param str etag:
             (optional), ETag from a previous request to the same endpoint
+        :param int page:
+            (optional), number of page to return
         :returns:
             generator of repositories in this organization
         :rtype:
@@ -1008,6 +1010,8 @@ class _Organization(models.GitHubCore):
         """
         url = self._build_url("repos", base_url=self._api)
         params = {}
+        if page:
+            params["page"] = page
         if type in ("all", "public", "member", "private", "forks", "sources"):
             params["type"] = type
         return self._iter(int(number), url, ShortRepository, params, etag)
