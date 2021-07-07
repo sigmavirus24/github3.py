@@ -477,6 +477,17 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             url_for("repos"), params={"per_page": 100}, headers={}
         )
 
+    def test_repositories_with_page(self):
+        """Show that one can iterate over repositories with parameters."""
+        i = self.instance.repositories(page=10)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for("repos"),
+            params={"page": 10, "per_page": 100},
+            headers={},
+        )
+
     def test_respositories_accepts_type(self):
         """Show that one can pass a repository type."""
         i = self.instance.repositories("all")
