@@ -1151,7 +1151,9 @@ class _Repository(models.GitHubCore):
         return self._instance_or_null(projects.Project, json)
 
     @decorators.requires_auth
-    def create_pull(self, title, base, head, body=None):
+    def create_pull(
+        self, title, base, head, body=None, maintainer_can_modify=None
+    ):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
         :param str title:
@@ -1162,12 +1164,17 @@ class _Repository(models.GitHubCore):
             (required), e.g., 'username:branch'
         :param str body:
             (optional), markdown formatted description
+        :param bool maintainer_can_modify:
+            (optional), Indicates whether a maintainer is allowed to modify the
+            pull request or not.
         :returns:
             the created pull request
         :rtype:
             :class:`~github3.pulls.ShortPullRequest`
         """
         data = {"title": title, "body": body, "base": base, "head": head}
+        if maintainer_can_modify is not None:
+            data["maintainer_can_modify"] = maintainer_can_modify
         return self._create_pull(data)
 
     @decorators.requires_auth
