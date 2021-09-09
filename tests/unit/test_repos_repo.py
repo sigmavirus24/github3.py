@@ -348,7 +348,7 @@ class TestRepository(helper.UnitHelper):
             "base": "master",
             "head": "feature_branch",
             "body": "body",
-            "maintainer_can_modify": False
+            "maintainer_can_modify": False,
         }
         with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             self.instance.create_pull(**data)

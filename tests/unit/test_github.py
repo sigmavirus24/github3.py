@@ -131,7 +131,7 @@ class TestGitHub(helper.UnitHelper):
         )
 
     def test_create_key_with_readonly(self):
-        """ Test the request to create a key with read only"""
+        """Test the request to create a key with read only"""
         self.instance.create_key("key_name", "key text", read_only=True)
 
         self.post_called_with(

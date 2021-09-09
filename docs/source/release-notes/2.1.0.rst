@@ -1,0 +1,7 @@
+2.1.0: 2021-09-09
+-----------------
+
+Features Added
+``````````````
+- Add ``maintainer_can_modify`` parameter to ``create_pull`` method of
+  ``Repo`` class.
