@@ -1,5 +1,5 @@
 #!/bin/sh
-output="$(find docs/source -name '*.rst' | xargs proselint)"
+output="$(find docs/source -name '*.rst' | grep -v docs/source/examples/octocat.rst | xargs proselint)"
 exit_code=$?
 
 if echo "$output" | grep -qve 'typography' ; then
