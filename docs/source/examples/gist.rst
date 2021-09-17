@@ -55,7 +55,7 @@ Creating an anonymous gist
     print(gist.html_url)
 
 In the above examples ``'spam.txt'`` is the file name. GitHub will autodetect
-file type based on extension provided. ``'What... is the air-speed velocity of
+file type based on extension provided. ``'What… is the air-speed velocity of
 an unladen swallow?'`` is the file's content or body. ``'Answer this to cross
 the bridge'`` is the gist's description. While required by github3.py, it is
 allowed to be empty, e.g., ``''`` is accepted by GitHub.
