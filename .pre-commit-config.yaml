@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    - id: check-added-large-files
+    - id: check-toml
+      types: [toml]
+    - id: check-yaml
+      types: [yaml]
+    - id: end-of-file-fixer
+      types: [text]
+      stages: [commit, push, manual]
+    - id: trailing-whitespace
+      types: [text]
+      stages: [commit, push, manual]
