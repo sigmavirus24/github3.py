@@ -341,6 +341,19 @@ class TestRepository(helper.UnitHelper):
             self.instance.create_pull(**data)
             pull.assert_called_once_with(data)
 
+    def test_create_pull_maintainer_can_modify(self):
+        """Verify maintainer_can_modify option for creating a pull request."""
+        data = {
+            "title": "foo",
+            "base": "master",
+            "head": "feature_branch",
+            "body": "body",
+            "maintainer_can_modify": False,
+        }
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
+            self.instance.create_pull(**data)
+            pull.assert_called_once_with(data)
+
     def test_create_pull_from_issue(self):
         """Verify the request for creating a pull request from an issue."""
         with unittest.mock.patch.object(Repository, "_create_pull") as pull:

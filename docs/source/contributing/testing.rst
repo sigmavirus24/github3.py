@@ -229,7 +229,7 @@ started when you write
 .. code:: python
 
     with self.recorder.use_cassette(cassette_name):
-        # ...
+        # …
 
 Everything that talks to GitHub should be written inside of the context
 created by the context manager there. No requests to GitHub should be made

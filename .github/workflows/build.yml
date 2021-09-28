@@ -12,7 +12,7 @@ jobs:
           - { VERSION: "3.6", TOXENV: "py36", ALLOW_FAILURE: false }
           - { VERSION: "3.7", TOXENV: "py37", ALLOW_FAILURE: false }
           - { VERSION: "3.8", TOXENV: "py38",ALLOW_FAILURE: false }
-          - { VERSION: "3.9", TOXENV: "py39-flake8,readme,doclint,docs,commitlint",ALLOW_FAILURE: false }
+          - { VERSION: "3.9", TOXENV: "py39-flake8,doclint,docs,commitlint",ALLOW_FAILURE: false }
           - { VERSION: "3.9", TOXENV: "docstrings", ALLOW_FAILURE: true}
           - { VERSION: "pypy3", TOXENV: "pypy", ALLOW_FAILURE: false }
 
@@ -37,4 +37,3 @@ jobs:
           TOXENV: ${{ matrix.PYTHON.TOXENV }}
           GH_RECORD_MODE: "none"
         continue-on-error: ${{ matrix.PYTHON.ALLOW_FAILURE }}
-        
