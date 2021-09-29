@@ -196,6 +196,7 @@ class TestPullRequest(helper.UnitHelper):
         )
         assert not self.instance.merged
         assert self.instance.mergeable
+        assert not self.instance.rebaseable
 
 
 class TestPullReview(helper.UnitHelper):

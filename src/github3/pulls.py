@@ -218,6 +218,7 @@ class _PullRequest(models.GitHubCore):
         self.merged_at = self._strptime(pull["merged_at"])
         self.number = pull["number"]
         self.patch_url = pull["patch_url"]
+        self.rebaseable = pull.get("rebaseable")
         requested_reviewers = pull.get("requested_reviewers", [])
         self.requested_reviewers = [
             users.ShortUser(r, self) for r in requested_reviewers
@@ -837,6 +838,11 @@ class ShortPullRequest(_PullRequest):
     .. attribute:: patch_url
 
         The URL to retrieve the patch for this pull request via the API.
+
+    .. attribute:: rebaseable
+
+        A boolean attribute indicating whether GitHub deems this pull request
+        is rebaseable. None if not set.
 
     .. attribute:: repository
 
