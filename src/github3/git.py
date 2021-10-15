@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """
 This module contains all the classes relating to Git Data.
 
 See also: http://developer.github.com/v3/git/
 """
 import base64
-
 from json import dumps
 
 from . import models
@@ -49,7 +47,7 @@ class Blob(models.GitHubCore):
         self.sha = blob["sha"]
 
     def _repr(self):
-        return "<Blob [{0:.10}]>".format(self.sha)
+        return f"<Blob [{self.sha:.10}]>"
 
     def decode_content(self):
         """Return the unencoded content of this blob.
@@ -84,7 +82,7 @@ class _Commit(models.GitHubCore):
         self.tree = CommitTree(commit["tree"], self)
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.sha)
+        return f"<{self.class_name} [{self.sha}]>"
 
 
 class Commit(_Commit):
@@ -120,7 +118,7 @@ class Commit(_Commit):
     class_name = "Commit"
 
     def _update_attributes(self, commit):
-        super(Commit, self)._update_attributes(commit)
+        super()._update_attributes(commit)
         self.parents = commit["parents"]
         self.sha = commit["sha"]
         if not self.sha:
@@ -191,7 +189,7 @@ class Reference(models.GitHubCore):
         self.ref = ref["ref"]
 
     def _repr(self):
-        return "<Reference [{0}]>".format(self.ref)
+        return f"<Reference [{self.ref}]>"
 
     @requires_auth
     def delete(self):
@@ -251,7 +249,7 @@ class GitObject(models.GitHubCore):
         self.type = obj["type"]
 
     def _repr(self):
-        return "<Git Object [{0}]>".format(self.sha)
+        return f"<Git Object [{self.sha}]>"
 
 
 class Tag(models.GitHubCore):
@@ -296,7 +294,7 @@ class Tag(models.GitHubCore):
         self.tagger = tag["tagger"]
 
     def _repr(self):
-        return "<Tag [{0}]>".format(self.tag)
+        return f"<Tag [{self.tag}]>"
 
 
 class CommitTree(models.GitHubCore):
@@ -319,7 +317,7 @@ class CommitTree(models.GitHubCore):
         self.sha = tree["sha"]
 
     def _repr(self):
-        return "<CommitTree [{0}]>".format(self.sha)
+        return f"<CommitTree [{self.sha}]>"
 
     def to_tree(self):
         """Retrieve a full Tree object for this CommitTree.
@@ -362,7 +360,7 @@ class Tree(models.GitHubCore):
             self.tree = [Hash(t, self) for t in self.tree]
 
     def _repr(self):
-        return "<Tree [{0}]>".format(self.sha)
+        return f"<Tree [{self.sha}]>"
 
     def __eq__(self, other):
         return self.as_dict() == other.as_dict()
@@ -429,4 +427,4 @@ class Hash(models.GitHubCore):
             self.size = info.get("size")
 
     def _repr(self):
-        return "<Hash [{0}]>".format(self.sha)
+        return f"<Hash [{self.sha}]>"

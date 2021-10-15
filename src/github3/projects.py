@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This module contains all the classes relating to projects."""
 from json import dumps
 
@@ -66,7 +65,7 @@ class Project(models.GitHubCore):
         self.updated_at = self._strptime(project["updated_at"])
 
     def _repr(self):
-        return "<Project [#{0}]>".format(self.id)
+        return f"<Project [#{self.id}]>"
 
     def column(self, id):
         """Get a project column with the given ID.
@@ -208,7 +207,7 @@ class ProjectColumn(models.GitHubCore):
         self.updated_at = self._strptime(project_column["updated_at"])
 
     def _repr(self):
-        return "<ProjectColumn [#{0}]>".format(self.id)
+        return f"<ProjectColumn [#{self.id}]>"
 
     def card(self, id):
         """Get a project card with the given ID.
@@ -430,7 +429,7 @@ class ProjectCard(models.GitHubCore):
         self.updated_at = project_card["updated_at"]
 
     def _repr(self):
-        return "<ProjectCard [#{0}]>".format(self.id)
+        return f"<ProjectCard [#{self.id}]>"
 
     @requires_auth
     def delete(self):
@@ -526,7 +525,7 @@ class ProjectCard(models.GitHubCore):
         """
         if self.content_url is None:
             raise exceptions.CardHasNoContentUrl(
-                "Card {} has no content_url".format(self.id)
+                f"Card {self.id} has no content_url"
             )
         parsed = self._uri_parse(self.content_url)
         _, owner, repository, _, number = parsed.path[1:].split("/", 5)
@@ -553,7 +552,7 @@ class ProjectCard(models.GitHubCore):
         """
         if self.content_url is None:
             raise exceptions.CardHasNoContentUrl(
-                "Card {} has no content_url".format(self.id)
+                f"Card {self.id} has no content_url"
             )
         parsed = self._uri_parse(self.content_url)
         _, owner, repository, _, number = parsed.path[1:].split("/", 5)

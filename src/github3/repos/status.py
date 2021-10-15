@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """This module contains the Status object for GitHub's commit status API."""
-
 from .. import models
 from .. import users
-
 from ..models import GitHubCore
 
 
@@ -44,7 +41,7 @@ class Status(_Status):
     class_name = "Status"
 
     def _update_attributes(self, status):
-        super(Status, self)._update_attributes(status)
+        super()._update_attributes(status)
         self.creator = users.ShortUser(status["creator"], self)
 
 

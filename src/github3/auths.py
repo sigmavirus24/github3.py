@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This module contains the Authorization object."""
 from .decorators import requires_basic_auth
 from .models import GitHubCore
@@ -99,7 +98,7 @@ class Authorization(GitHubCore):
         self.updated_at = self._strptime(auth["updated_at"])
 
     def _repr(self):
-        return "<Authorization [{0}]>".format(self.name)
+        return f"<Authorization [{self.name}]>"
 
     def _update(self, scopes_data, note, note_url):
         """Helper for add_scopes, replace_scopes, remove_scopes."""

@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 import collections.abc as abc_collections
-
 import functools
 
-from requests.compat import urlparse, urlencode
+from requests.compat import urlencode
+from requests.compat import urlparse
 
 from . import exceptions
 from . import models
@@ -59,7 +58,7 @@ class GitHubIterator(models.GitHubCore, abc_collections.Iterator):
         self.path = urlparse(self.url).path
 
     def _repr(self):
-        return "<GitHubIterator [{0}, {1}]>".format(self.count, self.path)
+        return f"<GitHubIterator [{self.count}, {self.path}]>"
 
     def __iter__(self):
         self.last_url, params = self.url, self.params
@@ -163,16 +162,14 @@ class SearchIterator(GitHubIterator):
     def __init__(
         self, count, url, cls, session, params=None, etag=None, headers=None
     ):
-        super(SearchIterator, self).__init__(
-            count, url, cls, session, params, etag, headers
-        )
+        super().__init__(count, url, cls, session, params, etag, headers)
         #: Total count returned by GitHub
         self.total_count = 0
         #: Items array returned in the last request
         self.items = []
 
     def _repr(self):
-        return "<SearchIterator [{0}, {1}?{2}]>".format(
+        return "<SearchIterator [{}, {}?{}]>".format(
             self.count, self.path, urlencode(self.params)
         )
 

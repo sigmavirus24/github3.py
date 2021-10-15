@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing the Issue logic."""
 from json import dumps
 
@@ -10,7 +9,6 @@ from . import label
 from . import milestone
 from .. import models
 from .. import users
-
 from ..decorators import requires_auth
 
 
@@ -441,7 +439,7 @@ class Issue(_Issue):
     class_name = "Issue"
 
     def _update_attributes(self, issue):
-        super(Issue, self)._update_attributes(issue)
+        super()._update_attributes(issue)
         self.body_html = issue["body_html"]
         self.body_text = issue["body_text"]
         self.closed_by = issue["closed_by"]

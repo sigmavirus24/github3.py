@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """This module contains the RepoComment class."""
-
 from .. import models
 from .. import users
-
 from ..decorators import requires_auth
 
 
@@ -41,7 +38,7 @@ class _RepoComment(models.GitHubCore):
         self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return "<{0} [{1}/{2}]>".format(
+        return "<{} [{}/{}]>".format(
             self.class_name, self.commit_id[:7], self.user.login or ""
         )
 
@@ -97,7 +94,7 @@ class RepoComment(_RepoComment):
     class_name = "Repository Comment"
 
     def _update_attributes(self, comment):
-        super(RepoComment, self)._update_attributes(comment)
+        super()._update_attributes(comment)
         self.body_text = comment["body_text"]
         self.body_html = comment["body_html"]
 

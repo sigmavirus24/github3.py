@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Unit tests for the github3.projects module."""
 import pytest
 
 from . import helper
-
-from github3 import GitHubError
 from github3 import exceptions
+from github3 import GitHubError
 from github3 import issues
 from github3 import projects
 

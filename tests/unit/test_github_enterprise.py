@@ -1,6 +1,7 @@
 import github3
+from .helper import create_example_data_helper
+from .helper import UnitHelper
 from github3.github import GitHubEnterprise
-from .helper import UnitHelper, create_example_data_helper
 
 get_example_user = create_example_data_helper("user_example")
 

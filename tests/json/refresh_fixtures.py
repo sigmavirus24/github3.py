@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-
-import os
-import json
 import getpass
+import json
+import os
+
 import requests
 
 IGNORE = (
@@ -72,14 +72,14 @@ def main():
             try:
                 json_data = json.load(f)
             except ValueError:
-                print("Couldn't process: {0}".format(file_name))
+                print(f"Couldn't process: {file_name}")
 
         url = json_data.get("url")
 
-        print("{0}: {1}".format(file_name, url))
+        print(f"{file_name}: {url}")
 
         if not url:
-            print("Skipping {0}".format(file_name))
+            print(f"Skipping {file_name}")
             continue
 
         response = s.get(url)

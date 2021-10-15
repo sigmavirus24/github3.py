@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """This module contains the RepoTag object for GitHub's tag API."""
-
 from . import commit
 from .. import models
 
@@ -48,7 +46,7 @@ class RepoTag(models.GitHubCore):
         self.zipball_url = tag["zipball_url"]
 
     def _repr(self):
-        return "<Repository Tag [{0}]>".format(self)
+        return f"<Repository Tag [{self}]>"
 
     def __str__(self):
         return self.name

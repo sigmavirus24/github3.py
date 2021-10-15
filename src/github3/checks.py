@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This module contains all the classes relating to Checks."""
 from json import dumps
 
@@ -44,7 +43,7 @@ class CheckPullRequest(models.GitHubCore):
         self._api = self.url = pull["url"]
 
     def _repr(self):
-        return "<CheckPullRequest [#{0}]>".format(self.number)
+        return f"<CheckPullRequest [#{self.number}]>"
 
     def to_pull(self):
         """Retrieve a full PullRequest object for this CheckPullRequest.

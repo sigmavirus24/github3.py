@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 """This module provides the basic models used in github3.py."""
 import json as jsonlib
 import logging
 
 import dateutil.parser
-import requests
 import requests.compat
 
 from . import exceptions
@@ -13,7 +11,7 @@ from . import session
 LOG = logging.getLogger(__package__)
 
 
-class GitHubCore(object):
+class GitHubCore:
     """The base object for all objects that require a session.
 
     The :class:`GitHubCore <GitHubCore>` object provides some
@@ -124,7 +122,7 @@ class GitHubCore(object):
         return hash(self._uniq)
 
     def _repr(self):
-        return "<github3-core at 0x{0:x}>".format(id(self))
+        return f"<github3-core at 0x{id(self):x}>"
 
     @staticmethod
     def _remove_none(data):
@@ -231,7 +229,7 @@ class GitHubCore(object):
     def _api(self):
         value = "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
         if self._uri.query:
-            value += "?{}".format(self._uri.query)
+            value += f"?{self._uri.query}"
         return value
 
     @staticmethod

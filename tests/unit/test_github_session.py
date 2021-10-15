@@ -227,7 +227,7 @@ class TestGitHubSession:
                 )
             )
             auth_header = pr.headers["Authorization"]
-            assert auth_header == "token {0}".format(token)
+            assert auth_header == f"token {token}"
 
     def test_two_factor_auth_callback_handles_None(self):
         s = self.build_session()

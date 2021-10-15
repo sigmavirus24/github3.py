@@ -1,6 +1,6 @@
-import github3
 import pytest
 
+import github3
 from .helper import IntegrationHelper
 
 

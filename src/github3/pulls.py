@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This module contains all the classes relating to pull requests."""
 from json import dumps
 
@@ -6,11 +5,11 @@ from uritemplate import URITemplate
 
 from . import models
 from . import users
-from .repos import commit as rcommit
-from .repos import contents
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment
+from .repos import commit as rcommit
+from .repos import contents
 
 
 class PullDestination(models.GitHubCore):
@@ -77,7 +76,7 @@ class PullDestination(models.GitHubCore):
         self.repo = (self._repo_owner, self._repo_name)
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.direction, self.label)
+        return f"<{self.direction} [{self.label}]>"
 
 
 class Head(PullDestination):
@@ -167,7 +166,7 @@ class PullFile(models.GitHubCore):
         self.contents_url = pfile["contents_url"]
 
     def _repr(self):
-        return "<Pull Request File [{0}]>".format(self.filename)
+        return f"<Pull Request File [{self.filename}]>"
 
     def contents(self):
         """Return the contents of the file.
@@ -239,7 +238,7 @@ class _PullRequest(models.GitHubCore):
         self.user = users.ShortUser(pull["user"], self)
 
     def _repr(self):
-        return "<{0} [#{1}]>".format(self.class_name, self.number)
+        return f"<{self.class_name} [#{self.number}]>"
 
     @requires_auth
     def close(self):
@@ -709,7 +708,7 @@ class PullRequest(_PullRequest):
     class_name = "Pull Request"
 
     def _update_attributes(self, pull):
-        super(PullRequest, self)._update_attributes(pull)
+        super()._update_attributes(pull)
         self.additions_count = pull["additions"]
         self.deletions_count = pull["deletions"]
         self.comments_count = pull["comments"]
@@ -978,7 +977,7 @@ class PullReview(models.GitHubCore):
         self.pull_request_url = review["pull_request_url"]
 
     def _repr(self):
-        return "<Pull Request Review [{0}]>".format(self.id)
+        return f"<Pull Request Review [{self.id}]>"
 
     @requires_auth
     def submit(self, body, event=None):
@@ -1107,7 +1106,7 @@ class ReviewComment(models.GitHubCore):
         self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return "<Review Comment [{0}]>".format(self.user.login)
+        return f"<Review Comment [{self.user.login}]>"
 
     @requires_auth
     def delete(self):
@@ -1185,6 +1184,6 @@ class ReviewRequests(models.GitHubCore):
         self.users = [users.ShortUser(u, self) for u in requests["users"]]
 
     def _repr(self):
-        return "<Review Requests [users: {0}, teams: {1}]>".format(
+        return "<Review Requests [users: {}, teams: {}]>".format(
             len(self.users), len(self.teams)
         )

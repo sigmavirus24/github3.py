@@ -1,21 +1,24 @@
 import io
 import json
+from copy import copy
+from datetime import datetime
+from datetime import timedelta
+from unittest import TestCase
+
 import pytest
 import requests
 
-from copy import copy
-from datetime import datetime, timedelta
-from github3 import exceptions, GitHubError
-from github3.models import GitHubCore
-from unittest import TestCase
 from . import helper
+from github3 import exceptions
+from github3 import GitHubError
+from github3.models import GitHubCore
 
 
 class MyTestRefreshClass(GitHubCore):
     """Subclass for testing refresh on GitHubCore."""
 
     def __init__(self, example_data, session):
-        super(MyTestRefreshClass, self).__init__(example_data, session)
+        super().__init__(example_data, session)
         self._api = example_data["url"]
         self.last_modified = example_data["last_modified"]
         self.etag = example_data["etag"]

@@ -1,32 +1,13 @@
-# -*- coding: utf-8 -*-
 """This module contains Repository objects.
 
 The Repository objects represent various different repository representations
 returned by GitHub.
 
 """
-
 import base64
 import json as jsonlib
 
 import uritemplate as urit
-
-from .. import checks
-from .. import decorators
-from .. import events
-from .. import exceptions
-from .. import git
-from .. import issues
-from ..issues import event as ievent
-from ..issues import label
-from ..issues import milestone
-from .. import licenses
-from .. import models
-from .. import notifications
-from .. import projects
-from .. import pulls
-from .. import users
-from .. import utils
 
 from . import branch
 from . import comment
@@ -44,6 +25,22 @@ from . import status
 from . import tag
 from . import topics
 from . import traffic
+from .. import checks
+from .. import decorators
+from .. import events
+from .. import exceptions
+from .. import git
+from .. import issues
+from .. import licenses
+from .. import models
+from .. import notifications
+from .. import projects
+from .. import pulls
+from .. import users
+from .. import utils
+from ..issues import event as ievent
+from ..issues import label
+from ..issues import milestone
 
 
 class _Repository(models.GitHubCore):
@@ -107,7 +104,7 @@ class _Repository(models.GitHubCore):
         self.trees_urlt = urit.URITemplate(repo["trees_url"])
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self)
+        return f"<{self.class_name} [{self}]>"
 
     def __str__(self):
         return self.full_name
@@ -3051,7 +3048,7 @@ class Repository(_Repository):
     class_name = "Repository"
 
     def _update_attributes(self, repo):
-        super(Repository, self)._update_attributes(repo)
+        super()._update_attributes(repo)
         self.allow_merge_commit = repo.get("allow_merge_commit")
         self.allow_rebase_merge = repo.get("allow_rebase_merge")
         self.allow_squash_merge = repo.get("allow_squash_merge")
@@ -3394,7 +3391,7 @@ class StarredRepository(models.GitHubCore):
         self.repo = self.repository
 
     def _repr(self):
-        return "<StarredRepository [{0!r}]>".format(self.repository)
+        return f"<StarredRepository [{self.repository!r}]>"
 
 
 def repo_issue_params(

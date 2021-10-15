@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """Code search results implementation."""
-
 from .. import models
 from .. import repos
 
@@ -61,4 +59,4 @@ class CodeSearchResult(models.GitHubCore):
         self.text_matches = data.get("text_matches", [])
 
     def _repr(self):
-        return "<CodeSearchResult [{0}]>".format(self.path)
+        return f"<CodeSearchResult [{self.path}]>"

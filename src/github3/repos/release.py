@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 """Release logic for the GitHub API."""
-
 import json
 
 from uritemplate import URITemplate
 
-from .. import utils
 from .. import models
 from .. import users
+from .. import utils
 from ..decorators import requires_auth
 from ..exceptions import error_for
 
@@ -117,7 +115,7 @@ class Release(models.GitHubCore):
         self.zipball_url = release["zipball_url"]
 
     def _repr(self):
-        return "<Release [{0}]>".format(self.name)
+        return f"<Release [{self.name}]>"
 
     def archive(self, format, path=""):
         """Get the tarball or zipball archive for this release.
@@ -370,7 +368,7 @@ class Asset(models.GitHubCore):
         self.updated_at = self._strptime(asset["updated_at"])
 
     def _repr(self):
-        return "<Asset [{0}]>".format(self.name)
+        return f"<Asset [{self.name}]>"
 
     def download(self, path=""):
         """Download the data for this asset.

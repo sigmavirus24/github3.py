@@ -2,11 +2,11 @@ import unittest.mock
 
 import pytest
 
-from github3 import GitHubEnterprise, GitHubError
+from . import helper
+from github3 import GitHubEnterprise
+from github3 import GitHubError
 from github3.github import GitHub
 from github3.projects import Project
-
-from . import helper
 
 
 def url_for(path=""):
@@ -85,6 +85,30 @@ class TestGitHub(helper.UnitHelper):
                 "client_secret": "",
                 "scopes": ["user", "repo"],
             },
+        )
+
+    def test_block(self):
+        """Show we can block users."""
+        self.instance.block("username")
+
+        self.session.put.assert_called_once_with(
+            url_for("user/blocks/username")
+        )
+
+    def test_is_blocking(self):
+        """Show we can check if a user is blocked."""
+        self.instance.is_blocking("username")
+
+        self.session.get.assert_called_once_with(
+            url_for("user/blocks/username")
+        )
+
+    def test_unblock(self):
+        """Show we can unblock users."""
+        self.instance.unblock("username")
+
+        self.session.delete.assert_called_once_with(
+            url_for("user/blocks/username")
         )
 
     def test_check_authorization(self):
@@ -434,7 +458,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         self.session.post.assert_called_once_with(
             url_for("hub"),
@@ -453,7 +477,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -468,7 +492,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is True
 
@@ -484,7 +508,7 @@ class TestGitHub(helper.UnitHelper):
             ("hub.callback", "https://localhost/post"),
             ("hub.secret", "secret"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         self.session.post.assert_called_once_with(
             url_for("hub"),
@@ -499,7 +523,7 @@ class TestGitHub(helper.UnitHelper):
             "https://github.com/octocat/hello-world/events/push",
         )
         body = [("hub.mode", "subscribe"), topic, ("hub.callback", "")]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -514,7 +538,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -525,7 +549,7 @@ class TestGitHub(helper.UnitHelper):
             ("hub.topic", ""),
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -536,7 +560,7 @@ class TestGitHub(helper.UnitHelper):
             ("hub.topic", ""),
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -847,6 +871,15 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for("authorizations"), params={"per_page": 100}, headers={}
+        )
+
+    def test_blocked_users(self):
+        """Show we can retrieve all blocked users by the current user."""
+        i = self.instance.blocked_users()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for("user/blocks"), params={"per_page": 100}, headers={}
         )
 
     def test_emails(self):
@@ -1383,6 +1416,21 @@ class TestGitHubRequiresAuthentication(
         """Show that one needs to authenticate to use #authorizations."""
         self.assert_requires_auth(self.instance.authorizations)
 
+    def test_block(self):
+        """Show we must be authenticated to block users."""
+        with pytest.raises(GitHubError):
+            self.instance.block("username")
+
+    def test_is_blocking(self):
+        """Show we must be auth'd to check if a user is blocked."""
+        with pytest.raises(GitHubError):
+            self.instance.is_blocking("username")
+
+    def test_unblock(self):
+        """Show must be authenticated to unblock users."""
+        with pytest.raises(GitHubError):
+            self.instance.unblock("username")
+
     def test_create_gpg_key(self):
         """Show that GitHub#create_gpg_key requires auth."""
         self.assert_requires_auth(self.instance.create_gpg_key)
@@ -1497,9 +1545,7 @@ class TestGitHubAuthorizations(helper.UnitHelper):
     example_data = None
 
     def create_session_mock(self, *args):
-        session = super(TestGitHubAuthorizations, self).create_session_mock(
-            *args
-        )
+        session = super().create_session_mock(*args)
         session.retrieve_client_credentials.return_value = ("id", "secret")
         return session
 
@@ -1545,6 +1591,6 @@ class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
 
     def test_str(self):
         """Show that instance string is formatted correctly."""
-        assert str(self.instance) == "<GitHub Enterprise [{0}]>".format(
+        assert str(self.instance) == "<GitHub Enterprise [{}]>".format(
             enterprise_url_for()
         )

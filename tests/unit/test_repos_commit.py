@@ -1,6 +1,5 @@
 """Unit tests for Repository Commits."""
 import github3
-
 from . import helper
 
 get_commit_example_data = helper.create_example_data_helper("commit_example")

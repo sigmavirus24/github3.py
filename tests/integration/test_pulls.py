@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on PullRequest."""
 import github3
-from github3 import repos
-
 from .helper import IntegrationHelper
+from github3 import repos
 
 
 class TestPullRequest(IntegrationHelper):
@@ -232,7 +230,7 @@ class TestPullFile(IntegrationHelper):
             if pull_file.filename == filename:
                 break
         else:
-            assert False, "Could not find '{0}'".format(filename)
+            assert False, f"Could not find '{filename}'"
 
         return pull_file
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing the GistFile object."""
 from .. import models
 
@@ -52,7 +51,7 @@ class GistFile(_GistFile):
     class_name = "GistFile"
 
     def _update_attributes(self, gistfile):
-        super(GistFile, self)._update_attributes(gistfile)
+        super()._update_attributes(gistfile)
         self.original_content = gistfile["content"]
         self.truncated = gistfile["truncated"]
 

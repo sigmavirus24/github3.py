@@ -1,7 +1,7 @@
 """Unit tests for github3.api."""
-import github3
-import unittest
 import unittest.mock
+
+import github3
 
 
 class TestAPI(unittest.TestCase):

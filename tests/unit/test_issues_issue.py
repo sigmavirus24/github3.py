@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
 import unittest.mock
-import github3
+
 import dateutil.parser
 
-from github3.issues.label import Label
-from github3.issues import Issue
+import github3
 from . import helper
+from github3.issues import Issue
+from github3.issues.label import Label
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/issues/comments"
@@ -379,7 +379,7 @@ class TestLabel(helper.UnitHelper):
 
     def test_repr(self):
         """Show that instance string is formatted correctly."""
-        assert repr(self.instance) == "<Label [{0}]>".format(
+        assert repr(self.instance) == "<Label [{}]>".format(
             self.instance.name
         )
 
@@ -430,7 +430,7 @@ class TestIssueEvent(helper.UnitHelper):
 
     def test_repr(self):
         """Show that instance string is formatted correctly."""
-        assert repr(self.instance) == "<Issue Event [{0} by {1}]>".format(
+        assert repr(self.instance) == "<Issue Event [{} by {}]>".format(
             "closed", "octocat"
         )
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Issue events logic."""
 from .. import users
 from ..models import GitHubCore
@@ -91,7 +90,7 @@ class IssueEvent(GitHubCore):
         self._uniq = self._api
 
     def _repr(self):
-        return "<Issue Event [{0} by {1}]>".format(self.event, self.actor)
+        return f"<Issue Event [{self.event} by {self.actor}]>"
 
 
 class RepositoryIssueEvent(IssueEvent):
@@ -115,7 +114,7 @@ class RepositoryIssueEvent(IssueEvent):
     """
 
     def _update_attributes(self, event):
-        super(RepositoryIssueEvent, self)._update_attributes(event)
+        super()._update_attributes(event)
         from . import issue
 
         self.issue = issue.ShortIssue(event["issue"], self)

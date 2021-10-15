@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Team."""
 import github3
-
 from .helper import IntegrationHelper
 
 
@@ -12,7 +10,7 @@ class TestTeam(IntegrationHelper):
     betamax_kwargs = {"match_requests_on": ["method", "uri", "json-body"]}
 
     def setUp(self):
-        super(TestTeam, self).setUp()
+        super().setUp()
         self.auto_login()
 
     def get_organization(self, organization="github3py"):

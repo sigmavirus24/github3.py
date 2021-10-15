@@ -1,11 +1,12 @@
 """Base classes and helpers for unit tests."""
-import github3
 import json
 import os.path
 import sys
-import pytest
-import unittest
 import unittest.mock
+
+import pytest
+
+import github3
 
 
 def create_url_helper(base_url):
@@ -79,9 +80,9 @@ class UnitHelper(unittest.TestCase):
         """Create a mocked session and add headers and auth attributes."""
         session = self.create_mocked_session()
         base_attrs = ["headers", "auth"]
-        attrs = dict(
-            (key, unittest.mock.Mock()) for key in set(args).union(base_attrs)
-        )
+        attrs = {
+            key: unittest.mock.Mock() for key in set(args).union(base_attrs)
+        }
         session.configure_mock(**attrs)
         session.delete.return_value = None
         session.get.return_value = None
@@ -204,7 +205,7 @@ class UnitIteratorHelper(UnitHelper):
         methods that iterate over the results of a response.
         """
         # Retrieve a mocked session object
-        session = super(UnitIteratorHelper, self).create_mocked_session(*args)
+        session = super().create_mocked_session(*args)
         # Initialize a NullObject which has magical properties
         null = NullObject()
         # Set it as the return value for every method
@@ -233,12 +234,12 @@ class UnitIteratorHelper(UnitHelper):
 
     def setUp(self):
         """Use UnitHelper's setUp but also patch _get_json."""
-        super(UnitIteratorHelper, self).setUp()
+        super().setUp()
         self.patch_get_json()
 
     def tearDown(self):
         """Stop mocking _get_json."""
-        super(UnitIteratorHelper, self).tearDown()
+        super().tearDown()
         self.get_json_mock.stop()
 
 
@@ -267,7 +268,7 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
 
     def setUp(self):
         """Use UnitIteratorHelper's setUp and patch _get_json."""
-        super(UnitSearchIteratorHelper, self).setUp()
+        super().setUp()
         self.patch_get_json()
 
 
@@ -309,7 +310,7 @@ class UnitGitHubEnterpriseHelper(UnitHelper):
 is_py3 = (3, 0) <= sys.version_info < (4, 0)
 
 
-class NullObject(object):
+class NullObject:
     def __init__(self, initializer=None):
         self.__dict__["initializer"] = initializer
 
@@ -328,7 +329,7 @@ class NullObject(object):
         return "" if is_py3 else "".decode()
 
     def __repr__(self):
-        return "<NullObject({0})>".format(
+        return "<NullObject({})>".format(
             repr(self.__getattribute__("initializer"))
         )
 

@@ -5,7 +5,6 @@ import dateutil
 import pytest
 
 import github3
-
 from .helper import IntegrationHelper
 
 
@@ -72,9 +71,7 @@ class TestCheckSuite(IntegrationHelper):
                     assert not pref["setting"]
                     break
             else:
-                pytest.fail(
-                    "No setting in response for app: {}".format(app_id)
-                )
+                pytest.fail(f"No setting in response for app: {app_id}")
 
             json = repo.auto_trigger_checks(app_id, enabled=True)
             for pref in json["preferences"]["auto_trigger_checks"]:
@@ -82,9 +79,7 @@ class TestCheckSuite(IntegrationHelper):
                     assert pref["setting"]
                     break
             else:
-                pytest.fail(
-                    "No setting in response for app: {}".format(app_id)
-                )
+                pytest.fail(f"No setting in response for app: {app_id}")
 
 
 class TestCheckApp(IntegrationHelper):
