@@ -6,7 +6,6 @@ import unittest
 import betamax
 import dateutil.tz
 import pytest
-
 from betamax.cassette import cassette
 
 import github3

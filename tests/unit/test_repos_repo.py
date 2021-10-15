@@ -1,31 +1,29 @@
 """Unit tests for Repositories."""
 import datetime
 import unittest.mock
+from base64 import b64encode
 
 import pytest
 
-from base64 import b64encode
+from . import helper
 from github3 import GitHubError
 from github3.exceptions import GitHubException
+from github3.models import GitHubCore
+from github3.projects import Project
 from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents
 from github3.repos.hook import Hook
-from github3.repos.repo import Repository, ShortRepository
-from github3.models import GitHubCore
-from github3.projects import Project
-
-from . import helper
+from github3.repos.repo import Repository
+from github3.repos.repo import ShortRepository
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/comments/1"
 )
 commit_url_for = helper.create_url_helper(
-    (
-        "https://api.github.com/repos/octocat/Hello-World/"
-        "commits/6dcb09b5b57875f334f61aebed695e2e4193db5e"
-    )
+    "https://api.github.com/repos/octocat/Hello-World/"
+    "commits/6dcb09b5b57875f334f61aebed695e2e4193db5e"
 )
 compare_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/compare/master...topic"
@@ -940,7 +938,7 @@ class TestRepository(helper.UnitHelper):
         """Verify instance string is formatted correctly."""
         owner = self.instance.owner
         repository = self.instance.name
-        assert str(self.instance) == "{0}/{1}".format(owner, repository)
+        assert str(self.instance) == f"{owner}/{repository}"
 
     def test_weekly_commit_count(self):
         """Verify the request for retrieving total commit counts."""
@@ -1701,7 +1699,7 @@ class TestContents(helper.UnitHelper):
 
     def test_str(self):
         """Verify that instance string is formatted properly."""
-        assert str(self.instance) == "<Contents [{0}]>".format(
+        assert str(self.instance) == "<Contents [{}]>".format(
             self.instance.path
         )
 
@@ -1763,7 +1761,7 @@ class TestHook(helper.UnitHelper):
 
     def test_str(self):
         """Show that instance string is formatted correctly."""
-        assert str(self.instance) == "<Hook [{0}]>".format(self.instance.name)
+        assert str(self.instance) == f"<Hook [{self.instance.name}]>"
 
     def test_delete(self):
         """Verify the request for editing a hook on a repository."""

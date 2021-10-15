@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on GitHub."""
 from datetime import datetime
 
-import github3
 import pytest
 import uritemplate
 
-from .helper import (
-    GitHubEnterpriseHelper,
-    IntegrationHelper,
-)
+import github3
+from .helper import GitHubEnterpriseHelper
+from .helper import IntegrationHelper
 
 GPG_KEY = (
     # Generated for this alone then deleted
@@ -98,6 +95,44 @@ class TestGitHub(IntegrationHelper):
 
         for email in emails:
             assert isinstance(email, github3.users.Email)
+
+    def test_blocked_users(self):
+        """Test the ability to retrieve a list of blocked users."""
+        self.token_login()
+        cassette_name = self.cassette_name("blocked_users")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.block("sigmavirus24")
+            users = list(self.gh.blocked_users())
+            assert self.gh.unblock("sigmavirus24")
+
+        assert len(users) == 1
+        assert ["sigmavirus24"] == [str(u) for u in users]
+
+    def test_block(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("block")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.block("sigmavirus24")
+            assert self.gh.unblock("sigmavirus24")
+
+    def test_unblock(self):
+        """Test the ability to unblock a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("unblock")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.block("sigmavirus24")
+            assert self.gh.unblock("sigmavirus24")
+
+    def test_is_blocking(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("is_blocking")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.is_blocking("sigmavirus24") is False
+            assert self.gh.block("sigmavirus24")
+            assert self.gh.is_blocking("sigmavirus24")
+            assert self.gh.unblock("sigmavirus24")
 
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist."""

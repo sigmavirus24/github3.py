@@ -1,12 +1,11 @@
 """Integration tests for Repositories."""
-import itertools
 import datetime
-
-import github3
-import github3.exceptions as exc
+import itertools
 
 import pytest
 
+import github3
+import github3.exceptions as exc
 from . import helper
 
 
@@ -235,7 +234,7 @@ class TestRepository(helper.IntegrationHelper):
         """Show that UnProcessableEntity is raised with empty comitter."""
         self.token_login()
         cassette_name = self.cassette_name(
-            ("create_commit_with_" "empty_committer")
+            "create_commit_with_" "empty_committer"
         )
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "github3.py")
@@ -478,7 +477,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("github3py", "fork_this")
             master = repository.commit("master")
             ref = repository.create_ref(
-                "refs/tags/test-tag-{}".format(master.sha[:6]), master
+                f"refs/tags/test-tag-{master.sha[:6]}", master
             )
             assert isinstance(ref, github3.git.Reference)
             ref.delete()
@@ -491,7 +490,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("github3py", "fork_this")
             master = repository.commit("master")
             ref = repository.create_branch_ref(
-                "test-branch-{}".format(master.sha[:6]), master
+                f"test-branch-{master.sha[:6]}", master
             )
             assert isinstance(ref, github3.git.Reference)
             ref.delete()
@@ -561,7 +560,7 @@ class TestRepository(helper.IntegrationHelper):
         """Test the ability to delete a key from a repository."""
         self.token_login()
         cassette_name = self.cassette_name("delete_key")
-        with open("tests/id_rsa.pub", "r") as fd:
+        with open("tests/id_rsa.pub") as fd:
             key_contents = fd.read()
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("github3py", "github3.py")

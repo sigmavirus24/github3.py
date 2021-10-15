@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Gist."""
-from .helper import IntegrationHelper
-
 import github3
+from .helper import IntegrationHelper
 
 
 class TestGist(IntegrationHelper):

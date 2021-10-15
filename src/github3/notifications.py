@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 This module contains the classes relating to notifications.
 
 See also: http://developer.github.com/v3/activity/notifications/
 """
 from json import dumps
+
 from . import models
 
 
@@ -72,7 +72,7 @@ class Thread(models.GitHubCore):
         self.updated_at = self._strptime(thread["updated_at"])
 
     def _repr(self):
-        return "<Thread [{0}]>".format(self.subject.get("title"))
+        return "<Thread [{}]>".format(self.subject.get("title"))
 
     def delete_subscription(self):
         """Delete subscription for this thread.
@@ -172,7 +172,7 @@ class _Subscription(models.GitHubCore):
         self.subscribed = sub["subscribed"]
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.subscribed)
+        return f"<{self.class_name} [{self.subscribed}]>"
 
     def delete(self):
         """Delete this subscription.
@@ -237,7 +237,7 @@ class ThreadSubscription(_Subscription):
     class_name = "ThreadSubscription"
 
     def _update_subscription(self, sub):
-        super(ThreadSubscription, self)._update_attributes(sub)
+        super()._update_attributes(sub)
         self.thread_url = sub["thread_url"]
 
 
@@ -279,5 +279,5 @@ class RepositorySubscription(_Subscription):
     class_name = "RepositorySubscription"
 
     def _update_subscription(self, sub):
-        super(RepositorySubscription, self)._update_attributes(sub)
+        super()._update_attributes(sub)
         self.repository_url = sub.get("repository_url")

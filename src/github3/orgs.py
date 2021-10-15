@@ -1,15 +1,16 @@
-# -*- coding: utf-8 -*-
 """This module contains all of the classes related to organizations."""
+import typing as t
 from json import dumps
 
 from uritemplate import URITemplate
 
-from . import users, models
-
+from . import models
+from . import users
 from .decorators import requires_auth
 from .events import Event
 from .projects import Project
-from .repos import Repository, ShortRepository
+from .repos import Repository
+from .repos import ShortRepository
 
 
 class _Team(models.GitHubCore):
@@ -268,7 +269,7 @@ class Team(_Team):
     class_name = "Team"
 
     def _update_attributes(self, team):
-        super(Team, self)._update_attributes(team)
+        super()._update_attributes(team)
         self.created_at = self._strptime(team["created_at"])
         self.members_count = team["members_count"]
         self.organization = ShortOrganization(team["organization"], self)
@@ -373,7 +374,7 @@ class _Organization(models.GitHubCore):
         display_name = ""
         name = getattr(self, "name", None)
         if name is not None:
-            display_name = ":{}".format(name)
+            display_name = f":{name}"
         return "<{s.class_name} [{s.login}{display}]>".format(
             s=self, display=display_name
         )
@@ -431,6 +432,67 @@ class _Organization(models.GitHubCore):
 
         url = self._build_url("teams", str(team_id), "repos", str(repository))
         return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def blocked_users(
+        self, number: int = -1, etag: t.Optional[str] = None
+    ) -> t.Generator[users.ShortUser, None, None]:
+        """Iterate over the users blocked by this organization.
+
+        :param int number:
+            (optional), number of users to iterate over.  Default: -1 iterates
+            over all values
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of the members of this team
+        :rtype:
+            :class:`~github3.users.ShortUser`
+        """
+        url = self._build_url("blocks", base_url=self._api)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
+
+    @requires_auth
+    def block(self, username: users.UserLike) -> bool:
+        """Block a specific user from an organization.
+
+        :parameter str username:
+            Name (or user-like instance) of the user to block.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("blocks", str(username), base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def unblock(self, username: users.UserLike) -> bool:
+        """Unblock a specific user from an organization.
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("blocks", str(username), base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def is_blocking(self, username: users.UserLike) -> bool:
+        """Check if this organization is blocking a specific user.
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("blocks", str(username), base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
     def create_hook(self, name, config, events=["push"], active=True):
@@ -1178,7 +1240,7 @@ class Organization(_Organization):
     class_name = "Organization"
 
     def _update_attributes(self, org):
-        super(Organization, self)._update_attributes(org)
+        super()._update_attributes(org)
         self.created_at = self._strptime(org["created_at"])
         self.followers_count = org["followers"]
         self.following_count = org["following"]
@@ -1367,7 +1429,7 @@ class Membership(models.GitHubCore):
     """
 
     def _repr(self):
-        return "<Membership [{0}]>".format(self.organization)
+        return f"<Membership [{self.organization}]>"
 
     def _update_attributes(self, membership):
         self._api = membership["url"]
@@ -1457,7 +1519,7 @@ class OrganizationHook(models.GitHubCore):
         self.updated_at = self._strptime(hook["updated_at"])
 
     def _repr(self):
-        return "<OrganizationHook [{0}]>".format(self.name)
+        return f"<OrganizationHook [{self.name}]>"
 
     @requires_auth
     def delete(self):

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """Repository traffic stats logic."""
-
 from .. import models
 
 

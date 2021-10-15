@@ -25,3 +25,4 @@ tests/id_rsa
 t.py
 *.pem
 /.python-version
+/.tool-versions

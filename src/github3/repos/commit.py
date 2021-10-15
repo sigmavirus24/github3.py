@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
 """This module contains the RepoCommit classes."""
-
 from . import status
-from .. import checks, git, models, users
+from .. import checks
+from .. import git
+from .. import models
+from .. import users
 from .comment import RepoComment
 
 
@@ -38,7 +39,7 @@ class _RepoCommit(models.GitHubCore):
         self._uniq = self.sha = commit["sha"]
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.sha[:7])
+        return f"<{self.class_name} [{self.sha[:7]}]>"
 
     def check_runs(self):
         """Retrieve the check runs for this commit.
@@ -174,7 +175,7 @@ class RepoCommit(_RepoCommit):
     class_name = "Repository Commit"
 
     def _update_attributes(self, commit):
-        super(RepoCommit, self)._update_attributes(commit)
+        super()._update_attributes(commit)
         #: The number of additions made in the commit.
         self.additions = 0
         #: The number of deletions made in the commit.
@@ -204,7 +205,7 @@ class ShortCommit(_RepoCommit):
     _refresh_to = RepoCommit
 
     def _update_attributes(self, commit):
-        super(ShortCommit, self)._update_attributes(commit)
+        super()._update_attributes(commit)
         self.author = commit["author"]
         if self.author:
             self.author = users.ShortUser(self.author, self)

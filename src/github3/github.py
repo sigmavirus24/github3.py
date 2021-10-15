@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 """This module contains the main interfaces to the API."""
 import json
 import re
+import typing as t
 
 import uritemplate
 
@@ -10,7 +10,6 @@ from . import auths
 from . import decorators
 from . import events
 from . import gists
-from .repos import invitation
 from . import issues
 from . import licenses
 from . import models
@@ -18,18 +17,16 @@ from . import notifications
 from . import orgs
 from . import projects
 from . import pulls
-from .repos import repo
 from . import search
 from . import session
 from . import structs
 from . import users
 from . import utils
-
-from .decorators import (
-    requires_auth,
-    requires_basic_auth,
-    requires_app_credentials,
-)
+from .decorators import requires_app_credentials
+from .decorators import requires_auth
+from .decorators import requires_basic_auth
+from .repos import invitation
+from .repos import repo
 
 
 _pubsub_re = re.compile(
@@ -64,7 +61,7 @@ class GitHub(models.GitHubCore):
 
     def __init__(self, username="", password="", token="", session=None):
         """Create a new GitHub instance to talk to the API."""
-        super(GitHub, self).__init__({}, session or self.new_session())
+        super().__init__({}, session or self.new_session())
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -72,8 +69,8 @@ class GitHub(models.GitHubCore):
 
     def _repr(self):
         if self.session.auth:
-            return "<GitHub [{!r}]>".format(self.session.auth)
-        return "<Anonymous GitHub at 0x{0:x}>".format(id(self))
+            return f"<GitHub [{self.session.auth!r}]>"
+        return f"<Anonymous GitHub at 0x{id(self):x}>"
 
     @requires_auth
     def activate_membership(self, organization):
@@ -502,6 +499,67 @@ class GitHub(models.GitHubCore):
                 json = self._json(self._post(url, data=data), 201)
 
         return self._instance_or_null(auths.Authorization, json)
+
+    @requires_auth
+    def blocked_users(
+        self, number: int = -1, etag: t.Optional[str] = None
+    ) -> t.Generator[users.ShortUser, None, None]:
+        """Iterate over the users blocked by this organization.
+
+        :param int number:
+            (optional), number of users to iterate over.  Default: -1 iterates
+            over all values
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of the members of this team
+        :rtype:
+            :class:`~github3.users.ShortUser`
+        """
+        url = self._build_url("user", "blocks")
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
+
+    @requires_auth
+    def block(self, username: users.UserLike) -> bool:
+        """Block a specific user from an organization.
+
+        :parameter str username:
+            Name (or user-like instance) of the user to block.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("user", "blocks", str(username))
+        return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def unblock(self, username: users.UserLike) -> bool:
+        """Unblock a specific user from an organization.
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("user", "blocks", str(username))
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def is_blocking(self, username: users.UserLike) -> bool:
+        """Check if this organization is blocking a specific user.
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("user", "blocks", str(username))
+        return self._boolean(self._get(url), 204, 404)
 
     def check_authorization(self, access_token):
         """Check an authorization created by a registered application.
@@ -2857,15 +2915,13 @@ class GitHubEnterprise(GitHub):
         session=None,
     ):
         """Create a client for a GitHub Enterprise instance."""
-        super(GitHubEnterprise, self).__init__(
-            username, password, token, session=session
-        )
+        super().__init__(username, password, token, session=session)
         self.session.base_url = url.rstrip("/") + "/api/v3"
         self.session.verify = verify
         self.url = url
 
     def _repr(self):
-        return "<GitHub Enterprise [{0.url}]>".format(self)
+        return f"<GitHub Enterprise [{self.url}]>"
 
     @requires_auth
     def create_user(self, login, email):

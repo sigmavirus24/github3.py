@@ -1,6 +1,5 @@
 """Integration tests for the github3.auths module."""
 import github3
-
 from .helper import IntegrationHelper
 
 

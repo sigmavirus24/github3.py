@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing the logic for a GistComment."""
 from .. import decorators
 from .. import models
@@ -65,7 +64,7 @@ class GistComment(models.GitHubCore):
         self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return "<Gist Comment [{0}]>".format(self.user.login)
+        return f"<Gist Comment [{self.user.login}]>"
 
     @decorators.requires_auth
     def delete(self):

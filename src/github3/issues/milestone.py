@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
 from json import dumps
 
 from . import label
 from .. import users
-
 from ..decorators import requires_auth
 from ..models import GitHubCore
 
@@ -85,7 +82,7 @@ class Milestone(GitHubCore):
         self.updated_at = self._strptime(milestone["updated_at"])
 
     def _repr(self):
-        return "<Milestone [{0}]>".format(self)
+        return f"<Milestone [{self}]>"
 
     def __str__(self):
         return self.title

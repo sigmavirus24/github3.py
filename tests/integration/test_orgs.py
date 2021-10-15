@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Organization."""
 import pytest
 
 import github3
-
 from .helper import IntegrationHelper
 
 
@@ -27,7 +25,7 @@ class TestOrganization(IntegrationHelper):
             if team.name == team_name:
                 break
         else:
-            assert False, 'Could not find team "{0}"'.format(team_name)
+            assert False, f'Could not find team "{team_name}"'
 
         return team
 
@@ -39,6 +37,48 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
             team = self.get_team(o)
             assert o.add_repository("github3py/urllib3", team.id) is True
+
+    def test_blocked_users(self):
+        """Test the ability to retrieve a list of blocked users."""
+        self.token_login()
+        cassette_name = self.cassette_name("blocked_users")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.block("o")
+            users = list(o.blocked_users())
+            assert o.unblock("o")
+
+        assert len(users) == 1
+        assert ["o"] == [str(u) for u in users]
+
+    def test_block(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("block")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.block("o")
+            assert o.unblock("o")
+
+    def test_unblock(self):
+        """Test the ability to unblock a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("unblock")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.block("o")
+            assert o.unblock("o")
+
+    def test_is_blocking(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("is_blocking")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.is_blocking("o") is False
+            assert o.block("o")
+            assert o.is_blocking("o")
+            assert o.unblock("o")
 
     def test_create_project(self):
         """Test the ability to create a project in an organization."""

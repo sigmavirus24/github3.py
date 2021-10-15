@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """Module containing the logic for labels."""
-
 from json import dumps
+
 from ..decorators import requires_auth
 from ..models import GitHubCore
 
@@ -113,5 +112,5 @@ class Label(_Label):
     class_name = "Label"
 
     def _update_attributes(self, label):
-        super(Label, self)._update_attributes(label)
+        super()._update_attributes(label)
         self.description = label["description"]

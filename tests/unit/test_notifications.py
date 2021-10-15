@@ -1,7 +1,8 @@
 """Unit tests around the Thread class."""
 import github3
-
-from .helper import UnitHelper, create_example_data_helper, create_url_helper
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("notification_example")
 url_for = create_url_helper("https://api.github.com/notifications/threads/1")
@@ -24,7 +25,7 @@ class TestThread(UnitHelper):
 
     def test_repr(self):
         """Show instance string is formatted correctly."""
-        assert repr(self.instance) == "<Thread [{0}]>".format(
+        assert repr(self.instance) == "<Thread [{}]>".format(
             self.instance.subject.get("title")
         )
 

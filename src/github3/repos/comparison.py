@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """This module contains the Comparison object."""
-
 from . import commit
 from .. import models
 
@@ -81,7 +79,7 @@ class Comparison(models.GitHubCore):
         self._uniq = self.commits
 
     def _repr(self):
-        return "<Comparison of {0} commits>".format(self.total_commits)
+        return f"<Comparison of {self.total_commits} commits>"
 
     def diff(self):
         """Retrieve the diff for this comparison.

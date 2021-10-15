@@ -2,7 +2,6 @@
 import pytest
 
 from . import helper
-
 from github3 import GitHubError
 from github3 import pulls
 
@@ -210,7 +209,7 @@ class TestPullReview(helper.UnitHelper):
         self.instance.submit("body", "APPROVED")
 
         self.post_called_with(
-            url_for("reviews/{0}/events".format(self.instance.id)),
+            url_for(f"reviews/{self.instance.id}/events"),
             data={"body": "body", "event": "APPROVED"},
         )
 

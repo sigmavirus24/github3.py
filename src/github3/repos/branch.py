@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """Implementation of a branch on a repository."""
-
 from . import commit
 from .. import decorators
 from .. import models
@@ -27,7 +25,7 @@ class _Branch(models.GitHubCore):
         self._api = self._build_url("branches", self.name, base_url=base)
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.name)
+        return f"<{self.class_name} [{self.name}]>"
 
     def latest_sha(self, differs_from=""):
         """Check if SHA-1 is the same as the remote branch.
@@ -44,7 +42,7 @@ class _Branch(models.GitHubCore):
         # If-None-Match returns 200 instead of 304 value does not have quotes
         headers = {
             "Accept": "application/vnd.github.v3.sha",
-            "If-None-Match": '"{0}"'.format(differs_from),
+            "If-None-Match": f'"{differs_from}"',
         }
         base = self._api.split("/branches", 1)[0]
         url = self._build_url("commits", self.name, base_url=base)
@@ -172,7 +170,7 @@ class Branch(_Branch):
     class_name = "Repository Branch"
 
     def _update_attributes(self, branch):
-        super(Branch, self)._update_attributes(branch)
+        super()._update_attributes(branch)
         self.commit = commit.ShortCommit(branch["commit"], self)
         #: Returns '_links' attribute.
         self.links = branch["_links"]

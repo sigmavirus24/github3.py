@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 """This module contains the Gist, ShortGist, and GistFork objects."""
 from json import dumps
 
-from .. import models
-from .. import users
-
-from ..decorators import requires_auth
 from . import comment
 from . import file as gistfile
 from . import history
+from .. import models
+from .. import users
+from ..decorators import requires_auth
 
 
 class _Gist(models.GitHubCore):
@@ -265,7 +263,7 @@ class GistFork(models.GitHubCore):
         self.url = self._api = fork["url"]
 
     def _repr(self):
-        return "<GistFork [{0}]>".format(self.id)
+        return f"<GistFork [{self.id}]>"
 
     def to_gist(self):
         """Retrieve the full Gist representation of this fork.
@@ -324,7 +322,7 @@ class Gist(_Gist):
     _file_class = gistfile.GistFile
 
     def _update_attributes(self, gist):
-        super(Gist, self)._update_attributes(gist)
+        super()._update_attributes(gist)
         self.commits_url = gist["commits_url"]
         self.original_forks = [GistFork(fork, self) for fork in gist["forks"]]
         self.forks_url = gist["forks_url"]

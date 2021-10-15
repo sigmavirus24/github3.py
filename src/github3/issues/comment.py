@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module with class(es) representing issue comments."""
 from .. import decorators
 from .. import models
@@ -72,7 +71,7 @@ class IssueComment(models.GitHubCore):
         self.user = users.ShortUser(comment["user"], self)
 
     def _repr(self):
-        return "<IssueComment [{0}]>".format(self.user.login)
+        return f"<IssueComment [{self.user.login}]>"
 
     @decorators.requires_auth
     def delete(self):

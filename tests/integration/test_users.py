@@ -1,8 +1,9 @@
 """Integration tests for the User class."""
-import github3
 import datetime
+
 import pytest
 
+import github3
 from .helper import IntegrationHelper
 from github3.exceptions import MethodNotAllowed
 

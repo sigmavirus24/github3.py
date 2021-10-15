@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """Repository and contributor stats logic."""
-
 import datetime
 
 import dateutil.tz
@@ -82,4 +80,4 @@ class ContributorStats(models.GitHubCore):
         self.alternate_weeks = self.alt_weeks = alt_weeks
 
     def _repr(self):
-        return "<Contributor Statistics [{0}]>".format(self.author)
+        return f"<Contributor Statistics [{self.author}]>"

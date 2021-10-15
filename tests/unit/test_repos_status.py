@@ -1,6 +1,6 @@
 import github3
-
-from .helper import UnitHelper, create_example_data_helper
+from .helper import create_example_data_helper
+from .helper import UnitHelper
 
 get_combined_status_example_data = create_example_data_helper(
     "repos_combined_status_example"

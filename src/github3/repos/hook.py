@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 """This module contains only the Hook object for GitHub's Hook API."""
-
 from json import dumps
+
 from ..decorators import requires_auth
 from ..models import GitHubCore
 
@@ -55,7 +54,7 @@ class Hook(GitHubCore):
         self.updated_at = self._strptime(hook["updated_at"])
 
     def _repr(self):
-        return "<Hook [{0}]>".format(self.name)
+        return f"<Hook [{self.name}]>"
 
     @requires_auth
     def delete(self):

@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """Topics related logic."""
-
 from .. import models
 
 
@@ -16,4 +14,4 @@ class Topics(models.GitHubCore):
         self.names = topics["names"]
 
     def _repr(self):
-        return "<Topics [{0}]>".format(", ".join(self.names))
+        return "<Topics [{}]>".format(", ".join(self.names))

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """A collection of useful utilities."""
 import collections.abc as abc_collections
-
 import datetime
 import re
 

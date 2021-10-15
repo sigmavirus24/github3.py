@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Module containing the GistHistory object."""
 from .. import models
 from .. import users

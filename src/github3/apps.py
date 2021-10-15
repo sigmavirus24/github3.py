@@ -98,7 +98,7 @@ class App(models.GitHubCore):
         self._api = self.url = self._build_url("apps", slug)
 
     def _repr(self):
-        return '<App ["{}" by {}]>'.format(self.name, str(self.owner))
+        return f'<App ["{self.name}" by {str(self.owner)}]>'
 
 
 class Installation(models.GitHubCore):
@@ -191,6 +191,6 @@ def create_jwt_headers(
         dict
     """
     jwt_token = create_token(private_key_pem, app_id, expire_in)
-    headers = {"Authorization": "Bearer {}".format(jwt_token)}
+    headers = {"Authorization": f"Bearer {jwt_token}"}
     headers.update(APP_PREVIEW_HEADERS)
     return headers

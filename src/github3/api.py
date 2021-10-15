@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 github3.api
 ===========
@@ -7,8 +6,8 @@ github3.api
 :license: Modified BSD, see LICENSE for more details
 
 """
-
-from .github import GitHub, GitHubEnterprise
+from .github import GitHub
+from .github import GitHubEnterprise
 
 gh = GitHub()
 

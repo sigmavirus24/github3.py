@@ -1,20 +1,18 @@
 """Unit tests around github3's Checks classes."""
-import pytest
 from json import dumps
 
+import pytest
+
 import github3
-
-from github3.checks import CheckRun, CheckSuite
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitAppInstallHelper
+from .helper import UnitHelper
+from .helper import UnitIteratorHelper
+from .helper import UnitRequiresAuthenticationHelper
+from github3.checks import CheckRun
+from github3.checks import CheckSuite
 from github3.exceptions import GitHubException
-
-from .helper import (
-    UnitAppInstallHelper,
-    UnitRequiresAuthenticationHelper,
-    UnitHelper,
-    UnitIteratorHelper,
-    create_url_helper,
-    create_example_data_helper,
-)
 
 url_for = create_url_helper("https://api.github.com/repos/github/hello-world")
 

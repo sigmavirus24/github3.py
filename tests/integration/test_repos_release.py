@@ -1,9 +1,9 @@
-import github3
 import os
 import tempfile
 
 import pytest
 
+import github3
 from .helper import IntegrationHelper
 
 
@@ -155,7 +155,7 @@ class TestAsset(IntegrationHelper):
         with self.recorder.use_cassette(
             cassette_name,
             preserve_exact_body_bytes=True,
-            **self.betamax_simple_body
+            **self.betamax_simple_body,
         ):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             release = repository.release(76677)
@@ -176,7 +176,7 @@ class TestAsset(IntegrationHelper):
         with self.recorder.use_cassette(
             cassette_name,
             preserve_exact_body_bytes=True,
-            **self.betamax_simple_body
+            **self.betamax_simple_body,
         ):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             release = repository.release(76677)
@@ -208,7 +208,7 @@ class TestAsset(IntegrationHelper):
         with self.recorder.use_cassette(
             cassette_name,
             preserve_exact_body_bytes=True,
-            **self.betamax_simple_body
+            **self.betamax_simple_body,
         ):
             file_contents = "Hello World"
             asset = release.upload_asset(
