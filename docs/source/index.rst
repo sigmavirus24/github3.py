@@ -35,7 +35,7 @@ user:
     print(kennethreitz.login)
     print(kennethreitz.followers_count)
 
-    followers = [str(f) for f in gh.followers('kennethreitz')]
+    followers = [str(f) for f in gh.followers_of('kennethreitz')]
 
 There are several examples of different aspects of using github3.py
 
