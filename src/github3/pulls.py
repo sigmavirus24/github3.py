@@ -201,8 +201,8 @@ class _PullRequest(models.GitHubCore):
         self.assignees = [users.ShortUser(a, self) for a in pull["assignees"]]
         self.base = Base(pull["base"], self)
         self.body = pull["body"]
-        self.body_html = pull["body_html"]
-        self.body_text = pull["body_text"]
+        self.body_html = pull["body"]
+        self.body_text = pull["body"]
         self.closed_at = self._strptime(pull["closed_at"])
         self.comments_url = pull["comments_url"]
         self.commits_url = pull["commits_url"]
@@ -965,8 +965,8 @@ class PullReview(models.GitHubCore):
         self.id = review["id"]
         self.author_association = review["author_association"]
         self.body = review["body"]
-        self.body_html = review["body_html"]
-        self.body_text = review["body_text"]
+        self.body_html = review["body"]
+        self.body_text = review["body"]
         # NOTE(pabelanger): In some cases, commit_id could be missing on a
         # PullReview.
         self.commit_id = review.get("commit_id", None)
@@ -1090,8 +1090,8 @@ class ReviewComment(models.GitHubCore):
         self.id = comment["id"]
         self.author_association = comment["author_association"]
         self.body = comment["body"]
-        self.body_html = comment["body_html"]
-        self.body_text = comment["body_text"]
+        self.body_html = comment["body"]
+        self.body_text = comment["body"]
         self.commit_id = comment["commit_id"]
         self.created_at = self._strptime(comment["created_at"])
         self.diff_hunk = comment["diff_hunk"]
