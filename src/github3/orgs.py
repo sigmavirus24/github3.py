@@ -439,6 +439,8 @@ class _Organization(models.GitHubCore):
     ) -> t.Generator[users.ShortUser, None, None]:
         """Iterate over the users blocked by this organization.
 
+        .. versionadded:: 2.1.0
+
         :param int number:
             (optional), number of users to iterate over.  Default: -1 iterates
             over all values
@@ -456,6 +458,8 @@ class _Organization(models.GitHubCore):
     def block(self, username: users.UserLike) -> bool:
         """Block a specific user from an organization.
 
+        .. versionadded:: 2.1.0
+
         :parameter str username:
             Name (or user-like instance) of the user to block.
         :returns:
@@ -470,6 +474,8 @@ class _Organization(models.GitHubCore):
     def unblock(self, username: users.UserLike) -> bool:
         """Unblock a specific user from an organization.
 
+        .. versionadded:: 2.1.0
+
         :parameter str username:
             Name (or user-like instance) of the user to unblock.
         :returns:
@@ -483,6 +489,8 @@ class _Organization(models.GitHubCore):
     @requires_auth
     def is_blocking(self, username: users.UserLike) -> bool:
         """Check if this organization is blocking a specific user.
+
+        .. versionadded:: 2.1.0
 
         :parameter str username:
             Name (or user-like instance) of the user to unblock.

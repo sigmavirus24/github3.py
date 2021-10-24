@@ -83,6 +83,7 @@ class TestCheckSuite(IntegrationHelper):
 
 
 class TestCheckApp(IntegrationHelper):
+    @pytest.mark.skip
     def test_check_app_refresh(self):
         cassette_name = self.cassette_name("create_check_run")
         with self.recorder.use_cassette(cassette_name):

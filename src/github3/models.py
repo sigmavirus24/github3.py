@@ -282,7 +282,7 @@ class GitHubCore:
         self._remaining = core.get("remaining", 0)
         return self._remaining
 
-    def refresh(self, conditional=False):
+    def refresh(self, conditional: bool = False) -> "GitHubCore":
         """Re-retrieve the information for this object.
 
         The reasoning for the return value is the following example: ::

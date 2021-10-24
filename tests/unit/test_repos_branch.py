@@ -28,68 +28,11 @@ class TestBranch(helper.UnitHelper):
             url_for_commits(), headers=headers
         )
 
-    def test_protect(self):
-        """Verify the request to protect a branch."""
-        headers = {"Accept": "application/vnd.github.loki-preview+json"}
-        json = {
-            "protection": {
-                "enabled": True,
-                "required_status_checks": {
-                    "enforcement_level": "non_admins",
-                    "contexts": ["continuous-integration/travis-ci"],
-                },
-            }
-        }
-
-        self.instance.protect()
-        self.session.patch.assert_called_once_with(
-            url_for_branches(), headers=headers, json=json
-        )
-
-    def test_protect_enforcement(self):
-        """Verify the request to protect a branch changing enforcement."""
-        headers = {"Accept": "application/vnd.github.loki-preview+json"}
-        json = {
-            "protection": {
-                "enabled": True,
-                "required_status_checks": {
-                    "enforcement_level": "off",
-                    "contexts": ["continuous-integration/travis-ci"],
-                },
-            }
-        }
-
-        self.instance.protect(enforcement="off")
-        self.session.patch.assert_called_once_with(
-            url_for_branches(), headers=headers, json=json
-        )
-
-    def test_protect_status_checks(self):
-        """Verify the request to protect a branch changing status checks."""
-        headers = {"Accept": "application/vnd.github.loki-preview+json"}
-        json = {
-            "protection": {
-                "enabled": True,
-                "required_status_checks": {
-                    "enforcement_level": "non_admins",
-                    "contexts": ["another/status-check"],
-                },
-            }
-        }
-
-        self.instance.protect(status_checks=["another/status-check"])
-        self.session.patch.assert_called_once_with(
-            url_for_branches(), headers=headers, json=json
-        )
-
     def test_unprotect(self):
         """Verify the request to unprotect a branch."""
-        headers = {"Accept": "application/vnd.github.loki-preview+json"}
-        json = {"protection": {"enabled": False}}
-
         self.instance.unprotect()
-        self.session.patch.assert_called_once_with(
-            url_for_branches(), headers=headers, json=json
+        self.session.delete.assert_called_once_with(
+            url_for_branches("protection")
         )
 
 
