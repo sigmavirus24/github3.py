@@ -1,7 +1,6 @@
 """Unit tests for methods implemented on Branch Protection."""
 import github3
 from . import helper
-from github3.repos.branch import BranchProtection
 
 protection_example_data = helper.create_example_data_helper(
     "branch_protection_example"
@@ -120,7 +119,6 @@ class TestProtectionRestrictions(helper.UnitHelper):
         self.post_called_with(
             protection_restrictions_teams_url_for(),
             data=["justice-league"],
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def test_remove_teams(self):
@@ -129,7 +127,6 @@ class TestProtectionRestrictions(helper.UnitHelper):
         self.delete_called_with(
             protection_restrictions_teams_url_for(),
             json=["justice-league"],
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def test_add_users(self):
@@ -157,7 +154,6 @@ class TestProtectionRestrictions(helper.UnitHelper):
         self.put_called_with(
             protection_restrictions_teams_url_for(),
             json=["justice-league"],
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def test_replace_users(self):
