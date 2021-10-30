@@ -1341,7 +1341,7 @@ class _Repository(models.GitHubCore):
             return self.create_ref("refs/tags/" + tag, sha)
 
         json = None
-        if tag and message and sha and obj_type and len(tagger) == 2:
+        if tag and message and sha and obj_type and len(tagger) >= 2:
             data = {
                 "tag": tag,
                 "message": message,
