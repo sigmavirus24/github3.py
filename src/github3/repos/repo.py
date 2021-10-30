@@ -1326,7 +1326,7 @@ class _Repository(models.GitHubCore):
             'blob'
         :param dict tagger:
             (required), containing the name, email of the
-            tagger and the date it was tagged
+            tagger and optionally the date it was tagged
         :param bool lightweight:
             (optional), if False, create an annotated
             tag, otherwise create a lightweight tag (a Reference).
@@ -1341,7 +1341,7 @@ class _Repository(models.GitHubCore):
             return self.create_ref("refs/tags/" + tag, sha)
 
         json = None
-        if tag and message and sha and obj_type and len(tagger) == 3:
+        if tag and message and sha and obj_type and len(tagger) == 2:
             data = {
                 "tag": tag,
                 "message": message,
