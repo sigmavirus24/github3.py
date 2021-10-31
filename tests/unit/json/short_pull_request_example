@@ -188,7 +188,8 @@
       "privacy": "closed",
       "permission": "admin",
       "members_url": "https://api.github.com/teams/1/members{/member}",
-      "repositories_url": "https://api.github.com/teams/1/repos"
+      "repositories_url": "https://api.github.com/teams/1/repos",
+      "parent": null
     }
   ],
   "head": {
@@ -294,6 +295,7 @@
       "size": 108,
       "default_branch": "master",
       "open_issues_count": 0,
+      "is_template": true,
       "topics": [
         "octocat",
         "atom",
@@ -307,6 +309,7 @@
       "has_downloads": true,
       "archived": false,
       "disabled": false,
+      "visibility": "public",
       "pushed_at": "2011-01-26T19:06:43Z",
       "created_at": "2011-01-26T19:01:12Z",
       "updated_at": "2011-01-26T19:14:43Z",
@@ -316,20 +319,25 @@
         "pull": true
       },
       "allow_rebase_merge": true,
+      "template_repository": null,
       "temp_clone_token": "ABTLWHOULUVAXGTRYU7OC2876QJ2O",
       "allow_squash_merge": true,
+      "allow_auto_merge": false,
+      "delete_branch_on_merge": true,
       "allow_merge_commit": true,
-      "allow_forking": true,
-      "forks": 123,
-      "open_issues": 123,
+      "subscribers_count": 42,
+      "network_count": 0,
       "license": {
         "key": "mit",
         "name": "MIT License",
         "url": "https://api.github.com/licenses/mit",
         "spdx_id": "MIT",
-        "node_id": "MDc6TGljZW5zZW1pdA=="
+        "node_id": "MDc6TGljZW5zZW1pdA==",
+        "html_url": "https://github.com/licenses/mit"
       },
-      "watchers": 123
+      "forks": 1,
+      "open_issues": 1,
+      "watchers": 1
     }
   },
   "base": {
@@ -435,6 +443,7 @@
       "size": 108,
       "default_branch": "master",
       "open_issues_count": 0,
+      "is_template": true,
       "topics": [
         "octocat",
         "atom",
@@ -448,6 +457,7 @@
       "has_downloads": true,
       "archived": false,
       "disabled": false,
+      "visibility": "public",
       "pushed_at": "2011-01-26T19:06:43Z",
       "created_at": "2011-01-26T19:01:12Z",
       "updated_at": "2011-01-26T19:14:43Z",
@@ -457,19 +467,25 @@
         "pull": true
       },
       "allow_rebase_merge": true,
+      "template_repository": null,
       "temp_clone_token": "ABTLWHOULUVAXGTRYU7OC2876QJ2O",
       "allow_squash_merge": true,
+      "allow_auto_merge": false,
+      "delete_branch_on_merge": true,
       "allow_merge_commit": true,
-      "forks": 123,
-      "open_issues": 123,
+      "subscribers_count": 42,
+      "network_count": 0,
       "license": {
         "key": "mit",
         "name": "MIT License",
         "url": "https://api.github.com/licenses/mit",
         "spdx_id": "MIT",
-        "node_id": "MDc6TGljZW5zZW1pdA=="
+        "node_id": "MDc6TGljZW5zZW1pdA==",
+        "html_url": "https://github.com/licenses/mit"
       },
-      "watchers": 123
+      "forks": 1,
+      "open_issues": 1,
+      "watchers": 1
     }
   },
   "_links": {
@@ -500,36 +516,5 @@
   },
   "author_association": "OWNER",
   "auto_merge": null,
-  "draft": false,
-  "merged": false,
-  "mergeable": true,
-  "rebaseable": true,
-  "mergeable_state": "clean",
-  "merged_by": {
-    "login": "octocat",
-    "id": 1,
-    "node_id": "MDQ6VXNlcjE=",
-    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/octocat",
-    "html_url": "https://github.com/octocat",
-    "followers_url": "https://api.github.com/users/octocat/followers",
-    "following_url": "https://api.github.com/users/octocat/following{/other_user}",
-    "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
-    "organizations_url": "https://api.github.com/users/octocat/orgs",
-    "repos_url": "https://api.github.com/users/octocat/repos",
-    "events_url": "https://api.github.com/users/octocat/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/octocat/received_events",
-    "type": "User",
-    "site_admin": false
-  },
-  "comments": 10,
-  "review_comments": 0,
-  "maintainer_can_modify": true,
-  "commits": 3,
-  "additions": 100,
-  "deletions": 3,
-  "changed_files": 5
+  "draft": false
 }

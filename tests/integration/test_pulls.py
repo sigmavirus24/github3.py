@@ -16,7 +16,7 @@ class TestPullRequest(IntegrationHelper):
 
     def test_close(self):
         """Show that one can close an open Pull Request."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("close")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(
@@ -26,7 +26,7 @@ class TestPullRequest(IntegrationHelper):
 
     def test_create_comment(self):
         """Show that a user can create a comment on a PR."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("create_comment")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=423)
@@ -43,7 +43,7 @@ class TestPullRequest(IntegrationHelper):
 
     def test_create_review_comment(self):
         """Show that a user can create an in-line reveiw comment on a PR."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("create_review_comment")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(num=286)
@@ -149,7 +149,7 @@ class TestPullRequest(IntegrationHelper):
 
     def test_reopen(self):
         """Show that one can reopen an open Pull Request."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("reopen")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(
@@ -175,7 +175,7 @@ class TestPullRequest(IntegrationHelper):
 
     def test_update(self):
         """Show that one can update an open Pull Request."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("update")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request(
@@ -185,7 +185,7 @@ class TestPullRequest(IntegrationHelper):
 
     def test_repository(self):
         """Show that the pull request has the owner repository."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("single")
         with self.recorder.use_cassette(cassette_name):
             p = self.get_pull_request()
@@ -210,7 +210,7 @@ class TestReviewComment(IntegrationHelper):
 
     def test_reply(self):
         """Show that a user can reply to an existing ReviewComment."""
-        self.basic_login()
+        self.token_login()
         cassette_name = self.cassette_name("reply")
         with self.recorder.use_cassette(cassette_name):
             p = self.gh.pull_request("github3py", "delete_contents", 2)
