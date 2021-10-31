@@ -1514,7 +1514,7 @@ class _Repository(models.GitHubCore):
         allow_squash_merge=None,
         allow_rebase_merge=None,
         has_projects=None,
-        delete_branch_on_merge=None
+        delete_branch_on_merge=None,
     ):
         """Edit this repository.
 
