@@ -195,6 +195,7 @@ class _PullRequest(models.GitHubCore):
         from . import orgs
 
         self._api = pull["url"]
+        self.active_lock_reason = pull["active_lock_reason"]
         self.assignee = pull["assignee"]
         if self.assignee is not None:
             self.assignee = users.ShortUser(self.assignee, self)
@@ -213,6 +214,7 @@ class _PullRequest(models.GitHubCore):
         self.id = pull["id"]
         self.issue_url = pull["issue_url"]
         self.links = pull["_links"]
+        self.locked = pull["locked"]
         self.merge_commit_sha = pull["merge_commit_sha"]
         self.merged_at = self._strptime(pull["merged_at"])
         self.number = pull["number"]
@@ -710,9 +712,12 @@ class PullRequest(_PullRequest):
     def _update_attributes(self, pull):
         super()._update_attributes(pull)
         self.additions_count = pull["additions"]
-        self.deletions_count = pull["deletions"]
+        self.auto_merge = pull["auto_merge"]
+        self.author_association = pull["author_association"]
         self.comments_count = pull["comments"]
         self.commits_count = pull["commits"]
+        self.deletions_count = pull["deletions"]
+        self.draft = pull["draft"]
         self.mergeable = pull["mergeable"]
         self.mergeable_state = pull["mergeable_state"]
         self.merged = pull["merged"]
@@ -720,6 +725,22 @@ class PullRequest(_PullRequest):
         if self.merged_by is not None:
             self.merged_by = users.ShortUser(self.merged_by, self)
         self.review_comments_count = pull["review_comments"]
+
+        requested_teams = pull["requested_teams"]
+        self.requested_teams = []
+        if requested_teams:
+            from . import orgs
+
+            self.requested_teams = [
+                orgs.ShortTeam(team, self) for team in requested_teams
+            ]
+
+        requested_reviewers = pull["requested_reviewers"]
+        self.requested_reviewers = []
+        if requested_reviewers:
+            self.requested_reviewers = [
+                users.ShortUser(user, self) for user in requested_reviewers
+            ]
 
 
 class ShortPullRequest(_PullRequest):
