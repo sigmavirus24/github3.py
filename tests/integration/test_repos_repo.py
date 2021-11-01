@@ -1212,7 +1212,8 @@ class TestRepository(helper.IntegrationHelper):
 
         assert len(stargazers) > 0
         for user in stargazers:
-            assert isinstance(user, github3.users.ShortUser)
+            assert isinstance(user, github3.users._User)
+            assert isinstance(user, github3.users.Stargazer)
 
     def test_statuses(self):
         """Test the ability to retrieve a commit's statuses."""
