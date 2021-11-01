@@ -1428,11 +1428,15 @@ class GitHub(models.GitHubCore):
         self.session.app_bearer_token_auth(token, expire_in)
 
     def login_as_app_installation(
-        self, private_key_pem, app_id, installation_id
+        self, private_key_pem, app_id, installation_id, expire_in=30
     ):
         """Login using your GitHub App's installation credentials.
 
         .. versionadded:: 1.2.0
+
+        .. versionchanged:: 3.0.0
+
+            Added ``expire_in`` parameter.
 
         .. seealso::
 
@@ -1455,17 +1459,23 @@ class GitHub(models.GitHubCore):
             The integer identifier for this GitHub Application.
         :param int installation_id:
             The integer identifier of your App's installation.
+        :param int expire_in:
+            (Optional) The number of seconds in the future that the underlying
+            JWT expires. To prevent tokens from being valid for too long and
+            creating a security risk, the library defaults to 30 seconds. In
+            the event that clock drift is significant between your machine and
+            GitHub's servers, you can set this higher than 30.
+            Default: 30
 
         .. _Authenticating as an Installation:
             https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-an-installation
         .. _Create a new installation token:
             https://developer.github.com/v3/apps/#create-a-new-installation-token
         """
-        # NOTE(sigmavirus24): This JWT token does not need to last very long.
-        # Instead of allowing it to stick around for 10 minutes, let's limit
-        # it to 30 seconds.
-        jwt_token = apps.create_token(private_key_pem, app_id, expire_in=30)
-        bearer_auth = session.AppBearerTokenAuth(jwt_token, 30)
+        jwt_token = apps.create_token(
+            private_key_pem, app_id, expire_in=expire_in
+        )
+        bearer_auth = session.AppBearerTokenAuth(jwt_token, expire_in)
         url = self._build_url(
             "app", "installations", str(installation_id), "access_tokens"
         )
