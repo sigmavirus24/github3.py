@@ -15,6 +15,7 @@
     issues
     notifications
     orgs
+    projects
     pulls
     repos
     search
