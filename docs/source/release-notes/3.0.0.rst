@@ -1,4 +1,4 @@
-3.0.0: 2021-10-30
+3.0.0: 2021-10-31
 -----------------
 
 Backwards Incompatible Changes
