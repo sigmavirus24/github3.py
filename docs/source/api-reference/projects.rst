@@ -1,6 +1,6 @@
-========================================
- Projectss and their Associated Objects
-========================================
+=======================================
+ Projects and their Associated Objects
+=======================================
 
 This section of the documentation covers the representations of various
 objects related to the `Projects API`_.
