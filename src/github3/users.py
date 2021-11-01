@@ -840,6 +840,28 @@ class ShortUser(_User):
     _refresh_to = User
 
 
+class Stargazer(_User):
+    """Object representing a user that has starred a repository.
+
+    .. versionadded:: 3.0.0
+
+    This object contains all of the attributes available on
+    :class:`~github3.users.ShortUser` as well as the following:
+
+    .. attribute:: starred_at
+
+        The time and date that the user starred the repository this was
+        queried from.
+    """
+
+    class_name = "Stargazer"
+    _refresh_to = User
+
+    def _update_attributes(self, stargazer):
+        super()._update_attributes(stargazer["user"])
+        self.starred_at = self._strptime(stargazer["starred_at"])
+
+
 class AuthenticatedUser(User):
     """Object to represent the currently authenticated user.
 

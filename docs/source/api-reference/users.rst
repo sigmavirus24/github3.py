@@ -12,6 +12,9 @@ User Objects
 .. autoclass:: github3.users.ShortUser
     :inherited-members:
 
+.. autoclass:: github3.users.Stargazer
+    :inherited-members:
+
 .. autoclass:: github3.users.User
     :inherited-members:
 
