@@ -1,7 +1,7 @@
 .. image::
     https://raw.github.com/sigmavirus24/github3.py/master/docs/img/gh3-logo.png
 
-github3.py is a comprehensive, actively developed and extraordinarily stable
+github3.py is a comprehensive, actively developed, and extraordinarily stable
 wrapper around the GitHub API (v3).
 
 Note: This library currently works with Python 3.6+ or pypy3. For older versions, please use version 1.3.0.
@@ -87,9 +87,9 @@ Contact Options
 ---------------
 
 - Feel free to use the `github3.py`_ tag on Stack Overflow for any questions
-  you may have
-- If you dislike Stack Overflow it is preferred that you send an email to
-  github3.py@librelist.com
+  you may have.
+- If you dislike Stack Overflow, it is preferred that you send an email to
+  github3.py@librelist.com .
 - You may also contact (via email_) the author directly with
   questions/suggestions/comments or if you wish to include sensitive data.
 
