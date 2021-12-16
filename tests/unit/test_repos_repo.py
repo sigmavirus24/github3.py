@@ -1385,7 +1385,9 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for("stargazers"), params={"per_page": 100}, headers={}
+            url_for("stargazers"),
+            params={"per_page": 100},
+            headers={"Accept": "application/vnd.github.v3.star+json"},
         )
 
     def test_statuses(self):

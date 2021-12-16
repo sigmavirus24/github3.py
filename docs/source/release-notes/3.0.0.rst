@@ -1,4 +1,4 @@
-3.0.0: 2021-10-30
+3.0.0: 2021-10-31
 -----------------
 
 Backwards Incompatible Changes
@@ -32,3 +32,6 @@ Features Added
 
 - Add support for beta branch synchronization endpoint
   :meth:`~github3.repos.branch.Branch.sync_with_upstream`
+
+- :class:`~github3.users.Stargazer` was added to give access to the
+  ``starred_at`` value when listing stargazers on a Repository object.

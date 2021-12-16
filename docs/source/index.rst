@@ -48,7 +48,6 @@ There are several examples of different aspects of using github3.py
     examples/git
     examples/github
     examples/issue
-    examples/iterators
     examples/logging
     examples/octocat
 

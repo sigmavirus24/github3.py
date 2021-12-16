@@ -2636,10 +2636,16 @@ class _Repository(models.GitHubCore):
         :returns:
             generator of users
         :rtype:
-            :class:`~github3.users.ShortUser`
+            :class:`~github3.users.Stargazer`
         """
         url = self._build_url("stargazers", base_url=self._api)
-        return self._iter(int(number), url, users.ShortUser, etag=etag)
+        return self._iter(
+            int(number),
+            url,
+            users.Stargazer,
+            etag=etag,
+            headers={"Accept": "application/vnd.github.v3.star+json"},
+        )
 
     def statuses(self, sha, number=-1, etag=None):
         """Iterate over the statuses for a specific SHA.

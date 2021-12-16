@@ -27,6 +27,9 @@ class _Team(models.GitHubCore):
         self.members_urlt = URITemplate(team["members_url"])
         self.name = team["name"]
         self.permission = team["permission"]
+        self.privacy = team.get(
+            "privacy"
+        )  # TODO: Re-record cassettes to ensure this exists
         self.repositories_url = team["repositories_url"]
         self.slug = team["slug"]
 
@@ -301,6 +304,10 @@ class ShortTeam(_Team):
 
         The level of permissions this team has, e.g., ``push``, ``pull``,
         or ``admin``.
+
+    .. attribute:: privacy
+
+        The privacy level of this team inside the organization.
 
     .. attribute:: repos_count
 
