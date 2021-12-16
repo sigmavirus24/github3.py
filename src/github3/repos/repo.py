@@ -2498,7 +2498,7 @@ class _Repository(models.GitHubCore):
         """
         json = None
         if ref:
-            url = self._build_url("git", "refs", ref, base_url=self._api)
+            url = self._build_url("git", "ref", ref, base_url=self._api)
             json = self._json(self._get(url), 200)
         return self._instance_or_null(git.Reference, json)
 
