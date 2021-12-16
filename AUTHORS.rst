@@ -12,7 +12,7 @@ Maintainer(s)
 
 - Matt Chung (@itsmemattchung)
 
-- Thiago D'Ávila (@staticdev)
+- Thiago (@staticdev)
 
 Requests
 ````````
@@ -208,3 +208,5 @@ Contributors
 - Gunnar Andersson (@gunnarx)
 
 - Nathan Walters (@nwalters512)
+
+- Thomas Lam (@lamcw)

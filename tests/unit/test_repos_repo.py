@@ -841,7 +841,7 @@ class TestRepository(helper.UnitHelper):
         """Verify the request for retrieving a reference."""
         self.instance.ref("heads/develop")
         self.session.get.assert_called_once_with(
-            url_for("git/refs/heads/develop")
+            url_for("git/ref/heads/develop")
         )
 
     def test_ref_required_ref(self):
