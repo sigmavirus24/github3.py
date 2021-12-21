@@ -1,7 +1,7 @@
 Before opening a new issue, please [search][] for a previously filed
 issue to ensure you're not creating a duplicate.
 
-**Note** Bug reports without the following will receive requests for these 
+**Note** Bug reports without the following will receive requests for these
 details to be provided.
 
 ## Version Information

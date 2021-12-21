@@ -1,10 +1,14 @@
-# -*- coding: utf-8 -*-
 """Implementation of a branch on a repository."""
-from __future__ import unicode_literals
+import typing as t
 
 from . import commit
 from .. import decorators
 from .. import models
+
+if t.TYPE_CHECKING:
+    from .. import apps as tapps
+    from .. import users as tusers
+    from . import orgs
 
 
 class _Branch(models.GitHubCore):
@@ -28,7 +32,7 @@ class _Branch(models.GitHubCore):
         self._api = self._build_url("branches", self.name, base_url=base)
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.name)
+        return f"<{self.class_name} [{self.name}]>"
 
     def latest_sha(self, differs_from=""):
         """Check if SHA-1 is the same as the remote branch.
@@ -40,12 +44,12 @@ class _Branch(models.GitHubCore):
         :returns:
             string of the SHA or None
         :rtype:
-            unicode on Python 2, str on Python 3
+            str on Python 3
         """
         # If-None-Match returns 200 instead of 304 value does not have quotes
         headers = {
             "Accept": "application/vnd.github.v3.sha",
-            "If-None-Match": '"{0}"'.format(differs_from),
+            "If-None-Match": f'"{differs_from}"',
         }
         base = self._api.split("/branches", 1)[0]
         url = self._build_url("commits", self.name, base_url=base)
@@ -55,7 +59,7 @@ class _Branch(models.GitHubCore):
         return None
 
     @decorators.requires_auth
-    def protection(self):
+    def protection(self) -> "BranchProtection":
         """Retrieve the protections enabled for this branch.
 
         See:
@@ -67,68 +71,130 @@ class _Branch(models.GitHubCore):
             :class:`~github3.repos.branch.BranchProtection`
         """
         url = self._build_url("protection", base_url=self._api)
-        preview_key = "required_approving_review_count"
-        headers = BranchProtection.PREVIEW_HEADERS_MAP[preview_key]
-        resp = self._get(url, headers=headers)
+        resp = self._get(url)
         json = self._json(resp, 200)
         return BranchProtection(json, self)
 
     @decorators.requires_auth
-    def protect(self, enforcement=None, status_checks=None):
+    def protect(
+        self,
+        required_status_checks: t.Optional[t.Mapping[str, t.Any]],
+        enforce_admins: t.Optional[bool],
+        required_pull_request_reviews: t.Optional[t.Mapping[str, t.Any]],
+        restrictions: t.Optional[t.Mapping[str, t.Sequence[str]]],
+        required_linear_history: t.Optional[bool] = None,
+        allow_force_pushes: t.Optional[bool] = None,
+        allow_deletions: t.Optional[bool] = None,
+        required_conversation_resolution: t.Optional[bool] = None,
+    ) -> "BranchProtection":
         """Enable force push protection and configure status check enforcement.
 
-        See: http://git.io/v4Gvu
+        See also:
+        https://docs.github.com/en/rest/reference/repos#update-branch-protection
 
-        :param str enforcement:
-            (optional), Specifies the enforcement level of the status checks.
-            Must be one of 'off', 'non_admins', or 'everyone'. Use `None` or
-            omit to use the already associated value.
-        :param list status_checks:
-            (optional), An list of strings naming status checks that must pass
-            before merging. Use `None` or omit to use the already associated
-            value.
+        .. versionchanged:: 3.0.0
+
+            The GitHub API changed since the last release this was updated in.
+            As such the parameters have to change here.
+
+        :param requireed_status_checks:
+            Required. Require status checks to pass before merging. Set to null
+            to disable.
+        :param enforce_admins:
+            Required. Enforce all configured restrictions for administrators.
+            Set to true to enforce required status checks for repository
+            administrators. Set to null to disable.
+        :param required_pull_request_reviews:
+            Required. Require at least one approving review on a pull request,
+            before merging. Set to null to disable.
+        :param restrictions:
+            Required. Restrict who can push to the protected branch. User,
+            app, and team restrictions are only available for
+            organization-owned repositories. Set to null to disable.
+        :param required_linear_history:
+            Enforces a linear commit Git history, which prevents anyone from
+            pushing merge commits to a branch. Set to true to enforce a linear
+            commit history. Set to false to disable a linear commit Git
+            history. Your repository must allow squash merging or rebase
+            merging before you can enable a linear commit history. Default:
+            false. For more information, see "Requiring a linear commit
+            history" in the GitHub Help documentation.
+        :param allow_force_pushes:
+            Permits force pushes to the protected branch by anyone with write
+            access to the repository. Set to true to allow force pushes. Set
+            to false or null to block force pushes. Default: false. For more
+            information, see "Enabling force pushes to a protected branch" in
+            the GitHub Help documentation."
+        :param allow_deletions:
+            Allows deletion of the protected branch by anyone with write
+            access to the repository. Set to false to prevent deletion of the
+            protected branch. Default: false. For more information, see
+            "Enabling force pushes to a protected branch" in the GitHub Help
+            documentation.
+        :param required_conversation_resolution:
+            Requires all conversations on code to be resolved before a pull
+            request can be merged into a branch that matches this rule. Set to
+            false to disable. Default: false.
         :returns:
-            True if successful, False otherwise
+            BranchProtection if successful
         :rtype:
-            bool
+            :class:`BranchProtection`
         """
-        previous_values = None
-        previous_protection = getattr(self, "original_protection", {})
-        if previous_protection:
-            previous_values = previous_protection.get(
-                "required_status_checks", {}
-            )
-        if enforcement is None and previous_values:
-            enforcement = previous_values["enforcement_level"]
-        if status_checks is None and previous_values:
-            status_checks = previous_values["contexts"]
-
         edit = {
-            "protection": {
-                "enabled": True,
-                "required_status_checks": {
-                    "enforcement_level": enforcement,
-                    "contexts": status_checks,
-                },
-            }
+            "required_status_checks": required_status_checks,
+            "enforce_admins": enforce_admins,
+            "required_pull_request_reviews": required_pull_request_reviews,
+            "restrictions": restrictions,
         }
-        resp = self._patch(self._api, json=edit, headers=self.PREVIEW_HEADERS)
+        if required_linear_history is not None:
+            edit["required_linear_history"] = required_linear_history
+        if allow_force_pushes is not None:
+            edit["allow_force_pushes"] = allow_force_pushes
+        if allow_deletions is not None:
+            edit["allow_deletions"] = allow_deletions
+        if required_conversation_resolution is not None:
+            edit[
+                "required_conversation_resolution"
+            ] = required_conversation_resolution
+        url = self._build_url("protection", base_url=self._api)
+        resp = self._put(url, json=edit)
         json = self._json(resp, 200)
-        if self._boolean(resp, 200, 404):
-            self._update_attributes(json)
-            return True
-        return False
+        return BranchProtection(json, self)
 
     @decorators.requires_auth
-    def unprotect(self):
-        """Disable force push protection on this branch."""
-        edit = {"protection": {"enabled": False}}
-        resp = self._patch(self._api, json=edit, headers=self.PREVIEW_HEADERS)
-        json = self._json(resp, 200)
-        if self._boolean(resp, 200, 404):
-            self._update_attributes(json)
-            return True
-        return False
+    def sync_with_upstream(self) -> t.Mapping[str, str]:
+        """Synchronize this branch with the upstream.
+
+        .. warning::
+
+            This API endpoint is still in Beta per gitHub
+
+        .. versionadded:: 3.0.0
+
+        Sync a branch of a forked repository to keep it up-to-date with the
+        upstream repository.
+
+        See also:
+        https://docs.github.com/en/rest/reference/repos#sync-a-fork-branch-with-the-upstream-repository
+
+        :returns:
+            The dictionary described in the documentation
+        :rtype:
+            dict
+        """
+        base = self._api.split("/branches", 1)[0]
+        url = self._build_url("merge-upstream", base_url=base)
+        json = self._json(self._post(url), 200)
+        return json
+
+    @decorators.requires_auth
+    def unprotect(self) -> bool:
+        """Disable protections on this branch."""
+        return self._boolean(
+            self._delete(self._build_url("protection", base_url=self._api)),
+            200,
+            403,
+        )
 
 
 class Branch(_Branch):
@@ -173,7 +239,7 @@ class Branch(_Branch):
     class_name = "Repository Branch"
 
     def _update_attributes(self, branch):
-        super(Branch, self)._update_attributes(branch)
+        super()._update_attributes(branch)
         self.commit = commit.ShortCommit(branch["commit"], self)
         #: Returns '_links' attribute.
         self.links = branch["_links"]
@@ -211,6 +277,10 @@ class ShortBranch(_Branch):
     class_name = "Short Repository Branch"
     _refresh_to = Branch
 
+    @t.overload
+    def refresh(self, conditional: bool = False) -> Branch:  # noqa: D102
+        ...
+
 
 class BranchProtection(models.GitHubCore):
     """The representation of a branch's protection.
@@ -219,6 +289,11 @@ class BranchProtection(models.GitHubCore):
 
         `Branch protection API documentation`_
             GitHub's documentation of branch protection
+
+    .. versionchanged:: 3.0.0
+
+        Added ``required_linear_history``, ``allow_force_pushes``,
+        ``allow_deletions``, and ``required_conversation_resolution``.
 
     This object has the following attributes:
 
@@ -244,22 +319,43 @@ class BranchProtection(models.GitHubCore):
         A :class:`~github3.repos.branch.ProtectionRequiredStatusChecks`
         representing the protection provided by requiring status checks.
 
+    .. attribute:: required_linear_history
+
+        .. versionadded:: 3.0.0
+
+        A :class:`~github3.repos.branch.ProtectionRequiredLinearHistory`
+        representing the information returned by the API about this
+        protection.
+
+    .. attribute:: allow_force_pushes
+
+        .. versionadded:: 3.0.0
+
+        A :class:`~github3.repos.branch.ProtectionAllowForcePushes`
+        representing the information returned by the API about this
+        protection.
+
+    .. attribute:: allow_deletions
+
+        .. versionadded:: 3.0.0
+
+        A :class:`~github3.repos.branch.ProtectionAllowDeletions`
+        representing the information returned by the API about this
+        protection.
+
+    .. attribute:: required_conversation_resolution
+
+        .. versionadded:: 3.0.0
+
+        A
+        :class:`~github3.repos.branch.ProtectionRequiredConversationResolution`
+        representing the information returned by the API about this
+        protection.
+
     .. links
     .. _Branch protection API documentation:
         https://developer.github.com/v3/repos/branches/#get-branch-protection
     """
-
-    PREVIEW_HEADERS_MAP = {
-        "required_approving_review_count": {
-            "Accept": "application/vnd.github.luke-cage-preview+json"
-        },
-        "requires_signed_commits": {
-            "Accept": "application/vnd.github.zzzax-preview+json"
-        },
-        "nested_teams": {
-            "Accept": "application/vnd.github.hellcat-preview+json"
-        },
-    }
 
     def _update_attributes(self, protection):
         self._api = protection["url"]
@@ -278,6 +374,17 @@ class BranchProtection(models.GitHubCore):
         )
         _set_conditional_attr(
             "required_status_checks", ProtectionRequiredStatusChecks
+        )
+        _set_conditional_attr(
+            "required_linear_history", ProtectionRequiredLinearHistory
+        )
+        _set_conditional_attr(
+            "allow_force_pushes", ProtectionAllowForcePushes
+        )
+        _set_conditional_attr("allow_deleteions", ProtectionAllowDeletions)
+        _set_conditional_attr(
+            "required_conversation_resolution",
+            ProtectionRequiredConversationResolution,
         )
 
     @decorators.requires_auth
@@ -354,16 +461,12 @@ class BranchProtection(models.GitHubCore):
             ),
         }
 
-        preview_key = "required_approving_review_count"
-        headers = BranchProtection.PREVIEW_HEADERS_MAP[preview_key]
-        json = self._json(
-            self._put(self._api, json=edit, headers=headers), 200
-        )
+        json = self._json(self._put(self._api, json=edit), 200)
         self._update_attributes(json)
         return self
 
     @decorators.requires_auth
-    def delete(self):
+    def delete(self) -> bool:
         """Remove branch protection.
 
         :returns:
@@ -373,6 +476,47 @@ class BranchProtection(models.GitHubCore):
         """
         resp = self._delete(self._api)
         return self._boolean(resp, 204, 404)
+
+    @decorators.requires_auth
+    def requires_signatures(self) -> bool:
+        """Check if commit signatures are presently required.
+
+        :returns:
+            True if enabled, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("required_signatures", base_url=self._api)
+        resp = self._get(url)
+        if resp.status_code == 200:
+            return resp.json()["enabled"]
+        return False
+
+    @decorators.requires_auth
+    def require_signatures(self) -> bool:
+        """Require commit signatures for commits to this branch.
+
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("required_signatures", base_url=self._api)
+        resp = self._post(url)
+        return self._boolean(resp, 200, 404)
+
+    @decorators.requires_auth
+    def delete_signature_requirements(self) -> bool:
+        """Stop requiring commit signatures for commits to this branch.
+
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("required_signatures", base_url=self._api)
+        resp = self._delete(url)
+        return self._boolean(resp, 200, 404)
 
 
 class ProtectionEnforceAdmins(models.GitHubCore):
@@ -406,17 +550,13 @@ class ProtectionEnforceAdmins(models.GitHubCore):
     @decorators.requires_auth
     def enable(self):
         """Enable Admin enforcement for protected branch."""
-        resp = self._post(
-            self._api, headers=BranchProtection.PREVIEW_HEADERS_MAP
-        )
+        resp = self._post(self._api)
         return self._boolean(resp, 200, 404)
 
     @decorators.requires_auth
     def disable(self):
         """Disable Admin enforcement for protected branch."""
-        resp = self._delete(
-            self._api, headers=BranchProtection.PREVIEW_HEADERS_MAP
-        )
+        resp = self._delete(self._api)
         return self._boolean(resp, 204, 404)
 
 
@@ -462,11 +602,12 @@ class ProtectionRestrictions(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        from .. import orgs, users
+        from .. import apps, orgs, users
 
         self._api = protection["url"]
         self.users_url = protection["users_url"]
         self.teams_url = protection["teams_url"]
+        self.apps_url = protection.get("apps_url")
         self.original_users = protection["users"]
         if self.original_users:
             self.original_users = [
@@ -479,8 +620,16 @@ class ProtectionRestrictions(models.GitHubCore):
                 orgs.ShortTeam(team, self) for team in self.original_teams
             ]
 
+        self.original_apps = protection.get("apps")
+        if self.original_apps:
+            self.original_apps = [
+                apps.App(app, self) for app in self.original_apps
+            ]
+
     @decorators.requires_auth
-    def add_teams(self, teams):
+    def add_teams(
+        self, teams: t.Sequence[str]
+    ) -> t.Sequence["orgs.ShortTeam"]:
         """Add teams to the protected branch.
 
         See:
@@ -501,13 +650,14 @@ class ProtectionRestrictions(models.GitHubCore):
         """
         from .. import orgs
 
-        headers = BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"]
-        resp = self._post(self.teams_url, data=teams, headers=headers)
+        resp = self._post(self.teams_url, data=teams)
         json = self._json(resp, 200)
         return [orgs.ShortTeam(team, self) for team in json] if json else []
 
     @decorators.requires_auth
-    def add_users(self, users):
+    def add_users(
+        self, users: t.Sequence[str]
+    ) -> t.Sequence["tusers.ShortUser"]:
         """Add users to protected branch.
 
         See
@@ -526,13 +676,122 @@ class ProtectionRestrictions(models.GitHubCore):
         :rtype:
             List[github3.users.ShortUser]
         """
-        json = self._json(self._post(self.users_url, data=users), 200)
-        from .. import users
+        from .. import users as _users
 
-        return [users.ShortUser(user, self) for user in json] if json else []
+        json = self._json(self._post(self.users_url, data=users), 200)
+        return [_users.ShortUser(user, self) for user in json] if json else []
 
     @decorators.requires_auth
-    def delete(self):
+    def apps(self, number: int = -1) -> t.Generator["tapps.App", None, None]:
+        """Retrieve current list of apps with access to the protected branch.
+
+        See
+        https://docs.github.com/en/rest/reference/repos#get-apps-with-access-to-the-protected-branch
+
+        .. warning::
+
+            This will not update the object to replace the ``original_apps``
+            attribute.
+
+        :param int number:
+            Limit the number of apps returned
+        :returns:
+            An iterator of apps
+        :rtype:
+            :class:`~github3.apps.App`
+        """
+        from .. import apps
+
+        return self._iter(int(number), self.apps_url, apps.App)
+
+    @decorators.requires_auth
+    def add_app_restrictions(
+        self, apps: t.Sequence[t.Union["tapps.App", str]]
+    ) -> t.List["tapps.App"]:
+        """Grant app push access to the current branch.
+
+        See
+        https://docs.github.com/en/rest/reference/repos#add-app-access-restrictions
+
+        Per GitHub's documentation above:
+
+            Grants the specified apps push access for this branch. Only
+            installed GitHub Apps with write access to the contents permission
+            can be added as authorized actors on a protected branch.
+
+        :param list apps:
+            List of slugs of apps to grant push access to the protected
+            branch. If you pass a list of :class:`~github3.apps.App` then the
+            library will retrieve the slug for you.
+        :returns:
+            List of apps with push access to the protected branch
+        :rtype:
+            List[:class:`~github3.apps.App`]
+        """
+        from .. import apps as _apps
+
+        apps = [getattr(a, "slug", a) for a in apps]
+        json = self._json(self._post(self.apps_url, data=apps), 200)
+        return [_apps.App(a, self) for a in json]
+
+    @decorators.requires_auth
+    def replace_app_restrictions(
+        self, apps: t.Sequence[t.Union["tapps.App", str]]
+    ) -> t.List["tapps.App"]:
+        """Replace existing app push access with only those specified.
+
+        See
+        https://docs.github.com/en/rest/reference/repos#set-app-access-restrictions
+
+        Per GitHub's documentation above:
+
+            Replaces the list of apps that have push access to this branch.
+            This removes all apps that previously had push access and grants
+            push access to the new list of apps. Only installed GitHub Apps
+            with write access to the contents permission can be added as
+            authorized actors on a protected branch.
+
+        :param list apps:
+            List of slugs of apps to grant push access to the protected
+            branch. If you pass a list of :class:`~github3.apps.App` then the
+            library will retrieve the slug for you.
+        :returns:
+            List of apps with push access to the protected branch
+        :rtype:
+            List[:class:`~github3.apps.App`]
+        """
+        from .. import apps as _apps
+
+        apps = [getattr(a, "slug", a) for a in apps]
+        json = self._json(self._put(self.apps_url, data=apps), 200)
+        return [_apps.App(a, self) for a in json]
+
+    @decorators.requires_auth
+    def remove_app_restrictions(
+        self, apps: t.Sequence[t.Union["tapps.App", str]]
+    ) -> t.List["tapps.App"]:
+        """Remove the apps' push access to the protected branch.
+
+        See
+        https://docs.github.com/en/rest/reference/repos#remove-app-access-restrictions
+
+        :param list apps:
+            List of slugs of apps to revoke push access to the protected
+            branch. If you pass a list of :class:`~github3.apps.App` then the
+            library will retrieve the slug for you.
+        :returns:
+            List of apps that still have push access
+        :rtype:
+            List[:class:`~github3.apps.App`]
+        """
+        from .. import apps as _apps
+
+        apps = [getattr(a, "slug", a) for a in apps]
+        json = self._json(self._delete(self.apps_url, data=apps), 200)
+        return [_apps.App(a, self) for a in json]
+
+    @decorators.requires_auth
+    def delete(self) -> bool:
         """Completely remove restrictions of the protected branch.
 
         See
@@ -547,7 +806,9 @@ class ProtectionRestrictions(models.GitHubCore):
         return self._boolean(resp, 204, 404)
 
     @decorators.requires_auth
-    def remove_teams(self, teams):
+    def remove_teams(
+        self, teams: t.Sequence[str]
+    ) -> t.Sequence["orgs.ShortTeam"]:
         """Remove teams from protected branch.
 
         See
@@ -563,13 +824,14 @@ class ProtectionRestrictions(models.GitHubCore):
         """
         from .. import orgs
 
-        headers = BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"]
-        resp = self._delete(self.teams_url, json=teams, headers=headers)
+        resp = self._delete(self.teams_url, json=teams)
         json = self._json(resp, 200)
         return [orgs.ShortTeam(team, self) for team in json] if json else []
 
     @decorators.requires_auth
-    def remove_users(self, users):
+    def remove_users(
+        self, users: t.Sequence[str]
+    ) -> t.Sequence["tusers.ShortUser"]:
         """Remove users from protected branch.
 
         See
@@ -585,12 +847,14 @@ class ProtectionRestrictions(models.GitHubCore):
         """
         resp = self._delete(self.users_url, json=users)
         json = self._json(resp, 200)
-        from .. import users
+        from .. import users as _users
 
-        return [users.ShortUser(user, self) for user in json] if json else []
+        return [_users.ShortUser(user, self) for user in json] if json else []
 
     @decorators.requires_auth
-    def replace_teams(self, teams):
+    def replace_teams(
+        self, teams: t.Sequence[str]
+    ) -> t.Sequence["orgs.ShortTeam"]:
         """Replace teams that will have access to protected branch.
 
         See
@@ -606,13 +870,14 @@ class ProtectionRestrictions(models.GitHubCore):
         """
         from .. import orgs
 
-        headers = BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"]
-        resp = self._put(self.teams_url, json=teams, headers=headers)
+        resp = self._put(self.teams_url, json=teams)
         json = self._json(resp, 200)
         return [orgs.ShortTeam(team, self) for team in json] if json else []
 
     @decorators.requires_auth
-    def replace_users(self, users):
+    def replace_users(
+        self, users: t.Sequence[str]
+    ) -> t.Sequence["tusers.ShortUser"]:
         """Replace users that will have access to protected branch.
 
         See
@@ -629,7 +894,9 @@ class ProtectionRestrictions(models.GitHubCore):
         users_resp = self._put(self.users_url, json=users)
         return self._boolean(users_resp, 200, 404)
 
-    def teams(self, number=-1):
+    def teams(
+        self, number: int = -1
+    ) -> t.Generator["orgs.ShortTeam", None, None]:
         """Retrieve an up-to-date listing of teams.
 
         :returns:
@@ -643,10 +910,11 @@ class ProtectionRestrictions(models.GitHubCore):
             int(number),
             self.teams_url,
             orgs.ShortTeam,
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
-    def users(self, number=-1):
+    def users(
+        self, number: int = -1
+    ) -> t.Generator["tusers.ShortUser", None, None]:
         """Retrieve an up-to-date listing of users.
 
         :returns:
@@ -970,3 +1238,100 @@ class ProtectionRequiredStatusChecks(models.GitHubCore):
         """
         resp = self._delete(self.url)
         return self._boolean(resp, 204, 404)
+
+
+class ProtectionRequiredLinearHistory(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+    This object has the following attributes:
+
+    .. attribute:: enabled
+
+        A boolean attribute indicating whether the ``required_linear_history``
+        protection is enabled or disabled.
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    def _update_attributes(self, protection):
+        self.enabled = protection["enabled"]
+
+
+class ProtectionAllowForcePushes(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+    This object has the following attributes:
+
+    .. attribute:: enabled
+
+        A boolean attribute indicating whether the ``allow_force_pushes``
+        protection is enabled or disabled.
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    def _update_attributes(self, protection):
+        self.enabled = protection["enabled"]
+
+
+class ProtectionAllowDeletions(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+    This object has the following attributes:
+
+    .. attribute:: enabled
+
+        A boolean attribute indicating whether the ``allow_deletions``
+        protection is enabled or disabled.
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    def _update_attributes(self, protection):
+        self.enabled = protection["enabled"]
+
+
+class ProtectionRequiredConversationResolution(models.GitHubCore):
+    """The representation of a sub-portion of branch protection.
+
+    .. seealso::
+
+        `Branch protection API documentation`_
+            GitHub's documentation of branch protection
+
+    This object has the following attributes:
+
+    .. attribute:: enabled
+
+        A boolean attribute indicating whether the
+        ``required_conversation_resolution`` protection is enabled or
+        disabled.
+
+    .. links
+    .. _Branch protection API documentation:
+        https://developer.github.com/v3/repos/branches/#get-branch-protection
+    """
+
+    def _update_attributes(self, protection):
+        self.enabled = protection["enabled"]

@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Team."""
 import github3
-
 from .helper import IntegrationHelper
 
 
@@ -12,7 +10,7 @@ class TestTeam(IntegrationHelper):
     betamax_kwargs = {"match_requests_on": ["method", "uri", "json-body"]}
 
     def setUp(self):
-        super(TestTeam, self).setUp()
+        super().setUp()
         self.auto_login()
 
     def get_organization(self, organization="github3py"):
@@ -27,13 +25,6 @@ class TestTeam(IntegrationHelper):
         t = o.team(id)
         assert isinstance(t, github3.orgs.Team)
         return t
-
-    def test_add_member(self):
-        """Show a user can add a member to a team."""
-        cassette_name = self.cassette_name("add_member")
-        with self.recorder.use_cassette(cassette_name):
-            team = self.get_team()
-            assert team.add_member("esacteksab") is True
 
     def test_add_repository(self):
         """Show that a user can add a repository to a team."""
@@ -73,13 +64,6 @@ class TestTeam(IntegrationHelper):
             t = self.get_team()
             assert t.has_repository("github3py/urllib3") is True
 
-    def test_is_member(self):
-        """Show that a user can check if another user is a team member."""
-        cassette_name = self.cassette_name("is_member")
-        with self.recorder.use_cassette(cassette_name):
-            t = self.get_team()
-            assert t.is_member("sigmavirus24") is True
-
     def test_members(self):
         """Show that a user can retrieve a team's members."""
         cassette_name = self.cassette_name("members")
@@ -104,13 +88,6 @@ class TestTeam(IntegrationHelper):
             t = self.get_team()
             for repository in t.repositories():
                 assert isinstance(repository, github3.repos.ShortRepository)
-
-    def test_remove_member(self):
-        """Show a user can remove a member from a team."""
-        cassette_name = self.cassette_name("remove_member")
-        with self.recorder.use_cassette(cassette_name):
-            team = self.get_team()
-            assert team.remove_member("esacteksab") is True
 
     def test_remove_repository(self):
         """Show a user can remove a repository from a team."""

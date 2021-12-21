@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 """Unit tests for the Issue class."""
-import github3
-import dateutil.parser
-import mock
+import unittest.mock
 
-from github3.issues.label import Label
-from github3.issues import Issue
+import dateutil.parser
+
+import github3
 from . import helper
+from github3.issues import Issue
+from github3.issues.label import Label
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/issues/comments"
@@ -49,10 +49,6 @@ class TestIssueRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     def test_add_labels(self):
         """Verify that adding a label requires authentication."""
         self.assert_requires_auth(self.instance.add_labels, "enhancement")
-
-    def test_assign(self):
-        """Verify that assigning an issue requires authentication."""
-        self.assert_requires_auth(self.instance.assign, "sigmavirus24")
 
     def test_close(self):
         """Verify that closing an issue requires authentication."""
@@ -112,26 +108,6 @@ class TestIssue(helper.UnitHelper):
         self.instance.add_labels("enhancement")
         self.post_called_with(url_for("labels"), data=["enhancement"])
 
-    def test_assign(self):
-        """Verify the request for assigning an issue."""
-        with mock.patch.object(Issue, "edit") as edit:
-            edit.return_value = True
-            labels = [str(label) for label in self.instance.original_labels]
-            self.instance.assign(username="sigmavirus24")
-            edit.assert_called_once_with(
-                self.instance.title,
-                self.instance.body,
-                "sigmavirus24",
-                self.instance.state,
-                self.instance.milestone.number,
-                labels,
-            )
-
-    def test_assign_empty_username(self):
-        """Verify the request when assigning a username."""
-        self.instance.assign("")
-        assert self.session.patch.called is False
-
     def test_close(self):
         """Verify the request for closing an issue."""
         self.instance.close()
@@ -183,7 +159,7 @@ class TestIssue(helper.UnitHelper):
             "body": "issue body",
             "assignee": "sigmavirus24",
             "state": "closed",
-            "labels": [u"标签1", u"标签2"],
+            "labels": ["标签1", "标签2"],
         }
         self.instance.edit(**data)
         self.patch_called_with(url_for(), data=data)
@@ -282,7 +258,9 @@ class TestIssue(helper.UnitHelper):
 
     def test_remove_all_labels(self):
         """Verify that all labels are removed."""
-        with mock.patch.object(Issue, "replace_labels") as replace_labels:
+        with unittest.mock.patch.object(
+            Issue, "replace_labels"
+        ) as replace_labels:
             replace_labels.return_value = []
             assert self.instance.remove_all_labels() == []
             replace_labels.assert_called_once_with([])
@@ -312,7 +290,7 @@ class TestIssue(helper.UnitHelper):
     def test_reopen(self):
         """Test the request for reopening an issue."""
         labels = [str(label) for label in self.instance.original_labels]
-        with mock.patch.object(Issue, "edit") as edit:
+        with unittest.mock.patch.object(Issue, "edit") as edit:
             self.instance.reopen()
             edit.assert_called_once_with(
                 self.instance.title,
@@ -401,7 +379,7 @@ class TestLabel(helper.UnitHelper):
 
     def test_repr(self):
         """Show that instance string is formatted correctly."""
-        assert repr(self.instance) == "<Label [{0}]>".format(
+        assert repr(self.instance) == "<Label [{}]>".format(
             self.instance.name
         )
 
@@ -452,7 +430,7 @@ class TestIssueEvent(helper.UnitHelper):
 
     def test_repr(self):
         """Show that instance string is formatted correctly."""
-        assert repr(self.instance) == "<Issue Event [{0} by {1}]>".format(
+        assert repr(self.instance) == "<Issue Event [{} by {}]>".format(
             "closed", "octocat"
         )
 

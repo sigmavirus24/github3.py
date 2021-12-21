@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 """Unit tests for the github3.projects module."""
 import pytest
 
 from . import helper
-
-from github3 import GitHubError
 from github3 import exceptions
+from github3 import GitHubError
 from github3 import issues
 from github3 import projects
 
@@ -279,7 +277,7 @@ class TestProjectCard(helper.UnitHelper):
         )
 
     def test_retrieve_pull_request_from_content_fails_without_content_url(
-        self
+        self,
     ):
         """Verify we raise an exception because we can't retrieve anything."""
         self.instance.content_url = None

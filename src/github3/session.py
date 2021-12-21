@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 """Module containing session and auth logic."""
-from collections import Callable
+import collections.abc as abc_collections
 import datetime
 from contextlib import contextmanager
 from logging import getLogger
@@ -31,7 +30,7 @@ class BasicAuth(requests.auth.HTTPBasicAuth):
 
     def __repr__(self):
         """Use the username as the representation."""
-        return "basic {}".format(self.username)
+        return f"basic {self.username}"
 
 
 class TokenAuth(requests.auth.AuthBase):
@@ -45,7 +44,7 @@ class TokenAuth(requests.auth.AuthBase):
 
     def __repr__(self):
         """Return a nice view of the token in use."""
-        return "token {}...".format(self.token[:4])
+        return f"token {self.token[:4]}..."
 
     def __ne__(self, other):
         """Test for equality, or the lack thereof."""
@@ -91,11 +90,14 @@ class GitHubSession(requests.Session):
     __attrs__ = requests.Session.__attrs__ + [
         "base_url",
         "two_factor_auth_cb",
+        "default_connect_timeout",
+        "default_read_timeout",
+        "request_counter",
     ]
 
-    def __init__(self, default_connect_timeout=4, default_read_timeout=1):
+    def __init__(self, default_connect_timeout=4, default_read_timeout=10):
         """Slightly modify how we initialize our session."""
-        super(GitHubSession, self).__init__()
+        super().__init__()
         self.default_connect_timeout = default_connect_timeout
         self.default_read_timeout = default_read_timeout
         self.headers.update(
@@ -107,7 +109,7 @@ class GitHubSession(requests.Session):
                 # Always sending JSON
                 "Content-Type": "application/json",
                 # Set our own custom User-Agent string
-                "User-Agent": "github3.py/{0}".format(__version__),
+                "User-Agent": f"github3.py/{__version__}",
             }
         )
         self.base_url = "https://api.github.com"
@@ -147,7 +149,7 @@ class GitHubSession(requests.Session):
         headers = kwargs.pop("headers", {})
         headers.update({"X-GitHub-OTP": str(self.two_factor_auth_cb())})
         kwargs.update(headers=headers)
-        return super(GitHubSession, self).request(*args, **kwargs)
+        return super().request(*args, **kwargs)
 
     def has_auth(self):
         """Check for whether or not the user has authentication configured."""
@@ -165,8 +167,8 @@ class GitHubSession(requests.Session):
 
     def request(self, *args, **kwargs):
         """Make a request, count it, and handle 2FA if necessary."""
-        kwargs.setdefault('timeout', self.timeout)
-        response = super(GitHubSession, self).request(*args, **kwargs)
+        kwargs.setdefault("timeout", self.timeout)
+        response = super().request(*args, **kwargs)
         self.request_counter += 1
         if requires_2fa(response) and self.two_factor_auth_cb:
             # No need to flatten and re-collect the args in
@@ -190,7 +192,7 @@ class GitHubSession(requests.Session):
         if not callback:
             return
 
-        if not isinstance(callback, Callable):
+        if not isinstance(callback, abc_collections.Callable):
             raise ValueError("Your callback should be callable")
 
         self.two_factor_auth_cb = callback
@@ -257,7 +259,7 @@ class AppInstallationTokenAuth(TokenAuth):
 
     def __init__(self, token, expires_at):
         """Set-up our authentication handler."""
-        super(AppInstallationTokenAuth, self).__init__(token)
+        super().__init__(token)
         self.expires_at_str = expires_at
         self.expires_at = dateutil.parser.parse(expires_at)
 
@@ -281,7 +283,7 @@ class AppInstallationTokenAuth(TokenAuth):
                     self.expires_at_str
                 )
             )
-        return super(AppInstallationTokenAuth, self).__call__(request)
+        return super().__call__(request)
 
 
 class AppBearerTokenAuth(TokenAuth):
@@ -291,7 +293,7 @@ class AppBearerTokenAuth(TokenAuth):
 
     def __init__(self, token, expire_in):
         """Set-up our authentication handler."""
-        super(AppBearerTokenAuth, self).__init__(token)
+        super().__init__(token)
         expire_in = datetime.timedelta(seconds=expire_in)
         self.expires_at = _utcnow() + expire_in
 
@@ -311,6 +313,6 @@ class AppBearerTokenAuth(TokenAuth):
         """Add the authorization header and format it."""
         if self.expired:
             raise exc.AppTokenExpired(
-                "Your app token expired at {}".format(str(self.expires_at))
+                f"Your app token expired at {str(self.expires_at)}"
             )
-        return super(AppBearerTokenAuth, self).__call__(request)
+        return super().__call__(request)

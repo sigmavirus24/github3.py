@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
 """This module contains all of the classes related to organizations."""
-from __future__ import unicode_literals
-
-import warnings
+import typing as t
 from json import dumps
 
 from uritemplate import URITemplate
 
-from . import users, models
-
+from . import models
+from . import users
 from .decorators import requires_auth
 from .events import Event
 from .projects import Project
-from .repos import Repository, ShortRepository
+from .repos import Repository
+from .repos import ShortRepository
 
 
 class _Team(models.GitHubCore):
@@ -29,35 +27,14 @@ class _Team(models.GitHubCore):
         self.members_urlt = URITemplate(team["members_url"])
         self.name = team["name"]
         self.permission = team["permission"]
+        self.privacy = team.get(
+            "privacy"
+        )  # TODO: Re-record cassettes to ensure this exists
         self.repositories_url = team["repositories_url"]
         self.slug = team["slug"]
 
     def _repr(self):
         return "<{s.class_name} [{s.name}]>".format(s=self)
-
-    @requires_auth
-    def add_member(self, username):
-        """Add ``username`` to this team.
-
-        .. deprecated:: 1.0.0
-
-            Use :meth:`add_or_update_membership` instead.
-
-        :param str username:
-            the username of the user you would like to add to this team.
-        :returns:
-            True if successfully added, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This is no longer supported by the GitHub API, see "
-            "https://developer.github.com/changes/2014-09-23-one-more-week"
-            "-before-the-add-team-member-api-breaking-change/",
-            DeprecationWarning,
-        )
-        url = self._build_url("members", username, base_url=self._api)
-        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
     def add_or_update_membership(self, username, role="member"):
@@ -161,51 +138,6 @@ class _Team(models.GitHubCore):
         return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
-    def invite(self, username):
-        """Invite the user to join this team.
-
-        .. deprecated:: 1.2.0
-
-            Use :meth:`add_or_update_membership` instead.
-
-        This returns a dictionary like so::
-
-            {'state': 'pending', 'url': 'https://api.github.com/teams/...'}
-
-        :param str username:
-            (required), login of user to invite to join this team.
-        :returns:
-            dictionary of the invitation response
-        :rtype:
-            dict
-        """
-        warnings.warn(
-            "This method is deprecated. Please use "
-            "``add_or_update_membership`` instead.",
-            DeprecationWarning,
-        )
-        return self.add_or_update_membership(username)
-
-    @requires_auth
-    def is_member(self, username):
-        """Check if ``login`` is a member of this team.
-
-        :param str username:
-            (required), username name of the user
-        :returns:
-            True if the user is a member, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This method is deprecated. Please use "
-            "``membership_for`` instead.",
-            DeprecationWarning,
-        )
-        url = self._build_url("members", username, base_url=self._api)
-        return self._boolean(self._get(url), 204, 404)
-
-    @requires_auth
     def members(self, role=None, number=-1, etag=None):
         """Iterate over the members of this team.
 
@@ -274,30 +206,6 @@ class _Team(models.GitHubCore):
         return json or {}
 
     @requires_auth
-    def remove_member(self, username):
-        """Remove ``username`` from this team.
-
-        .. deprecated:: 1.0.0
-
-            Use :meth:`revoke_membership` instead.
-
-        :param str username:
-            (required), username of the member to remove
-        :returns:
-            True if successful, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This is no longer supported by the GitHub API, see "
-            "https://developer.github.com/changes/2014-09-23-one-more-week"
-            "-before-the-add-team-member-api-breaking-change/",
-            DeprecationWarning,
-        )
-        url = self._build_url("members", username, base_url=self._api)
-        return self._boolean(self._delete(url), 204, 404)
-
-    @requires_auth
     def revoke_membership(self, username):
         """Revoke this user's team membership.
 
@@ -364,7 +272,7 @@ class Team(_Team):
     class_name = "Team"
 
     def _update_attributes(self, team):
-        super(Team, self)._update_attributes(team)
+        super()._update_attributes(team)
         self.created_at = self._strptime(team["created_at"])
         self.members_count = team["members_count"]
         self.organization = ShortOrganization(team["organization"], self)
@@ -396,6 +304,10 @@ class ShortTeam(_Team):
 
         The level of permissions this team has, e.g., ``push``, ``pull``,
         or ``admin``.
+
+    .. attribute:: privacy
+
+        The privacy level of this team inside the organization.
 
     .. attribute:: repos_count
 
@@ -431,6 +343,10 @@ class _Organization(models.GitHubCore):
         http://developer.github.com/v3/orgs/
     """
 
+    PREVIEW_HEADERS = {
+        "Accept": "application/vnd.github.hellcat-preview+json"
+    }
+
     class_name = "_Organization"
 
     # Filters available when listing members. Note: ``"2fa_disabled"``
@@ -465,57 +381,10 @@ class _Organization(models.GitHubCore):
         display_name = ""
         name = getattr(self, "name", None)
         if name is not None:
-            display_name = ":{}".format(name)
+            display_name = f":{name}"
         return "<{s.class_name} [{s.login}{display}]>".format(
             s=self, display=display_name
         )
-
-    @requires_auth
-    def add_member(self, username, team_id):
-        """Add ``username`` to ``team`` and thereby to this organization.
-
-        .. warning::
-
-            This method is no longer valid. To add a member to a team, you
-            must now retrieve the team directly, and use the ``invite``
-            method.
-
-        .. warning::
-
-            This method is no longer valid. To add a member to a team, you
-            must now retrieve the team directly, and use the ``invite``
-            method.
-
-        Any user that is to be added to an organization, must be added
-        to a team as per the GitHub api.
-
-        .. versionchanged:: 1.0
-
-            The second parameter used to be ``team`` but has been changed to
-            ``team_id``. This parameter is now required to be an integer to
-            improve performance of this method.
-
-        :param str username:
-            (required), login name of the user to be added
-        :param int team_id:
-            (required), team id
-        :returns:
-            True if successful, False otherwise
-        :rtype:
-            bool
-        """
-        warnings.warn(
-            "This is no longer supported by the GitHub API, see "
-            "https://developer.github.com/changes/2014-09-23-one-more-week"
-            "-before-the-add-team-member-api-breaking-change/",
-            DeprecationWarning,
-        )
-
-        if int(team_id) < 0:
-            return False
-
-        url = self._build_url("teams", str(team_id), "members", str(username))
-        return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
     def add_or_update_membership(self, username, role="member"):
@@ -570,6 +439,75 @@ class _Organization(models.GitHubCore):
 
         url = self._build_url("teams", str(team_id), "repos", str(repository))
         return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def blocked_users(
+        self, number: int = -1, etag: t.Optional[str] = None
+    ) -> t.Generator[users.ShortUser, None, None]:
+        """Iterate over the users blocked by this organization.
+
+        .. versionadded:: 2.1.0
+
+        :param int number:
+            (optional), number of users to iterate over.  Default: -1 iterates
+            over all values
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of the members of this team
+        :rtype:
+            :class:`~github3.users.ShortUser`
+        """
+        url = self._build_url("blocks", base_url=self._api)
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
+
+    @requires_auth
+    def block(self, username: users.UserLike) -> bool:
+        """Block a specific user from an organization.
+
+        .. versionadded:: 2.1.0
+
+        :parameter str username:
+            Name (or user-like instance) of the user to block.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("blocks", str(username), base_url=self._api)
+        return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def unblock(self, username: users.UserLike) -> bool:
+        """Unblock a specific user from an organization.
+
+        .. versionadded:: 2.1.0
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("blocks", str(username), base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def is_blocking(self, username: users.UserLike) -> bool:
+        """Check if this organization is blocking a specific user.
+
+        .. versionadded:: 2.1.0
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("blocks", str(username), base_url=self._api)
+        return self._boolean(self._get(url), 204, 404)
 
     @requires_auth
     def create_hook(self, name, config, events=["push"], active=True):
@@ -636,6 +574,7 @@ class _Organization(models.GitHubCore):
         auto_init=False,
         gitignore_template="",
         license_template="",
+        has_projects=True,
     ):
         """Create a repository for this organization.
 
@@ -672,6 +611,9 @@ class _Organization(models.GitHubCore):
         :param str license_template:
             (optional), name of the license; this is ignored if auto_int is
             False.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository. API
+            default: ``True``
         :returns:
             the created repository
         :rtype:
@@ -688,6 +630,7 @@ class _Organization(models.GitHubCore):
             "license_template": license_template,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
+            "has_projects": has_projects,
         }
         if int(team_id) > 0:
             data.update({"team_id": team_id})
@@ -709,7 +652,14 @@ class _Organization(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def create_team(self, name, repo_names=[], permission="pull"):
+    def create_team(
+        self,
+        name,
+        repo_names=[],
+        permission="pull",
+        parent_team_id=None,
+        privacy="secret",
+    ):
         """Create a new team and return it.
 
         This only works if the authenticated user owns this organization.
@@ -727,6 +677,14 @@ class _Organization(models.GitHubCore):
                 repositories accessible by this team
             - ``admin`` -- members can push, pull and administer
                 repositories accessible by this team
+        :param int parent_team_id:
+            (optional), the ID of a team to set as the parent team.
+        :param str privacy:
+            (optional), options:
+
+            - ``secret`` -- (default) only visible to organization
+                owners and members of this team
+            - ``closed`` -- visible to all members of this organization
         :returns:
             the created team
         :rtype:
@@ -736,9 +694,18 @@ class _Organization(models.GitHubCore):
             "name": name,
             "repo_names": repo_names,
             "permission": permission,
+            "privacy": privacy,
         }
+        headers = (
+            self.PREVIEW_HEADERS
+            if parent_team_id or privacy == "closed"
+            else None
+        )
+        if parent_team_id:
+            data.update({"parent_team_id": parent_team_id})
+
         url = self._build_url("teams", base_url=self._api)
-        json = self._json(self._post(url, data), 201)
+        json = self._json(self._post(url, data, headers=headers), 201)
         return self._instance_or_null(Team, json)
 
     @requires_auth
@@ -945,29 +912,6 @@ class _Organization(models.GitHubCore):
         """
         url = self._build_url("users", username, "events", "orgs", self.login)
         return self._iter(int(number), url, Event, etag=etag)
-
-    def events(self, number=-1, etag=None):
-        """Iterate over public events for this org (deprecated).
-
-        .. deprecated:: 1.0.0
-
-            Use :meth:`public_events` instead.
-
-        :param int number:
-            (optional), number of events to return. Default: -1 iterates over
-            all events available.
-        :param str etag:
-            (optional), ETag from a previous request to the same endpoint
-        :returns:
-            generator of events
-        :rtype:
-            :class:`~github3.events.Event`
-        """
-        warnings.warn(
-            "This method is deprecated. Please use ``public_events`` instead.",
-            DeprecationWarning,
-        )
-        return self.public_events(number, etag=etag)
 
     def public_events(self, number=-1, etag=None):
         """Iterate over public events for this org.
@@ -1232,6 +1176,21 @@ class _Organization(models.GitHubCore):
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Team, json)
 
+    @requires_auth
+    def team_by_name(self, team_slug):
+        """Return the team specified by ``team_slug``.
+
+        :param str team_slug:
+            (required), slug for the team
+        :returns:
+            the team identified by the slug in this organization
+        :rtype:
+            :class:`~github3.orgs.Team`
+        """
+        url = self._build_url("teams", str(team_slug), base_url=self._api)
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(Team, json)
+
 
 class Organization(_Organization):
     """Object for the full representation of a Organization.
@@ -1296,7 +1255,7 @@ class Organization(_Organization):
     class_name = "Organization"
 
     def _update_attributes(self, org):
-        super(Organization, self)._update_attributes(org)
+        super()._update_attributes(org)
         self.created_at = self._strptime(org["created_at"])
         self.followers_count = org["followers"]
         self.following_count = org["following"]
@@ -1485,7 +1444,7 @@ class Membership(models.GitHubCore):
     """
 
     def _repr(self):
-        return "<Membership [{0}]>".format(self.organization)
+        return f"<Membership [{self.organization}]>"
 
     def _update_attributes(self, membership):
         self._api = membership["url"]
@@ -1575,7 +1534,7 @@ class OrganizationHook(models.GitHubCore):
         self.updated_at = self._strptime(hook["updated_at"])
 
     def _repr(self):
-        return "<OrganizationHook [{0}]>".format(self.name)
+        return f"<OrganizationHook [{self.name}]>"
 
     @requires_auth
     def delete(self):

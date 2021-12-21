@@ -1,0 +1,63 @@
+2.0.0: 2021-02-21
+-----------------
+
+Features Added
+``````````````
+
+- Add support to Python 3.8 and 3.9.
+- Remove support to Python versions that reached end-of-life (2, 3.4 and 3.5).
+- Update CI/CD to thoroughly test all supported version.
+- Remove compatibility imports for Python 2.
+- Remove dev-dependency for mock.
+
+Bugs Fixed
+``````````
+
+* Key errors on Gist.history.
+
+Removals
+````````
+
+* Removal of legacy unicode future imports.
+
+* Removal of already deprecated code on version 1.x:
+
+- ``github3.api.all_events`` use ``github.GitHub.all_events``
+- ``github3.api.all_repositories`` use ``github.GitHub.all_repositories``
+- ``github3.api.all_users`` use ``github.GitHub.all_users``
+- ``github3.api.authorize`` use ``github.GitHub.authorize``
+- ``github3.api.create_gist`` use ``github.GitHub.create_gist``
+- ``github3.api.emojis``
+- ``github3.api.followed_by`` use ``github.GitHub.followed_by``
+- ``github3.api.followers_of`` use ``github.GitHub.followers_of``
+- ``github3.api.gist`` use ``github.GitHub.gist``
+- ``github3.api.gists_by`` use ``github.GitHub.gists_by``
+- ``github3.api.gitignore_template`` use ``github.GitHub.gitignore_template``
+- ``github3.api.gitignore_templates`` use ``github.GitHub.gitignore_templates``
+- ``github3.api.issue`` use ``github.GitHub.issue``
+- ``github3.api.issues_on`` use ``github.GitHub.issues_on``
+- ``github3.api.markdown`` use ``github.GitHub.markdown``
+- ``github3.api.octocat`` use ``github.GitHub.octocat``
+- ``github3.api.organization``
+- ``github3.api.organizations_with`` use ``github.GitHub.organizations_with``
+- ``github3.api.public_gists`` use ``github.GitHub.public_gists``
+- ``github3.api.pull_request`` use ``github.GitHub.pull_request``
+- ``github3.api.rate_limit``
+- ``github3.api.repositories_by`` use ``github.GitHub.organizations_with``
+- ``github3.api.repository``
+- ``github3.api.search_code`` use ``github.GitHub.search_code``
+- ``github3.api.search_issues`` use ``github.GitHub.search_issues``
+- ``github3.api.search_repositories`` use ``github.GitHub.search_repositories``
+- ``github3.api.search_users`` use ``github.GitHub.search_users``
+- ``github3.api.starred_by`` use ``github.GitHub.starred_by``
+- ``github3.api.subscriptions_for`` use ``github.GitHub.subscriptions_for``
+- ``github3.api.user``
+- ``github3.api.zen`` use ``github.GitHub.zen``
+- ``Git#Blob.decoded`` use ``Git#Blob.decode_content``
+- ``Team#is_member`` use ``Login#is_member``
+- ``Team#add_member`` use ``Team#add_or_update_membership``
+- ``Team#invite`` use ``Team#add_or_update_membership``
+- ``Team#remove_member`` use ``Team#add_or_update_membership``
+- ``Organization#add_member`` add ``username`` to ``team``.
+- ``Organization#events`` use ``Organization#public_events``
+- ``Issue#assign`` use ``issues.issue.Issue.add_assignees``

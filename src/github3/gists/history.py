@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """Module containing the GistHistory object."""
-from __future__ import unicode_literals
-
 from .. import models
 from .. import users
 
@@ -45,24 +42,24 @@ class GistHistory(models.GitHubCore):
         The number of deletions from the gist compared to the previous
         revision.
 
-    .. attribute:: totoal
+    .. attribute:: total
 
         The total number of changes to the gist compared to the previous
         revision.
     """
 
-    def _update_attributes(self, history):
+    def _update_attributes(self, history) -> None:
         self.url = self._api = history["url"]
         self.version = history["version"]
         self.user = users.ShortUser(history["user"], self)
         self.change_status = history["change_status"]
-        self.additions = self.change_status["additions"]
-        self.deletions = self.change_status["deletions"]
+        self.additions = self.change_status.get("additions")
+        self.deletions = self.change_status.get("deletions")
         self.total = self.change_status["total"]
         self.committed_at = self._strptime(history["committed_at"])
 
-    def _repr(self):
-        return "<Gist History [{0}]>".format(self.version)
+    def _repr(self) -> str:
+        return f"<Gist History [{self.version}]>"
 
     def gist(self):
         """Retrieve the gist at this version.

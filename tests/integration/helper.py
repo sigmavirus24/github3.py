@@ -6,7 +6,6 @@ import unittest
 import betamax
 import dateutil.tz
 import pytest
-
 from betamax.cassette import cassette
 
 import github3
@@ -23,7 +22,7 @@ class IntegrationHelper(unittest.TestCase):
         self.token = os.environ.get("GH_AUTH", "x" * 20)
         self.app_id = int(os.environ.get("GH_APP_ID", "0"))
         self.private_key_bytes = os.environ.get(
-            "GH_APP_PRIVATE_KEY", u""
+            "GH_APP_PRIVATE_KEY", ""
         ).encode("utf8")
         self.app_installation_id = int(
             os.environ.get("GH_APP_INSTALLATION_ID", "0")
@@ -55,15 +54,14 @@ class IntegrationHelper(unittest.TestCase):
             self.current_cassette.is_recording()
             and self.private_key_bytes
             and self.app_id
-            and self.installation_id
+            and self.app_installation_id
         ):
             self.gh.login_as_app_installation(
                 self.private_key_bytes,
                 app_id=self.app_id,
                 installation_id=self.app_installation_id,
-                expire_in=30,
             )
-            token = self.gh.session.auth
+            token = self.gh.session.auth.token
         else:
             token = "v1.{}".format("x" * 10)
             now = datetime.datetime.now(tz=dateutil.tz.UTC)
@@ -124,8 +122,3 @@ betamax.Betamax.register_request_matcher(CustomHeadersMatcher)
 class GitHubEnterpriseHelper(IntegrationHelper):
     def get_client(self):
         return github3.GitHubEnterprise(self.enterprise_url)
-
-
-class GitHubStatusHelper(IntegrationHelper):
-    def get_client(self):
-        return github3.GitHubStatus()

@@ -1,16 +1,9 @@
-# -*- coding: utf-8 -*-
 """This module provides decorators to the rest of the library."""
-
-from functools import wraps
-from requests.models import Response
 import os
+from functools import wraps
+from io import BytesIO as StringIO
 
-try:  # (No coverage)
-    # python2
-    from StringIO import StringIO  # (No coverage)
-except ImportError:  # (No coverage)
-    # python3
-    from io import BytesIO as StringIO
+from requests.models import Response
 
 
 class RequestsStringIO(StringIO):

@@ -133,7 +133,7 @@ Old name                                      New name
 ``GitHub#iter_repo_issues``                   ``GitHub#issues_on``
 ``GitHub#iter_keys``                          ``GitHub#keys``
 ``GitHub#iter_orgs``                          ``GitHub#{organizations,organizations_with}``
-``GitHub#iter_repos``                         ``GitHub#reposistories``
+``GitHub#iter_repos``                         ``GitHub#repositories``
 ``GitHub#iter_user_repos``                    ``GitHub#repositories_by``
 ``GitHub#iter_user_teams``                    ``GitHub#user_teams``
 ``Issue#iter_comments``                       ``Issue#comments``
@@ -453,7 +453,7 @@ New Features
 
 - Add ``Organization#all_events``.
 
-- Add ``Tag.tagger_as_User`` which attempts to return the tagger as as User.
+- Add ``Tag.tagger_as_User`` which attempts to return the tagger as User.
 
 - Add ``Repo.statuses`` and a corresponding ``repo.status.CombinedStatus`` to
 
@@ -539,7 +539,7 @@ Bugs Fixed
   so we accidentally left out our actual hard dependencies.
 
 - The ``context`` parameter to ``Repository#create_status`` now properly
-  defaults to ``"default"``.
+  defaults to ``default``.
 
 - Fix AttributeError when ``IssueEvent`` has assignee.
 

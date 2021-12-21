@@ -2,12 +2,14 @@
 import pytest
 
 from . import helper
-
 from github3 import GitHubError
 from github3 import pulls
 
 get_pr_example_data = helper.create_example_data_helper(
     "pull_request_example"
+)
+get_short_pr_example_data = helper.create_example_data_helper(
+    "short_pull_request_example"
 )
 get_pullreview_example_data = helper.create_example_data_helper(
     "pull_review_example"
@@ -138,7 +140,7 @@ class TestPullRequest(helper.UnitHelper):
         )
 
     def test_merge_with_custom_title(self):
-        """Show that user can merge a Pull Request with custom commit title"""
+        """Show that user can merge a Pull Request with custom commit title."""
         self.instance.merge(commit_title="commit title")
 
         self.put_called_with(
@@ -196,6 +198,19 @@ class TestPullRequest(helper.UnitHelper):
         )
         assert not self.instance.merged
         assert self.instance.mergeable
+        assert self.instance.rebaseable
+
+
+class TestShortPullRequest(helper.UnitHelper):
+    """ShortPullRequest unit tests."""
+
+    described_class = pulls.ShortPullRequest
+    example_data = get_short_pr_example_data()
+
+    def test_no_extra_attributes(self):
+        """Verify that the short representation in the docs works."""
+        # Let's just test an attribute
+        assert isinstance(self.instance.locked, bool)
 
 
 class TestPullReview(helper.UnitHelper):
@@ -205,11 +220,11 @@ class TestPullReview(helper.UnitHelper):
     example_data = get_pullreview_example_data()
 
     def test_submit(self):
-        """Verify the request to submit a review"""
+        """Verify the request to submit a review."""
         self.instance.submit("body", "APPROVED")
 
         self.post_called_with(
-            url_for("reviews/{0}/events".format(self.instance.id)),
+            url_for(f"reviews/{self.instance.id}/events"),
             data={"body": "body", "event": "APPROVED"},
         )
 

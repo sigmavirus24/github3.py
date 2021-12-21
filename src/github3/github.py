@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """This module contains the main interfaces to the API."""
-from __future__ import unicode_literals
-
 import json
 import re
+import typing as t
 
 import uritemplate
 
@@ -12,7 +10,6 @@ from . import auths
 from . import decorators
 from . import events
 from . import gists
-from .repos import invitation
 from . import issues
 from . import licenses
 from . import models
@@ -20,17 +17,16 @@ from . import notifications
 from . import orgs
 from . import projects
 from . import pulls
-from .repos import repo
 from . import search
+from . import session
 from . import structs
 from . import users
 from . import utils
-
-from .decorators import (
-    requires_auth,
-    requires_basic_auth,
-    requires_app_credentials,
-)
+from .decorators import requires_app_credentials
+from .decorators import requires_auth
+from .decorators import requires_basic_auth
+from .repos import invitation
+from .repos import repo
 
 
 _pubsub_re = re.compile(
@@ -65,7 +61,7 @@ class GitHub(models.GitHubCore):
 
     def __init__(self, username="", password="", token="", session=None):
         """Create a new GitHub instance to talk to the API."""
-        super(GitHub, self).__init__({}, session or self.new_session())
+        super().__init__({}, session or self.new_session())
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -73,8 +69,8 @@ class GitHub(models.GitHubCore):
 
     def _repr(self):
         if self.session.auth:
-            return "<GitHub [{!r}]>".format(self.session.auth)
-        return "<Anonymous GitHub at 0x{0:x}>".format(id(self))
+            return f"<GitHub [{self.session.auth!r}]>"
+        return f"<Anonymous GitHub at 0x{id(self):x}>"
 
     @requires_auth
     def activate_membership(self, organization):
@@ -504,6 +500,75 @@ class GitHub(models.GitHubCore):
 
         return self._instance_or_null(auths.Authorization, json)
 
+    @requires_auth
+    def blocked_users(
+        self, number: int = -1, etag: t.Optional[str] = None
+    ) -> t.Generator[users.ShortUser, None, None]:
+        """Iterate over the users blocked by this organization.
+
+        .. versionadded:: 2.1.0
+
+        :param int number:
+            (optional), number of users to iterate over.  Default: -1 iterates
+            over all values
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of the members of this team
+        :rtype:
+            :class:`~github3.users.ShortUser`
+        """
+        url = self._build_url("user", "blocks")
+        return self._iter(int(number), url, users.ShortUser, etag=etag)
+
+    @requires_auth
+    def block(self, username: users.UserLike) -> bool:
+        """Block a specific user from an organization.
+
+        .. versionadded:: 2.1.0
+
+        :parameter str username:
+            Name (or user-like instance) of the user to block.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("user", "blocks", str(username))
+        return self._boolean(self._put(url), 204, 404)
+
+    @requires_auth
+    def unblock(self, username: users.UserLike) -> bool:
+        """Unblock a specific user from an organization.
+
+        .. versionadded:: 2.1.0
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("user", "blocks", str(username))
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def is_blocking(self, username: users.UserLike) -> bool:
+        """Check if this organization is blocking a specific user.
+
+        .. versionadded:: 2.1.0
+
+        :parameter str username:
+            Name (or user-like instance) of the user to unblock.
+        :returns:
+            True if successful, Fales otherwise
+        :rtype:
+            bool
+        """
+        url = self._build_url("user", "blocks", str(username))
+        return self._boolean(self._get(url), 204, 404)
+
     def check_authorization(self, access_token):
         """Check an authorization created by a registered application.
 
@@ -681,6 +746,7 @@ class GitHub(models.GitHubCore):
         has_wiki=True,
         auto_init=False,
         gitignore_template="",
+        has_projects=True,
     ):
         """Create a repository for the authenticated user.
 
@@ -706,6 +772,9 @@ class GitHub(models.GitHubCore):
         :param str gitignore_template:
             (optional), name of the git template to use; ignored if auto_init =
             False.
+        :param bool has_projects:
+            (optional), If ``True``, enable projects for this repository. API
+            default: ``True``
         :returns:
             created repository
         :rtype:
@@ -721,6 +790,7 @@ class GitHub(models.GitHubCore):
             "has_wiki": has_wiki,
             "auto_init": auto_init,
             "gitignore_template": gitignore_template,
+            "has_projects": has_projects,
         }
         json = self._json(self._post(url, data=data), 201)
         return self._instance_or_null(repo.Repository, json)
@@ -1358,11 +1428,15 @@ class GitHub(models.GitHubCore):
         self.session.app_bearer_token_auth(token, expire_in)
 
     def login_as_app_installation(
-        self, private_key_pem, app_id, installation_id
+        self, private_key_pem, app_id, installation_id, expire_in=30
     ):
         """Login using your GitHub App's installation credentials.
 
         .. versionadded:: 1.2.0
+
+        .. versionchanged:: 3.0.0
+
+            Added ``expire_in`` parameter.
 
         .. seealso::
 
@@ -1385,23 +1459,30 @@ class GitHub(models.GitHubCore):
             The integer identifier for this GitHub Application.
         :param int installation_id:
             The integer identifier of your App's installation.
+        :param int expire_in:
+            (Optional) The number of seconds in the future that the underlying
+            JWT expires. To prevent tokens from being valid for too long and
+            creating a security risk, the library defaults to 30 seconds. In
+            the event that clock drift is significant between your machine and
+            GitHub's servers, you can set this higher than 30.
+            Default: 30
 
         .. _Authenticating as an Installation:
             https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-an-installation
         .. _Create a new installation token:
             https://developer.github.com/v3/apps/#create-a-new-installation-token
         """
-        # NOTE(sigmavirus24): This JWT token does not need to last very long.
-        # Instead of allowing it to stick around for 10 minutes, let's limit
-        # it to 30 seconds.
-        headers = apps.create_jwt_headers(
-            private_key_pem, app_id, expire_in=30
+        jwt_token = apps.create_token(
+            private_key_pem, app_id, expire_in=expire_in
         )
+        bearer_auth = session.AppBearerTokenAuth(jwt_token, expire_in)
         url = self._build_url(
             "app", "installations", str(installation_id), "access_tokens"
         )
         with self.session.no_auth():
-            response = self.session.post(url, headers=headers)
+            response = self.session.post(
+                url, auth=bearer_auth, headers=apps.APP_PREVIEW_HEADERS
+            )
             json = self._json(response, 201)
 
         self.session.app_installation_token_auth(json)
@@ -1421,7 +1502,7 @@ class GitHub(models.GitHubCore):
         :returns:
             the HTML formatted markdown text
         :rtype:
-            str (or unicode on Python 2)
+            str
         """
         data = None
         json = False
@@ -1546,7 +1627,7 @@ class GitHub(models.GitHubCore):
         :returns:
             ascii art of Octocat
         :rtype:
-            str (or unicode on Python 2)
+            str
         """
         url = self._build_url("octocat")
         req = self._get(url, params={"s": say})
@@ -2820,7 +2901,7 @@ class GitHub(models.GitHubCore):
         :returns:
             the zen of GitHub
         :rtype:
-            str (on Python 3, unicode on Python 2)
+            str
         """
         url = self._build_url("zen")
         resp = self._get(url)
@@ -2852,15 +2933,13 @@ class GitHubEnterprise(GitHub):
         session=None,
     ):
         """Create a client for a GitHub Enterprise instance."""
-        super(GitHubEnterprise, self).__init__(
-            username, password, token, session=session
-        )
+        super().__init__(username, password, token, session=session)
         self.session.base_url = url.rstrip("/") + "/api/v3"
         self.session.verify = verify
         self.url = url
 
     def _repr(self):
-        return "<GitHub Enterprise [{0.url}]>".format(self)
+        return f"<GitHub Enterprise [{self.url}]>"
 
     @requires_auth
     def create_user(self, login, email):
@@ -2914,39 +2993,3 @@ class GitHubEnterprise(GitHub):
             url = self._build_url("enterprise", "stats", option.lower())
             stats = self._json(self._get(url), 200)
         return stats
-
-
-class GitHubStatus(models.GitHubCore):
-    """A sleek interface to the GitHub System Status API.
-
-    This will only ever return the JSON objects returned by the API.
-    """
-
-    def __init__(self, session=None):
-        """Create a status API client."""
-        super(GitHubStatus, self).__init__({}, session or self.new_session())
-        self.session.base_url = "https://status.github.com"
-
-    def _repr(self):
-        return "<GitHub Status>"
-
-    def _recipe(self, *args):
-        url = self._build_url(*args)
-        resp = self._get(url)
-        return resp.json() if self._boolean(resp, 200, 404) else {}
-
-    def api(self):
-        """Retrieve API status."""
-        return self._recipe("api.json")
-
-    def status(self):
-        """Retrieve overall status."""
-        return self._recipe("api", "status.json")
-
-    def last_message(self):
-        """Retrieve the last message."""
-        return self._recipe("api", "last-message.json")
-
-    def messages(self):
-        """Retrieve all messages."""
-        return self._recipe("api", "messages.json")

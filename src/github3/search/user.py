@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from .. import users
 from ..models import GitHubCore
 
@@ -31,4 +28,4 @@ class UserSearchResult(GitHubCore):
         self.user = users.ShortUser(result, self)
 
     def _repr(self):
-        return "<UserSearchResult [{0}]>".format(self.user)
+        return f"<UserSearchResult [{self.user}]>"

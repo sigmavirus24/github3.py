@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """Commit search results implementation."""
-from __future__ import unicode_literals
-
 from .. import git
 from .. import models
 from .. import repos
@@ -71,4 +68,4 @@ class CommitSearchResult(models.GitHubCore):
         self.text_matches = data.get("text_matches", [])
 
     def _repr(self):
-        return "<CommitSearchResult [{0}]>".format(self.sha[:7])
+        return f"<CommitSearchResult [{self.sha[:7]}]>"

@@ -1,4 +1,6 @@
-from .helper import UnitHelper, mock
+import unittest.mock
+
+from .helper import UnitHelper
 from github3.structs import GitHubIterator
 
 
@@ -23,19 +25,19 @@ class TestGitHubIterator(UnitHelper):
 
     def test_refresh(self):
         """Show that __iter__ is called when refreshing."""
-        with mock.patch.object(GitHubIterator, "__iter__") as i:
+        with unittest.mock.patch.object(GitHubIterator, "__iter__") as i:
             self.instance.refresh()
             assert i.called is True
 
     def test_refresh_conditional(self):
         """Show that __iter__ is called when refreshing."""
-        with mock.patch.object(GitHubIterator, "__iter__") as i:
+        with unittest.mock.patch.object(GitHubIterator, "__iter__") as i:
             self.instance.refresh(True)
             assert i.called is True
 
     def test_sets_per_page_to_100(self):
         """Test that the Iterator defaults the per_page parameter to 100"""
-        self.session.get.return_value = mock.Mock(
+        self.session.get.return_value = unittest.mock.Mock(
             status_code=200, json=lambda: [], links={}
         )
 

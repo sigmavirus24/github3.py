@@ -41,6 +41,10 @@ class App(models.GitHubCore):
 
         The description of the App provided by the owner.
 
+    .. attribute:: events
+
+        An array of the event types an App receives
+
     .. attribute:: external_url
 
         The URL provided for the App by the owner.
@@ -69,6 +73,14 @@ class App(models.GitHubCore):
         A :class:`~github3.users.ShortUser` object representing the GitHub
         user who owns the App.
 
+    .. attribute:: permissions
+
+        A dictionary describing the permissions the App has
+
+    .. attribute:: slug
+
+        A short string used to identify the App
+
     .. attribute:: updated_at
 
         A :class:`~datetime.datetime` object representing the day and time
@@ -80,19 +92,27 @@ class App(models.GitHubCore):
         https://developer.github.com/v3/apps/
     """
 
+    CUSTOM_HEADERS = {
+        "Accept": "application/vnd.github.machine-man-preview+json"
+    }
+
     def _update_attributes(self, json):
         self.created_at = self._strptime(json["created_at"])
         self.description = json["description"]
         self.external_url = json["external_url"]
+        self.events = json["events"]
         self.html_url = json["html_url"]
         self.id = json["id"]
         self.name = json["name"]
         self.node_id = json["node_id"]
         self.owner = users.ShortUser(json["owner"], self)
+        self.permissions = json["permissions"]
+        self.slug = json["slug"]
         self.updated_at = self._strptime(json["updated_at"])
+        self._api = self.url = self._build_url("apps", self.slug)
 
     def _repr(self):
-        return '<App ["{}" by {}]>'.format(self.name, str(self.owner))
+        return f'<App ["{self.name}" by {str(self.owner)}]>'
 
 
 class Installation(models.GitHubCore):
@@ -185,6 +205,6 @@ def create_jwt_headers(
         dict
     """
     jwt_token = create_token(private_key_pem, app_id, expire_in)
-    headers = {"Authorization": "Bearer {}".format(jwt_token)}
+    headers = {"Authorization": f"Bearer {jwt_token}"}
     headers.update(APP_PREVIEW_HEADERS)
     return headers

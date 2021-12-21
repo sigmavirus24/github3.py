@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
 """
 This module contains the classes relating to licenses.
 
 See also: https://developer.github.com/v3/licenses/
 """
-from __future__ import unicode_literals
-
 import base64
 
 from . import models
@@ -23,7 +20,7 @@ class _License(models.GitHubCore):
         self.spdx_id = license["spdx_id"]
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.name)
+        return f"<{self.class_name} [{self.name}]>"
 
 
 class License(_License):
@@ -72,7 +69,7 @@ class License(_License):
     class_name = "License"
 
     def _update_attributes(self, license):
-        super(License, self)._update_attributes(license)
+        super()._update_attributes(license)
         self.body = license["body"]
         self.conditions = license["conditions"]
         self.description = license["description"]
@@ -83,7 +80,7 @@ class License(_License):
         self.permissions = license["permissions"]
 
     def _repr(self):
-        return "<License [{0}]>".format(self.name)
+        return f"<License [{self.name}]>"
 
 
 class ShortLicense(_License):
@@ -191,7 +188,7 @@ class RepositoryLicense(models.GitHubCore):
         self.license = ShortLicense(license["license"], self)
 
     def _repr(self):
-        return "<RepositoryLicense [{0}]>".format(self.name)
+        return f"<RepositoryLicense [{self.name}]>"
 
     def decode_content(self):
         """Decode the :attr:`content` attribute.
@@ -202,7 +199,7 @@ class RepositoryLicense(models.GitHubCore):
         :returns:
             plain-text content of this license
         :rtype:
-            text (unicode on Python 2, str on Python 3)
+            text (str on Python 3)
         """
         if self.encoding == "base64":
             return base64.b64decode(self.content.encode("utf-8")).decode(

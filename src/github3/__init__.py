@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 github3
 =======
@@ -9,61 +8,25 @@ See https://github3.readthedocs.io/ for documentation.
 :license: Modified BSD, see LICENSE for more details
 
 """
-
-from .__about__ import (
-    __package_name__,
-    __title__,
-    __author__,
-    __author_email__,
-    __license__,
-    __copyright__,
-    __version__,
-    __version_info__,
-    __url__,
-)
-from .api import (
-    all_events,
-    all_repositories,
-    all_users,
-    authorize,
-    create_gist,
-    emojis,
-    enterprise_login,
-    followed_by,
-    followers_of,
-    gist,
-    gists_by,
-    gitignore_template,
-    gitignore_templates,
-    issue,
-    issues_on,
-    login,
-    markdown,
-    octocat,
-    organization,
-    organizations_with,
-    public_gists,
-    pull_request,
-    rate_limit,
-    repositories_by,
-    repository,
-    search_code,
-    search_issues,
-    search_repositories,
-    search_users,
-    starred_by,
-    subscriptions_for,
-    user,
-    zen,
-)
-from .github import GitHub, GitHubEnterprise, GitHubStatus
+from .__about__ import __author__
+from .__about__ import __author_email__
+from .__about__ import __copyright__
+from .__about__ import __license__
+from .__about__ import __package_name__
+from .__about__ import __title__
+from .__about__ import __url__
+from .__about__ import __version__
+from .__about__ import __version_info__
+from .api import enterprise_login
+from .api import login
 from .exceptions import GitHubError
+from .github import GitHub
+from .github import GitHubEnterprise
 
 __all__ = (
     "GitHub",
     "GitHubEnterprise",
     "GitHubError",
-    "GitHubStatus",
     "authorize",
     "login",
     "enterprise_login",

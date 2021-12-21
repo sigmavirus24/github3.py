@@ -22,7 +22,7 @@ object ``g``. That might look like this::
         pass
 
     try:
-        user = raw_input('GitHub username: ')
+        user = input('GitHub username: ') or getuser()
     except KeyboardInterrupt:
         user = getuser()
 
@@ -60,12 +60,12 @@ Adding a new key to your account
 ::
 
     try:
-        path = raw_input('Path to key: ')
+        path = input('Path to key: ')
     except KeyboardInterrupt:
         path = ''
 
     try:
-        name = raw_input('Key name: ')
+        name = input('Key name: ')
     except KeyboardInterrupt:
         name = ''
 
@@ -110,7 +110,7 @@ Creating a new repository
 
     for key in keys:
         try:
-            repo[key] = raw_input(key + ': ')
+            repo[key] = input(key + ': ')
         except KeyboardInterrupt:
             pass
 
@@ -126,7 +126,7 @@ Create a commit to change an existing file
 
 ::
 
-    repo.contents('/README.md').update('commit message', 'file content'.encode('utf-8'))
+    repo.file_contents('/README.md').update('commit message', 'file content'.encode('utf-8'))
 
 Follow another user on GitHub
 -----------------------------

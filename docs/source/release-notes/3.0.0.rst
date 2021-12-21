@@ -1,0 +1,37 @@
+3.0.0: 2021-10-31
+-----------------
+
+Backwards Incompatible Changes
+``````````````````````````````
+
+- :meth:`~github3.repos.branch.Branch.protect` has been updated to reflect the
+  GitHub API
+
+Features Added
+``````````````
+
+- Add ``maintainer_can_modify`` parameter to
+  :meth:`~github3.repos.repo.Repository.create_pull`
+
+- Add :attr:`~github3.repos.branch.BranchProtection.required_linear_history`,
+  :attr:`~github3.repos.branch.BranchProtection.allow_force_pushes`,
+  :attr:`~github3.repos.branch.BranchProtection.allow_deletions`, and
+  :attr:`~github3.repos.branch.BranchProtection.required_conversation_resolution`.
+
+- Add support for blocking users to :class:`~github3.github.GitHub` and
+  :class:`~github3.orgs.Organization`.
+
+  - :meth:`~github3.github.GitHub.blocked_users`
+  - :meth:`~github3.github.GitHub.block`
+  - :meth:`~github3.github.GitHub.is_blocking`
+  - :meth:`~github3.github.GitHub.unblock`
+  - :meth:`~github3.orgs.Organization.blocked_users`
+  - :meth:`~github3.orgs.Organization.block`
+  - :meth:`~github3.orgs.Organization.is_blocking`
+  - :meth:`~github3.orgs.Organization.unblock`
+
+- Add support for beta branch synchronization endpoint
+  :meth:`~github3.repos.branch.Branch.sync_with_upstream`
+
+- :class:`~github3.users.Stargazer` was added to give access to the
+  ``starred_at`` value when listing stargazers on a Repository object.

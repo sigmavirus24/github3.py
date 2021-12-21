@@ -11,10 +11,10 @@ clean:
 	git clean -Xdf
 	rm -rf build/ dist/
 
-travis:
+ga:
 	$(TEST_RUNNER)
 
-tests: travis
+tests: ga
 
 test-deps:
 	pip install -r dev-requirements.txt

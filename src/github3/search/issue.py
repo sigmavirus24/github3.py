@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """Issue search results implementation."""
-from __future__ import unicode_literals
-
-from ..models import GitHubCore
 from ..issues import ShortIssue
+from ..models import GitHubCore
 
 
 class IssueSearchResult(GitHubCore):
@@ -37,4 +34,4 @@ class IssueSearchResult(GitHubCore):
         self.issue = ShortIssue(result, self)
 
     def _repr(self):
-        return "<IssueSearchResult [{0}]>".format(self.issue)
+        return f"<IssueSearchResult [{self.issue}]>"

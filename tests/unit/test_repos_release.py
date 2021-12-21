@@ -1,17 +1,16 @@
-from github3.repos.release import Release, Asset
-from github3.users import ShortUser
+import json
+import unittest.mock
 
-from .helper import (
-    UnitHelper,
-    UnitIteratorHelper,
-    create_url_helper,
-    mock,
-    create_example_data_helper,
-)
+import pytest
 
 import github3
-import json
-import pytest
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
+from .helper import UnitIteratorHelper
+from github3.repos.release import Asset
+from github3.repos.release import Release
+from github3.users import ShortUser
 
 url_for = create_url_helper(
     "https://api.github.com/repos/sigmavirus24/github3.py/releases"
@@ -73,7 +72,7 @@ class TestRelease(UnitHelper):
         self.session.delete.assert_called_once_with(self.example_data["url"])
 
     def test_upload_asset(self):
-        self.session.post.return_value = mock.Mock(
+        self.session.post.return_value = unittest.mock.Mock(
             status_code=201, json=lambda: self.example_data["assets"][0]
         )
         with open(__file__) as fd:
@@ -90,7 +89,7 @@ class TestRelease(UnitHelper):
             )
 
     def test_upload_asset_with_a_label(self):
-        self.session.post.return_value = mock.Mock(
+        self.session.post.return_value = unittest.mock.Mock(
             status_code=201, json=lambda: self.example_data["assets"][0]
         )
         with open(__file__) as fd:
@@ -139,7 +138,9 @@ class TestAsset(UnitHelper):
     @pytest.mark.xfail
     def test_download(self):
         """Verify the request to download an Asset file."""
-        with mock.patch("github3.utils.stream_response_to_file") as stream:
+        with unittest.mock.patch(
+            "github3.utils.stream_response_to_file"
+        ) as stream:
             self.instance.download()
 
         self.session.get.assert_called_once_with(
@@ -152,7 +153,9 @@ class TestAsset(UnitHelper):
 
     def test_download_with_302(self):
         """Verify the request to download an Asset file."""
-        with mock.patch.object(github3.models.GitHubCore, "_get") as get:
+        with unittest.mock.patch.object(
+            github3.models.GitHubCore, "_get"
+        ) as get:
             get.return_value.status_code = 302
             get.return_value.headers = {"location": "https://fakeurl"}
             self.instance.download()

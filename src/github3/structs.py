@@ -1,18 +1,26 @@
-# -*- coding: utf-8 -*-
-import collections
+import collections.abc as abc_collections
 import functools
 
-from requests.compat import urlparse, urlencode
+from requests.compat import urlencode
+from requests.compat import urlparse
 
 from . import exceptions
 from . import models
 
 
-class GitHubIterator(models.GitHubCore, collections.Iterator):
+class GitHubIterator(models.GitHubCore, abc_collections.Iterator):
     """The :class:`GitHubIterator` class powers all of the iter_* methods."""
 
     def __init__(
-        self, count, url, cls, session, params=None, etag=None, headers=None
+        self,
+        count,
+        url,
+        cls,
+        session,
+        params=None,
+        etag=None,
+        headers=None,
+        list_key=None,
     ):
         models.GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
@@ -41,6 +49,8 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
         self.last_response = None
         #: Last status code received
         self.last_status = 0
+        #: Key to get the list of items in case a dict is returned
+        self.list_key = list_key
 
         if etag:
             self.headers.update({"If-None-Match": etag})
@@ -48,7 +58,7 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
         self.path = urlparse(self.url).path
 
     def _repr(self):
-        return "<GitHubIterator [{0}, {1}]>".format(self.count, self.path)
+        return f"<GitHubIterator [{self.count}, {self.path}]>"
 
     def __iter__(self):
         self.last_url, params = self.url, self.params
@@ -80,6 +90,17 @@ class GitHubIterator(models.GitHubCore, collections.Iterator):
 
             if json is None:
                 break
+
+            # Some APIs return the list of items inside a dict
+            if isinstance(json, dict) and self.list_key is not None:
+                try:
+                    json = json[self.list_key]
+                except KeyError:
+                    raise exceptions.UnprocessableResponseBody(
+                        "GitHub's API returned a body that could not be"
+                        " handled",
+                        json,
+                    )
 
             # languages returns a single dict. We want the items.
             if isinstance(json, dict):
@@ -141,16 +162,14 @@ class SearchIterator(GitHubIterator):
     def __init__(
         self, count, url, cls, session, params=None, etag=None, headers=None
     ):
-        super(SearchIterator, self).__init__(
-            count, url, cls, session, params, etag, headers
-        )
+        super().__init__(count, url, cls, session, params, etag, headers)
         #: Total count returned by GitHub
         self.total_count = 0
         #: Items array returned in the last request
         self.items = []
 
     def _repr(self):
-        return "<SearchIterator [{0}, {1}?{2}]>".format(
+        return "<SearchIterator [{}, {}?{}]>".format(
             self.count, self.path, urlencode(self.params)
         )
 

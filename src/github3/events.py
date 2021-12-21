@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """This module contains the classes related to Events."""
-from __future__ import unicode_literals
-
 import copy
 
 from . import models
@@ -454,7 +451,7 @@ class Event(models.GitHubCore):
         self.public = event["public"]
 
     def _repr(self):
-        return "<Event [{0}]>".format(self.type[:-5])
+        return f"<Event [{self.type[:-5]}]>"
 
     @staticmethod
     def list_types():

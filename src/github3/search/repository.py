@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """Repository search results implementation."""
-from __future__ import unicode_literals
-
 from .. import models
 from .. import repos
 
@@ -38,4 +35,4 @@ class RepositorySearchResult(models.GitHubCore):
         self.repository = repos.ShortRepository(result, self)
 
     def _repr(self):
-        return "<RepositorySearchResult [{0}]>".format(self.repository)
+        return f"<RepositorySearchResult [{self.repository}]>"

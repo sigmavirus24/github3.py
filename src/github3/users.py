@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
 """This module contains everything relating to Users."""
-from __future__ import unicode_literals
-
+import typing as t
 from json import dumps
 
-from github3.auths import Authorization
 from uritemplate import URITemplate
 
 from . import models
 from .decorators import requires_auth
 from .events import Event
+from github3.auths import Authorization
 
 
 class GPGKey(models.GitHubCore):
@@ -91,7 +89,7 @@ class GPGKey(models.GitHubCore):
         self.subkeys = [GPGKey(subkey, self) for subkey in key["subkeys"]]
 
     def _repr(self):
-        return "<GPG Key [{0}]>".format(self.key_id)
+        return f"<GPG Key [{self.key_id}]>"
 
     def __str__(self):
         return self.key_id
@@ -136,7 +134,7 @@ class Key(models.GitHubCore):
         self.id = key["id"]
 
     def _repr(self):
-        return "<User Key [{0}]>".format(self.title)
+        return f"<User Key [{self.title}]>"
 
     def __str__(self):
         return self.key
@@ -205,7 +203,7 @@ class Plan(models.GitHubCore):
         self.space = plan["space"]
 
     def _repr(self):
-        return "<Plan [{0}]>".format(self.name)  # (No coverage)
+        return f"<Plan [{self.name}]>"  # (No coverage)
 
     def __str__(self):
         return self.name
@@ -228,7 +226,7 @@ class _Email(models.GitHubCore):
         self.verified = email["verified"]
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.email)
+        return f"<{self.class_name} [{self.email}]>"
 
     def __str__(self):
         return self.email
@@ -275,12 +273,12 @@ class Email(_Email):
     """
 
     def _update_attributes(self, email):
-        super(Email, self)._update_attributes(email)
+        super()._update_attributes(email)
         self.primary = email["primary"]
         self.visibility = email["visibility"]
 
     def _repr(self):
-        return "<Email [{0}]>".format(self.email)
+        return f"<Email [{self.email}]>"
 
     def __str__(self):
         return self.email
@@ -334,7 +332,7 @@ class _User(models.GitHubCore):
         full_name = ""
         name = getattr(self, "name", None)
         if name is not None:
-            full_name = ":{}".format(name)
+            full_name = f":{name}"
         return "<{s.class_name} [{s.login}{full_name}]>".format(
             s=self, full_name=full_name
         )
@@ -732,7 +730,7 @@ class User(_User):
     class_name = "User"
 
     def _update_attributes(self, user):
-        super(User, self)._update_attributes(user)
+        super()._update_attributes(user)
         self.bio = user["bio"]
         self.blog = user["blog"]
         self.company = user["company"]
@@ -842,6 +840,28 @@ class ShortUser(_User):
     _refresh_to = User
 
 
+class Stargazer(_User):
+    """Object representing a user that has starred a repository.
+
+    .. versionadded:: 3.0.0
+
+    This object contains all of the attributes available on
+    :class:`~github3.users.ShortUser` as well as the following:
+
+    .. attribute:: starred_at
+
+        The time and date that the user starred the repository this was
+        queried from.
+    """
+
+    class_name = "Stargazer"
+    _refresh_to = User
+
+    def _update_attributes(self, stargazer):
+        super()._update_attributes(stargazer["user"])
+        self.starred_at = self._strptime(stargazer["starred_at"])
+
+
 class AuthenticatedUser(User):
     """Object to represent the currently authenticated user.
 
@@ -884,10 +904,10 @@ class AuthenticatedUser(User):
     class_name = "AuthenticatedUser"
 
     def _update_attributes(self, user):
-        super(AuthenticatedUser, self)._update_attributes(user)
-        self.disk_usage = user["disk_usage"]
-        self.owned_private_repos_count = user["owned_private_repos"]
-        self.total_private_repos_count = user["total_private_repos"]
+        super()._update_attributes(user)
+        self.disk_usage = user.get("disk_usage")
+        self.owned_private_repos_count = user.get("owned_private_repos")
+        self.total_private_repos_count = user.get("total_private_repos")
         self.plan = user.get("plan")
         if self.plan is not None:
             self.plan = Plan(self.plan, self)
@@ -911,7 +931,7 @@ class Collaborator(_User):
     _refresh_to = User
 
     def _update_attributes(self, user):
-        super(Collaborator, self)._update_attributes(user)
+        super()._update_attributes(user)
 
         self.permissions = user["permissions"]
 
@@ -943,5 +963,10 @@ class Contributor(_User):
     _refresh_to = User
 
     def _update_attributes(self, contributor):
-        super(Contributor, self)._update_attributes(contributor)
+        super()._update_attributes(contributor)
         self.contributions_count = contributor["contributions"]
+
+
+UserLike = t.Union[
+    ShortUser, User, AuthenticatedUser, Collaborator, Contributor, str
+]

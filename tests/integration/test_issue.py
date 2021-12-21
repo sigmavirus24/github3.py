@@ -1,9 +1,8 @@
 """Integration tests for Issues."""
-import github3
-import github3.exceptions as exc
-
 import pytest
 
+import github3
+import github3.exceptions as exc
 from .helper import IntegrationHelper
 
 
@@ -37,18 +36,6 @@ class TestIssue(IntegrationHelper):
         assert len(labels) > 0
         for label in labels:
             assert isinstance(label, github3.issues.label.ShortLabel)
-
-    def test_assign(self):
-        """Test the ability to assign a user to an issue."""
-        self.auto_login()
-        cassette_name = self.cassette_name("assign")
-        with self.recorder.use_cassette(cassette_name):
-            issue = self.gh.issue(
-                username="sigmavirus24", repository="github3.py", number=497
-            )
-            assigned = issue.assign("itsmemattchung")
-
-        assert assigned is True
 
     def test_comment(self):
         """Test the ability to retrieve an issue comment."""

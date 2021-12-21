@@ -24,3 +24,5 @@ tests/id_rsa
 .pytest_cache/
 t.py
 *.pem
+/.python-version
+/.tool-versions

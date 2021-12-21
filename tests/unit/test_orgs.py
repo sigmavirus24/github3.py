@@ -1,12 +1,11 @@
 """Organization unit tests."""
-import mock
 import pytest
 
-from github3 import GitHubError
-from github3.orgs import Organization, OrganizationHook
-from github3.projects import Project
-
 from . import helper
+from github3 import GitHubError
+from github3.orgs import Organization
+from github3.orgs import OrganizationHook
+from github3.projects import Project
 
 url_for = helper.create_url_helper("https://api.github.com/orgs/github")
 hook_url_for = helper.create_url_helper(
@@ -26,20 +25,32 @@ class TestOrganization(helper.UnitHelper):
     described_class = Organization
     example_data = get_org_example_data()
 
-    def test_add_member(self):
-        """Show that an authenticated user can add a member to an org."""
-        self.instance.add_member("user", 10)
-
-        self.session.put.assert_called_once_with(
-            "https://api.github.com/teams/10/members/user"
-        )
-
     def test_add_repository(self):
         """Show that one can add a repository to an organization."""
         self.instance.add_repository("name-of-repo", 10)
 
         self.session.put.assert_called_once_with(
             "https://api.github.com/teams/10/repos/name-of-repo"
+        )
+
+    def test_block(self):
+        """Show we can block users."""
+        self.instance.block("username")
+
+        self.session.put.assert_called_once_with(url_for("blocks/username"))
+
+    def test_is_blocking(self):
+        """Show we can check if a user is blocked."""
+        self.instance.is_blocking("username")
+
+        self.session.get.assert_called_once_with(url_for("blocks/username"))
+
+    def test_unblock(self):
+        """Show we can unblock users."""
+        self.instance.unblock("username")
+
+        self.session.delete.assert_called_once_with(
+            url_for("blocks/username")
         )
 
     def test_conceal_member(self):
@@ -77,6 +88,7 @@ class TestOrganization(helper.UnitHelper):
                 "team_id": 1,
                 "gitignore_template": "",
                 "license_template": "",
+                "has_projects": True,
             },
         )
 
@@ -90,7 +102,9 @@ class TestOrganization(helper.UnitHelper):
                 "name": "team-name",
                 "repo_names": [],
                 "permission": "push",
+                "privacy": "secret",
             },
+            headers=None,
         )
 
     def test_create_hook(self):
@@ -225,6 +239,14 @@ class TestOrganization(helper.UnitHelper):
             "https://api.github.com/teams/10"
         )
 
+    def test_team_by_name(self):
+        """Show that a user can retrieve a team by name."""
+        self.instance.team_by_name("team-name")
+
+        self.session.get.assert_called_once_with(
+            "https://api.github.com/orgs/github/teams/team-name"
+        )
+
     def test_team_requires_positive_team_id(self):
         """Show that team requires a team_id greater than 0."""
         self.instance.team(-1)
@@ -285,15 +307,25 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     described_class = Organization
     example_data = get_org_example_data()
 
-    def test_add_member(self):
-        """Show that one must be authenticated to add a member to an org."""
-        with pytest.raises(GitHubError):
-            self.instance.add_member("user", 10)
-
     def test_add_repository(self):
         """Show that one must be authenticated to add a repo to an org."""
         with pytest.raises(GitHubError):
             self.instance.add_repository("foo", 10)
+
+    def test_block(self):
+        """Show we must be authenticated to block users."""
+        with pytest.raises(GitHubError):
+            self.instance.block("username")
+
+    def test_is_blocking(self):
+        """Show we must be auth'd to check if a user is blocked."""
+        with pytest.raises(GitHubError):
+            self.instance.is_blocking("username")
+
+    def test_unblock(self):
+        """Show must be authenticated to unblock users."""
+        with pytest.raises(GitHubError):
+            self.instance.unblock("username")
 
     def test_conceal_member(self):
         """Show that one must be authenticated to conceal a member."""
@@ -393,19 +425,13 @@ class TestOrganizationIterator(helper.UnitIteratorHelper):
             headers={},
         )
 
-    @mock.patch("warnings.warn")
-    def test_events(self, warn_mock):
-        """Show that one can iterate over an organization's events."""
-        i = self.instance.events()
+    def test_blocked_users(self):
+        """Show we can retrieve all blocked users by the current org."""
+        i = self.instance.blocked_users()
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for("events"), params={"per_page": 100}, headers={}
-        )
-
-        warn_mock.assert_called_once_with(
-            "This method is deprecated. Please use ``public_events`` instead.",
-            DeprecationWarning,
+            url_for("blocks"), params={"per_page": 100}, headers={}
         )
 
     def test_members(self):
@@ -551,7 +577,7 @@ class TestOrganizationHook(helper.UnitHelper):
 
     def test_str(self):
         """Show that instance string is formatted correctly."""
-        assert str(self.instance) == "<OrganizationHook [{0}]>".format(
+        assert str(self.instance) == "<OrganizationHook [{}]>".format(
             self.instance.name
         )
 

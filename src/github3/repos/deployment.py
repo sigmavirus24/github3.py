@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
 """The module containing deployment logic."""
-from __future__ import unicode_literals
-
 from .. import users
-
 from ..models import GitHubCore
 
 
@@ -74,7 +70,7 @@ class Deployment(GitHubCore):
         self.updated_at = self._strptime(deployment["updated_at"])
 
     def _repr(self):
-        return "<Deployment [{0} @ {1}]>".format(self.id, self.sha)
+        return f"<Deployment [{self.id} @ {self.sha}]>"
 
     def create_status(self, state, target_url=None, description=None):
         """Create a new deployment status for this deployment.
@@ -180,4 +176,4 @@ class DeploymentStatus(GitHubCore):
         self.updated_at = self._strptime(status["updated_at"])
 
     def _repr(self):
-        return "<DeploymentStatus [{0}]>".format(self.id)
+        return f"<DeploymentStatus [{self.id}]>"

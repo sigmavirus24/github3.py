@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """All exceptions for the github3 library."""
 
 
@@ -102,7 +101,7 @@ class GitHubError(GitHubException):
 
     def __init__(self, resp):
         """Initialize our exception class."""
-        super(GitHubError, self).__init__(resp)
+        super().__init__(resp)
         #: Response code that triggered the error
         self.response = resp
         self.code = resp.status_code
@@ -118,12 +117,12 @@ class GitHubError(GitHubException):
             self.msg = resp.content or "[No message]"
 
     def __repr__(self):
-        return "<{0} [{1}]>".format(
+        return "<{} [{}]>".format(
             self.__class__.__name__, self.msg or self.code
         )
 
     def __str__(self):
-        return "{0} {1}".format(self.code, self.msg)
+        return f"{self.code} {self.msg}"
 
     @property
     def message(self):
@@ -166,9 +165,7 @@ class NotRefreshable(GitHubException):
 
     def __init__(self, object_name):
         """Initialize our NotRefreshable exception."""
-        super(NotRefreshable, self).__init__(
-            self.message_format.format(object_name)
-        )
+        super().__init__(self.message_format.format(object_name))
 
 
 class ResponseError(GitHubError):
@@ -190,11 +187,11 @@ class TransportError(GitHubException):
     def __init__(self, exception):
         """Initialize TransportError exception."""
         self.msg = self.msg_format.format(str(exception))
-        super(TransportError, self).__init__(self, self.msg, exception)
+        super().__init__(self, self.msg, exception)
         self.exception = exception
 
     def __str__(self):
-        return "{0}: {1}".format(type(self.exception), self.msg)
+        return f"{type(self.exception)}: {self.msg}"
 
 
 class ConnectionError(TransportError):
@@ -219,7 +216,7 @@ class UnprocessableResponseBody(ResponseError):
         self.msg = message
 
     def __repr__(self):
-        return "<{0} [{1}]>".format("UnprocessableResponseBody", self.body)
+        return "<{} [{}]>".format("UnprocessableResponseBody", self.body)
 
     def __str__(self):
         return self.message

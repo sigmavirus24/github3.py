@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
 """GitHub Pages related logic."""
-from __future__ import unicode_literals
-
 from .. import models
 
 
@@ -33,7 +30,7 @@ class PagesInfo(models.GitHubCore):
         if info:
             info += "/"
         info += self.status or ""
-        return "<Pages Info [{0}]>".format(info)
+        return f"<Pages Info [{info}]>"
 
 
 class PagesBuild(models.GitHubCore):
@@ -85,4 +82,4 @@ class PagesBuild(models.GitHubCore):
         self.updated_at = self._strptime(build["updated_at"])
 
     def _repr(self):
-        return "<Pages Build [{0}/{1}]>".format(self.commit, self.status)
+        return f"<Pages Build [{self.commit}/{self.status}]>"

@@ -1,7 +1,8 @@
 """Unit tests around github3's Subscription classes."""
 import github3
-
-from .helper import UnitHelper, create_url_helper, create_example_data_helper
+from .helper import create_example_data_helper
+from .helper import create_url_helper
+from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("subscription_example")
 url_for = create_url_helper(

@@ -1,3 +1,5 @@
+import unittest.mock
+
 try:
     import cPickle as pickle
 except ImportError:
@@ -8,7 +10,6 @@ import pytest
 import requests
 
 from github3 import session
-from .helper import mock
 
 
 class TestGitHubSession:
@@ -30,35 +31,35 @@ class TestGitHubSession:
         assert "User-Agent" in s.headers
         assert s.headers["User-Agent"].startswith("github3.py/")
 
-    @mock.patch.object(requests.Session, 'request')
+    @unittest.mock.patch.object(requests.Session, "request")
     def test_default_timeout(self, request_mock):
         """Test that default timeout values are used"""
-        response = mock.Mock()
+        response = unittest.mock.Mock()
         response.configure_mock(status_code=200, headers={})
         request_mock.return_value = response
         s = self.build_session()
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
-            "GET", "http://example.com", allow_redirects=True,
-            timeout=(4, 1)
+            "GET", "http://example.com", allow_redirects=True, timeout=(4, 10)
         )
 
-    @mock.patch.object(requests.Session, 'request')
+    @unittest.mock.patch.object(requests.Session, "request")
     def test_custom_timeout(self, request_mock):
         """Test that custom timeout values are used"""
-        response = mock.Mock()
+        response = unittest.mock.Mock()
         response.configure_mock(status_code=200, headers={})
         request_mock.return_value = response
         s = session.GitHubSession(
-            default_connect_timeout=300,
-            default_read_timeout=400
+            default_connect_timeout=300, default_read_timeout=400
         )
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
-            "GET", "http://example.com", allow_redirects=True,
-            timeout=(300, 400)
+            "GET",
+            "http://example.com",
+            allow_redirects=True,
+            timeout=(300, 400),
         )
 
     def test_build_url(self):
@@ -124,7 +125,7 @@ class TestGitHubSession:
         pr = s.prepare_request(req)
         assert "token token goes here" != pr.headers["Authorization"]
 
-    @mock.patch.object(requests.Session, "request")
+    @unittest.mock.patch.object(requests.Session, "request")
     def test_handle_two_factor_auth(self, request_mock):
         """Test the method that handles getting the 2fa code"""
         s = self.build_session()
@@ -135,12 +136,12 @@ class TestGitHubSession:
             *args, headers={"X-GitHub-OTP": "fake"}
         )
 
-    @mock.patch.object(requests.Session, "request")
+    @unittest.mock.patch.object(requests.Session, "request")
     def test_request_ignores_responses_that_do_not_require_2fa(
         self, request_mock
     ):
         """Test that request does not try to handle 2fa when it should not"""
-        response = mock.Mock()
+        response = unittest.mock.Mock()
         response.configure_mock(status_code=200, headers={})
         request_mock.return_value = response
         s = self.build_session()
@@ -148,14 +149,13 @@ class TestGitHubSession:
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
-            "GET", "http://example.com", allow_redirects=True,
-            timeout=(4, 1)
+            "GET", "http://example.com", allow_redirects=True, timeout=(4, 10)
         )
 
-    @mock.patch.object(requests.Session, "request")
+    @unittest.mock.patch.object(requests.Session, "request")
     def test_creates_history_while_handling_2fa(self, request_mock):
         """Test that the overridden request method will create history"""
-        response = mock.Mock()
+        response = unittest.mock.Mock()
         response.configure_mock(
             status_code=401,
             headers={"X-GitHub-OTP": "required;2fa"},
@@ -219,7 +219,7 @@ class TestGitHubSession:
         dashnetrc = tmpdir.join("_netrc")
         dashnetrc.write(netrc_contents)
 
-        with mock.patch.dict("os.environ", {"HOME": str(tmpdir)}):
+        with unittest.mock.patch.dict("os.environ", {"HOME": str(tmpdir)}):
             # prepare_request triggers reading of .netrc files
             pr = s.prepare_request(
                 requests.Request(
@@ -227,7 +227,7 @@ class TestGitHubSession:
                 )
             )
             auth_header = pr.headers["Authorization"]
-            assert auth_header == "token {0}".format(token)
+            assert auth_header == f"token {token}"
 
     def test_two_factor_auth_callback_handles_None(self):
         s = self.build_session()

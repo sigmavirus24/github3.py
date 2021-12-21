@@ -1,7 +1,6 @@
 import pytest
 
 import github3
-
 from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/users/octocat")
@@ -287,9 +286,7 @@ class TestPlan(helper.UnitHelper):
     def test_str(self):
         """Show that the instance string is formatted correctly."""
         assert str(self.instance) == self.instance.name
-        assert repr(self.instance) == "<Plan [{0}]>".format(
-            self.instance.name
-        )
+        assert repr(self.instance) == f"<Plan [{self.instance.name}]>"
 
     def test_is_free(self):
         """Show that user can check if the plan is free."""

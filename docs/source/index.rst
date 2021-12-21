@@ -35,7 +35,7 @@ user:
     print(kennethreitz.login)
     print(kennethreitz.followers_count)
 
-    followers = [str(f) for f in gh.followers('kennethreitz')]
+    followers = [str(f) for f in gh.followers_of('kennethreitz')]
 
 There are several examples of different aspects of using github3.py
 
@@ -48,7 +48,6 @@ There are several examples of different aspects of using github3.py
     examples/git
     examples/github
     examples/issue
-    examples/iterators
     examples/logging
     examples/octocat
 
@@ -122,15 +121,15 @@ The tests are generally run using tox. Tox can be installed like so
 
     pip install tox
 
-We test against PyPy and the following versions of Python:
-
-- 2.7
-
-- 3.4
-
-- 3.5
+We test against PyPy3 and the following versions of Python:
 
 - 3.6
+
+- 3.7
+
+- 3.8
+
+- 3.9
 
 If you simply run ``tox`` it will run tests against all of these versions of
 python and run ``flake8`` against the codebase as well. If you want to run
@@ -138,13 +137,13 @@ against one specific version, you can do
 
 .. code-block:: console
 
-    tox -e py36
+    tox -e py39
 
 And if you want to run tests against a specific file, you can do
 
 .. code-block:: console
 
-    tox -e py36 -- tests/unit/test_github.py
+    tox -e py39 -- tests/unit/test_github.py
 
 To run the tests, ``tox`` uses ``py.test`` so you can pass any options or
 parameters to ``py.test`` after specifying ``--``. For example, you can get
@@ -152,7 +151,7 @@ more verbose output by doing
 
 .. code-block:: console
 
-    tox -e py36 -- -vv
+    tox -e py39 -- -vv
 
 .. toctree::
 

@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 """This module provides the basic models used in github3.py."""
-from __future__ import unicode_literals
-
 import json as jsonlib
 import logging
 
 import dateutil.parser
-import requests
 import requests.compat
 
 from . import exceptions
@@ -15,7 +11,7 @@ from . import session
 LOG = logging.getLogger(__package__)
 
 
-class GitHubCore(object):
+class GitHubCore:
     """The base object for all objects that require a session.
 
     The :class:`GitHubCore <GitHubCore>` object provides some
@@ -54,9 +50,10 @@ class GitHubCore(object):
 
     def __getattr__(self, attribute):
         """Proxy access to stored JSON."""
-        if attribute not in self._json_data:
+        _json_data = object.__getattribute__(self, "_json_data")
+        if attribute not in _json_data:
             raise AttributeError(attribute)
-        value = self._json_data.get(attribute)
+        value = _json_data[attribute]
         setattr(self, attribute, value)
         return value
 
@@ -125,7 +122,7 @@ class GitHubCore(object):
         return hash(self._uniq)
 
     def _repr(self):
-        return "<github3-core at 0x{0:x}>".format(id(self))
+        return f"<github3-core at 0x{id(self):x}>"
 
     @staticmethod
     def _remove_none(data):
@@ -133,7 +130,7 @@ class GitHubCore(object):
             return
         for (k, v) in list(data.items()):
             if v is None:
-                del (data[k])
+                del data[k]
 
     def _instance_or_null(self, instance_class, json):
         if json is not None and not isinstance(json, dict):
@@ -232,7 +229,7 @@ class GitHubCore(object):
     def _api(self):
         value = "{0.scheme}://{0.netloc}{0.path}".format(self._uri)
         if self._uri.query:
-            value += "?{}".format(self._uri.query)
+            value += f"?{self._uri.query}"
         return value
 
     @staticmethod
@@ -245,7 +242,16 @@ class GitHubCore(object):
             self._uri = self._uri_parse(uri)
         self.url = uri
 
-    def _iter(self, count, url, cls, params=None, etag=None, headers=None):
+    def _iter(
+        self,
+        count,
+        url,
+        cls,
+        params=None,
+        etag=None,
+        headers=None,
+        list_key=None,
+    ):
         """Generic iterator for this project.
 
         :param int count: How many items to return.
@@ -254,12 +260,16 @@ class GitHubCore(object):
         :param params dict: (optional) Parameters for the request
         :param str etag: (optional), ETag from the last call
         :param dict headers: (optional) HTTP Headers for the request
+        :param str list_key: (optional) Key for extracting the list of items
+            from a dict response
         :returns: A lazy iterator over the pagianted resource
         :rtype: :class:`GitHubIterator <github3.structs.GitHubIterator>`
         """
         from .structs import GitHubIterator
 
-        return GitHubIterator(count, url, cls, self, params, etag, headers)
+        return GitHubIterator(
+            count, url, cls, self, params, etag, headers, list_key
+        )
 
     @property
     def ratelimit_remaining(self):
@@ -272,7 +282,7 @@ class GitHubCore(object):
         self._remaining = core.get("remaining", 0)
         return self._remaining
 
-    def refresh(self, conditional=False):
+    def refresh(self, conditional: bool = False) -> "GitHubCore":
         """Re-retrieve the information for this object.
 
         The reasoning for the return value is the following example: ::

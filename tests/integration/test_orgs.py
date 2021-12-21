@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on Organization."""
 import pytest
 
 import github3
-
 from .helper import IntegrationHelper
 
 
@@ -27,18 +25,9 @@ class TestOrganization(IntegrationHelper):
             if team.name == team_name:
                 break
         else:
-            assert False, 'Could not find team "{0}"'.format(team_name)
+            assert False, f'Could not find team "{team_name}"'
 
         return team
-
-    def test_add_member(self):
-        """Test the ability to add a member to an organization."""
-        self.auto_login()
-        cassette_name = self.cassette_name("add_member")
-        with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization()
-            team = self.get_team(o)
-            assert o.add_member("esacteksab", team.id) is True
 
     def test_add_repository(self):
         """Test the ability to add a repository to an organization."""
@@ -48,6 +37,48 @@ class TestOrganization(IntegrationHelper):
             o = self.get_organization()
             team = self.get_team(o)
             assert o.add_repository("github3py/urllib3", team.id) is True
+
+    def test_blocked_users(self):
+        """Test the ability to retrieve a list of blocked users."""
+        self.token_login()
+        cassette_name = self.cassette_name("blocked_users")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.block("o")
+            users = list(o.blocked_users())
+            assert o.unblock("o")
+
+        assert len(users) == 1
+        assert ["o"] == [str(u) for u in users]
+
+    def test_block(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("block")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.block("o")
+            assert o.unblock("o")
+
+    def test_unblock(self):
+        """Test the ability to unblock a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("unblock")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.block("o")
+            assert o.unblock("o")
+
+    def test_is_blocking(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("is_blocking")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("testgh3py")
+            assert o.is_blocking("o") is False
+            assert o.block("o")
+            assert o.is_blocking("o")
+            assert o.unblock("o")
 
     def test_create_project(self):
         """Test the ability to create a project in an organization."""
@@ -96,6 +127,23 @@ class TestOrganization(IntegrationHelper):
             assert isinstance(t, github3.orgs.Team)
             assert t.delete() is True
 
+    def test_create_team_child(self):
+        """Test the ability to create a new child team."""
+        self.auto_login()
+        cassette_name = self.cassette_name("create_team_parent")
+        with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
+            o = self.get_organization()
+
+            parent_t = o.create_team("temp-team", privacy="closed")
+            assert isinstance(parent_t, github3.orgs.Team)
+
+            with self.recorder.use_cassette(
+                self.cassette_name("create_team_child"), **self.betamax_kwargs
+            ):
+                t = o.create_team("temp-team-child", parent_team_id=2589002)
+                assert isinstance(parent_t, github3.orgs.Team)
+                assert t.delete() is True
+
     def test_edit(self):
         """Test the ability to edit an organization."""
         self.auto_login()
@@ -135,16 +183,6 @@ class TestOrganization(IntegrationHelper):
 
             for event in o.all_events(username="gh3test"):
                 assert isinstance(event, github3.events.Event)
-
-    def test_events(self):
-        """Test retrieving an organization's public event stream."""
-        cassette_name = self.cassette_name("public_events")
-        with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization()
-
-            for event in o.events():
-                assert isinstance(event, github3.events.Event)
-                assert isinstance(event.as_json(), str)
 
     def test_public_events(self):
         """Test retrieving an organization's public event stream."""
@@ -258,19 +296,6 @@ class TestOrganization(IntegrationHelper):
 
             assert o.publicize_member("omgjlk") is True
 
-    def test_remove_member(self):
-        """Test the ability to remove a member of the organization."""
-        self.auto_login()
-        cassette_name = self.cassette_name("remove_member")
-        with self.recorder.use_cassette(cassette_name):
-            o = self.get_organization()
-            team = self.get_team(o)
-
-            # First add the user
-            assert o.add_member("gh3test", team.id) is True
-            # Now remove them
-            assert o.remove_member("gh3test") is True
-
     def test_remove_repository(self):
         """Test the ability to remove a repository from a team."""
         self.auto_login()
@@ -291,6 +316,19 @@ class TestOrganization(IntegrationHelper):
             first_team = next(o.teams())
 
             fetched_team = o.team(first_team.id)
+            assert first_team == fetched_team
+
+    def test_team_by_name(self):
+        """Test the ability retrieve an individual team by name."""
+        self.auto_login()
+        cassette_name = self.cassette_name("team_by_name")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("erico-sandbox")
+
+            # Grab a team, any team
+            first_team = next(o.teams())
+
+            fetched_team = o.team_by_name(first_team.slug)
             assert first_team == fetched_team
 
     def test_invitations(self):

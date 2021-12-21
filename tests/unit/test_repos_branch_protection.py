@@ -1,8 +1,5 @@
 """Unit tests for methods implemented on Branch Protection."""
-
 import github3
-from github3.repos.branch import BranchProtection
-
 from . import helper
 
 protection_example_data = helper.create_example_data_helper(
@@ -34,7 +31,6 @@ class TestProtectionEnforceAdmins(helper.UnitHelper):
         self.instance.enable()
         self.post_called_with(
             enforce_admins_url_for(),
-            headers=BranchProtection.PREVIEW_HEADERS_MAP,
         )
 
     def test_disable(self):
@@ -42,7 +38,6 @@ class TestProtectionEnforceAdmins(helper.UnitHelper):
         self.instance.disable()
         self.delete_called_with(
             enforce_admins_url_for(),
-            headers=BranchProtection.PREVIEW_HEADERS_MAP,
         )
 
 
@@ -50,8 +45,10 @@ protection_required_pull_request_reviews_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/"
     "branches/master/protection/required_pull_request_reviews"
 )
-protection_required_pull_request_reviews_data = helper.create_example_data_helper(  # noqa: E501
-    "branch_protection_required_pull_request_reviews_example"
+protection_required_pull_request_reviews_data = (
+    helper.create_example_data_helper(  # noqa: E501
+        "branch_protection_required_pull_request_reviews_example"
+    )
 )
 
 
@@ -122,7 +119,6 @@ class TestProtectionRestrictions(helper.UnitHelper):
         self.post_called_with(
             protection_restrictions_teams_url_for(),
             data=["justice-league"],
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def test_remove_teams(self):
@@ -131,7 +127,6 @@ class TestProtectionRestrictions(helper.UnitHelper):
         self.delete_called_with(
             protection_restrictions_teams_url_for(),
             json=["justice-league"],
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def test_add_users(self):
@@ -159,7 +154,6 @@ class TestProtectionRestrictions(helper.UnitHelper):
         self.put_called_with(
             protection_restrictions_teams_url_for(),
             json=["justice-league"],
-            headers=BranchProtection.PREVIEW_HEADERS_MAP["nested_teams"],
         )
 
     def test_replace_users(self):
@@ -180,8 +174,10 @@ protection_required_status_checks_contexts_url_for = helper.create_url_helper(
     "branches/master/protection/required_status_checks/contexts"
 )
 
-protection_required_status_checks_example_data = helper.create_example_data_helper(  # noqa: E501
-    "branch_protection_required_status_checks_example"
+protection_required_status_checks_example_data = (
+    helper.create_example_data_helper(  # noqa: E501
+        "branch_protection_required_status_checks_example"
+    )
 )
 
 

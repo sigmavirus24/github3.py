@@ -1,10 +1,12 @@
-from datetime import datetime
-from github3.utils import stream_response_to_file, timestamp_parameter
-
 import io
-import mock
+import unittest.mock
+from datetime import datetime
+
 import pytest
 import requests
+
+from github3.utils import stream_response_to_file
+from github3.utils import timestamp_parameter
 
 
 class TestTimestampConverter:
@@ -44,7 +46,7 @@ class TestTimestampConverter:
 
 @pytest.fixture
 def mocked_open():
-    return mock.mock_open()
+    return unittest.mock.mock_open()
 
 
 @pytest.fixture
@@ -67,7 +69,9 @@ class OpenFile:
 
 class TestStreamingDownloads:
     def test_opens_a_new_file(self, mocked_open, response):
-        with mock.patch("github3.utils.open", mocked_open, create=True):
+        with unittest.mock.patch(
+            "github3.utils.open", mocked_open, create=True
+        ):
             stream_response_to_file(response, "some_file")
 
         mocked_open.assert_called_once_with("some_file", "wb")
@@ -81,7 +85,9 @@ class TestStreamingDownloads:
         assert fd.data == b"fake data"
 
     def test_finds_filename_in_headers(self, mocked_open, response):
-        with mock.patch("github3.utils.open", mocked_open, create=True):
+        with unittest.mock.patch(
+            "github3.utils.open", mocked_open, create=True
+        ):
             stream_response_to_file(response)
 
         mocked_open.assert_called_once_with("a_file_name", "wb")

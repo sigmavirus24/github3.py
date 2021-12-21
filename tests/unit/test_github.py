@@ -1,10 +1,12 @@
+import unittest.mock
+
 import pytest
 
-from github3 import GitHubEnterprise, GitHubError
-from github3.github import GitHub, GitHubStatus
-from github3.projects import Project
-
 from . import helper
+from github3 import GitHubEnterprise
+from github3 import GitHubError
+from github3.github import GitHub
+from github3.projects import Project
 
 
 def url_for(path=""):
@@ -85,6 +87,30 @@ class TestGitHub(helper.UnitHelper):
             },
         )
 
+    def test_block(self):
+        """Show we can block users."""
+        self.instance.block("username")
+
+        self.session.put.assert_called_once_with(
+            url_for("user/blocks/username")
+        )
+
+    def test_is_blocking(self):
+        """Show we can check if a user is blocked."""
+        self.instance.is_blocking("username")
+
+        self.session.get.assert_called_once_with(
+            url_for("user/blocks/username")
+        )
+
+    def test_unblock(self):
+        """Show we can unblock users."""
+        self.instance.unblock("username")
+
+        self.session.delete.assert_called_once_with(
+            url_for("user/blocks/username")
+        )
+
     def test_check_authorization(self):
         """Test an app's ability to check a authorization token."""
         self.instance.set_client_id("client-id", "client-secret")
@@ -129,7 +155,7 @@ class TestGitHub(helper.UnitHelper):
         )
 
     def test_create_key_with_readonly(self):
-        """ Test the request to create a key with read only"""
+        """Test the request to create a key with read only"""
         self.instance.create_key("key_name", "key text", read_only=True)
 
         self.post_called_with(
@@ -164,6 +190,7 @@ class TestGitHub(helper.UnitHelper):
                 "has_wiki": True,
                 "auto_init": False,
                 "gitignore_template": "",
+                "has_projects": True,
             },
         )
 
@@ -324,7 +351,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = helper.mock.Mock(ok=True)
+        self.session.post.return_value = unittest.mock.Mock(ok=True)
         text = "##Hello"
         mode = "markdown"
         self.instance.markdown(text=text, mode=mode)
@@ -334,7 +361,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown_raw(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = helper.mock.Mock(ok=True)
+        self.session.post.return_value = unittest.mock.Mock(ok=True)
         text = "Hello"
         raw = True
         self.instance.markdown(text=text, raw=raw)
@@ -346,7 +373,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_markdown_gfm(self):
         """Verify the request for rendering a markdown document."""
-        self.session.post.return_value = helper.mock.Mock(ok=True)
+        self.session.post.return_value = unittest.mock.Mock(ok=True)
         text = "##Hello"
         mode = "gfm"
         context = "sigmavirus24/github3.py"
@@ -370,7 +397,9 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = helper.mock.Mock(ok=True, text="egg")
+        self.session.get.return_value = unittest.mock.Mock(
+            ok=True, text="egg"
+        )
         egg = self.instance.octocat(say="hello")
         self.session.get.assert_called_once_with(
             url_for("octocat"), params={"s": "hello"}
@@ -380,7 +409,9 @@ class TestGitHub(helper.UnitHelper):
 
     def test_octocat_response_not_ok(self):
         """Verify the request for retrieving an easter egg."""
-        self.session.get.return_value = helper.mock.Mock(ok=False, text="egg")
+        self.session.get.return_value = unittest.mock.Mock(
+            ok=False, text="egg"
+        )
 
         egg = self.instance.octocat(say="hello")
 
@@ -427,7 +458,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         self.session.post.assert_called_once_with(
             url_for("hub"),
@@ -446,7 +477,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -461,7 +492,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is True
 
@@ -477,7 +508,7 @@ class TestGitHub(helper.UnitHelper):
             ("hub.callback", "https://localhost/post"),
             ("hub.secret", "secret"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         self.session.post.assert_called_once_with(
             url_for("hub"),
@@ -492,7 +523,7 @@ class TestGitHub(helper.UnitHelper):
             "https://github.com/octocat/hello-world/events/push",
         )
         body = [("hub.mode", "subscribe"), topic, ("hub.callback", "")]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -507,7 +538,7 @@ class TestGitHub(helper.UnitHelper):
             topic,
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -518,7 +549,7 @@ class TestGitHub(helper.UnitHelper):
             ("hub.topic", ""),
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -529,7 +560,7 @@ class TestGitHub(helper.UnitHelper):
             ("hub.topic", ""),
             ("hub.callback", "https://localhost/post"),
         ]
-        data = dict([(k[4:], v) for k, v in body])
+        data = {k[4:]: v for k, v in body}
         self.instance.pubsubhubbub(**data)
         assert self.session.post.called is False
 
@@ -721,7 +752,7 @@ class TestGitHub(helper.UnitHelper):
 
     def test_zen(self):
         """Verify the request for returning a quote from Zen of Github."""
-        self.session.get.return_value = helper.mock.Mock(
+        self.session.get.return_value = unittest.mock.Mock(
             status_code=200, text="hello"
         )
         self.instance.zen()
@@ -840,6 +871,15 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
 
         self.session.get.assert_called_once_with(
             url_for("authorizations"), params={"per_page": 100}, headers={}
+        )
+
+    def test_blocked_users(self):
+        """Show we can retrieve all blocked users by the current user."""
+        i = self.instance.blocked_users()
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for("user/blocks"), params={"per_page": 100}, headers={}
         )
 
     def test_emails(self):
@@ -1376,6 +1416,21 @@ class TestGitHubRequiresAuthentication(
         """Show that one needs to authenticate to use #authorizations."""
         self.assert_requires_auth(self.instance.authorizations)
 
+    def test_block(self):
+        """Show we must be authenticated to block users."""
+        with pytest.raises(GitHubError):
+            self.instance.block("username")
+
+    def test_is_blocking(self):
+        """Show we must be auth'd to check if a user is blocked."""
+        with pytest.raises(GitHubError):
+            self.instance.is_blocking("username")
+
+    def test_unblock(self):
+        """Show must be authenticated to unblock users."""
+        with pytest.raises(GitHubError):
+            self.instance.unblock("username")
+
     def test_create_gpg_key(self):
         """Show that GitHub#create_gpg_key requires auth."""
         self.assert_requires_auth(self.instance.create_gpg_key)
@@ -1490,9 +1545,7 @@ class TestGitHubAuthorizations(helper.UnitHelper):
     example_data = None
 
     def create_session_mock(self, *args):
-        session = super(TestGitHubAuthorizations, self).create_session_mock(
-            *args
-        )
+        session = super().create_session_mock(*args)
         session.retrieve_client_credentials.return_value = ("id", "secret")
         return session
 
@@ -1538,37 +1591,6 @@ class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
 
     def test_str(self):
         """Show that instance string is formatted correctly."""
-        assert str(self.instance) == "<GitHub Enterprise [{0}]>".format(
+        assert str(self.instance) == "<GitHub Enterprise [{}]>".format(
             enterprise_url_for()
         )
-
-
-class TestGitHubStatus(helper.UnitHelper):
-
-    """Test methods on GitHubStatus."""
-
-    described_class = GitHubStatus
-
-    def test_api(self):
-        """Verify the request for /api."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.api()
-            _recipe.assert_called_once_with("api.json")
-
-    def test_last_message(self):
-        """Verify the request for /api/last-message."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.last_message()
-            _recipe.assert_called_once_with("api", "last-message.json")
-
-    def test_messages(self):
-        """Verify the request for /api/messages."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.messages()
-            _recipe.assert_called_once_with("api", "messages.json")
-
-    def test_status(self):
-        """Verify the request for /api/status."""
-        with helper.mock.patch.object(GitHubStatus, "_recipe") as _recipe:
-            self.instance.status()
-            _recipe.assert_called_once_with("api", "status.json")

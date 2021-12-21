@@ -1,29 +1,29 @@
 """Unit tests for Repositories."""
 import datetime
-import mock
+import unittest.mock
+from base64 import b64encode
+
 import pytest
 
-from base64 import b64encode
+from . import helper
 from github3 import GitHubError
+from github3.exceptions import GitHubException
+from github3.models import GitHubCore
+from github3.projects import Project
 from github3.repos.comment import RepoComment
 from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents
 from github3.repos.hook import Hook
-from github3.repos.repo import Repository, ShortRepository
-from github3.models import GitHubCore
-from github3.projects import Project
-
-from . import helper
+from github3.repos.repo import Repository
+from github3.repos.repo import ShortRepository
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/comments/1"
 )
 commit_url_for = helper.create_url_helper(
-    (
-        "https://api.github.com/repos/octocat/Hello-World/"
-        "commits/6dcb09b5b57875f334f61aebed695e2e4193db5e"
-    )
+    "https://api.github.com/repos/octocat/Hello-World/"
+    "commits/6dcb09b5b57875f334f61aebed695e2e4193db5e"
 )
 compare_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/compare/master...topic"
@@ -119,7 +119,7 @@ class TestRepository(helper.UnitHelper):
 
         b64_encoded_content = b64encode(data["content"]).decode("utf-8")
         data.update({"content": b64_encoded_content})
-        del (data["path"])
+        del data["path"]
 
         self.put_called_with(url_for("contents/hello.txt"), data=data)
 
@@ -313,7 +313,9 @@ class TestRepository(helper.UnitHelper):
 
     def test_create_pull_private_required_data(self):
         """Verify the request for creating a pull request."""
-        with helper.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
+        with unittest.mock.patch.object(
+            GitHubCore, "_remove_none"
+        ) as rm_none:
             data = {}
             self.instance._create_pull(data)
             rm_none.assert_called_once_with({})
@@ -333,20 +335,33 @@ class TestRepository(helper.UnitHelper):
             "head": "feature_branch",
             "body": "body",
         }
-        with helper.mock.patch.object(Repository, "_create_pull") as pull:
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
+            self.instance.create_pull(**data)
+            pull.assert_called_once_with(data)
+
+    def test_create_pull_maintainer_can_modify(self):
+        """Verify maintainer_can_modify option for creating a pull request."""
+        data = {
+            "title": "foo",
+            "base": "master",
+            "head": "feature_branch",
+            "body": "body",
+            "maintainer_can_modify": False,
+        }
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             self.instance.create_pull(**data)
             pull.assert_called_once_with(data)
 
     def test_create_pull_from_issue(self):
         """Verify the request for creating a pull request from an issue."""
-        with helper.mock.patch.object(Repository, "_create_pull") as pull:
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             data = {"issue": 1, "base": "master", "head": "feature_branch"}
             self.instance.create_pull_from_issue(**data)
             pull.assert_called_once_with(data)
 
     def test_create_pull_from_issue_required_issue_number(self):
         """Verify the request for creating a pull request from an issue."""
-        with helper.mock.patch.object(Repository, "_create_pull") as pull:
+        with unittest.mock.patch.object(Repository, "_create_pull") as pull:
             pull_request = self.instance.create_pull_from_issue(
                 issue=-1, base="master", head="feature_branch"
             )
@@ -403,7 +418,9 @@ class TestRepository(helper.UnitHelper):
             "description": "bar",
             "context": "default",
         }
-        with helper.mock.patch.object(GitHubCore, "_remove_none") as rm_none:
+        with unittest.mock.patch.object(
+            GitHubCore, "_remove_none"
+        ) as rm_none:
             self.instance.create_status(sha="fake-sha", **data)
             rm_none.assert_called_once_with(data)
             self.post_called_with(url_for("statuses/fake-sha"), data=data)
@@ -545,7 +562,9 @@ class TestRepository(helper.UnitHelper):
             "has_projects": False,
         }
 
-        with mock.patch.object(Repository, "_update_attributes") as up_attr:
+        with unittest.mock.patch.object(
+            Repository, "_update_attributes"
+        ) as up_attr:
             assert self.instance.edit(**data) is True
             assert up_attr.called is True
             self.patch_called_with(url_for(), data=data)
@@ -629,7 +648,9 @@ class TestRepository(helper.UnitHelper):
                 {"created_at": "2014-03-18T17:15:42Z", "body": "comment body"}
             ],
         }
-        with mock.patch.object(GitHubCore, "_remove_none") as rm_none:
+        with unittest.mock.patch.object(
+            GitHubCore, "_remove_none"
+        ) as rm_none:
             self.instance.import_issue(**data)
             rm_none.assert_any_call(issue["issue"])
             rm_none.assert_any_call(issue)
@@ -819,7 +840,7 @@ class TestRepository(helper.UnitHelper):
         """Verify the request for retrieving a reference."""
         self.instance.ref("heads/develop")
         self.session.get.assert_called_once_with(
-            url_for("git/refs/heads/develop")
+            url_for("git/ref/heads/develop")
         )
 
     def test_ref_required_ref(self):
@@ -917,7 +938,7 @@ class TestRepository(helper.UnitHelper):
         """Verify instance string is formatted correctly."""
         owner = self.instance.owner
         repository = self.instance.name
-        assert str(self.instance) == "{0}/{1}".format(owner, repository)
+        assert str(self.instance) == f"{owner}/{repository}"
 
     def test_weekly_commit_count(self):
         """Verify the request for retrieving total commit counts."""
@@ -926,6 +947,48 @@ class TestRepository(helper.UnitHelper):
         self.session.get.assert_called_once_with(
             url_for("stats/participation")
         )
+
+    def test_views_default(self):
+        """Verify the request for retrieving repository daily views."""
+        self.instance.views()
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/views"), params={"per": "day"}
+        )
+
+    def test_views_weekly(self):
+        """Verify the request for retrieving repository weekly views."""
+        self.instance.views(per="week")
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/views"), params={"per": "week"}
+        )
+
+    def test_views_invalid_per(self):
+        """Verify invalid views resolution raises ValueError."""
+        with pytest.raises(ValueError):
+            self.instance.views(per="invalid")
+
+    def test_clones_default(self):
+        """Verify the request for retrieving repository daily clones."""
+        self.instance.clones()
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/clones"), params={"per": "day"}
+        )
+
+    def test_clones_weekly(self):
+        """Verify the request for retrieving repository weekly clones."""
+        self.instance.clones(per="week")
+
+        self.session.get.assert_called_once_with(
+            url_for("traffic/clones"), params={"per": "week"}
+        )
+
+    def test_clones_invalid_per(self):
+        """Verify invalid clones resolution raises ValueError."""
+        with pytest.raises(ValueError):
+            self.instance.clones(per="invalid")
 
 
 class TestRepositoryIterator(helper.UnitIteratorHelper):
@@ -1321,7 +1384,9 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for("stargazers"), params={"per_page": 100}, headers={}
+            url_for("stargazers"),
+            params={"per_page": 100},
+            headers={"Accept": "application/vnd.github.v3.star+json"},
         )
 
     def test_statuses(self):
@@ -1368,6 +1433,45 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
         )
 
 
+class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
+
+    """Unit test for regular Repository methods."""
+
+    described_class = Repository
+    example_data = repo_example_data
+    preview_header = {"Accept": "application/vnd.github.antiope-preview+json"}
+
+    def test_check_run(self):
+        """Verify the request for retrieving a check run on a repository."""
+        self.instance.check_run(1)
+        self.session.get.assert_called_once_with(
+            url_for("check-runs/1"), headers=self.preview_header
+        )
+
+    def test_check_suite(self):
+        """Verify the request for retrieving a check run on a repository."""
+        self.instance.check_suite(1)
+        self.session.get.assert_called_once_with(
+            url_for("check-suites/1"), headers=self.preview_header
+        )
+
+    def test_create_check_run(self):
+        """Verify the request for creating a check run on a suite."""
+        data = {"name": "testcheck", "head_sha": "fake-sha"}
+        self.instance.create_check_run(**data)
+        self.post_called_with(
+            url_for("check-runs"), data=data, headers=self.preview_header
+        )
+
+    def test_create_check_suite(self):
+        """Verify the request for creating a check suite on a commit."""
+        data = {"head_sha": "fake-sha"}
+        self.instance.create_check_suite(**data)
+        self.post_called_with(
+            url_for("check-suites"), data=data, headers=self.preview_header
+        )
+
+
 class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     """Unit test for regular Repository methods."""
@@ -1379,6 +1483,18 @@ class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Verify that adding a collaborator requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.add_collaborator("foo")
+
+    def test_create_check_run(self):
+        """Verify the request for creating a check run on a suite."""
+        with pytest.raises(GitHubException):
+            self.instance.create_check_run(
+                head_sha="fake-sha", name="testcheck"
+            )
+
+    def test_create_check_suite(self):
+        """Verify the request for creating a check run on a suite."""
+        with pytest.raises(GitHubException):
+            self.instance.create_check_suite(head_sha="fake-sha")
 
     def test_create_ref(self):
         """Verify that creating a tag requires authentication."""
@@ -1585,7 +1701,7 @@ class TestContents(helper.UnitHelper):
 
     def test_str(self):
         """Verify that instance string is formatted properly."""
-        assert str(self.instance) == "<Contents [{0}]>".format(
+        assert str(self.instance) == "<Contents [{}]>".format(
             self.instance.path
         )
 
@@ -1647,7 +1763,7 @@ class TestHook(helper.UnitHelper):
 
     def test_str(self):
         """Show that instance string is formatted correctly."""
-        assert str(self.instance) == "<Hook [{0}]>".format(self.instance.name)
+        assert str(self.instance) == f"<Hook [{self.instance.name}]>"
 
     def test_delete(self):
         """Verify the request for editing a hook on a repository."""

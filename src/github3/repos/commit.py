@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """This module contains the RepoCommit classes."""
-from __future__ import unicode_literals
-
 from . import status
-from .. import git, models, users
+from .. import checks
+from .. import git
+from .. import models
+from .. import users
 from .comment import RepoComment
 
 
@@ -26,6 +26,11 @@ class _RepoCommit(models.GitHubCore):
 
     """
 
+    PREVIEW_HEADERS = {
+        "Accept": "application/vnd.github.groot-preview+json,"
+        "application/vnd.github.v3.full+json"
+    }
+
     class_name = "_RepoCommit"
 
     def _update_attributes(self, commit):
@@ -34,7 +39,45 @@ class _RepoCommit(models.GitHubCore):
         self._uniq = self.sha = commit["sha"]
 
     def _repr(self):
-        return "<{0} [{1}]>".format(self.class_name, self.sha[:7])
+        return f"<{self.class_name} [{self.sha[:7]}]>"
+
+    def check_runs(self):
+        """Retrieve the check runs for this commit.
+
+        .. versionadded:: 1.3.0
+
+        :returns:
+            the check runs for this commit
+        :rtype:
+            :class:`~github3.checks.CheckRun`
+        """
+        url = self._build_url("check-runs", base_url=self._api)
+        return self._iter(
+            -1,
+            url,
+            checks.CheckRun,
+            headers=checks.CheckRun.CUSTOM_HEADERS,
+            list_key="check_runs",
+        )
+
+    def check_suites(self):
+        """Retrieve the check suites for this commit.
+
+        .. versionadded:: 1.3.0
+
+        :returns:
+            the check suites for this commit
+        :rtype:
+            :class:`~github3.checks.CheckSuite`
+        """
+        url = self._build_url("check-suites", base_url=self._api)
+        return self._iter(
+            -1,
+            url,
+            checks.CheckSuite,
+            headers=checks.CheckSuite.CUSTOM_HEADERS,
+            list_key="check_suites",
+        )
 
     def diff(self):
         """Retrieve the diff for this commit.
@@ -101,6 +144,30 @@ class _RepoCommit(models.GitHubCore):
         url = self._build_url("comments", base_url=self._api)
         return self._iter(int(number), url, RepoComment, etag=etag)
 
+    def associated_pull_requests(self, number=-1, etag=None):
+        """Iterate pull requests associated with a commit.
+
+        :param int number:
+            (optional), number of comments to return. Default: -1 returns all
+            pull requests
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            generator of pull requests
+        :rtype:
+            :class:~github3.pulls.PullRequest`
+        """
+        from .. import pulls
+
+        url = self._build_url("pulls", base_url=self._api)
+        return self._iter(
+            number,
+            url,
+            pulls.ShortPullRequest,
+            etag=etag,
+            headers=self.PREVIEW_HEADERS,
+        )
+
 
 class RepoCommit(_RepoCommit):
     """Representation of a commit with repository and git data."""
@@ -108,7 +175,7 @@ class RepoCommit(_RepoCommit):
     class_name = "Repository Commit"
 
     def _update_attributes(self, commit):
-        super(RepoCommit, self)._update_attributes(commit)
+        super()._update_attributes(commit)
         #: The number of additions made in the commit.
         self.additions = 0
         #: The number of deletions made in the commit.
@@ -138,7 +205,7 @@ class ShortCommit(_RepoCommit):
     _refresh_to = RepoCommit
 
     def _update_attributes(self, commit):
-        super(ShortCommit, self)._update_attributes(commit)
+        super()._update_attributes(commit)
         self.author = commit["author"]
         if self.author:
             self.author = users.ShortUser(self.author, self)

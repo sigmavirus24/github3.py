@@ -29,13 +29,6 @@ object so for brevity's sake, I'm not listing all of it's inherited members.
     :members:
 
 
-GitHubStatus Object
-===================
-
-.. autoclass:: github3.github.GitHubStatus
-    :members:
-
-
 GitHubSession Object
 ====================
 

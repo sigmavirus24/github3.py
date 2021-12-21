@@ -1,14 +1,12 @@
 """Base classes and helpers for unit tests."""
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-import github3
 import json
 import os.path
 import sys
+import unittest.mock
+
 import pytest
-import unittest
+
+import github3
 
 
 def create_url_helper(base_url):
@@ -73,16 +71,18 @@ class UnitHelper(unittest.TestCase):
 
     def create_mocked_session(self):
         """Use mock to auto-spec a GitHubSession and return an instance."""
-        MockedSession = mock.create_autospec(github3.session.GitHubSession)
+        MockedSession = unittest.mock.create_autospec(
+            github3.session.GitHubSession
+        )
         return MockedSession()
 
     def create_session_mock(self, *args):
         """Create a mocked session and add headers and auth attributes."""
         session = self.create_mocked_session()
         base_attrs = ["headers", "auth"]
-        attrs = dict(
-            (key, mock.Mock()) for key in set(args).union(base_attrs)
-        )
+        attrs = {
+            key: unittest.mock.Mock() for key in set(args).union(base_attrs)
+        }
         session.configure_mock(**attrs)
         session.delete.return_value = None
         session.get.return_value = None
@@ -90,6 +90,7 @@ class UnitHelper(unittest.TestCase):
         session.post.return_value = None
         session.put.return_value = None
         session.has_auth.return_value = True
+        session.build_url = self.get_build_url_proxy()
         return session
 
     def create_instance_of_described_class(self):
@@ -204,7 +205,7 @@ class UnitIteratorHelper(UnitHelper):
         methods that iterate over the results of a response.
         """
         # Retrieve a mocked session object
-        session = super(UnitIteratorHelper, self).create_mocked_session(*args)
+        session = super().create_mocked_session(*args)
         # Initialize a NullObject which has magical properties
         null = NullObject()
         # Set it as the return value for every method
@@ -213,6 +214,7 @@ class UnitIteratorHelper(UnitHelper):
         session.patch.return_value = null
         session.post.return_value = null
         session.put.return_value = null
+        session.build_url = self.get_build_url_proxy()
         return session
 
     def get_next(self, iterator):
@@ -224,7 +226,7 @@ class UnitIteratorHelper(UnitHelper):
 
     def patch_get_json(self):
         """Patch a GitHubIterator's _get_json method."""
-        self.get_json_mock = mock.patch.object(
+        self.get_json_mock = unittest.mock.patch.object(
             github3.structs.GitHubIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
@@ -232,13 +234,24 @@ class UnitIteratorHelper(UnitHelper):
 
     def setUp(self):
         """Use UnitHelper's setUp but also patch _get_json."""
-        super(UnitIteratorHelper, self).setUp()
+        super().setUp()
         self.patch_get_json()
 
     def tearDown(self):
         """Stop mocking _get_json."""
-        super(UnitIteratorHelper, self).tearDown()
+        super().tearDown()
         self.get_json_mock.stop()
+
+
+class UnitIteratorAppInstHelper(UnitIteratorHelper):
+    """Helper for iterable unittests that require app installation."""
+
+    def after_setup(self):
+        """Set session app installation"""
+        MockedAuth = unittest.mock.create_autospec(
+            github3.session.AppInstallationTokenAuth
+        )
+        self.session.auth = MockedAuth
 
 
 class UnitSearchIteratorHelper(UnitIteratorHelper):
@@ -247,7 +260,7 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
 
     def patch_get_json(self):
         """Patch a SearchIterator's _get_json method."""
-        self.get_json_mock = mock.patch.object(
+        self.get_json_mock = unittest.mock.patch.object(
             github3.structs.SearchIterator, "_get_json"
         )
         self.patched_get_json = self.get_json_mock.start()
@@ -255,8 +268,19 @@ class UnitSearchIteratorHelper(UnitIteratorHelper):
 
     def setUp(self):
         """Use UnitIteratorHelper's setUp and patch _get_json."""
-        super(UnitSearchIteratorHelper, self).setUp()
+        super().setUp()
         self.patch_get_json()
+
+
+class UnitAppInstallHelper(UnitHelper):
+    """Helper for unittests that require app installation."""
+
+    def after_setup(self):
+        """Set session app installation"""
+        MockedAuth = unittest.mock.create_autospec(
+            github3.session.AppInstallationTokenAuth
+        )
+        self.session.auth = MockedAuth
 
 
 class UnitRequiresAuthenticationHelper(UnitHelper):
@@ -286,7 +310,7 @@ class UnitGitHubEnterpriseHelper(UnitHelper):
 is_py3 = (3, 0) <= sys.version_info < (4, 0)
 
 
-class NullObject(object):
+class NullObject:
     def __init__(self, initializer=None):
         self.__dict__["initializer"] = initializer
 
@@ -305,7 +329,7 @@ class NullObject(object):
         return "" if is_py3 else "".decode()
 
     def __repr__(self):
-        return "<NullObject({0})>".format(
+        return "<NullObject({})>".format(
             repr(self.__getattribute__("initializer"))
         )
 

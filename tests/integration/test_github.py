@@ -1,16 +1,12 @@
-# -*- coding: utf-8 -*-
 """Integration tests for methods implemented on GitHub."""
 from datetime import datetime
 
-import github3
 import pytest
 import uritemplate
 
-from .helper import (
-    GitHubEnterpriseHelper,
-    IntegrationHelper,
-    GitHubStatusHelper,
-)
+import github3
+from .helper import GitHubEnterpriseHelper
+from .helper import IntegrationHelper
 
 GPG_KEY = (
     # Generated for this alone then deleted
@@ -99,6 +95,44 @@ class TestGitHub(IntegrationHelper):
 
         for email in emails:
             assert isinstance(email, github3.users.Email)
+
+    def test_blocked_users(self):
+        """Test the ability to retrieve a list of blocked users."""
+        self.token_login()
+        cassette_name = self.cassette_name("blocked_users")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.block("sigmavirus24")
+            users = list(self.gh.blocked_users())
+            assert self.gh.unblock("sigmavirus24")
+
+        assert len(users) == 1
+        assert ["sigmavirus24"] == [str(u) for u in users]
+
+    def test_block(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("block")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.block("sigmavirus24")
+            assert self.gh.unblock("sigmavirus24")
+
+    def test_unblock(self):
+        """Test the ability to unblock a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("unblock")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.block("sigmavirus24")
+            assert self.gh.unblock("sigmavirus24")
+
+    def test_is_blocking(self):
+        """Test the ability to block a user."""
+        self.token_login()
+        cassette_name = self.cassette_name("is_blocking")
+        with self.recorder.use_cassette(cassette_name):
+            assert self.gh.is_blocking("sigmavirus24") is False
+            assert self.gh.block("sigmavirus24")
+            assert self.gh.is_blocking("sigmavirus24")
+            assert self.gh.unblock("sigmavirus24")
 
     def test_create_gist(self):
         """Test the ability of a GitHub instance to create a new gist."""
@@ -461,7 +495,7 @@ class TestGitHub(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.gh.octocat()
             assert o is not None
-            assert o is not ""
+            assert o != ""
             o = self.gh.octocat(say)
             assert say in o
 
@@ -773,40 +807,3 @@ class TestGitHubEnterprise(GitHubEnterpriseHelper):
             stats = self.gh.admin_stats("all")
 
         assert isinstance(stats, dict)
-
-
-class TestGitHubStatus(GitHubStatusHelper):
-    def setUp(self):
-        super(TestGitHubStatus, self).setUp()
-
-    def test_api(self):
-        """Test the ability to check the status of /api."""
-        cassette_name = self.cassette_name("api")
-        with self.recorder.use_cassette(cassette_name):
-            api = self.gh.api()
-
-        assert isinstance(api, dict)
-
-    def test_last_message(self):
-        """Test the ability to check the status of /api/last-message."""
-        cassette_name = self.cassette_name("last_message")
-        with self.recorder.use_cassette(cassette_name):
-            last_message = self.gh.last_message()
-
-        assert isinstance(last_message, dict)
-
-    def test_messages(self):
-        """Test the ability to check the status of /api/messages."""
-        cassette_name = self.cassette_name("messages")
-        with self.recorder.use_cassette(cassette_name):
-            messages = self.gh.messages()
-
-        assert isinstance(messages, list)
-
-    def test_status(self):
-        """Test the ability to check the status of /api/status."""
-        cassette_name = self.cassette_name("status")
-        with self.recorder.use_cassette(cassette_name):
-            status = self.gh.status()
-
-        assert isinstance(status, dict)

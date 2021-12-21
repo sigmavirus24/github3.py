@@ -1,8 +1,8 @@
 import base64
-import betamax
 import os
-import pytest
 
+import betamax
+import pytest
 from betamax_matchers import json_body
 
 credentials = [

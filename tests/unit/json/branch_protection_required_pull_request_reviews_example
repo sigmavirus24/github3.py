@@ -8,6 +8,7 @@
       {
         "login": "octocat",
         "id": 1,
+        "node_id": "MDQ6VXNlcjE=",
         "avatar_url": "https://github.com/images/error/octocat_happy.gif",
         "gravatar_id": "",
         "url": "https://api.github.com/users/octocat",
@@ -28,7 +29,9 @@
     "teams": [
       {
         "id": 1,
+        "node_id": "MDQ6VGVhbTE=",
         "url": "https://api.github.com/teams/1",
+        "html_url": "https://github.com/orgs/github/teams/justice-league",
         "name": "Justice League",
         "slug": "justice-league",
         "description": "A great team.",

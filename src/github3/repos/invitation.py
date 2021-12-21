@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 """Invitation related logic."""
-from __future__ import unicode_literals
-
 from json import dumps
 
 from .. import models
 from .. import users
-
 from ..decorators import requires_auth
 
 
@@ -69,7 +65,7 @@ class Invitation(models.GitHubCore):
         self.url = invitation["url"]
 
     def _repr(self):
-        return "<Invitation [{0}]>".format(self.repository.full_name)
+        return f"<Invitation [{self.repository.full_name}]>"
 
     @requires_auth
     def accept(self):
@@ -121,7 +117,7 @@ class Invitation(models.GitHubCore):
         """
         if permissions not in self.allowed_permissions:
             raise ValueError(
-                "'permissions' must be one of {0}".format(
+                "'permissions' must be one of {}".format(
                     ", ".join(sorted(self.allowed_permissions))
                 )
             )
