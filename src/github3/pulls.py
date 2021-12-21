@@ -712,7 +712,7 @@ class PullRequest(_PullRequest):
     def _update_attributes(self, pull):
         super()._update_attributes(pull)
         self.additions_count = pull["additions"]
-        self.auto_merge = pull["auto_merge"]
+        self.auto_merge = pull.get("auto_merge", None)
         self.author_association = pull["author_association"]
         self.comments_count = pull["comments"]
         self.commits_count = pull["commits"]
