@@ -85,7 +85,7 @@ class Contents(models.GitHubCore):
         self.content = content.get("content")
         self.encoding = content.get("encoding")
         self.decoded = self.content
-        if self.encoding == "base64" and self.content:
+        if self.encoding == "base64" and self.content is not None:
             self.decoded = b64decode(self.content.encode())
         self.download_url = content["download_url"]
         self.git_url = content["git_url"]
