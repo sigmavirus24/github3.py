@@ -208,3 +208,5 @@ Contributors
 - Gunnar Andersson (@gunnarx)
 
 - Thomas Lam (@lamcw)
+
+- David Glick (@davisagli)
