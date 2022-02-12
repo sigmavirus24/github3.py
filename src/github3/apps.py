@@ -4,8 +4,7 @@ https://developer.github.com/apps/building-github-apps/
 """
 import time
 
-from jwcrypto import jwk
-from jwcrypto import jwt
+import jwt
 
 from . import models
 from . import users
@@ -155,10 +154,6 @@ class Installation(models.GitHubCore):
         self.updated_at = self._strptime(json["updated_at"])
 
 
-def _load_private_key(pem_key_bytes):
-    return jwk.JWK.from_pem(pem_key_bytes)
-
-
 def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
     """Create an encrypted token for the specified App.
 
@@ -176,15 +171,13 @@ def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
     """
     if not isinstance(private_key_pem, bytes):
         raise ValueError('"private_key_pem" parameter must be byte-string')
-    key = _load_private_key(private_key_pem)
     now = int(time.time())
-    token = jwt.JWT(
-        header={"alg": "RS256"},
-        claims={"iat": now, "exp": now + expire_in, "iss": app_id},
-        algs=["RS256"],
+    token = jwt.encode(
+        payload={"iat": now, "exp": now + expire_in, "iss": app_id},
+        key=private_key_pem,
+        algorithm="RS256",
     )
-    token.make_signed_token(key)
-    return token.serialize()
+    return token
 
 
 def create_jwt_headers(

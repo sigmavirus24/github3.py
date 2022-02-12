@@ -18,9 +18,14 @@ Dependencies
 
 - requests_
 - uritemplate_
+- python-dateutil_
+- PyJWT_
 
 .. _requests: https://github.com/kennethreitz/requests
 .. _uritemplate: https://github.com/sigmavirus24/uritemplate
+.. _python-dateutil: https://github.com/dateutil/dateutil
+.. _PyJWT: https://github.com/jpadilla/pyjwt
+
 
 Contributing
 ------------
@@ -45,13 +50,11 @@ this in a virtual environment. These need to be installed for the tests to run.
 Build status
 ~~~~~~~~~~~~
 
-You can find `master` build statuses for different environments.
+You can find build statuses for different environments.
 
 - Github_
-- appveyor_
 
 .. _Github: https://github.com/sigmavirus24/github3.py/actions
-.. _appveyor: https://ci.appveyor.com/project/sigmavirus24/github3-py/branch/master
 
 License
 -------
