@@ -51,7 +51,7 @@ class TestTeam(IntegrationHelper):
             t = o.create_team("edit-me")
             assert isinstance(t, github3.orgs.Team)
             # Edit the new team
-            assert t.edit("delete-me", permission="admin") is True
+            assert t.edit("delete-me") is True
             # Assert that the name has changed
             assert t.name == "delete-me"
             # Get rid of it, we don't need it.
