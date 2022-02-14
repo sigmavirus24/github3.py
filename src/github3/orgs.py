@@ -12,6 +12,17 @@ from .projects import Project
 from .repos import Repository
 from .repos import ShortRepository
 
+if t.TYPE_CHECKING:
+    from . import users as _users
+
+
+class ShortRepositoryWithPermissions(ShortRepository):
+    class_name = "ShortRepositoryWithPermissions"
+
+    def _update_attributes(self, repo) -> None:
+        super()._update_attributes(repo)
+        self.permissions = repo["permissions"]
+
 
 class _Team(models.GitHubCore):
     """Base class for Team representations."""
@@ -32,6 +43,10 @@ class _Team(models.GitHubCore):
         )  # TODO: Re-record cassettes to ensure this exists
         self.repositories_url = team["repositories_url"]
         self.slug = team["slug"]
+        self.parent = None
+        parent = team.get("parent")
+        if parent:
+            self.parent = ShortTeam(parent, self)
 
     def _repr(self):
         return "<{s.class_name} [{s.name}]>".format(s=self)
@@ -171,6 +186,15 @@ class _Team(models.GitHubCore):
         )
 
     @requires_auth
+    def permissions_for(
+        self, repository: str
+    ) -> ShortRepositoryWithPermissions:
+        headers = {"Accept": "application/vnd.github.v3.repository+json"}
+        url = self._build_url("repos", repository, base_url=self._api)
+        json = self._json(self._get(url, headers=headers), 200)
+        return ShortRepositoryWithPermissions(json, self)
+
+    @requires_auth
     def repositories(self, number=-1, etag=None):
         """Iterate over the repositories this team has access to.
 
@@ -182,12 +206,14 @@ class _Team(models.GitHubCore):
         :returns:
             generator of repositories this team has access to
         :rtype:
-            :class:`~github3.repos.ShortRepository`
+            :class:`~github3.orgs.ShortRepositoryWithPermissions`
         """
-        headers = {"Accept": "application/vnd.github.ironman-preview+json"}
         url = self._build_url("repos", base_url=self._api)
         return self._iter(
-            int(number), url, ShortRepository, etag=etag, headers=headers
+            int(number),
+            url,
+            ShortRepositoryWithPermissions,
+            etag=etag,
         )
 
     @requires_auth
@@ -342,10 +368,6 @@ class _Organization(models.GitHubCore):
     .. _Organization Documentation:
         http://developer.github.com/v3/orgs/
     """
-
-    PREVIEW_HEADERS = {
-        "Accept": "application/vnd.github.hellcat-preview+json"
-    }
 
     class_name = "_Organization"
 
@@ -654,11 +676,14 @@ class _Organization(models.GitHubCore):
     @requires_auth
     def create_team(
         self,
-        name,
-        repo_names=[],
-        permission="pull",
-        parent_team_id=None,
-        privacy="secret",
+        name: str,
+        repo_names: t.Optional[t.Sequence[str]] = [],
+        maintainers: t.Optional[
+            t.Union[t.Sequence[str], t.Sequence["_users._User"]]
+        ] = [],
+        permission: str = "pull",
+        parent_team_id: t.Optional[int] = None,
+        privacy: str = "secret",
     ):
         """Create a new team and return it.
 
@@ -668,6 +693,8 @@ class _Organization(models.GitHubCore):
             (required), name to be given to the team
         :param list repo_names:
             (optional) repositories, e.g.  ['github/dotfiles']
+        :param list maintainers:
+            (optional) list of usernames who will be maintainers
         :param str permission:
             (optional), options:
 
@@ -692,20 +719,16 @@ class _Organization(models.GitHubCore):
         """
         data = {
             "name": name,
-            "repo_names": repo_names,
+            "repo_names": [getattr(r, "full_name", r) for r in repo_names],
+            "maintainers": [getattr(m, "login", m) for m in maintainers],
             "permission": permission,
             "privacy": privacy,
         }
-        headers = (
-            self.PREVIEW_HEADERS
-            if parent_team_id or privacy == "closed"
-            else None
-        )
         if parent_team_id:
             data.update({"parent_team_id": parent_team_id})
 
         url = self._build_url("teams", base_url=self._api)
-        json = self._json(self._post(url, data, headers=headers), 201)
+        json = self._json(self._post(url, data), 201)
         return self._instance_or_null(Team, json)
 
     @requires_auth

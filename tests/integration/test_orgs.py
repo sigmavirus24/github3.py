@@ -130,19 +130,21 @@ class TestOrganization(IntegrationHelper):
     def test_create_team_child(self):
         """Test the ability to create a new child team."""
         self.auto_login()
-        cassette_name = self.cassette_name("create_team_parent")
+        cassette_name = self.cassette_name("create_team_child")
         with self.recorder.use_cassette(cassette_name, **self.betamax_kwargs):
             o = self.get_organization()
 
             parent_t = o.create_team("temp-team", privacy="closed")
             assert isinstance(parent_t, github3.orgs.Team)
 
-            with self.recorder.use_cassette(
-                self.cassette_name("create_team_child"), **self.betamax_kwargs
-            ):
-                t = o.create_team("temp-team-child", parent_team_id=2589002)
-                assert isinstance(parent_t, github3.orgs.Team)
-                assert t.delete() is True
+            t = o.create_team(
+                "temp-team-child",
+                parent_team_id=parent_t.id,
+                privacy="closed",
+            )
+            assert isinstance(t, github3.orgs.Team)
+            assert t.delete() is True
+            assert parent_t.delete() is True
 
     def test_edit(self):
         """Test the ability to edit an organization."""

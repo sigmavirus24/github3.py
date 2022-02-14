@@ -128,7 +128,5 @@ class TestTeamIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for("repos"),
-            params={"per_page": 100},
-            headers={"Accept": "application/vnd.github.ironman-preview+json"},
+            url_for("repos"), params={"per_page": 100}, headers={}
         )

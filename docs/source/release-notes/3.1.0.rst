@@ -1,0 +1,12 @@
+3.1.0: 2022-02-xx
+-----------------
+
+Features Added
+``````````````
+
+- Add :class:`~github3.orgs.ShortRepositoryWithPermissions` to include the
+  permissions dictionary returned by the GitHub API when listing repositories
+  a team has access to.
+
+- Add :meth:`github3.orgs.Team.permissions_for("<org>/<repo>")` to retrieve a
+  full permissions listing for a given repository in an organization.

@@ -101,10 +101,10 @@ class TestOrganization(helper.UnitHelper):
             data={
                 "name": "team-name",
                 "repo_names": [],
+                "maintainers": [],
                 "permission": "push",
                 "privacy": "secret",
             },
-            headers=None,
         )
 
     def test_create_hook(self):
