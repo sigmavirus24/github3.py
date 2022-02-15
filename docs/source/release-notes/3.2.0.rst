@@ -1,0 +1,16 @@
+3.2.0: 2022-xx-xx
+-----------------
+
+Dependency Change
+`````````````````
+
+
+Features Added
+``````````````
+
+- Added more allowed statuses to Deployments for
+  :meth:`github3.repos.deployment.Deployment.create_status()`
+
+
+Bug Fixes
+`````````

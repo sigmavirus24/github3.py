@@ -77,7 +77,8 @@ class Deployment(GitHubCore):
 
         :param str state:
             (required), The state of the status. Can be one of
-            ``pending``, ``success``, ``error``, or ``failure``.
+            ``pending``, ``success``, ``error``, ``inactive``,
+            ``in_progress``, ``queued``, or ``failure``.
         :param str target_url:
             The target URL to associate with this status.
             This URL should contain output to keep the user updated while the
@@ -92,7 +93,15 @@ class Deployment(GitHubCore):
         """
         json = None
 
-        if state in ("pending", "success", "error", "failure"):
+        if state in (
+            "pending",
+            "success",
+            "error",
+            "inactive",
+            "in_progress",
+            "queued",
+            "failure",
+        ):
             data = {
                 "state": state,
                 "target_url": target_url,
