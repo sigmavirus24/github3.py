@@ -1,0 +1,11 @@
+3.1.1: 2022-02-21
+-----------------
+
+Features Added
+``````````````
+
+- Support editing parent team and team visibility via
+  :meth:`github3.orgs.Team.edit`
+
+- Added more allowed statuses to Deployments for
+  :meth:`github3.repos.deployment.Deployment.create_status()`
