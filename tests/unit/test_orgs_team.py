@@ -33,10 +33,15 @@ class TestTeam(helper.UnitHelper):
 
     def test_edit(self):
         """Show that a user can edit a team."""
-        self.instance.edit("name", "admin")
+        self.instance.edit("name", "admin", 1234)
 
         self.patch_called_with(
-            url_for(), data={"name": "name", "permission": "admin"}
+            url_for(),
+            data={
+                "name": "name",
+                "permission": "admin",
+                "parent_team_id": 1234,
+            },
         )
 
     def test_has_repository(self):

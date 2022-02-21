@@ -118,20 +118,39 @@ class _Team(models.GitHubCore):
         return self._boolean(self._delete(self._api), 204, 404)
 
     @requires_auth
-    def edit(self, name, permission=""):
+    def edit(
+        self,
+        name: str,
+        permission: str = "",
+        parent_team_id: t.Optional[int] = None,
+        privacy: t.Optional[str] = None,
+    ):
         """Edit this team.
 
         :param str name:
             (required), the new name of this team
         :param str permission:
             (optional), one of ('pull', 'push', 'admin')
+            .. deprecated:: 3.0.0
+
+                This was deprecated by the GitHub API.
+        :param int parent_team_id:
+            (optional), id of the parent team for this team
+        :param str privacy:
+            (optional), one of "closed" or "secret"
         :returns:
             True if successful, False otherwise
         :rtype:
             bool
         """
         if name:
-            data = {"name": name, "permission": permission}
+            data = {"name": name}
+            if permission:
+                data["permission"] = permission
+            if parent_team_id is not None:
+                data["parent_team_id"] = parent_team_id
+            if privacy in {"closed", "secret"}:
+                data["privacy"] = privacy
             json = self._json(self._patch(self._api, data=dumps(data)), 200)
             if json:
                 self._update_attributes(json)
