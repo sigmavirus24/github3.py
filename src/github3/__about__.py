@@ -5,7 +5,7 @@ __author__ = "Ian Stapleton Cordasco"
 __author_email__ = "graffatcolmingov@gmail.com"
 __license__ = "Modified BSD"
 __copyright__ = "Copyright 2012-2022 Ian Stapleton Cordasco"
-__version__ = "3.1.1"
+__version__ = "3.1.2"
 __version_info__ = tuple(
     int(i) for i in __version__.split(".") if i.isdigit()
 )
