@@ -212,3 +212,5 @@ Contributors
 - David Glick (@davisagli)
 
 - Greg Gilbert (@greggilbert)
+
+- Philipp Heil (@zkdev)
