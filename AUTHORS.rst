@@ -210,3 +210,9 @@ Contributors
 - Nathan Walters (@nwalters512)
 
 - Thomas Lam (@lamcw)
+
+- David Glick (@davisagli)
+
+- Greg Gilbert (@greggilbert)
+
+- Philipp Heil (@zkdev)

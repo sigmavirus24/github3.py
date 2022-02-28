@@ -33,10 +33,15 @@ class TestTeam(helper.UnitHelper):
 
     def test_edit(self):
         """Show that a user can edit a team."""
-        self.instance.edit("name", "admin")
+        self.instance.edit("name", "admin", 1234)
 
         self.patch_called_with(
-            url_for(), data={"name": "name", "permission": "admin"}
+            url_for(),
+            data={
+                "name": "name",
+                "permission": "admin",
+                "parent_team_id": 1234,
+            },
         )
 
     def test_has_repository(self):
@@ -128,7 +133,5 @@ class TestTeamIterator(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            url_for("repos"),
-            params={"per_page": 100},
-            headers={"Accept": "application/vnd.github.ironman-preview+json"},
+            url_for("repos"), params={"per_page": 100}, headers={}
         )

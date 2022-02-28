@@ -583,6 +583,30 @@ class TestRepository(helper.UnitHelper):
             url_for("contents/path/to/file.txt"), params={"ref": "some-sha"}
         )
 
+    def test_file_contents_works_for_empty_file(self):
+        """Verify file_contents works for an empty file edge case."""
+        mock_response = unittest.mock.MagicMock(status_code=200)
+        mock_response.json.return_value = {
+            "content": "",
+            "download_url": "",
+            "encoding": "base64",
+            "git_url": "",
+            "html_url": "",
+            "name": "",
+            "path": "",
+            "sha": "",
+            "size": "",
+            "type": "",
+            "url": "",
+            "_links": "",
+        }
+        self.session.get.return_value = mock_response
+
+        file_contents = self.instance.file_contents(
+            "path/to/empty_file.txt", ref="some-sha"
+        )
+        assert file_contents.decoded == b""
+
     def test_git_commit_required_sha(self):
         """Verify the request for retrieving a git commit from a repository."""
         self.instance.git_commit("")

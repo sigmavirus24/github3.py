@@ -1,0 +1,9 @@
+3.1.1: 2022-02-22
+-----------------
+
+Bugs Fixed
+``````````
+
+- Always specify our ``PyJWT`` dependency with the ``crypto`` extra so that
+  users will get ``cryptography`` installed for them. Previously, ``jwcrypto``
+  had an explicit dependency on this but for ``PyJWT`` it is optional.

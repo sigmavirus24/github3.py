@@ -48,14 +48,16 @@ class TestTeam(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             o = self.get_organization()
             # Create a new team to play with
-            t = o.create_team("edit-me")
+            t = o.create_team("edit-me", privacy="closed")
+            p = o.create_team("parent", privacy="closed")
             assert isinstance(t, github3.orgs.Team)
             # Edit the new team
-            assert t.edit("delete-me", permission="admin") is True
+            assert t.edit("delete-me", parent_team_id=p.id) is True
             # Assert that the name has changed
             assert t.name == "delete-me"
             # Get rid of it, we don't need it.
             assert t.delete() is True
+            assert p.delete() is True
 
     def test_has_repository(self):
         """Show that a user can check of a team has access to a repository."""
