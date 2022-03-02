@@ -1,13 +1,12 @@
-3.2.0: 2022-xx-xx
+3.2.0: 2022-03-02
 -----------------
-
-Dependency Change
-`````````````````
-
-
-Features Added
-``````````````
-
 
 Bug Fixes
 `````````
+
+- Migrate to GitHub's supported Teams endpoints for select methods that were
+  relying on the deprecated endpoints. See also gh-1080_
+
+
+.. _gh-1080:
+   https://github.com/sigmavirus24/github3.py/issues/1080

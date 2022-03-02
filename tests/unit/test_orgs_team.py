@@ -4,7 +4,9 @@ from . import helper
 from github3 import GitHubError
 from github3.orgs import Team
 
-url_for = helper.create_url_helper("https://api.github.com/teams/1")
+url_for = helper.create_url_helper(
+    "https://api.github.com/organizations/1/team/1"
+)
 
 get_team_example_data = helper.create_example_data_helper("orgs_team_example")
 

@@ -30,7 +30,8 @@ class TestOrganization(helper.UnitHelper):
         self.instance.add_repository("name-of-repo", 10)
 
         self.session.put.assert_called_once_with(
-            "https://api.github.com/teams/10/repos/name-of-repo"
+            f"https://api.github.com/organizations/{self.instance.id}"
+            "/team/10/repos/name-of-repo"
         )
 
     def test_block(self):
@@ -218,7 +219,8 @@ class TestOrganization(helper.UnitHelper):
         self.instance.remove_repository("repo-name", 10)
 
         self.session.delete.assert_called_once_with(
-            "https://api.github.com/teams/10/repos/repo-name"
+            f"https://api.github.com/organizations/{self.instance.id}"
+            "/team/10/repos/repo-name"
         )
 
     def test_repr(self):
@@ -236,7 +238,7 @@ class TestOrganization(helper.UnitHelper):
         self.instance.team(10)
 
         self.session.get.assert_called_once_with(
-            "https://api.github.com/teams/10"
+            f"https://api.github.com/organizations/{self.instance.id}/team/10"
         )
 
     def test_team_by_name(self):

@@ -1,6 +1,7 @@
 """This module provides the basic models used in github3.py."""
 import json as jsonlib
 import logging
+import typing as t
 
 import dateutil.parser
 import requests.compat
@@ -8,7 +9,14 @@ import requests.compat
 from . import exceptions
 from . import session
 
+
+if t.TYPE_CHECKING:
+    from . import structs
+
 LOG = logging.getLogger(__package__)
+
+
+T = t.TypeVar("T")
 
 
 class GitHubCore:
@@ -20,9 +28,9 @@ class GitHubCore:
     """
 
     _ratelimit_resource = "core"
-    _refresh_to = None
+    _refresh_to: t.Optional["GitHubCore"] = None
 
-    def __init__(self, json, session):
+    def __init__(self, json, session: session.GitHubSession):
         """Initialize our basic object.
 
         Pretty much every object will pass in decoded JSON and a Session.
@@ -244,14 +252,14 @@ class GitHubCore:
 
     def _iter(
         self,
-        count,
-        url,
-        cls,
-        params=None,
-        etag=None,
-        headers=None,
-        list_key=None,
-    ):
+        count: int,
+        url: str,
+        cls: t.Type[T],
+        params: t.Optional[t.Mapping[str, t.Optional[str]]] = None,
+        etag: t.Optional[str] = None,
+        headers: t.Optional[t.Mapping[str, str]] = None,
+        list_key: t.Optional[str] = None,
+    ) -> "structs.GitHubIterator[T]":
         """Generic iterator for this project.
 
         :param int count: How many items to return.
