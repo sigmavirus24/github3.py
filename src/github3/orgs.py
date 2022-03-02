@@ -144,7 +144,7 @@ class _Team(models.GitHubCore):
             bool
         """
         if name:
-            data = {"name": name}
+            data: t.Dict[str, t.Union[str, int]] = {"name": name}
             if permission:
                 data["permission"] = permission
             if parent_team_id is not None:
@@ -478,7 +478,14 @@ class _Organization(models.GitHubCore):
         if int(team_id) < 0:
             return False
 
-        url = self._build_url("teams", str(team_id), "repos", str(repository))
+        url = self._build_url(
+            "organizations",
+            str(self.id),
+            "team",
+            str(team_id),
+            "repos",
+            str(repository),
+        )
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
@@ -736,10 +743,14 @@ class _Organization(models.GitHubCore):
         :rtype:
             :class:`~github3.orgs.Team`
         """
-        data = {
+        data: t.Dict[str, t.Union[t.List[str], str, int]] = {
             "name": name,
-            "repo_names": [getattr(r, "full_name", r) for r in repo_names],
-            "maintainers": [getattr(m, "login", m) for m in maintainers],
+            "repo_names": [
+                getattr(r, "full_name", r) for r in (repo_names or [])
+            ],
+            "maintainers": [
+                getattr(m, "login", m) for m in (maintainers or [])
+            ],
             "permission": permission,
             "privacy": privacy,
         }
@@ -1149,7 +1160,7 @@ class _Organization(models.GitHubCore):
         return self._iter(int(number), url, ShortTeam, etag=etag)
 
     @requires_auth
-    def publicize_member(self, username):
+    def publicize_member(self, username: str) -> bool:
         """Make ``username``'s membership in this organization public.
 
         :param str username:
@@ -1163,7 +1174,7 @@ class _Organization(models.GitHubCore):
         return self._boolean(self._put(url), 204, 404)
 
     @requires_auth
-    def remove_member(self, username):
+    def remove_member(self, username: str) -> bool:
         """Remove the user named ``username`` from this organization.
 
         .. note::
@@ -1182,7 +1193,11 @@ class _Organization(models.GitHubCore):
         return self._boolean(self._delete(url), 204, 404)
 
     @requires_auth
-    def remove_repository(self, repository, team_id):
+    def remove_repository(
+        self,
+        repository: t.Union[Repository, ShortRepository, str],
+        team_id: int,
+    ):
         """Remove ``repository`` from the team with ``team_id``.
 
         :param str repository:
@@ -1196,13 +1211,18 @@ class _Organization(models.GitHubCore):
         """
         if int(team_id) > 0:
             url = self._build_url(
-                "teams", str(team_id), "repos", str(repository)
+                "organizations",
+                str(self.id),
+                "team",
+                str(team_id),
+                "repos",
+                str(repository),
             )
             return self._boolean(self._delete(url), 204, 404)
         return False
 
     @requires_auth
-    def team(self, team_id):
+    def team(self, team_id: int) -> t.Optional[Team]:
         """Return the team specified by ``team_id``.
 
         :param int team_id:
@@ -1214,12 +1234,14 @@ class _Organization(models.GitHubCore):
         """
         json = None
         if int(team_id) > 0:
-            url = self._build_url("teams", str(team_id))
+            url = self._build_url(
+                "organizations", str(self.id), "team", str(team_id)
+            )
             json = self._json(self._get(url), 200)
         return self._instance_or_null(Team, json)
 
     @requires_auth
-    def team_by_name(self, team_slug):
+    def team_by_name(self, team_slug: str) -> t.Optional[Team]:
         """Return the team specified by ``team_slug``.
 
         :param str team_slug:
