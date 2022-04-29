@@ -154,29 +154,45 @@ class Installation(models.GitHubCore):
         self.updated_at = self._strptime(json["updated_at"])
 
 
-def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
+def create_token(
+    private_key_pem,
+    app_id,
+    expire_in=TEN_MINUTES_AS_SECONDS,
+    token_creator=None,
+):
     """Create an encrypted token for the specified App.
 
     :param bytes private_key_pem:
-        The bytes of the private key for this GitHub Application.
+        The bytes of the private key for this GitHub Application. None if
+        passing the token_creator
     :param int app_id:
         The integer identifier for this GitHub Application.
     :param int expire_in:
         The length in seconds for this token to be valid for.
         Default: 600 seconds (10 minutes)
+    :param token_creator:
+        A function that will create the JWT token. Pass this if using a vault
+        that does not hand out the private key but creates the signature
+        as part of the SDK.
     :returns:
         Serialized encrypted token.
     :rtype:
         text
     """
-    if not isinstance(private_key_pem, bytes):
+    if token_creator is None and not isinstance(private_key_pem, bytes):
         raise ValueError('"private_key_pem" parameter must be byte-string')
     now = int(time.time())
-    token = jwt.encode(
-        payload={"iat": now, "exp": now + expire_in, "iss": app_id},
-        key=private_key_pem,
-        algorithm="RS256",
-    )
+    payload = {"iat": now, "exp": now + expire_in, "iss": app_id}
+    if token_creator:
+        if not callable(token_creator):
+            raise ValueError('"token_creator" parameter must be function')
+        token = token_creator(payload)
+    else:
+        token = jwt.encode(
+            payload=payload,
+            key=private_key_pem,
+            algorithm="RS256",
+        )
     return token
 
 

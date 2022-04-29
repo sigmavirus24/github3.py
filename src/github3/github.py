@@ -1428,7 +1428,12 @@ class GitHub(models.GitHubCore):
         self.session.app_bearer_token_auth(token, expire_in)
 
     def login_as_app_installation(
-        self, private_key_pem, app_id, installation_id, expire_in=30
+        self,
+        private_key_pem,
+        app_id,
+        installation_id,
+        expire_in=30,
+        token_creator=None,
     ):
         """Login using your GitHub App's installation credentials.
 
@@ -1454,7 +1459,8 @@ class GitHub(models.GitHubCore):
             This method expires after 1 hour.
 
         :param bytes private_key_pem:
-            The bytes of the private key for this GitHub Application.
+            The bytes of the private key for this GitHub Application. None
+            if passing a token_creator
         :param int app_id:
             The integer identifier for this GitHub Application.
         :param int installation_id:
@@ -1466,6 +1472,10 @@ class GitHub(models.GitHubCore):
             the event that clock drift is significant between your machine and
             GitHub's servers, you can set this higher than 30.
             Default: 30
+        :param token_creator:
+            A function that will create the JWT token. Pass this if using a
+            vault that does not hand out the private key but creates the
+            signature as part of the SDK.
 
         .. _Authenticating as an Installation:
             https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-an-installation
@@ -1473,7 +1483,10 @@ class GitHub(models.GitHubCore):
             https://developer.github.com/v3/apps/#create-a-new-installation-token
         """
         jwt_token = apps.create_token(
-            private_key_pem, app_id, expire_in=expire_in
+            private_key_pem,
+            app_id,
+            expire_in=expire_in,
+            token_creator=token_creator,
         )
         bearer_auth = session.AppBearerTokenAuth(jwt_token, expire_in)
         url = self._build_url(
