@@ -214,3 +214,5 @@ Contributors
 - Greg Gilbert (@greggilbert)
 
 - Philipp Heil (@zkdev)
+
+- Petter Kvalvaag (@pettermk)
