@@ -1429,11 +1429,11 @@ class GitHub(models.GitHubCore):
 
     def login_as_app_installation(
         self,
-        private_key_pem,
-        app_id,
-        installation_id,
-        expire_in=30,
-        token_creator=None,
+        private_key_pem: t.Optional[bytes],
+        app_id: int,
+        installation_id: int,
+        expire_in: int = 30,
+        token_creator: t.Optional[t.Callable[[t.Dict], str]] = None,
     ):
         """Login using your GitHub App's installation credentials.
 
@@ -1442,6 +1442,10 @@ class GitHub(models.GitHubCore):
         .. versionchanged:: 3.0.0
 
             Added ``expire_in`` parameter.
+
+        .. versionchanged:: 3.2.1
+
+            Added ``token_creator`` parameter.
 
         .. seealso::
 
@@ -1472,10 +1476,11 @@ class GitHub(models.GitHubCore):
             the event that clock drift is significant between your machine and
             GitHub's servers, you can set this higher than 30.
             Default: 30
-        :param token_creator:
-            A function that will create the JWT token. Pass this if using a
-            vault that does not hand out the private key but creates the
-            signature as part of the SDK.
+        :param func token_creator:
+            A function that accepts a payload as a dictionary and produces a
+            JWT token as a string. Pass this if using a vault that does not
+            hand out the private key but creates the signature as part of the
+            SDK.
 
         .. _Authenticating as an Installation:
             https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-an-installation

@@ -3,6 +3,7 @@
 https://developer.github.com/apps/building-github-apps/
 """
 import time
+import typing as t
 
 import jwt
 
@@ -155,12 +156,16 @@ class Installation(models.GitHubCore):
 
 
 def create_token(
-    private_key_pem,
-    app_id,
-    expire_in=TEN_MINUTES_AS_SECONDS,
-    token_creator=None,
+    private_key_pem: t.Optional[bytes],
+    app_id: int,
+    expire_in: int = TEN_MINUTES_AS_SECONDS,
+    token_creator: t.Optional[t.Callable[[t.Dict], str]] = None,
 ):
     """Create an encrypted token for the specified App.
+
+    .. versionchanged:: 3.2.1
+
+        Added ``token_creator`` parameter.
 
     :param bytes private_key_pem:
         The bytes of the private key for this GitHub Application. None if
@@ -170,10 +175,11 @@ def create_token(
     :param int expire_in:
         The length in seconds for this token to be valid for.
         Default: 600 seconds (10 minutes)
-    :param token_creator:
-        A function that will create the JWT token. Pass this if using a vault
-        that does not hand out the private key but creates the signature
-        as part of the SDK.
+    :param func token_creator:
+        A function that accepts a payload as a dictionary and produces a
+        JWT token as a string. Pass this if using a vault that does not
+        hand out the private key but creates the signature as part of the
+        SDK.
     :returns:
         Serialized encrypted token.
     :rtype:
