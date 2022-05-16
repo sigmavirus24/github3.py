@@ -270,6 +270,20 @@ class TestOrganization(helper.UnitHelper):
             headers=headers,
         )
 
+    def test_cancel_invite(self):
+        """Show that one can cancel a invitation in an organization."""
+        self.instance.cancel_invite("123")
+
+        self.delete_called_with(url_for("invitations/123"))
+
+    def test_failed_invitations(self):
+        """Get all the failed invitation in an organization."""
+        self.instance.failed_invitations()
+
+        self.session.get.assert_called_once_with(
+            url_for("failed_invitations")
+        )
+
     def test_invite_requires_valid_role(self):
         """Validate our validation of roles."""
         with pytest.raises(ValueError):
@@ -383,6 +397,16 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that inviting a member requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.invite()
+
+    def test_cancel_invite(self):
+        """Show that cancelling invitation requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.cancel_invite()
+
+    def test_failed_invitations(self):
+        """Show that getting failed invitations requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.failed_invitations()
 
     def test_membership_for(self):
         """Show that inviting a member requires authentication."""

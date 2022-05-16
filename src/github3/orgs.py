@@ -922,6 +922,27 @@ class _Organization(models.GitHubCore):
         json = self._json(self._post(url, data=data, headers=headers), 200)
         return self._instance_or_null(Invitation, json)
 
+    @requires_auth
+    def cancel_invite(self, invitee_id):
+        """Cancel the invitation using ``invitee_id``
+        of the user from the organization.
+
+        :param int invitee_id:
+            the identifier for the user being invited, to cancel its invitation
+        :returns: bool
+        """
+        url = self._build_url("invitations", invitee_id, base_url=self._api)
+        return self._boolean(self._delete(url), 204, 404)
+
+    @requires_auth
+    def failed_invitations(self):
+        """List failed organization invitations.
+
+        :returns: bool
+        """
+        url = self._build_url("failed_invitations", base_url=self._api)
+        return self._json(self._get(url), 200, 404)
+
     def is_member(self, username):
         """Check if the user named ``username`` is a member.
 
