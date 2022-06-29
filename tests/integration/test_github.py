@@ -68,6 +68,15 @@ class TestGitHub(IntegrationHelper):
 
         assert isinstance(app, github3.apps.App)
 
+    def test_app_installation_repos(self):
+        """Validate an app can retrieve its repositories."""
+        cassette_name = self.cassette_name("app_installation_repos")
+        with self.recorder.use_cassette(cassette_name):
+            self.app_installation_login()
+
+            for r in self.gh.app_installation_repos(number=100):
+                assert isinstance(r, github3.repos.ShortRepository)
+
     def test_authorize(self):
         """Test the ability to create an authorization."""
         from ..conftest import credentials
