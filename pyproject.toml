@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 78
-target-version = ['py36']
+target-version = ['py37']
 safe = true
 exclude = '''
 (
