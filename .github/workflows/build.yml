@@ -19,19 +19,23 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
+
       - name: Setup Python
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v4.2.0
         with:
           python-version: ${{ matrix.PYTHON.VERSION }}
+
       - name: Upgrade pip
         run: |
           pip install --constraint=.github/workflows/constraints.txt pip
           pip --version
+
       - name: Install Tox
         run: |
           pip install --constraint=.github/workflows/constraints.txt tox
           tox --version
+
       - name: Run Tox
         run: tox
         env:
