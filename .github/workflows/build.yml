@@ -9,7 +9,6 @@ jobs:
     strategy:
       matrix:
         python:
-          - { VERSION: "3.6", TOXENV: "py36", ALLOW_FAILURE: false }
           - { VERSION: "3.7", TOXENV: "py37", ALLOW_FAILURE: false }
           - { VERSION: "3.8", TOXENV: "py38",ALLOW_FAILURE: false }
           - { VERSION: "3.9", TOXENV: "py39",ALLOW_FAILURE: false }

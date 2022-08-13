@@ -123,8 +123,6 @@ The tests are generally run using tox. Tox can be installed like so
 
 We test against PyPy3 and the following versions of Python:
 
-- 3.6
-
 - 3.7
 
 - 3.8
