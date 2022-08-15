@@ -126,8 +126,10 @@ class _Repository(models.GitHubCore):
         :type username:
             str or :class:`~github3.users.User`
         :param str permission:
-            (optional), permission to grant the collaborator, valid on organization repositories only
-            Can be 'pull', 'triage', 'push', 'maintain', 'admin' or an organization-defined custom role name.
+            (optional), permission to grant the collaborator, valid on
+            organization repositories only.
+            Can be 'pull', 'triage', 'push', 'maintain', 'admin' or an
+            organization-defined custom role name.
         :returns:
             True if successful, False otherwise
         :rtype:
