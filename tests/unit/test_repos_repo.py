@@ -88,7 +88,7 @@ class TestRepository(helper.UnitHelper):
 
         self.session.put.assert_called_once_with(
             url_for("collaborators/sigmavirus24"),
-            data='{"permission": "admin"}'
+            data='{"permission": "admin"}',
         )
 
     def test_add_null_collaborator(self):
