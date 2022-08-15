@@ -81,6 +81,16 @@ class TestRepository(helper.UnitHelper):
             url_for("collaborators/sigmavirus24")
         )
 
+    def test_add_collaborator_with_permission(self):
+        """Verify the request to add a collaborator to a repository with
+        `admin` permission."""
+        self.instance.add_collaborator("sigmavirus24", "admin")
+
+        self.session.put.assert_called_once_with(
+            url_for("collaborators/sigmavirus24"),
+            data='{"permission": "admin"}',
+        )
+
     def test_add_null_collaborator(self):
         """Verify no request is made when adding `None` as a collaborator."""
         self.instance.add_collaborator(None)
