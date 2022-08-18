@@ -216,3 +216,5 @@ Contributors
 - Philipp Heil (@zkdev)
 
 - Petter Kvalvaag (@pettermk)
+
+- Peter Küffner (@kuepe-sl)

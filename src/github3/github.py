@@ -1980,7 +1980,7 @@ class GitHub(models.GitHubCore):
     def repositories(
         self, type=None, sort=None, direction=None, number=-1, etag=None
     ):
-        """List repositories for the authenticated user, filterable by ``type``.
+        """List repositories for the authenticated user filterable by ``type``.
 
         .. versionchanged:: 0.6
 
