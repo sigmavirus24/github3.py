@@ -352,6 +352,20 @@ class TestOrganization(IntegrationHelper):
                 [team.id], invitee_id=2354350, role="direct_member"
             )
 
+    def test_cancel_invite(self):
+        """Show that a user can cancel invitation of github."""
+        cassette_name = self.cassette_name("cancel_invite")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("Thunderbird-client", auth_needed=True)
+            assert o.cancel_invite("123")
+
+    def test_failed_invitations(self):
+        """Get list of failed invitations."""
+        cassette_name = self.cassette_name("failed_invitations")
+        with self.recorder.use_cassette(cassette_name):
+            o = self.get_organization("mozillatw", auth_needed=True)
+            assert o.failed_invitations()
+
     def test_membership(self):
         """Show that a user can obtain the membership status."""
         cassette_name = self.cassette_name("membership")
