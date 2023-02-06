@@ -136,7 +136,7 @@ class GitHubCore:
     def _remove_none(data):
         if not data:
             return
-        for (k, v) in list(data.items()):
+        for k, v in list(data.items()):
             if v is None:
                 del data[k]
 
