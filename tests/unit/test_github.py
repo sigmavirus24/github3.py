@@ -1579,7 +1579,6 @@ class TestGitHubAuthorizations(helper.UnitHelper):
 
 
 class TestGitHubEnterprise(helper.UnitGitHubEnterpriseHelper):
-
     described_class = GitHubEnterprise
 
     def test_admin_stats(self):

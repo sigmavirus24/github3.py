@@ -2276,7 +2276,7 @@ class _Repository(models.GitHubCore):
             "direction": ("asc", "desc"),
         }
         params = {"state": state, "sort": sort, "direction": direction}
-        for (k, v) in list(params.items()):
+        for k, v in list(params.items()):
             if not (v and (v in accepted[k])):  # e.g., '' or None
                 del params[k]
         if not params:
