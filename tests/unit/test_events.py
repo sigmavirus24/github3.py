@@ -21,7 +21,6 @@ get_team_example_data = create_example_data_helper("team_example")
 
 
 class TestEvent(UnitHelper):
-
     described_class = github3.events.Event
     example_data = get_example_data()
 

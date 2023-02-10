@@ -45,7 +45,6 @@ def enterprise_url(request):
 
 
 class IfNoneMatchMatcher(betamax.BaseMatcher):
-
     name = "if-none-match"
 
     def match(self, request, recorded_request):

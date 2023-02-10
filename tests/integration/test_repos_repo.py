@@ -602,7 +602,7 @@ class TestRepository(helper.IntegrationHelper):
             repository = self.gh.repository("sigmavirus24", "github3.py")
             contents = repository.directory_contents("github3/search/")
 
-        for (filename, content) in contents:
+        for filename, content in contents:
             assert content.name == filename
             assert isinstance(content, github3.repos.contents.Contents)
 

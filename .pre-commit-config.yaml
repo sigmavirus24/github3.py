@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.4.0
     hooks:
     - id: check-added-large-files
     - id: check-toml
@@ -14,30 +14,30 @@ repos:
       types: [text]
       stages: [commit, push, manual]
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.7.1
+    rev: v3.9.0
     hooks:
     - id: reorder-python-imports
-      args: [--application-directories, '.:src', --py36-plus]
+      args: [--application-directories, '.:src', --py37-plus]
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 23.1.0
     hooks:
     - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.31.0
+    rev: v3.3.1
     hooks:
     - id: pyupgrade
-      args: [--py36-plus]
+      args: [--py37-plus]
   #- repo: https://github.com/pre-commit/mirrors-mypy
   #  rev: v0.910
   #  hooks:
   #  - id: mypy
   #    exclude: ^(docs/|tests/)
   - repo: https://github.com/jorisroovers/gitlint
-    rev: v0.17.0
+    rev: v0.19.0dev
     hooks:
     - id: gitlint
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v1.20.0
+    rev: v2.2.0
     hooks:
     - id: setup-cfg-fmt
-      args: [--min-py3-version, '3.6']
+      args: [--min-py3-version, '3.7']

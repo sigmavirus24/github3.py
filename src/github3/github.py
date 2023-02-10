@@ -383,6 +383,35 @@ class GitHub(models.GitHubCore):
         )
         return self._instance_or_null(apps.Installation, json)
 
+    @decorators.requires_app_installation_auth
+    def app_installation_repos(self, number=-1, etag=None):
+        """Retrieve repositories accessible by app installation.
+
+        .. versionadded:: 3.2.1
+
+        .. seealso::
+
+            `List repositories accessible to the app installation`_
+                API Documentation
+
+        :returns:
+            The repositories accessible to the app installation
+        :rtype:
+            :class:`~github3.repos.repo.ShortRepository`
+
+        .. _List repositories accessible to the app installation:
+            https://docs.github.com/en/rest/apps/installations#list-repositories-accessible-to-the-app-installation
+        """
+        url = self._build_url("installation", "repositories")
+        return self._iter(
+            count=int(number),
+            url=url,
+            cls=repo.ShortRepository,
+            params=None,
+            etag=etag,
+            list_key="repositories",
+        )
+
     @decorators.requires_app_bearer_auth
     def authenticated_app(self):
         """Retrieve information about the current app.
@@ -1956,7 +1985,7 @@ class GitHub(models.GitHubCore):
     def repositories(
         self, type=None, sort=None, direction=None, number=-1, etag=None
     ):
-        """List repositories for the authenticated user, filterable by ``type``.
+        """List repositories for the authenticated user filterable by ``type``.
 
         .. versionchanged:: 0.6
 

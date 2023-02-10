@@ -52,7 +52,6 @@ class TestGitHubError(TestCase):
 
 
 class TestGitHubCore(helper.UnitHelper):
-
     described_class = MyTestRefreshClass
     last_modified = datetime.now().strftime("%a, %d %b %Y %H:%M:%S GMT")
     url = "https://api.github.com/foo"
@@ -216,7 +215,6 @@ class TestGitHubCore(helper.UnitHelper):
 
 
 class TestGitHubCoreIssue672(helper.UnitHelper):
-
     described_class = MyTestRefreshClass
     last_modified = datetime.now().strftime("%a, %d %b %Y %H:%M:%S GMT")
     url = "https://api.github.com/foo?bar=1"

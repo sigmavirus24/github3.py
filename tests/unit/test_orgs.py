@@ -30,7 +30,8 @@ class TestOrganization(helper.UnitHelper):
         self.instance.add_repository("name-of-repo", 10)
 
         self.session.put.assert_called_once_with(
-            "https://api.github.com/teams/10/repos/name-of-repo"
+            f"https://api.github.com/organizations/{self.instance.id}"
+            "/team/10/repos/name-of-repo"
         )
 
     def test_block(self):
@@ -218,7 +219,8 @@ class TestOrganization(helper.UnitHelper):
         self.instance.remove_repository("repo-name", 10)
 
         self.session.delete.assert_called_once_with(
-            "https://api.github.com/teams/10/repos/repo-name"
+            f"https://api.github.com/organizations/{self.instance.id}"
+            "/team/10/repos/repo-name"
         )
 
     def test_repr(self):
@@ -236,7 +238,7 @@ class TestOrganization(helper.UnitHelper):
         self.instance.team(10)
 
         self.session.get.assert_called_once_with(
-            "https://api.github.com/teams/10"
+            f"https://api.github.com/organizations/{self.instance.id}/team/10"
         )
 
     def test_team_by_name(self):
@@ -266,6 +268,20 @@ class TestOrganization(helper.UnitHelper):
                 "role": "direct_member",
             },
             headers=headers,
+        )
+
+    def test_cancel_invite(self):
+        """Show that one can cancel a invitation in an organization."""
+        self.instance.cancel_invite("123")
+
+        self.delete_called_with(url_for("invitations/123"))
+
+    def test_failed_invitations(self):
+        """Get all the failed invitation in an organization."""
+        self.instance.failed_invitations()
+
+        self.session.get.assert_called_once_with(
+            url_for("failed_invitations")
         )
 
     def test_invite_requires_valid_role(self):
@@ -381,6 +397,16 @@ class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
         """Show that inviting a member requires authentication."""
         with pytest.raises(GitHubError):
             self.instance.invite()
+
+    def test_cancel_invite(self):
+        """Show that cancelling invitation requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.cancel_invite()
+
+    def test_failed_invitations(self):
+        """Show that getting failed invitations requires authentication."""
+        with pytest.raises(GitHubError):
+            self.instance.failed_invitations()
 
     def test_membership_for(self):
         """Show that inviting a member requires authentication."""

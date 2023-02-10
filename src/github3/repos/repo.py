@@ -118,13 +118,18 @@ class _Repository(models.GitHubCore):
         return self._instance_or_null(pulls.ShortPullRequest, json)
 
     @decorators.requires_auth
-    def add_collaborator(self, username):
+    def add_collaborator(self, username, permission=None):
         """Add ``username`` as a collaborator to a repository.
 
         :param username:
             (required), username of the user
         :type username:
             str or :class:`~github3.users.User`
+        :param str permission:
+            (optional), permission to grant the collaborator, valid on
+            organization repositories only.
+            Can be 'pull', 'triage', 'push', 'maintain', 'admin' or an
+            organization-defined custom role name.
         :returns:
             True if successful, False otherwise
         :rtype:
@@ -134,7 +139,12 @@ class _Repository(models.GitHubCore):
         url = self._build_url(
             "collaborators", str(username), base_url=self._api
         )
-        return self._boolean(self._put(url), 201, 404)
+        if permission:
+            data = {"permission": permission}
+            resp = self._put(url, data=jsonlib.dumps(data))
+        else:
+            resp = self._put(url)
+        return self._boolean(resp, 201, 404)
 
     def archive(self, format, path="", ref="master"):
         """Get the tarball or zipball archive for this repo at ref.
@@ -2272,7 +2282,7 @@ class _Repository(models.GitHubCore):
             "direction": ("asc", "desc"),
         }
         params = {"state": state, "sort": sort, "direction": direction}
-        for (k, v) in list(params.items()):
+        for k, v in list(params.items()):
             if not (v and (v in accepted[k])):  # e.g., '' or None
                 del params[k]
         if not params:
