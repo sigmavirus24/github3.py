@@ -727,12 +727,6 @@ class TestGitHub(helper.UnitHelper):
 
         self.session.headers.update.called is False
 
-    def test_set_api_version(self):
-        self.instance.set_api_version("2022-11-28")
-        self.session.headers.update.assert_called_once_with(
-            {"X-GitHub-Api-Version": "2022-11-28"}
-        )
-
     def test_set_user_agent(self):
         self.instance.set_user_agent("github3py")
         self.session.headers.update.assert_called_once_with(
@@ -1395,6 +1389,14 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
             params={"per_page": 100, "q": "tom repos:>42 followers:>1000"},
             headers={},
         )
+
+    def test_api_version_header(_):
+        gh = GitHub(api_version="2022-11-28")
+        assert gh.session.headers.get("X-GitHub-Api-Version") == "2022-11-28"
+
+    def test_api_version_header_not_defined(_):
+        gh = GitHub()
+        assert gh.session.headers.get("X-GitHub-Api-Version") is None
 
 
 class TestGitHubRequiresAuthentication(

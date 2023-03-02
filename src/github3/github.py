@@ -59,9 +59,21 @@ class GitHub(models.GitHubCore):
     call the GitHub object with authentication parameters.
     """
 
-    def __init__(self, username="", password="", token="", session=None):
-        """Create a new GitHub instance to talk to the API."""
+    def __init__(
+        self, username="", password="", token="", session=None, api_version=""
+    ):
+        """Create a new GitHub instance to talk to the API.
+
+        :param str api_version:
+            API version to send with X-GitHub-Api-Version header.
+            See https://docs.github.com/en/rest/overview/api-versions
+            for details about API versions.
+        """
         super().__init__({}, session or self.new_session())
+
+        if api_version:
+            self.session.headers.update({"X-GitHub-Api-Version": api_version})
+
         if token:
             self.login(username, token=token)
         elif username and password:
@@ -2595,17 +2607,6 @@ class GitHub(models.GitHubCore):
             40-character hexidecimal client_secret provided by GitHub
         """
         self.session.params = {"client_id": id, "client_secret": secret}
-
-    def set_api_version(self, api_version):
-        """Allow to set a specific API version.
-
-        :param str api_version:
-            API version to send with X-GitHub-Api-Version header.
-            See https://docs.github.com/en/rest/overview/api-versions?apiVersion=2022-11-28 for details on API versions.
-        """  # noqa: E501
-        if not api_version:
-            return
-        self.session.headers.update({"X-GitHub-Api-Version": api_version})
 
     def set_user_agent(self, user_agent):
         """Allow the user to set their own user agent string.
