@@ -727,6 +727,12 @@ class TestGitHub(helper.UnitHelper):
 
         self.session.headers.update.called is False
 
+    def test_set_api_version(self):
+        self.instance.set_api_version("2022-11-28")
+        self.session.headers.update.assert_called_once_with(
+            {"X-GitHub-Api-Version": "2022-11-28"}
+        )
+
     def test_set_user_agent(self):
         self.instance.set_user_agent("github3py")
         self.session.headers.update.assert_called_once_with(

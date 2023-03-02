@@ -2596,6 +2596,17 @@ class GitHub(models.GitHubCore):
         """
         self.session.params = {"client_id": id, "client_secret": secret}
 
+    def set_api_version(self, api_version):
+        """Allow to set a specific API version.
+
+        :param str api_version:
+            API version to send with X-GitHub-Api-Version header.
+            See https://docs.github.com/en/rest/overview/api-versions?apiVersion=2022-11-28 for details on API versions.
+        """  # noqa: E501
+        if not api_version:
+            return
+        self.session.headers.update({"X-GitHub-Api-Version": api_version})
+
     def set_user_agent(self, user_agent):
         """Allow the user to set their own user agent string.
 
