@@ -1390,6 +1390,14 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
             headers={},
         )
 
+    def test_api_version_header(_):
+        gh = GitHub(api_version="2022-11-28")
+        assert gh.session.headers.get("X-GitHub-Api-Version") == "2022-11-28"
+
+    def test_api_version_header_not_defined(_):
+        gh = GitHub()
+        assert gh.session.headers.get("X-GitHub-Api-Version") is None
+
 
 class TestGitHubRequiresAuthentication(
     helper.UnitRequiresAuthenticationHelper
