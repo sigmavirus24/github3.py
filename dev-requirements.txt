@@ -1,7 +1,7 @@
 .
-#coverage==3.5.2
-pytest>=2.3.5,<3.3.0
-wheel==0.38.1
-betamax>=0.5.0
-betamax_matchers>=0.2.0
+pytest>=7.0
+pytest-xdist[psutil]
+wheel
+betamax>=0.5.1
+betamax_matchers>=0.3.0
 tox>=3.1.3
