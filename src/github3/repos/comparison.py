@@ -66,7 +66,9 @@ class Comparison(models.GitHubCore):
         self.behind_by = compare["behind_by"]
         self.commits = compare["commits"]
         self.total_commits = compare["total_commits"]
-        self.commits=self._iter(-1, self._api, commit.ShortCommit, list_key="commits")
+        self.commits = self._iter(
+            -1, self._api, commit.ShortCommit, list_key="commits"
+        )
         self.diff_url = compare["diff_url"]
         self.files = compare["files"]
         self.html_url = compare["html_url"]
