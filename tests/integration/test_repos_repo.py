@@ -165,6 +165,17 @@ class TestRepository(helper.IntegrationHelper):
             comparison = repository.compare_commits(base, head)
             assert isinstance(comparison, github3.repos.comparison.Comparison)
 
+    def test_compare_commits_large(self):
+        """Test the ability to compare two commits with larger number of changes."""
+        cassette_name = self.cassette_name("compare_commits_large")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("sigmavirus24", "github3.py")
+            base = "1.0.0"
+            head = "3.2.0"
+            comparison = repository.compare_commits(base, head)
+            assert isinstance(comparison, github3.repos.comparison.Comparison)
+            assert comparison.total_commits == sum(1 for _ in comparison.commits)
+
     def test_contributor_statistics(self):
         """Test the ability to retrieve contributor statistics for a repo."""
         cassette_name = self.cassette_name("contributor_statistics")

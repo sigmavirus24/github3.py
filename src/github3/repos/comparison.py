@@ -65,17 +65,20 @@ class Comparison(models.GitHubCore):
         self.base_commit = commit.ShortCommit(compare["base_commit"], self)
         self.behind_by = compare["behind_by"]
         self.commits = compare["commits"]
+        self.total_commits = compare["total_commits"]
         if self.commits:
-            self.commits = [
-                commit.ShortCommit(com, self) for com in self.commits
-            ]
+            if self.total_commits>len(self.commits):
+                self.commits=self._iter(-1, self._api, commit.ShortCommit, list_key="commits")
+            else:
+                self.commits = [
+                    commit.ShortCommit(com, self) for com in self.commits
+                ]
         self.diff_url = compare["diff_url"]
         self.files = compare["files"]
         self.html_url = compare["html_url"]
         self.patch_url = compare["patch_url"]
         self.permalink_url = compare["permalink_url"]
         self.status = compare["status"]
-        self.total_commits = compare["total_commits"]
         self._uniq = self.commits
 
     def _repr(self):
