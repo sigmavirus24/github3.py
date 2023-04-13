@@ -174,7 +174,9 @@ class TestRepository(helper.IntegrationHelper):
             head = "3.2.0"
             comparison = repository.compare_commits(base, head)
             assert isinstance(comparison, github3.repos.comparison.Comparison)
-            assert comparison.total_commits == sum(1 for _ in comparison.commits)
+            assert comparison.total_commits == sum(
+                1 for _ in comparison.commits
+            )
 
     def test_contributor_statistics(self):
         """Test the ability to retrieve contributor statistics for a repo."""
