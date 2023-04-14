@@ -118,6 +118,9 @@ class Comparison(models.GitHubCore):
             :class:`~github3.repos.commit.ShortCommit`
         """
         return self._iter(
-            number, self._api, commit.ShortCommit,
-            list_key="commits", etag=etag
+            number,
+            self._api,
+            commit.ShortCommit,
+            list_key="commits",
+            etag=etag,
         )
