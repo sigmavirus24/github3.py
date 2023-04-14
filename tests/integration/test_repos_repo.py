@@ -165,6 +165,18 @@ class TestRepository(helper.IntegrationHelper):
             comparison = repository.compare_commits(base, head)
             assert isinstance(comparison, github3.repos.comparison.Comparison)
 
+    def test_compare_commits_consistency(self):
+        """Test that Comparison commits matches original_commits"""
+        cassette_name = self.cassette_name("compare_commits_consistency")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("sigmavirus24", "github3.py")
+            base = "a811e1a270f65eecb65755eca38d888cbefcb0a7"
+            head = "76dcc6cb4b9860034be81b7e58adc286a115aa97"
+            comparison = repository.compare_commits(base, head)
+            self.assertListEqual(
+                list(comparison.commits()), comparison.original_commits
+            )
+
     def test_compare_commits_large(self):
         """Test the ability to compare two commits with many changes."""
         cassette_name = self.cassette_name("compare_commits_large")
@@ -174,7 +186,7 @@ class TestRepository(helper.IntegrationHelper):
             head = "3.2.0"
             comparison = repository.compare_commits(base, head)
             assert isinstance(comparison, github3.repos.comparison.Comparison)
-            iter_count = sum(1 for _ in comparison.commits)
+            iter_count = sum(1 for _ in comparison.commits())
             assert comparison.total_commits == iter_count
 
     def test_contributor_statistics(self):
