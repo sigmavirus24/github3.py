@@ -218,3 +218,5 @@ Contributors
 - Petter Kvalvaag (@pettermk)
 
 - Peter Küffner (@kuepe-sl)
+
+- Andrew MacCormack (@amaccormack-lumira)
