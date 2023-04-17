@@ -12,7 +12,7 @@ Maintainer(s)
 
 - Matt Chung (@itsmemattchung)
 
-- Thiago A. (@staticdev)
+- Thiago (@staticdev)
 
 Requests
 ````````
@@ -218,3 +218,5 @@ Contributors
 - Petter Kvalvaag (@pettermk)
 
 - Peter Küffner (@kuepe-sl)
+
+- Andrew MacCormack (@amaccormack-lumira)

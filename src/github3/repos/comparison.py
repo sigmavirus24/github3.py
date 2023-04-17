@@ -24,10 +24,16 @@ class Comparison(models.GitHubCore):
 
         The number of commits the head commit is behind the base.
 
-    .. attribute:: commits
+    .. attribute:: original_commits
+
+        .. versionchanged:: 4.0.0
+
 
         A list of :class:`~github3.repos.commit.ShortCommit` objects
-        representing the commits in the comparison.
+        representing up to the first 250 commits in the comparison.
+
+        If a comparison has more than 250 commits, use the commits function
+        to iterate over all available commits.
 
     .. attribute:: diff_url
 
@@ -64,19 +70,17 @@ class Comparison(models.GitHubCore):
         self.ahead_by = compare["ahead_by"]
         self.base_commit = commit.ShortCommit(compare["base_commit"], self)
         self.behind_by = compare["behind_by"]
-        self.commits = compare["commits"]
-        if self.commits:
-            self.commits = [
-                commit.ShortCommit(com, self) for com in self.commits
-            ]
+        self.total_commits = compare["total_commits"]
+        self.original_commits = [
+            commit.ShortCommit(com, self) for com in compare["commits"]
+        ]
         self.diff_url = compare["diff_url"]
         self.files = compare["files"]
         self.html_url = compare["html_url"]
         self.patch_url = compare["patch_url"]
         self.permalink_url = compare["permalink_url"]
         self.status = compare["status"]
-        self.total_commits = compare["total_commits"]
-        self._uniq = self.commits
+        self._uniq = self.original_commits
 
     def _repr(self):
         return f"<Comparison of {self.total_commits} commits>"
@@ -106,3 +110,23 @@ class Comparison(models.GitHubCore):
             self._api, headers={"Accept": "application/vnd.github.patch"}
         )
         return resp.content if self._boolean(resp, 200, 404) else b""
+
+    def commits(self, number=-1, etag=None):
+        """Iterate over the commits available for this comparison.
+
+        :param int number:
+            (optional), Number of assets to return
+        :param str etag:
+            (optional), last ETag header sent
+        :returns:
+            generator of asset objects
+        :rtype:
+            :class:`~github3.repos.commit.ShortCommit`
+        """
+        return self._iter(
+            number,
+            self._api,
+            commit.ShortCommit,
+            list_key="commits",
+            etag=etag,
+        )

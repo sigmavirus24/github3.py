@@ -1,5 +1,14 @@
-4.0.0: 2023-04-16
+4.0.0: 2023-04-23
 -----------------
+
+Backwards Incompatible Changes
+``````````````````````````````
+
+- :meth:`~github3.repos.comparison.Comparison.commits` was renamed to
+  `original_commits` (max 250 commits). Now `commits` uses Github's API to
+  get the full commit list out of the compare endpoint, so enabled
+  pagination/iterator on the commits within the Comparison class 
+  (@amaccormack-lumira). See also gh-1137_
 
 Features Added
 ``````````````
@@ -14,15 +23,16 @@ Removal
 
 - Remove support to EOL Python 3.6 (@staticdev). See also gh-1103_
 
-Dependency Change
-`````````````````
-
-- Bump the dev-requirements.txt (@offbyone). See also gh-1136_
-
 Bug Fixes
 `````````
 
-- Missing set permission for collaborators. See also gh-954_
+- Missing set permission for collaborators (@NargiT). See also gh-954_
+
+CI/CD
+`````
+
+- Bump the dev-requirements.txt (@offbyone). See also gh-1136_
+- Modernize the build: switch to hatchling (@offbyone). See also gh-1142_
 
 .. _gh-954:
    https://github.com/sigmavirus24/github3.py/issues/954
@@ -38,3 +48,7 @@ Bug Fixes
    https://github.com/sigmavirus24/github3.py/issues/1121
 .. _gh-1136:
    https://github.com/sigmavirus24/github3.py/pull/1136
+.. _gh-1137:
+   https://github.com/sigmavirus24/github3.py/issues/1137
+.. _gh-1142:
+   https://github.com/sigmavirus24/github3.py/pull/1142
