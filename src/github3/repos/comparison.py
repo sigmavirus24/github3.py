@@ -26,6 +26,9 @@ class Comparison(models.GitHubCore):
 
     .. attribute:: original_commits
 
+        .. versionchanged:: 4.0.0
+        
+
         A list of :class:`~github3.repos.commit.ShortCommit` objects
         representing the first commits in the comparison.
 
