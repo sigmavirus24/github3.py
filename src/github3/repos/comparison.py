@@ -30,7 +30,10 @@ class Comparison(models.GitHubCore):
         
 
         A list of :class:`~github3.repos.commit.ShortCommit` objects
-        representing the first commits in the comparison.
+        representing up to the first 250 commits in the comparison.
+
+        If a comparison has more than 250 commits, use the commits function
+        to iterate over all available commits.
 
     .. attribute:: diff_url
 
