@@ -37,9 +37,9 @@ Please read the `CONTRIBUTING`_ document.
 Testing
 ~~~~~~~
 
-You can run either ``pip install -r dev-requirements.txt`` to install the
-following before testing or simply ``make test-deps``. It is suggested you do
-this in a virtual environment. These need to be installed for the tests to run.
+You can run ``pip install -e .[dev]`` to install the following before testing or
+simply ``make test-deps``. It is suggested you do this in a virtual environment.
+These need to be installed for the tests to run.
 
 - betamax_
 - coverage_ by Ned Batchelder
