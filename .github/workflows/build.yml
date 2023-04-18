@@ -35,12 +35,12 @@ jobs:
 
       - name: Upgrade pip
         run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
+          pip install pip
           pip --version
 
       - name: Install Tox
         run: |
-          pip install --constraint=.github/workflows/constraints.txt tox
+          pip install tox
           tox --version
 
       - name: Run Tox
