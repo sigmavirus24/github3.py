@@ -26,3 +26,4 @@ t.py
 *.pem
 /.python-version
 /.tool-versions
+src/github3/_version.py
