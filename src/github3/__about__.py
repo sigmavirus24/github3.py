@@ -5,8 +5,11 @@ __author__ = "Ian Stapleton Cordasco"
 __author_email__ = "graffatcolmingov@gmail.com"
 __license__ = "Modified BSD"
 __copyright__ = "Copyright 2012-2022 Ian Stapleton Cordasco"
+__version__ = "3.2.0"
+__version_info__ = tuple(
+    int(i) for i in __version__.split(".") if i.isdigit()
+)
 __url__ = "https://github3.readthedocs.io"
-from ._version import __version__, __version_info__
 
 __all__ = (
     "__package_name__",

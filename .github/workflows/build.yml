@@ -24,9 +24,6 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
-        with:
-          # We want our tags here
-          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v4.2.0
