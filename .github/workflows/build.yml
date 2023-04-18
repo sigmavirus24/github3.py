@@ -4,23 +4,29 @@ on: [push, pull_request]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python:
           - { VERSION: "3.7", TOXENV: "py37", ALLOW_FAILURE: false }
-          - { VERSION: "3.8", TOXENV: "py38",ALLOW_FAILURE: false }
-          - { VERSION: "3.9", TOXENV: "py39",ALLOW_FAILURE: false }
-          - { VERSION: "3.10", TOXENV: "py310",ALLOW_FAILURE: false }
-          - { VERSION: "3.11", TOXENV: "py311",ALLOW_FAILURE: false }
-          - { VERSION: "3.10", TOXENV: "flake8,doclint,docs,commitlint", ALLOW_FAILURE: false }
-          - { VERSION: "3.10", TOXENV: "docstrings", ALLOW_FAILURE: true}
+          - { VERSION: "3.8", TOXENV: "py38", ALLOW_FAILURE: false }
+          - { VERSION: "3.9", TOXENV: "py39", ALLOW_FAILURE: false }
+          - { VERSION: "3.10", TOXENV: "py310", ALLOW_FAILURE: false }
+          - { VERSION: "3.11", TOXENV: "py311", ALLOW_FAILURE: false }
+          - {
+              VERSION: "3.10",
+              TOXENV: "flake8,doclint,docs,commitlint",
+              ALLOW_FAILURE: false,
+            }
+          - { VERSION: "3.10", TOXENV: "docstrings", ALLOW_FAILURE: true }
           - { VERSION: "pypy3.9", TOXENV: "pypy", ALLOW_FAILURE: false }
 
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
+        with:
+          # We want our tags here
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v4.2.0
