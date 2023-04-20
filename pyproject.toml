@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
@@ -81,6 +81,5 @@ exclude = '''
     | build
     | dist
   )/
-  | src/github3/_version.py
 )
 '''
