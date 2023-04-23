@@ -52,11 +52,14 @@ dev = [
 [tool.hatch.version]
 path = "src/github3/__about__.py"
 
+[tool.hatch.build.targets.sdist]
+strict-naming = false
+
 [tool.hatch.build.targets.wheel]
 packages = [
   "src/github3",
 ]
-
+strict-naming = false
 
 [project.urls]
 Documentation = "https://github3.readthedocs.io"
