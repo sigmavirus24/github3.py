@@ -1,0 +1,54 @@
+4.0.0: 2023-04-23
+-----------------
+
+Backwards Incompatible Changes
+``````````````````````````````
+
+- :meth:`~github3.repos.comparison.Comparison.commits` was renamed to
+  `original_commits` (max 250 commits). Now `commits` uses Github's API to
+  get the full commit list out of the compare endpoint, so enabled
+  pagination/iterator on the commits within the Comparison class
+  (@amaccormack-lumira). See also gh-1137_
+
+Features Added
+``````````````
+
+- Add tests for Python 3.11 (@cclauss). See also gh-1124_
+- Add function for getting repos for github app (@pettermk). See also gh-1085_
+- Cancel and failed invitation (@pallavisharma1210). See also gh-1091_
+- Allow to set GitHub API version (@anz-ableton). See also gh-1121_
+
+Removal
+```````
+
+- Remove support to EOL Python 3.6 (@staticdev). See also gh-1103_
+
+Bug Fixes
+`````````
+
+- Missing set permission for collaborators (@NargiT). See also gh-954_
+
+CI/CD
+`````
+
+- Bump the dev-requirements.txt (@offbyone). See also gh-1136_
+- Modernize the build: switch to hatchling (@offbyone). See also gh-1142_
+
+.. _gh-954:
+   https://github.com/sigmavirus24/github3.py/issues/954
+.. _gh-1103:
+   https://github.com/sigmavirus24/github3.py/issues/1103
+.. _gh-1085:
+   https://github.com/sigmavirus24/github3.py/issues/1085
+.. _gh-1091:
+   https://github.com/sigmavirus24/github3.py/pull/1091
+.. _gh-1124:
+   https://github.com/sigmavirus24/github3.py/pull/1124
+.. _gh-1121:
+   https://github.com/sigmavirus24/github3.py/issues/1121
+.. _gh-1136:
+   https://github.com/sigmavirus24/github3.py/pull/1136
+.. _gh-1137:
+   https://github.com/sigmavirus24/github3.py/issues/1137
+.. _gh-1142:
+   https://github.com/sigmavirus24/github3.py/pull/1142

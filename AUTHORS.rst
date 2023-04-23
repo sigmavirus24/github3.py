@@ -12,7 +12,7 @@ Maintainer(s)
 
 - Matt Chung (@itsmemattchung)
 
-- Thiago D'Ávila (@staticdev)
+- Thiago (@staticdev)
 
 Requests
 ````````
