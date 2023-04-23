@@ -7,7 +7,7 @@ Backwards Incompatible Changes
 - :meth:`~github3.repos.comparison.Comparison.commits` was renamed to
   `original_commits` (max 250 commits). Now `commits` uses Github's API to
   get the full commit list out of the compare endpoint, so enabled
-  pagination/iterator on the commits within the Comparison class 
+  pagination/iterator on the commits within the Comparison class
   (@amaccormack-lumira). See also gh-1137_
 
 Features Added
