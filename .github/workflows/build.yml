@@ -4,18 +4,21 @@ on: [push, pull_request]
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python:
           - { VERSION: "3.7", TOXENV: "py37", ALLOW_FAILURE: false }
-          - { VERSION: "3.8", TOXENV: "py38",ALLOW_FAILURE: false }
-          - { VERSION: "3.9", TOXENV: "py39",ALLOW_FAILURE: false }
-          - { VERSION: "3.10", TOXENV: "py310",ALLOW_FAILURE: false }
-          - { VERSION: "3.11", TOXENV: "py311",ALLOW_FAILURE: false }
-          - { VERSION: "3.10", TOXENV: "flake8,doclint,docs,commitlint", ALLOW_FAILURE: false }
-          - { VERSION: "3.10", TOXENV: "docstrings", ALLOW_FAILURE: true}
+          - { VERSION: "3.8", TOXENV: "py38", ALLOW_FAILURE: false }
+          - { VERSION: "3.9", TOXENV: "py39", ALLOW_FAILURE: false }
+          - { VERSION: "3.10", TOXENV: "py310", ALLOW_FAILURE: false }
+          - { VERSION: "3.11", TOXENV: "py311", ALLOW_FAILURE: false }
+          - {
+              VERSION: "3.11",
+              TOXENV: "flake8,doclint,docs,commitlint",
+              ALLOW_FAILURE: false,
+            }
+          - { VERSION: "3.11", TOXENV: "docstrings", ALLOW_FAILURE: true }
           - { VERSION: "pypy3.9", TOXENV: "pypy", ALLOW_FAILURE: false }
 
     steps:
@@ -29,12 +32,12 @@ jobs:
 
       - name: Upgrade pip
         run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
+          pip install pip
           pip --version
 
       - name: Install Tox
         run: |
-          pip install --constraint=.github/workflows/constraints.txt tox
+          pip install tox
           tox --version
 
       - name: Run Tox

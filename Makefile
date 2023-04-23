@@ -17,7 +17,7 @@ ga:
 tests: ga
 
 test-deps:
-	pip install -r dev-requirements.txt
+	pip install -e .[dev]
 
 htmlcov: .coverage
 	coverage html --omit=github3/packages/*
