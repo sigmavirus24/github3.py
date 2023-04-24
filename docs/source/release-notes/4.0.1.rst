@@ -1,0 +1,10 @@
+4.0.1: 2023-04-25
+-----------------
+
+CI/CD
+`````
+
+- Disable hatch strict naming for packaing (@staticdev). See also gh-1145_
+
+.. _gh-1145:
+   https://github.com/sigmavirus24/github3.py/issues/1145
