@@ -91,8 +91,8 @@ Contact Options
 
 - Feel free to use the `github3.py`_ tag on Stack Overflow for any questions
   you may have.
-- If you dislike Stack Overflow, it is preferred that you send an email to
-  github3.py@librelist.com .
+- If you dislike Stack Overflow, it is preferred that you use Github
+  discussions (https://github.com/sigmavirus24/github3.py/discussions).
 - You may also contact (via email_) the author directly with
   questions/suggestions/comments or if you wish to include sensitive data.
 
