@@ -1423,6 +1423,120 @@ class TestRepository(helper.IntegrationHelper):
             assert isinstance(v["count"], int)
             assert isinstance(v["uniques"], int)
 
+    def test_repository_public_key(self):
+        """
+        Test the ability to retrieve a repository public key.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name("public_key")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("MrBatschner", "github3.py")
+            public_key = repository.public_key()
+
+        assert isinstance(public_key, github3.actions.secrets.PublicKey)
+        assert public_key.key_id == "568250167242549743"
+        assert (
+            public_key.key == "QySP8dCFzAo2101f0tJgz5BMDC80OKws7P30/vGoJBc="
+        )
+
+    def test_repository_secrets(self):
+        """
+        Test the ability to iterate over repository secrets.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("secrets")
+        secret_count = 0
+
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("MrBatschner", "github3.py")
+            secrets_iter = repository.secrets()
+
+            for s in secrets_iter:
+                secret_count += 1
+                assert isinstance(s, github3.actions.secrets.RepositorySecret)
+                assert (
+                    s.name == "FOO_ITER_SECRET" or s.name == "BAR_ITER_SECRET"
+                )
+
+        assert secret_count == 2
+
+    def test_organization_secrets(self):
+        """
+        Tests the ability to list all organization secrets shared with a
+        repository.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("organization-secrets")
+        secret_count = 0
+
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("gardenlinux", "gardenlinux")
+            secrets_iter = repository.organization_secrets()
+
+            for s in secrets_iter:
+                secret_count += 1
+                assert isinstance(
+                    s, github3.actions.secrets.SharedOrganizationSecret
+                )
+                assert (
+                    s.name == "FOO_ORG_SECRET" or s.name == "BAR_ORG_SECRET"
+                )
+
+        assert secret_count == 2
+
+    def test_repository_secret(self):
+        """
+        Test the ability to fetch a single repository secret.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("secret")
+
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("MrBatschner", "github3.py")
+            secret = repository.secret("BAR_SECRET")
+
+        assert isinstance(secret, github3.actions.secrets.RepositorySecret)
+        assert secret.name == "BAR_SECRET"
+
+    def test_repository_create_or_update_secret(self):
+        """
+        Test the ability to create or update a repository secret.
+        """
+        self.token_login()
+        encrypted_data = "peJfDjgtbr+FO7AJumPcdWNMjL2X1jYXycIKIlSVljXZLiy0yosjMsgjFF3qA62PUihD"  # noqa: E501
+
+        cassette_name = self.cassette_name("create_or_update_secret")
+        with self.recorder.use_cassette(cassette_name):
+            repo = self.gh.repository("MrBatschner", "github3.py")
+            secret = repo.create_or_update_secret(
+                "bar_secret", encrypted_data
+            )
+
+        assert isinstance(secret, github3.actions.secrets.RepositorySecret)
+        assert secret.name == "BAR_SECRET"
+        assert isinstance(secret.created_at, datetime.datetime)
+        assert isinstance(secret.updated_at, datetime.datetime)
+
+    def test_repository_delete_secret(self):
+        """
+        Test the ability to delete a repository secret.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("delete_secret")
+        with self.recorder.use_cassette(cassette_name):
+            repo = self.gh.repository("MrBatschner", "github3.py")
+            first_delete = repo.delete_secret("foo_secret")
+            second_delete = repo.delete_secret("foo_secret")
+
+        assert isinstance(first_delete, bool)
+        assert first_delete is True
+        assert isinstance(second_delete, bool)
+        assert second_delete is False
+
 
 class TestContents(helper.IntegrationHelper):
 

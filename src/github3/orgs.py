@@ -11,6 +11,8 @@ from .events import Event
 from .projects import Project
 from .repos import Repository
 from .repos import ShortRepository
+from . import exceptions
+from .actions import secrets as actionsecrets
 
 if t.TYPE_CHECKING:
     from . import users as _users
@@ -1275,6 +1277,133 @@ class _Organization(models.GitHubCore):
         url = self._build_url("teams", str(team_slug), base_url=self._api)
         json = self._json(self._get(url), 200)
         return self._instance_or_null(Team, json)
+
+    @requires_auth
+    def public_key(self) -> t.Optional[actionsecrets.PublicKey]:
+        """Retrieves an organizations public-key for GitHub Actions secrets
+
+        :returns:
+            the public key of the organization
+        :rtype:
+            :class:`~github3.secrets.PublicKey`
+        """
+        url = self._build_url(
+            "orgs", self.login, "actions", "secrets", "public-key"
+        )
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(actionsecrets.PublicKey, json)
+
+    @requires_auth
+    def secrets(self, number=-1, etag=None):
+        """Iterate over all GitHub Actions secrets of an organization.
+
+        :param int number:
+            (optional), number of secrets to return.
+            Default: -1 returns all available secrets
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            Generator of organization secrets.
+        :rtype:
+            :class:`~github3.secrets.OrganizationSecret`
+        """
+        url = self._build_url("orgs", self.login, "actions", "secrets")
+        return self._iter(
+            int(number),
+            url,
+            actionsecrets.OrganizationSecret,
+            etag=etag,
+            list_key="secrets",
+        )
+
+    @requires_auth
+    def secret(self, secret_name):
+        """Returns the organization secret with the given name.
+
+        :param str secret_name:
+            Name of the organization secret to obtain.
+        :returns:
+            The organization secret with the given name.
+        :rtype:
+            :class:`~github3.secrets.OrganizationSecret`
+        """
+        url = self._build_url(
+            "orgs", self.login, "actions", "secrets", secret_name
+        )
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(actionsecrets.OrganizationSecret, json)
+
+    @requires_auth
+    def create_or_update_secret(
+        self, secret_name, encrypted_value, visibility, selected_repo_ids=None
+    ):
+        """Creates or updates an organization secret.
+
+        :param str secret_name:
+            Name of the organization secret to be created or updated.
+        :param str encrypted_value:
+            The value of the secret which was previously encrypted
+            by the organizations public key.
+            Check
+            https://developer.github.com/v3/actions/secrets#create-or-update-an-organization-secret
+            for how to properly encrypt the secret value before using
+            this function.
+        :param str visibility:
+            Visibility of this organization secret, must be one of 'all',
+            'private' or 'selected'.
+        :param list[int] selected_repo_ids:
+            A list of repository IDs this secret should be visible to, required
+            if visibility is 'selected'.
+        :returns:
+            The secret that was just created or updated.
+        :rtype:
+            :class:`~github3.py.secrets.OrganizationSecret`
+        """
+        data = {}
+
+        if visibility not in ("all", "private", "selected"):
+            raise ValueError(
+                "visibility must be 'all', 'private' or 'selected'"
+            )
+        data.update(visibility=visibility)
+
+        if visibility == "selected":
+            if selected_repo_ids is None or len(selected_repo_ids) == 0:
+                raise ValueError(
+                    "must supply a list of repos IDs for visibility 'selected'"
+                )
+            else:
+                data.update(selected_repository_ids=selected_repo_ids)
+
+        data.update(encrypted_value=encrypted_value)
+        data.update(key_id=self.public_key().key_id)
+
+        url = self._build_url(
+            "orgs", self.login, "actions", "secrets", secret_name
+        )
+        response = self._put(url, json=data)
+        if response.status_code not in (201, 204):
+            raise exceptions.error_for(response)
+
+        # PUT for secrets does not return anything but having a secret
+        # object at least containing the timestamps would be nice
+        return self.secret(secret_name)
+
+    @requires_auth
+    def delete_secret(self, secret_name):
+        """Deletes an organization secret.
+
+        :param str secret_name:
+            The name of the secret to delete.
+        :returns:
+            A boolean indicating whether the secret was successfully deleted.
+        :rtype:
+            bool
+        """
+        url = self._build_url(
+            "orgs", self.login, "actions", "secrets", secret_name
+        )
+        return self._boolean(self._delete(url), 204, 404)
 
 
 class Organization(_Organization):
