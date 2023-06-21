@@ -1,6 +1,7 @@
 """Integration tests for methods implemented on Organization."""
-import pytest
 import datetime
+
+import pytest
 
 import github3
 from .helper import IntegrationHelper

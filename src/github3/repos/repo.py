@@ -6,9 +6,9 @@ returned by GitHub.
 """
 import base64
 import json as jsonlib
+import typing
 
 import uritemplate as urit
-import typing
 
 from . import branch
 from . import comment

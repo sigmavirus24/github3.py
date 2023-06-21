@@ -1,9 +1,8 @@
 """Secret unit tests."""
 import pytest
 
-from . import helper
-
 import github3
+from . import helper
 
 get_secret_examlple_data = helper.create_example_data_helper("secret_example")
 get_organization_secret_example_data = helper.create_example_data_helper(

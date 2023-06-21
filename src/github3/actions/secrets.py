@@ -1,5 +1,4 @@
 """This module contains all the classes relating to GitHub Actions secrets."""
-
 import typing
 
 from .. import models

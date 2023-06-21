@@ -4,15 +4,15 @@ from json import dumps
 
 from uritemplate import URITemplate
 
+from . import exceptions
 from . import models
 from . import users
+from .actions import secrets as actionsecrets
 from .decorators import requires_auth
 from .events import Event
 from .projects import Project
 from .repos import Repository
 from .repos import ShortRepository
-from . import exceptions
-from .actions import secrets as actionsecrets
 
 if t.TYPE_CHECKING:
     from . import users as _users
