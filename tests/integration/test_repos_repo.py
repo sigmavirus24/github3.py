@@ -1698,9 +1698,9 @@ class TestRepoCommit(helper.IntegrationHelper):
         """Test the ability to retrieve a diff for a commit."""
         cassette_name = self.cassette_name("diff")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository("sigmavirus24", "github3.py")
+            repository = self.gh.repository("MrBatschner", "github3.py")
             commit = repository.commit(
-                "51cfbf8cbf98b0ba5006b3490f553bc05d4461e4"
+                "e232061a577e4943a806991ffe7e03cc54d69265"
             )
             diff = commit.diff()
 
@@ -1710,9 +1710,9 @@ class TestRepoCommit(helper.IntegrationHelper):
         """Test the ability to retrieve a patch for a commit."""
         cassette_name = self.cassette_name("patch")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository("sigmavirus24", "github3.py")
+            repository = self.gh.repository("MrBatschner", "github3.py")
             commit = repository.commit(
-                "51cfbf8cbf98b0ba5006b3490f553bc05d4461e4"
+                "e232061a577e4943a806991ffe7e03cc54d69265"
             )
             patch = commit.patch()
 
@@ -1727,9 +1727,9 @@ class TestComparison(helper.IntegrationHelper):
         """Test the ability to retrieve a diff for a comparison."""
         cassette_name = self.cassette_name("diff")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository("sigmavirus24", "github3.py")
+            repository = self.gh.repository("MrBatschner", "github3.py")
             comparison = repository.compare_commits(
-                base="master", head="develop"
+                base="main", head="broken-recordings"
             )
             diff = comparison.diff()
 
@@ -1739,9 +1739,9 @@ class TestComparison(helper.IntegrationHelper):
         """Test the ability to retrieve a diff for a comparison."""
         cassette_name = self.cassette_name("patch")
         with self.recorder.use_cassette(cassette_name):
-            repository = self.gh.repository("sigmavirus24", "github3.py")
+            repository = self.gh.repository("MrBatschner", "github3.py")
             comparison = repository.compare_commits(
-                base="master", head="develop"
+                base="main", head="broken-recordings"
             )
             patch = comparison.patch()
 
