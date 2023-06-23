@@ -1,0 +1,45 @@
+---
+name: Check documentation
+
+"on":
+  schedule:
+    - cron: "0 1 * * *" # everyday at 1am
+  push:
+    paths:
+      - "**.rst"
+      - "docs/**"
+  pull_request:
+    paths:
+      - "**.rst"
+      - "docs/**"
+
+jobs:
+  docs:
+    name: Build documentation & check links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Upgrade pip
+        run: |
+          pip install -U pip
+          pip --version
+
+      - name: Install Tox
+        run: |
+          pip install tox
+          tox --version
+
+      - name: Build documentation
+        run: tox
+        env:
+          TOXENV: docs
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: docs/_build
