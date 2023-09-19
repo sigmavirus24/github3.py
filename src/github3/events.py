@@ -392,7 +392,7 @@ class Event(models.GitHubCore):
     .. attribute:: actor
 
         A :class:`~github3.events.EventUser` that represents the user whose
-        action generated this event.
+        action generated this event, or `None` if the user no longer exists.
 
     .. attribute:: created_at
 
@@ -442,7 +442,8 @@ class Event(models.GitHubCore):
         # If we don't copy this, then we end up altering _json_data which we do
         # not want to do:
         event = copy.deepcopy(event)
-        self.actor = EventUser(event["actor"], self)
+        if event["actor"]:
+            self.actor = EventUser(event["actor"], self)
         self.created_at = self._strptime(event["created_at"])
         self.id = event["id"]
         self.org = event.get("org")
