@@ -60,8 +60,9 @@ class IssueEvent(GitHubCore):
 
     def _update_attributes(self, event):
         self._api = event["url"]
-        if event["actor"]:
-            self.actor = users.ShortUser(event["actor"], self)
+        self.actor = event["actor"]
+        if self.actor:
+            self.actor = users.ShortUser(self.actor, self)
         self.commit_id = event["commit_id"]
         self.commit_url = event["commit_url"]
         self.created_at = self._strptime(event["created_at"])

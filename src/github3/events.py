@@ -442,8 +442,9 @@ class Event(models.GitHubCore):
         # If we don't copy this, then we end up altering _json_data which we do
         # not want to do:
         event = copy.deepcopy(event)
-        if event["actor"]:
-            self.actor = EventUser(event["actor"], self)
+        self.actor = event["actor"]
+        if self.actor:
+            self.actor = EventUser(self.actor, self)
         self.created_at = self._strptime(event["created_at"])
         self.id = event["id"]
         self.org = event.get("org")
