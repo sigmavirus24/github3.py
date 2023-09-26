@@ -2,7 +2,7 @@
 import typing as t
 from json import dumps
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
 
 from . import models
 from .decorators import requires_auth

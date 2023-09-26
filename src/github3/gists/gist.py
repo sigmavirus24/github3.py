@@ -1,4 +1,5 @@
 """This module contains the Gist, ShortGist, and GistFork objects."""
+import typing as t
 from json import dumps
 
 from . import comment
@@ -31,7 +32,9 @@ class _Gist(models.GitHubCore):
     """
 
     class_name = "_Gist"
-    _file_class = gistfile.ShortGistFile
+    _file_class: t.Type[
+        t.Union[gistfile.ShortGistFile, gistfile.GistFile]
+    ] = gistfile.ShortGistFile
 
     def _update_attributes(self, gist):
         self.comments_count = gist["comments"]
@@ -265,7 +268,7 @@ class GistFork(models.GitHubCore):
     def _repr(self):
         return f"<GistFork [{self.id}]>"
 
-    def to_gist(self):
+    def to_gist(self, conditional: bool = False) -> models.GitHubCore:
         """Retrieve the full Gist representation of this fork.
 
         :returns:

@@ -7,7 +7,7 @@ returned by GitHub.
 import base64
 import json as jsonlib
 
-import uritemplate as urit
+import uritemplate as urit  # type: ignore
 
 from . import branch
 from . import comment

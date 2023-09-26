@@ -3,7 +3,7 @@ import json
 import re
 import typing as t
 
-import uritemplate
+import uritemplate  # type: ignore
 
 from . import apps
 from . import auths
@@ -544,7 +544,7 @@ class GitHub(models.GitHubCore):
     @requires_auth
     def blocked_users(
         self, number: int = -1, etag: t.Optional[str] = None
-    ) -> t.Generator[users.ShortUser, None, None]:
+    ) -> t.Iterator[users.ShortUser]:
         """Iterate over the users blocked by this organization.
 
         .. versionadded:: 2.1.0

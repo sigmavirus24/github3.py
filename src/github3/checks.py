@@ -45,7 +45,7 @@ class CheckPullRequest(models.GitHubCore):
     def _repr(self):
         return f"<CheckPullRequest [#{self.number}]>"
 
-    def to_pull(self):
+    def to_pull(self, conditional: bool = False):
         """Retrieve a full PullRequest object for this CheckPullRequest.
 
         :returns:
@@ -119,7 +119,7 @@ class CheckApp(models.GitHubCore):
             self.name, str(self.owner["login"])
         )
 
-    def to_app(self):
+    def to_app(self, conditional: bool = False) -> models.GitHubCore:
         """Retrieve a full App object for this CheckApp.
 
         :returns:

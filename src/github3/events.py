@@ -41,7 +41,7 @@ class EventUser(models.GitHubCore):
         self.login = user["login"]
         self._api = self.url = user["url"]
 
-    def to_user(self):
+    def to_user(self, conditional: bool = False) -> models.GitHubCore:
         """Retrieve a full User object for this EventUser.
 
         :returns:
@@ -93,7 +93,7 @@ class EventOrganization(models.GitHubCore):
         self.login = org["login"]
         self._api = self.url = org["url"]
 
-    def to_org(self):
+    def to_org(self, conditional: bool = False) -> models.GitHubCore:
         """Retrieve a full Organization object for this EventOrganization.
 
         :returns:
@@ -148,7 +148,7 @@ class EventPullRequest(models.GitHubCore):
         self.locked = pull["locked"]
         self._api = self.url = pull["url"]
 
-    def to_pull(self):
+    def to_pull(self, conditional: bool = False) -> models.GitHubCore:
         """Retrieve a full PullRequest object for this EventPullRequest.
 
         :returns:
@@ -258,7 +258,9 @@ class EventReviewComment(models.GitHubCore):
         self.updated_at = self._strptime(comment["updated_at"])
         self.user = users.ShortUser(comment["user"], self)
 
-    def to_review_comment(self):
+    def to_review_comment(
+        self, conditional: bool = False
+    ) -> models.GitHubCore:
         """Retrieve a full ReviewComment object for this EventReviewComment.
 
         :returns:
@@ -269,7 +271,7 @@ class EventReviewComment(models.GitHubCore):
         from . import pulls
 
         comment = self._json(self._get(self._api), 200)
-        return pulls.ReviewComment(comment, self)
+        return pulls.ReviewComment(comment, self.session)
 
     refresh = to_review_comment
 
@@ -285,7 +287,7 @@ class EventIssue(models.GitHubCore):
         self.locked = issue["locked"]
         self._api = self.url = issue["url"]
 
-    def to_issue(self):
+    def to_issue(self, conditional: bool = False) -> models.GitHubCore:
         """Retrieve a full Issue object for this EventIssue."""
         from . import issues
 
@@ -352,7 +354,9 @@ class EventIssueComment(models.GitHubCore):
         self.updated_at = self._strptime(comment["updated_at"])
         self.user = users.ShortUser(comment["user"], self)
 
-    def to_issue_comment(self):
+    def to_issue_comment(
+        self, conditional: bool = False
+    ) -> models.GitHubCore:
         """Retrieve the full IssueComment object for this comment.
 
         :returns:

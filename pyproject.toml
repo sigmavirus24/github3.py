@@ -86,3 +86,10 @@ exclude = '''
   )/
 )
 '''
+
+[tool.mypy]
+files = ["."]
+exclude = [
+    "^docs/",
+    "^tests/",
+]
