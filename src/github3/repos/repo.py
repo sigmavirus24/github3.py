@@ -91,7 +91,9 @@ class _Repository(models.GitHubCore):
         self.milestones_urlt = urit.URITemplate(repo["milestones_url"])
         self.name = repo["name"]
         self.notifications_urlt = urit.URITemplate(repo["notifications_url"])
-        self.owner = users.ShortUser(repo["owner"], self)
+        self.owner = repo["owner"]
+        if self.owner:
+            self.owner = users.ShortUser(self.owner, self)
         self.private = repo["private"]
         self.pulls_urlt = urit.URITemplate(repo["pulls_url"])
         self.releases_urlt = urit.URITemplate(repo["releases_url"])
