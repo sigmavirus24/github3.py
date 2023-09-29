@@ -71,7 +71,9 @@ class PullDestination(models.GitHubCore):
         repo = dest.get("repo")
         if repo:
             self._repo_name = repo.get("name")
-            self._repo_owner = repo["owner"]["login"]
+            self._repo_owner = repo.get("owner")
+            if self._repo_owner:
+                self._repo_owner = self._repo_owner["login"]
             self.repository = ShortRepository(repo, self)
         self.repo = (self._repo_owner, self._repo_name)
 
