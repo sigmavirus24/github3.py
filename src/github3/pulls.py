@@ -994,7 +994,9 @@ class PullReview(models.GitHubCore):
         # PullReview.
         self.commit_id = review.get("commit_id", None)
         self.html_url = review["html_url"]
-        self.user = users.ShortUser(review["user"], self)
+        self.user = review["user"]
+        if self.user:
+            self.user = users.ShortUser(self.user, self)
         self.state = review["state"]
         self.submitted_at = self._strptime(review.get("submitted_at"))
         self.pull_request_url = review["pull_request_url"]
