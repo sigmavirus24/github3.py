@@ -1,7 +1,7 @@
 """This module contains all the classes relating to pull requests."""
 from json import dumps
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
 
 from . import models
 from . import users

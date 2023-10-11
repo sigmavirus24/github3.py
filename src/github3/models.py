@@ -16,9 +16,6 @@ if t.TYPE_CHECKING:
 LOG = logging.getLogger(__package__)
 
 
-T = t.TypeVar("T")
-
-
 class GitHubCore:
     """The base object for all objects that require a session.
 
@@ -28,7 +25,7 @@ class GitHubCore:
     """
 
     _ratelimit_resource = "core"
-    _refresh_to: t.Optional["GitHubCore"] = None
+    _refresh_to: t.Optional[t.Type["GitHubCore"]] = None
 
     def __init__(self, json, session: session.GitHubSession):
         """Initialize our basic object.
@@ -240,26 +237,28 @@ class GitHubCore:
             value += f"?{self._uri.query}"
         return value
 
-    @staticmethod
-    def _uri_parse(uri):
-        return requests.compat.urlparse(uri)
-
     @_api.setter
     def _api(self, uri):
         if uri:
             self._uri = self._uri_parse(uri)
         self.url = uri
 
+    @staticmethod
+    def _uri_parse(uri):
+        return requests.compat.urlparse(uri)
+
     def _iter(
         self,
         count: int,
         url: str,
-        cls: t.Type[T],
-        params: t.Optional[t.Mapping[str, t.Optional[str]]] = None,
+        cls: t.Type["GitHubCore"],
+        params: t.Optional[
+            t.MutableMapping[str, t.Union[str, int, None]]
+        ] = None,
         etag: t.Optional[str] = None,
         headers: t.Optional[t.Mapping[str, str]] = None,
         list_key: t.Optional[str] = None,
-    ) -> "structs.GitHubIterator[T]":
+    ) -> "structs.GitHubIterator":
         """Generic iterator for this project.
 
         :param int count: How many items to return.
@@ -276,7 +275,7 @@ class GitHubCore:
         from .structs import GitHubIterator
 
         return GitHubIterator(
-            count, url, cls, self, params, etag, headers, list_key
+            count, url, cls, self.session, params, etag, headers, list_key
         )
 
     @property
@@ -329,7 +328,7 @@ class GitHubCore:
                 self._json_data = json
                 self._update_attributes(json)
             else:
-                return self._refresh_to(json, self)
+                return self._refresh_to(json, self.session)
         return self
 
     def new_session(self):

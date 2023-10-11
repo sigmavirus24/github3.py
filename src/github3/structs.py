@@ -10,11 +10,9 @@ from . import models
 
 if t.TYPE_CHECKING:
     import requests.models
+    from typing_extensions import Final
 
     from . import session
-
-
-T = t.TypeVar("T")
 
 
 class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
@@ -24,16 +22,18 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
         self,
         count: int,
         url: str,
-        cls: t.Type[T],
+        cls: t.Type[models.GitHubCore],
         session: "session.GitHubSession",
-        params: t.Optional[t.Mapping[str, t.Optional[str]]] = None,
+        params: t.Optional[
+            t.MutableMapping[str, t.Union[str, int, None]]
+        ] = None,
         etag: t.Optional[str] = None,
         headers: t.Optional[t.Mapping[str, str]] = None,
         list_key: t.Optional[str] = None,
     ) -> None:
         models.GitHubCore.__init__(self, {}, session)
         #: Original number of items requested
-        self.original: t.Final[int] = count
+        self.original: Final[int] = count
         #: Number of items left in the iterator
         self.count: int = count
         #: URL the class used to make it's first GET
@@ -42,9 +42,11 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
         self.last_url: t.Optional[str] = None
         self._api: str = self.url
         #: Class for constructing an item to return
-        self.cls: t.Type[T] = cls
+        self.cls: t.Type[models.GitHubCore] = cls
         #: Parameters of the query string
-        self.params: t.Mapping[str, t.Optional[str]] = params or {}
+        self.params: t.MutableMapping[str, t.Optional[t.Union[str, int]]] = (
+            params or {}
+        )
         self._remove_none(self.params)
         # We do not set this from the parameter sent. We want this to
         # represent the ETag header returned by GitHub no matter what.
@@ -55,11 +57,11 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
         #: Headers generated for the GET request
         self.headers: t.Dict[str, str] = dict(headers or {})
         #: The last response seen
-        self.last_response: "requests.models.Response" = None
+        self.last_response: t.Optional["requests.models.Response"] = None
         #: Last status code received
         self.last_status: int = 0
         #: Key to get the list of items in case a dict is returned
-        self.list_key: t.Final[t.Optional[str]] = list_key
+        self.list_key: Final[t.Optional[str]] = list_key
 
         if etag:
             self.headers.update({"If-None-Match": etag})
@@ -69,7 +71,7 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
     def _repr(self) -> str:
         return f"<GitHubIterator [{self.count}, {self.path}]>"
 
-    def __iter__(self) -> t.Generator[T, None, None]:
+    def __iter__(self) -> t.Iterator[models.GitHubCore]:
         self.last_url, params = self.url, self.params
         headers = self.headers
 
@@ -79,9 +81,7 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
         if "per_page" not in params and self.count == -1:
             params["per_page"] = 100
 
-        cls = self.cls
-        if issubclass(self.cls, models.GitHubCore):
-            cls = functools.partial(self.cls, session=self)
+        cls = functools.partial(self.cls, session=self.session)
 
         while (self.count == -1 or self.count > 0) and self.last_url:
             response = self._get(
@@ -90,7 +90,7 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
             self.last_response = response
             self.last_status = response.status_code
             if params:
-                params = None  # rel_next already has the params
+                params = {}  # rel_next already has the params
 
             if not self.etag and response.headers.get("ETag"):
                 self.etag = response.headers.get("ETag")
@@ -136,7 +136,7 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
             rel_next = response.links.get("next", {})
             self.last_url = rel_next.get("url", "")
 
-    def __next__(self) -> T:
+    def __next__(self) -> models.GitHubCore:
         if not hasattr(self, "__i__"):
             self.__i__ = self.__iter__()
         return next(self.__i__)
@@ -152,7 +152,7 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
         self.__i__ = self.__iter__()
         return self
 
-    def next(self) -> T:
+    def next(self) -> models.GitHubCore:
         return self.__next__()
 
 
@@ -172,9 +172,11 @@ class SearchIterator(GitHubIterator):
         self,
         count: int,
         url: str,
-        cls: t.Type[T],
+        cls: t.Type[models.GitHubCore],
         session: "session.GitHubSession",
-        params: t.Optional[t.Mapping[str, t.Optional[str]]] = None,
+        params: t.Optional[
+            t.MutableMapping[str, t.Union[int, str, None]]
+        ] = None,
         etag: t.Optional[str] = None,
         headers: t.Optional[t.Mapping[str, str]] = None,
     ):

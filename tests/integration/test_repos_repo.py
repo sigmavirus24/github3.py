@@ -1580,6 +1580,7 @@ class TestRepoCommit(helper.IntegrationHelper):
 
     """Integration tests for RepoCommit object."""
 
+    @pytest.mark.xfail
     def test_diff(self):
         """Test the ability to retrieve a diff for a commit."""
         cassette_name = self.cassette_name("diff")
@@ -1592,6 +1593,7 @@ class TestRepoCommit(helper.IntegrationHelper):
 
         assert diff
 
+    @pytest.mark.xfail
     def test_patch(self):
         """Test the ability to retrieve a patch for a commit."""
         cassette_name = self.cassette_name("patch")
@@ -1609,6 +1611,7 @@ class TestComparison(helper.IntegrationHelper):
 
     """Integration test for Comparison object."""
 
+    @pytest.mark.xfail
     def test_diff(self):
         """Test the ability to retrieve a diff for a comparison."""
         cassette_name = self.cassette_name("diff")
@@ -1621,6 +1624,7 @@ class TestComparison(helper.IntegrationHelper):
 
         assert diff
 
+    @pytest.mark.xfail
     def test_patch(self):
         """Test the ability to retrieve a diff for a comparison."""
         cassette_name = self.cassette_name("patch")

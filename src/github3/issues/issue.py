@@ -1,7 +1,7 @@
 """Module containing the Issue logic."""
 from json import dumps
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
 
 from . import comment
 from . import event
