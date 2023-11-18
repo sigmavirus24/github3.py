@@ -1332,7 +1332,9 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 
     def test_search_commits(self):
         """Verify the request to search for commits."""
-        i = self.instance.search_commits("css repo:octocat/Spoon-Knife", per_page=15)
+        i = self.instance.search_commits(
+            "css repo:octocat/Spoon-Knife", per_page=15
+        )
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
@@ -1393,7 +1395,9 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 
     def test_search_users(self):
         """Verify the request to search for users."""
-        i = self.instance.search_users("tom repos:>42 followers:>1000", per_page=15)
+        i = self.instance.search_users(
+            "tom repos:>42 followers:>1000", per_page=15
+        )
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
