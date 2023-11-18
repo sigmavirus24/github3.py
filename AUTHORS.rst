@@ -222,3 +222,5 @@ Contributors
 - Andrew MacCormack (@amaccormack-lumira)
 
 - Chris R (@offbyone)
+
+- Chris Cotter (@ccotter)

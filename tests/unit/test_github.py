@@ -1317,14 +1317,14 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
     def test_search_code(self):
         """Verify the request to search for code."""
         i = self.instance.search_code(
-            "addClass in:file language:js repo:jquery/jquery"
+            "addClass in:file language:js repo:jquery/jquery", per_page=15
         )
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
             url_for("search/code"),
             params={
-                "per_page": 100,
+                "per_page": 15,
                 "q": "addClass in:file language:js repo:jquery/jquery",
             },
             headers={},
@@ -1332,6 +1332,17 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 
     def test_search_commits(self):
         """Verify the request to search for commits."""
+        i = self.instance.search_commits("css repo:octocat/Spoon-Knife", per_page=15)
+        self.get_next(i)
+
+        self.session.get.assert_called_once_with(
+            url_for("search/commits"),
+            params={"per_page": 15, "q": "css repo:octocat/Spoon-Knife"},
+            headers={"Accept": "application/vnd.github.cloak-preview"},
+        )
+
+    def test_search_commits_default_per_page(self):
+        """Verify the default per_page in the commits search."""
         i = self.instance.search_commits("css repo:octocat/Spoon-Knife")
         self.get_next(i)
 
@@ -1347,6 +1358,7 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
             "windows label:bug language:python state:open",
             sort="created",
             order="asc",
+            per_page=15,
         )
         self.get_next(i)
 
@@ -1354,7 +1366,7 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
             url_for("search/issues"),
             params={
                 "order": "asc",
-                "per_page": 100,
+                "per_page": 15,
                 "q": "windows label:bug language:python state:open",
                 "sort": "created",
             },
@@ -1364,7 +1376,7 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
     def test_search_repositories(self):
         """Verify the request to search for repositories."""
         i = self.instance.search_repositories(
-            "tetris language:assembly", sort="stars", order="asc"
+            "tetris language:assembly", sort="stars", order="asc", per_page=15
         )
         self.get_next(i)
 
@@ -1372,7 +1384,7 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
             url_for("search/repositories"),
             params={
                 "order": "asc",
-                "per_page": 100,
+                "per_page": 15,
                 "q": "tetris language:assembly",
                 "sort": "stars",
             },
@@ -1381,12 +1393,12 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 
     def test_search_users(self):
         """Verify the request to search for users."""
-        i = self.instance.search_users("tom repos:>42 followers:>1000")
+        i = self.instance.search_users("tom repos:>42 followers:>1000", per_page=15)
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
             url_for("search/users"),
-            params={"per_page": 100, "q": "tom repos:>42 followers:>1000"},
+            params={"per_page": 15, "q": "tom repos:>42 followers:>1000"},
             headers={},
         )
 

@@ -2248,6 +2248,9 @@ class GitHub(models.GitHubCore):
         if sort and order in ("asc", "desc"):
             params["order"] = order
 
+        if per_page is not None:
+            params["per_page"] = per_page
+
         if text_match:
             headers = {
                 "Accept": "application/vnd.github.v3.full.text-match+json"
@@ -2334,6 +2337,9 @@ class GitHub(models.GitHubCore):
 
         if sort and order in ("asc", "desc"):
             params["order"] = order
+
+        if per_page is not None:
+            params["per_page"] = per_page
 
         if text_match:
             headers["Accept"] = ", ".join(
@@ -2427,6 +2433,9 @@ class GitHub(models.GitHubCore):
         if order in ("asc", "desc"):
             params["order"] = order
 
+        if per_page is not None:
+            params["per_page"] = per_page
+
         if text_match:
             headers = {
                 "Accept": "application/vnd.github.v3.full.text-match+json"
@@ -2504,6 +2513,9 @@ class GitHub(models.GitHubCore):
 
         if order in ("asc", "desc"):
             params["order"] = order
+
+        if per_page is not None:
+            params["per_page"] = per_page
 
         if text_match:
             headers = {
@@ -2587,6 +2599,9 @@ class GitHub(models.GitHubCore):
 
         if order in ("asc", "desc"):
             params["order"] = order
+
+        if per_page is not None:
+            params["per_page"] = per_page
 
         if text_match:
             headers = {
