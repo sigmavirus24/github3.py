@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: docs
-          path: docs/_build
+          path: docs/build
