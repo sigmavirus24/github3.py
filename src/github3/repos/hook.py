@@ -1,4 +1,5 @@
 """This module contains only the Hook object for GitHub's Hook API."""
+
 from json import dumps
 
 from ..decorators import requires_auth

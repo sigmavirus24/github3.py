@@ -1,4 +1,5 @@
 """Unit tests around github3's Checks classes."""
+
 from json import dumps
 
 import pytest

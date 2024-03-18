@@ -1,4 +1,5 @@
 """This module contains the classes related to Events."""
+
 import copy
 
 from . import models

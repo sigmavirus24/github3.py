@@ -1,4 +1,5 @@
 """This module provides the basic models used in github3.py."""
+
 import json as jsonlib
 import logging
 import typing as t

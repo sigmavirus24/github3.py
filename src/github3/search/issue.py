@@ -1,4 +1,5 @@
 """Issue search results implementation."""
+
 from ..issues import ShortIssue
 from ..models import GitHubCore
 

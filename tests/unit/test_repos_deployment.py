@@ -1,4 +1,5 @@
 """Unit tests for Deployment methods."""
+
 import github3
 from .helper import create_example_data_helper
 from .helper import create_url_helper
@@ -14,7 +15,6 @@ example_data = get_repo_example_data()
 
 
 class TestDeploymentIterators(UnitIteratorHelper):
-
     """Test Deployment methods that return iterators."""
 
     described_class = github3.repos.deployment.Deployment

@@ -8,7 +8,6 @@ get_combined_status_example_data = create_example_data_helper(
 
 
 class TestCombinedStatus(UnitHelper):
-
     """Commit unit test."""
 
     described_class = github3.repos.status.CombinedStatus

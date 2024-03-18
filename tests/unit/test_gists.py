@@ -1,4 +1,5 @@
 """Unit tests for the github3.gists module."""
+
 import pytest
 
 import github3
@@ -107,7 +108,6 @@ class TestGist(helper.UnitHelper):
 
 
 class TestGistIssue883(helper.UnitHelper):
-
     """Unit tests for the Gist object about issue 883."""
 
     described_class = github3.gists.Gist

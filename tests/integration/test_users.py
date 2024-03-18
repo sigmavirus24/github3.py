@@ -1,4 +1,5 @@
 """Integration tests for the User class."""
+
 import datetime
 
 import pytest
@@ -34,7 +35,6 @@ GPG_KEY = (
 
 
 class TestGPGKey(IntegrationHelper):
-
     """Integration tests for methods of the GPGKey class."""
 
     def test_delete(self):
@@ -79,7 +79,6 @@ class TestKey(IntegrationHelper):
 
 
 class TestUser(IntegrationHelper):
-
     """Integration tests for methods on the User class."""
 
     def test_events(self):

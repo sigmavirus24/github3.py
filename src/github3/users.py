@@ -1,4 +1,5 @@
 """This module contains everything relating to Users."""
+
 import typing as t
 from json import dumps
 

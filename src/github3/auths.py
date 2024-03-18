@@ -1,4 +1,5 @@
 """This module contains the Authorization object."""
+
 from .decorators import requires_basic_auth
 from .models import GitHubCore
 

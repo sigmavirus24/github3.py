@@ -1,4 +1,5 @@
 """Unit tests for the auths module."""
+
 import github3
 from . import helper
 
@@ -6,7 +7,6 @@ url_for = helper.create_url_helper("https://api.github.com/authorizations/1")
 
 
 class TestAuthorization(helper.UnitHelper):
-
     """Authorization unit tests."""
 
     described_class = github3.auths.Authorization
@@ -51,7 +51,6 @@ class TestAuthorization(helper.UnitHelper):
 
 
 class TestAuthorizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test methods that require authentication on Authorization."""
 
     described_class = github3.auths.Authorization

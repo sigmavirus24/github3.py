@@ -33,7 +33,6 @@ authenticated_user_2_12_example_data = (
 
 
 class TestUser(helper.UnitHelper):
-
     """Test methods on User class."""
 
     described_class = github3.users.User
@@ -68,7 +67,6 @@ class TestUser(helper.UnitHelper):
 
 
 class TestUserGPGKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Unit tests that demonstrate which GPGKey methods require auth."""
 
     described_class = github3.users.GPGKey
@@ -80,7 +78,6 @@ class TestUserGPGKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestUserGPGKey(helper.UnitHelper):
-
     """Unit tests for the GPGKey object."""
 
     described_class = github3.users.GPGKey
@@ -94,7 +91,6 @@ class TestUserGPGKey(helper.UnitHelper):
 
 
 class TestUserKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test that ensure certain methods on Key class requires auth."""
 
     described_class = github3.users.Key
@@ -112,7 +108,6 @@ class TestUserKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestUserKey(helper.UnitHelper):
-
     """Test methods on Key class."""
 
     described_class = github3.users.Key
@@ -144,7 +139,6 @@ class TestUserKey(helper.UnitHelper):
 
 
 class TestUserIterators(helper.UnitIteratorHelper):
-
     """Test User methods that return iterators."""
 
     described_class = github3.users.User
@@ -264,7 +258,6 @@ class TestUserIterators(helper.UnitIteratorHelper):
 
 
 class TestUsersRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test that ensure certain methods on the User class requires auth."""
 
     described_class = github3.users.User
@@ -277,7 +270,6 @@ class TestUsersRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestPlan(helper.UnitHelper):
-
     """Test for methods on Plan class."""
 
     described_class = github3.users.Plan
@@ -294,7 +286,6 @@ class TestPlan(helper.UnitHelper):
 
 
 class TestAuthenticatedUserCompatibility_2_12(helper.UnitHelper):
-
     """Test methods on AuthenticatedUser from Github Enterprise 2.12."""
 
     described_class = github3.users.AuthenticatedUser

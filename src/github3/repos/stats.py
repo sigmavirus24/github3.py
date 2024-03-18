@@ -1,4 +1,5 @@
 """Repository and contributor stats logic."""
+
 import datetime
 
 import dateutil.tz

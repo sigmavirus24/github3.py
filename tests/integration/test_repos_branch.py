@@ -1,4 +1,5 @@
 """Integration tests for methods implemented on Branch."""
+
 from .helper import IntegrationHelper
 
 

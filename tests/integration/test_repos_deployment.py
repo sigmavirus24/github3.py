@@ -1,4 +1,5 @@
 """Deployment integration tests."""
+
 import github3
 from .helper import IntegrationHelper
 
@@ -9,7 +10,6 @@ def find(func, iterable):
 
 
 class TestDeployment(IntegrationHelper):
-
     """Integration tests for the Deployment class."""
 
     def test_create_status(self):

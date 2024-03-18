@@ -1,11 +1,11 @@
 """Unit tests for github3.api."""
+
 import unittest.mock
 
 import github3
 
 
 class TestAPI(unittest.TestCase):
-
     """All tests for the github3.api module."""
 
     def test_enterprise_login(self):

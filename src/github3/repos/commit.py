@@ -1,4 +1,5 @@
 """This module contains the RepoCommit classes."""
+
 from . import status
 from .. import checks
 from .. import git

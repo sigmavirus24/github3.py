@@ -1,4 +1,5 @@
 """Unit tests for the Milestone class."""
+
 import datetime
 
 import github3
@@ -92,7 +93,6 @@ class TestMilestone(helper.UnitHelper):
 
 
 class TestMilestoneIterator(helper.UnitIteratorHelper):
-
     """Test Milestone methods that return iterators."""
 
     described_class = github3.issues.milestone.Milestone

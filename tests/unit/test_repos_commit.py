@@ -1,4 +1,5 @@
 """Unit tests for Repository Commits."""
+
 import github3
 from . import helper
 
@@ -9,7 +10,6 @@ url_for = helper.create_url_helper(example_commit_data["url"])
 
 
 class TestRepoCommitIterator(helper.UnitIteratorHelper):
-
     """Unit tests for RepoCommit iterator methods."""
 
     described_class = github3.repos.commit.RepoCommit
@@ -46,7 +46,6 @@ class TestRepoCommitIterator(helper.UnitIteratorHelper):
 
 
 class TestRepoCommitIteratorAppInstAuth(helper.UnitIteratorAppInstHelper):
-
     """Unit tests for RepoCommit iterator methods."""
 
     described_class = github3.repos.commit.RepoCommit

@@ -1,4 +1,5 @@
 """Unit tests around the Thread class."""
+
 import github3
 from .helper import create_example_data_helper
 from .helper import create_url_helper

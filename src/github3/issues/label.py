@@ -1,4 +1,5 @@
 """Module containing the logic for labels."""
+
 from json import dumps
 
 from ..decorators import requires_auth
