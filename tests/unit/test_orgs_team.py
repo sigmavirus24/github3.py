@@ -1,8 +1,9 @@
 import pytest
 
-from . import helper
 from github3 import GitHubError
 from github3.orgs import Team
+
+from . import helper
 
 url_for = helper.create_url_helper(
     "https://api.github.com/organizations/1/team/1"

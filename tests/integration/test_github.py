@@ -1,10 +1,12 @@
 """Integration tests for methods implemented on GitHub."""
+
 from datetime import datetime
 
 import pytest
 import uritemplate
 
 import github3
+
 from .helper import GitHubEnterpriseHelper
 from .helper import IntegrationHelper
 

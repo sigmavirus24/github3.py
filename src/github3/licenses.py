@@ -3,6 +3,7 @@ This module contains the classes relating to licenses.
 
 See also: https://developer.github.com/v3/licenses/
 """
+
 import base64
 
 from . import models

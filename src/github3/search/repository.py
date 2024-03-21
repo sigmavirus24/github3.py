@@ -1,4 +1,5 @@
 """Repository search results implementation."""
+
 from .. import models
 from .. import repos
 

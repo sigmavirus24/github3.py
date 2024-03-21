@@ -1,11 +1,13 @@
 """Organization unit tests."""
+
 import pytest
 
-from . import helper
 from github3 import GitHubError
 from github3.orgs import Organization
 from github3.orgs import OrganizationHook
 from github3.projects import Project
+
+from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/orgs/github")
 hook_url_for = helper.create_url_helper(

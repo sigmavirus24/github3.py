@@ -6,7 +6,6 @@ except ImportError:
     import pickle
 
 import pytest
-
 import requests
 
 from github3 import session

@@ -4,27 +4,12 @@ The Repository objects represent various different repository representations
 returned by GitHub.
 
 """
+
 import base64
 import json as jsonlib
 
 import uritemplate as urit  # type: ignore
 
-from . import branch
-from . import comment
-from . import commit
-from . import comparison
-from . import contents
-from . import deployment
-from . import hook
-from . import invitation
-from . import issue_import
-from . import pages
-from . import release
-from . import stats
-from . import status
-from . import tag
-from . import topics
-from . import traffic
 from .. import checks
 from .. import decorators
 from .. import events
@@ -41,6 +26,22 @@ from .. import utils
 from ..issues import event as ievent
 from ..issues import label
 from ..issues import milestone
+from . import branch
+from . import comment
+from . import commit
+from . import comparison
+from . import contents
+from . import deployment
+from . import hook
+from . import invitation
+from . import issue_import
+from . import pages
+from . import release
+from . import stats
+from . import status
+from . import tag
+from . import topics
+from . import traffic
 
 
 class _Repository(models.GitHubCore):

@@ -1,12 +1,14 @@
 """Unit tests for the Issue class."""
+
 import unittest.mock
 
 import dateutil.parser
 
 import github3
-from . import helper
 from github3.issues import Issue
 from github3.issues.label import Label
+
+from . import helper
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/issues/comments"

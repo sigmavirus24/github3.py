@@ -1,4 +1,5 @@
 """The module that holds much of the metadata about github3.py."""
+
 __package_name__ = "github3.py"
 __title__ = "github3"
 __author__ = "Ian Stapleton Cordasco"

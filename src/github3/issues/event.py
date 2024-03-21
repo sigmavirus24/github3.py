@@ -1,4 +1,5 @@
 """Issue events logic."""
+
 from .. import users
 from ..models import GitHubCore
 

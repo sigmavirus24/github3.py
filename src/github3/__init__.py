@@ -8,6 +8,7 @@ See https://github3.readthedocs.io/ for documentation.
 :license: Modified BSD, see LICENSE for more details
 
 """
+
 from .__about__ import __author__
 from .__about__ import __author_email__
 from .__about__ import __copyright__

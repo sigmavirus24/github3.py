@@ -1,4 +1,5 @@
 """Module containing session and auth logic."""
+
 import collections.abc as abc_collections
 import datetime
 from contextlib import contextmanager

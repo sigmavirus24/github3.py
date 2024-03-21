@@ -1,9 +1,9 @@
 from json import dumps
 
-from . import label
 from .. import users
 from ..decorators import requires_auth
 from ..models import GitHubCore
+from . import label
 
 
 class Milestone(GitHubCore):

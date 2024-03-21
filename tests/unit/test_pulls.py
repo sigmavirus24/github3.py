@@ -1,9 +1,11 @@
 """Unit tests for the github3.pulls module."""
+
 import pytest
 
-from . import helper
 from github3 import GitHubError
 from github3 import pulls
+
+from . import helper
 
 get_pr_example_data = helper.create_example_data_helper(
     "pull_request_example"

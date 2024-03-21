@@ -2,11 +2,12 @@ import unittest.mock
 
 import pytest
 
-from . import helper
 from github3 import GitHubEnterprise
 from github3 import GitHubError
 from github3.github import GitHub
 from github3.projects import Project
+
+from . import helper
 
 
 def url_for(path=""):
@@ -1308,7 +1309,6 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
 
 
 class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
-
     """Test GitHub methods that return search iterators."""
 
     described_class = GitHub
@@ -1418,7 +1418,6 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 class TestGitHubRequiresAuthentication(
     helper.UnitRequiresAuthenticationHelper
 ):
-
     """Test methods that require authentication."""
 
     described_class = GitHub

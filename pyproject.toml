@@ -93,3 +93,8 @@ exclude = [
     "^docs/",
     "^tests/",
 ]
+
+[tool.isort]
+profile = "black"
+line_length = 78
+force_single_line = true

@@ -1,13 +1,14 @@
 """This module contains the Gist, ShortGist, and GistFork objects."""
+
 import typing as t
 from json import dumps
 
-from . import comment
-from . import file as gistfile
-from . import history
 from .. import models
 from .. import users
 from ..decorators import requires_auth
+from . import comment
+from . import file as gistfile
+from . import history
 
 
 class _Gist(models.GitHubCore):

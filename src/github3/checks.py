@@ -1,4 +1,5 @@
 """This module contains all the classes relating to Checks."""
+
 from json import dumps
 
 from . import decorators

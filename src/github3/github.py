@@ -1,4 +1,5 @@
 """This module contains the main interfaces to the API."""
+
 import json
 import re
 import typing as t
@@ -27,7 +28,6 @@ from .decorators import requires_auth
 from .decorators import requires_basic_auth
 from .repos import invitation
 from .repos import repo
-
 
 _pubsub_re = re.compile(
     r"https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+"

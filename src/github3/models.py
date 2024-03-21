@@ -1,4 +1,5 @@
 """This module provides the basic models used in github3.py."""
+
 import json as jsonlib
 import logging
 import typing as t
@@ -8,7 +9,6 @@ import requests.compat
 
 from . import exceptions
 from . import session
-
 
 if t.TYPE_CHECKING:
     from . import structs

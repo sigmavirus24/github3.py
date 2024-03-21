@@ -1,14 +1,15 @@
 """Implementation of a branch on a repository."""
+
 import typing as t
 
-from . import commit
 from .. import decorators
 from .. import models
+from . import commit
 
 if t.TYPE_CHECKING:
     from .. import apps as tapps
-    from .. import users as tusers
     from .. import orgs
+    from .. import users as tusers
 
 
 class _Branch(models.GitHubCore):
@@ -603,7 +604,9 @@ class ProtectionRestrictions(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        from .. import apps, orgs, users
+        from .. import apps
+        from .. import orgs
+        from .. import users
 
         self._api = protection["url"]
         self.users_url = protection["users_url"]
