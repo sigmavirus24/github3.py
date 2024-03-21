@@ -1,14 +1,13 @@
 """Implementation of a branch on a repository."""
 import typing as t
 
+from .. import decorators, models
 from . import commit
-from .. import decorators
-from .. import models
 
 if t.TYPE_CHECKING:
     from .. import apps as tapps
-    from .. import users as tusers
     from .. import orgs
+    from .. import users as tusers
 
 
 class _Branch(models.GitHubCore):

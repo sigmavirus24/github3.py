@@ -1,5 +1,6 @@
 """Integration tests for methods implemented on Project."""
 import github3
+
 from .helper import IntegrationHelper
 
 

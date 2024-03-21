@@ -1,5 +1,6 @@
 """Unit tests for methods implemented on Branch Protection."""
 import github3
+
 from . import helper
 
 protection_example_data = helper.create_example_data_helper(

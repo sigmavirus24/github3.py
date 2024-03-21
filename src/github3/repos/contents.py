@@ -1,6 +1,5 @@
 """This module contains the Contents object."""
-from base64 import b64decode
-from base64 import b64encode
+from base64 import b64decode, b64encode
 from json import dumps
 
 from .. import models

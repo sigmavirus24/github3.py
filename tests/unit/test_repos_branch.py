@@ -1,5 +1,6 @@
 """Unit tests for methods implemented on Branch."""
 import github3
+
 from . import helper
 
 get_example_data = helper.create_example_data_helper("repos_branch_example")

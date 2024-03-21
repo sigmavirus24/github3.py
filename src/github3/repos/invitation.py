@@ -1,8 +1,7 @@
 """Invitation related logic."""
 from json import dumps
 
-from .. import models
-from .. import users
+from .. import models, users
 from ..decorators import requires_auth
 
 

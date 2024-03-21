@@ -93,3 +93,6 @@ exclude = [
     "^docs/",
     "^tests/",
 ]
+
+[tool.isort]
+profile = "black"

@@ -5,6 +5,7 @@ import dateutil
 import pytest
 
 import github3
+
 from .helper import IntegrationHelper
 
 

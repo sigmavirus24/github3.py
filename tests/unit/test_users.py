@@ -1,6 +1,7 @@
 import pytest
 
 import github3
+
 from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/users/octocat")

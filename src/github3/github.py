@@ -5,29 +5,27 @@ import typing as t
 
 import uritemplate  # type: ignore
 
-from . import apps
-from . import auths
-from . import decorators
-from . import events
-from . import gists
-from . import issues
-from . import licenses
-from . import models
-from . import notifications
-from . import orgs
-from . import projects
-from . import pulls
-from . import search
-from . import session
-from . import structs
-from . import users
-from . import utils
-from .decorators import requires_app_credentials
-from .decorators import requires_auth
-from .decorators import requires_basic_auth
-from .repos import invitation
-from .repos import repo
-
+from . import (
+    apps,
+    auths,
+    decorators,
+    events,
+    gists,
+    issues,
+    licenses,
+    models,
+    notifications,
+    orgs,
+    projects,
+    pulls,
+    search,
+    session,
+    structs,
+    users,
+    utils,
+)
+from .decorators import requires_app_credentials, requires_auth, requires_basic_auth
+from .repos import invitation, repo
 
 _pubsub_re = re.compile(
     r"https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+"

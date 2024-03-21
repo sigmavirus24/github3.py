@@ -6,8 +6,7 @@ import time
 
 import jwt
 
-from . import models
-from . import users
+from . import models, users
 
 TEN_MINUTES_AS_SECONDS = 10 * 60
 DEFAULT_JWT_TOKEN_EXPIRATION = TEN_MINUTES_AS_SECONDS

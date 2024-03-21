@@ -5,7 +5,6 @@ from base64 import b64encode
 
 import pytest
 
-from . import helper
 from github3 import GitHubError
 from github3.exceptions import GitHubException
 from github3.models import GitHubCore
@@ -15,8 +14,9 @@ from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents
 from github3.repos.hook import Hook
-from github3.repos.repo import Repository
-from github3.repos.repo import ShortRepository
+from github3.repos.repo import Repository, ShortRepository
+
+from . import helper
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/comments/1"

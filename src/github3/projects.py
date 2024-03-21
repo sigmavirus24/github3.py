@@ -1,10 +1,7 @@
 """This module contains all the classes relating to projects."""
 from json import dumps
 
-from . import exceptions
-from . import models
-from . import pulls
-from . import users
+from . import exceptions, models, pulls, users
 from .decorators import requires_auth
 from .issues import issue
 

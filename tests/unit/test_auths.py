@@ -1,5 +1,6 @@
 """Unit tests for the auths module."""
 import github3
+
 from . import helper
 
 url_for = helper.create_url_helper("https://api.github.com/authorizations/1")

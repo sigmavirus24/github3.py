@@ -3,8 +3,7 @@ from json import dumps
 
 from uritemplate import URITemplate  # type: ignore
 
-from . import models
-from . import users
+from . import models, users
 from .decorators import requires_auth
 from .issues import Issue
 from .issues.comment import IssueComment

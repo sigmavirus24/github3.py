@@ -3,8 +3,7 @@ import datetime
 
 import dateutil.tz
 
-from .. import models
-from .. import users
+from .. import models, users
 
 
 def alternate_week(week):

@@ -1,7 +1,8 @@
 """Integration tests for methods implemented on PullRequest."""
 import github3
-from .helper import IntegrationHelper
 from github3 import repos
+
+from .helper import IntegrationHelper
 
 
 class TestPullRequest(IntegrationHelper):

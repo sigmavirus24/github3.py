@@ -1,7 +1,6 @@
 import github3
-from .helper import create_example_data_helper
-from .helper import create_url_helper
-from .helper import UnitHelper
+
+from .helper import UnitHelper, create_example_data_helper, create_url_helper
 
 get_example_data = create_example_data_helper("license_example")
 url_for = create_url_helper("https://api.github.com/licenses/mit")

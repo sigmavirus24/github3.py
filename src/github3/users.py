@@ -4,10 +4,11 @@ from json import dumps
 
 from uritemplate import URITemplate  # type: ignore
 
+from github3.auths import Authorization
+
 from . import models
 from .decorators import requires_auth
 from .events import Event
-from github3.auths import Authorization
 
 
 class GPGKey(models.GitHubCore):

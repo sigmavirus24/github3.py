@@ -1,8 +1,5 @@
 """Module with class(es) representing issue comments."""
-from .. import decorators
-from .. import models
-from .. import users
-from .. import utils
+from .. import decorators, models, users, utils
 
 
 class IssueComment(models.GitHubCore):

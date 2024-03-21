@@ -1,5 +1,6 @@
 """Integration tests for Git."""
 import github3
+
 from .helper import IntegrationHelper
 
 

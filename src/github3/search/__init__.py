@@ -4,7 +4,6 @@ from .issue import IssueSearchResult
 from .repository import RepositorySearchResult
 from .user import UserSearchResult
 
-
 __all__ = (
     "CodeSearchResult",
     "CommitSearchResult",

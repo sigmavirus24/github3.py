@@ -1,8 +1,7 @@
 """This module contains all the classes relating to Checks."""
 from json import dumps
 
-from . import decorators
-from . import models
+from . import decorators, models
 
 
 class CheckPullRequest(models.GitHubCore):

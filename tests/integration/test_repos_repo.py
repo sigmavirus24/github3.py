@@ -6,6 +6,7 @@ import pytest
 
 import github3
 import github3.exceptions as exc
+
 from . import helper
 
 

@@ -1,6 +1,6 @@
 """This module contains the Comparison object."""
-from . import commit
 from .. import models
+from . import commit
 
 
 class Comparison(models.GitHubCore):

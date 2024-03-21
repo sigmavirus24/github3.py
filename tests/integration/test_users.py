@@ -4,8 +4,9 @@ import datetime
 import pytest
 
 import github3
-from .helper import IntegrationHelper
 from github3.exceptions import MethodNotAllowed
+
+from .helper import IntegrationHelper
 
 GPG_KEY = (
     # Generated for this alone then deleted

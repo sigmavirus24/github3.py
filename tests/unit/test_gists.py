@@ -2,6 +2,7 @@
 import pytest
 
 import github3
+
 from . import helper
 
 gist_example_data = helper.create_example_data_helper("gist_example")

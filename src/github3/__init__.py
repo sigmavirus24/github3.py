@@ -8,20 +8,20 @@ See https://github3.readthedocs.io/ for documentation.
 :license: Modified BSD, see LICENSE for more details
 
 """
-from .__about__ import __author__
-from .__about__ import __author_email__
-from .__about__ import __copyright__
-from .__about__ import __license__
-from .__about__ import __package_name__
-from .__about__ import __title__
-from .__about__ import __url__
-from .__about__ import __version__
-from .__about__ import __version_info__
-from .api import enterprise_login
-from .api import login
+from .__about__ import (
+    __author__,
+    __author_email__,
+    __copyright__,
+    __license__,
+    __package_name__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
+)
+from .api import enterprise_login, login
 from .exceptions import GitHubError
-from .github import GitHub
-from .github import GitHubEnterprise
+from .github import GitHub, GitHubEnterprise
 
 __all__ = (
     "GitHub",

@@ -3,13 +3,9 @@ from json import dumps
 
 from uritemplate import URITemplate  # type: ignore
 
-from . import comment
-from . import event
-from . import label
-from . import milestone
-from .. import models
-from .. import users
+from .. import models, users
 from ..decorators import requires_auth
+from . import comment, event, label, milestone
 
 
 class _Issue(models.GitHubCore):

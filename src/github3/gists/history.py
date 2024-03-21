@@ -1,6 +1,5 @@
 """Module containing the GistHistory object."""
-from .. import models
-from .. import users
+from .. import models, users
 
 
 class GistHistory(models.GitHubCore):

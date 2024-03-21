@@ -4,13 +4,15 @@ import unittest.mock
 import pytest
 
 import github3
-from .helper import create_example_data_helper
-from .helper import create_url_helper
-from .helper import UnitHelper
-from .helper import UnitIteratorHelper
-from github3.repos.release import Asset
-from github3.repos.release import Release
+from github3.repos.release import Asset, Release
 from github3.users import ShortUser
+
+from .helper import (
+    UnitHelper,
+    UnitIteratorHelper,
+    create_example_data_helper,
+    create_url_helper,
+)
 
 url_for = create_url_helper(
     "https://api.github.com/repos/sigmavirus24/github3.py/releases"

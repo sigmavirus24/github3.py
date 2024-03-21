@@ -6,9 +6,7 @@ import typing as t
 import dateutil.parser
 import requests.compat
 
-from . import exceptions
-from . import session
-
+from . import exceptions, session
 
 if t.TYPE_CHECKING:
     from . import structs

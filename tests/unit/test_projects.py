@@ -1,12 +1,9 @@
 """Unit tests for the github3.projects module."""
 import pytest
 
-from . import helper
-from github3 import exceptions
-from github3 import GitHubError
-from github3 import issues
-from github3 import projects
+from github3 import GitHubError, exceptions, issues, projects
 
+from . import helper
 
 get_project_example_data = helper.create_example_data_helper(
     "project_example"

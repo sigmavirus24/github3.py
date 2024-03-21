@@ -1,8 +1,8 @@
 from unittest import TestCase
 
 import github3
-from .helper import create_example_data_helper
-from .helper import UnitHelper
+
+from .helper import UnitHelper, create_example_data_helper
 
 get_example_data = create_example_data_helper("event_example")
 get_org_example_data = create_example_data_helper("org_example")
