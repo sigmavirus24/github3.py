@@ -24,7 +24,11 @@ from . import (
     users,
     utils,
 )
-from .decorators import requires_app_credentials, requires_auth, requires_basic_auth
+from .decorators import (
+    requires_app_credentials,
+    requires_auth,
+    requires_basic_auth,
+)
 from .repos import invitation, repo
 
 _pubsub_re = re.compile(
