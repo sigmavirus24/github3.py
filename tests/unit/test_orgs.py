@@ -1,4 +1,5 @@
 """Organization unit tests."""
+
 import pytest
 
 from github3 import GitHubError

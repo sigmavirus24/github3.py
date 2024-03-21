@@ -1,4 +1,5 @@
 """Commit search results implementation."""
+
 from .. import git, models, repos, users
 
 

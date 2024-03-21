@@ -110,7 +110,6 @@ class TestRelease(UnitHelper):
 
 
 class TestReleaseIterators(UnitIteratorHelper):
-
     """Test iterator methods on the Release class."""
 
     described_class = Release

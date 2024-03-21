@@ -1,4 +1,5 @@
 """Unit tests for methods implemented on Branch Protection."""
+
 import github3
 
 from . import helper

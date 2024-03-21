@@ -1,4 +1,5 @@
 """Code search results implementation."""
+
 from .. import models, repos
 
 

@@ -6,6 +6,7 @@ This module contains the classes related to issues.
 
 See also: http://developer.github.com/v3/issues/
 """
+
 from ..utils import timestamp_parameter
 from .issue import Issue, ShortIssue
 

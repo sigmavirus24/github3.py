@@ -1,4 +1,5 @@
 """Invitation related logic."""
+
 from json import dumps
 
 from .. import models, users

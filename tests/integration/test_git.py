@@ -1,11 +1,11 @@
 """Integration tests for Git."""
+
 import github3
 
 from .helper import IntegrationHelper
 
 
 class TestTree(IntegrationHelper):
-
     """Integration tests for methods on the Test class."""
 
     def test_inequality(self):
@@ -30,7 +30,6 @@ class TestTree(IntegrationHelper):
 
 
 class TestReference(IntegrationHelper):
-
     """Integration tests for methods on the Reference class."""
 
     def test_update(self):

@@ -1,4 +1,5 @@
 """Unit tests around github3's Subscription classes."""
+
 import github3
 
 from .helper import UnitHelper, create_example_data_helper, create_url_helper

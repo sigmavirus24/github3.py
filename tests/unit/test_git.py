@@ -50,7 +50,6 @@ class TestTree(UnitHelper):
 
 
 class TestCommit(UnitHelper):
-
     """Commit unit test."""
 
     described_class = github3.git.Commit
@@ -61,7 +60,6 @@ class TestCommit(UnitHelper):
 
 
 class TestGitTag(UnitHelper):
-
     """Git Tag unit test."""
 
     described_class = github3.git.Tag
@@ -72,7 +70,6 @@ class TestGitTag(UnitHelper):
 
 
 class TestReference(UnitHelper):
-
     """Reference unit test."""
 
     described_class = github3.git.Reference

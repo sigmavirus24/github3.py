@@ -1,4 +1,5 @@
 """Module containing the logic for a GistComment."""
+
 from .. import decorators, models, users
 
 

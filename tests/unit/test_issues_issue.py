@@ -1,4 +1,5 @@
 """Unit tests for the Issue class."""
+
 import unittest.mock
 
 import dateutil.parser

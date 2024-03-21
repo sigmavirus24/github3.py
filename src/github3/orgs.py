@@ -1,4 +1,5 @@
 """This module contains all of the classes related to organizations."""
+
 import typing as t
 from json import dumps
 

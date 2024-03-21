@@ -1,4 +1,5 @@
 """This module contains the Gist, ShortGist, and GistFork objects."""
+
 import typing as t
 from json import dumps
 

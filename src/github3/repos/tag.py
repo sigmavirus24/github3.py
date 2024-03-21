@@ -1,4 +1,5 @@
 """This module contains the RepoTag object for GitHub's tag API."""
+
 from .. import models
 from . import commit
 

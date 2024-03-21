@@ -1,11 +1,11 @@
 """Integration tests for methods implemented on Gist."""
+
 import github3
 
 from .helper import IntegrationHelper
 
 
 class TestGist(IntegrationHelper):
-
     """Gist integration tests."""
 
     def test_comments(self):

@@ -1308,7 +1308,6 @@ class TestGitHubIterators(helper.UnitIteratorHelper):
 
 
 class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
-
     """Test GitHub methods that return search iterators."""
 
     described_class = GitHub
@@ -1418,7 +1417,6 @@ class TestGitHubSearchIterators(helper.UnitSearchIteratorHelper):
 class TestGitHubRequiresAuthentication(
     helper.UnitRequiresAuthenticationHelper
 ):
-
     """Test methods that require authentication."""
 
     described_class = GitHub

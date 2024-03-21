@@ -6,6 +6,7 @@ github3.api
 :license: Modified BSD, see LICENSE for more details
 
 """
+
 from .github import GitHub, GitHubEnterprise
 
 gh = GitHub()

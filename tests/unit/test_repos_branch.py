@@ -1,4 +1,5 @@
 """Unit tests for methods implemented on Branch."""
+
 import github3
 
 from . import helper
@@ -38,7 +39,6 @@ class TestBranch(helper.UnitHelper):
 
 
 class TestBranchRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Unit tests for Branch methods that require authentication."""
 
     described_class = github3.repos.branch.Branch

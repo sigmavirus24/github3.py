@@ -12,6 +12,7 @@ Sub-modules:
 
 See also: http://developer.github.com/v3/gists/
 """
+
 from .gist import Gist, ShortGist
 
 __all__ = ("Gist", "ShortGist")

@@ -1,4 +1,5 @@
 """This module contains the Comparison object."""
+
 from .. import models
 from . import commit
 

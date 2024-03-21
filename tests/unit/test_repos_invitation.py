@@ -1,4 +1,5 @@
 """Unit tests for Repository Invitation objects."""
+
 import github3
 
 from . import helper

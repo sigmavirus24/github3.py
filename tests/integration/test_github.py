@@ -1,4 +1,5 @@
 """Integration tests for methods implemented on GitHub."""
+
 from datetime import datetime
 
 import pytest

@@ -1,4 +1,5 @@
 """Integration tests for Repositories."""
+
 import datetime
 import itertools
 
@@ -11,7 +12,6 @@ from . import helper
 
 
 class TestRepository(helper.IntegrationHelper):
-
     """Integration tests for the Repository object."""
 
     def test_add_collaborator(self):
@@ -1426,7 +1426,6 @@ class TestRepository(helper.IntegrationHelper):
 
 
 class TestContents(helper.IntegrationHelper):
-
     """Integration test for Contents object."""
 
     def test_delete(self):
@@ -1463,7 +1462,6 @@ class TestContents(helper.IntegrationHelper):
 
 
 class TestHook(helper.IntegrationHelper):
-
     """Integration tests for Hook object."""
 
     def test_delete(self):
@@ -1545,7 +1543,6 @@ class TestHook(helper.IntegrationHelper):
 
 
 class TestRepoComment(helper.IntegrationHelper):
-
     """Integration tests for RepoComment object."""
 
     def test_delete(self):
@@ -1578,7 +1575,6 @@ class TestRepoComment(helper.IntegrationHelper):
 
 
 class TestRepoCommit(helper.IntegrationHelper):
-
     """Integration tests for RepoCommit object."""
 
     @pytest.mark.xfail
@@ -1609,7 +1605,6 @@ class TestRepoCommit(helper.IntegrationHelper):
 
 
 class TestComparison(helper.IntegrationHelper):
-
     """Integration test for Comparison object."""
 
     @pytest.mark.xfail

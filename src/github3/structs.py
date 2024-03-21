@@ -155,7 +155,6 @@ class GitHubIterator(models.GitHubCore, collections.abc.Iterator):
 
 
 class SearchIterator(GitHubIterator):
-
     """This is a special-cased class for returning iterable search results.
 
     It inherits from :class:`GitHubIterator <github3.structs.GitHubIterator>`.
