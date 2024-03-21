@@ -153,9 +153,9 @@ class _Branch(models.GitHubCore):
         if allow_deletions is not None:
             edit["allow_deletions"] = allow_deletions
         if required_conversation_resolution is not None:
-            edit["required_conversation_resolution"] = (
-                required_conversation_resolution
-            )
+            edit[
+                "required_conversation_resolution"
+            ] = required_conversation_resolution
         url = self._build_url("protection", base_url=self._api)
         resp = self._put(url, json=edit)
         json = self._json(resp, 200)
