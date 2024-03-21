@@ -1,6 +1,9 @@
 """Commit search results implementation."""
 
-from .. import git, models, repos, users
+from .. import git
+from .. import models
+from .. import repos
+from .. import users
 
 
 class CommitSearchResult(models.GitHubCore):

@@ -2,7 +2,8 @@ import unittest.mock
 
 import pytest
 
-from github3 import GitHubEnterprise, GitHubError
+from github3 import GitHubEnterprise
+from github3 import GitHubError
 from github3.github import GitHub
 from github3.projects import Project
 

@@ -5,7 +5,8 @@ from datetime import datetime
 import pytest
 import requests
 
-from github3.utils import stream_response_to_file, timestamp_parameter
+from github3.utils import stream_response_to_file
+from github3.utils import timestamp_parameter
 
 
 class TestTimestampConverter:

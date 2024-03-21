@@ -2,7 +2,8 @@
 
 from json import dumps
 
-from . import decorators, models
+from . import decorators
+from . import models
 
 
 class CheckPullRequest(models.GitHubCore):

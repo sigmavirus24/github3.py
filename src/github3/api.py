@@ -7,7 +7,8 @@ github3.api
 
 """
 
-from .github import GitHub, GitHubEnterprise
+from .github import GitHub
+from .github import GitHubEnterprise
 
 gh = GitHub()
 

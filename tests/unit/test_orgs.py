@@ -3,7 +3,8 @@
 import pytest
 
 from github3 import GitHubError
-from github3.orgs import Organization, OrganizationHook
+from github3.orgs import Organization
+from github3.orgs import OrganizationHook
 from github3.projects import Project
 
 from . import helper

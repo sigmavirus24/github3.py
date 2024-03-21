@@ -10,41 +10,38 @@ import json as jsonlib
 
 import uritemplate as urit  # type: ignore
 
-from .. import (
-    checks,
-    decorators,
-    events,
-    exceptions,
-    git,
-    issues,
-    licenses,
-    models,
-    notifications,
-    projects,
-    pulls,
-    users,
-    utils,
-)
+from .. import checks
+from .. import decorators
+from .. import events
+from .. import exceptions
+from .. import git
+from .. import issues
+from .. import licenses
+from .. import models
+from .. import notifications
+from .. import projects
+from .. import pulls
+from .. import users
+from .. import utils
 from ..issues import event as ievent
-from ..issues import label, milestone
-from . import (
-    branch,
-    comment,
-    commit,
-    comparison,
-    contents,
-    deployment,
-    hook,
-    invitation,
-    issue_import,
-    pages,
-    release,
-    stats,
-    status,
-    tag,
-    topics,
-    traffic,
-)
+from ..issues import label
+from ..issues import milestone
+from . import branch
+from . import comment
+from . import commit
+from . import comparison
+from . import contents
+from . import deployment
+from . import hook
+from . import invitation
+from . import issue_import
+from . import pages
+from . import release
+from . import stats
+from . import status
+from . import tag
+from . import topics
+from . import traffic
 
 
 class _Repository(models.GitHubCore):

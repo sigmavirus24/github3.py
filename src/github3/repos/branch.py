@@ -2,7 +2,8 @@
 
 import typing as t
 
-from .. import decorators, models
+from .. import decorators
+from .. import models
 from . import commit
 
 if t.TYPE_CHECKING:
@@ -603,7 +604,9 @@ class ProtectionRestrictions(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        from .. import apps, orgs, users
+        from .. import apps
+        from .. import orgs
+        from .. import users
 
         self._api = protection["url"]
         self.users_url = protection["users_url"]

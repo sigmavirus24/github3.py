@@ -2,7 +2,10 @@
 
 from json import dumps
 
-from . import exceptions, models, pulls, users
+from . import exceptions
+from . import models
+from . import pulls
+from . import users
 from .decorators import requires_auth
 from .issues import issue
 

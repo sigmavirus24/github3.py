@@ -2,9 +2,11 @@ import collections.abc
 import functools
 import typing as t
 
-from requests.compat import urlencode, urlparse
+from requests.compat import urlencode
+from requests.compat import urlparse
 
-from . import exceptions, models
+from . import exceptions
+from . import models
 
 if t.TYPE_CHECKING:
     import requests.models

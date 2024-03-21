@@ -1,6 +1,7 @@
 """This module contains the RepoComment class."""
 
-from .. import models, users
+from .. import models
+from .. import users
 from ..decorators import requires_auth
 
 

@@ -7,7 +7,8 @@ import uritemplate
 
 import github3
 
-from .helper import GitHubEnterpriseHelper, IntegrationHelper
+from .helper import GitHubEnterpriseHelper
+from .helper import IntegrationHelper
 
 GPG_KEY = (
     # Generated for this alone then deleted

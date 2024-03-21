@@ -1,6 +1,8 @@
 """Module containing the logic for a GistComment."""
 
-from .. import decorators, models, users
+from .. import decorators
+from .. import models
+from .. import users
 
 
 class GistComment(models.GitHubCore):

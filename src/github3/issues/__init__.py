@@ -8,7 +8,8 @@ See also: http://developer.github.com/v3/issues/
 """
 
 from ..utils import timestamp_parameter
-from .issue import Issue, ShortIssue
+from .issue import Issue
+from .issue import ShortIssue
 
 __all__ = ["Issue", "ShortIssue"]
 

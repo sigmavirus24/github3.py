@@ -2,7 +2,8 @@
 
 import pytest
 
-from github3 import GitHubError, pulls
+from github3 import GitHubError
+from github3 import pulls
 
 from . import helper
 

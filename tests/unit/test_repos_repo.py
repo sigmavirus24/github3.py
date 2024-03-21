@@ -15,7 +15,8 @@ from github3.repos.commit import RepoCommit
 from github3.repos.comparison import Comparison
 from github3.repos.contents import Contents
 from github3.repos.hook import Hook
-from github3.repos.repo import Repository, ShortRepository
+from github3.repos.repo import Repository
+from github3.repos.repo import ShortRepository
 
 from . import helper
 

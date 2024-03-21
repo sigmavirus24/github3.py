@@ -504,7 +504,8 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`~github3.repos.repo.StarredRepository`
         """
-        from .repos import Repository, StarredRepository
+        from .repos import Repository
+        from .repos import StarredRepository
 
         params = {"sort": sort, "direction": direction}
         self._remove_none(params)

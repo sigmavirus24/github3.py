@@ -1,6 +1,9 @@
 """This module contains the RepoCommit classes."""
 
-from .. import checks, git, models, users
+from .. import checks
+from .. import git
+from .. import models
+from .. import users
 from . import status
 from .comment import RepoComment
 

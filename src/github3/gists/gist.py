@@ -3,7 +3,8 @@
 import typing as t
 from json import dumps
 
-from .. import models, users
+from .. import models
+from .. import users
 from ..decorators import requires_auth
 from . import comment
 from . import file as gistfile

@@ -2,7 +2,10 @@
 
 import pytest
 
-from github3 import GitHubError, exceptions, issues, projects
+from github3 import GitHubError
+from github3 import exceptions
+from github3 import issues
+from github3 import projects
 
 from . import helper
 

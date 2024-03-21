@@ -1,6 +1,7 @@
 """Repository search results implementation."""
 
-from .. import models, repos
+from .. import models
+from .. import repos
 
 
 class RepositorySearchResult(models.GitHubCore):

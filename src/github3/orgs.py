@@ -5,11 +5,13 @@ from json import dumps
 
 from uritemplate import URITemplate  # type: ignore
 
-from . import models, users
+from . import models
+from . import users
 from .decorators import requires_auth
 from .events import Event
 from .projects import Project
-from .repos import Repository, ShortRepository
+from .repos import Repository
+from .repos import ShortRepository
 
 if t.TYPE_CHECKING:
     from . import users as _users

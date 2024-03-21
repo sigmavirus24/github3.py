@@ -4,7 +4,9 @@ import json
 
 from uritemplate import URITemplate  # type: ignore
 
-from .. import models, users, utils
+from .. import models
+from .. import users
+from .. import utils
 from ..decorators import requires_auth
 from ..exceptions import error_for
 
