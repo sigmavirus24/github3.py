@@ -7,6 +7,7 @@ so far).
 
 See also: http://developer.github.com/v3/actions/
 """
+
 from .secrets import OrganizationSecret
 from .secrets import RepositorySecret
 from .secrets import SharedOrganizationSecret

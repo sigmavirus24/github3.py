@@ -1,4 +1,5 @@
 """Integration tests for methods implemented on Organization."""
+
 import datetime
 
 import pytest
@@ -422,7 +423,6 @@ class TestOrganization(IntegrationHelper):
 
 
 class TestOrganizationSecrets(IntegrationHelper):
-
     """Integration tests for organization secrets."""
 
     encrypted_data = "9JgL1eNoSjB/9cmjYUI00ojLcLxidIgvspXw/g+vmEvlIgqafYXTe1sbVEsz3RyLEyu/"  # noqa: E501

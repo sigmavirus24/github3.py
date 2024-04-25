@@ -1,11 +1,11 @@
 """This module contains all the classes relating to GitHub Actions secrets."""
+
 import typing
 
 from .. import models
 
 
 class PublicKey(models.GitHubCore):
-
     """Object representing a Public Key for GitHub Actions secrets.
 
     See https://docs.github.com/en/rest/actions/secrets for more details.
@@ -31,7 +31,6 @@ class PublicKey(models.GitHubCore):
 
 
 class _Secret(models.GitHubCore):
-
     """Base class for all secrets for GitHub Actions.
 
     See https://docs.github.com/en/rest/actions/secrets for more details.
