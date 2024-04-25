@@ -1,8 +1,9 @@
 """This module contains all of the classes related to organizations."""
+
 import typing as t
 from json import dumps
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
 
 from . import exceptions
 from . import models
@@ -213,7 +214,7 @@ class _Team(models.GitHubCore):
         headers = {"Accept": "application/vnd.github.v3.repository+json"}
         url = self._build_url("repos", repository, base_url=self._api)
         json = self._json(self._get(url, headers=headers), 200)
-        return ShortRepositoryWithPermissions(json, self)
+        return ShortRepositoryWithPermissions(json, self.session)
 
     @requires_auth
     def repositories(self, number=-1, etag=None):
@@ -493,7 +494,7 @@ class _Organization(models.GitHubCore):
     @requires_auth
     def blocked_users(
         self, number: int = -1, etag: t.Optional[str] = None
-    ) -> t.Generator[users.ShortUser, None, None]:
+    ) -> t.Iterator[users.ShortUser]:
         """Iterate over the users blocked by this organization.
 
         .. versionadded:: 2.1.0
@@ -751,7 +752,7 @@ class _Organization(models.GitHubCore):
                 getattr(r, "full_name", r) for r in (repo_names or [])
             ],
             "maintainers": [
-                getattr(m, "login", m) for m in (maintainers or [])
+                str(getattr(m, "login", m)) for m in (maintainers or [])
             ],
             "permission": permission,
             "privacy": privacy,

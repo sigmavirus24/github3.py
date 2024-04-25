@@ -1,11 +1,13 @@
 """Integration tests for the User class."""
+
 import datetime
 
 import pytest
 
 import github3
-from .helper import IntegrationHelper
 from github3.exceptions import MethodNotAllowed
+
+from .helper import IntegrationHelper
 
 GPG_KEY = (
     # Generated for this alone then deleted
@@ -34,7 +36,6 @@ GPG_KEY = (
 
 
 class TestGPGKey(IntegrationHelper):
-
     """Integration tests for methods of the GPGKey class."""
 
     def test_delete(self):
@@ -79,7 +80,6 @@ class TestKey(IntegrationHelper):
 
 
 class TestUser(IntegrationHelper):
-
     """Integration tests for methods on the User class."""
 
     def test_events(self):

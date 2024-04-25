@@ -12,7 +12,7 @@ Please provide:
 
 - The version of pip you used to install github3.py
 
-- The version of github3.py, requests, uritemplate, and dateutil installed
+- The version of github3.py, requests, uritemplate, and python-dateutil installed
 
 ## Minimum Reproducible Example
 

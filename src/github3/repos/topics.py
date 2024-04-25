@@ -1,4 +1,5 @@
 """Topics related logic."""
+
 from .. import models
 
 

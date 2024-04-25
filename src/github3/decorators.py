@@ -1,4 +1,5 @@
 """This module provides decorators to the rest of the library."""
+
 import os
 from functools import wraps
 from io import BytesIO as StringIO

@@ -1,10 +1,12 @@
 """Integration tests for methods implemented on Check* classes."""
+
 import datetime
 
 import dateutil
 import pytest
 
 import github3
+
 from .helper import IntegrationHelper
 
 

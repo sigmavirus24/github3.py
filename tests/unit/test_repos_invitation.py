@@ -1,5 +1,7 @@
 """Unit tests for Repository Invitation objects."""
+
 import github3
+
 from . import helper
 
 get_invitation_example_data = helper.create_example_data_helper(

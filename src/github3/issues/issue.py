@@ -1,15 +1,16 @@
 """Module containing the Issue logic."""
+
 from json import dumps
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
 
+from .. import models
+from .. import users
+from ..decorators import requires_auth
 from . import comment
 from . import event
 from . import label
 from . import milestone
-from .. import models
-from .. import users
-from ..decorators import requires_auth
 
 
 class _Issue(models.GitHubCore):

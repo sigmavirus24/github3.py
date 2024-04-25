@@ -3,6 +3,7 @@ This module contains all the classes relating to Git Data.
 
 See also: http://developer.github.com/v3/git/
 """
+
 import base64
 from json import dumps
 
@@ -297,42 +298,6 @@ class Tag(models.GitHubCore):
         return f"<Tag [{self.tag}]>"
 
 
-class CommitTree(models.GitHubCore):
-    """This object represents the abbreviated tree data in a commit.
-
-    The API returns different representations of different objects. When
-    representing a :class:`~github3.git.ShortCommit` or
-    :class:`~github3.git.Commit`, the API returns an abbreviated
-    representation of a git tree.
-
-    This object has the following attributes:
-
-    .. attribute:: sha
-
-        The SHA1 of this tree in the git repository.
-    """
-
-    def _update_attributes(self, tree):
-        self._api = tree["url"]
-        self.sha = tree["sha"]
-
-    def _repr(self):
-        return f"<CommitTree [{self.sha}]>"
-
-    def to_tree(self):
-        """Retrieve a full Tree object for this CommitTree.
-
-        :returns:
-            The full git data about this tree
-        :rtype:
-            :class:`~github3.git.Tree`
-        """
-        json = self._json(self._get(self._api), 200)
-        return self._instance_or_null(Tree, json)
-
-    refresh = to_tree
-
-
 class Tree(models.GitHubCore):
     """This represents a tree object from a git repository.
 
@@ -380,6 +345,42 @@ class Tree(models.GitHubCore):
             self._get(self._api, params={"recursive": "1"}), 200
         )
         return self._instance_or_null(Tree, json)
+
+
+class CommitTree(models.GitHubCore):
+    """This object represents the abbreviated tree data in a commit.
+
+    The API returns different representations of different objects. When
+    representing a :class:`~github3.git.ShortCommit` or
+    :class:`~github3.git.Commit`, the API returns an abbreviated
+    representation of a git tree.
+
+    This object has the following attributes:
+
+    .. attribute:: sha
+
+        The SHA1 of this tree in the git repository.
+    """
+
+    def _update_attributes(self, tree):
+        self._api = tree["url"]
+        self.sha = tree["sha"]
+
+    def _repr(self):
+        return f"<CommitTree [{self.sha}]>"
+
+    def to_tree(self, conditional: bool = False) -> models.GitHubCore:
+        """Retrieve a full Tree object for this CommitTree.
+
+        :returns:
+            The full git data about this tree
+        :rtype:
+            :class:`~github3.git.Tree`
+        """
+        json = self._json(self._get(self._api), 200)
+        return self._instance_or_null(Tree, json)
+
+    refresh = to_tree
 
 
 class Hash(models.GitHubCore):

@@ -70,7 +70,6 @@ Source = "https://github.com/sigmavirus24/github3.py"
 [tool.black]
 line-length = 78
 target-version = ['py37']
-safe = true
 exclude = '''
 (
   /(
@@ -83,6 +82,19 @@ exclude = '''
     | _build
     | build
     | dist
+    | venv
   )/
 )
 '''
+
+[tool.mypy]
+files = ["."]
+exclude = [
+    "^docs/",
+    "^tests/",
+]
+
+[tool.isort]
+profile = "black"
+line_length = 78
+force_single_line = true

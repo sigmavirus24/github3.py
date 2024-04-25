@@ -4,6 +4,7 @@ import tempfile
 import pytest
 
 import github3
+
 from .helper import IntegrationHelper
 
 

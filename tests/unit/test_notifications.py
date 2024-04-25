@@ -1,8 +1,10 @@
 """Unit tests around the Thread class."""
+
 import github3
+
+from .helper import UnitHelper
 from .helper import create_example_data_helper
 from .helper import create_url_helper
-from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("notification_example")
 url_for = create_url_helper("https://api.github.com/notifications/threads/1")

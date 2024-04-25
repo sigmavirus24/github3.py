@@ -1,4 +1,5 @@
 """Module containing the GistHistory object."""
+
 from .. import models
 from .. import users
 
@@ -51,7 +52,7 @@ class GistHistory(models.GitHubCore):
     def _update_attributes(self, history) -> None:
         self.url = self._api = history["url"]
         self.version = history["version"]
-        self.user = users.ShortUser(history["user"], self)
+        self.user = users.ShortUser(history["user"], self.session)
         self.change_status = history["change_status"]
         self.additions = self.change_status.get("additions")
         self.deletions = self.change_status.get("deletions")

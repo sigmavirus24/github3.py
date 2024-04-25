@@ -8,10 +8,11 @@ from unittest import TestCase
 import pytest
 import requests
 
-from . import helper
-from github3 import exceptions
 from github3 import GitHubError
+from github3 import exceptions
 from github3.models import GitHubCore
+
+from . import helper
 
 
 class MyTestRefreshClass(GitHubCore):

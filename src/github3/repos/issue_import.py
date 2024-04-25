@@ -1,4 +1,5 @@
 """This module contains the logic for GitHub's import issue API."""
+
 from .. import models
 
 

@@ -1,9 +1,10 @@
 """This module contains the main interfaces to the API."""
+
 import json
 import re
 import typing as t
 
-import uritemplate
+import uritemplate  # type: ignore
 
 from . import apps
 from . import auths
@@ -27,7 +28,6 @@ from .decorators import requires_auth
 from .decorators import requires_basic_auth
 from .repos import invitation
 from .repos import repo
-
 
 _pubsub_re = re.compile(
     r"https?://[\w\d\-\.\:]+/\w[\w-]+\w/[\w\._-]+/events/\w+"
@@ -544,7 +544,7 @@ class GitHub(models.GitHubCore):
     @requires_auth
     def blocked_users(
         self, number: int = -1, etag: t.Optional[str] = None
-    ) -> t.Generator[users.ShortUser, None, None]:
+    ) -> t.Iterator[users.ShortUser]:
         """Iterate over the users blocked by this organization.
 
         .. versionadded:: 2.1.0
@@ -2248,6 +2248,9 @@ class GitHub(models.GitHubCore):
         if sort and order in ("asc", "desc"):
             params["order"] = order
 
+        if per_page is not None:
+            params["per_page"] = per_page
+
         if text_match:
             headers = {
                 "Accept": "application/vnd.github.v3.full.text-match+json"
@@ -2334,6 +2337,9 @@ class GitHub(models.GitHubCore):
 
         if sort and order in ("asc", "desc"):
             params["order"] = order
+
+        if per_page is not None:
+            params["per_page"] = per_page
 
         if text_match:
             headers["Accept"] = ", ".join(
@@ -2427,6 +2433,9 @@ class GitHub(models.GitHubCore):
         if order in ("asc", "desc"):
             params["order"] = order
 
+        if per_page is not None:
+            params["per_page"] = per_page
+
         if text_match:
             headers = {
                 "Accept": "application/vnd.github.v3.full.text-match+json"
@@ -2504,6 +2513,9 @@ class GitHub(models.GitHubCore):
 
         if order in ("asc", "desc"):
             params["order"] = order
+
+        if per_page is not None:
+            params["per_page"] = per_page
 
         if text_match:
             headers = {
@@ -2587,6 +2599,9 @@ class GitHub(models.GitHubCore):
 
         if order in ("asc", "desc"):
             params["order"] = order
+
+        if per_page is not None:
+            params["per_page"] = per_page
 
         if text_match:
             headers = {

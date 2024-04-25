@@ -1,4 +1,5 @@
 """Module with class(es) representing issue comments."""
+
 from .. import decorators
 from .. import models
 from .. import users

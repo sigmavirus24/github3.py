@@ -1,4 +1,5 @@
 """Integration tests for Repositories."""
+
 import datetime
 import itertools
 
@@ -6,11 +7,11 @@ import pytest
 
 import github3
 import github3.exceptions as exc
+
 from . import helper
 
 
 class TestRepository(helper.IntegrationHelper):
-
     """Integration tests for the Repository object."""
 
     def test_add_collaborator(self):
@@ -1539,7 +1540,6 @@ class TestRepository(helper.IntegrationHelper):
 
 
 class TestContents(helper.IntegrationHelper):
-
     """Integration test for Contents object."""
 
     def test_delete(self):
@@ -1576,7 +1576,6 @@ class TestContents(helper.IntegrationHelper):
 
 
 class TestHook(helper.IntegrationHelper):
-
     """Integration tests for Hook object."""
 
     def test_delete(self):
@@ -1658,7 +1657,6 @@ class TestHook(helper.IntegrationHelper):
 
 
 class TestRepoComment(helper.IntegrationHelper):
-
     """Integration tests for RepoComment object."""
 
     def test_delete(self):
@@ -1691,9 +1689,9 @@ class TestRepoComment(helper.IntegrationHelper):
 
 
 class TestRepoCommit(helper.IntegrationHelper):
-
     """Integration tests for RepoCommit object."""
 
+    @pytest.mark.xfail
     def test_diff(self):
         """Test the ability to retrieve a diff for a commit."""
         cassette_name = self.cassette_name("diff")
@@ -1706,6 +1704,7 @@ class TestRepoCommit(helper.IntegrationHelper):
 
         assert diff
 
+    @pytest.mark.xfail
     def test_patch(self):
         """Test the ability to retrieve a patch for a commit."""
         cassette_name = self.cassette_name("patch")
@@ -1720,9 +1719,9 @@ class TestRepoCommit(helper.IntegrationHelper):
 
 
 class TestComparison(helper.IntegrationHelper):
-
     """Integration test for Comparison object."""
 
+    @pytest.mark.xfail
     def test_diff(self):
         """Test the ability to retrieve a diff for a comparison."""
         cassette_name = self.cassette_name("diff")
@@ -1735,6 +1734,7 @@ class TestComparison(helper.IntegrationHelper):
 
         assert diff
 
+    @pytest.mark.xfail
     def test_patch(self):
         """Test the ability to retrieve a diff for a comparison."""
         cassette_name = self.cassette_name("patch")

@@ -1,4 +1,5 @@
 """GitHub Pages related logic."""
+
 from .. import models
 
 

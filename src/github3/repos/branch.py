@@ -1,14 +1,15 @@
 """Implementation of a branch on a repository."""
+
 import typing as t
 
-from . import commit
 from .. import decorators
 from .. import models
+from . import commit
 
 if t.TYPE_CHECKING:
     from .. import apps as tapps
+    from .. import orgs
     from .. import users as tusers
-    from . import orgs
 
 
 class _Branch(models.GitHubCore):
@@ -73,7 +74,7 @@ class _Branch(models.GitHubCore):
         url = self._build_url("protection", base_url=self._api)
         resp = self._get(url)
         json = self._json(resp, 200)
-        return BranchProtection(json, self)
+        return BranchProtection(json, self.session)
 
     @decorators.requires_auth
     def protect(
@@ -153,13 +154,13 @@ class _Branch(models.GitHubCore):
         if allow_deletions is not None:
             edit["allow_deletions"] = allow_deletions
         if required_conversation_resolution is not None:
-            edit[
-                "required_conversation_resolution"
-            ] = required_conversation_resolution
+            edit["required_conversation_resolution"] = (
+                required_conversation_resolution
+            )
         url = self._build_url("protection", base_url=self._api)
         resp = self._put(url, json=edit)
         json = self._json(resp, 200)
-        return BranchProtection(json, self)
+        return BranchProtection(json, self.session)
 
     @decorators.requires_auth
     def sync_with_upstream(self) -> t.Mapping[str, str]:
@@ -277,8 +278,9 @@ class ShortBranch(_Branch):
     class_name = "Short Repository Branch"
     _refresh_to = Branch
 
-    @t.overload
-    def refresh(self, conditional: bool = False) -> Branch:  # noqa: D102
+    def refresh(  # type: ignore[empty-body]
+        self, conditional: bool = False
+    ) -> models.GitHubCore:  # noqa: D102
         ...
 
 
@@ -602,7 +604,9 @@ class ProtectionRestrictions(models.GitHubCore):
     """
 
     def _update_attributes(self, protection):
-        from .. import apps, orgs, users
+        from .. import apps
+        from .. import orgs
+        from .. import users
 
         self._api = protection["url"]
         self.users_url = protection["users_url"]
@@ -652,7 +656,11 @@ class ProtectionRestrictions(models.GitHubCore):
 
         resp = self._post(self.teams_url, data=teams)
         json = self._json(resp, 200)
-        return [orgs.ShortTeam(team, self) for team in json] if json else []
+        return (
+            [orgs.ShortTeam(team, self.session) for team in json]
+            if json
+            else []
+        )
 
     @decorators.requires_auth
     def add_users(
@@ -679,10 +687,14 @@ class ProtectionRestrictions(models.GitHubCore):
         from .. import users as _users
 
         json = self._json(self._post(self.users_url, data=users), 200)
-        return [_users.ShortUser(user, self) for user in json] if json else []
+        return (
+            [_users.ShortUser(user, self.session) for user in json]
+            if json
+            else []
+        )
 
     @decorators.requires_auth
-    def apps(self, number: int = -1) -> t.Generator["tapps.App", None, None]:
+    def apps(self, number: int = -1) -> t.Iterator["tapps.App"]:
         """Retrieve current list of apps with access to the protected branch.
 
         See
@@ -732,7 +744,7 @@ class ProtectionRestrictions(models.GitHubCore):
 
         apps = [getattr(a, "slug", a) for a in apps]
         json = self._json(self._post(self.apps_url, data=apps), 200)
-        return [_apps.App(a, self) for a in json]
+        return [_apps.App(a, self.session) for a in json]
 
     @decorators.requires_auth
     def replace_app_restrictions(
@@ -764,7 +776,7 @@ class ProtectionRestrictions(models.GitHubCore):
 
         apps = [getattr(a, "slug", a) for a in apps]
         json = self._json(self._put(self.apps_url, data=apps), 200)
-        return [_apps.App(a, self) for a in json]
+        return [_apps.App(a, self.session) for a in json]
 
     @decorators.requires_auth
     def remove_app_restrictions(
@@ -788,7 +800,7 @@ class ProtectionRestrictions(models.GitHubCore):
 
         apps = [getattr(a, "slug", a) for a in apps]
         json = self._json(self._delete(self.apps_url, data=apps), 200)
-        return [_apps.App(a, self) for a in json]
+        return [_apps.App(a, self.session) for a in json]
 
     @decorators.requires_auth
     def delete(self) -> bool:
@@ -826,7 +838,11 @@ class ProtectionRestrictions(models.GitHubCore):
 
         resp = self._delete(self.teams_url, json=teams)
         json = self._json(resp, 200)
-        return [orgs.ShortTeam(team, self) for team in json] if json else []
+        return (
+            [orgs.ShortTeam(team, self.session) for team in json]
+            if json
+            else []
+        )
 
     @decorators.requires_auth
     def remove_users(
@@ -849,7 +865,11 @@ class ProtectionRestrictions(models.GitHubCore):
         json = self._json(resp, 200)
         from .. import users as _users
 
-        return [_users.ShortUser(user, self) for user in json] if json else []
+        return (
+            [_users.ShortUser(user, self.session) for user in json]
+            if json
+            else []
+        )
 
     @decorators.requires_auth
     def replace_teams(
@@ -872,7 +892,11 @@ class ProtectionRestrictions(models.GitHubCore):
 
         resp = self._put(self.teams_url, json=teams)
         json = self._json(resp, 200)
-        return [orgs.ShortTeam(team, self) for team in json] if json else []
+        return (
+            [orgs.ShortTeam(team, self.session) for team in json]
+            if json
+            else []
+        )
 
     @decorators.requires_auth
     def replace_users(
@@ -894,9 +918,7 @@ class ProtectionRestrictions(models.GitHubCore):
         users_resp = self._put(self.users_url, json=users)
         return self._boolean(users_resp, 200, 404)
 
-    def teams(
-        self, number: int = -1
-    ) -> t.Generator["orgs.ShortTeam", None, None]:
+    def teams(self, number: int = -1) -> t.Iterator["orgs.ShortTeam"]:
         """Retrieve an up-to-date listing of teams.
 
         :returns:
@@ -912,9 +934,7 @@ class ProtectionRestrictions(models.GitHubCore):
             orgs.ShortTeam,
         )
 
-    def users(
-        self, number: int = -1
-    ) -> t.Generator["tusers.ShortUser", None, None]:
+    def users(self, number: int = -1) -> t.Iterator["tusers.ShortUser"]:
         """Retrieve an up-to-date listing of users.
 
         :returns:

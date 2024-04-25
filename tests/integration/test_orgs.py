@@ -4,11 +4,11 @@ import datetime
 import pytest
 
 import github3
+
 from .helper import IntegrationHelper
 
 
 class TestOrganization(IntegrationHelper):
-
     """Organization integration tests."""
 
     betamax_kwargs = {"match_requests_on": ["method", "uri", "json-body"]}
@@ -606,7 +606,6 @@ class TestOrganizationSecrets(IntegrationHelper):
 
 
 class TestOrganizationHook(IntegrationHelper):
-
     """Integration tests for OrganizationHook object."""
 
     def test_delete(self):

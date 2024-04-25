@@ -1,4 +1,5 @@
 """This module contains the Status object for GitHub's commit status API."""
+
 from .. import models
 from .. import users
 from ..models import GitHubCore

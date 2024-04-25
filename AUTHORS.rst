@@ -224,3 +224,5 @@ Contributors
 - Chris R (@offbyone)
 
 - Thomas Buchner (@MrBatschner)
+
+- Chris Cotter (@ccotter)

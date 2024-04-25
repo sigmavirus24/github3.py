@@ -1,7 +1,8 @@
 import github3
+
+from .helper import UnitHelper
 from .helper import create_example_data_helper
 from .helper import create_url_helper
-from .helper import UnitHelper
 
 get_example_data = create_example_data_helper("tree_example")
 url_for = create_url_helper(
@@ -51,7 +52,6 @@ class TestTree(UnitHelper):
 
 
 class TestCommit(UnitHelper):
-
     """Commit unit test."""
 
     described_class = github3.git.Commit
@@ -62,7 +62,6 @@ class TestCommit(UnitHelper):
 
 
 class TestGitTag(UnitHelper):
-
     """Git Tag unit test."""
 
     described_class = github3.git.Tag
@@ -73,7 +72,6 @@ class TestGitTag(UnitHelper):
 
 
 class TestReference(UnitHelper):
-
     """Reference unit test."""
 
     described_class = github3.git.Reference

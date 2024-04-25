@@ -1,7 +1,8 @@
 """Release logic for the GitHub API."""
+
 import json
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
 
 from .. import models
 from .. import users

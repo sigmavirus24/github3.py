@@ -1,10 +1,11 @@
 """Integration tests for methods implemented on Team."""
+
 import github3
+
 from .helper import IntegrationHelper
 
 
 class TestTeam(IntegrationHelper):
-
     """Team integration tests."""
 
     betamax_kwargs = {"match_requests_on": ["method", "uri", "json-body"]}

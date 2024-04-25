@@ -1,13 +1,14 @@
 """Integration tests for Issues."""
+
 import pytest
 
 import github3
 import github3.exceptions as exc
+
 from .helper import IntegrationHelper
 
 
 class TestIssue(IntegrationHelper):
-
     """Integration tests for methods on the Issue class."""
 
     def test_add_assignees(self):

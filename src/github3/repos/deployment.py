@@ -1,4 +1,5 @@
 """The module containing deployment logic."""
+
 from .. import users
 from ..models import GitHubCore
 

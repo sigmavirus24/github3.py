@@ -1,11 +1,11 @@
 """Unit tests for Repositories."""
+
 import datetime
 import unittest.mock
 from base64 import b64encode
 
 import pytest
 
-from . import helper
 from github3 import GitHubError
 from github3.exceptions import GitHubException
 from github3.models import GitHubCore
@@ -17,6 +17,8 @@ from github3.repos.contents import Contents
 from github3.repos.hook import Hook
 from github3.repos.repo import Repository
 from github3.repos.repo import ShortRepository
+
+from . import helper
 
 comment_url_for = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/comments/1"
@@ -67,7 +69,6 @@ repo_2_12_example_data = get_repo_2_12_example_data()
 
 
 class TestRepository(helper.UnitHelper):
-
     """Unit test for regular Repository methods."""
 
     described_class = Repository
@@ -1026,7 +1027,6 @@ class TestRepository(helper.UnitHelper):
 
 
 class TestRepositoryIterator(helper.UnitIteratorHelper):
-
     """Unit tests for Repository methods that return iterators."""
 
     described_class = Repository
@@ -1468,7 +1468,6 @@ class TestRepositoryIterator(helper.UnitIteratorHelper):
 
 
 class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
-
     """Unit test for regular Repository methods."""
 
     described_class = Repository
@@ -1507,7 +1506,6 @@ class TestRepositoryWithAppInstAuth(helper.UnitAppInstallHelper):
 
 
 class TestRepositoryRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Unit test for regular Repository methods."""
 
     described_class = Repository
@@ -1768,7 +1766,6 @@ class TestContents(helper.UnitHelper):
 
 
 class TestContentsRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Unit test for Content methods that require Auth."""
 
     described_class = Contents
@@ -1789,7 +1786,6 @@ class TestContentsRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestHook(helper.UnitHelper):
-
     """Test methods on Hook class."""
 
     described_class = Hook
@@ -1843,7 +1839,6 @@ class TestHook(helper.UnitHelper):
 
 
 class TestHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """Test methods on Hook object that require authentication."""
 
     described_class = Hook
@@ -1876,7 +1871,6 @@ class TestHookRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestRepoComment(helper.UnitHelper):
-
     """Unit test for methods on RepoComment object."""
 
     example_data = comment_example_data
@@ -1901,7 +1895,6 @@ class TestRepoComment(helper.UnitHelper):
 
 
 class TestRepoCommentRequiresAuth(helper.UnitRequiresAuthenticationHelper):
-
     """
     Unit test for methods that require authentication on RepoCommment
     object.
@@ -1926,7 +1919,6 @@ class TestRepoCommentRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
 
 class TestRepoCommit(helper.UnitHelper):
-
     """Unit tests for RepoCommit object."""
 
     described_class = RepoCommit
@@ -1959,7 +1951,6 @@ class TestRepoCommit(helper.UnitHelper):
 
 
 class TestComparison(helper.UnitHelper):
-
     """Unit test for Comparison object."""
 
     described_class = Comparison
@@ -1989,7 +1980,6 @@ class TestComparison(helper.UnitHelper):
 
 
 class TestRepositoryCompatibility_2_12(helper.UnitIteratorHelper):
-
     """Unit tests for Repository from Github Enterprise 2.12"""
 
     described_class = Repository

@@ -1,4 +1,5 @@
 """Base classes and helpers for unit tests."""
+
 import json
 import os.path
 import sys
@@ -194,7 +195,6 @@ class UnitHelper(unittest.TestCase):
 
 
 class UnitIteratorHelper(UnitHelper):
-
     """Base class for iterator based unit tests."""
 
     def create_session_mock(self, *args):
@@ -255,7 +255,6 @@ class UnitIteratorAppInstHelper(UnitIteratorHelper):
 
 
 class UnitSearchIteratorHelper(UnitIteratorHelper):
-
     """Base class for search iterator based unit tests."""
 
     def patch_get_json(self):
@@ -284,7 +283,6 @@ class UnitAppInstallHelper(UnitHelper):
 
 
 class UnitRequiresAuthenticationHelper(UnitHelper):
-
     """Helper for unit tests that demonstrate authentication is required."""
 
     def after_setup(self):

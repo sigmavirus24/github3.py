@@ -1,13 +1,15 @@
 """This module contains everything relating to Users."""
+
 import typing as t
 from json import dumps
 
-from uritemplate import URITemplate
+from uritemplate import URITemplate  # type: ignore
+
+from github3.auths import Authorization
 
 from . import models
 from .decorators import requires_auth
 from .events import Event
-from github3.auths import Authorization
 
 
 class GPGKey(models.GitHubCore):
@@ -502,7 +504,8 @@ class _User(models.GitHubCore):
             endpoint
         :returns: generator of :class:`~github3.repos.repo.StarredRepository`
         """
-        from .repos import Repository, StarredRepository
+        from .repos import Repository
+        from .repos import StarredRepository
 
         params = {"sort": sort, "direction": direction}
         self._remove_none(params)
