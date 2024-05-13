@@ -594,7 +594,7 @@ class TestOrganizationSecrets(IntegrationHelper):
                 [shared_repo_id_1, shared_repo_id_2],
             )
 
-            success = secret.delete_selected_repository(shared_repo_id_2)
+            success = secret.remove_selected_repository(shared_repo_id_2)
             assert success is True
 
             shared_repos = secret.selected_repositories()

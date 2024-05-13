@@ -44,7 +44,7 @@ class TestOrganizationSecrets(helper.UnitHelper):
         """
         self.instance.set_selected_repositories([123])
         self.session.put.assert_called_once_with(
-            self.instance._selected_repos_url,
+            self.instance.selected_repositories_url,
             json={"selected_repository_ids": [123]},
         )
 
@@ -61,17 +61,21 @@ class TestOrganizationSecrets(helper.UnitHelper):
         """
         Show that adding a selected repository does the proper HTTP request.
         """
-        add_repo_url = "/".join([self.instance._selected_repos_url, str(123)])
+        add_repo_url = "/".join(
+            [self.instance.selected_repositories_url, str(123)]
+        )
         _ = self.instance.add_selected_repository(123)
 
         self.session.put.assert_called_once_with(add_repo_url)
 
-    def test_delete_selected_repository(self):
+    def test_remove_selected_repository(self):
         """
         Show that deleting a selected repository does the proper HTTP request.
         """
-        del_repo_url = "/".join([self.instance._selected_repos_url, str(123)])
-        _ = self.instance.delete_selected_repository(123)
+        del_repo_url = "/".join(
+            [self.instance.selected_repositories_url, str(123)]
+        )
+        _ = self.instance.remove_selected_repository(123)
 
         self.session.delete.assert_called_once_with(del_repo_url)
 
@@ -94,10 +98,10 @@ class TestOrganizationSecrets(helper.UnitHelper):
         """
         self.instance.visibility = "all"
         with pytest.raises(ValueError):
-            self.instance.delete_selected_repository(123)
+            self.instance.remove_selected_repository(123)
         self.instance.visibility = "private"
         with pytest.raises(ValueError):
-            self.instance.delete_selected_repository(123)
+            self.instance.remove_selected_repository(123)
 
 
 class TestOrganizationSecretIterators(helper.UnitIteratorHelper):
@@ -112,7 +116,7 @@ class TestOrganizationSecretIterators(helper.UnitIteratorHelper):
         self.get_next(i)
 
         self.session.get.assert_called_once_with(
-            self.instance._selected_repos_url,
+            self.instance.selected_repositories_url,
             params={"per_page": 100},
             headers={},
         )

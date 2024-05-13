@@ -121,6 +121,11 @@ class OrganizationSecret(_Secret):
     .. attribute:: updated_at
 
         The timestamp of when the secret was last updated
+
+    .. attribute:: visibility
+
+        Specifies which type of organization repositories have access to
+        the secret. Can be one of all, private, selected.
     """
 
     class_name = "OrganizationSecret"
@@ -129,7 +134,9 @@ class OrganizationSecret(_Secret):
         super()._update_attributes(secret)
         self.visibility = secret["visibility"]
         if self.visibility == "selected":
-            self._selected_repos_url = secret["selected_repositories_url"]
+            self.selected_repositories_url = secret[
+                "selected_repositories_url"
+            ]
 
     def selected_repositories(self, number=-1, etag=""):
         """Iterates over all repositories this secret is visible to.
@@ -152,13 +159,13 @@ class OrganizationSecret(_Secret):
 
         return self._iter(
             int(number),
-            self._selected_repos_url,
+            self.selected_repositories_url,
             repos.ShortRepository,
             etag=etag,
             list_key="repositories",
         )
 
-    def set_selected_repositories(self, repository_ids: typing.List[int]):
+    def set_selected_repositories(self, repository_ids: typing.Sequence[int]):
         """Sets the selected repositories this secret is visible to.
 
         :param list[int] repository_ids:
@@ -177,7 +184,7 @@ class OrganizationSecret(_Secret):
         data = {"selected_repository_ids": repository_ids}
 
         return self._boolean(
-            self._put(self._selected_repos_url, json=data), 204, 404
+            self._put(self.selected_repositories_url, json=data), 204, 404
         )
 
     def add_selected_repository(self, repository_id: int):
@@ -199,10 +206,10 @@ class OrganizationSecret(_Secret):
                 "cannot add a repository when visibility is not 'selected'"
             )
 
-        url = "/".join([self._selected_repos_url, str(repository_id)])
+        url = "/".join([self.selected_repositories_url, str(repository_id)])
         return self._boolean(self._put(url), 204, 409)
 
-    def delete_selected_repository(self, repository_id: int):
+    def remove_selected_repository(self, repository_id: int):
         """Deletes a repository from the list of repositories this secret is
         visible to.
 
@@ -222,5 +229,5 @@ class OrganizationSecret(_Secret):
                 "cannot delete a repository when visibility is not 'selected'"
             )
 
-        url = "/".join([self._selected_repos_url, str(repository_id)])
+        url = "/".join([self.selected_repositories_url, str(repository_id)])
         return self._boolean(self._delete(url), 204, 409)
