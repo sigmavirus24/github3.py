@@ -7,6 +7,7 @@ returned by GitHub.
 
 import base64
 import json as jsonlib
+import typing
 
 import uritemplate as urit  # type: ignore
 
@@ -23,6 +24,7 @@ from .. import projects
 from .. import pulls
 from .. import users
 from .. import utils
+from ..actions import secrets as actionsecrets
 from ..issues import event as ievent
 from ..issues import label
 from ..issues import milestone
@@ -2887,6 +2889,140 @@ class _Repository(models.GitHubCore):
         if json and json.get("Last-Modified"):
             del json["Last-Modified"]
         return json
+
+    @decorators.requires_auth
+    def public_key(self) -> typing.Optional[actionsecrets.PublicKey]:
+        """Retrieves a repositories public-key for GitHub Actions secrets
+
+        :returns:
+            the public key of the repository
+        :rtype:
+            :class:`~github3.secrets.PublicKey`
+        """
+        url = self._build_url(
+            "repos", self.owner, self.name, "actions", "secrets", "public-key"
+        )
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(actionsecrets.PublicKey, json)
+
+    @decorators.requires_auth
+    def secrets(self, number=-1, etag=None):
+        """Iterate over all GitHub Actions secrets of a repository.
+
+        :param int number:
+            (optional), number of secrets to return.
+            Default: -1 returns all available secrets
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            Generator of repository secrets.
+        :rtype:
+            :class:`~github3.secrets.RepositorySecret`
+        """
+        url = self._build_url(
+            "repos", self.owner, self.name, "actions", "secrets"
+        )
+        return self._iter(
+            int(number),
+            url,
+            actionsecrets.RepositorySecret,
+            etag=etag,
+            list_key="secrets",
+        )
+
+    @decorators.requires_auth
+    def organization_secrets(self, number=-1, etag=None):
+        """Iterate over all GitHub Actions organization secrets that are
+        shared with this repository.
+
+        :param int number:
+            (optional), number of secrets to return.
+            Default: -1 returns all available secrets
+        :param str etag:
+            (optional), ETag from a previous request to the same endpoint
+        :returns:
+            Generator of shared organization secrets.
+        :rtype:
+            :class:`~github3.secrets.SharedOrganizationSecret`
+        """
+
+        url = self._build_url(
+            "repos", self.owner, self.name, "actions", "organization-secrets"
+        )
+        return self._iter(
+            int(number),
+            url,
+            actionsecrets.SharedOrganizationSecret,
+            etag=etag,
+            list_key="secrets",
+        )
+
+    @decorators.requires_auth
+    def secret(self, secret_name):
+        """Returns the repository secret with the given name.
+
+        :param str secret_name:
+            Name of the repository secret to obtain.
+        :returns:
+            The repository secret with the given name.
+        :rtype:
+            :class:`~github3.secrets.RepositorySecret`
+        """
+        url = self._build_url(
+            "repos", self.owner, self.name, "actions", "secrets", secret_name
+        )
+        json = self._json(self._get(url), 200)
+        return self._instance_or_null(actionsecrets.RepositorySecret, json)
+
+    @decorators.requires_auth
+    def create_or_update_secret(self, secret_name, encrypted_value):
+        """Creates or updates a repository secret.
+
+        :param str secret_name:
+            Name of the repository secret to be created or updated.
+        :param str encrypted_value:
+            The value of the secret which was previously encrypted
+            by the repositorie's public key.
+            Check
+            https://developer.github.com/v3/actions/secrets#create-or-update-a-repository-secret
+            for how to properly encrypt the secret value before using
+            this function.
+        :returns:
+            The secret that was just created or updated.
+        :rtype:
+            :class:`~github3.py.secrets.RepositorySecret`
+        """
+        data = {
+            "encrypted_value": encrypted_value,
+            "key_id": self.public_key().key_id,
+        }
+
+        url = self._build_url(
+            "repos", self.owner, self.name, "actions", "secrets", secret_name
+        )
+        response = self._put(url, json=data)
+        if response.status_code not in (201, 204):
+            raise exceptions.error_for(response)
+
+        # PUT for secrets does not return anything but having a secret
+        # object at least containing the timestamps would be nice
+        return self.secret(secret_name)
+
+    @decorators.requires_auth
+    def delete_secret(self, secret_name):
+        """Deletes a repository secret.
+
+        :param str secret_name:
+            The name of the secret to delete.
+        :returns:
+            A boolean indicating whether the secret was successfully deleted.
+        :rtype:
+            bool
+        """
+        url = self._build_url(
+            "repos", self.owner, self.name, "actions", "secrets", secret_name
+        )
+        return self._boolean(self._delete(url), 204, 404)
 
 
 class Repository(_Repository):

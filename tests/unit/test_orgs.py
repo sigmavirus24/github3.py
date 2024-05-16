@@ -318,6 +318,26 @@ class TestOrganization(helper.UnitHelper):
             url_for("memberships/username")
         )
 
+    def test_create_invalid_organization_secret(self):
+        """
+        Show that creating an organization secret with invalid values
+        will raise a ValueError.
+        """
+        with pytest.raises(ValueError):
+            self.instance.create_or_update_secret(
+                secret_name="foo",
+                encrypted_value="bar",
+                visibility="invalid",
+            )
+
+        with pytest.raises(ValueError):
+            self.instance.create_or_update_secret(
+                secret_name="foo",
+                encrypted_value="bar",
+                visibility="selected",
+                selected_repo_ids=None,
+            )
+
 
 class TestOrganizationRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Unit tests that ensure certain methods require authentication."""

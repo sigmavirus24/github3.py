@@ -1,5 +1,7 @@
 """Integration tests for methods implemented on Organization."""
 
+import datetime
+
 import pytest
 
 import github3
@@ -418,6 +420,189 @@ class TestOrganization(IntegrationHelper):
         assert len(hooks) > 0
         for hook in hooks:
             assert isinstance(hook, github3.orgs.OrganizationHook)
+
+
+class TestOrganizationSecrets(IntegrationHelper):
+    """Integration tests for organization secrets."""
+
+    encrypted_data = "9JgL1eNoSjB/9cmjYUI00ojLcLxidIgvspXw/g+vmEvlIgqafYXTe1sbVEsz3RyLEyu/"  # noqa: E501
+
+    def test_organization_public_key(self):
+        """
+        Test the ability to retrieve an organization public key.
+        """
+        self.token_login()
+        cassette_name = self.cassette_name("public_key")
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            public_key = org.public_key()
+
+        assert isinstance(public_key, github3.actions.secrets.PublicKey)
+        assert public_key.key_id == "568250167242549743"
+        assert (
+            public_key.key == "rHXYIm/JzMRLsG6814/8GKmJRlSYQh7FIOdCvHNODys="
+        )
+
+    def test_organization_secrets(self):
+        """
+        Test the ability to iterate over organization secrets.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("secrets")
+        secret_count = 0
+
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            secrets_iter = org.secrets()
+
+            for s in secrets_iter:
+                secret_count += 1
+                assert isinstance(
+                    s, github3.actions.secrets.OrganizationSecret
+                )
+                assert (
+                    s.name == "FOO_ORG_SECRET" or s.name == "BAR_ORG_SECRET"
+                )
+
+        assert secret_count == 2
+
+    def test_organization_secret(self):
+        """
+        Test the ability to fetch a single organization secret.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("secret")
+
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            secret = org.secret("FOO_ORG_SECRET")
+
+        assert isinstance(secret, github3.actions.secrets.OrganizationSecret)
+        assert secret.name == "FOO_ORG_SECRET"
+
+    def test_organization_create_or_update_secret(self):
+        """
+        Test the ability to create or update organization secrets.
+        """
+        self.token_login()
+        shared_repo_ids = [245713798, 517639342]
+
+        cassette_name = self.cassette_name("create_or_update_secret")
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            secret = org.create_or_update_secret(
+                "foo_secret", self.encrypted_data, "all", None
+            )
+
+            assert isinstance(
+                secret, github3.actions.secrets.OrganizationSecret
+            )
+            assert secret.name == "FOO_SECRET"
+            assert isinstance(secret.created_at, datetime.datetime)
+            assert isinstance(secret.updated_at, datetime.datetime)
+            assert secret.visibility == "all"
+            assert secret.selected_repositories() is None
+
+            shared_secret = org.create_or_update_secret(
+                "foo_shared_secret",
+                self.encrypted_data,
+                "selected",
+                shared_repo_ids,
+            )
+
+            assert isinstance(
+                shared_secret, github3.actions.secrets.OrganizationSecret
+            )
+            assert shared_secret.name == "FOO_SHARED_SECRET"
+            assert shared_secret.visibility == "selected"
+            shared_repos = shared_secret.selected_repositories()
+            assert shared_repos is not None
+
+            shared_repo_count = 0
+            for i in shared_repos:
+                shared_repo_count += 1
+                assert i.id in shared_repo_ids
+
+            assert shared_repo_count == 2
+
+    def test_organization_delete_secret(self):
+        """
+        Test the ability to delete an organization secret.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("delete_secret")
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            first_delete = org.delete_secret("foo_org_secret")
+            second_delete = org.delete_secret("foo_org_secret")
+
+        assert isinstance(first_delete, bool)
+        assert first_delete is True
+        assert isinstance(second_delete, bool)
+        assert second_delete is False
+
+    def test_add_repo_to_shared_secret(self):
+        """
+        Tests the ability to add a respository to a shared
+        organization secret.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("add_repo_to_shared_secret")
+        shared_repo_id_1 = 245713798
+        shared_repo_id_2 = 517639342
+
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            secret = org.create_or_update_secret(
+                "foo_shared_secret",
+                self.encrypted_data,
+                "selected",
+                [shared_repo_id_1],
+            )
+
+            success = secret.add_selected_repository(shared_repo_id_2)
+            assert success is True
+
+            shared_repos = secret.selected_repositories()
+            shared_repo_count = 0
+            for i in shared_repos:
+                shared_repo_count += 1
+                assert i.id in [shared_repo_id_1, shared_repo_id_2]
+            assert shared_repo_count == 2
+
+    def test_delete_repo_from_shared_secret(self):
+        """
+        Tests the ability to delete a respository from a shared
+        organization secret.
+        """
+        self.token_login()
+
+        cassette_name = self.cassette_name("delete_repo_from_shared_secret")
+        shared_repo_id_1 = 245713798
+        shared_repo_id_2 = 517639342
+
+        with self.recorder.use_cassette(cassette_name):
+            org = self.gh.organization("gardenlinux")
+            secret = org.create_or_update_secret(
+                "foo_shared_secret",
+                self.encrypted_data,
+                "selected",
+                [shared_repo_id_1, shared_repo_id_2],
+            )
+
+            success = secret.remove_selected_repository(shared_repo_id_2)
+            assert success is True
+
+            shared_repos = secret.selected_repositories()
+            shared_repo_count = 0
+            for i in shared_repos:
+                shared_repo_count += 1
+                assert i.id != shared_repo_id_2
+            assert shared_repo_count == 1
 
 
 class TestOrganizationHook(IntegrationHelper):
