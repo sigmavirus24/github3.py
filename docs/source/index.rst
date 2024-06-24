@@ -7,7 +7,7 @@ Release v\ |version|.
 github3.py is wrapper for the `GitHub API`_ written in python. The design of
 github3.py is centered around having a logical organization of the methods
 needed to interact with the API. In order to use it, you should get a token
-in `github <https://github.com/settings/tokens>`_ as password. 
+in `github <https://github.com/settings/tokens>`_ as password.
 As an example, let's get information about a user:
 
 .. code-block:: python
