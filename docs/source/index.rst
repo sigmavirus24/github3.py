@@ -6,14 +6,15 @@ Release v\ |version|.
 
 github3.py is wrapper for the `GitHub API`_ written in python. The design of
 github3.py is centered around having a logical organization of the methods
-needed to interact with the API. As an example, let's get information about a
-user:
+needed to interact with the API. In order to use it, you should get a token
+in `github <https://github.com/settings/tokens>`_ as password. 
+As an example, let's get information about a user:
 
 .. code-block:: python
 
     from github3 import login
 
-    gh = login('sigmavirus24', password='<password>')
+    gh = login('sigmavirus24', password='<github_token>')
 
     sigmavirus24 = gh.me()
     # <AuthenticatedUser [sigmavirus24:Ian Stapleton Cordasco]>
