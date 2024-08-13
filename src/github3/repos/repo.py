@@ -1162,7 +1162,7 @@ class _Repository(models.GitHubCore):
 
     @decorators.requires_auth
     def create_pull(
-        self, title, base, head, body=None, maintainer_can_modify=None
+        self, title, base, head, head_repo=None, body=None, maintainer_can_modify=None
     ):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
@@ -1171,7 +1171,9 @@ class _Repository(models.GitHubCore):
         :param str base:
             (required), e.g., 'master'
         :param str head:
-            (required), e.g., 'username:branch'
+            (required), e.g., 'username:branch' or 'branch' when using head_repo
+        :param str head_repo:
+            (optional), required for cross-repository pull requests if both repositories are owned by the same organization. e.g., 'organization/repository'
         :param str body:
             (optional), markdown formatted description
         :param bool maintainer_can_modify:
@@ -1185,6 +1187,8 @@ class _Repository(models.GitHubCore):
         data = {"title": title, "body": body, "base": base, "head": head}
         if maintainer_can_modify is not None:
             data["maintainer_can_modify"] = maintainer_can_modify
+        if head_repo is not None:
+            data["head_repo"] = head_repo
         return self._create_pull(data)
 
     @decorators.requires_auth
