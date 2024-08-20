@@ -228,3 +228,5 @@ Contributors
 - Chris Cotter (@ccotter)
 
 - Daniel Diniz (@devdanzin)
+
+- Jonas Brand (@8R0WNI3)
