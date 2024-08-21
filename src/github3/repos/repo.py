@@ -1162,7 +1162,13 @@ class _Repository(models.GitHubCore):
 
     @decorators.requires_auth
     def create_pull(
-        self, title, base, head, head_repo=None, body=None, maintainer_can_modify=None
+        self,
+        title,
+        base,
+        head,
+        head_repo=None,
+        body=None,
+        maintainer_can_modify=None,
     ):
         """Create a pull request of ``head`` onto ``base`` branch in this repo.
 
