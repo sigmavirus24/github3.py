@@ -9,10 +9,10 @@ repos:
       types: [yaml]
     - id: end-of-file-fixer
       types: [text]
-      stages: [Nonepre-commitNone, Nonepre-pushNone, manual]
+      stages: [pre-commit, pre-push, manual]
     - id: trailing-whitespace
       types: [text]
-      stages: [Nonepre-commitNone, Nonepre-pushNone, manual]
+      stages: [pre-commit, pre-push, manual]
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
