@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
     - id: check-added-large-files
     - id: check-toml
@@ -9,16 +9,16 @@ repos:
       types: [yaml]
     - id: end-of-file-fixer
       types: [text]
-      stages: [commit, push, manual]
+      stages: [pre-commit, pre-push, manual]
     - id: trailing-whitespace
       types: [text]
-      stages: [commit, push, manual]
+      stages: [pre-commit, pre-push, manual]
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
     hooks:
     - id: isort
   - repo: https://github.com/psf/black
-    rev: 24.8.0
+    rev: 24.10.0
     hooks:
     - id: black
   - repo: https://github.com/asottile/pyupgrade
