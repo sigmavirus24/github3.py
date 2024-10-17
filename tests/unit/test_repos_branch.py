@@ -15,6 +15,7 @@ url_for_sync = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/merge-upstream"
 )
 
+
 class TestBranch(helper.UnitHelper):
     """Branch unit tests."""
 

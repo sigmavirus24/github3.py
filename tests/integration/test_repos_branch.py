@@ -45,6 +45,9 @@ class TestBranch(IntegrationHelper):
             branch = repository.branch("main")
             result = branch.sync_with_upstream()
 
-        assert result["message"] == "Successfully fetched and fast-forwarded from upstream python:main."
+        assert (
+            result["message"]
+            == "Successfully fetched and fast-forwarded from upstream python:main."
+        )
         assert result["merge_type"] == "fast-forward"
         assert result["base_branch"] == "python:main"
