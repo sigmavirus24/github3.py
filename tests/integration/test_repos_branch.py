@@ -47,7 +47,7 @@ class TestBranch(IntegrationHelper):
 
         msg = (
             "Successfully fetched and fast-forwarded"
-            "from upstream python:main."
+            " from upstream python:main."
         )
         assert result["message"] == msg
         assert result["merge_type"] == "fast-forward"
