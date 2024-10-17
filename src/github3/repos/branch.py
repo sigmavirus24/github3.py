@@ -166,17 +166,13 @@ class _Branch(models.GitHubCore):
     def sync_with_upstream(self) -> t.Mapping[str, str]:
         """Synchronize this branch with the upstream.
 
-        .. warning::
-
-            This API endpoint is still in Beta per gitHub
-
         .. versionadded:: 3.0.0
 
         Sync a branch of a forked repository to keep it up-to-date with the
         upstream repository.
 
         See also:
-        https://docs.github.com/en/rest/reference/repos#sync-a-fork-branch-with-the-upstream-repository
+        https://docs.github.com/en/rest/branches/branches#sync-a-fork-branch-with-the-upstream-repository
 
         :returns:
             The dictionary described in the documentation
@@ -185,7 +181,7 @@ class _Branch(models.GitHubCore):
         """
         base = self._api.split("/branches", 1)[0]
         url = self._build_url("merge-upstream", base_url=base)
-        json = self._json(self._post(url), 200)
+        json = self._json(self._post(url, data={"branch": self.name}), 200)
         return json
 
     @decorators.requires_auth
