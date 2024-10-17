@@ -55,7 +55,7 @@ class TestBranchRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     example_data = get_example_data()
 
     def test_sync_with_upstream(self):
-        """Verify that syncing a branch with upstream requires authentication."""
+        """Verify that branch syncing with upstream requires authentication."""
         self.assert_requires_auth(self.instance.sync_with_upstream)
 
     def test_protect(self):
