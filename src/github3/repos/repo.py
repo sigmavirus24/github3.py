@@ -1393,6 +1393,23 @@ class _Repository(models.GitHubCore):
         return self._instance_or_null(git.Tree, json)
 
     @decorators.requires_auth
+    def create_dispatch_event(self, event_type, client_payload=None):
+        """Create a project for this repository.
+
+        :param str event_type:
+            (required), webhook event name
+        :param client_payload:
+            (optional), information about the webhook that may be used by the workflow
+        :returns:
+            True if successful, False otherwise
+        :rtype:
+        """
+        url = self._build_url("dispatches", base_url=self._api)
+        data = {"event_type": event_type, "client_payload": client_payload}
+        self._remove_none(data)
+        return self._boolean(self._post(url, data=data), 204, 404)
+    
+    @decorators.requires_auth
     def delete(self):
         """Delete this repository.
 
