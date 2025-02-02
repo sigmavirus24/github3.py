@@ -1394,7 +1394,7 @@ class _Repository(models.GitHubCore):
 
     @decorators.requires_auth
     def create_dispatch_event(self, event_type, client_payload=None):
-        """Create a project for this repository.
+        """Create a dispatch event for this repository.
 
         :param str event_type:
             (required), webhook event name
