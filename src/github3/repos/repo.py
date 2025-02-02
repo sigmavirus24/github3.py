@@ -1408,7 +1408,7 @@ class _Repository(models.GitHubCore):
         data = {"event_type": event_type, "client_payload": client_payload}
         self._remove_none(data)
         return self._boolean(self._post(url, data=data), 204, 404)
-    
+
     @decorators.requires_auth
     def delete(self):
         """Delete this repository.
