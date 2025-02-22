@@ -1399,7 +1399,8 @@ class _Repository(models.GitHubCore):
         :param str event_type:
             (required), webhook event name
         :param client_payload:
-            (optional), information about the webhook that may be used by the workflow
+            (optional), information about the webhook that may be used by the
+            workflow
         :returns:
             True if successful, False otherwise
         :rtype:
