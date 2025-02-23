@@ -110,11 +110,18 @@ class _Issue(models.GitHubCore):
             bool
         """
         assignee = self.assignee.login if self.assignee else ""
+        assignees = [a.login for a in self.assignees]
         number = self.milestone.number if self.milestone else None
         labels = [lbl.name for lbl in self.original_labels]
 
         return self.edit(
-            self.title, self.body, assignee, "closed", number, labels
+            self.title,
+            self.body,
+            assignee,
+            "closed",
+            number,
+            labels,
+            assignees,
         )
 
     def comment(self, id_num):
@@ -388,10 +395,11 @@ class _Issue(models.GitHubCore):
             bool
         """
         assignee = self.assignee.login if self.assignee else ""
+        assignees = [a.login for a in self.assignees]
         number = self.milestone.number if self.milestone else None
         labels = [str(lbl) for lbl in self.original_labels]
         return self.edit(
-            self.title, self.body, assignee, "open", number, labels
+            self.title, self.body, assignee, "open", number, labels, assignees
         )
 
     @requires_auth

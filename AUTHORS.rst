@@ -226,3 +226,5 @@ Contributors
 - Thomas Buchner (@MrBatschner)
 
 - Chris Cotter (@ccotter)
+
+- Jonas Brand (@8R0WNI3)
