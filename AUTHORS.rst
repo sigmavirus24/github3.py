@@ -226,3 +226,5 @@ Contributors
 - Thomas Buchner (@MrBatschner)
 
 - Chris Cotter (@ccotter)
+
+- Daniel Diniz (@devdanzin)
