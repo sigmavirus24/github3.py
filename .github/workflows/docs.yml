@@ -13,13 +13,21 @@ name: Check documentation
       - "**.rst"
       - "docs/**"
 
+permissions:
+  contents: read
+
 jobs:
   docs:
     name: Build documentation & check links
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: actions/setup-python@3605726ffa6ef7750b99ff496e5b88248b414e26 # v4.9.0
         with:
           python-version: "3.11"
 
@@ -39,7 +47,7 @@ jobs:
           TOXENV: docs
 
       - name: Upload documentation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3.2.1
         with:
           name: docs
           path: docs/build

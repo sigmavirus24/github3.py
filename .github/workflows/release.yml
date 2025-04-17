@@ -18,6 +18,11 @@ jobs:
       hashes: ${{ steps.hash.outputs.hashes }}
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
+
       - name: "Checkout repository"
         uses: "actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3"
 
@@ -69,6 +74,11 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
+    - name: Harden the runner (Audit all outbound calls)
+      uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+      with:
+        egress-policy: audit
+
     - name: "Download dists"
       uses: "actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a"
       with:
