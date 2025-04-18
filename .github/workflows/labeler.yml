@@ -22,7 +22,7 @@ jobs:
           egress-policy: audit
 
       - name: Check out the repository
-        uses: actions/checkout@a81bbbf8298c0fa03ea29cdc473d45769f953675 # v2.3.3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run Labeler
         uses: crazy-max/ghaction-github-labeler@52525cb66833763f651fc34e244e4f73b6e07ff5 # v3.1.1
