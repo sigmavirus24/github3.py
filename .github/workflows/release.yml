@@ -24,7 +24,7 @@ jobs:
           egress-policy: audit
 
       - name: "Checkout repository"
-        uses: "actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3"
+        uses: "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"
 
       - name: "Setup Python"
         uses: "actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55"
