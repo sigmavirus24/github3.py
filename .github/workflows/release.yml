@@ -80,7 +80,7 @@ jobs:
         egress-policy: audit
 
     - name: "Download dists"
-      uses: "actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a"
+      uses: "actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e"
       with:
         name: "dist"
         path: "dist/"
