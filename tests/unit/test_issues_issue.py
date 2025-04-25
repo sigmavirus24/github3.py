@@ -114,6 +114,7 @@ class TestIssue(helper.UnitHelper):
         """Verify the request for closing an issue."""
         self.instance.close()
         labels = [label.name for label in self.instance.original_labels]
+        assignees = [a.login for a in self.instance.assignees]
 
         self.patch_called_with(
             url_for(),
@@ -124,6 +125,7 @@ class TestIssue(helper.UnitHelper):
                 "milestone": self.instance.milestone.number or "",
                 "state": "closed",
                 "title": self.instance.title,
+                "assignees": assignees,
             },
         )
 
@@ -292,6 +294,7 @@ class TestIssue(helper.UnitHelper):
     def test_reopen(self):
         """Test the request for reopening an issue."""
         labels = [str(label) for label in self.instance.original_labels]
+        assignees = [a.login for a in self.instance.assignees]
         with unittest.mock.patch.object(Issue, "edit") as edit:
             self.instance.reopen()
             edit.assert_called_once_with(
@@ -301,6 +304,7 @@ class TestIssue(helper.UnitHelper):
                 "open",
                 self.instance.milestone.number,
                 labels,
+                assignees,
             )
 
     def test_replace_labels(self):
