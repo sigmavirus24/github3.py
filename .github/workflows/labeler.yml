@@ -6,14 +6,25 @@ on:
       - main
       - master
 
+permissions:
+  contents: read
+
 jobs:
   labeler:
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      issues: write  # for crazy-max/ghaction-github-labeler to create, rename, update and delete label
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
       - name: Check out the repository
-        uses: actions/checkout@v2.3.3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Run Labeler
-        uses: crazy-max/ghaction-github-labeler@v3.1.1
+        uses: crazy-max/ghaction-github-labeler@24d110aa46a59976b8a7f35518cb7f14f434c916 # v5.3.0
         with:
           skip-delete: true
