@@ -33,3 +33,22 @@ class TestBranch(IntegrationHelper):
             latest_sha = branch.latest_sha(differs_from=sha)
 
         assert not isinstance(latest_sha, bytes)
+
+    def test_sync_with_upstream(self):
+        self.token_login()
+        cassette_name = self.cassette_name("sync_with_upstream")
+        betamax_kwargs = {
+            "match_requests_on": ["method", "uri", "if-none-match"]
+        }
+        with self.recorder.use_cassette(cassette_name, **betamax_kwargs):
+            repository = self.gh.repository("devdanzin", "cpython")
+            branch = repository.branch("main")
+            result = branch.sync_with_upstream()
+
+        msg = (
+            "Successfully fetched and fast-forwarded"
+            " from upstream python:main."
+        )
+        assert result["message"] == msg
+        assert result["merge_type"] == "fast-forward"
+        assert result["base_branch"] == "python:main"

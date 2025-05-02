@@ -11,6 +11,9 @@ url_for_branches = helper.create_url_helper(
 url_for_commits = helper.create_url_helper(
     "https://api.github.com/repos/octocat/Hello-World/commits/master"
 )
+url_for_sync = helper.create_url_helper(
+    "https://api.github.com/repos/octocat/Hello-World/merge-upstream"
+)
 
 
 class TestBranch(helper.UnitHelper):
@@ -30,6 +33,13 @@ class TestBranch(helper.UnitHelper):
             url_for_commits(), headers=headers
         )
 
+    def test_sync_with_upstream(self):
+        """Verify the request fot syncing a branch with upstream."""
+        self.instance.sync_with_upstream()
+        self.session.post.assert_called_once_with(
+            url_for_sync(), '{"branch": "master"}'
+        )
+
     def test_unprotect(self):
         """Verify the request to unprotect a branch."""
         self.instance.unprotect()
@@ -43,6 +53,10 @@ class TestBranchRequiresAuth(helper.UnitRequiresAuthenticationHelper):
 
     described_class = github3.repos.branch.Branch
     example_data = get_example_data()
+
+    def test_sync_with_upstream(self):
+        """Verify that branch syncing with upstream requires authentication."""
+        self.assert_requires_auth(self.instance.sync_with_upstream)
 
     def test_protect(self):
         """Verify that protecting a branch requires authentication."""
