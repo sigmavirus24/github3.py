@@ -1,0 +1,11 @@
+4.1.0: 2025-xx-xx
+-----------------
+
+Features Added
+``````````````
+
+- Add support for multiple assignees for
+  :meth:`github3.issues.issue.Issue.close` and
+  :meth:`github3.issues.issue.Issue.reopen`. This prevents extra-assignees from
+  being unassigned if an issue is closed and allows re-opening the issue with
+  the same set of assignees.
