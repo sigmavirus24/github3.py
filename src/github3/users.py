@@ -309,50 +309,7 @@ class _User(models.GitHubCore):
 
     def __init__(self, json, session):
         if json is None:
-            #  from https://api.github.com/users/ghost
-            json = {
-                "login": "ghost",
-                "id": 10137,
-                "node_id": "MDQ6VXNlcjEwMTM3",
-                "avatar_url": "https://avatars.githubusercontent.com/u/10137?v"
-                "=4",
-                "gravatar_id": "",
-                "url": "https://api.github.com/users/ghost",
-                "html_url": "https://github.com/ghost",
-                "followers_url": "https://api.github.com/users/ghost/followers",
-                "following_url": "https://api.github.com/users/ghost/following"
-                "{/other_user}",
-                "gists_url": "https://api.github.com/users/ghost/gists{/gist_id"
-                "}",
-                "starred_url": "https://api.github.com/users/ghost/starred{/own"
-                "er}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/ghost/subscr"
-                "iptions",
-                "organizations_url": "https://api.github.com/users/ghost/orgs",
-                "repos_url": "https://api.github.com/users/ghost/repos",
-                "events_url": "https://api.github.com/users/ghost/events{/priva"
-                "cy}",
-                "received_events_url": "https://api.github.com/users/ghost/rece"
-                "ived_events",
-                "type": "User",
-                "user_view_type": "public",
-                "site_admin": False,
-                "name": "Deleted user",
-                "company": None,
-                "blog": "",
-                "location": "Nothing to see here, move along.",
-                "email": None,
-                "hireable": None,
-                "bio": "Hi, I'm @ghost! I take the place of user accounts that "
-                "have been deleted.\n:ghost:\n",
-                "twitter_username": None,
-                "public_repos": 0,
-                "public_gists": 0,
-                "followers": 11584,
-                "following": 0,
-                "created_at": "2008-05-13T06:14:25Z",
-                "updated_at": "2018-04-10T17:22:33Z",
-            }
+            json = _ghost_json
         super().__init__(json, session)
 
     def _update_attributes(self, user):
@@ -1021,3 +978,42 @@ class Contributor(_User):
 UserLike = t.Union[
     ShortUser, User, AuthenticatedUser, Collaborator, Contributor, str
 ]
+
+_ghost_json: t.Final[t.Dict[str, t.Any]] = {
+    #  from https://api.github.com/users/ghost
+    "login": "ghost",
+    "id": 10137,
+    "node_id": "MDQ6VXNlcjEwMTM3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/10137?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/ghost",
+    "html_url": "https://github.com/ghost",
+    "followers_url": "https://api.github.com/users/ghost/followers",
+    "following_url": "https://api.github.com/users/ghost/following{/other_user"
+    "}",
+    "gists_url": "https://api.github.com/users/ghost/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/ghost/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/ghost/subscriptions",
+    "organizations_url": "https://api.github.com/users/ghost/orgs",
+    "repos_url": "https://api.github.com/users/ghost/repos",
+    "events_url": "https://api.github.com/users/ghost/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/ghost/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": False,
+    "name": "Deleted user",
+    "company": None,
+    "blog": "",
+    "location": "Nothing to see here, move along.",
+    "email": None,
+    "hireable": None,
+    "bio": "Hi, I'm @ghost! I take the place of user accounts that have been "
+    "deleted.\n:ghost:\n",
+    "twitter_username": None,
+    "public_repos": 0,
+    "public_gists": 0,
+    "followers": 11584,
+    "following": 0,
+    "created_at": "2008-05-13T06:14:25Z",
+    "updated_at": "2018-04-10T17:22:33Z",
+}
