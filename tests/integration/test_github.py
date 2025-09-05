@@ -774,6 +774,17 @@ class TestGitHub(IntegrationHelper):
                 " encoded"
             )
 
+    def test_release_by_ghostuser(self):
+        """Test the ability to retrieve a release with "author: null" (ghost user)."""
+        cassette_name = self.cassette_name("release_author_null")
+        with self.recorder.use_cassette(cassette_name):
+            repository = self.gh.repository("qiskit-community", "qiskit-qec")
+        release = repository.release(63525446)
+
+        assert isinstance(release, github3.repos.release.Release)
+        assert isinstance(release.author, github3.users.ShortUser)
+        assert release.author.login == "ghost"
+
     def test_unfollow(self):
         """Test the ability to unfollow a user."""
         self.token_login()
