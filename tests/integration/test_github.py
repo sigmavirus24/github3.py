@@ -779,7 +779,7 @@ class TestGitHub(IntegrationHelper):
         cassette_name = self.cassette_name("release_author_null")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("qiskit-community", "qiskit-qec")
-        release = repository.release(63525446)
+            release = repository.release(63525446)
 
         assert isinstance(release, github3.repos.release.Release)
         assert isinstance(release.author, github3.users.ShortUser)
