@@ -14,7 +14,7 @@ repos:
       types: [text]
       stages: [pre-commit, pre-push, manual]
   - repo: https://github.com/PyCQA/isort
-    rev: 6.1.0
+    rev: 7.0.0
     hooks:
     - id: isort
   - repo: https://github.com/psf/black-pre-commit-mirror
@@ -22,7 +22,7 @@ repos:
     hooks:
     - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.0
     hooks:
     - id: pyupgrade
       args: [--py37-plus]
@@ -39,10 +39,10 @@ repos:
     hooks:
     - id: gitlint
   - repo: https://github.com/asottile/setup-cfg-fmt
-    rev: v2.8.0
+    rev: v3.1.0
     hooks:
     - id: setup-cfg-fmt
-      args: [--min-py3-version, '3.7']
+      args: [--min-py-version, '3.9']
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.28.0
     hooks:
