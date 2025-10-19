@@ -775,7 +775,7 @@ class TestGitHub(IntegrationHelper):
             )
 
     def test_release_by_ghostuser(self):
-        """Test the ability to retrieve a release with "author: null" (ghost user)."""
+        """Test to retrieve a release with "author: null" (ghost user)."""
         cassette_name = self.cassette_name("release_author_null")
         with self.recorder.use_cassette(cassette_name):
             repository = self.gh.repository("qiskit-community", "qiskit-qec")
