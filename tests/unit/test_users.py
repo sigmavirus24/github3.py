@@ -67,6 +67,21 @@ class TestUser(helper.UnitHelper):
         )
 
 
+class TestGhostUser(helper.UnitHelper):
+    """Test methods on Ghost User class."""
+
+    described_class = github3.users.User
+    example_data = get_users_example_data()
+
+    def after_setup(self):
+        self.instance = github3.users.User(None, self.session)
+
+    def test_str(self):
+        """Show that instance string and repr is ghost."""
+        assert str(self.instance) == "ghost"
+        assert repr(self.instance) == "<User [ghost:Deleted user]>"
+
+
 class TestUserGPGKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Unit tests that demonstrate which GPGKey methods require auth."""
 
