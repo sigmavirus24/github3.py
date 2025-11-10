@@ -18,11 +18,11 @@ repos:
     hooks:
     - id: isort
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.9.0
+    rev: 25.11.0
     hooks:
     - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.0
+    rev: v3.21.1
     hooks:
     - id: pyupgrade
       args: [--py37-plus]
@@ -44,6 +44,6 @@ repos:
     - id: setup-cfg-fmt
       args: [--min-py-version, '3.9']
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.29.0
     hooks:
     - id: gitleaks
