@@ -22,7 +22,7 @@ repos:
     hooks:
     - id: black
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.1
+    rev: v3.21.2
     hooks:
     - id: pyupgrade
       args: [--py37-plus]
@@ -44,6 +44,6 @@ repos:
     - id: setup-cfg-fmt
       args: [--min-py-version, '3.9']
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.29.0
+    rev: v8.29.1
     hooks:
     - id: gitleaks
