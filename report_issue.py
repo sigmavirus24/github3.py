@@ -65,9 +65,7 @@ body = """**Issue type**: {}
 ------
 
 *Generated with github3.py using the report_issue script*
-""".format(
-    issue_type, traceback, description
-)
+""".format(issue_type, traceback, description)
 
 i = repo.create_issue(title, body)
 
