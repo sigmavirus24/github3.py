@@ -24,13 +24,11 @@ class TestGist(IntegrationHelper):
         with self.recorder.use_cassette(cassette_name):
             gist = self.gh.gist("f396190a0d0047be791b")
             assert gist is not None
-            c = gist.create_comment(
-                """```ruby
+            c = gist.create_comment("""```ruby
             mac.split('').map.with_index do |v, i|
               positions.include?(i) ? ':' + v : v
             end
-            ```"""
-            )
+            ```""")
             assert isinstance(c, github3.gists.comment.GistComment)
 
     def test_commits(self):
