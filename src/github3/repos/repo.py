@@ -3589,5 +3589,5 @@ def repo_issue_params(
         issues.issue_params(None, state, labels, sort, direction, since)
     )
     if per_page:
-        params['per_page'] = per_page
+        params["per_page"] = per_page
     return params
