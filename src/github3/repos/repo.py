@@ -2019,6 +2019,7 @@ class _Repository(models.GitHubCore):
         since=None,
         number=-1,
         etag=None,
+        per_page=None,
     ):
         """Iterate over issues on this repo based upon parameters passed.
 
@@ -2069,6 +2070,7 @@ class _Repository(models.GitHubCore):
             sort,
             direction,
             since,
+            per_page,
         )
 
         return self._iter(int(number), url, issues.ShortIssue, params, etag)
@@ -3576,6 +3578,7 @@ def repo_issue_params(
     since=None,
     number=-1,
     etag=None,
+    per_page=None,
 ):
     """Validate and filter issue method parameters in one place."""
     params = {"assignee": assignee, "mentioned": mentioned}
@@ -3585,4 +3588,6 @@ def repo_issue_params(
     params.update(
         issues.issue_params(None, state, labels, sort, direction, since)
     )
+    if per_page:
+        params['per_page'] = per_page
     return params
