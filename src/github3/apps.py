@@ -160,8 +160,12 @@ def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
 
     :param bytes private_key_pem:
         The bytes of the private key for this GitHub Application.
-    :param int app_id:
-        The integer identifier for this GitHub Application.
+    :param int|str app_id:
+        The identifier for this GitHub Application. Previously this
+        was documented as an ``int``, however, PyJWT now requires it to be
+        a ``str`` so we are accepting both. In both cases it will be
+        coerced to a ``str``. We will *not* accept bytes and passing bytes
+        is expected to fail.
     :param int expire_in:
         The length in seconds for this token to be valid for.
         Default: 600 seconds (10 minutes)
@@ -174,7 +178,7 @@ def create_token(private_key_pem, app_id, expire_in=TEN_MINUTES_AS_SECONDS):
         raise ValueError('"private_key_pem" parameter must be byte-string')
     now = int(time.time())
     token = jwt.encode(
-        payload={"iat": now, "exp": now + expire_in, "iss": app_id},
+        payload={"iat": now, "exp": now + expire_in, "iss": str(app_id)},
         key=private_key_pem,
         algorithm="RS256",
     )
