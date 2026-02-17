@@ -481,6 +481,28 @@ class TestRepository(helper.IntegrationHelper):
 
         assert isinstance(pull_request, github3.pulls.ShortPullRequest)
 
+    def test_create_pull_head_repo(self):
+        """Test the ability to create a pull request by fully specifying the organization, repository, and branch."""
+        self.token_login()
+        cassette_name = self.cassette_name("create_pull")
+        with self.recorder.use_cassette(cassette_name):
+            original_repository = self.gh.repository(
+                "github3py", "github3.py"
+            )
+            repository = original_repository.create_fork(
+                organization="testgh3py"
+            )
+            pull_request = repository.create_pull(
+                title="Update forked repo",
+                base="master",
+                head="develop",
+                head_repo="testgh3py/github3.py",
+                body="Testing the ability to create a pull request",
+            )
+            repository.delete()
+
+        assert isinstance(pull_request, github3.pulls.ShortPullRequest)
+
     def test_create_pull_from_issue(self):
         """Verify creation of a pull request from an issue."""
         self.token_login()
