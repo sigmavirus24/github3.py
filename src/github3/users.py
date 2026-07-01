@@ -971,7 +971,31 @@ class Contributor(_User):
     _refresh_to = User
 
     def _update_attributes(self, contributor):
-        super()._update_attributes(contributor)
+        if "login" in contributor:
+            super()._update_attributes(contributor)
+            self.name = contributor.get("name")
+            self.email = contributor.get("email")
+        else:
+            self.avatar_url = None
+            self.events_urlt = None
+            self.followers_url = None
+            self.following_urlt = None
+            self.gists_urlt = None
+            self.gravatar_id = None
+            self.html_url = None
+            self.id = None
+            self.login = contributor.get("name") or contributor.get("email")
+            self.name = contributor.get("name")
+            self.email = contributor.get("email")
+            self.organizations_url = None
+            self.received_events_url = None
+            self.repos_url = None
+            self.site_admin = None
+            self.starred_urlt = None
+            self.subscriptions_url = None
+            self.type = None
+            self.url = self._api = None
+            self._uniq = self.login
         self.contributions_count = contributor["contributions"]
 
 
