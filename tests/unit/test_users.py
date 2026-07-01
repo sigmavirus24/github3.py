@@ -82,6 +82,30 @@ class TestGhostUser(helper.UnitHelper):
         assert repr(self.instance) == "<User [ghost:Deleted user]>"
 
 
+class TestContributor(helper.UnitHelper):
+    """Test methods on Contributor class."""
+
+    described_class = github3.users.Contributor
+    example_data = dict(get_users_example_data(), contributions=1)
+
+    def test_anonymous_contributor(self):
+        """Show that anonymous contributors are parsed."""
+        contributor = github3.users.Contributor(
+            {
+                "name": "Anonymous Contributor",
+                "email": "anonymous@example.com",
+                "contributions": 3,
+            },
+            self.session,
+        )
+
+        assert contributor.name == "Anonymous Contributor"
+        assert contributor.email == "anonymous@example.com"
+        assert contributor.login == "Anonymous Contributor"
+        assert contributor.contributions_count == 3
+        assert contributor.url is None
+
+
 class TestUserGPGKeyRequiresAuth(helper.UnitRequiresAuthenticationHelper):
     """Unit tests that demonstrate which GPGKey methods require auth."""
 
