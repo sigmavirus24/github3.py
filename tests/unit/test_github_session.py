@@ -40,7 +40,11 @@ class TestGitHubSession:
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
-            "GET", "http://example.com", params=None, allow_redirects=True, timeout=(4, 10)
+            "GET",
+            "http://example.com",
+            params=None,
+            allow_redirects=True,
+            timeout=(4, 10),
         )
 
     @unittest.mock.patch.object(requests.Session, "request")
@@ -149,7 +153,11 @@ class TestGitHubSession:
         r = s.get("http://example.com")
         assert r is response
         request_mock.assert_called_once_with(
-            "GET", "http://example.com", params=None, allow_redirects=True, timeout=(4, 10)
+            "GET",
+            "http://example.com",
+            params=None,
+            allow_redirects=True,
+            timeout=(4, 10),
         )
 
     @unittest.mock.patch.object(requests.Session, "request")
